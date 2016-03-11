@@ -25,11 +25,12 @@
     (> (/ ir-failed ir-total) (:erroneous-infrared-threshold config))))
 
 (defn- data-from-photos
-  [config filelist]
+  [state filelist]
   (let [photodata (into {} (map #(vector % (file-metadata %)) filelist))
         photos (map (fn [[k v]] v) photodata)]
-    (if (exceed-ir-threshold config photos)
-      (either/left "Erroneous IR threshold exceeded for dataset. Check date/time setting on camera.")
+    (if (exceed-ir-threshold (:config state) photos)
+      (either/left ((:translations state) (:language (:config state))
+                    :error/infrared-datetime-threshold-exceeded))
       (either/right photodata))))
 
 (defn- exif-data-file
@@ -42,18 +43,18 @@
        (not (some #(.isDirectory %) files))))
 
 (defn- process-dir
-  [config dir]
-  (let [files (filter exif-data-files (file-seq (io/file dir)))]
-    (vector dir (data-from-photos config files))))
+  [state dir]
+  (let [files (filter exif-data-file (file-seq (io/file dir)))]
+    (vector dir (data-from-photos state files))))
 
 (s/defn data-from-tree :- [s/enum cats.monad.either.Left cats.monad.either.Right]
   "Extract photo metadata from all directories in the root.
 Result is grouped by directory.  Only leaves containing (EXIF) photos are
 considered valid.  Result is Either an error or a map with the directory name
 and the photo metadata."
-  [config rootdir]
+  [state rootdir]
   {:pre [(instance? java.io.File rootdir)]}
   (let [dirname #(.getParent (io/file %))
         dirs (keys (filter (fn[[k v]] (exif-data-dir v))
                            (group-by dirname (file-seq rootdir))))]
-    (into {} (map (partial process-dir config) dirs))))
+    (into {} (map (partial process-dir state) dirs))))
