@@ -1,5 +1,5 @@
 (ns ctdp.core
-  (:require [ctdp.photoset :as ps]
+  (:require [ctdp.album-reader :as ar]
             [ctdp.config :refer :all]
             [ctdp.translations :refer :all]
             [cats.monad.either :as either]
@@ -12,4 +12,4 @@
         warn ((:translations state) (:language (:config state)) :error/warn)
         errfn #(printf "[%s] %s: %s\n" warn %1 %2)]
     (map (fn [[k v]] (either/branch v (partial errfn k) clojure.pprint/pprint))
-         (ps/data-from-tree state (clojure.java.io/file dir)))))
+         (ar/data-from-tree state (clojure.java.io/file dir)))))
