@@ -1,4 +1,4 @@
-(ns ctdp.photo-processor
+(ns ctdp.photo
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s])

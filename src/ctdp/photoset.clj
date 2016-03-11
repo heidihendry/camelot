@@ -1,8 +1,8 @@
-(ns ctdp.photoset-manager
+(ns ctdp.photoset
   (:require [clojure.java.io :as io]
             [clj-time.core :as t]
             [schema.core :as s]
-            [ctdp.photo-processor :refer [file-metadata]]
+            [ctdp.photo :refer [file-metadata]]
             [cats.monad.either :as either])
   (:import [com.drew.imaging ImageMetadataReader]))
 
