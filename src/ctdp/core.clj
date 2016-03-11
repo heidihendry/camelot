@@ -1,6 +1,9 @@
-(ns ctdp.core)
+(ns ctdp.core
+  (:require [ctdp.photoset-manager :as pm]
+            [ctdp.config :refer :all]
+            [cats.monad.either :as either]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(map (fn [[k v]] (either/branch v
+                                (partial printf "[WARNING] %s: %s" k)
+                                clojure.pprint/pprint))
+ (pm/data-from-tree config (clojure.java.io/file (:rootdir config))))
