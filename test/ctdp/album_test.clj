@@ -50,5 +50,4 @@
     (let [f (clojure.java.io/file "file")
           data {f maginon-metadata}
           result (album state data)]
-      (is (either/right? result))
-      (is (= (:make (:camera (get (m/extract result) f))) "Maginon")))))
+      (is (= (:make (:camera (get (:photos result) f))) "Maginon")))))

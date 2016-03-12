@@ -5,4 +5,5 @@
    :infrared-iso-value-threshold 999
    :language :en
    :night-end-hour 5
-   :night-start-hour 21})
+   :night-start-hour 21
+   :problems {:datetime :warn}})

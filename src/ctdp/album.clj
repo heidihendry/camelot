@@ -31,6 +31,5 @@
   (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise v)]) set-data))
         photos (map (fn [[k v]] v) album-data)]
     (if (exceed-ir-threshold (:config state) photos)
-      (either/left ((:translations state) (:language (:config state))
-                    :error/infrared-datetime-threshold-exceeded))
-      (either/right album-data))))
+      {:photos album-data :problems [:datetime]}
+      {:photos album-data})))
