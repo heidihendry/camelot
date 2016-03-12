@@ -64,8 +64,9 @@
     (assert (= (count parts) 6))
     (apply t/date-time (map #(Integer/parseInt %) parts))))
 
-(s/defn normalise :- PhotoMetadata [metadata]
+(s/defn normalise :- PhotoMetadata
   "Return a normalised data structure for the given vendor- and photo-specific metadata"
+  [metadata]
   (let [md #(get metadata %)
         cam (camera
              {:make (md "Make")
