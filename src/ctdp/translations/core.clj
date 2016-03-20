@@ -1,4 +1,4 @@
-(ns ctdp.translations
+(ns ctdp.translations.core
   (:require [ctdp.translations.en :refer :all])
   (:require [ctdp.translations.vn :refer :all]))
 

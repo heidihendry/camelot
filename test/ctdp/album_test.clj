@@ -4,9 +4,7 @@
             [ctdp.album :refer :all]
             [clj-time.core :as t]
             [schema.test :as st]
-            [ctdp.exif-test-metadata :refer :all]
-            [cats.monad.either :as either]
-            [cats.core :as m]))
+            [ctdp.exif-test-metadata :refer :all]))
 
 (use-fixtures :once st/validate-schemas)
 

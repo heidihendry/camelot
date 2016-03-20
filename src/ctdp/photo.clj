@@ -1,63 +1,21 @@
 (ns ctdp.photo
   (:require [clojure.string :as str]
             [clj-time.core :as t]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [ctdp.model.photo :as mp])
+  (:import [ctdp.model.photo Camera CameraSettings PhotoMetadata]))
 
-(s/defrecord CameraSettings
-    [aperture :- s/Str
-     exposure :- s/Str
-     flash :- s/Str
-     focal-length :- s/Str
-     fstop :- s/Str
-     iso :- s/Num
-     resolution-x :- s/Num
-     resolution-y :- s/Num])
+(s/defn night? :- s/Bool
+  [night-start night-end hour]
+  (or (> hour night-start) (< hour night-end)))
 
-(s/defrecord Camera
-    [make :- s/Str
-     model :- s/Str
-     software :- s/Str])
+(s/defn infrared-sane? :- s/Bool
+  [nightfn isothresh photo]
+  (let [hour (t/hour (:datetime photo))
+        iso (:iso (:settings photo))]
+    (or (> iso isothresh) (not (nightfn hour)))))
 
-(s/defrecord PhotoMetadata
-    [datetime :- org.joda.time.DateTime
-     description :- s/Str
-     filesize :- s/Num
-     camera :- Camera
-     settings :- CameraSettings])
-
-(s/defn camera :- Camera
-  "Camera constructor"
-  [{:keys [make model sw]}]
-  {:pre [(string? make)
-         (string? model)
-         (string? sw)]}
-  (->Camera make model sw))
-
-(s/defn camera-settings :- CameraSettings
-  "CameraSettings constructor"
-  [{:keys [aperture exposure flash focal-length fstop iso width height]}]
-  {:pre [(string? aperture)
-         (string? exposure)
-         (string? flash)
-         (string? focal-length)
-         (string? fstop)
-         (number? iso)
-         (number? width)
-         (number? height)]}
-  (->CameraSettings aperture exposure flash focal-length
-                    fstop iso width height))
-
-(s/defn photo :- PhotoMetadata
-  "Photo constructor"
-  [{:keys [datetime description filesize camera camera-settings]}]
-  {:pre [(instance? org.joda.time.DateTime datetime)
-         (string? description)
-         (number? filesize)
-         (instance? Camera camera)
-         (instance? CameraSettings camera-settings)]}
-  (->PhotoMetadata datetime description filesize camera camera-settings))
-
-(defn- exif-date-to-datetime
+(s/defn exif-date-to-datetime :- org.joda.time.DateTime
   "Exif metadata dates are strings like 2014:04:11 16:37:00.  This makes them real dates."
   [ed]
   (let [parts (str/split ed #"[ :]")]
@@ -68,11 +26,11 @@
   "Return a normalised data structure for the given vendor- and photo-specific metadata"
   [metadata]
   (let [md #(get metadata %)
-        cam (camera
+        cam (mp/camera
              {:make (md "Make")
               :model (md "Model")
               :sw (md "Software")})
-        camset (camera-settings
+        camset (mp/camera-settings
                 {:aperture (or (md "Aperture Value") "")
                  :exposure (md "Exposure Time")
                  :flash (md "Flash")
@@ -82,7 +40,7 @@
                  :width (read-string (md "Image Width"))
                  :height (read-string (md "Image Height"))}
                 )]
-    (photo
+    (mp/photo
      {:camera-settings camset
       :camera cam
       :datetime (exif-date-to-datetime (md "Date/Time"))

@@ -1,4 +1,6 @@
-(ns ctdp.config)
+(ns ctdp.config
+  (:require [ctdp.translations.core :refer :all]
+            [taoensso.tower :as tower]))
 
 (def config
   {:erroneous-infrared-threshold 0.2
@@ -7,3 +9,7 @@
    :night-end-hour 5
    :night-start-hour 21
    :problems {:datetime :warn}})
+
+(def state
+  {:config config
+   :translations (tower/make-t tconfig)})

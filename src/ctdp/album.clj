@@ -1,35 +1,32 @@
 (ns ctdp.album
   (:require [clj-time.core :as t]
             [schema.core :as s]
-            [ctdp.photo :as photo]
-            [cats.monad.either :as either]))
+            [ctdp.model.album :as ma]
+            [ctdp.photo :as photo]))
 
-(defn- night?
-  [night-start night-end hour]
-  (or (> hour night-start) (< hour night-end)))
-
-(defn- infrared-sane?
-  [nightfn isothresh photo]
-  (let [hour (t/hour (:datetime photo))
-        iso (:iso (:settings photo))
-        ir? (> iso isothresh)]
-    (or ir? (not (nightfn hour)))))
-
-(defn exceed-ir-threshold
+(s/defn exceed-ir-threshold :- s/Bool
   [config photos]
-  (let [isothresh (:infrared-iso-value-threshold config)
-        nightfn (partial night? (:night-start-hour config) (:night-end-hour config))
-        ir-fn (partial infrared-sane? nightfn isothresh)
-        ir-check (map ir-fn photos)
-        ir-failed (count (remove identity ir-check))
+  (let [nightfn (partial photo/night? (:night-start-hour config) (:night-end-hour config))
+        ir-check-fn (partial photo/infrared-sane? nightfn
+                             (:infrared-iso-value-threshold config))
+        ir-failed (count (remove identity (map ir-check-fn photos)))
         night-total (count (filter #(nightfn (t/hour (:datetime %))) photos))]
-    (when (not (zero? night-total))
-      (> (/ ir-failed night-total) (:erroneous-infrared-threshold config)))))
+    (if (not (zero? night-total))
+      (> (/ ir-failed night-total) (:erroneous-infrared-threshold config))
+      false)))
 
-(s/defn album
+(s/defn list-problems :- [s/Keyword]
+  [config album-data]
+  (if (exceed-ir-threshold config (map (fn [[k v]] v) album-data))
+    [:datetime]
+    []))
+
+(s/defn album :- ma/Album
   [state set-data]
-  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise v)]) set-data))
-        photos (map (fn [[k v]] v) album-data)]
-    (if (exceed-ir-threshold (:config state) photos)
-      {:photos album-data :problems [:datetime]}
-      {:photos album-data})))
+  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise v)]) set-data))]
+    {:photos album-data
+     :problems (list-problems (:config state) album-data)}))
+
+(s/defn album-set
+  [state tree-data]
+  (into {} (map (fn [[k v]] (vector k (album state v))) tree-data)))
