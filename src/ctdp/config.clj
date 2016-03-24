@@ -8,7 +8,9 @@
    :language :en
    :night-end-hour 5
    :night-start-hour 21
-   :problems {:datetime :warn}})
+   :problems {:datetime :warn}
+   :rename {:format "%s-%s"
+            :fields [[:camera :make] [:camera :model]]}})
 
 (def state
   {:config config

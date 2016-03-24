@@ -3,7 +3,6 @@
             [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
-            [ctdp.album :refer [album]]
             [ctdp.model.album :as ma])
   (:import [com.drew.imaging ImageMetadataReader]
            [ctdp.model.photo PhotoMetadata]))

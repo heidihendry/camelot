@@ -2,7 +2,8 @@
   (:require [ctdp.reader.dirtree :as r]
             [ctdp.album :as a]
             [ctdp.config :refer [state]]
-            [ctdp.problems :as problems]))
+            [ctdp.problems :as problems]
+            [ctdp.action.rename-photo :as rp]))
 
 (defn maybe-apply
   [f albsev]
@@ -23,7 +24,7 @@
 
 (defn run
   [dir]
-  (let [album-fn #(clojure.pprint/pprint %)]
+  (let [album-fn #(rp/rename-photos state %)]
     (->> dir
          (r/read-tree state)
          (a/album-set state)
