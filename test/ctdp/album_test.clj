@@ -48,3 +48,30 @@
           data {f maginon-metadata}
           result (album (gen-state config) data)]
       (is (= (:make (:camera (get (:photos result) f))) "Maginon")))))
+
+(def camera {:make "CamMaker" :model "MyCam"})
+(def chrono-first {:datetime (t/date-time 2015 1 1 0 0 0) :camera camera})
+(def chrono-second {:datetime (t/date-time 2015 1 1 12 0 0) :camera camera})
+(def chrono-third {:datetime (t/date-time 2015 1 2 5 0 0) :camera camera})
+(def chrono-last {:datetime (t/date-time 2015 1 2 12 0 0) :camera camera})
+
+(deftest test-extract-metadata
+  (testing "Start date is extracted"
+    (let [album [chrono-second chrono-first chrono-last chrono-third]
+          result (extract-metadata album)]
+      (is (= (:datetime chrono-first) (:datetime-start result)))))
+
+  (testing "End date is extracted"
+    (let [album [chrono-second chrono-first chrono-last chrono-third]
+          result (extract-metadata album)]
+      (is (= (:datetime chrono-last) (:datetime-end result)))))
+
+  (testing "Make is extracted"
+    (let [album [chrono-second chrono-first chrono-last chrono-third]
+          result (extract-metadata album)]
+      (is (= "CamMaker" (:make result)))))
+
+  (testing "Model is extracted"
+    (let [album [chrono-second chrono-first chrono-last chrono-third]
+          result (extract-metadata album)]
+      (is (= "MyCam" (:model result))))))
