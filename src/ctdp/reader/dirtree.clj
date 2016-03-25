@@ -16,11 +16,13 @@
   (and (.isFile file) (re-find #"(?i)(.jpe?g|.tiff?)$" (.getName file))))
 
 (defn- album-dir?
+  "Return true if there are exif-containing files and the directory hasn't any subdirectories. False otherwise."
   [files]
   (and (some exif-file? files)
        (not (some #(.isDirectory %) files))))
 
 (defn- parse-tag
+  "Map tag names to their descriptions, returning the result as a hash"
   [tag]
   (into {} (map #(hash-map (.getTagName %) (-> % (.getDescription) (str/trim))) tag)))
 

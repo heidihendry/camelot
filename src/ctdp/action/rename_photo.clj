@@ -7,6 +7,7 @@
   (:import [org.apache.commons.io FilenameUtils]))
 
 (s/defn stringify-field :- s/Str
+  "Return a given metadata field as a string."
   [config metadata extr]
   {:pre [(not (nil? extr))]}
   (let [time-fmt (tf/formatter (or (:date-format (:rename config))
@@ -17,6 +18,8 @@
       true extr)))
 
 (s/defn extract-all-fields :- [s/Str]
+  "Return a list of all fields needed for photo renaming.
+Throw IllegalStateException should fields not be present in the metadata."
   [state metadata]
   (let [fields (:fields (:rename (:config state)))
         extract (map #(reduce (fn [acc n] (get acc n)) metadata %) fields)
@@ -31,12 +34,15 @@
                    ((:translate state) :problems/rename-field-not-found problems)))))))
 
 (defn create-photo-name
+  "Return a file's desired basename (sans extension) as a string."
   [state metadata]
   (let [fmt (:format (:rename (:config state)))
         fd (extract-all-fields state metadata)]
     (apply format fmt fd)))
 
 (defn- generate-rename-actions
+  "Return a pair of source and destination filenames.
+Should renaming not be possible, return nil."
   [state [file metadata]]
   (let [new-name (create-photo-name state metadata)
         dir (.getParent file)
@@ -51,6 +57,7 @@
         [file new-file]))))
 
 (defn- rename-reducer
+  "Reducer for verifying uniqueness of the desired filenames."
   [acc [f t]]
   (let [v (get acc t)]
     (if (nil? v)
@@ -59,6 +66,8 @@
                     :sources (conj (get v :sources) f)}))))
 
 (defn- validate-renames
+  "Return all safe renames.
+If any rename may be conflicting, none of the renames are performed."
   [state renames]
   (let [chkdata (reduce rename-reducer {} renames)
         chkfail (filter (fn [[k v]] (when (> (:count v) 1)
@@ -72,12 +81,14 @@
           '()))))
 
 (defn apply-renames
+  "Reducer for updating photo filenames after modification."
   [album renames]
   (reduce (fn [alb [from to]]
             (dissoc (assoc alb to (get alb from)) from))
           album renames))
 
 (defn rename-photos
+  "Rename all photos in the given album."
   [state [dir album]]
   (println ((:translate state) :status/rename-photos (.getPath dir)))
   (let [renames (->> (:photos album)

@@ -6,10 +6,12 @@
   (:import [ctdp.model.photo Camera CameraSettings PhotoMetadata]))
 
 (s/defn night? :- s/Bool
+  "Check whether the given time is 'night'."
   [night-start night-end hour]
   (or (> hour night-start) (< hour night-end)))
 
 (s/defn infrared-sane? :- s/Bool
+  "Check whether the infraresh thresholds for a photo seem valid."
   [nightfn isothresh photo]
   (let [hour (t/hour (:datetime photo))
         iso (:iso (:settings photo))]
