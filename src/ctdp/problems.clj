@@ -17,7 +17,7 @@
 (defn problem-handler
   [state f dir severity problem]
   (let [klookup #(keyword (str "problems/" (name %)))
-        tlookup #((:translations state) (:language (:config state)) (klookup %))]
+        tlookup #((:translate state) (klookup %))]
     (when (> (get severities severity) (get severities :ignore))
       (f (tlookup severity) dir (tlookup problem)))
     severity))

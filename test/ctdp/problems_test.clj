@@ -1,6 +1,7 @@
 (ns ctdp.problems-test
   (:require [clojure.test :refer :all]
             [clojure.data :refer [diff]]
+            [ctdp.config :refer [gen-state]]
             [ctdp.problems :refer :all]))
 
 (deftest test-highest-severity
@@ -19,12 +20,11 @@
 (defn test-problem-handler-helper
   [f level]
   (problem-handler
-   { :translations (fn [a b] a)
-    :config {:language :en}}
+   (gen-state {:language :en})
    f
    nil
    level
-   :aproblem))
+   :problems/datetime))
 
 (deftest test-problem-handler
   (testing "Handler is ran when problem is not ignored"

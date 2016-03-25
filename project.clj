@@ -8,4 +8,5 @@
                  [prismatic/schema "1.0.5"]
                  [clj-time "0.11.0"]
                  [funcool/cats "1.2.1"]
-                 [com.taoensso/tower "3.1.0-beta4"]])
+                 [com.taoensso/tower "3.1.0-beta4"]
+                 [commons-io/commons-io "2.4"]])

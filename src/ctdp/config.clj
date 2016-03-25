@@ -10,8 +10,16 @@
    :night-start-hour 21
    :problems {:datetime :warn}
    :rename {:format "%s-%s"
-            :fields [[:camera :make] [:camera :model]]}})
+            :fields [[:datetime] [:camera :model]]
+            :date-format "YYYY-MM-dd HH.mm.ss"}})
 
-(def state
-  {:config config
-   :translations (tower/make-t tconfig)})
+(defn gen-translator
+  [config]
+  (let [tlookup (partial (tower/make-t tconfig) (:language config))]
+    (fn [t & vars]
+      (apply format (tlookup t) vars))))
+
+(defn gen-state
+  [conf]
+  {:config conf
+   :translate (gen-translator conf)})

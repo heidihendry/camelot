@@ -1,6 +1,7 @@
 (ns ctdp.action.rename-photo-test
   (:require [clojure.test :refer :all]
             [ctdp.album :refer :all]
+            [ctdp.config :refer [gen-state]]
             [clj-time.core :as t]
             [schema.test :as st]
             [taoensso.tower :as tower]
@@ -19,8 +20,7 @@
                     :camera-settings {:iso 9000}
                     :datetime (t/date-time 2015 01 01)}]
           (is (= ["CameraMaker" "CamModel"]
-                 (extract-all-fields {:config config
-                                      :translations (tower/make-t tconfig)} metadata)))))
+                 (extract-all-fields (gen-state config) metadata)))))
 
   (testing "Various data types are serialised to string"
     (let [paths [[:camera :make]
@@ -34,8 +34,7 @@
                     :camera-settings {:iso 9000}
                     :datetime (t/date-time 2015 01 01)}]
       (is (= ["CameraMaker" "9000" "2015/01/01"]
-             (extract-all-fields {:config config
-                                  :translations (tower/make-t tconfig)} metadata)))))
+             (extract-all-fields (gen-state config) metadata)))))
 
   (testing "Lookup should fail gracefully-ish"
     (let [paths [[:camTYPOera :make]
@@ -50,6 +49,5 @@
                     :datetime (t/date-time 2015 01 01)}]
       (is (thrown-with-msg? IllegalStateException
                             #"\[:camTYPOera :make\].*\[:camera-settings :TYPOiso\]"
-                            (extract-all-fields {:config config
-                                                 :translations (tower/make-t tconfig)}
+                            (extract-all-fields (gen-state config)
                                                 metadata))))))
