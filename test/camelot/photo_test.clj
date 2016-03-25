@@ -1,10 +1,10 @@
-(ns ctdp.photo-test
+(ns camelot.photo-test
   (:require [clojure.test :refer :all]
             [clojure.data :refer [diff]]
-            [ctdp.photo :refer :all]
+            [camelot.photo :refer :all]
             [schema.test :as st]
             [clj-time.core :as t]
-            [ctdp.exif-test-metadata :refer :all]))
+            [camelot.exif-test-metadata :refer :all]))
 
 (use-fixtures :once st/validate-schemas)
 

@@ -1,5 +1,5 @@
-(ns ctdp.config
-  (:require [ctdp.translations.core :refer :all]
+(ns camelot.config
+  (:require [camelot.translations.core :refer :all]
             [taoensso.tower :as tower]))
 
 (def config

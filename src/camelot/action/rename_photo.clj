@@ -1,4 +1,4 @@
-(ns ctdp.action.rename-photo
+(ns camelot.action.rename-photo
   (:require [schema.core :as s]
             [clj-time.format :as tf]
             [taoensso.tower :as tower]
@@ -26,7 +26,8 @@ Throw IllegalStateException should fields not be present in the metadata."
         problems (reduce-kv (fn [acc i v]
                               (if (nil? v)
                                 (conj acc (get fields i))
-                                acc)) [] (into [] extract))]
+                                acc))
+                            [] (into [] extract))]
     (if (empty? problems)
       (map #(stringify-field (:config state) metadata %) extract)
       (throw (java.lang.IllegalStateException.

@@ -1,4 +1,4 @@
-(ns ctdp.model.photo
+(ns camelot.model.photo
   (:require [schema.core :as s]))
 
 (s/defrecord CameraSettings

@@ -1,8 +1,8 @@
-(ns ctdp.album
+(ns camelot.album
   (:require [clj-time.core :as t]
             [schema.core :as s]
-            [ctdp.model.album :as ma]
-            [ctdp.photo :as photo]))
+            [camelot.model.album :as ma]
+            [camelot.photo :as photo]))
 
 (s/defn exceed-ir-threshold :- s/Bool
   "Check whether the album's photos exceed the user-defined infrared check thresholds."

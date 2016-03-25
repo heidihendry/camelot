@@ -1,4 +1,4 @@
-(ns ctdp.problems)
+(ns camelot.problems)
 
 (def severities
   "Error severities, with a corresponding weighting"

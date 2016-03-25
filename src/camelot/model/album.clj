@@ -1,7 +1,7 @@
-(ns ctdp.model.album
+(ns camelot.model.album
   (:require [schema.core :as s]
-            [ctdp.model.photo :as mp])
-  (:import [ctdp.model.photo PhotoMetadata]))
+            [camelot.model.photo :as mp])
+  (:import [camelot.model.photo PhotoMetadata]))
 
 (def RawMetadata {s/Str s/Str})
 

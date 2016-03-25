@@ -1,9 +1,9 @@
-(ns ctdp.photo
+(ns camelot.photo
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
-            [ctdp.model.photo :as mp])
-  (:import [ctdp.model.photo Camera CameraSettings PhotoMetadata]))
+            [camelot.model.photo :as mp])
+  (:import [camelot.model.photo Camera CameraSettings PhotoMetadata]))
 
 (s/defn night? :- s/Bool
   "Check whether the given time is 'night'."

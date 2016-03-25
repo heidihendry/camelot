@@ -1,6 +1,6 @@
-(ns ctdp.core-test
+(ns camelot.core-test
   (:require [clojure.test :refer :all]
-            [ctdp.core :refer :all]))
+            [camelot.core :refer :all]))
 
 ;(deftest a-test
 ;  (testing "FIXME, I fail."

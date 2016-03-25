@@ -1,4 +1,4 @@
-(ns ctdp.translations.en)
+(ns camelot.translations.en)
 
 (def t-en
   {:problems

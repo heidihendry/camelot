@@ -1,6 +1,6 @@
-(ns ctdp.exif-test-metadata
+(ns camelot.exif-test-metadata
   (:require [clojure.test :refer :all]
-            [ctdp.core :refer :all]))
+            [camelot.core :refer :all]))
 
 (def maginon-metadata
   {"Compression Type" "Baseline",
