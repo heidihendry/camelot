@@ -1,6 +1,6 @@
-(ns ctdp.translations.core
-  (:require [ctdp.translations.en :refer :all])
-  (:require [ctdp.translations.vn :refer :all]))
+(ns camelot.translations.core
+  (:require [camelot.translations.en :refer :all])
+  (:require [camelot.translations.vn :refer :all]))
 
 (def tconfig
   "Configuration for translations."

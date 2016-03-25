@@ -1,11 +1,11 @@
-(ns ctdp.album-test
+(ns camelot.album-test
   (:require [clojure.test :refer :all]
             [clojure.data :refer [diff]]
-            [ctdp.album :refer :all]
-            [ctdp.config :refer [gen-state]]
+            [camelot.album :refer :all]
+            [camelot.config :refer [gen-state]]
             [clj-time.core :as t]
             [schema.test :as st]
-            [ctdp.exif-test-metadata :refer :all]))
+            [camelot.exif-test-metadata :refer :all]))
 
 (use-fixtures :once st/validate-schemas)
 

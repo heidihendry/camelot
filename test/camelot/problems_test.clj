@@ -1,8 +1,8 @@
-(ns ctdp.problems-test
+(ns camelot.problems-test
   (:require [clojure.test :refer :all]
             [clojure.data :refer [diff]]
-            [ctdp.config :refer [gen-state]]
-            [ctdp.problems :refer :all]))
+            [camelot.config :refer [gen-state]]
+            [camelot.problems :refer :all]))
 
 (deftest test-highest-severity
   (testing "Error is highest severity"

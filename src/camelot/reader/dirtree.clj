@@ -1,11 +1,11 @@
-(ns ctdp.reader.dirtree
+(ns camelot.reader.dirtree
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
-            [ctdp.model.album :as ma])
+            [camelot.model.album :as ma])
   (:import [com.drew.imaging ImageMetadataReader]
-           [ctdp.model.photo PhotoMetadata]))
+           [camelot.model.photo PhotoMetadata]))
 
 (def RawAlbum {java.io.File ma/RawMetadata})
 

@@ -1,12 +1,12 @@
-(ns ctdp.action.rename-photo-test
+(ns camelot.action.rename-photo-test
   (:require [clojure.test :refer :all]
-            [ctdp.album :refer :all]
-            [ctdp.config :refer [gen-state]]
+            [camelot.album :refer :all]
+            [camelot.config :refer [gen-state]]
             [clj-time.core :as t]
             [schema.test :as st]
             [taoensso.tower :as tower]
-            [ctdp.translations.core :refer :all]
-            [ctdp.action.rename-photo :refer :all]))
+            [camelot.translations.core :refer :all]
+            [camelot.action.rename-photo :refer :all]))
 
 (use-fixtures :once st/validate-schemas)
 
