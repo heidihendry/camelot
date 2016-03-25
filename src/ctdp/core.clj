@@ -25,8 +25,9 @@
 (defn run
   [dir]
   (let [state (gen-state config)
-        album-fn #(rp/rename-photos state %)]
+        album-transform #(->> %
+                              (rp/rename-photos state))]
     (->> dir
          (r/read-tree state)
          (a/album-set state)
-         (run-albums state album-fn))))
+         (run-albums state album-transform))))
