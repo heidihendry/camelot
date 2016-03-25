@@ -71,6 +71,12 @@
             (doseq [f fs] (println "  *" (.getPath f))))
           '()))))
 
+(defn apply-renames
+  [album renames]
+  (reduce (fn [alb [from to]]
+            (dissoc (assoc alb to (get alb from)) from))
+          album renames))
+
 (defn rename-photos
   [state [dir album]]
   (println ((:translate state) :status/rename-photos (.getPath dir)))
@@ -80,4 +86,5 @@
                      (validate-renames state))]
     (doseq [[from to] renames]
       (println ((:translate state) :status/apply-rename (.getPath from) (.getPath to)))
-      (.renameTo from to))))
+      (.renameTo from to))
+    {dir (assoc album :photos (apply-renames (:photos album) renames))}))

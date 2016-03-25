@@ -50,4 +50,16 @@
       (is (thrown-with-msg? IllegalStateException
                             #"\[:camTYPOera :make\].*\[:camera-settings :TYPOiso\]"
                             (extract-all-fields (gen-state config)
-                                                metadata))))))
+                                                metadata)))))
+
+  (testing "Files should be renamed in the album data-structure"
+    (let [album {"file1" {:data "this was file1"}
+                 "file2" {:data "this was file2"}
+                 "file3" {:data "this was file3"}}
+          renames [["file1" "file-renamed1"]
+                   ["file2" "file-renamed2"]
+                   ["file3" "file-renamed3"]]
+          expected {"file-renamed1" {:data "this was file1"}
+                    "file-renamed2" {:data "this was file2"}
+                    "file-renamed3" {:data "this was file3"}}]
+      (is (= (apply-renames album renames) expected)))))
