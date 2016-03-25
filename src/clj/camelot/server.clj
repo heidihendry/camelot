@@ -1,17 +1,21 @@
-(ns camelot.core
-  (:gen-class)
+(ns camelot.server
   (:require [camelot.reader.dirtree :as r]
             [camelot.album :as a]
             [camelot.config :refer [gen-state config]]
             [camelot.problems :as problems]
             [camelot.action.rename-photo :as rp]
+            [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
-            [compojure.core :refer :all]
-            [compojure.route :as route]
-            [ring.util.response :as rsp]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]])
+            [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
+            [compojure.route :refer [resources]]
+            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+            [ring.middleware.gzip :refer [wrap-gzip]]
+            [ring.middleware.logger :refer [wrap-with-logger]]
+            [environ.core :refer [env]]
+            [ring.adapter.jetty :refer [run-jetty]])
   (:import [java.awt Desktop]
-           [java.net URI]))
+           [java.net URI])
+  (:gen-class))
 
 (defn maybe-apply
   "Apply function `f` to album, so long as there aren't any warnings'"
@@ -43,22 +47,32 @@
          (a/album-set state)
          (run-albums state album-transform))))
 
-(defroutes app-routes
-  (GET "/" [] (rsp/redirect "/index.html"))
-  (route/resources "/")
-  (route/not-found "Not Found"))
-
 (defn- start-browser
   []
-  (let [addr "http://localhost:3000/"
+  (if (not (env :camelot-launch-browser-disabled))
+    (let [addr "http://localhost:3000/"
           uri (new URI addr)]
       (try
         (if (Desktop/isDesktopSupported)
           (.browse (Desktop/getDesktop) uri))
         (catch java.lang.UnsupportedOperationException e
-          (sh "bash" "-c" (str "xdg-open " addr " 1> /dev/null 2>&1  &"))))))
+          (sh "bash" "-c" (str "xdg-open " addr " &> /dev/null &")))))))
 
-(def app
+(defroutes routes
+  (GET "/" _
+    {:status 200
+     :headers {"Content-Type" "text/html; charset=utf-8"}
+     :body (io/input-stream (io/resource "public/index.html"))})
+  (resources "/"))
+
+(def http-handler
   (do
     (start-browser)
-    (wrap-defaults app-routes site-defaults)))
+    (-> routes
+        (wrap-defaults api-defaults)
+        wrap-with-logger
+        wrap-gzip)))
+
+(defn -main [& [port]]
+  (let [port (Integer. (or port (env :port) 10555))]
+    (run-jetty http-handler {:port port :join? false})))
