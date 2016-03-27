@@ -141,4 +141,19 @@
                               {:species "Smiley Wolf" :quantity 5}]}]
           state (gen-state config)]
       (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 4
+                                                      "Smiley Wolf" 7}))
+
+  (fact "Results are correct regardless of ordering of input"
+    (let [album [{:datetime (t/date-time 2015 01 01 06 10 00)
+                  :sightings [{:species "Yellow Spotted Housecat" :quantity 2}]}
+                 {:datetime (t/date-time 2015 01 01 06 00 00)
+                  :sightings [{:species "Yellow Spotted Housecat" :quantity 1}
+                              {:species "Smiley Wolf" :quantity 2}]}
+                 {:datetime (t/date-time 2015 01 01 07 10 00)
+                  :sightings [{:species "Yellow Spotted Housecat" :quantity 2}
+                              {:species "Smiley Wolf" :quantity 5}]}
+                 {:datetime (t/date-time 2015 01 01 07 00 00)
+                  :sightings [{:species "Smiley Wolf" :quantity 1}]}]
+          state (gen-state config)]
+      (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 4
                                                       "Smiley Wolf" 7})))
