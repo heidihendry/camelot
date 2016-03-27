@@ -16,10 +16,15 @@
      model :- s/Str
      software :- s/Str])
 
+(s/defrecord Sightings
+    [species :- s/Str
+     count :- s/Num])
+
 (s/defrecord PhotoMetadata
     [datetime :- org.joda.time.DateTime
      description :- s/Str
      filesize :- s/Num
+     sightings :- [Sightings]
      camera :- Camera
      settings :- CameraSettings])
 
@@ -47,10 +52,11 @@
 
 (s/defn photo :- PhotoMetadata
   "Photo constructor"
-  [{:keys [datetime description filesize camera camera-settings]}]
+  [{:keys [datetime description filesize sightings camera camera-settings]}]
   {:pre [(instance? org.joda.time.DateTime datetime)
          (string? description)
          (number? filesize)
+         (s/validate [Sightings] sightings)
          (instance? Camera camera)
          (instance? CameraSettings camera-settings)]}
-  (->PhotoMetadata datetime description filesize camera camera-settings))
+  (->PhotoMetadata datetime description filesize sightings camera camera-settings))

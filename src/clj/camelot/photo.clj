@@ -45,6 +45,7 @@
     (mp/photo
      {:camera-settings camset
       :camera cam
+      :sightings []
       :datetime (exif-date-to-datetime (md "Date/Time"))
       :description (or (md "Description") "")
       :filesize (read-string (md "File Size"))})))
