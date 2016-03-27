@@ -1,5 +1,5 @@
 (ns camelot.action.rename-photo-test
-  (:require [clojure.test :refer :all]
+  (:require [midje.sweet :refer :all]
             [camelot.album :refer :all]
             [camelot.config :refer [gen-state]]
             [clj-time.core :as t]
@@ -8,10 +8,10 @@
             [camelot.translations.core :refer :all]
             [camelot.action.rename-photo :refer :all]))
 
-(use-fixtures :once st/validate-schemas)
+(namespace-state-changes (before :facts st/validate-schemas))
 
-(deftest field-data-extraction-test
-  (testing "Path lookup and extraction is successful"
+(facts "field data extraction"
+  (fact "Path lookup and extraction is successful"
     (let [paths [[:camera :make]
                  [:camera :model]]
           config {:rename {:fields paths} :language :en}
@@ -19,10 +19,9 @@
                              :model "CamModel"}
                     :camera-settings {:iso 9000}
                     :datetime (t/date-time 2015 01 01)}]
-          (is (= ["CameraMaker" "CamModel"]
-                 (extract-all-fields (gen-state config) metadata)))))
+      (extract-all-fields (gen-state config) metadata) => ["CameraMaker" "CamModel"]))
 
-  (testing "Various data types are serialised to string"
+  (fact "Various data types are serialised to string"
     (let [paths [[:camera :make]
                  [:camera-settings :iso]
                  [:datetime]]
@@ -33,10 +32,9 @@
                              :model "CamModel"}
                     :camera-settings {:iso 9000}
                     :datetime (t/date-time 2015 01 01)}]
-      (is (= ["CameraMaker" "9000" "2015/01/01"]
-             (extract-all-fields (gen-state config) metadata)))))
+      (extract-all-fields (gen-state config) metadata) => ["CameraMaker" "9000" "2015/01/01"]))
 
-  (testing "Lookup should fail gracefully-ish"
+  (fact "Lookup should fail gracefully-ish"
     (let [paths [[:camTYPOera :make]
                  [:camera-settings :TYPOiso]
                  [:datetime]]
@@ -47,12 +45,9 @@
                              :model "CamModel"}
                     :camera-settings {:iso 9000}
                     :datetime (t/date-time 2015 01 01)}]
-      (is (thrown-with-msg? IllegalStateException
-                            #"\[:camTYPOera :make\].*\[:camera-settings :TYPOiso\]"
-                            (extract-all-fields (gen-state config)
-                                                metadata)))))
+      (extract-all-fields (gen-state config) metadata) => (throws IllegalStateException #"\[:camTYPOera :make\].*\[:camera-settings :TYPOiso\]")))
 
-  (testing "Files should be renamed in the album data-structure"
+  (fact "Files should be renamed in the album data-structure"
     (let [album {"file1" {:data "this was file1"}
                  "file2" {:data "this was file2"}
                  "file3" {:data "this was file3"}}
@@ -62,4 +57,4 @@
           expected {"file-renamed1" {:data "this was file1"}
                     "file-renamed2" {:data "this was file2"}
                     "file-renamed3" {:data "this was file3"}}]
-      (is (= (apply-renames album renames) expected)))))
+      (apply-renames album renames) => expected)))

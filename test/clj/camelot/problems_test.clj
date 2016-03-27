@@ -1,21 +1,24 @@
 (ns camelot.problems-test
-  (:require [clojure.test :refer :all]
+  (:require [midje.sweet :refer :all]
             [clojure.data :refer [diff]]
+            [schema.test :as st]
             [camelot.config :refer [gen-state]]
             [camelot.problems :refer :all]))
 
-(deftest test-highest-severity
-  (testing "Error is highest severity"
-    (is (= :error (reduce highest-severity :okay [:okay :error :ignore :warn :info]))))
+(namespace-state-changes (before :facts st/validate-schemas))
 
-  (testing "Warn is second highest severity"
-    (is (= :warn (reduce highest-severity :okay [:okay :ignore :warn :info]))))
+(facts "highest severity"
+       (fact "Error is highest severity"
+             (reduce highest-severity :okay [:okay :error :ignore :warn :info]) => :error)
 
-  (testing "Info is third highest severity"
-    (is (= :info (reduce highest-severity :okay [:okay :info :ignore]))))
+       (fact "Warn is second highest severity"
+         (reduce highest-severity :okay [:okay :ignore :warn :info]) => :warn)
 
-  (testing "Ignore is higher severity than okay"
-    (is (= :ignore (reduce highest-severity :okay [:okay :ignore])))))
+       (fact "Info is third highest severity"
+         (reduce highest-severity :okay [:okay :info :ignore]) => :info)
+
+       (fact "Ignore is higher severity than okay"
+         (reduce highest-severity :okay [:okay :ignore]) => :ignore))
 
 (defn test-problem-handler-helper
   [f level]
@@ -26,15 +29,15 @@
    level
    :problems/datetime))
 
-(deftest test-problem-handler
-  (testing "Handler is ran when problem is not ignored"
+(facts test-problem-handler
+  (fact "Handler is ran when problem is not ignored"
     (let [v (atom 0)
           h (fn [a b c] (swap! v inc))]
       (test-problem-handler-helper h :info)
-      (is (= @v 1))))
+      @v => 1))
 
-  (testing "Handler is not ran when problem is ignored"
+  (fact "Handler is not ran when problem is ignored"
     (let [v (atom 0)
           h (fn [a b c] (swap! v inc))]
       (test-problem-handler-helper h :ignore)
-      (is (= @v 0)))))
+      @v = 0)))
