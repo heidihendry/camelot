@@ -1,23 +1,28 @@
 (defproject camelot "0.1.0-SNAPSHOT"
-  :description "Camera Trap Data Processing"
+  :description "Camelot - Camera Trap Management"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.7.228" :scope "provided"]
-                 [com.drewnoakes/metadata-extractor "2.8.1"]
-                 [prismatic/schema "1.0.5"]
+  :dependencies [[bk/ring-gzip "0.1.1"]
                  [clj-time "0.11.0"]
+                 [cljs-http "0.1.39"]
+                 [com.andrewmcveigh/cljs-time "0.4.0"]
+                 [com.drewnoakes/metadata-extractor "2.8.1"]
                  [com.taoensso/tower "3.1.0-beta4"]
                  [commons-io/commons-io "2.4"]
-                 [ring "1.4.0"]
-                 [ring/ring-defaults "0.2.0"]
-                 [bk/ring-gzip "0.1.1"]
-                 [ring.middleware.logger "0.5.0"]
                  [compojure "1.5.0"]
                  [environ "1.0.2"]
-                 [org.omcljs/om "1.0.0-alpha31"]]
+                 [org.clojure/clojurescript "1.7.228" :scope "provided"]
+                 [org.clojure/core.async "0.2.374"]
+                 [org.omcljs/om "1.0.0-alpha31"]
+                 [prismatic/schema "1.0.5"]
+                 [ring "1.4.0"]
+                 [ring-transit "0.1.4"]
+                 [ring.middleware.logger "0.5.0"]
+                 [ring/ring-defaults "0.2.0"]
+                 [org.clojure/clojure "1.8.0"]
+                 [midje "1.8.3"]]
 
   :plugins [[lein-cljsbuild "1.1.1"]
             [lein-environ "1.0.1"]]
