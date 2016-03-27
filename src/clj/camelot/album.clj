@@ -84,7 +84,9 @@
   [state album]
   (into {} (map (fn [[k v]] {k (reduce + (map :quantity v))})
                 (reduce #(reduce (partial independence-reducer state (:datetime %2)) %1
-                                 (:sightings %2)) {} album))))
+                                 (:sightings %2)) {} (sort #(t/before? (:datetime %1)
+                                                                       (:datetime %2))
+                                                           album)))))
 
 (s/defn extract-metadata :- ma/ExtractedMetadata
   "Return aggregated metadata for a given album"
