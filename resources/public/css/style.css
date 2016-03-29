@@ -1,3 +1,94 @@
-h1 {
-  text-decoration: underline;
+#app {
+    margin-top: 1rem;
+    margin-left: 2rem;
+    padding-bottom: 2rem;
+}
+
+#navigation .navbar-nav {
+    float: none;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+.nav {
+    width: 100%;
+    background: #eee;
+    margin: 0;
+    border-bottom: 1px solid #dfdfdf;
+}
+
+.nav ul {
+    list-style: none;
+    height: 100%;
+}
+
+.nav li {
+    display: inline-block;
+    margin: 0;
+    padding: 0.5rem 2rem;
+    border-right: 1px solid #dfdfdf;
+}
+
+.nav li a {
+    color: #666;
+    margin: 0;
+}
+
+.nav a:hover {
+    background: none;
+}
+
+#navigation .nav > li > a:hover {
+    background-color: inherit;
+}
+
+.navbar-nav li:last-child {
+    float: right;
+    border-right: none;
+    border-left: 1px solid #dfdfdf;
+}
+
+.settings-label {
+    display: block;
+    clear: both;
+    font-weight: normal;
+    font-size: 80%;
+}
+
+.settings-field {
+    margin-bottom: 1rem;
+}
+
+.nav li:hover {
+    cursor: pointer;
+    background: #ddd;
+    height: 100%;
+}
+
+#footer {
+    text-align: center;
+    width: 100%;
+    background: #333;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+#footer .version {
+    font-weight: normal;
+    color: #aaa;
+    font-size 80%;
+}
+
+#footer .developer {
+    display: block;
+    font-weight: normal;
+    color: #777;
+    font-size 80%;
+}
+
+#footer .developer a {
+    color: #777;
+    text-decoration: underline;
 }
