@@ -46,12 +46,19 @@
    #(identity %)
    #(-> % .getPath)))
 
+(defn retrieve-index
+  []
+  {:status 200
+   :headers {"Content-Type" "text/html; charset=utf-8"}
+   :body (io/input-stream (io/resource "public/index.html"))})
+
 (defroutes routes
-  (GET "/" _
-    {:status 200
-     :headers {"Content-Type" "text/html; charset=utf-8"}
-     :body (io/input-stream (io/resource "public/index.html"))})
-  (GET "/albums" [] (response (main/read-albums (gen-state config) "/home/chris/testdata")))
+  (GET "/" _ (retrieve-index))
+  (GET "/settings" _ (retrieve-index))
+  (GET "/dashboard" _ (retrieve-index))
+  (GET "/default-config" [] (response config))
+  (POST "/albums" {{config :config, dir :dir} :params}
+       (response (main/read-albums (gen-state config) dir)))
   (POST "/transit-test" {{time :t} :params} (response {:a time}))
   (resources "/"))
 
@@ -68,6 +75,9 @@
         wrap-with-logger
         wrap-gzip)))
 
-(defn -main [& [port]]
-  (let [port (Integer. (or port (env :camelot-port) 10555))]
-    (run-jetty http-handler {:port port :join? false})))
+(defn -main [& [mode directory]]
+  (case mode
+    "bscheck" (let [state (gen-state config)]
+                (main/consistency-check state (main/read-albums state directory)))
+    (let [port (Integer. (or (env :camelot-port) 10555))]
+      (run-jetty http-handler {:port port :join? false}))))

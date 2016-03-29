@@ -13,7 +13,7 @@
                  [commons-io/commons-io "2.4"]
                  [compojure "1.5.0"]
                  [environ "1.0.2"]
-                 [midje "1.8.3"]]
+                 [midje "1.8.3"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
@@ -23,6 +23,7 @@
                  [ring-transit "0.1.4"]
                  [ring.middleware.logger "0.5.0"]
                  [ring/ring-defaults "0.2.0"]
+                 [secretary "1.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.1"]
             [lein-environ "1.0.1"]]
