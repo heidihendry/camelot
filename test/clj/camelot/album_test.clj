@@ -22,26 +22,26 @@
 (facts "infrared threshold"
   (fact "A photo which uses IR at night is okay"
     (let [album [{:datetime night :settings {:iso 1000}}]]
-      (exceed-ir-threshold config album) => false))
+      (check-ir-threshold (gen-state config) album) => :pass))
 
   (fact "A photo which uses IR in the day is okay"
     (let [album [{:datetime day :settings {:iso 1000}}]]
-      (exceed-ir-threshold config album) => false))
+      (check-ir-threshold (gen-state config) album) => :pass))
 
   (fact "A photo which does not use IR at night is not okay"
     (let [album [{:datetime night :settings {:iso 999}}]]
-      (exceed-ir-threshold config album) => true))
+      (check-ir-threshold (gen-state config) album) => :fail))
 
   (fact "One valid and one invalid photo is not okay"
     (let [album [{:datetime night :settings {:iso 999}}
                  {:datetime day :settings {:iso 999}}]]
-      (exceed-ir-threshold config album) => true))
+      (check-ir-threshold (gen-state config) album) => :fail))
 
   (fact "Two valid and one invalid photos is okay"
     (let [album [{:datetime night :settings {:iso 999}}
                  {:datetime day :settings {:iso 1000}}
                  {:datetime night :settings {:iso 1000}}]]
-      (exceed-ir-threshold config album) => false)))
+      (check-ir-threshold (gen-state config) album) => :pass)))
 
 (facts "album creation"
   (fact "An album is created for a single file's metadata"
@@ -157,3 +157,59 @@
           state (gen-state config)]
       (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 4
                                                       "Smiley Wolf" 7})))
+
+(facts "Check: datetime std. dev"
+  (fact "Does not flag std. dev issues if date/times are perfectly consistent"
+    (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)}
+                 {:datetime (t/date-time 2015 01 01 06 10 00)}
+                 {:datetime (t/date-time 2015 01 01 06 20 00)}
+                 {:datetime (t/date-time 2015 01 01 06 30 00)}
+                 {:datetime (t/date-time 2015 01 01 06 40 00)}
+                 {:datetime (t/date-time 2015 01 01 06 50 00)}]]
+      (check-photo-stddev (gen-state config) album) => :pass))
+
+  (fact "Does not flag std. dev issues if date/times are within thresholds"
+    (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)}
+                 {:datetime (t/date-time 2015 01 14 06 10 00)}
+                 {:datetime (t/date-time 2015 01 17 06 20 00)}
+                 {:datetime (t/date-time 2015 01 10 06 30 00)}
+                 {:datetime (t/date-time 2015 01 28 06 40 00)}
+                 {:datetime (t/date-time 2015 01 21 06 50 00)}]]
+      (check-photo-stddev (gen-state config) album) => :pass))
+
+  (fact "Does flag std. dev issues if one or more date/times deviations are excessive"
+    (let [album [{:datetime (t/date-time 2015 1 1  6 00 00)}
+                 {:datetime (t/date-time 2015 3 24 6 10 00)}
+                 {:datetime (t/date-time 2015 3 25 6 20 00)}
+                 {:datetime (t/date-time 2015 3 26 6 30 00)}
+                 {:datetime (t/date-time 2015 3 27 6 40 00)}
+                 {:datetime (t/date-time 2015 3 28 6 40 00)}
+                 {:datetime (t/date-time 2015 3 30 6 40 00)}
+                 {:datetime (t/date-time 2015 4 2  6 40 00)}
+                 {:datetime (t/date-time 2015 4 4  6 40 00)}
+                 {:datetime (t/date-time 2015 4 6  6 00)}
+                 {:datetime (t/date-time 2015 4 7  6 40 00)}
+                 {:datetime (t/date-time 2015 4 10 6 50 00)}]]
+      (check-photo-stddev (gen-state config) album) => :fail)))
+
+(facts "Check: project start/end"
+  (fact "Passes if dates are within project start/end"
+    (let [config {:project-start (t/date-time 2015 1 1)
+                  :project-end (t/date-time 2015 6 1)}
+          album [{:datetime (t/date-time 2015 1 1 0 0 0)}
+                 {:datetime (t/date-time 2015 6 1 0 0 0)}]]
+      (check-project-dates (gen-state config) album) => :pass))
+
+  (fact "Fails if a date is prior to the project start"
+    (let [config {:project-start (t/date-time 2015 1 1)
+                  :project-end (t/date-time 2015 6 1)}
+          album [{:datetime (t/date-time 2014 12 31 0 0 0)}
+                 {:datetime (t/date-time 2015 6 1 0 0 0)}]]
+      (check-project-dates (gen-state config) album) => :fail))
+
+  (fact "Fails if a date is after the project end"
+    (let [config {:project-start (t/date-time 2015 1 1)
+                  :project-end (t/date-time 2015 6 1)}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)}
+                 {:datetime (t/date-time 2016 1 1 0 0 0)}]]
+      (check-project-dates (gen-state config) album) => :fail)))

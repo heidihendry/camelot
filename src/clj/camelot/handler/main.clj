@@ -37,6 +37,34 @@ Otherwise return the contents of the cache."
                      (a/album-set state)))
     @cache)
 
+(defn run-tests
+  [state acc [file alb]]
+  (let [tests {:photo-stddev a/check-photo-stddev
+               :project-dates a/check-project-dates
+               :time-light-sanity a/check-ir-threshold}]
+    (do
+      (assoc acc file
+             (remove nil?
+                     (map (fn [[t f]]
+                            (if (= (f state (vals (:photos alb))) :fail)
+                              t
+                              nil))
+                          tests))))))
+
+(defn consistency-check
+  "Check album consistency"
+  [state albums]
+  (println ((:translate state) :checks/starting))
+  (run! println (map (fn [[k v]]
+                       (str ((:translate state) :checks/failure-notice (.getPath k))
+                            "\n  * "
+                            (clojure.string/join
+                             "\n  * "
+                             (map #((:translate state)
+                                    (keyword (str "checks/" (name %))))
+                                  (seq v)))))
+                     (reduce (partial run-tests state) {} albums))))
+
 (defn run
   "Retrieve album data and apply transformations."
   [dir]

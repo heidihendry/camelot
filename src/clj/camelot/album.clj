@@ -1,25 +1,28 @@
 (ns camelot.album
   (:require [clj-time.core :as t]
+            [clj-time.coerce :as tc]
             [schema.core :as s]
             [camelot.model.album :as ma]
             [camelot.photo :as photo]))
 
-(s/defn exceed-ir-threshold :- s/Bool
+(s/defn check-ir-threshold :- s/Bool
   "Check whether the album's photos exceed the user-defined infrared check thresholds."
-  [config photos]
-  (let [nightfn (partial photo/night? (:night-start-hour config) (:night-end-hour config))
+  [state photos]
+  (let [nightfn (partial photo/night? (:night-start-hour (:config state)) (:night-end-hour (:config state)))
         ir-check-fn (partial photo/infrared-sane? nightfn
-                             (:infrared-iso-value-threshold config))
+                             (:infrared-iso-value-threshold (:config state)))
         ir-failed (count (remove identity (map ir-check-fn photos)))
         night-total (count (filter #(nightfn (t/hour (:datetime %))) photos))]
     (if (not (zero? night-total))
-      (> (/ ir-failed night-total) (:erroneous-infrared-threshold config))
-      false)))
+      (if (> (/ ir-failed night-total) (:erroneous-infrared-threshold (:config state)))
+        :fail
+        :pass)
+      :pass)))
 
 (s/defn list-problems :- [s/Keyword]
   "Return a list of all problems encountered while processing album data"
-  [config album-data]
-  (if (exceed-ir-threshold config (map (fn [[k v]] v) album-data))
+  [state album-data]
+  (if (= (check-ir-threshold state (map (fn [[k v]] v) album-data)) :fail)
     [:datetime]
     []))
 
@@ -103,9 +106,43 @@
   (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise v)]) set-data))]
     {:photos album-data
      :metadata (extract-metadata state (vals album-data))
-     :problems (list-problems (:config state) album-data)}))
+     :problems (list-problems state album-data)}))
 
 (s/defn album-set
   "Return a datastructure representing all albums and their metadata"
   [state tree-data]
   (into {} (map (fn [[k v]] (vector k (album state v))) tree-data)))
+
+(s/defn squares
+  [avg coll]
+  (map #(let [n (-' % avg)] (*' n n)) coll))
+
+(s/defn stddev
+  [coll]
+  (let [total (count coll)
+        mean (/ (reduce +' 0 coll) total)
+        squares (squares mean coll)]
+    (if (< total 2)
+      0
+      (Math/sqrt (/ (apply +' squares) (-' total 1))))))
+
+(s/defn check-photo-stddev
+  [state photos]
+  (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)
+        gettime #(-> % (:datetime) (tc/to-long))
+        ftime (gettime (first photos))
+        times (map #(-' (gettime %) ftime) photos)
+        sd (stddev times)]
+    (if (nil? (reduce #(if (> %2 (+' %1 (*' sd 3)))
+                         (reduced nil)
+                         %2) 0 (rest times)))
+     :fail
+     :pass)))
+
+(s/defn check-project-dates
+  [state photos]
+  (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
+    (if (or (t/before? (:datetime (first photos)) (:project-start (:config state)))
+            (t/after? (:datetime (last photos)) (:project-end (:config state))))
+      :fail
+      :pass)))

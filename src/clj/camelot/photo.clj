@@ -39,13 +39,33 @@
                  :focal-length (or (md "Focal Length") "")
                  :fstop (md "F-Number")
                  :iso (read-string (md "ISO Speed Ratings"))
+                 :orientation (or (md "Orientation") "")
                  :width (read-string (md "Image Width"))
-                 :height (read-string (md "Image Height"))}
-                )]
+                 :height (read-string (md "Image Height"))})
+        location (mp/location
+                  {:gps-lon (or (md "GPS Longitude") "")
+                   :gps-lon-ref (or (md "GPS Longitude Ref") "")
+                   :gps-lat (or (md "GPS Latitude") "")
+                   :gps-lat-ref (or (md "GPS Latitude Ref") "")
+                   :gps-alt (or (md "GPS Altitude") "")
+                   :gps-alt-ref (or (md "GPS Altitude Ref") "")
+                   :subloc (or (md "Sub-location") "")
+                   :city (or (md "City") "")
+                   :state (or (md "Province/State") "")
+                   :country (or (md "Country/Primary Location Name") "")
+                   :country-code (or (md "Country/Primary Location Code") "")
+                   :map-datum (or (md "GPS Map Datum") "")})]
     (mp/photo
      {:camera-settings camset
       :camera cam
-      :sightings []
+      :sightings [(mp/sighting {:species (or (md "Caption/Abstract") "")
+                                :quantity (read-string (or (md "Object Name") "0"))})]
       :datetime (exif-date-to-datetime (md "Date/Time"))
+      :headline (or (md "Headline") "")
+      :artist (or (md "Artist") "")
+      :phase (or (md "Source") "")
+      :copyright (or (md "Copyright Notice") "")
       :description (or (md "Description") "")
-      :filesize (read-string (md "File Size"))})))
+      :filename (read-string (md "File Name"))
+      :filesize (read-string (md "File Size"))
+      :location location})))
