@@ -6,8 +6,8 @@
 (def RawMetadata {s/Str s/Str})
 
 (def Sightings
-  {s/required-key :species} s/Str
-  {s/required-key :count} s/Num)
+  {(s/required-key :species) s/Str
+   (s/required-key :count) s/Num})
 
 (def ExtractedMetadata
   {(s/required-key :datetime-start) org.joda.time.DateTime

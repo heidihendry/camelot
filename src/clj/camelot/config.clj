@@ -1,5 +1,6 @@
 (ns camelot.config
   (:require [camelot.translations.core :refer :all]
+            [clj-time.core :as t]
             [taoensso.tower :as tower]))
 
 (def config
@@ -9,6 +10,8 @@
    :language :en
    :night-end-hour 5
    :night-start-hour 21
+   :project-start (t/date-time 2014 03 14)
+   :project-end (t/date-time 2015 01 24)
    :problems {:datetime :warn}
    :rename {:format "%s-%s"
             :fields [[:datetime] [:camera :model]]
