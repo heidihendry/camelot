@@ -13,6 +13,7 @@
    :project-start (t/date-time 2014 03 14)
    :project-end (t/date-time 2015 01 24)
    :problems {:datetime :warn}
+   :sighting-independence-minutes-threshold 20
    :rename {:format "%s-%s"
             :fields [[:datetime] [:camera :model]]
             :date-format "YYYY-MM-dd HH.mm.ss"}})
