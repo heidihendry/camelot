@@ -213,3 +213,32 @@
           album [{:datetime (t/date-time 2015 1 5 0 0 0)}
                  {:datetime (t/date-time 2016 1 1 0 0 0)}]]
       (check-project-dates (gen-state config) album) => :fail)))
+
+(facts "Check: camera check"
+  (fact "Albums with 2 camera checks on different days should pass"
+    (let [config {:project-start (t/date-time 2015 1 1)
+                  :project-end (t/date-time 2015 6 1)}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}
+                 {:datetime (t/date-time 2015 1 7 0 0 0)
+                  :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}]]
+      (check-camera-checks (gen-state config) album) => :pass))
+
+  (fact "Albums with 1 camera check should fail"
+    (let [config {:project-start (t/date-time 2015 1 1)
+                  :project-end (t/date-time 2015 6 1)}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :sightings [{:species "Smiley Wolf" :quantity 1}]}
+                 {:datetime (t/date-time 2015 1 7 0 0 0)
+                  :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}]]
+      (check-camera-checks (gen-state config) album) => :fail))
+
+  (fact "Albums with 2 camera checks on the same day should fail"
+    (let [config {:project-start (t/date-time 2015 1 1)
+                  :project-end (t/date-time 2015 6 1)}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}]]
+      (check-camera-checks (gen-state config) album) => :fail))
+  )

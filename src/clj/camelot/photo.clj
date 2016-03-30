@@ -66,6 +66,6 @@
       :phase (or (md "Source") "")
       :copyright (or (md "Copyright Notice") "")
       :description (or (md "Description") "")
-      :filename (read-string (md "File Name"))
+      :filename (md "File Name")
       :filesize (read-string (md "File Size"))
       :location location})))

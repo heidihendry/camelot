@@ -41,7 +41,8 @@ Otherwise return the contents of the cache."
   [state acc [file alb]]
   (let [tests {:photo-stddev a/check-photo-stddev
                :project-dates a/check-project-dates
-               :time-light-sanity a/check-ir-threshold}]
+               :time-light-sanity a/check-ir-threshold
+               :check-camera-checks a/check-camera-checks}]
     (do
       (assoc acc file
              (remove nil?

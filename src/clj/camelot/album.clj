@@ -146,3 +146,16 @@
             (t/after? (:datetime (last photos)) (:project-end (:config state))))
       :fail
       :pass)))
+
+(s/defn check-camera-checks
+  [state photos]
+  (let [has-check #(some (fn [x] (re-matches #"(?i).*camera.?check" (:species x)))
+                         (:sightings %))
+        as-day #(let [d (:datetime %)] (t/date-time (t/year d) (t/month d) (t/day d)))
+        check-photos (->> photos
+                          (filter has-check)
+                          (map as-day)
+                          (into #{}))]
+    (if (> (count check-photos) 1)
+      :pass
+      :fail)))
