@@ -37,8 +37,9 @@ echo "done"
 
 echo -n "Bumping to release version... "
 sed -i 's/\s"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT"$/ "\1"/' ${PROJECT_FILE}
-git commit -a -m "Version bump: $1"
-git tag -sa "v$1" -m "Release: $1"
+released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
+git commit -a -m "Version bump: $released_version"
+git tag -sa "v" -m "Release: $released_version"
 echo "done"
 
 echo -n "Running release build... "
