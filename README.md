@@ -1,5 +1,15 @@
 # camelot
+Camelot is software for Camera Trap data management and analysis.
 
+## Usage
+
+Camelot currently features two modes of operation: a very primitive web interface, and a simple command line data checker.  Of the two, only the command line version is operable.
+
+A Camera Trap project can be analysed with:
+
+```sh
+java -jar camelot-<version>.jar bscheck /path/to/allphotos
+```
 
 ## Development
 
