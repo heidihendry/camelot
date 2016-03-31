@@ -14,6 +14,10 @@
    :project-end (t/date-time 2015 01 24)
    :problems {:datetime :warn}
    :sighting-independence-minutes-threshold 20
+   :required-fields [[:headline] [:artist] [:phase] [:copyright]
+                     [:location :gps-longitude] [:location :gps-longitude-ref]
+                     [:location :gps-latitude] [:location :gps-latitude-ref]
+                     [:datetime] [:filename]]
    :rename {:format "%s-%s"
             :fields [[:datetime] [:camera :model]]
             :date-format "YYYY-MM-dd HH.mm.ss"}})

@@ -216,8 +216,7 @@
 
 (facts "Check: camera check"
   (fact "Albums with 2 camera checks on different days should pass"
-    (let [config {:project-start (t/date-time 2015 1 1)
-                  :project-end (t/date-time 2015 6 1)}
+    (let [config {}
           album [{:datetime (t/date-time 2015 1 5 0 0 0)
                   :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}
                  {:datetime (t/date-time 2015 1 7 0 0 0)
@@ -225,8 +224,7 @@
       (check-camera-checks (gen-state config) album) => :pass))
 
   (fact "Albums with 1 camera check should fail"
-    (let [config {:project-start (t/date-time 2015 1 1)
-                  :project-end (t/date-time 2015 6 1)}
+    (let [config {}
           album [{:datetime (t/date-time 2015 1 5 0 0 0)
                   :sightings [{:species "Smiley Wolf" :quantity 1}]}
                  {:datetime (t/date-time 2015 1 7 0 0 0)
@@ -234,11 +232,102 @@
       (check-camera-checks (gen-state config) album) => :fail))
 
   (fact "Albums with 2 camera checks on the same day should fail"
-    (let [config {:project-start (t/date-time 2015 1 1)
-                  :project-end (t/date-time 2015 6 1)}
+    (let [config {}
           album [{:datetime (t/date-time 2015 1 5 0 0 0)
                   :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}
                  {:datetime (t/date-time 2015 1 5 0 0 0)
                   :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}]]
-      (check-camera-checks (gen-state config) album) => :fail))
-  )
+      (check-camera-checks (gen-state config) album) => :fail)))
+
+(facts "Album headline consistency"
+  (fact "All files in an album containing the same headline should pass"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :headline "AB-ABC-01"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :headline "AB-ABC-01"}]]
+      (check-headline-consistency (gen-state config) album) => :pass))
+
+  (fact "Any one file not containing the same headline as the rest should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :headline "AB-ABC-01"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :headline "XY-PSQ-02"}]]
+      (check-headline-consistency (gen-state config) album) => :fail)))
+
+(facts "Required fields are respected"
+  (fact "Required fields present across all files should pass"
+    (let [config {:required-fields [[:headline] [:artist] [:phase] [:copyright]
+                                    [:location :gps-longitude] [:location :gps-longitude-ref]
+                                    [:location :gps-latitude] [:location :gps-latitude-ref]
+                                    [:datetime] [:filename]]}
+          album [{:datetime true
+                  :headline true
+                  :artist true
+                  :phase true
+                  :copyright true
+                  :location {:gps-longitude true
+                             :gps-longitude-ref true
+                             :gps-latitude true
+                             :gps-latitude-ref true}
+                  :filename true}]]
+      (check-required-fields (gen-state config) album) => :pass))
+
+  (fact "Required fields missing from any files should fail"
+    (let [config {:required-fields [[:headline] [:artist] [:phase] [:copyright]
+                                    [:location :gps-longitude] [:location :gps-longitude-ref]
+                                    [:location :gps-latitude] [:location :gps-latitude-ref]
+                                    [:datetime] [:filename]]}
+          ;; copyright missing
+          album [{:datetime true
+                  :headline true
+                  :artist true
+                  :phase true
+                  :location {:gps-longitude true
+                             :gps-longitude-ref true
+                             :gps-latitude true
+                             :gps-latitude-ref true}
+                  :filename true}]]
+      (check-required-fields (gen-state config) album) => :fail)))
+
+(facts "An album must have files"
+  (fact "An empty album fails"
+    (let [config {}
+          album []]
+      (check-album-has-data (gen-state config) album) => :fail))
+
+  (fact "An album with any files passes"
+    (let [config {:project-start (t/date-time 2015 1 1)
+                  :project-end (t/date-time 2015 6 1)}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)}]]
+      (check-album-has-data (gen-state config) album) => :pass)))
+
+(fact "Sighting consistency"
+  (fact "A sighting which has a species and quantity passes"
+    (let [config {}
+          album [{:sightings [{:species "Yellow Spotted Cat"
+                               :quantity 1}]}]]
+      (check-sighting-consistency (gen-state config) album) => :pass))
+
+  (fact "A sighting which has a species but no quantity fails"
+    (let [config {}
+          album [{:sightings [{:species "Yellow Spotted Cat"
+                               :quantity nil}]}]]
+      (check-sighting-consistency (gen-state config) album) => :fail))
+
+  (fact "A sighting which has a quantity but no species fails"
+    (let [config {}
+          album [{:sightings [{:species nil
+                               :quantity 1}]}]]
+      (check-sighting-consistency (gen-state config) album) => :fail))
+
+  (fact "An album which contains a bad sighting fails"
+    (let [config {}
+          album [{:sightings [{:species "Yellow Spotted Cat"
+                               :quantity 1}]}
+                 {:sightings [{:species nil
+                               :quantity 1}]}
+                 {:sightings [{:species "Smiley Wolf"
+                               :quantity 2}]}]]
+      (check-sighting-consistency (gen-state config) album) => :fail)))

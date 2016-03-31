@@ -1,5 +1,6 @@
 (ns camelot.action.rename-photo
   (:require [schema.core :as s]
+            [camelot.photo :as photo]
             [clj-time.format :as tf]
             [taoensso.tower :as tower]
             [clojure.java.io :as io]
@@ -22,7 +23,7 @@
 Throw IllegalStateException should fields not be present in the metadata."
   [state metadata]
   (let [fields (:fields (:rename (:config state)))
-        extract (map #(reduce (fn [acc n] (get acc n)) metadata %) fields)
+        extract (map (partial photo/extract-path-value metadata) fields)
         problems (reduce-kv (fn [acc i v]
                               (if (nil? v)
                                 (conj acc (get fields i))
