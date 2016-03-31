@@ -103,7 +103,7 @@
 (s/defn album :- ma/Album
   "Return the metadata for a single album, given raw tag data"
   [state set-data]
-  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise v)]) set-data))]
+  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise state v)]) set-data))]
     {:photos album-data
      :metadata (extract-metadata state (vals album-data))
      :problems (list-problems state album-data)}))
@@ -159,3 +159,33 @@
     (if (> (count check-photos) 1)
       :pass
       :fail)))
+
+(s/defn check-headline-consistency
+  [state photos]
+  (or (reduce #(when (not (= (:headline %1) (:headline %2)))
+                 (reduced :fail)) (first photos) (rest photos))
+      :pass))
+
+(s/defn check-required-fields
+  [state photos]
+  (let [fields (:required-fields (:config state))]
+    (or (reduce #(when (some nil? (map (partial photo/extract-path-value %2) fields))
+                   (reduced :fail)) nil
+                   photos)
+        :pass)))
+
+(s/defn check-album-has-data
+  [state photos]
+  (if (empty? photos)
+    :fail
+    :pass))
+
+(s/defn check-sighting-consistency
+  [state photos]
+  (or (reduce #(do (println %2)
+                (if (or (nil? (:quantity %2)) (nil? (:species %2)))
+                 (reduced :fail)
+                 %1))
+              :pass
+              (apply concat (map :sightings photos)))
+      :pass))

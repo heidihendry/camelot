@@ -26,46 +26,52 @@
 
 (s/defn normalise :- PhotoMetadata
   "Return a normalised data structure for the given vendor- and photo-specific metadata"
-  [metadata]
+  [state metadata]
   (let [md #(get metadata %)
         cam (mp/camera
              {:make (md "Make")
               :model (md "Model")
               :sw (md "Software")})
         camset (mp/camera-settings
-                {:aperture (or (md "Aperture Value") "")
+                {:aperture (md "Aperture Value")
                  :exposure (md "Exposure Time")
                  :flash (md "Flash")
-                 :focal-length (or (md "Focal Length") "")
+                 :focal-length (md "Focal Length")
                  :fstop (md "F-Number")
                  :iso (read-string (md "ISO Speed Ratings"))
-                 :orientation (or (md "Orientation") "")
+                 :orientation (md "Orientation")
                  :width (read-string (md "Image Width"))
                  :height (read-string (md "Image Height"))})
         location (mp/location
-                  {:gps-lon (or (md "GPS Longitude") "")
-                   :gps-lon-ref (or (md "GPS Longitude Ref") "")
-                   :gps-lat (or (md "GPS Latitude") "")
-                   :gps-lat-ref (or (md "GPS Latitude Ref") "")
-                   :gps-alt (or (md "GPS Altitude") "")
-                   :gps-alt-ref (or (md "GPS Altitude Ref") "")
-                   :subloc (or (md "Sub-location") "")
-                   :city (or (md "City") "")
-                   :state (or (md "Province/State") "")
-                   :country (or (md "Country/Primary Location Name") "")
-                   :country-code (or (md "Country/Primary Location Code") "")
-                   :map-datum (or (md "GPS Map Datum") "")})]
+                  {:gps-lon (md "GPS Longitude")
+                   :gps-lon-ref (md "GPS Longitude Ref")
+                   :gps-lat (md "GPS Latitude")
+                   :gps-lat-ref (md "GPS Latitude Ref")
+                   :gps-alt (md "GPS Altitude")
+                   :gps-alt-ref (md "GPS Altitude Ref")
+                   :subloc (md "Sub-location")
+                   :city (md "City")
+                   :state (md "Province/State")
+                   :country (md "Country/Primary Location Name")
+                   :country-code (md "Country/Primary Location Code")
+                   :map-datum (md "GPS Map Datum")})]
     (mp/photo
      {:camera-settings camset
       :camera cam
-      :sightings [(mp/sighting {:species (or (md "Caption/Abstract") "")
-                                :quantity (read-string (or (md "Object Name") "0"))})]
+      :sightings (if (or (md "Caption/Abstract") (md "Object Name"))
+                   [(mp/sighting {:species (md "Caption/Abstract")
+                                  :quantity (md "Object Name")})]
+                   [])
       :datetime (exif-date-to-datetime (md "Date/Time"))
-      :headline (or (md "Headline") "")
-      :artist (or (md "Artist") "")
-      :phase (or (md "Source") "")
-      :copyright (or (md "Copyright Notice") "")
-      :description (or (md "Description") "")
+      :headline (md "Headline")
+      :artist (md "Artist")
+      :phase (md "Source")
+      :copyright (md "Copyright Notice")
+      :description (md "Description")
       :filename (md "File Name")
       :filesize (read-string (md "File Size"))
       :location location})))
+
+(defn extract-path-value
+  [metadata path]
+  (reduce (fn [acc n] (get acc n)) metadata path))

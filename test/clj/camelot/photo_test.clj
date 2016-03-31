@@ -2,6 +2,7 @@
   (:require [midje.sweet :refer :all]
             [clojure.data :refer [diff]]
             [camelot.photo :refer :all]
+            [camelot.config :refer [gen-state]]
             [schema.test :as st]
             [clj-time.core :as t]
             [camelot.exif-test-metadata :refer :all]))
@@ -10,13 +11,15 @@
 
 (facts "metadata normalisation"
   (fact "Maginon metadata normalises okay"
-    (let [output (normalise maginon-metadata)]
+    (let [config []
+          output (normalise (gen-state config) maginon-metadata)]
       (:filesize output) => 1175819
       (:make (:camera output)) => "Maginon"
       (:datetime output) => (t/date-time 2014 4 11 16 37 52)))
 
   (fact "Cuddeback metadata normalises okay"
-    (let [output (normalise cuddeback-metadata)]
+    (let [config []
+          output (normalise (gen-state config) cuddeback-metadata)]
       (:filesize output) => 513653
       (:make (:camera output)) => "CUDDEBACK"
       (:datetime output) => (t/date-time 2014 4 11 19 47 46))))
