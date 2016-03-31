@@ -182,10 +182,9 @@
 
 (s/defn check-sighting-consistency
   [state photos]
-  (or (reduce #(do (println %2)
-                (if (or (nil? (:quantity %2)) (nil? (:species %2)))
+  (or (reduce #(if (or (nil? (:quantity %2)) (nil? (:species %2)))
                  (reduced :fail)
-                 %1))
+                 %1)
               :pass
               (apply concat (map :sightings photos)))
       :pass))
