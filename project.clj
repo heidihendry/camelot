@@ -17,7 +17,7 @@
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
-                 [org.omcljs/om "1.0.0-alpha31"]
+                 [org.omcljs/om "1.0.0-alpha31" :exclusions [com.cognitect/transit-cljs]]
                  [prismatic/schema "1.0.5"]
                  [ring "1.4.0"]
                  [ring-transit "0.1.4"]
@@ -101,8 +101,8 @@
                              [com.cemerick/piggieback "0.2.1"]
                              [org.clojure/tools.nrepl "0.2.12"]]
 
-              :plugins [[lein-figwheel "0.5.1"]
-                        [lein-doo "0.1.6"]]
+              :plugins [[lein-figwheel "0.5.1" :exclusions [org.clojure/clojure]]
+                        [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]]
 
               :cljsbuild {:builds
                           {:test
