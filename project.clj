@@ -116,6 +116,7 @@
              {:source-paths ^:replace ["src/clj"]
               :hooks [leiningen.cljsbuild]
               :omit-source true
+              :global-vars {*warn-on-reflection* true}
               :aot :all
               :cljsbuild {:builds
                           {:app
