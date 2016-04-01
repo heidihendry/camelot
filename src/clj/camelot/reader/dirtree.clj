@@ -3,9 +3,12 @@
             [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
-            [camelot.model.album :as ma])
+            [camelot.model.album :as ma]
+            [camelot.util.java-file :as f]
+            [camelot.util.image-metadata :as im])
   (:import [com.drew.imaging ImageMetadataReader]
-           [camelot.model.photo PhotoMetadata]))
+           [camelot.model.photo PhotoMetadata]
+           [java.io File]))
 
 (def RawAlbum {java.io.File ma/RawMetadata})
 
@@ -13,30 +16,30 @@
 
 (defn- exif-file?
   [file]
-  (and (.isFile file) (re-find #"(?i)(.jpe?g|.tiff?)$" (.getName file))))
+  (and (f/isFile file) (re-find #"(?i)(.jpe?g|.tiff?)$" (f/getName file))))
 
 (defn- album-dir?
   "Return true if there are exif-containing files and the directory hasn't any subdirectories. False otherwise."
   [files]
   (and (some exif-file? files)
-       (not (some #(.isDirectory %) files))))
+       (not (some f/isDirectory files))))
 
 (defn- parse-tag
   "Map tag names to their descriptions, returning the result as a hash"
   [tag]
-  (into {} (map #(hash-map (.getTagName %) (-> % (.getDescription) (str/trim))) tag)))
+  (into {} (map #(hash-map (im/getTagName %) (->> % (im/getDescription) (str/trim))) tag)))
 
 (s/defn file-metadata :- ma/RawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
   [reader file]
   (let [metadata (reader file)
-        tags (map #(.getTags %) (.getDirectories metadata))]
+        tags (map im/getTags (im/getDirectories metadata))]
     (into {} (map parse-tag tags))))
 
 (s/defn exif-files :- RawAlbum
   [state dir]
   (let [files (filter exif-file? (file-seq (io/file dir)))
-        reader #(ImageMetadataReader/readMetadata %)]
+        reader #(ImageMetadataReader/readMetadata ^File %)]
     (into {} (map #(vector % (file-metadata reader %)) files))))
 
 (s/defn read-tree :- RawAlbumSet
@@ -46,7 +49,7 @@ considered valid.  Result is Either an error or a map with the directory name
 and the photo metadata."
   [state root]
   {:pre [(string? root)]}
-  (let [dirname #(.getParentFile (io/file %))
+  (let [dirname #(f/getParentFile (io/file %))
         dirs (keys (filter (fn [[k v]] (album-dir? v))
                            (group-by dirname (file-seq (clojure.java.io/file root)))))]
     (into {} (map #(vector % (exif-files state %)) dirs))))
