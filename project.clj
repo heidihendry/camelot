@@ -1,4 +1,4 @@
-(defproject camelot "0.1.1-SNAPSHOT"
+(defproject camelot "0.1.1"
   :description "Camelot - Camera Trap Management"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -28,7 +28,7 @@
   :plugins [[lein-cljsbuild "1.1.1"]
             [lein-environ "1.0.1"]]
 
-  :min-lein-version "0.1.1-SNAPSHOT"
+  :min-lein-version "0.1.1"
 
   :source-paths ["src/clj" "src/cljs" "dev"]
 
