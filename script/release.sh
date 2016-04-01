@@ -26,8 +26,11 @@ lein check
 echo "done"
 
 echo -n "Compiling... "
-lein with-profiles -dev,+production compile
-lein with-profiles -dev,+uberjar cljsbuild once
+#lein with-profiles -dev,+production compile
+#lein with-profiles -dev,+uberjar cljsbuild once
+# Using uberjar over compile due to bug in Lein 2.6.1
+# https://github.com/technomancy/leiningen/issues/2096
+lein with-profiles -dev,-user,+uberjar uberjar
 echo "done"
 
 echo -n "Running tests... "
