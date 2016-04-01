@@ -5,7 +5,7 @@
             [camelot.model.album :as ma]
             [camelot.photo :as photo]))
 
-(s/defn check-ir-threshold :- s/Bool
+(defn check-ir-threshold
   "Check whether the album's photos exceed the user-defined infrared check thresholds."
   [state photos]
   (let [nightfn (partial photo/night? (:night-start-hour (:config state)) (:night-end-hour (:config state)))
@@ -18,13 +18,6 @@
         :fail
         :pass)
       :pass)))
-
-(s/defn list-problems :- [s/Keyword]
-  "Return a list of all problems encountered while processing album data"
-  [state album-data]
-  (if (= (check-ir-threshold state (map (fn [[k v]] v) album-data)) :fail)
-    [:datetime]
-    []))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."
@@ -100,19 +93,6 @@
    :model (extract-model album)
    :sightings (extract-independent-sightings state album)})
 
-(s/defn album :- ma/Album
-  "Return the metadata for a single album, given raw tag data"
-  [state set-data]
-  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise state v)]) set-data))]
-    {:photos album-data
-     :metadata (extract-metadata state (vals album-data))
-     :problems (list-problems state album-data)}))
-
-(s/defn album-set
-  "Return a datastructure representing all albums and their metadata"
-  [state tree-data]
-  (into {} (map (fn [[k v]] (vector k (album state v))) tree-data)))
-
 (s/defn squares
   [avg coll]
   (map #(let [n (-' % avg)] (*' n n)) coll))
@@ -126,7 +106,7 @@
       0
       (Math/sqrt (/ (apply +' squares) (-' total 1))))))
 
-(s/defn check-photo-stddev
+(defn check-photo-stddev
   [state photos]
   (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)
         gettime #(-> % (:datetime) (tc/to-long))
@@ -139,7 +119,7 @@
      :fail
      :pass)))
 
-(s/defn check-project-dates
+(defn check-project-dates
   [state photos]
   (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
     (if (or (t/before? (:datetime (first photos)) (:project-start (:config state)))
@@ -147,7 +127,7 @@
       :fail
       :pass)))
 
-(s/defn check-camera-checks
+(defn check-camera-checks
   [state photos]
   (let [has-check #(some (fn [x] (re-matches #"(?i).*camera.?check" (:species x)))
                          (:sightings %))
@@ -160,13 +140,13 @@
       :pass
       :fail)))
 
-(s/defn check-headline-consistency
+(defn check-headline-consistency
   [state photos]
   (or (reduce #(when (not (= (:headline %1) (:headline %2)))
                  (reduced :fail)) (first photos) (rest photos))
       :pass))
 
-(s/defn check-required-fields
+(defn check-required-fields
   [state photos]
   (let [fields (:required-fields (:config state))]
     (or (reduce #(when (some nil? (map (partial photo/extract-path-value %2) fields))
@@ -174,13 +154,13 @@
                    photos)
         :pass)))
 
-(s/defn check-album-has-data
+(defn check-album-has-data
   [state photos]
   (if (empty? photos)
     :fail
     :pass))
 
-(s/defn check-sighting-consistency
+(defn check-sighting-consistency
   [state photos]
   (or (reduce #(if (or (nil? (:quantity %2)) (nil? (:species %2)))
                  (reduced :fail)
@@ -189,7 +169,7 @@
               (apply concat (map :sightings photos)))
       :pass))
 
-(s/defn check-species
+(defn check-species
   [state photos]
   (let [m (->> photos
                (map #(map :species (:sightings %)))
@@ -202,3 +182,39 @@
     (if m
       :fail
       :pass)))
+
+(defn- problem-descriptions
+  [state problems]
+  (map #(hash-map :problem % :description ((:translate state) %)) problems))
+
+(s/defn list-problems :- [s/Keyword]
+  "Return a list of all problems encountered while processing album data"
+  [state album-data]
+  (let [tests {:photo-stddev check-photo-stddev
+               :project-dates check-project-dates
+               :time-light-sanity check-ir-threshold
+               :camera-checks check-camera-checks
+               :headline-consistency check-headline-consistency
+               :required-fields check-required-fields
+               :album-has-data check-album-has-data
+               :sighting-consistency check-sighting-consistency
+               :surveyed-species check-species}]
+    (remove nil?
+            (map (fn [[t f]]
+                   (if (= (f state (vals (:photos album-data))) :fail)
+                     t
+                     nil))
+                 tests))))
+
+(s/defn album :- ma/Album
+  "Return the metadata for a single album, given raw tag data"
+  [state set-data]
+  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise state v)]) set-data))]
+    {:photos album-data
+     :metadata (extract-metadata state (vals album-data))
+     :problems (problem-descriptions state (list-problems state album-data))}))
+
+(s/defn album-set
+  "Return a datastructure representing all albums and their metadata"
+  [state tree-data]
+  (into {} (map (fn [[k v]] (vector k (album state v))) tree-data)))

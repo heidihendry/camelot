@@ -16,7 +16,11 @@
    (s/required-key :model) s/Str
    (s/required-key :sightings) Sightings})
 
+(def Problem
+  {(s/required-key :problem) s/Keyword
+   (s/required-key :description) s/Str})
+
 (def Album
   {(s/required-key :photos) {java.io.File PhotoMetadata}
    (s/required-key :metadata) ExtractedMetadata
-   (s/required-key :problems) [s/Keyword]})
+   (s/required-key :problems) [Problem]})
