@@ -331,3 +331,16 @@
                  {:sightings [{:species "Smiley Wolf"
                                :quantity 2}]}]]
       (check-sighting-consistency (gen-state config) album) => :fail)))
+
+(facts "Species check"
+  (fact "Sightings with known species should pass"
+    (let [config {:surveyed-species ["Smiley Wolf"]}
+          album [{:sightings [{:species "smiley wolf"
+                               :quantity 1}]}]]
+      (check-species (gen-state config) album) => :pass))
+
+  (fact "Sightings with known species should pass"
+    (let [config {:surveyed-species ["Smiley Wolf"]}
+          album [{:sightings [{:species "yellow spotted cat"
+                               :quantity 1}]}]]
+      (check-species (gen-state config) album) => :fail)))

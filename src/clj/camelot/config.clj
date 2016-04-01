@@ -14,6 +14,28 @@
    :project-end (t/date-time 2015 01 24)
    :problems {:datetime :warn}
    :sighting-independence-minutes-threshold 20
+   :surveyed-species ["Atherurus macrourus"
+                      "Cervus unicolor"
+                      "Chrotogale owstoni"
+                      "Homo sapiens"
+                      "HUMAN-CAMERACHECK"
+                      "Lophura diardi"
+                      "Lophura nycthemera"
+                      "Macaca arctoides"
+                      "Macaca assamensis"
+                      "Macaca mulatta"
+                      "Martes flavigula"
+                      "Muntiacus muntjac"
+                      "Nomascus concolor"
+                      "Nycticebus bengalensis"
+                      "Paguma larvata"
+                      "Paradoxurus hermaphroditus"
+                      "Pardofelis marmorata"
+                      "Prionailurus bengalensis"
+                      "Prionodon pardicolor"
+                      "Sus scrofa"
+                      "Tragopan temmnickii"
+                      "Ursus thibetanus"]
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
                      [:location :gps-longitude] [:location :gps-longitude-ref]
                      [:location :gps-latitude] [:location :gps-latitude-ref]
