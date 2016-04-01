@@ -3,7 +3,8 @@
             [camelot.album :as a]
             [camelot.config :refer [gen-state config]]
             [camelot.problems :as problems]
-            [camelot.action.rename-photo :as rp]))
+            [camelot.action.rename-photo :as rp]
+            [camelot.util.java-file :as f]))
 
 (def cache
   "The contents of the album set and metadata"
@@ -45,7 +46,7 @@ Otherwise return the contents of the cache."
   [state albums]
   (println ((:translate state) :checks/starting))
   (run! println (map (fn [[k v]]
-                       (str ((:translate state) :checks/failure-notice (.getPath k))
+                       (str ((:translate state) :checks/failure-notice (f/getPath k))
                             "\n  * "
                             (clojure.string/join
                              "\n  * "

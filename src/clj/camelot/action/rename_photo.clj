@@ -4,8 +4,10 @@
             [clj-time.format :as tf]
             [taoensso.tower :as tower]
             [clojure.java.io :as io]
-            [clojure.string :as str])
-  (:import [org.apache.commons.io FilenameUtils]))
+            [clojure.string :as str]
+            [camelot.util.java-file :as f])
+  (:import [org.apache.commons.io FilenameUtils]
+           [java.io File]))
 
 (s/defn stringify-field :- s/Str
   "Return a given metadata field as a string."
@@ -47,15 +49,15 @@ Throw IllegalStateException should fields not be present in the metadata."
 Should renaming not be possible, return nil."
   [state [file metadata]]
   (let [new-name (create-photo-name state metadata)
-        dir (.getParent file)
-        extension (FilenameUtils/getExtension (.getName file))
-        basename (FilenameUtils/removeExtension (.getName file))
+        dir (f/getParent file)
+        extension (FilenameUtils/getExtension (f/getName file))
+        basename (FilenameUtils/removeExtension (f/getName file))
         new-file (io/file (str dir "/" new-name "." (str/lower-case extension)))]
     (when (not (= file new-file))
-      (if (.exists new-file)
+      (if (f/exists new-file)
         (println (str ((:translate state) :problems/warn)
                       ((:translate state) :problems/rename-existing-conflict
-                       (.toPath file) (.toPath new-file))))
+                       (f/toPath file) (f/toPath new-file))))
         [file new-file]))))
 
 (defn- rename-reducer
@@ -78,8 +80,8 @@ If any rename may be conflicting, none of the renames are performed."
     (if (empty? chkfail)
       renames
       (do (doseq [[k {fs :sources}] chkfail]
-            (println (str ((:translate state) :problems/rename-conflict (.getPath k))))
-            (doseq [f fs] (println "  *" (.getPath f))))
+            (println (str ((:translate state) :problems/rename-conflict (f/getPath k))))
+            (doseq [f fs] (println "  *" (f/getPath f))))
           '()))))
 
 (defn apply-renames
@@ -92,12 +94,12 @@ If any rename may be conflicting, none of the renames are performed."
 (defn rename-photos
   "Rename all photos in the given album."
   [state [dir album]]
-  (println ((:translate state) :status/rename-photos (.getPath dir)))
+  (println ((:translate state) :status/rename-photos (f/getPath dir)))
   (let [renames (->> (:photos album)
                      (map #(generate-rename-actions state %))
                      (remove nil?)
                      (validate-renames state))]
     (doseq [[from to] renames]
-      (println ((:translate state) :status/apply-rename (.getPath from) (.getPath to)))
-      (.renameTo from to))
+      (println ((:translate state) :status/apply-rename (f/getPath from) (f/getPath to)))
+      (f/renameTo from to))
     {dir (assoc album :photos (apply-renames (:photos album) renames))}))

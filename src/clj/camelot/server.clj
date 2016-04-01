@@ -14,10 +14,12 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [cognitect.transit :as transit]
-            [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]])
+            [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
+            [camelot.util.java-file :refer [getPath]])
   (:import [java.awt Desktop]
            [java.net URI]
-           [org.joda.time DateTime])
+           [org.joda.time DateTime]
+           [java.io File])
   (:gen-class))
 
 (defn- start-browser
@@ -27,24 +29,28 @@
           uri (new URI addr)]
       (try
         (if (Desktop/isDesktopSupported)
-          (.browse (Desktop/getDesktop) uri))
+          (.browse ^Desktop (Desktop/getDesktop) uri))
         (catch java.lang.UnsupportedOperationException e
           (sh "bash" "-c" (str "xdg-open " addr " &> /dev/null &")))))))
 
-(def joda-time-reader (transit/read-handler #(DateTime. (Long/parseLong %))))
-(def file-reader (transit/read-handler #(java.io.File. (Long/parseLong %))))
+(def joda-time-reader (transit/read-handler #(DateTime. ^java.lang.Long (Long/parseLong %))))
+(def file-reader (transit/read-handler #(File. ^java.lang.Long (Long/parseLong %))))
+
+(defn getTime
+  []
+  #(.getTime ^java.util.Date %))
 
 (def joda-time-writer
   (transit/write-handler
    (constantly "m")
-   #(-> % c/to-date .getTime)
-   #(-> % c/to-date .getTime .toString)))
+   #(-> % c/to-date getTime)
+   #(-> % c/to-date getTime .toString)))
 
 (def file-writer
   (transit/write-handler
    (constantly "f")
    #(identity %)
-   #(-> % .getPath)))
+   #(-> % (getPath))))
 
 (defn retrieve-index
   []
@@ -68,7 +74,7 @@
     (-> routes
         (wrap-transit-response {:encoding :json, :opts
                                 {:handlers {org.joda.time.DateTime joda-time-writer
-                                            java.io.File file-writer}}})
+                                            File file-writer}}})
         (wrap-transit-params {:opts {:handlers {(constantly "m") joda-time-reader
                                                 (constantly "f") file-reader}}})
         (wrap-defaults api-defaults)
