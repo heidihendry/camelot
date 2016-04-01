@@ -32,10 +32,9 @@
   "Read albums if not already cached.
 Otherwise return the contents of the cache."
   [state dir]
-  (reset! cache (->> dir
-                     (r/read-tree state)
-                     (a/album-set state)))
-    @cache)
+  (->> dir
+       (r/read-tree state)
+       (a/album-set state)))
 
 (defn run-tests
   [state acc [file alb]]
