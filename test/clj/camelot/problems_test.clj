@@ -20,24 +20,3 @@
        (fact "Ignore is higher severity than okay"
          (reduce highest-severity :okay [:okay :ignore]) => :ignore))
 
-(defn test-problem-handler-helper
-  [f level]
-  (problem-handler
-   (gen-state {:language :en})
-   f
-   nil
-   level
-   :problems/datetime))
-
-(facts test-problem-handler
-  (fact "Handler is ran when problem is not ignored"
-    (let [v (atom 0)
-          h (fn [a b c] (swap! v inc))]
-      (test-problem-handler-helper h :info)
-      @v => 1))
-
-  (fact "Handler is not ran when problem is ignored"
-    (let [v (atom 0)
-          h (fn [a b c] (swap! v inc))]
-      (test-problem-handler-helper h :ignore)
-      @v = 0)))

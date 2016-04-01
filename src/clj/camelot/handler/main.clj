@@ -39,23 +39,7 @@ Otherwise return the contents of the cache."
 
 (defn run-tests
   [state acc [file alb]]
-  (let [tests {:photo-stddev a/check-photo-stddev
-               :project-dates a/check-project-dates
-               :time-light-sanity a/check-ir-threshold
-               :camera-checks a/check-camera-checks
-               :headline-consistency a/check-headline-consistency
-               :required-fields a/check-required-fields
-               :album-has-data a/check-album-has-data
-               :sighting-consistency a/check-sighting-consistency
-               :surveyed-species a/check-species}]
-    (do
-      (assoc acc file
-             (remove nil?
-                     (map (fn [[t f]]
-                            (if (= (f state (vals (:photos alb))) :fail)
-                              t
-                              nil))
-                          tests))))))
+  (assoc acc file (a/list-problems state alb)))
 
 (defn consistency-check
   "Check album consistency"
