@@ -39,10 +39,10 @@ lein with-profiles +test,+uberjar cljsbuild test
 echo "done"
 
 echo -n "Bumping to release version... "
-sed -i 's/\s"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT"$/ "\1"/' ${PROJECT_FILE}
+sed -i 's/${PROJECT_NAME}\s"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT"$/${PROJECT_NAME} "\1"/' ${PROJECT_FILE}
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
 git commit -a -m "Version bump: $released_version"
-git tag -sa "v" -m "Release: $released_version"
+git tag -sa "v$released_version" -m "Release: $released_version"
 echo "done"
 
 echo -n "Running release build... "
