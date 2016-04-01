@@ -108,24 +108,29 @@
 
 (defn check-photo-stddev
   [state photos]
-  (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)
-        gettime #(-> % (:datetime) (tc/to-long))
-        ftime (gettime (first photos))
-        times (map #(-' (gettime %) ftime) photos)
-        sd (stddev times)]
-    (if (nil? (reduce #(if (> %2 (+' %1 (*' sd 3)))
-                         (reduced nil)
-                         %2) 0 (rest times)))
-     :fail
-     :pass)))
+  (if (< (count photos) 2)
+    :pass
+    (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)
+          gettime #(-> % (:datetime) (tc/to-long))
+          ftime (gettime (first photos))
+          times (map #(-' (gettime %) ftime) photos)
+          sd (stddev times)]
+      
+      (if (nil? (reduce #(if (> %2 (+' %1 (*' sd 3)))
+                           (reduced nil)
+                           %2) 0 (rest times)))
+        :fail
+        :pass))))
 
 (defn check-project-dates
   [state photos]
-  (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
-    (if (or (t/before? (:datetime (first photos)) (:project-start (:config state)))
-            (t/after? (:datetime (last photos)) (:project-end (:config state))))
-      :fail
-      :pass)))
+  (if (empty? photos)
+    :pass
+    (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
+      (if (or (t/before? (:datetime (first photos)) (:project-start (:config state)))
+              (t/after? (:datetime (last photos)) (:project-end (:config state))))
+        :fail
+        :pass))))
 
 (defn check-camera-checks
   [state photos]
@@ -185,7 +190,7 @@
 
 (defn- problem-descriptions
   [state problems]
-  (map #(hash-map :problem % :description ((:translate state) %)) problems))
+  (map #(hash-map :problem % :description ((:translate state) (keyword (str "checks/" (name %))))) problems))
 
 (s/defn list-problems :- [s/Keyword]
   "Return a list of all problems encountered while processing album data"
