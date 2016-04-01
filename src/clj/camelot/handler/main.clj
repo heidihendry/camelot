@@ -46,7 +46,8 @@ Otherwise return the contents of the cache."
                :headline-consistency a/check-headline-consistency
                :required-fields a/check-required-fields
                :album-has-data a/check-album-has-data
-               :sighting-consistency a/check-sighting-consistency}]
+               :sighting-consistency a/check-sighting-consistency
+               :surveyed-species a/check-species}]
     (do
       (assoc acc file
              (remove nil?

@@ -27,6 +27,7 @@
             :required-fields "One or more required fields are missing from one or more photos"
             :album-has-data "Album must not be empty"
             :sighting-consistency "Mismatch found in sighting data: species without quantity or quantity without species"
+            :surveyed-species "A species was identified which is not known to the survey"
             }
 
    :missing  "|Missing translation: [%1$s %2$s %3$s]|"})

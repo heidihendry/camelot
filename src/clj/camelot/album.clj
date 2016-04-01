@@ -188,3 +188,17 @@
               :pass
               (apply concat (map :sightings photos)))
       :pass))
+
+(s/defn check-species
+  [state photos]
+  (let [m (->> photos
+               (map #(map :species (:sightings %)))
+               (flatten)
+               (remove nil?)
+               (filter #(not (some #{(clojure.string/lower-case %)}
+                                   (map clojure.string/lower-case
+                                        (:surveyed-species (:config state))))))
+               (first))]
+    (if m
+      :fail
+      :pass)))
