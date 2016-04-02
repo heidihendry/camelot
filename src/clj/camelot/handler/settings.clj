@@ -30,6 +30,15 @@
          (keyword)
          (translate))))
 
+(defn config-description
+  [state schema]
+  (let [translate #((:translate state) %)]
+    (reduce (fn [acc [k v]]
+              (assoc acc k
+                     {:label (translate (keyword (format "config/%s/label" (name k))))
+                      :description (translate (keyword (format "config/%s/description" (name k))))
+                      :schema v})) {} schema)))
+
 (defn get-metadata
   [state]
   (map #(hash-map :data %
@@ -38,5 +47,5 @@
 
 (defn settings-schema
   [state]
-  {:config mp/config-schema
+  {:config (config-description state (mp/config-schema state))
    :metadata (get-metadata state)})
