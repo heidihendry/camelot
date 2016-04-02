@@ -1,5 +1,6 @@
 (ns camelot.server
   (:require [camelot.handler.main :as main]
+            [camelot.handler.settings :as hs]
             [camelot.config :refer [gen-state config create-default-config]]
             [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
@@ -36,8 +37,7 @@
 (def joda-time-reader (transit/read-handler #(DateTime. ^java.lang.Long (Long/parseLong %))))
 (def file-reader (transit/read-handler #(File. ^java.lang.Long (Long/parseLong %))))
 
-(defn getTime
-  []
+(def getTime
   #(.getTime ^java.util.Date %))
 
 (def joda-time-writer
@@ -63,8 +63,10 @@
   (GET "/settings" _ (retrieve-index))
   (GET "/dashboard" _ (retrieve-index))
   (GET "/default-config" [] (response (config)))
+  (POST "/settings/get" {{config :config} :params}
+        (response (hs/settings-schema (gen-state config))))
   (POST "/albums" {{config :config, dir :dir} :params}
-        (response (main/read-albums (gen-state (config)) dir)))
+        (response (main/read-albums (gen-state config) dir)))
   (POST "/transit-test" {{time :t} :params} (response {:a time}))
   (resources "/"))
 

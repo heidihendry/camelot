@@ -1,6 +1,76 @@
 (ns camelot.model.photo
   (:require [schema.core :as s]))
 
+(def config-schema
+  {:erroneous-infrared-threshold {:type :percentage}
+   :infrared-iso-value-threshold {:type :number}
+   :language {:type :select
+              :options {:en :language/en
+                        :vn :language/vn}}
+   :night-start-hour {:type :select
+                      :options {17 "17:00"
+                                18 "18:00"
+                                19 "19:00"
+                                20 "20:00"
+                                21 "21:00"
+                                22 "22:00"
+                                23 "23:00"}}
+   :night-end-hour {:type :select
+                    :options {0 "0:00"
+                              1 "1:00"
+                              2 "2:00"
+                              3 "3:00"
+                              4 "4:00"
+                              5 "5:00"
+                              6 "6:00"
+                              7 "7:00"
+                              8 "8:00"}}
+   :project-start {:type :datetime}
+   :project-end {:type :datetime}
+   :suveyed-species {:type :list
+                     :list-of :text}
+   :required-fields {:type :list
+                     :list-of :paths}
+   :rename {:type :setting-group
+            :group {:format {:type :string}
+                    :fields {:type :list
+                             :list-of :paths}
+                    :date-format {:type :string}}}})
+
+(def metadata-structure
+  [[:location [:gps-longitude
+               :gps-longitude-ref
+               :gps-latitude
+               :gps-latitude-ref
+               :gps-altitude
+               :gps-altitude-ref
+               :sublocation
+               :city
+               :state-province
+               :country
+               :country-code
+               :map-datum]]
+   [:camera-settings [:aperture
+                      :exposure
+                      :flash
+                      :focal-length
+                      :fstop
+                      :iso
+                      :orientation
+                      :resolution-x
+                      :resolution-y]]
+   [:camera [:make
+             :model
+             :software]]
+   :datetime
+   :headline
+   :artist
+   :phase
+   :copyright
+   :description
+   :filename
+   :filesize])
+
 (s/defrecord Location
     [gps-longitude :- s/Str
      gps-longitude-ref :- s/Str
