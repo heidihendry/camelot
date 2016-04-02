@@ -11,8 +11,6 @@
             [environ.core :refer [env]])
   (:import [org.apache.commons.lang3 SystemUtils]))
 
-(def timestamp-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
-
 (def default-config
   {:erroneous-infrared-threshold 0.2
    :infrared-iso-value-threshold 999
@@ -45,6 +43,8 @@
     SystemUtils/IS_OS_MAC_OSX (config-path (str (env :home) "/Library/Preferences"))
     :else (config-path (str (env :pwd) ".camelot"))))
 
+(def timestamp-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
+
 (defn parse-dates
   [config]
   (assoc config
@@ -63,19 +63,18 @@
 (defn read-config-file
   [path]
   (if (f/can-read? (io/file path))
-    io/reader
+    (io/reader path)
     (throw (RuntimeException. ((gen-translator default-config) :problems/config-not-found)))))
 
 (defn config
   "Application configuration"
   []
-  (or @config-cache
-      (->> (get-config-file)
-           (read-config-file)
-           (f/pushback-reader)
-           (edn/read)
-           (parse-dates)
-           (reset! config-cache))))
+  (->> (get-config-file)
+       (read-config-file)
+       (f/pushback-reader)
+       (edn/read)
+       (parse-dates)
+       (reset! config-cache)))
 
 (defn create-default-config
   []
