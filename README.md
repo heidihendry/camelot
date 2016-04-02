@@ -99,7 +99,7 @@ A list of paths into file metadata (see `:required-fields` for more information 
 
 ##### :format
 
-A (format string)[https://en.wikipedia.org/wiki/Printf_format_string] denoting the filename format.
+A [format string](https://en.wikipedia.org/wiki/Printf_format_string) denoting the filename format.
 
 The variables in this are expanded based on the information in the `:fields` property.
 
