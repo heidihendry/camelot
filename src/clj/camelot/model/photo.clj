@@ -1,12 +1,13 @@
 (ns camelot.model.photo
   (:require [schema.core :as s]))
 
-(def config-schema
+(defn config-schema
+  [state]
   {:erroneous-infrared-threshold {:type :percentage}
    :infrared-iso-value-threshold {:type :number}
    :language {:type :select
-              :options {:en :language/en
-                        :vn :language/vn}}
+              :options {:en ((:translate state) :language/en)
+                        :vn ((:translate state) :language/vn)}}
    :night-start-hour {:type :select
                       :options {17 "17:00"
                                 18 "18:00"
@@ -27,8 +28,8 @@
                               8 "8:00"}}
    :project-start {:type :datetime}
    :project-end {:type :datetime}
-   :suveyed-species {:type :list
-                     :list-of :text}
+   :surveyed-species {:type :list
+                      :list-of :text}
    :required-fields {:type :list
                      :list-of :paths}
    :rename {:type :setting-group

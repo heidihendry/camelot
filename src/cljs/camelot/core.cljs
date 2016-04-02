@@ -51,7 +51,7 @@
     (render [_]
       (dom/div nil
                (dom/h2 nil "Settings")
-               (dom/div nil (om/build rs/settings-component (:config app)))))))
+               (dom/div nil (om/build rs/settings-component (:config (:settings app))))))))
 
 (defn nav-item-component [data owner]
   (reify
@@ -93,16 +93,15 @@
   [state]
   (util/getreq (baseurl "/default-config")
                {}
-               #(do (prn (:body %))
+               #(do 
                   (util/ls-set-item! "config" (:body %))
                     (om/update! (om/ref-cursor (om/root-cursor app-state)) :config (:body %))
                     (util/postreq (baseurl "/albums")
                                   {:config (:body %) :dir "/home/chris/testdata"}
                                   (fn [x] (om/update! (om/ref-cursor (om/root-cursor app-state)) :albums (:body x))))
-                    (when (nil? (:settings (:config state)))
-                      (util/postreq (baseurl "/settings/get")
-                                    {:config (:config state)}
-                                    (fn [x] (om/update! (om/ref-cursor (om/root-cursor app-state)) :settings (:body %))))))))
+                    (util/postreq (baseurl "/settings/get")
+                                  {:config (:config state)}
+                                  (fn [x] (om/update! (om/ref-cursor (om/root-cursor app-state)) :settings (:body x)))))))
 
 (defroute "/dashboard" [] (generate-view album-component-view))
 (defroute "/settings" [] (generate-view settings-component-view))
@@ -125,10 +124,9 @@
           (util/postreq (baseurl "/albums")
                         {:config config :dir "/home/chris/testdata"}
                         #(om/update! (om/ref-cursor (om/root-cursor app-state)) :albums (:body %))))
-        (when (nil? (:settings config))
-          (util/postreq (baseurl "/settings/get")
-                        {:config config}
-                        #(om/update! (om/ref-cursor (om/root-cursor app-state)) :settings (:body %)))))
+        (util/postreq (baseurl "/settings/get")
+                      {:config config}
+                      #(om/update! (om/ref-cursor (om/root-cursor app-state)) :settings (:body %))))
       (config-default app-state))))
 
 (defn default-page [page]

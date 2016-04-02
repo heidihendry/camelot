@@ -6,23 +6,49 @@
 (defn save []
   (throw (js/Error. "Not implemented")))
 
-(defn field-component [[key value] owner]
+(defn select-option-component
+  [[key desc] owner]
+  (prn (type key))
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (if (= (type key) cljs.core/Keyword)
+                                (name key)
+                                key)} desc))))
+
+(defmulti input-field :type)
+
+(defmethod input-field :select
+  [s owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/select #js {:value (if (= (type key) cljs.core/Keyword)
+                                (name (first (keys (:options s))))
+                                (first (keys (:options s))))}
+                  (om/build-all select-option-component (:options s))))))
+
+(defmethod input-field :default
+  [s owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/input #js {:type "text" :value (name (:type s))}))))
+
+(defn field-component
+  [[key value] owner]
   (reify
     om/IRender
     (render [_]
       (dom/div nil
                (dom/div nil
-                        (if (map? value)
-                          (dom/div nil
-                                   (dom/h3 nil (name key))
-                                   (apply dom/div nil
-                                          (om/build-all field-component value)))
-                          (dom/div #js {:className "settings-field"}
-                                   (dom/label #js {:className "settings-label"} (name key))
-                                   (dom/input #js {:type "text"
-                                                   :value value}))))))))
+                        (dom/div #js {:className "settings-field"}
+                                 (dom/label #js {:className "settings-label"
+                                                 :title (:description value)} (:label value))
+                                 (om/build input-field (:schema value))))))))
 
-(defn settings-component [data owner]
+(defn settings-component
+  [data owner]
   (reify
     om/IRender
     (render [_]
