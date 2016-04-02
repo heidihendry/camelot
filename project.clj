@@ -14,6 +14,7 @@
                  [compojure "1.5.0"]
                  [environ "1.0.2"]
                  [midje "1.8.3"]
+                 [org.apache.commons/commons-lang3 "3.4"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]

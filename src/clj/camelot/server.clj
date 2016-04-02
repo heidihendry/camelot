@@ -1,6 +1,6 @@
 (ns camelot.server
   (:require [camelot.handler.main :as main]
-            [camelot.config :refer [gen-state config]]
+            [camelot.config :refer [gen-state config create-default-config]]
             [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
             [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
@@ -62,9 +62,9 @@
   (GET "/" _ (retrieve-index))
   (GET "/settings" _ (retrieve-index))
   (GET "/dashboard" _ (retrieve-index))
-  (GET "/default-config" [] (response config))
+  (GET "/default-config" [] (response (config)))
   (POST "/albums" {{config :config, dir :dir} :params}
-       (response (main/read-albums (gen-state config) dir)))
+        (response (main/read-albums (gen-state (config)) dir)))
   (POST "/transit-test" {{time :t} :params} (response {:a time}))
   (resources "/"))
 
@@ -83,7 +83,8 @@
 
 (defn -main [& [mode directory]]
   (case mode
-    "bscheck" (let [state (gen-state config)]
+    "bscheck" (let [state (gen-state (config))]
                 (main/consistency-check state (main/read-albums state directory)))
+    "init" (create-default-config)
     (let [port (Integer. (or (env :camelot-port) 10555))]
       (run-jetty http-handler {:port port :join? false}))))

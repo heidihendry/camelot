@@ -1,7 +1,7 @@
 (ns camelot.handler.main
   (:require [camelot.reader.dirtree :as r]
             [camelot.album :as a]
-            [camelot.config :refer [gen-state config]]
+            [camelot.config :refer [gen-state]]
             [camelot.problems :as problems]
             [camelot.action.rename-photo :as rp]
             [camelot.util.java-file :as f]))
@@ -57,9 +57,8 @@ Otherwise return the contents of the cache."
 
 (defn run
   "Retrieve album data and apply transformations."
-  [dir]
-  (let [state (gen-state config)
-        album-transform #(->> %
+  [state dir]
+  (let [album-transform #(->> %
                               (rp/rename-photos state))]
     (->> dir
          (read-albums state)
