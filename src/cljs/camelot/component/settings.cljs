@@ -1,4 +1,4 @@
-(ns camelot.route.settings
+(ns camelot.component.settings
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [secretary.core :as secretary :refer-macros [defroute]]))
@@ -6,9 +6,11 @@
 (defn save []
   (throw (js/Error. "Not implemented")))
 
+(defn cancel []
+  (throw (js/Error. "Not implemented")))
+
 (defn select-option-component
   [[key desc] owner]
-  (prn (type key))
   (reify
     om/IRender
     (render [_]
@@ -23,7 +25,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/select #js {:value (if (= (type key) cljs.core/Keyword)
+      (dom/select #js {:className "settings-input" :value (if (= (type key) cljs.core/Keyword)
                                 (name (first (keys (:options s))))
                                 (first (keys (:options s))))}
                   (om/build-all select-option-component (:options s))))))
@@ -33,7 +35,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "text" :value (name (:type s))}))))
+      (dom/input #js {:type "text" :className "settings-input" :value (name (:type s))}))))
 
 (defn field-component
   [[key value] owner]
@@ -53,8 +55,20 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (apply dom/div nil
-                      (om/build-all field-component data))
-               (dom/button #js {:className "btn btn-primary"
+               (apply dom/div #js {:id "settings-inner"}
+                      (om/build-all field-component data))))))
+
+(defn settings-view-component [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil
+               (dom/h4 nil "Settings")
+               (dom/div nil (om/build settings-component (:config (:settings app))))
+               (dom/div #js {:className "button-container"}
+                        (dom/button #js {:className "btn btn-primary"
                                          :onClick #(save)}
-                                    "Save")))))
+                                    "Save")
+                        (dom/button #js {:className "btn btn-default"
+                                         :onClick #(cancel)}
+                                    "Cancel"))))))

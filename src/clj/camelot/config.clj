@@ -9,7 +9,8 @@
             [clojure.edn :as edn]
             [taoensso.tower :as tower]
             [environ.core :refer [env]])
-  (:import [org.apache.commons.lang3 SystemUtils]))
+  (:import [org.apache.commons.lang3 SystemUtils]
+           [java.util Properties]))
 
 (def default-config
   {:erroneous-infrared-threshold 0.2
@@ -95,3 +96,17 @@
   [conf]
   {:config conf
    :translate (gen-translator conf)})
+
+(defn version-property [dep]
+  (let [path (str "META-INF/maven/" (or (namespace dep) (name dep))
+                  "/" (name dep) "/pom.properties")
+        props (io/resource path)]
+    (when props
+      (with-open [stream (io/input-stream props)]
+        (let [props (doto (Properties.) (.load stream))]
+          (.getProperty props "version"))))))
+
+(defn get-version
+  []
+  (or (System/getProperty "camelot.version")
+      (-> (version-property 'camelot))))

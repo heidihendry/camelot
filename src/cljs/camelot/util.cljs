@@ -5,6 +5,16 @@
             [cljs.core.async :refer [<!]])
   (:import [goog.date UtcDateTime]))
 
+(defn with-baseurl [path]
+  (let [port (-> js/window (aget "location") (aget "port"))]
+    (str
+     (-> js/window (aget "location") (aget "protocol"))
+     "//"
+     (-> js/window (aget "location") (aget "hostname"))
+     (when (not (zero? (count port)))
+       (str ":" port))
+     path)))
+
 (def transit-file-reader identity)
 
 (def transit-date-writer
