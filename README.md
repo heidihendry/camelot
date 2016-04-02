@@ -89,15 +89,15 @@ The number of minutes after a species is sighted before further photographs of t
 
 Rename files based on their metadata.  This setting consists of 3 properties:
 
-##### :date-format
+**:date-format**
 
 A string representing the format for which date metadata should be represented.  When setting this, be mindful of characters which may or may not be allowed in filenames (e.g., `:` is problematic).
 
-##### :fields
+**:fields**
 
 A list of paths into file metadata (see `:required-fields` for more information about paths) for which data must be extracted to generate the filename.
 
-##### :format
+**:format**
 
 A [format string](https://en.wikipedia.org/wiki/Printf_format_string) denoting the filename format.
 
