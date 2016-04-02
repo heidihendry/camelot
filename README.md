@@ -26,6 +26,7 @@ This is a list (i.e., `[...]`) of paths into a file's metadata.  The metadata of
 ...
 }
 ```
+
 Would mean that both the `gps-longitude` within the `location` collection of properties, and the `datetime` must be present in the metadata of every file.
 
 #### :project-start
@@ -52,6 +53,7 @@ The list is case insensitive.
                    "Smiley Wolf",
                    "HUMAN-CAMERACHECK"]
 }
+```
 
 #### :language
 
