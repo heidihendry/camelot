@@ -1,11 +1,69 @@
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('OpenSans-Light'), url('../fonts/opensans-light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('OpenSans'), url('../fonts/opensans-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: bold;
+  font-weight: 600;
+  src: local('OpenSans-Semibold'), url('../fonts/opensans-semibold.woff') format('woff');
+}
+
+html > body {
+    font-family: 'Open Sans', Arial, sans-serif;
+    background-color: #fafafa;
+    color: #333;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+#navigation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 500;
+}
+
+#app h1, #app h2, #app h3, h4 {
+    color: #444;
+    margin-top: 0;
+    position: relative;
+}
+
 #app {
-    margin-top: 1rem;
-    margin-left: 2rem;
+    margin-top: 6rem;
+    padding-top: 2rem;
+    padding-left: 2rem;
+    width: 100%;
+    overflow: hidden;
+    max-width: 100%;
     padding-bottom: 2rem;
+}
+
+label, .settings-label {
+    color: #666;
+    display: block;
+    clear: both;
+    font-weight: normal;
 }
 
 #navigation .navbar-nav {
     float: none;
+    box-shadow: 0px 3px 10px 1px #999;
+    width: auto;
+    min-width: auto;
+    margin: 0;
 }
 
 a:hover {
@@ -13,10 +71,9 @@ a:hover {
 }
 
 .nav {
-    width: 100%;
-    background: #eee;
+    min-width: auto;
+    background: #116095;
     margin: 0;
-    border-bottom: 1px solid #dfdfdf;
 }
 
 .nav ul {
@@ -24,16 +81,24 @@ a:hover {
     height: 100%;
 }
 
-.nav li {
+#navigation .nav > li {
     display: inline-block;
     margin: 0;
     padding: 0.5rem 2rem;
-    border-right: 1px solid #dfdfdf;
+    height: 6rem;
+    border-right: 1px solid #1175aa;
+}
+
+#navigation .nav > li.icon-only {
+    display: inline-block;
+    margin: 0;
+    padding: 0rem;
+    height: 6rem;
+    border-right: 1px solid #1175aa;
 }
 
 .nav li a {
-    color: #666;
-    margin: 0;
+    color: #ccc;
 }
 
 .nav a:hover {
@@ -41,54 +106,141 @@ a:hover {
 }
 
 #navigation .nav > li > a:hover {
-    background-color: inherit;
+    background: none;
 }
 
 .navbar-nav li:last-child {
     float: right;
     border-right: none;
-    border-left: 1px solid #dfdfdf;
-}
-
-.settings-label {
-    display: block;
-    clear: both;
-    font-weight: normal;
-    font-size: 80%;
+    border-left: 1px solid #1175aa;
 }
 
 .settings-field {
     margin-bottom: 1rem;
 }
 
+.nav li {
+    transition: background 0.3s ease-in-out;
+}
+
 .nav li:hover {
     cursor: pointer;
-    background: #ddd;
+    background: #1175aa;
     height: 100%;
+}
+
+.nav li.active {
+    cursor: pointer;
+    background: #1175aa;
+    height: 100%;
+}
+
+.nav li a:hover {
+    background: none;
 }
 
 #footer {
     text-align: center;
     width: 100%;
-    background: #333;
     padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding-bottom: 2rem;
+    background-image: url("/images/footer-tile.png");
+    background-color: #333;
 }
 
 #footer .version {
     font-weight: normal;
-    color: #aaa;
-    font-size 80%;
+    color: #888;
+    font-size: 90%;
+}
+
+#footer .title {
+    display: block;
+    margin: auto;
+    padding: 1.5rem;
+    padding-bottom: 2.5rem;
 }
 
 #footer .developer {
     display: block;
     font-weight: normal;
-    color: #777;
-    font-size 80%;
+    color: #888;
+    font-size: 90%;
 }
 
 #footer .developer a {
-    color: #777;
+    color: #888;
     text-decoration: underline;
+}
+
+select.settings-input {
+    padding: 0.5rem;
+    font-size: 100%;
+    min-width: 28rem;
+}
+
+input.settings-input {
+    min-width: 28rem;
+    padding: 0.5rem;
+    color: #666;
+    font-size: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+}
+
+#app button {
+    margin: 0;
+    width: 100%;
+    padding: 1rem 3rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.button-container {
+    margin: 0;
+    width: 100%;
+}
+
+#app button.btn-default {
+    padding: 1rem 3rem;
+}
+
+#settings {
+    position: fixed;
+    width: 34rem;
+    right: -36rem;
+    background: #fff;
+    padding: 1rem;
+    padding-left: 0;
+    padding-right: 0;
+    height: calc(100vh - 6rem);
+    top: 6rem;
+    z-index: 1000;
+    transition: right 0.5s ease-in-out;
+    border: 1px solid #999;
+    box-shadow: 10px 15px 60px 1px #333;
+    border-top-left-radius: 1rem;
+}
+
+#settings h4 {
+    padding-left: 2rem;
+}
+
+#settings .button-container {
+    padding: 0 2rem;
+}
+
+#settings-inner {
+    overflow-y: scroll;
+    height: calc(100vh - 22rem);
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    padding: 0.5rem 0;
+    padding-left: 2rem;
+}
+
+#settings.show {
+    right: 0px;
+    display: block;
 }

@@ -1,4 +1,4 @@
-(ns camelot.route.error
+(ns camelot.component.error
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [secretary.core :as secretary :refer-macros [defroute]]))

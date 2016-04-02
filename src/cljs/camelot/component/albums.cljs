@@ -1,4 +1,4 @@
-(ns camelot.route.albums
+(ns camelot.component.albums
   (:require [camelot.util :as util]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
@@ -42,3 +42,9 @@
                         (dom/h3 nil (first albums))
                         (apply dom/div nil
                                (om/build-all album-component albums)))))))
+
+(defn album-view-component [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil (apply dom/div nil (om/build-all albums-component (:albums app)))))))
