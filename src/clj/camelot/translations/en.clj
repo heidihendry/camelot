@@ -11,6 +11,8 @@
               :rename-conflict "%s: Not performing renames, as not all results would be unique. A file with this named would be the result of renaming the following files:"
               :species-quantity-missing "%s: has species without a quantity"
               :species-name-missing "%s: has quantity without a species"
+              :default-config-exists "A default configuration file already exists. Please delete '%s' and try again."
+              :config-not-found "A configuration file was not found.  Please run camelot with the 'init' option and adjust the configuration file created."
               }
 
    :status {:rename-photos "Renaming photos in album: '%s'"
@@ -28,5 +30,7 @@
             :sighting-consistency "Mismatch found in sighting data: species without quantity or quantity without species"
             :surveyed-species "A species was identified which is not known to the survey"
             }
+
+   :default-config-created "A default configuration has been created in '%s'"
 
    :missing  "|Missing translation: [%1$s %2$s %3$s]|"})
