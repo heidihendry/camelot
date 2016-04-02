@@ -5,20 +5,7 @@
             [cljs.core.async :refer [<!]])
   (:import [goog.date UtcDateTime]))
 
-(defn ls-set-item!
-  "Set `key' in browser's localStorage to `val`."
-  [key val]
-  (.setItem (.-localStorage js/window) key (transit/write (transit/writer :json) val)))
-
-(defn ls-get-item
-  "Returns value of `key' from browser's localStorage."
-  [key]
-  (transit/read (transit/reader :json) (.getItem (.-localStorage js/window) key)))
-
-(defn ls-remove-item!
-  "Remove the browser's localStorage value for the given `key`"
-  [key]
-  (.removeItem (.-localStorage js/window) key))
+(def transit-file-reader identity)
 
 (def transit-date-writer
   (transit/write-handler
@@ -30,7 +17,27 @@
   [s]
   (UtcDateTime.fromTimestamp s))
 
-(def transit-file-reader identity)
+(def transit-read-handlers
+  {"m" transit-date-reader
+   "f" transit-file-reader})
+
+(def transit-write-handlers
+  {UtcDateTime transit-date-writer})
+
+(defn ls-set-item!
+  "Set `key' in browser's localStorage to `val`."
+  [key val]
+  (.setItem (.-localStorage js/window) key (transit/write (transit/writer :json {:handlers transit-write-handlers}) val)))
+
+(defn ls-get-item
+  "Returns value of `key' from browser's localStorage."
+  [key]
+  (transit/read (transit/reader :json {:handlers transit-read-handlers}) (.getItem (.-localStorage js/window) key)))
+
+(defn ls-remove-item!
+  "Remove the browser's localStorage value for the given `key`"
+  [key]
+  (.removeItem (.-localStorage js/window) key))
 
 (defn- request
   [method href params f]
@@ -38,10 +45,9 @@
     (let [response (<! (method href
                                {:transit-params params
                                 :transit-opts {:decoding-opts
-                                               {:handlers {"m" transit-date-reader
-                                                           "f" transit-file-reader}}
+                                               {:handlers transit-read-handlers}
                                                :encoding-opts
-                                               {:handlers {UtcDateTime transit-date-writer}}}}))]
+                                               {:handlers transit-write-handlers}}}))]
       (f response))))
 
 (def postreq (partial request http/post))
