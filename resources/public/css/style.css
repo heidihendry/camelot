@@ -245,3 +245,48 @@ input.settings-input {
     right: 0px;
     display: block;
 }
+
+.month-panel .label {
+    font-size: 100%;
+    color: #333;
+}
+
+.list-item {
+    background: #1175aa;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    margin: 0.2rem 0.2rem;
+    margin-top: 0;
+    margin-bottom: 0.4rem;
+    display: inline-block;
+    color: white;
+}
+
+.list-item-delete {
+    padding-left: 0.5rem;
+    color: #5be;
+}
+
+.list-item-delete:hover {
+    cursor: pointer;
+    color: #fafafa;
+}
+
+#app .list-input select.settings-input {
+    width: 24.7rem;
+    min-width: auto;
+    margin-right: 0.3rem;
+}
+
+#app .list-input input.settings-input {
+    width: 24.7rem;
+    min-width: auto;
+    margin-top: 0;
+    margin-right: 0.3rem;
+}
+
+#app .list-input button {
+    width: 3rem;
+    margin-top: 0;
+    padding: 0.5rem 0.5rem;
+}

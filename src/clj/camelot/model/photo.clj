@@ -29,13 +29,15 @@
    :project-start {:type :datetime}
    :project-end {:type :datetime}
    :surveyed-species {:type :list
-                      :list-of :text}
+                      :list-of :string}
    :required-fields {:type :list
-                     :list-of :paths}
+                     :list-of :paths
+                     :complete-with :metadata}
    :rename {:type :setting-group
             :group {:format {:type :string}
                     :fields {:type :list
-                             :list-of :paths}
+                             :list-of :paths
+                             :complete-with :metadata}
                     :date-format {:type :string}}}})
 
 (def metadata-structure

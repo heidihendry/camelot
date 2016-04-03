@@ -41,9 +41,8 @@
 
 (defn get-metadata
   [state]
-  (map #(hash-map :data %
-                  :description (path-description state %))
-       metadata-paths))
+  (into {} (map #(hash-map % (path-description state %))
+                metadata-paths)))
 
 (defn settings-schema
   [state]

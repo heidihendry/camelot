@@ -1,7 +1,7 @@
 (ns camelot.server
   (:require [camelot.handler.main :as main]
             [camelot.handler.settings :as hs]
-            [camelot.config :refer [gen-state config get-version create-default-config]]
+            [camelot.config :refer [gen-state config get-version create-default-config decursorise]]
             [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
             [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
@@ -65,9 +65,9 @@
   (GET "/default-config" [] (response (config)))
   (GET "/application" [] (response {:version (get-version)}))
   (POST "/settings/get" {{config :config} :params}
-        (response (hs/settings-schema (gen-state config))))
+        (response (hs/settings-schema (gen-state (decursorise config)))))
   (POST "/albums" {{config :config, dir :dir} :params}
-        (response (main/read-albums (gen-state config) dir)))
+        (response (main/read-albums (gen-state (decursorise config)) dir)))
   (POST "/transit-test" {{time :t} :params} (response {:a time}))
   (resources "/"))
 
