@@ -135,6 +135,9 @@
                                                          (om/set-state! owner :select-value ""))}))
                  (dom/div nil
                           (dom/input #js {:type "text" :className "settings-input" :placeholder "Add item" :value (get state :text-value)
+                                          :onKeyDown #(when (= (.-key %) "Enter")
+                                                        (do (add-item! (get state :text-value) s k owner)
+                                                            (om/set-state! owner :text-value "")))
                                           :onChange #(om/set-state! owner :text-value (.. % -target -value))})
                           (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
                                            :onClick #(do (add-item! (get state :text-value) s k owner)
