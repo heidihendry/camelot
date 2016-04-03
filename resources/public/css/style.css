@@ -101,7 +101,7 @@ a:hover {
 }
 
 .nav li a {
-    color: #ccc;
+    color: #fafafa;
 }
 
 .nav a:hover {
@@ -276,7 +276,7 @@ input.settings-input {
 
 .list-item-delete {
     padding-left: 0.5rem;
-    color: #5be;
+    color: #aef;
 }
 
 .list-item-delete:hover {
