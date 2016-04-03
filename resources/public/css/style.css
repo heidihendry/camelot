@@ -179,11 +179,11 @@ a:hover {
 select.settings-input {
     padding: 0.5rem;
     font-size: 90%;
-    min-width: 28rem;
+    min-width: 30rem;
 }
 
 input.settings-input {
-    min-width: 28rem;
+    min-width: 30rem;
     padding: 0.5rem;
     color: #666;
     font-size: 90%;
@@ -226,7 +226,7 @@ input.settings-input {
 }
 
 #settings h4 {
-    padding-left: 2rem;
+    padding-left: 1rem;
 }
 
 #settings h4.section-heading {
@@ -240,7 +240,7 @@ input.settings-input {
 }
 
 #settings .button-container {
-    padding: 0 2rem;
+    padding: 0 1rem;
 }
 
 #settings-inner {
@@ -250,7 +250,7 @@ input.settings-input {
     border-bottom: 1px solid #ddd;
     border-top: 1px solid #ddd;
     padding: 0.5rem 0;
-    padding-left: 2rem;
+    padding-left: 1rem;
 }
 
 #settings.show {
@@ -285,13 +285,13 @@ input.settings-input {
 }
 
 #app .list-input select.settings-input {
-    width: 24.7rem;
+    width: 26.7rem;
     min-width: auto;
     margin-right: 0.3rem;
 }
 
 #app .list-input input.settings-input {
-    width: 24.7rem;
+    width: 26.7rem;
     min-width: auto;
     margin-top: 0;
     margin-right: 0.3rem;
