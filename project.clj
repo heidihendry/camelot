@@ -28,7 +28,11 @@
                  [secretary "1.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.1"]
-            [lein-environ "1.0.1"]]
+            [lein-environ "1.0.1"]
+            [lein-less "1.7.5"]]
+
+  :less {:source-paths ["resources/public/less"]
+         :target-path "resources/public/css"}
 
   :min-lein-version "2.6.1"
 
