@@ -40,6 +40,19 @@
                              :complete-with :metadata}
                     :date-format {:type :string}}}})
 
+(def config-menu
+  [[:label :settings/preferences]
+   [:language]
+   [:label :settings/validations]
+   [:project-start]
+   [:project-end]
+   [:required-fields]
+   [:surveyed-species]
+   [:night-start-hour]
+   [:night-end-hour]
+   [:infrared-iso-value-threshold]
+   [:erroneous-infrared-threshold]])
+
 (def metadata-structure
   [[:location [:gps-longitude
                :gps-longitude-ref

@@ -103,25 +103,26 @@
       (dom/input #js {:type "text" :className "settings-input" :value (get-in (state/config-state) [k :value])}))))
 
 (defn field-component
-  [[key value :as s] owner]
+  [menu-item owner]
+  (prn menu-item)
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
-               (dom/div nil
-                        (dom/div #js {:className "settings-field"}
-                                 (dom/label #js {:className "settings-label"
-                                                 :title (:description value)} (:label value))
-                                 (om/build input-field s)))))))
+      (if (= (first menu-item) :label)
+        (dom/h4 #js {:className "section-heading"} (second menu-item))
+        (let [value (get (state/settings-config-state) (first menu-item))]
+          (dom/div #js {:className "settings-field"}
+                   (dom/label #js {:className "settings-label"
+                                   :title (:description value)} (:label value))
+                   (om/build input-field [(first menu-item) value])))))))
 
 (defn settings-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
-               (apply dom/div #js {:id "settings-inner"}
-                      (om/build-all field-component data))))))
+      (apply dom/div #js {:id "settings-inner"}
+             (om/build-all field-component data)))))
 
 (defn settings-view-component [app owner]
   (reify
@@ -129,7 +130,7 @@
     (render [_]
       (dom/div nil
                (dom/h4 nil "Settings")
-               (dom/div nil (om/build settings-component (:config (:settings app))))
+               (dom/div nil (om/build settings-component (:menu (:settings app))))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"
                                          :onClick #(save)}

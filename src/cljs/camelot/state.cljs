@@ -11,6 +11,10 @@
   []
   (om/ref-cursor (om/root-cursor app-state)))
 
+(defn settings-config-state
+  []
+  (om/ref-cursor (:config (:settings (om/root-cursor app-state)))))
+
 (defn metadata-schema-state
   []
   (om/ref-cursor (:metadata (:settings (om/root-cursor app-state)))))
