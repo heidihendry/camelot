@@ -43,13 +43,23 @@ html > body {
         margin-top: 0;
         position: relative;
     }
-}
 
-label, .settings-label {
-    color: #666;
-    display: block;
-    clear: both;
-    font-weight: normal;
+    .button-container {
+        margin: 0;
+        width: 100%;
+    }
+
+    button {
+        margin: 0;
+        width: 100%;
+        padding: 0.7rem 2rem;
+        margin-top: 0.3rem;
+        margin-bottom: 0.3rem;
+    }
+
+    button.btn-default {
+        padding: 0.7rem 2rem;
+    }
 }
 
 #navigation {
@@ -66,6 +76,12 @@ label, .settings-label {
         width: auto;
         min-width: auto;
         margin: 0;
+
+        li:last-child {
+            float: right;
+            border-right: none;
+            border-left: 1px solid #1175aa;
+        }
     }
 
     .nav {
@@ -78,48 +94,40 @@ label, .settings-label {
             height: 100%;
         }
 
-        &>li {
+        li {
+            transition: background 0.3s ease-in-out;
             display: inline-block;
             margin: 0;
             padding: 0.5rem 2rem;
             height: 6rem;
             border-right: 1px solid #1175aa;
-        }
 
-        &>li.icon-only {
-            display: inline-block;
-            margin: 0;
-            padding: 0rem;
-            height: 6rem;
-            border-right: 1px solid #1175aa;
-        }
+            &.icon-only {
+                display: inline-block;
+                margin: 0;
+                padding: 0rem;
+                height: 6rem;
+                border-right: 1px solid #1175aa;
+            }
 
-        li a {
-            color: #fafafa;
-        }
+            a {
+                color: #fafafa;
 
-        li {
-            transition: background 0.3s ease-in-out;
-        }
+                &:hover {
+                    background: none;
+                }
+            }
 
-        li:hover {
-            cursor: pointer;
-            background: #1175aa;
-        }
+            &:hover {
+                cursor: pointer;
+                background: #1175aa;
+            }
 
-        li.active {
-            cursor: pointer;
-            background: #1175aa;
+            &.active {
+                cursor: pointer;
+                background: #1175aa;
+            }
         }
-
-        li a:hover {
-            background: none;
-        }
-    }
-    .navbar-nav li:last-child {
-        float: right;
-        border-right: none;
-        border-left: 1px solid #1175aa;
     }
 }
 
@@ -165,38 +173,6 @@ a:hover {
     }
 }
 
-select.settings-input {
-    padding: 0.5rem;
-    font-size: 90%;
-    min-width: 30rem;
-}
-
-input.settings-input {
-    min-width: 30rem;
-    padding: 0.5rem;
-    color: #666;
-    font-size: 90%;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-}
-
-#app button {
-    margin: 0;
-    width: 100%;
-    padding: 0.7rem 2rem;
-    margin-top: 0.3rem;
-    margin-bottom: 0.3rem;
-}
-
-.button-container {
-    margin: 0;
-    width: 100%;
-}
-
-#app button.btn-default {
-    padding: 0.7rem 2rem;
-}
-
 #settings {
     position: fixed;
     width: 34rem;
@@ -213,19 +189,40 @@ input.settings-input {
     box-shadow: 10px 15px 60px 1px #333;
     border-top-left-radius: 1rem;
 
+    .settings-label {
+        color: #666;
+        display: block;
+        clear: both;
+        font-weight: normal;
+    }
+
+    select.settings-input {
+        padding: 0.5rem;
+        font-size: 90%;
+        min-width: 30rem;
+    }
+
+    input.settings-input {
+        min-width: 30rem;
+        padding: 0.5rem;
+        color: #666;
+        font-size: 90%;
+        border-radius: 0.5rem;
+        border: 1px solid #ccc;
+    }
 
     h4 {
         padding-left: 1rem;
-    }
 
-    h4.section-heading {
-        padding-left: 0rem;
-        margin-top: 2rem;
-        font-size: 100%;
-    }
+        &.section-heading {
+            padding-left: 0rem;
+            margin-top: 2rem;
+            font-size: 100%;
+        }
 
-    h4.section-heading:first-of-type {
-        margin-top: 0;
+        &.section-heading:first-of-type {
+            margin-top: 0;
+        }
     }
 
     .button-container {
@@ -273,22 +270,24 @@ input.settings-input {
         color: #fafafa;
     }
 
-    .list-input select.settings-input {
-        width: 26.7rem;
-        min-width: auto;
-        margin-right: 0.3rem;
-    }
+    .list-input {
+        select.settings-input {
+            width: 26.7rem;
+            min-width: auto;
+            margin-right: 0.3rem;
+        }
 
-    .list-input input.settings-input {
-        width: 26.7rem;
-        min-width: auto;
-        margin-top: 0;
-        margin-right: 0.3rem;
-    }
+        input.settings-input {
+            width: 26.7rem;
+            min-width: auto;
+            margin-top: 0;
+            margin-right: 0.3rem;
+        }
 
-    .list-input button {
-        width: 3rem;
-        margin-top: 0;
-        padding: 0.5rem 0.5rem;
+        button {
+            width: 3rem;
+            margin-top: 0;
+            padding: 0.5rem 0.5rem;
+        }
     }
 }
