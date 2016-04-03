@@ -62,7 +62,7 @@
   color: #333333;
 }
 .days > .cell {
-    background-color: #116095;
+    background-color: #1175aa;
     color: white;
 }
 .week {
@@ -118,7 +118,6 @@
   padding: 6px;
   cursor: pointer;
   text-align: center;
-  font-size: 14px;
   line-height: 20px;
   vertical-align: middle;
   border: 1px solid #e0e0e0;
@@ -143,6 +142,7 @@
 .datepicker-popup {
   position: absolute;
   margin-top: 25px;
+  z-index: 1500;
 }
 .datepicker-popup .datepicker-popup-inner {
   position: absolute;
