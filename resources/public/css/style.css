@@ -43,6 +43,8 @@ html > body {
 }
 
 #app {
+    position: relative;
+    box-shadow: 0px 5px 15px 5px #000;
     margin-top: 6rem;
     padding-top: 2rem;
     padding-left: 2rem;
@@ -146,7 +148,7 @@ a:hover {
     padding-top: 1rem;
     padding-bottom: 2rem;
     background-image: url("../images/footer-tile.png");
-    background-color: #333;
+    background-color: #222;
 }
 
 #footer .version {
