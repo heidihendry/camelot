@@ -2,6 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [cljs.reader :as reader]
+            [clojure.string :as string]
             [om-datepicker.components :refer [datepicker]]
             [camelot.state :as state]
             [secretary.core :as secretary :refer-macros [defroute]]))
@@ -28,6 +29,23 @@
     (om/transact! data edit-key (fn [_] (.. e -target -value)))
     (set! (.. e -target -value) (get data edit-key))))
 
+(defn remove-item!
+  [val data edit-key owner]
+  (om/transact! data edit-key (fn [_] (hash-map :value (into [] (remove #{val} (get-in data [edit-key :value])))))))
+
+(defn add-metadata-item!
+  [val data edit-key owner]
+  (when (not (empty? val))
+    (om/transact! data edit-key (fn [_] (hash-map :value (into [] (conj (get-in data [edit-key :value]) val)))))))
+
+(defn add-item!
+  [val data edit-key owner]
+  (prn "fire")
+  (prn val)
+  (when (not (empty? val))
+    (prn "doing it")
+    (om/transact! data edit-key (fn [_] (hash-map :value (into [] (into #{} (conj (get-in data [edit-key :value]) val))))))))
+
 (defn save []
   (throw (js/Error. "Not implemented")))
 
@@ -42,9 +60,10 @@
   (reify
     om/IRender
     (render [_]
-      (dom/option #js {:value (if (= (type key) cljs.core/Keyword)
-                                (name key)
-                                key)} desc))))
+      (dom/option #js {:value (cond
+                                (= (type key) cljs.core/Keyword) (name key)
+                                (= (type key) cljs.core/PersistentVector) (string/join "#" (map name key))
+                                :else key)} desc))))
 
 (defmulti input-field (fn [[k v]] (:type (:schema v))))
 
@@ -63,43 +82,66 @@
                     (om/build-all select-option-component (:options (:schema v))))))))
 
 (defn string-list-item
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:className "list-item"} data))))
+  [k]
+  (fn
+    [data owner]
+    (reify
+      om/IRender
+      (render [_]
+        (dom/span #js {:className "list-item"}
+                  (:elt data)
+                  (dom/span #js {:className "list-item-delete fa fa-trash"
+                                 :onClick #(remove-item! (:elt data) (:state data) (:key data) owner)}))))))
 
 (defn path-list-item
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/span #js {:className "list-item"}
-                (get (state/metadata-schema-state) data)
-                (dom/span #js {:className "list-item-delete fa fa-trash"})))))
+  [k]
+  (fn [data owner]
+    (reify
+      om/IRender
+      (render [_]
+        (dom/span #js {:className "list-item"}
+                  (get (state/metadata-schema-state) (:elt data))
+                  (dom/span #js {:className "list-item-delete fa fa-trash"
+                                 :onClick #(remove-item! (:elt data) (:state data) (:key data) owner)}))))))
 
 (defmethod input-field :list
-  [[k v :as d] owner]
+  [[k v s :as d] owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IInitState
+    (init-state [_]
+      {:select-value nil
+       :text-value ""})
+    om/IRenderState
+    (render-state [this state]
       (dom/div #js {:className "list-input"}
                (apply dom/div nil
                       (if (= (:list-of (:schema v)) :paths)
-                        (om/build-all path-list-item (sort #(< (get (state/metadata-schema-state) %1)
-                                              (get (state/metadata-schema-state) %2)) (get-in (state/config-state) [k :value])))
-                        (om/build-all string-list-item (sort #(< %1 %2) (get-in (state/config-state) [k :value])))))
+                        (om/build-all (path-list-item k) (into [] (map #(hash-map :state s
+                                                                                  :key k
+                                                                                  :elt %) (get-in s [k :value]))))
+                        (om/build-all (string-list-item k) (into [] (map #(hash-map :state s
+                                                                                    :key k
+                                                                                    :elt %)
+                                                                     (sort #(< (:value %1) (:value %2)) (get-in s [k :value])))))))
                (if (= (:complete-with (:schema v)) :metadata)
-                 (dom/select #js {:className "settings-input"}
-                             (om/build-all select-option-component
-                                           (sort #(< (second %1) (second %2)) (remove #(some (set %) (get-in (state/config-state) [k :value]))
-                                                                (state/metadata-schema-state)))))
-                 (dom/input #js {:type "text" :className "settings-input" :placeholder "Add item"}))
-               (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
-                                :onClick #(add)})))))
+                 (dom/div nil
+                          (dom/select #js {:className "settings-input" :value (get state :select-value)
+                                           :onChange #(om/set-state! owner :select-value (.. % -target -value))}
+                                      (om/build-all select-option-component
+                                                    (conj (sort #(< (second %1) (second %2)) (remove #(some (set %) (get-in s [k :value]))
+                                                                                                     (state/metadata-schema-state))) [])))
+                          (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
+                                           :onClick #(do (add-metadata-item! (into [] (map keyword (string/split (get state :select-value) "#"))) s k owner)
+                                                         (om/set-state! owner :select-value ""))}))
+                 (dom/div nil
+                          (dom/input #js {:type "text" :className "settings-input" :placeholder "Add item" :value (get state :text-value)
+                                          :onChange #(om/set-state! owner :text-value (.. % -target -value))})
+                          (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
+                                           :onClick #(do (add-item! (get state :text-value) s k owner)
+                                                         (om/set-state! owner :text-value ""))})))))))
 
 (defmethod input-field :datetime
-  [[k v :as d] owner]
+  [[k v s :as d] owner]
   (reify
     om/IRender
     (render [_]
@@ -107,7 +149,7 @@
 
 ;; TODO this needs to be between 0.0 and 1.0
 (defmethod input-field :percentage
-  [[k v :as d] owner]
+  [[k v s :as d] owner]
   (reify
     om/IRender
     (render [_]
@@ -116,7 +158,7 @@
                       :value (get-in (state/config-state) [k :value])}))))
 
 (defmethod input-field :number
-  [[k v :as d] owner]
+  [[k v s :as d] owner]
   (reify
     om/IRender
     (render [_]
@@ -125,7 +167,7 @@
                       :value (get-in (state/config-state) [k :value])}))))
 
 (defmethod input-field :default
-  [[k v :as d] owner]
+  [[k v s :as d] owner]
   (reify
     om/IRender
     (render [_]
@@ -134,7 +176,7 @@
                       :value (get-in (state/config-state) [k :value])}))))
 
 (defn field-component
-  [menu-item owner]
+  [[menu-item s] owner]
   (reify
     om/IRender
     (render [_]
@@ -144,7 +186,7 @@
           (dom/div #js {:className "settings-field"}
                    (dom/label #js {:className "settings-label"
                                    :title (:description value)} (:label value))
-                   (om/build input-field [(first menu-item) value])))))))
+                   (om/build input-field [(first menu-item) value s])))))))
 
 (defn settings-component
   [data owner]
@@ -152,7 +194,7 @@
     om/IRender
     (render [_]
       (apply dom/div #js {:id "settings-inner"}
-             (om/build-all field-component data)))))
+             (om/build-all field-component (map #(vector % (:config-state data)) (:menu data)))))))
 
 (defn settings-view-component [app owner]
   (reify
@@ -160,7 +202,8 @@
     (render [_]
       (dom/div nil
                (dom/h4 nil "Settings")
-               (dom/div nil (om/build settings-component (:menu (:settings app))))
+               (dom/div nil (om/build settings-component {:menu (:menu (:settings app))
+                                                          :config-state (state/config-state)}))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"
                                          :onClick #(save)}
