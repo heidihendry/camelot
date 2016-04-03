@@ -30,11 +30,12 @@
   (reify
     om/IRender
     (render [_]
-      (dom/select #js {:className "settings-input" :value
-                       (if (= (type key) cljs.core/Keyword)
-                         (name (first (keys (:options (:schema v)))))
-                         (first (keys (:options (:schema v)))))}
-                  (om/build-all select-option-component (:options (:schema v)))))))
+      (let [val (get-in (state/config-state) [k :value])]
+        (dom/select #js {:className "settings-input" :value
+                         (if (= (type val) cljs.core/Keyword)
+                           (name val)
+                           val)}
+                    (om/build-all select-option-component (:options (:schema v))))))))
 
 (defn string-list-item
   [data owner]
