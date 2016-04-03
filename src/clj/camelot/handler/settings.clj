@@ -44,7 +44,14 @@
   (into {} (map #(hash-map % (path-description state %))
                 metadata-paths)))
 
+(defn translate-menu-labels
+  [state menu]
+  (into [] (map #(if (= (first %) :label)
+                   [(first %) ((:translate state) (second %))]
+                   %) menu)))
+
 (defn settings-schema
   [state]
   {:config (config-description state (mp/config-schema state))
-   :metadata (get-metadata state)})
+   :metadata (get-metadata state)
+   :menu (translate-menu-labels state mp/config-menu)})

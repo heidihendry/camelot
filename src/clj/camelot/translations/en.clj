@@ -85,6 +85,8 @@
               :filename "File Name"
               :filesize "File Size"}
 
+   :settings {:preferences "Preferences"
+              :validations "Validations"}
    :default-config-created "A default configuration has been created in '%s'"
 
    :missing  "|Missing translation: [%1$s %2$s %3$s]|"})
