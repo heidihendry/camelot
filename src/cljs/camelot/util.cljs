@@ -6,14 +6,16 @@
   (:import [goog.date UtcDateTime]))
 
 (defn with-baseurl [path]
-  (let [port (-> js/window (aget "location") (aget "port"))]
-    (str
-     (-> js/window (aget "location") (aget "protocol"))
-     "//"
-     (-> js/window (aget "location") (aget "hostname"))
-     (when (not (zero? (count port)))
-       (str ":" port))
-     path)))
+  (if (clojure.string/starts-with? (-> js/window (aget "location") (aget "protocol")) "http")
+    (let [port (-> js/window (aget "location") (aget "port"))]
+      (str
+       (-> js/window (aget "location") (aget "protocol"))
+       "//"
+       (-> js/window (aget "location") (aget "hostname"))
+       (when (not (zero? (count port)))
+         (str ":" port))
+       path))
+    (str "http://localhost:3449" path)))
 
 (def transit-file-reader identity)
 

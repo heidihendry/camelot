@@ -22,7 +22,7 @@
                   (util/ls-set-item! "config" (:body %))
                   (om/update! (state/app-state-cursor) :config (:body %))
                     (util/postreq (util/with-baseurl "/albums")
-                                  {:config (:body %) :dir "/home/chris/testdata"}
+                                  {:config (:body %) :dir "/home/chris/photodata/testdata"}
                                   (fn [x] (om/update! (state/app-state-cursor) :albums (:body x))))
                     (util/postreq (util/with-baseurl "/settings/get")
                                   {:config (:config state)}
@@ -40,7 +40,7 @@
         (om/update! (state/app-state-cursor) :config config)
         (when (nil? (:albums config))
           (util/postreq (util/with-baseurl "/albums")
-                        {:config config :dir "/home/chris/testdata"}
+                        {:config config :dir "/home/chris/photodata/testdata"}
                         #(om/update! (state/app-state-cursor) :albums (:body %))))
         (util/postreq (util/with-baseurl "/settings/get")
                       {:config config}
@@ -48,7 +48,7 @@
       (config-default state/app-state))))
 
 (defn default-page [page]
-  (if (= page "/")
+  (if (or (= page "/") (clojure.string/ends-with? page "index.html"))
     "/dashboard"
     page))
 
