@@ -1,9 +1,32 @@
 (ns camelot.component.settings
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
+            [cljs.reader :as reader]
             [om-datepicker.components :refer [datepicker]]
             [camelot.state :as state]
             [secretary.core :as secretary :refer-macros [defroute]]))
+
+(defn set-coerced-value!
+  [k]
+  (fn [e data edit-key owner]
+    (let [f (cond (= (type k) cljs.core/Keyword) (fn [_] (keyword (.. e -target -value)))
+                  (number? k) (fn [_] (reader/read-string (.. e -target -value)))
+                  :else (fn [_] (.. e -target -value)))]
+      (om/transact! data edit-key f))))
+
+(defn set-unvalidated-text! [e data edit-key owner]
+  (om/transact! data edit-key (fn [_] (.. e -target -value))))
+
+(defn set-number! [e data edit-key owner]
+  (if (re-matches #"^[\.0-9]*$" (.. e -target -value))
+    (om/transact! data edit-key (fn [_] (.. e -target -value)))
+    (set! (.. e -target -value) (get data edit-key))))
+
+(defn set-percentage! [e data edit-key owner]
+  (if (and (re-matches #"^[.0-9]*$" (.. e -target -value))
+             (<= (reader/read-string (.. e -target -value)) 1.0))
+    (om/transact! data edit-key (fn [_] (.. e -target -value)))
+    (set! (.. e -target -value) (get data edit-key))))
 
 (defn save []
   (throw (js/Error. "Not implemented")))
@@ -31,7 +54,9 @@
     om/IRender
     (render [_]
       (let [val (get-in (state/config-state) [k :value])]
-        (dom/select #js {:className "settings-input" :value
+        (dom/select #js {:className "settings-input"
+                         :onChange #((set-coerced-value! val) % (k (state/config-state)) :value owner)
+                         :value
                          (if (= (type val) cljs.core/Keyword)
                            (name val)
                            val)}
@@ -54,7 +79,7 @@
                 (dom/span #js {:className "list-item-delete fa fa-trash"})))))
 
 (defmethod input-field :list
-  [[k v] owner]
+  [[k v :as d] owner]
   (reify
     om/IRender
     (render [_]
@@ -74,7 +99,7 @@
                                 :onClick #(add)})))))
 
 (defmethod input-field :datetime
-  [[k v] owner]
+  [[k v :as d] owner]
   (reify
     om/IRender
     (render [_]
@@ -82,29 +107,34 @@
 
 ;; TODO this needs to be between 0.0 and 1.0
 (defmethod input-field :percentage
-  [[k v] owner]
+  [[k v :as d] owner]
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "number" :className "settings-input" :value (get-in (state/config-state) [k :value])}))))
+      (dom/input #js {:type "number" :className "settings-input"
+                      :onChange #(set-percentage! % (k (state/config-state)) :value owner)
+                      :value (get-in (state/config-state) [k :value])}))))
 
 (defmethod input-field :number
-  [[k v] owner]
+  [[k v :as d] owner]
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "number" :className "settings-input" :value (get-in (state/config-state) [k :value])}))))
+      (dom/input #js {:type "number" :className "settings-input"
+                      :onChange #(set-number! % (k (state/config-state)) :value owner)
+                      :value (get-in (state/config-state) [k :value])}))))
 
 (defmethod input-field :default
-  [[k v] owner]
+  [[k v :as d] owner]
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "text" :className "settings-input" :value (get-in (state/config-state) [k :value])}))))
+      (dom/input #js {:type "text" :className "settings-input"
+                      :onChange #(set-unvalidated-text! % (k (state/config-state)) :value owner)
+                      :value (get-in (state/config-state) [k :value])}))))
 
 (defn field-component
   [menu-item owner]
-  (prn menu-item)
   (reify
     om/IRender
     (render [_]
