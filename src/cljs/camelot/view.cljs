@@ -21,8 +21,10 @@
   (om/root view state/app-state
            {:target (js/document.getElementById "page-content")}))
 
-(om/root cset/settings-view-component state/app-state {:target (js/document.getElementById "settings")})
+(defn settings-menu-view
+  []
+  (om/root cset/settings-view-component state/app-state
+           {:target (js/document.getElementById "settings")}))
 
 (defroute "/dashboard" [] (generate-view calb/album-view-component))
-(defroute "/settings" [] (generate-view cset/settings-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))
