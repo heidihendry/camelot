@@ -1,12 +1,17 @@
 (ns camelot.component.settings
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
+            [om-datepicker.components :refer [datepicker]]
+            [camelot.state :as state]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
 (defn save []
   (throw (js/Error. "Not implemented")))
 
 (defn cancel []
+  (throw (js/Error. "Not implemented")))
+
+(defn add []
   (throw (js/Error. "Not implemented")))
 
 (defn select-option-component
@@ -18,27 +23,86 @@
                                 (name key)
                                 key)} desc))))
 
-(defmulti input-field :type)
+(defmulti input-field (fn [[k v]] (:type (:schema v))))
 
 (defmethod input-field :select
-  [s owner]
+  [[k v] owner]
   (reify
     om/IRender
     (render [_]
-      (dom/select #js {:className "settings-input" :value (if (= (type key) cljs.core/Keyword)
-                                (name (first (keys (:options s))))
-                                (first (keys (:options s))))}
-                  (om/build-all select-option-component (:options s))))))
+      (dom/select #js {:className "settings-input" :value
+                       (if (= (type key) cljs.core/Keyword)
+                         (name (first (keys (:options (:schema v)))))
+                         (first (keys (:options (:schema v)))))}
+                  (om/build-all select-option-component (:options (:schema v)))))))
+
+(defn string-list-item
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "list-item"} data))))
+
+(defn path-list-item
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/span #js {:className "list-item"}
+                (get (state/metadata-schema-state) data)
+                (dom/span #js {:className "list-item-delete fa fa-trash"})))))
+
+(defmethod input-field :list
+  [[k v] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "list-input"}
+               (apply dom/div nil
+                      (if (= (:list-of (:schema v)) :paths)
+                        (om/build-all path-list-item (sort #(< (get (state/metadata-schema-state) %1)
+                                              (get (state/metadata-schema-state) %2)) (get-in (state/config-state) [k :value])))
+                        (om/build-all string-list-item (sort #(< %1 %2) (get-in (state/config-state) [k :value])))))
+               (if (= (:complete-with (:schema v)) :metadata)
+                 (dom/select #js {:className "settings-input"}
+                             (om/build-all select-option-component
+                                           (sort #(< (second %1) (second %2)) (remove #(some (set %) (get-in (state/config-state) [k :value]))
+                                                                (state/metadata-schema-state)))))
+                 (dom/input #js {:type "text" :className "settings-input" :placeholder "Add item"}))
+               (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
+                                :onClick #(add)})))))
+
+(defmethod input-field :datetime
+  [[k v] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build datepicker (get (state/config-state) k)))))
+
+;; TODO this needs to be between 0.0 and 1.0
+(defmethod input-field :percentage
+  [[k v] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/input #js {:type "number" :className "settings-input" :value (get-in (state/config-state) [k :value])}))))
+
+(defmethod input-field :number
+  [[k v] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/input #js {:type "number" :className "settings-input" :value (get-in (state/config-state) [k :value])}))))
 
 (defmethod input-field :default
-  [s owner]
+  [[k v] owner]
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "text" :className "settings-input" :value (name (:type s))}))))
+      (dom/input #js {:type "text" :className "settings-input" :value (get-in (state/config-state) [k :value])}))))
 
 (defn field-component
-  [[key value] owner]
+  [[key value :as s] owner]
   (reify
     om/IRender
     (render [_]
@@ -47,7 +111,7 @@
                         (dom/div #js {:className "settings-field"}
                                  (dom/label #js {:className "settings-label"
                                                  :title (:description value)} (:label value))
-                                 (om/build input-field (:schema value))))))))
+                                 (om/build input-field s)))))))
 
 (defn settings-component
   [data owner]

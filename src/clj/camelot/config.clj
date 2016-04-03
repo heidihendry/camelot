@@ -18,8 +18,8 @@
    :language :en
    :night-end-hour 5
    :night-start-hour 21
-   :project-start "1970-01-01 00:00:00"
-   :project-end "2069-12-31 23:59:59"
+   :project-start {:value "1970-01-01 00:00:00"}
+   :project-end {:value "2069-12-31 23:59:59"}
    :sighting-independence-minutes-threshold 20
    :surveyed-species []
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
@@ -67,6 +67,14 @@
     (io/reader path)
     (throw (RuntimeException. ((gen-translator default-config) :problems/config-not-found)))))
 
+(defn decursorise
+  [conf]
+  (into {} (map (fn [[k v]] {k (:value v)}) conf)))
+
+(defn cursorise
+  [conf]
+  (into {} (map (fn [[k v]] {k {:value v}}) conf)))
+
 (defn config
   "Application configuration"
   []
@@ -75,6 +83,7 @@
        (f/pushback-reader)
        (edn/read)
        (parse-dates)
+       (cursorise)
        (reset! config-cache)))
 
 (defn create-default-config
