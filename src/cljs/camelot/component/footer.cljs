@@ -10,5 +10,5 @@
                (dom/img #js {:src "images/logo.png" :className "title"})
                (dom/label #js {:className "version"} (str "Version " (-> data :application :version)))
                (dom/label #js {:className "developer"}
-                          (dom/a {:href "chris@bitpattern.com.au"} "Bit Pattern")
+                          (dom/a #js {:href "http://www.bitpattern.com.au" :target "_blank"} "Bit Pattern")
                           " © 2016 ")))))
