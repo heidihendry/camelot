@@ -3,7 +3,7 @@
   (:require [cljs-http.client :as http]
             [cognitect.transit :as transit]
             [cljs.core.async :refer [<!]])
-  (:import [goog.date UtcDateTime]))
+  (:import [goog.date DateTime]))
 
 (defn with-baseurl [path]
   (if (clojure.string/starts-with? (-> js/window (aget "location") (aget "protocol")) "http")
@@ -27,14 +27,14 @@
 
 (defn- transit-date-reader
   [s]
-  (UtcDateTime.fromTimestamp s))
+  (DateTime.fromTimestamp s))
 
 (def transit-read-handlers
   {"m" transit-date-reader
    "f" transit-file-reader})
 
 (def transit-write-handlers
-  {UtcDateTime transit-date-writer})
+  {DateTime transit-date-writer})
 
 (defn ls-set-item!
   "Set `key' in browser's localStorage to `val`."

@@ -6,9 +6,8 @@
             [om-datepicker.components :refer [datepicker]]
             [camelot.state :as state]
             [camelot.nav :as nav]
+            [camelot.util :refer [postreq with-baseurl]]
             [secretary.core :as secretary :refer-macros [defroute]]))
-
-
 
 (defn set-coerced-value!
   [k]
@@ -49,7 +48,9 @@
 (defn save []
   (do
     (om/update! (state/app-state-cursor) :config (deref (state/config-buffer-state)))
-    (nav/toggle-settings!)))
+    (postreq (with-baseurl "/settings/save")
+             {:config (deref (state/config-state))}
+             (fn [d] (nav/toggle-settings!)))))
 
 (defn cancel []
   (do

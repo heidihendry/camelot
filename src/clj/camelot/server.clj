@@ -34,7 +34,7 @@
         (catch java.lang.UnsupportedOperationException e
           (sh "bash" "-c" (str "xdg-open " addr " &> /dev/null &")))))))
 
-(def joda-time-reader (transit/read-handler #(DateTime. ^java.lang.Long (Long/parseLong %))))
+(def joda-time-reader (transit/read-handler #(c/from-long ^java.lang.Long (Long/parseLong %))))
 (def file-reader (transit/read-handler #(File. ^java.lang.Long (Long/parseLong %))))
 
 (def getTime
@@ -43,8 +43,8 @@
 (def joda-time-writer
   (transit/write-handler
    (constantly "m")
-   #(-> % c/to-date getTime)
-   #(-> % c/to-date getTime .toString)))
+   #(-> % c/to-long)
+   #(-> % c/to-long .toString)))
 
 (def file-writer
   (transit/write-handler
@@ -64,6 +64,8 @@
   (GET "/dashboard" _ (retrieve-index))
   (GET "/default-config" [] (response (config)))
   (GET "/application" [] (response {:version (get-version)}))
+  (POST "/settings/save" {{config :config} :params}
+        (response (hs/settings-save (decursorise config))))
   (POST "/settings/get" {{config :config} :params}
         (response (hs/settings-schema (gen-state (decursorise config)))))
   (POST "/albums" {{config :config, dir :dir} :params}
@@ -78,8 +80,8 @@
         (wrap-transit-response {:encoding :json, :opts
                                 {:handlers {org.joda.time.DateTime joda-time-writer
                                             File file-writer}}})
-        (wrap-transit-params {:opts {:handlers {(constantly "m") joda-time-reader
-                                                (constantly "f") file-reader}}})
+        (wrap-transit-params {:opts {:handlers {"m" joda-time-reader
+                                                "f" file-reader}}})
         (wrap-defaults api-defaults)
         wrap-with-logger
         wrap-gzip)))

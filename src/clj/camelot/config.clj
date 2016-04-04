@@ -4,6 +4,7 @@
             [clojure.string :as str]
             [clj-time.core :as t]
             [clojure.pprint :as pp]
+            [clj-time.coerce :as tc]
             [clj-time.format :as tf]
             [clojure.java.io :as io]
             [clojure.edn :as edn]
@@ -46,11 +47,17 @@
 
 (def timestamp-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
 
+(defn normalise-dates
+  [config]
+  (assoc config
+         :project-start (tc/to-long (:project-start config))
+         :project-end (tc/to-long (:project-end config))))
+
 (defn parse-dates
   [config]
   (assoc config
-         :project-start (tf/parse timestamp-formatter (:project-start config))
-         :project-end (tf/parse timestamp-formatter (:project-end config))))
+         :project-start (tc/from-long (:project-start config))
+         :project-end (tc/from-long (:project-end config))))
 
 (def config-cache (atom nil))
 
@@ -86,19 +93,27 @@
        (cursorise)
        (reset! config-cache)))
 
-(defn create-default-config
-  []
-  (let [translate (gen-translator default-config)
+(defn- save-config-helper
+  [config overwrite?]
+  (let [translate (gen-translator config)
         conf (get-config-file)
         confdir (f/getParentFile (io/file conf))]
     (when (not (f/exists confdir))
       (f/mkdir confdir))
-    (if (f/exists (io/file conf))
+    (if (and (not overwrite?) (f/exists (io/file conf)))
       (throw (RuntimeException. (translate :problems/default-config-exists conf)))
       (do
         (with-open [w (io/writer conf)]
-          (pp/write default-config :stream w))
-        (println (translate :default-config-created conf))))))
+          (pp/write config :stream w))))
+    config))
+
+(defn save-config
+  [config]
+  (save-config-helper (normalise-dates config) true))
+
+(defn create-default-config
+  []
+  (save-config default-config nil))
 
 (defn gen-state
   "Return the global application state."
