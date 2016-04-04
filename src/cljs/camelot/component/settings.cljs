@@ -5,7 +5,10 @@
             [clojure.string :as string]
             [om-datepicker.components :refer [datepicker]]
             [camelot.state :as state]
+            [camelot.nav :as nav]
             [secretary.core :as secretary :refer-macros [defroute]]))
+
+
 
 (defn set-coerced-value!
   [k]
@@ -40,20 +43,18 @@
 
 (defn add-item!
   [val data edit-key owner]
-  (prn "fire")
-  (prn val)
   (when (not (empty? val))
-    (prn "doing it")
     (om/transact! data edit-key (fn [_] (hash-map :value (into [] (into #{} (conj (get-in data [edit-key :value]) val))))))))
 
 (defn save []
-  (throw (js/Error. "Not implemented")))
+  (do
+    (om/update! (state/app-state-cursor) :config (deref (state/config-buffer-state)))
+    (nav/toggle-settings!)))
 
 (defn cancel []
-  (throw (js/Error. "Not implemented")))
-
-(defn add []
-  (throw (js/Error. "Not implemented")))
+  (do
+    (om/update! (state/app-state-cursor) :config-buffer (deref (state/config-state)))
+    (nav/toggle-settings!)))
 
 (defn select-option-component
   [[key desc] owner]
@@ -72,9 +73,9 @@
   (reify
     om/IRender
     (render [_]
-      (let [val (get-in (state/config-state) [k :value])]
+      (let [val (get-in (state/config-buffer-state) [k :value])]
         (dom/select #js {:className "settings-input"
-                         :onChange #((set-coerced-value! val) % (k (state/config-state)) :value owner)
+                         :onChange #((set-coerced-value! val) % (k (state/config-buffer-state)) :value owner)
                          :value
                          (if (= (type val) cljs.core/Keyword)
                            (name val)
@@ -148,7 +149,7 @@
   (reify
     om/IRender
     (render [_]
-      (om/build datepicker (get (state/config-state) k)))))
+      (om/build datepicker (get (state/config-buffer-state) k)))))
 
 ;; TODO this needs to be between 0.0 and 1.0
 (defmethod input-field :percentage
@@ -157,8 +158,8 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "number" :className "settings-input"
-                      :onChange #(set-percentage! % (k (state/config-state)) :value owner)
-                      :value (get-in (state/config-state) [k :value])}))))
+                      :onChange #(set-percentage! % (k (state/config-buffer-state)) :value owner)
+                      :value (get-in (state/config-buffer-state) [k :value])}))))
 
 (defmethod input-field :number
   [[k v s :as d] owner]
@@ -166,8 +167,8 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "number" :className "settings-input"
-                      :onChange #(set-number! % (k (state/config-state)) :value owner)
-                      :value (get-in (state/config-state) [k :value])}))))
+                      :onChange #(set-number! % (k (state/config-buffer-state)) :value owner)
+                      :value (get-in (state/config-buffer-state) [k :value])}))))
 
 (defmethod input-field :default
   [[k v s :as d] owner]
@@ -175,8 +176,8 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "text" :className "settings-input"
-                      :onChange #(set-unvalidated-text! % (k (state/config-state)) :value owner)
-                      :value (get-in (state/config-state) [k :value])}))))
+                      :onChange #(set-unvalidated-text! % (k (state/config-buffer-state)) :value owner)
+                      :value (get-in (state/config-buffer-state) [k :value])}))))
 
 (defn field-component
   [[menu-item s] owner]
@@ -206,7 +207,7 @@
       (dom/div nil
                (dom/h4 nil "Settings")
                (dom/div nil (om/build settings-component {:menu (:menu (:settings app))
-                                                          :config-state (state/config-state)}))
+                                                          :config-state (state/config-buffer-state)}))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"
                                          :onClick #(save)}

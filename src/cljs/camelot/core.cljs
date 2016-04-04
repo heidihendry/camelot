@@ -21,6 +21,7 @@
                #(do
                   (util/ls-set-item! "config" (:body %))
                   (om/update! (state/app-state-cursor) :config (:body %))
+                  (om/update! (state/app-state-cursor) :config-buffer (:body %))
                   (view/settings-menu-view)
                   (util/postreq (util/with-baseurl "/albums")
                                   {:config (:body %) :dir "/home/chris/photodata/testdata"}
@@ -39,6 +40,7 @@
                      {}
                      #(om/update! (state/app-state-cursor) :application (:body %)))
         (om/update! (state/app-state-cursor) :config config)
+        (om/update! (state/app-state-cursor) :config-buffer config)
         (view/settings-menu-view)
         (when (nil? (:albums config))
           (util/postreq (util/with-baseurl "/albums")
