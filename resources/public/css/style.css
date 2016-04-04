@@ -33,6 +33,7 @@ html > body {
   overflow: hidden;
   max-width: 100%;
   padding-bottom: 2rem;
+  min-height: 500px;
 }
 #app h1,
 #app h2,
@@ -248,4 +249,13 @@ a:hover {
   width: 3rem;
   margin-top: 0;
   padding: 0.5rem 0.5rem;
+}
+#loading {
+    height: 30px;
+    width: 120px;
+    background: url("../images/logo-inv.png");
+    background-repeat: no-repeat;
+    position: fixed;
+    top: calc(40vh);
+    left: calc(50vw - 60px);
 }

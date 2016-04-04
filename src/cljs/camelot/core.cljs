@@ -56,8 +56,16 @@
     "/dashboard"
     page))
 
+(defn disable-loading
+  []
+  (set! (.-style (js/document.getElementById "loading")) "display: none")
+  (set! (.-style (js/document.getElementById "navigation")) "")
+  (set! (.-style (js/document.getElementById "app")) "")
+  (set! (.-style (js/document.getElementById "footer")) ""))
+
 (or ;(:config @app-state)
  (do (setup)
+     (disable-loading)
      (-> js/document
          .-location
          .-pathname
