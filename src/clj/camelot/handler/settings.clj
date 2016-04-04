@@ -55,3 +55,7 @@
   {:config (config-description state (mp/config-schema state))
    :metadata (get-metadata state)
    :menu (translate-menu-labels state mp/config-menu)})
+
+(defn settings-save
+  [config]
+  (c/save-config config))
