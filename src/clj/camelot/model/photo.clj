@@ -5,6 +5,7 @@
   [state]
   {:erroneous-infrared-threshold {:type :percentage}
    :infrared-iso-value-threshold {:type :number}
+   :sighting-independence-minutes-threshold {:type :number}
    :language {:type :select
               :options {:en ((:translate state) :language/en)
                         :vn ((:translate state) :language/vn)}}
@@ -50,6 +51,7 @@
    [:surveyed-species]
    [:night-start-hour]
    [:night-end-hour]
+   [:sighting-independence-minutes-threshold]
    [:infrared-iso-value-threshold]
    [:erroneous-infrared-threshold]])
 
