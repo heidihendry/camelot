@@ -1,7 +1,7 @@
 (ns camelot.server
   (:require [camelot.handler.main :as main]
             [camelot.handler.settings :as hs]
-            [camelot.config :refer [gen-state config get-version create-default-config decursorise]]
+            [camelot.config :refer [gen-state config config-internal get-version create-default-config decursorise]]
             [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
             [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]

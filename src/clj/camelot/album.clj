@@ -206,7 +206,7 @@
                :surveyed-species check-species}]
     (remove nil?
             (map (fn [[t f]]
-                   (let [res (f state (vals (:photos album-data)))]
+                   (let [res (f state (vals album-data))]
                      (if (not= (:result res) :pass)
                        {:problem t
                         :reason (if (:reason res)

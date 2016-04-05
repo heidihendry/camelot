@@ -38,6 +38,8 @@
                                            :description "Value between 0.0 and 1.0 to set the treshold for date/time error detection"}
             :infrared-iso-value-threshold {:label "Infrared ISO Value Threshold"
                                            :description "ISO value of the photos beyond which it is considered 'night'"}
+            :sighting-independence-minutes-threshold {:label "Sighting Independence Threshold (mins)"
+                                                      :description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"}
             :language {:label "Language"
                        :description "Interface language to use"}
             :night-start-hour {:label "Night Start Time"

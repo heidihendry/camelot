@@ -59,8 +59,6 @@
          :project-start (tc/from-long (:project-start config))
          :project-end (tc/from-long (:project-end config))))
 
-(def config-cache (atom nil))
-
 (defn gen-translator
   "Create a translator for the user's preferred language."
   [config]
@@ -82,16 +80,18 @@
   [conf]
   (into {} (map (fn [[k v]] {k {:value v}}) conf)))
 
-(defn config
+(defn config-internal
   "Application configuration"
   []
   (->> (get-config-file)
        (read-config-file)
        (f/pushback-reader)
        (edn/read)
-       (parse-dates)
-       (cursorise)
-       (reset! config-cache)))
+       (parse-dates)))
+
+(defn config
+  []
+  (cursorise (config-internal)))
 
 (defn- save-config-helper
   [config overwrite?]
