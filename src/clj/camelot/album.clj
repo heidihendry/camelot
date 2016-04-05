@@ -115,7 +115,6 @@
           ftime (gettime (first photos))
           times (map #(-' (gettime %) ftime) photos)
           sd (stddev times)]
-      
       (if (nil? (reduce #(if (> %2 (+' %1 (*' sd 3)))
                            (reduced nil)
                            %2) 0 (rest times)))
@@ -127,10 +126,11 @@
   (if (empty? photos)
     {:result :pass}
     (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
-      (if (or (t/before? (:datetime (first photos)) (:project-start (:config state)))
-              (t/after? (:datetime (last photos)) (:project-end (:config state))))
-        {:result :fail}
-        {:result :pass}))))
+      (cond (t/before? (:datetime (first photos)) (:project-start (:config state)))
+            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (first photos))}
+            (t/after? (:datetime (last photos)) (:project-end (:config state)))
+            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (first photos))}
+            :else {:result :pass}))))
 
 (defn check-camera-checks
   [state photos]
@@ -143,13 +143,20 @@
                           (into #{}))]
     (if (> (count check-photos) 1)
       {:result :pass}
-      {:result :fail})))
+      {:result :fail :reason ((:translate state) :checks/camera-checks)})))
+
+(defn compare-headlines
+  [state h1 h2]
+  (if (not (= (:headline h1) (:headline h2)))
+    (reduced {:result :fail :reason ((:translate state) :checks/headline-consistency h1 h2)})
+    h1))
 
 (defn check-headline-consistency
   [state photos]
-  (or (reduce #(when (not (= (:headline %1) (:headline %2)))
-                 (reduced {:result :fail})) (first photos) (rest photos))
-      {:result :pass}))
+  (let [r (reduce (partial compare-headlines state) (first photos) (rest photos))]
+    (if (= (:result r) :fail)
+      r
+      {:result :pass})))
 
 (defn check-required-fields
   [state photos]
