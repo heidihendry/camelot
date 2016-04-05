@@ -18,7 +18,7 @@
 
 (def Problem
   {(s/required-key :problem) s/Keyword
-   (s/required-key :description) s/Str})
+   (s/required-key :reason) s/Str})
 
 (def Album
   {(s/required-key :photos) {java.io.File PhotoMetadata}

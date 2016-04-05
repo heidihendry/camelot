@@ -15,9 +15,9 @@
         night-total (count (filter #(nightfn (t/hour (:datetime %))) photos))]
     (if (not (zero? night-total))
       (if (> (/ ir-failed night-total) (:erroneous-infrared-threshold (:config state)))
-        :fail
-        :pass)
-      :pass)))
+        {:result :fail}
+        {:result :pass})
+      {:result :pass})))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."
@@ -109,7 +109,7 @@
 (defn check-photo-stddev
   [state photos]
   (if (< (count photos) 2)
-    :pass
+    {:result :pass}
     (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)
           gettime #(-> % (:datetime) (tc/to-long))
           ftime (gettime (first photos))
@@ -119,18 +119,18 @@
       (if (nil? (reduce #(if (> %2 (+' %1 (*' sd 3)))
                            (reduced nil)
                            %2) 0 (rest times)))
-        :fail
-        :pass))))
+        {:result :fail}
+        {:result :pass}))))
 
 (defn check-project-dates
   [state photos]
   (if (empty? photos)
-    :pass
+    {:result :pass}
     (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
       (if (or (t/before? (:datetime (first photos)) (:project-start (:config state)))
               (t/after? (:datetime (last photos)) (:project-end (:config state))))
-        :fail
-        :pass))))
+        {:result :fail}
+        {:result :pass}))))
 
 (defn check-camera-checks
   [state photos]
@@ -142,37 +142,37 @@
                           (map as-day)
                           (into #{}))]
     (if (> (count check-photos) 1)
-      :pass
-      :fail)))
+      {:result :pass}
+      {:result :fail})))
 
 (defn check-headline-consistency
   [state photos]
   (or (reduce #(when (not (= (:headline %1) (:headline %2)))
-                 (reduced :fail)) (first photos) (rest photos))
-      :pass))
+                 (reduced {:result :fail})) (first photos) (rest photos))
+      {:result :pass}))
 
 (defn check-required-fields
   [state photos]
   (let [fields (:required-fields (:config state))]
     (or (reduce #(when (some nil? (map (partial photo/extract-path-value %2) fields))
-                   (reduced :fail)) nil
+                   (reduced {:result :fail})) nil
                    photos)
-        :pass)))
+        {:result :pass})))
 
 (defn check-album-has-data
   [state photos]
   (if (empty? photos)
-    :fail
-    :pass))
+    {:result :fail}
+    {:result :pass}))
 
 (defn check-sighting-consistency
   [state photos]
   (or (reduce #(if (or (nil? (:quantity %2)) (nil? (:species %2)))
-                 (reduced :fail)
+                 (reduced {:result :fail})
                  %1)
-              :pass
+              {:result :pass}
               (apply concat (map :sightings photos)))
-      :pass))
+      {:result :pass}))
 
 (defn check-species
   [state photos]
@@ -185,8 +185,8 @@
                                         (:surveyed-species (:config state))))))
                (first))]
     (if m
-      :fail
-      :pass)))
+      {:result :fail}
+      {:result :pass})))
 
 (defn- problem-descriptions
   [state problems]
@@ -206,9 +206,18 @@
                :surveyed-species check-species}]
     (remove nil?
             (map (fn [[t f]]
-                   (if (= (f state (vals (:photos album-data))) :fail)
-                     t
-                     nil))
+                   (let [res (f state (vals (:photos album-data)))]
+                     (if (not= (:result res) :pass)
+                       {:problem t
+                        :reason (if (:reason res)
+                                  ((:translate state) (:reason res))
+                                  (->> t
+                                       (name)
+                                       (str "checks/")
+                                       (keyword)
+                                       ((:translate state))
+                                       ((:translate state) :checks/problem-without-reason)))}
+                       nil)))
                  tests))))
 
 (s/defn album :- ma/Album
@@ -217,7 +226,7 @@
   (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise state v)]) set-data))]
     {:photos album-data
      :metadata (extract-metadata state (vals album-data))
-     :problems (problem-descriptions state (list-problems state album-data))}))
+     :problems (list-problems state album-data)}))
 
 (s/defn album-set
   "Return a datastructure representing all albums and their metadata"
