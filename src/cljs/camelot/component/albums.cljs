@@ -25,13 +25,21 @@
                                                :onChange #(om/update! metadata :description (.. % -target -value))
                                                :onBlur #(util/postreq "update-photo-metadata" {:file (om/value file) :metadata (om/value metadata)} (fn [x] prn x))})))))))
 
+(defn problem-component
+  [problem owner]
+  (reify
+    om/IRender
+    (render [this]
+      (prn problem)
+      (dom/label #js {:className "album-problem"} (:reason problem)))))
+
 (defn album-component [data owner]
   (reify
     om/IRender
     (render [this]
-      (dom/div nil
-               (apply dom/div nil
-                      (om/build-all photo-component (:photos data)))))))
+      (if (not (empty? (:problems data)))
+        (apply dom/div nil
+               (om/build-all problem-component (:problems data)))))))
 
 (defn albums-component [albums owner]
   (reify

@@ -20,6 +20,7 @@
 
    :checks {:starting "Running consistency checks..."
             :failure-notice "FAIL: %s:"
+            :problem-without-reason "Problem encountered: '%s'. The exact reason is not known."
             :photo-stddev "The timestamp on some photos significantly exceeds the standard deviation"
             :project-dates "The timestamp on some photos lies outside of the project start and stop times"
             :time-light-sanity "The camera settings do not coincide with the timestamp on numerous photos"
