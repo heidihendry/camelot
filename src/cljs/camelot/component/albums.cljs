@@ -30,15 +30,14 @@
   (reify
     om/IRender
     (render [this]
-      (prn problem)
-      (dom/label #js {:className "album-problem"} (:reason problem)))))
+      (dom/li #js {:className "album-problem"} (:reason problem)))))
 
 (defn album-component [data owner]
   (reify
     om/IRender
     (render [this]
       (if (not (empty? (:problems data)))
-        (apply dom/div nil
+        (apply dom/ul nil
                (om/build-all problem-component (:problems data)))))))
 
 (defn albums-component [albums owner]
