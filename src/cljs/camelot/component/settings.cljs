@@ -50,7 +50,10 @@
     (om/update! (state/app-state-cursor) :config (deref (state/config-buffer-state)))
     (postreq (with-baseurl "/settings/save")
              {:config (deref (state/config-state))}
-             (fn [d] (nav/toggle-settings!)))))
+             (fn [d] (nav/toggle-settings!)
+               (postreq (with-baseurl "/albums")
+                        {:config (deref (state/config-state)) :dir "/home/chris/photodata/testdata"}
+                        #(om/update! (state/app-state-cursor) :albums (:body %)))))))
 
 (defn cancel []
   (do
