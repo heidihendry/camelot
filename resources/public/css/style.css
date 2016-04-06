@@ -259,3 +259,7 @@ a:hover {
     top: calc(40vh);
     left: calc(50vw - 60px);
 }
+.album-validation-summary {
+    font-size: 140%;
+    margin-bottom: 1rem;
+}
