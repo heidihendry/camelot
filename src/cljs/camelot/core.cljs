@@ -24,8 +24,10 @@
                   (om/update! (state/app-state-cursor) :config-buffer (:body %))
                   (view/settings-menu-view)
                   (util/postreq (util/with-baseurl "/albums")
-                                  {:config (:body %) :dir "/home/chris/photodata/testdata"}
-                                  (fn [x] (om/update! (state/app-state-cursor) :albums (:body x))))
+                                  {:config (:body %)}
+                                  (fn [x] (if (= (type (:body x)) js/String)
+                                            (js/alert (:body x))
+                                            (om/update! (state/app-state-cursor) :albums (:body x)))))
                     (util/postreq (util/with-baseurl "/settings/get")
                                   {:config (:config state)}
                                   (fn [x] (om/update! (state/app-state-cursor) :settings (:body x)))))))
@@ -44,8 +46,10 @@
         (view/settings-menu-view)
         (when (nil? (:albums config))
           (util/postreq (util/with-baseurl "/albums")
-                        {:config config :dir "/home/chris/photodata/testdata"}
-                        #(om/update! (state/app-state-cursor) :albums (:body %))))
+                        {:config config}
+                        #(if (= (type (:body %)) js/String)
+                           (js/alert (:body %))
+                           (om/update! (state/app-state-cursor) :albums (:body %)))))
         (util/postreq (util/with-baseurl "/settings/get")
                       {:config config}
                       #(om/update! (state/app-state-cursor) :settings (:body %))))

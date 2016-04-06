@@ -6,6 +6,8 @@
               :info "[INFO] "
               :ignore "[IGNORE] "
               :okay "[OK] "
+              :root-path-missing "A directory for this survey has not been specified"
+              :root-path-not-found "The directory for the survey was not found or could not be read"
               :rename-field-not-found "Unable to resolve the following field selectors during photo renaming: '%s'"
               :rename-existing-conflict "%s: Not renaming as doing so may overwrite existing file '%s'"
               :rename-conflict "%s: Not performing renames, as not all results would be unique. A file with this named would be the result of renaming the following files:"
@@ -20,8 +22,8 @@
 
    :checks {:starting "Running consistency checks..."
             :failure-notice "FAIL: %s:"
-            :problem-without-reason "Problem encountered: '%s'. The exact reason is not known."
-            :photo-stddev-before "The timestamp on '%s' is significantly earlier than the norm"
+            :problem-without-reason "%s. The exact reason is not known."
+            :photo-stddev-before "The timestamp on '%s' is significantly earlier other timestamps"
             :photo-stddev-after "The timestamp on '%s' is significantly later than the norm"
             :project-dates "The timestamp on some photos lies outside of the project start and stop times"
             :time-light-sanity "The camera settings do not coincide with the timestamp on numerous photos"
@@ -43,6 +45,8 @@
                                                       :description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"}
             :language {:label "Language"
                        :description "Interface language to use"}
+            :root-path {:label "Survey Directory"
+                        :description "Pathname to the root directory of this survey's photo data"}
             :night-start-hour {:label "Night Start Time"
                                :description "Hour beyond which it is considered night"}
             :night-end-hour {:label "Night End Time"
@@ -90,7 +94,7 @@
               :filesize "File Size"}
 
    :settings {:preferences "Preferences"
-              :validations "Validations"}
+              :survey-settings "Survey Settings"}
    :default-config-created "A default configuration has been created in '%s'"
 
    :missing  "|Missing translation: [%1$s %2$s %3$s]|"})

@@ -29,6 +29,7 @@
                               8 "8:00"}}
    :project-start {:type :datetime}
    :project-end {:type :datetime}
+   :root-path {:type :string}
    :surveyed-species {:type :list
                       :list-of :string}
    :required-fields {:type :list
@@ -44,7 +45,8 @@
 (def config-menu
   [[:label :settings/preferences]
    [:language]
-   [:label :settings/validations]
+   [:label :settings/survey-settings]
+   [:root-path]
    [:project-start]
    [:project-end]
    [:required-fields]
