@@ -52,8 +52,10 @@
              {:config (deref (state/config-state))}
              (fn [d] (nav/toggle-settings!)
                (postreq (with-baseurl "/albums")
-                        {:config (deref (state/config-state)) :dir "/home/chris/photodata/testdata"}
-                        #(om/update! (state/app-state-cursor) :albums (:body %)))))))
+                        {:config (deref (state/config-state))}
+                        #(if (= (type (:body %)) js/String)
+                           (js/alert (:body %))
+                           (om/update! (state/app-state-cursor) :albums (:body %))))))))
 
 (defn cancel []
   (do

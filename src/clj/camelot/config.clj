@@ -17,10 +17,11 @@
   {:erroneous-infrared-threshold 0.2
    :infrared-iso-value-threshold 999
    :language :en
+   :root-path nil
    :night-end-hour 5
    :night-start-hour 21
-   :project-start {:value "1970-01-01 00:00:00"}
-   :project-end {:value "2069-12-31 23:59:59"}
+   :project-start 27266400000
+   :project-end 1577836800000
    :sighting-independence-minutes-threshold 20
    :surveyed-species []
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
@@ -91,7 +92,8 @@
 
 (defn config
   []
-  (cursorise (config-internal)))
+  (cursorise (merge (parse-dates default-config)
+                    (config-internal))))
 
 (defn- save-config-helper
   [config overwrite?]

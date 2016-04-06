@@ -3,6 +3,7 @@
             [camelot.album :as a]
             [camelot.config :refer [gen-state]]
             [camelot.problems :as problems]
+            [camelot.util.java-file :as jf]
             [camelot.action.rename-photo :as rp]
             [camelot.util.java-file :as f]))
 
@@ -33,9 +34,15 @@
   "Read albums if not already cached.
 Otherwise return the contents of the cache."
   [state dir]
-  (->> dir
-       (r/read-tree state)
-       (a/album-set state)))
+  (let [fdir (clojure.java.io/file dir)]
+    (cond
+      (nil? dir) ((:translate state) :problems/root-path-missing)
+      (not (and (jf/exists fdir) (jf/can-read? fdir)))
+      ((:translate state) :problems/root-path-not-found)
+      :else
+      (->> dir
+           (r/read-tree state)
+           (a/album-set state)))))
 
 (defn run-tests
   [state acc [file alb]]

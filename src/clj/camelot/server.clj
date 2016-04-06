@@ -68,8 +68,8 @@
         (response (hs/settings-save (decursorise config))))
   (POST "/settings/get" {{config :config} :params}
         (response (hs/settings-schema (gen-state (decursorise config)))))
-  (POST "/albums" {{config :config, dir :dir} :params}
-        (response (main/read-albums (gen-state (decursorise config)) dir)))
+  (POST "/albums" {{config :config} :params}
+        (response (main/read-albums (gen-state (decursorise config)) (:root-path (decursorise config)))))
   (POST "/transit-test" {{time :t} :params} (response {:a time}))
   (resources "/"))
 
