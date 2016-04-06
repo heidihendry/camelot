@@ -36,22 +36,42 @@
   (reify
     om/IRender
     (render [this]
-      (if (not (empty? (:problems data)))
-        (apply dom/ul nil
-               (om/build-all problem-component (:problems data)))))))
+      (dom/div nil
+               (if (empty? (:problems data))
+                 (dom/label nil "No problems found. Time to analyse!")
+                 (apply dom/ul nil
+                        (om/build-all problem-component (:problems data))))))))
 
 (defn albums-component [albums owner]
   (reify
     om/IRender
     (render [this]
       (dom/div nil
-               (dom/div nil
-                        (dom/h3 nil (first albums))
-                        (apply dom/div nil
-                               (om/build-all album-component albums)))))))
+               (dom/label nil (first albums))
+               (apply dom/div nil
+                      (om/build-all album-component (remove #(= (type %) js/String) albums)))))))
+
+(defn album-summary-component [albums owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [pass-rate (/ (->> albums
+                              (vals)
+                              (map :problems)
+                              (filter empty?)
+                              (count))
+                         (count albums))
+            col-bias (* pass-rate 200)]
+        (dom/div #js {:className "album-validation-summary"}
+                 (dom/label #js {:style #js {:color (goog.string/format "rgb(%d, %d, 50)" (- 200 col-bias) col-bias)}}
+                            (goog.string/format "Folders passing validation: %.1f%%"
+                                                (* pass-rate 100))))))))
 
 (defn album-view-component [app owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div nil (apply dom/div nil (om/build-all albums-component (:albums app)))))))
+      (dom/div nil
+               (dom/div nil (om/build album-summary-component (:albums app)))
+               (dom/h3 nil "Problems Identified")
+               (apply dom/div nil (om/build-all albums-component (:albums app)))))))
