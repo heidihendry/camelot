@@ -46,7 +46,7 @@
             :language {:label "Language"
                        :description "Interface language to use"}
             :root-path {:label "Survey Directory"
-                        :description "Pathname to the root directory of this survey's photo data"}
+                        :description "Pathname to the root directory of this survey's photo data. This must be as it would appear to the system running the Camelot server process."}
             :night-start-hour {:label "Night Start Time"
                                :description "Hour beyond which it is considered night"}
             :night-end-hour {:label "Night End Time"
