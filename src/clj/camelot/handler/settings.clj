@@ -1,26 +1,20 @@
 (ns camelot.handler.settings
   (:require [camelot.config :as c]
-            [camelot.model.photo :as mp]))
+            [camelot.model.settings :as ms]))
 
-(declare flatten-nested-metadata)
-
-(defn flatten-metadata-structure
+(defn- flatten-metadata-structure
+  "Transfor metadata structure in to a vector of paths"
   [md]
-  (into [] (reduce #(concat %1 (if (= (type %2) clojure.lang.Keyword)
-                                 [[%2]]
-                               (flatten-nested-metadata %2)))
+  (vec (reduce #(concat %1 (if (= (type %2) clojure.lang.Keyword)
+                              [[%2]]
+                              (mapv (fn [v] [(first %2) v]) (second %2))))
                    []
-                md)))
+                   md)))
 
-(defn flatten-nested-metadata
-  [[k md]]
-  (into [] (map #(into [] (flatten [k (if (= (type %) clojure.lang.Keyword)
-                                        [%]
-                                        (flatten-nested-metadata %))])) md)))
-
-(def metadata-paths (flatten-metadata-structure mp/metadata-structure))
+(def metadata-paths (flatten-metadata-structure ms/metadata-structure))
 
 (defn path-description
+  "Return a translation for a given path"
   [state path]
   (let [translate #((:translate state) %)]
     (->> path
@@ -31,6 +25,7 @@
          (translate))))
 
 (defn config-description
+  "Add label and description data to the given schema definition"
   [state schema]
   (let [translate #((:translate state) %)]
     (reduce (fn [acc [k v]]
@@ -40,22 +35,26 @@
                       :schema v})) {} schema)))
 
 (defn get-metadata
+  "Return paths alongside a (translated) description of the metadata represented
+  by that path."
   [state]
-  (into {} (map #(hash-map % (path-description state %))
-                metadata-paths)))
+  (into {} (map #(hash-map % (path-description state %)) metadata-paths)))
 
 (defn translate-menu-labels
+  "Return a menu with its labels translated"
   [state menu]
-  (into [] (map #(if (= (first %) :label)
-                   [(first %) ((:translate state) (second %))]
-                   %) menu)))
+  (vec (map #(if (= (first %) :label)
+               [(first %) ((:translate state) (second %))]
+               %) menu)))
 
 (defn settings-schema
+  "Return settings, menu and configuration definitions"
   [state]
-  {:config (config-description state (mp/config-schema state))
+  {:config (config-description state (ms/config-schema state))
    :metadata (get-metadata state)
-   :menu (translate-menu-labels state mp/config-menu)})
+   :menu (translate-menu-labels state ms/config-menu)})
 
 (defn settings-save
+  "Save a configuration."
   [config]
   (c/save-config config))
