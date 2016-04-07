@@ -1,9 +1,9 @@
 (ns camelot.album-test
-  (:require [midje.sweet :refer :all]
-            [clojure.data :refer [diff]]
+  (:require [clojure.data :refer [diff]]
             [camelot.album :refer :all]
             [camelot.config :as config]
             [clj-time.core :as t]
+            [midje.sweet :refer :all]
             [schema.test :as st]
             [camelot.exif-test-metadata :refer :all]))
 
