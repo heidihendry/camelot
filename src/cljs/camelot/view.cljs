@@ -26,5 +26,5 @@
   (om/root cset/settings-view-component state/app-state
            {:target (js/document.getElementById "settings")}))
 
-(defroute "/dashboard" [] (generate-view calb/album-view-component))
+(defroute "/#/dashboard" [] (generate-view calb/album-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

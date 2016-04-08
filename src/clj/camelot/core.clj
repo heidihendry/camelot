@@ -1,7 +1,7 @@
 (ns camelot.core
   (:require [camelot.handler.albums :as ha]
             [camelot.handler.settings :as hs]
-            [camelot.processing.settings :refer [gen-state config decursorise]]
+            [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
             [camelot.util.transit :as tutil]
             [clojure.java.io :as io]
             [environ.core :refer [env]]
@@ -24,17 +24,16 @@
 
 (defroutes routes
   (GET "/" _ (retrieve-index))
-  (GET "/settings" _ (retrieve-index))
-  (GET "/dashboard" _ (retrieve-index))
-  (GET "/default-config" [] (response (config)))
+  (GET "/default-config" [] (response (cursorise (config))))
   (GET "/application" [] (response {:version (hs/get-version)}))
-  (POST "/settings/save" {{config :config} :params}
+  (GET "/settings" []
+       (response (hs/settings-schema (gen-state (config)))))
+  (POST "/settings" {{config :config} :params}
         (response (hs/settings-save (decursorise config))))
-  (POST "/settings/get" {{config :config} :params}
-        (response (hs/settings-schema (gen-state (decursorise config)))))
-  (POST "/albums" {{config :config} :params}
-        (response (ha/read-albums (gen-state (decursorise config)) (:root-path (decursorise config)))))
-  (POST "/transit-test" {{time :t} :params} (response {:a time}))
+  (GET "/albums" []
+       (let [conf (config)]
+         (response (ha/read-albums (gen-state conf)
+                                   (:root-path conf)))))
   (resources "/"))
 
 (def http-handler

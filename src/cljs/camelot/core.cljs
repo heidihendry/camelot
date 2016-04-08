@@ -14,23 +14,23 @@
 (defn config-default
   [state]
   (util/getreq (util/with-baseurl "/application")
-               {}
+               nil
                #(om/update! (state/app-state-cursor) :application (:body %)))
   (util/getreq (util/with-baseurl "/default-config")
-               {}
+               nil
                #(do
                   (util/ls-set-item! "config" (:body %))
                   (om/update! (state/app-state-cursor) :config (:body %))
                   (om/update! (state/app-state-cursor) :config-buffer (:body %))
                   (view/settings-menu-view)
-                  (util/postreq (util/with-baseurl "/albums")
-                                  {:config (:body %)}
+                  (util/getreq (util/with-baseurl "/albums")
+                                nil
                                   (fn [x] (if (= (type (:body x)) js/String)
                                             (js/alert (:body x))
                                             (om/update! (state/app-state-cursor) :albums (:body x)))))
-                    (util/postreq (util/with-baseurl "/settings/get")
-                                  {:config (:config state)}
-                                  (fn [x] (om/update! (state/app-state-cursor) :settings (:body x)))))))
+                  (util/getreq (util/with-baseurl "/settings")
+                               nil
+                               (fn [x] (om/update! (state/app-state-cursor) :settings (:body x)))))))
 
 (defn setup
   []
@@ -39,26 +39,28 @@
     (if config
       (do
         (util/getreq (util/with-baseurl "/application")
-                     {}
+                     nil
                      #(om/update! (state/app-state-cursor) :application (:body %)))
         (om/update! (state/app-state-cursor) :config config)
         (om/update! (state/app-state-cursor) :config-buffer config)
         (view/settings-menu-view)
         (when (nil? (:albums config))
-          (util/postreq (util/with-baseurl "/albums")
-                        {:config config}
+          (util/getreq (util/with-baseurl "/albums")
+                       nil
                         #(if (= (type (:body %)) js/String)
                            (js/alert (:body %))
                            (om/update! (state/app-state-cursor) :albums (:body %)))))
-        (util/postreq (util/with-baseurl "/settings/get")
-                      {:config config}
+        (util/getreq (util/with-baseurl "/settings")
+                      nil
                       #(om/update! (state/app-state-cursor) :settings (:body %))))
       (config-default state/app-state))))
 
-(defn default-page [page]
-  (if (or (= page "/") (clojure.string/ends-with? page "index.html"))
-    "/dashboard"
-    page))
+(secretary/set-config! :prefix "#")
+
+(defn default-page [hash]
+  (if (= hash "")
+    "/#/dashboard"
+    (str "/" hash)))
 
 (defn disable-loading
   []
@@ -72,6 +74,6 @@
      (disable-loading)
      (-> js/document
          .-location
-         .-pathname
+         .-hash
          default-page
          (nav/nav!))))

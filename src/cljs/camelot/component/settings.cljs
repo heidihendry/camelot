@@ -6,7 +6,7 @@
             [om-datepicker.components :refer [datepicker]]
             [camelot.state :as state]
             [camelot.nav :as nav]
-            [camelot.util :refer [postreq with-baseurl]]
+            [camelot.util :refer [postreq getreq with-baseurl]]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
 (defn set-coerced-value!
@@ -48,14 +48,14 @@
 (defn save []
   (do
     (om/update! (state/app-state-cursor) :config (deref (state/config-buffer-state)))
-    (postreq (with-baseurl "/settings/save")
+    (postreq (with-baseurl "/settings")
              {:config (deref (state/config-state))}
              (fn [d] (nav/toggle-settings!)
-               (postreq (with-baseurl "/albums")
-                        {:config (deref (state/config-state))}
-                        #(if (= (type (:body %)) js/String)
-                           (js/alert (:body %))
-                           (om/update! (state/app-state-cursor) :albums (:body %))))))))
+               (getreq (with-baseurl "/albums")
+                      nil
+                      #(if (= (type (:body %)) js/String)
+                         (js/alert (:body %))
+                         (om/update! (state/app-state-cursor) :albums (:body %))))))))
 
 (defn cancel []
   (do
