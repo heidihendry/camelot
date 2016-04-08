@@ -101,10 +101,10 @@ Throws a RuntimeException if the file cannot be read."
        (parse-dates)))
 
 (defn config
-  "Return the (cursorised) configuration."
+  "Return the configuration."
   []
-  (cursorise (merge (parse-dates default-config)
-                    (config-internal))))
+  (merge (parse-dates default-config)
+         (config-internal)))
 
 (defn- save-config-helper
   "Save the configuration data.  Overwrites the configuration file is the `overwrite?' flag is set."

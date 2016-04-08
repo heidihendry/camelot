@@ -4,8 +4,9 @@
 (defonce app-state
   (atom
    {:nav
-    {:menu-items [{:url "/dashboard" :label "Dashboard"}
-                  {:url "/settings" :label "Settings"}]}}))
+    {:menu-items [{:url "/#/dashboard" :label "Dashboard"}
+                  {:url "/#/test" :label "Test"}
+                  {:url "/#/settings" :label "Settings"}]}}))
 
 (defn app-state-cursor
   []
