@@ -1,11 +1,11 @@
-(ns camelot.photo-test
+(ns camelot.processing.photo-test
   (:require [midje.sweet :refer :all]
             [clojure.data :refer [diff]]
-            [camelot.photo :refer :all]
-            [camelot.config :refer [gen-state]]
+            [camelot.processing.photo :refer :all]
+            [camelot.processing.settings :refer [gen-state]]
             [schema.test :as st]
             [clj-time.core :as t]
-            [camelot.exif-test-metadata :refer :all]))
+            [camelot.fixtures.exif-test-metadata :refer :all]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 

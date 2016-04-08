@@ -1,119 +1,89 @@
 # camelot
 Camelot is software for Camera Trap data management and analysis.
 
+Currently Camelot provides validation checking for survey data read from image metadata.
+
 ## Getting Started
 
-One of the goals of Camelot is to be highly configurable.  Before using Camelot, you must generate a configuration file explicitly:
+Run camelot with:
 
 ```sh
-java -jar camelot-<version>.jar init
+java -jar camelot-<version>.jar
 ```
 
-Camelot will provide the path name to the generated configuration.  You should edit this file to suit your needs before using Camelot.  The following section describes each property available in this file.
+This starts a web server which is available on TCP 8080 (by default).  If you wish to use another port, set the CAMELOT_PORT environment variable to the port number you desire.
+
+You should connect to this port with your web browser.  Upon connecting, you'll be notified that Camelot is not configured.  Open the settings menu from the top right-hand corner, set the settings you wish to use, and press `Save' from the button left corner of the screen.
 
 ### Configuration
 
-#### :required-fields
+#### Required Fields
 
-:required-fields is a list of properties which must be present in the metadata of a file.  Should any one of these properties not be present, a problem will be flagged in the dataset.
+A list of properties which must be present in the metadata of a file.  Should any one of these properties not be present, a problem will be flagged in the dataset.
 
-This is a list (i.e., `[...]`) of paths into a file's metadata.  The metadata of a file is hierarchical, and so path is a list designating the outermost property through to the innermost in this hierarchy.
-
-```clojure
-{...
-:required-fields [[:location :gps-longitude]
-                  [:datetime]]
-...
-}
-```
-
-Would mean that both the `gps-longitude` within the `location` collection of properties, and the `datetime` must be present in the metadata of every file.
-
-#### :project-start
+#### Project Start
 
 A timestamp indicating the beginning of the project. Should the timestamp of any file in the dataset fall occur before this, a problem will be flagged.  The start time is _inclusive_.
 
-The string format is `YEAR-MONTH-DAY HOUR:MINS:SECS`
-
-#### :project-end
+#### Project End
 
 Like :project-start, but for the project end date.  The end time is _exclusive_.
 
-#### :surveyed-species
+#### Surveyed Species
 
-A list (i.e., `[...]`) of strings with the names of the species in the survey.  Should any file's metadata include a species not present in this list, a problem will be flagged.
+A list of strings with the names of the species in the survey.  Should any file's metadata include a species not present in this list, a problem will be flagged.
 
 `HUMAN-CAMERACHECK` is considered by Camelot as a special species used to verify the start and end of a phase.  Should a collection not contain a at least 2 files with this species, with unique dates, it will be flagged as a problem in the dataset.
 
-The list is case insensitive.
+#### Language
 
-```clojure
-{...
-:surveyed-species ["Yellow Spotted Cat",
-                   "Smiley Wolf",
-                   "HUMAN-CAMERACHECK"]
-}
-```
+Language used by Camelot. Currently only `English` is supported.  Support for `Vietnamese` is planned in the future.
 
-#### :language
-
-Language used by Camelot. Currently only `:en` is supported.  Support for `:vn` is planned in the future.
-
-#### :night-start-hour
+#### Night Start Hour
 
 One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night is guaranteed to have fallen.  This should be set to the hour after there is no sign of daylight.
 
-#### :night-end-hour
+#### Night End Hour
 
 One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night may have ended.  This should be set to the earliest time at which there's sign of daylight.
 
-#### :infrared-iso-value-threshold
+#### Infrared ISO Value Threshold
 
 One of four properties used to (naively) identify camera time configuration issues.  The ISO value of the cameras which is used to suggest a photo was taken at night.
 
 File ISO values greater than this threshold are considered `night` photos and thus are expected to lie within :night-start-hour and :night-end-hour
 
-#### :erroneous-infrared-threshold
+#### Erroneous Infrared Threshold
 
-One of four properties used to (naively) identify camera time configuration issues. This is the maximum allowable proportion of photos which are `night` photos, but do not fall within the block of time denoted by `:night-start-hour` and `:night-end-hour`.
+One of four properties used to (naively) identify camera time configuration issues. This is the maximum allowable proportion of photos which are `night` photos, but do not fall within the block of time denoted by `Night Start Hour` and `Night End Hour`.
 
-#### :sighting-independence-minutes-threshold
+#### Sighting Independence Minutes Threshold
 
 The number of minutes after a species is sighted before further photographs of that species at that location should be considered independent (and thus included in analysis).
 
-*Important:* Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
+**Important:** Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
 
-#### :rename
+#### Rename
 
-*Important:* This functionality is not currently user-accessible.
+**Important:** This functionality is not currently user-accessible.
 
 Rename files based on their metadata.  This setting consists of 3 properties:
 
-**:date-format**
+**Date Format**
 
 A string representing the format for which date metadata should be represented.  When setting this, be mindful of characters which may or may not be allowed in filenames (e.g., `:` is problematic).
 
-**:fields**
+**Fields**
 
 A list of paths into file metadata (see `:required-fields` for more information about paths) for which data must be extracted to generate the filename.
 
-**:format**
+**Format**
 
 A [format string](https://en.wikipedia.org/wiki/Printf_format_string) denoting the filename format.
 
 The variables in this are expanded based on the information in the `:fields` property.
 
 There must be exactly as many parameters in this as paths in the `:fields` property.
-
-## Usage
-
-Camelot currently features two modes of operation: a very primitive web interface, and a simple command line data checker.  Of the two, only the command line version is operable.
-
-A Camera Trap project can be analysed with:
-
-```sh
-java -jar camelot-<version>.jar bscheck /path/to/allphotos
-```
 
 ## Development
 
@@ -224,7 +194,7 @@ Now your app is running at
 [http://localhost:5000](http://localhost:5000) in production mode.
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2016 Chris Mann
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

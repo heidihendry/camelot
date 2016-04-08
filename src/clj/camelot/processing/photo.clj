@@ -1,4 +1,4 @@
-(ns camelot.photo
+(ns camelot.processing.photo
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
@@ -73,5 +73,6 @@
       :location location})))
 
 (defn extract-path-value
+  "Return the metadata for a given path."
   [metadata path]
   (reduce (fn [acc n] (get acc n)) metadata path))

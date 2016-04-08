@@ -1,5 +1,5 @@
 (ns camelot.handler.settings
-  (:require [camelot.config :as c]
+  (:require [camelot.processing.settings :as ps]
             [camelot.model.settings :as ms]))
 
 (defn- flatten-metadata-structure
@@ -57,4 +57,10 @@
 (defn settings-save
   "Save a configuration."
   [config]
-  (c/save-config config))
+  (ps/save-config config))
+
+(defn get-version
+  "Get the version string from the system properties or the jar metadata."
+  []
+  (or (System/getProperty "camelot.version")
+      (-> (ps/version-property-from-pom 'camelot))))

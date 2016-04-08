@@ -1,5 +1,5 @@
 (ns user
-  (:require [camelot.server]
+  (:require [camelot.core]
             [ring.middleware.reload :refer [wrap-reload]]
             [figwheel-sidecar.repl-api :as figwheel]))
 
@@ -9,7 +9,7 @@
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
 (def http-handler
-  (wrap-reload #'camelot.server/http-handler))
+  (wrap-reload #'camelot.core/http-handler))
 
 (defn run []
   (figwheel/start-figwheel!))

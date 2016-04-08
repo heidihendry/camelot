@@ -1,9 +1,23 @@
-(ns camelot.album
-  (:require [clj-time.core :as t]
+(ns camelot.processing.validation
+  (:require [camelot.processing.photo :as photo]
+            [clj-time.core :as t]
             [clj-time.coerce :as tc]
-            [schema.core :as s]
-            [camelot.model.album :as ma]
-            [camelot.photo :as photo]))
+            [schema.core :as s]))
+
+(defn- squares
+  "Calculate the square of the difference from the average for the collection."
+  [avg coll]
+  (map #(let [n (-' % avg)] (*' n n)) coll))
+
+(defn- stddev
+  "Calculate the std.dev."
+  [coll]
+  (let [total (count coll)
+        mean (/ (reduce +' 0 coll) total)
+        squares (squares mean coll)]
+    (if (< total 2)
+      0
+      (Math/sqrt (/ (apply +' squares) (-' total 1))))))
 
 (defn check-ir-threshold
   "Check whether the album's photos exceed the user-defined infrared check thresholds."
@@ -19,94 +33,8 @@
         {:result :pass})
       {:result :pass})))
 
-(defn- extract-date
-  "Extract the first date from an album, given a custom comparison function `cmp'."
-  [cmp album]
-  (:datetime (first (sort #(cmp (:datetime %1) (:datetime %2)) album))))
-
-(defn- extract-start-date
-  "Extract the earliest photo date from the contents of an album"
-  []
-  (partial extract-date t/before?))
-
-(defn- extract-end-date
-  "Extract the most recent photo date from the contents of an album"
-  []
-  (partial extract-date t/after?))
-
-(defn- extract-make
-  "Extract the camera make from an album"
-  [album]
-  (:make (:camera (first album))))
-
-(defn- extract-model
-  "Extract the camera model from an album"
-  [album]
-  (:model (:camera (first album))))
-
-(defn- add-sighting
-  [state previous-sightings datetime quantity]
-  (let [duration (:sighting-independence-minutes-threshold (:config state))]
-    (conj previous-sightings {:start datetime
-                              :end (t/plus datetime (t/minutes duration))
-                              :quantity quantity
-                              })))
-
-(defn- update-sighting
-  [state previous-sightings sighting quantity]
-  (conj previous-sightings
-        (assoc sighting :quantity (max (or (get sighting :quantity) 0)
-                                       quantity))))
-
-(defn- dependent-sighting
-  [sighting datespans]
-  (first (filter #(or (= sighting (:start %))
-                      (= sighting (:end %))
-                      (and (t/after? sighting (:start %))
-                           (t/before? sighting (:end %))))
-                 datespans)))
-
-(defn- independence-reducer
-  [state datetime acc this-sighting]
-  (let [species (:species this-sighting)
-        previous-sighting (dependent-sighting datetime (get acc species))]
-    (assoc acc species
-           (if previous-sighting
-             (update-sighting state (remove #(= previous-sighting %) (get acc species)) previous-sighting (:quantity this-sighting))
-             (add-sighting state (get acc species) datetime (:quantity this-sighting))))))
-
-(defn extract-independent-sightings
-  "Extract the camera model from an album"
-  [state album]
-  (into {} (map (fn [[k v]] {k (reduce + (map :quantity v))})
-                (reduce #(reduce (partial independence-reducer state (:datetime %2)) %1
-                                 (:sightings %2)) {} (sort #(t/before? (:datetime %1)
-                                                                       (:datetime %2))
-                                                           album)))))
-
-(s/defn extract-metadata :- ma/ExtractedMetadata
-  "Return aggregated metadata for a given album"
-  [state album]
-  {:datetime-start ((extract-start-date) album)
-   :datetime-end ((extract-end-date) album)
-   :make (extract-make album)
-   :model (extract-model album)
-   :sightings (extract-independent-sightings state album)})
-
-(s/defn squares
-  [avg coll]
-  (map #(let [n (-' % avg)] (*' n n)) coll))
-
-(s/defn stddev
-  [coll]
-  (let [total (count coll)
-        mean (/ (reduce +' 0 coll) total)
-        squares (squares mean coll)]
-    (if (< total 2)
-      0
-      (Math/sqrt (/ (apply +' squares) (-' total 1))))))
-
 (defn check-photo-stddev
+  "Check the given photos have no outliers by date/time"
   [state photos]
   (if (< (count photos) 2)
     {:result :pass}
@@ -122,6 +50,7 @@
         {:result :pass}))))
 
 (defn check-project-dates
+  "Check that photos fall within the defined project dates."
   [state photos]
   (if (empty? photos)
     {:result :pass}
@@ -133,6 +62,7 @@
             :else {:result :pass}))))
 
 (defn check-camera-checks
+  "Ensure there are at least two camera-checks in the given set of photos with unique dates."
   [state photos]
   (let [has-check #(some (fn [x] (re-matches #"(?i).*camera.?check" (:species x)))
                          (:sightings %))
@@ -146,12 +76,14 @@
       {:result :fail :reason ((:translate state) :checks/camera-checks)})))
 
 (defn compare-headlines
+  "Compare two handlines, failing if they're not consistent."
   [state h1 h2]
   (if (not (= (:headline h1) (:headline h2)))
     (reduced {:result :fail :reason ((:translate state) :checks/headline-consistency h1 h2)})
     h1))
 
 (defn check-headline-consistency
+  "Check the headline of all photos is consistent."
   [state photos]
   (let [r (reduce (partial compare-headlines state) (first photos) (rest photos))]
     (if (= (:result r) :fail)
@@ -159,6 +91,7 @@
       {:result :pass})))
 
 (defn check-required-fields
+  "Ensure all Require Fields contain data."
   [state photos]
   (let [fields (:required-fields (:config state))]
     (or (reduce #(when (some nil? (map (partial photo/extract-path-value %2) fields))
@@ -167,12 +100,14 @@
         {:result :pass})))
 
 (defn check-album-has-data
+  "Ensure the album has data."
   [state photos]
   (if (empty? photos)
     {:result :fail}
     {:result :pass}))
 
 (defn check-sighting-consistency
+  "Ensure the sighting data is fully completed."
   [state photos]
   (or (reduce #(if (or (nil? (:quantity %2)) (nil? (:species %2)))
                  (reduced {:result :fail})
@@ -182,6 +117,7 @@
       {:result :pass}))
 
 (defn check-species
+  "Ensure the species of the photos are known to the survey"
   [state photos]
   (let [m (->> photos
                (map #(map :species (:sightings %)))
@@ -226,16 +162,3 @@
                                        ((:translate state) :checks/problem-without-reason)))}
                        nil)))
                  tests))))
-
-(s/defn album :- ma/Album
-  "Return the metadata for a single album, given raw tag data"
-  [state set-data]
-  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise state v)]) set-data))]
-    {:photos album-data
-     :metadata (extract-metadata state (vals album-data))
-     :problems (list-problems state album-data)}))
-
-(s/defn album-set
-  "Return a datastructure representing all albums and their metadata"
-  [state tree-data]
-  (into {} (map (fn [[k v]] (vector k (album state v))) tree-data)))

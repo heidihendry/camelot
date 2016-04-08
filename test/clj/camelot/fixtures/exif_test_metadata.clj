@@ -1,4 +1,4 @@
-(ns camelot.exif-test-metadata)
+(ns camelot.fixtures.exif-test-metadata)
 
 (def maginon-metadata
   {"Compression Type" "Baseline",

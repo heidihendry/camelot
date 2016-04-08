@@ -1,9 +1,9 @@
-(ns camelot.config
-  (:require [camelot.translations.core :refer :all]
+(ns camelot.processing.settings
+  (:require [camelot.translation.core :refer :all]
             [camelot.util.java-file :as f]
             [clojure.string :as str]
-            [clj-time.core :as t]
             [clojure.pprint :as pp]
+            [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [clj-time.format :as tf]
             [clojure.java.io :as io]
@@ -14,14 +14,15 @@
            [java.util Properties]))
 
 (def default-config
+  "Return the default configuration."
   {:erroneous-infrared-threshold 0.2
    :infrared-iso-value-threshold 999
    :language :en
    :root-path nil
    :night-end-hour 5
    :night-start-hour 21
-   :project-start 27266400000
-   :project-end 1577836800000
+   :project-start (tc/to-long (t/now))
+   :project-end (tc/to-long (t/now))
    :sighting-independence-minutes-threshold 20
    :surveyed-species []
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
@@ -35,10 +36,12 @@
 (def os (System/getProperty "os.name"))
 
 (defn config-path
+  "Return the full path where the configuration file is stored."
   [dir]
   (format "%s%scamelot%sconfig.clj" dir SystemUtils/FILE_SEPARATOR SystemUtils/FILE_SEPARATOR))
 
 (defn get-config-file
+  "Return the OS-specific path to the configuration file."
   []
   (cond
     SystemUtils/IS_OS_WINDOWS (env :appdata)
@@ -46,15 +49,18 @@
     SystemUtils/IS_OS_MAC_OSX (config-path (str (env :home) "/Library/Preferences"))
     :else (config-path (str (env :pwd) ".camelot"))))
 
-(def timestamp-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
+(def timestamp-formatter
+  (tf/formatter "yyyy-MM-dd HH:mm:ss"))
 
 (defn normalise-dates
+  "Convert configuration dates to long (e.g., for serialisation)."
   [config]
   (assoc config
          :project-start (tc/to-long (:project-start config))
          :project-end (tc/to-long (:project-end config))))
 
 (defn parse-dates
+  "Convert configuration dates to DateTime objects."
   [config]
   (assoc config
          :project-start (tc/from-long (:project-start config))
@@ -68,16 +74,20 @@
       (apply format (tlookup t) vars))))
 
 (defn read-config-file
+  "Read the configuration file from storage,
+Throws a RuntimeException if the file cannot be read."
   [path]
-  (if (f/can-read? (io/file path))
+  (if (and (f/exists? (io/file path)) (f/readable? (io/file path)))
     (io/reader path)
     (throw (RuntimeException. ((gen-translator default-config) :problems/config-not-found)))))
 
 (defn decursorise
+  "Remove :value keys used for Om cursors to leaves from the configuration data."
   [conf]
   (into {} (map (fn [[k v]] {k (:value v)}) conf)))
 
 (defn cursorise
+  "Add :value keys used for Om cursors to leaves from the configuration data."
   [conf]
   (into {} (map (fn [[k v]] {k {:value v}}) conf)))
 
@@ -91,18 +101,20 @@
        (parse-dates)))
 
 (defn config
+  "Return the (cursorised) configuration."
   []
   (cursorise (merge (parse-dates default-config)
                     (config-internal))))
 
 (defn- save-config-helper
+  "Save the configuration data.  Overwrites the configuration file is the `overwrite?' flag is set."
   [config overwrite?]
   (let [translate (gen-translator config)
         conf (get-config-file)
-        confdir (f/getParentFile (io/file conf))]
-    (when (not (f/exists confdir))
+        confdir (f/get-parent-file (io/file conf))]
+    (when (not (f/exists? confdir))
       (f/mkdir confdir))
-    (if (and (not overwrite?) (f/exists (io/file conf)))
+    (if (and (not overwrite?) (f/exists? (io/file conf)))
       (throw (RuntimeException. (translate :problems/default-config-exists conf)))
       (do
         (with-open [w (io/writer conf)]
@@ -110,10 +122,12 @@
     config))
 
 (defn save-config
+  "Save the configuration file.  Overwrites existing."
   [config]
   (save-config-helper (normalise-dates config) true))
 
 (defn create-default-config
+  "Save the default configuration file.  Does not overwrite existing."
   []
   (save-config default-config nil))
 
@@ -123,7 +137,8 @@
   {:config conf
    :translate (gen-translator conf)})
 
-(defn version-property [dep]
+(defn version-property-from-pom [dep]
+  "Return a version string from the Jar metadata."
   (let [path (str "META-INF/maven/" (or (namespace dep) (name dep))
                   "/" (name dep) "/pom.properties")
         props (io/resource path)]
@@ -131,8 +146,3 @@
       (with-open [stream (io/input-stream props)]
         (let [props (doto (Properties.) (.load stream))]
           (.getProperty props "version"))))))
-
-(defn get-version
-  []
-  (or (System/getProperty "camelot.version")
-      (-> (version-property 'camelot))))

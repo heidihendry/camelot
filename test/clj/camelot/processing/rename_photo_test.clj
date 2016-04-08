@@ -1,12 +1,10 @@
-(ns camelot.action.rename-photo-test
+(ns camelot.processing.rename-photo-test
   (:require [midje.sweet :refer :all]
-            [camelot.album :refer :all]
-            [camelot.config :refer [gen-state]]
+            [camelot.processing.settings :refer [gen-state]]
+            [camelot.processing.rename-photo :refer :all]
             [clj-time.core :as t]
             [schema.test :as st]
-            [taoensso.tower :as tower]
-            [camelot.translations.core :refer :all]
-            [camelot.action.rename-photo :refer :all]))
+            [taoensso.tower :as tower]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 
