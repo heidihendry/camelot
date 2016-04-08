@@ -2,7 +2,7 @@
   (:require [camelot.handler.settings :refer :all]
             [midje.sweet :refer :all]
             [schema.test :as st]
-            [camelot.config :refer [gen-state]]))
+            [camelot.processing.settings :refer [gen-state]]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 

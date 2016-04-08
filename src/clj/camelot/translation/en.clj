@@ -1,4 +1,4 @@
-(ns camelot.translations.en)
+(ns camelot.translation.en)
 
 (def t-en
   {:problems {:error "[ERROR] "

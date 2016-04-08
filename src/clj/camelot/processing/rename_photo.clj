@@ -1,6 +1,6 @@
-(ns camelot.action.rename-photo
+(ns camelot.processing.rename-photo
   (:require [schema.core :as s]
-            [camelot.photo :as photo]
+            [camelot.processing.photo :as photo]
             [clj-time.format :as tf]
             [taoensso.tower :as tower]
             [clojure.java.io :as io]
@@ -49,15 +49,15 @@ Throw IllegalStateException should fields not be present in the metadata."
 Should renaming not be possible, return nil."
   [state [file metadata]]
   (let [new-name (create-photo-name state metadata)
-        dir (f/getParent file)
-        extension (FilenameUtils/getExtension (f/getName file))
-        basename (FilenameUtils/removeExtension (f/getName file))
+        dir (f/get-parent file)
+        extension (FilenameUtils/getExtension (f/get-name file))
+        basename (FilenameUtils/removeExtension (f/get-name file))
         new-file (io/file (str dir "/" new-name "." (str/lower-case extension)))]
     (when (not (= file new-file))
-      (if (f/exists new-file)
+      (if (f/exists? new-file)
         (println (str ((:translate state) :problems/warn)
                       ((:translate state) :problems/rename-existing-conflict
-                       (f/toPath file) (f/toPath new-file))))
+                       (f/to-path file) (f/to-path new-file))))
         [file new-file]))))
 
 (defn- rename-reducer
@@ -80,8 +80,8 @@ If any rename may be conflicting, none of the renames are performed."
     (if (empty? chkfail)
       renames
       (do (doseq [[k {fs :sources}] chkfail]
-            (println (str ((:translate state) :problems/rename-conflict (f/getPath k))))
-            (doseq [f fs] (println "  *" (f/getPath f))))
+            (println (str ((:translate state) :problems/rename-conflict (f/get-path k))))
+            (doseq [f fs] (println "  *" (f/get-path f))))
           '()))))
 
 (defn apply-renames
@@ -94,12 +94,12 @@ If any rename may be conflicting, none of the renames are performed."
 (defn rename-photos
   "Rename all photos in the given album."
   [state [dir album]]
-  (println ((:translate state) :status/rename-photos (f/getPath dir)))
+  (println ((:translate state) :status/rename-photos (f/get-path dir)))
   (let [renames (->> (:photos album)
                      (map #(generate-rename-actions state %))
                      (remove nil?)
                      (validate-renames state))]
     (doseq [[from to] renames]
-      (println ((:translate state) :status/apply-rename (f/getPath from) (f/getPath to)))
-      (f/renameTo from to))
+      (println ((:translate state) :status/apply-rename (f/get-path from) (f/get-path to)))
+      (f/rename-to from to))
     {dir (assoc album :photos (apply-renames (:photos album) renames))}))
