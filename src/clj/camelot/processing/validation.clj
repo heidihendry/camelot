@@ -132,6 +132,16 @@
       {:result :fail}
       {:result :pass})))
 
+(defn check-future
+  "Ensure the timestamp on the photos is not in the future."
+  [state photos]
+  (let [res (filter #(t/after? (:datetime %) (t/now)) photos)]
+    (if (empty? res)
+      {:result :pass}
+      {:result :fail
+       :reason ((:translate state) :checks/future-timestamp
+                (:filename (first res)))})))
+
 (defn- problem-descriptions
   [state problems]
   (map #(hash-map :problem % :description ((:translate state) (keyword (str "checks/" (name %))))) problems))
@@ -147,7 +157,8 @@
                :required-fields check-required-fields
                :album-has-data check-album-has-data
                :sighting-consistency check-sighting-consistency
-               :surveyed-species check-species}]
+               :surveyed-species check-species
+               :future-timestamp check-future}]
     (remove nil?
             (map (fn [[t f]]
                    (let [res (f state (vals album-data))]

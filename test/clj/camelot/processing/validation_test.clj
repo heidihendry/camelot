@@ -77,7 +77,11 @@
                  {:datetime (t/date-time 2015 4 6  6 00)}
                  {:datetime (t/date-time 2015 4 7  6 40 00)}
                  {:datetime (t/date-time 2015 4 10 6 50 00)}]]
-      (:result (check-photo-stddev (gen-state-helper config) album)) => :fail)))
+      (:result (check-photo-stddev (gen-state-helper config) album)) => :fail))
+
+  (fact "An album with one photo passes"
+    (let [album [{:datetime (t/date-time 2015 4 10 6 50 00)}]]
+      (:result (check-photo-stddev (gen-state-helper config) album)) => :pass)))
 
 (facts "Check: project start/end"
   (fact "Passes if dates are within project start/end"
@@ -235,3 +239,14 @@
           album [{:sightings [{:species "yellow spotted cat"
                                :quantity 1}]}]]
       (:result (check-species (gen-state-helper config) album)) => :fail)))
+
+(facts "Future timestamps"
+  (fact "A timestamp in the future fails"
+    (let [album [{:datetime (t/date-time 2021 1 1 0 0 0)}]]
+      (with-redefs [t/now #(t/date-time 2020 1 1)]
+        (:result (check-future (gen-state-helper {}) album)) => :fail)))
+
+  (fact "A timestamp in the past is okay"
+    (let [album [{:datetime (t/date-time 2019 1 1 0 0 0)}]]
+      (with-redefs [t/now #(t/date-time 2020 1 1)]
+        (:result (check-future (gen-state-helper {}) album)) => :pass))))
