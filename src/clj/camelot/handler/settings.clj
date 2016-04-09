@@ -64,3 +64,7 @@
   []
   (or (System/getProperty "camelot.version")
       (-> (ps/version-property-from-pom 'camelot))))
+
+(defn get-nav-menu
+  [state]
+  (ms/nav-menu state))

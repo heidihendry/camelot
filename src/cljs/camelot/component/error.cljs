@@ -3,7 +3,9 @@
             [om.dom :as dom :include-macros true]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
-(defn not-found-page-component [data owner]
+(defn not-found-page-component
+  "Page not found"
+  [data owner]
   (reify
     om/IRender
     (render [_]

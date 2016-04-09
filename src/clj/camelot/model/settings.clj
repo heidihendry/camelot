@@ -89,3 +89,8 @@
    :description
    :filename
    :filesize])
+
+(defn nav-menu
+  [state]
+  {:menu-items [{:url "/#/dashboard" :label ((:translate state) :application/dashboard)}
+                {:function "settings"}]})

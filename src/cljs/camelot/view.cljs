@@ -9,19 +9,25 @@
             [camelot.component.footer :as cfoot]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
-(def navbar
+(defn navbar
+  "Render the navbar"
+  []
   (om/root cnav/nav-component (state/nav-state)
            {:target (js/document.getElementById "navigation")}))
 
 (def footer
+  "Render the footer"
   (om/root cfoot/footer-component state/app-state
            {:target (js/document.getElementById "footer")}))
 
-(defn generate-view [view]
+(defn generate-view
+  "Render the main page content"
+  [view]
   (om/root view state/app-state
            {:target (js/document.getElementById "page-content")}))
 
 (defn settings-menu-view
+  "Render the settings panel"
   []
   (om/root cset/settings-view-component state/app-state
            {:target (js/document.getElementById "settings")}))
