@@ -29,6 +29,7 @@ This is a 'pre-alpha' release, and thus comes with numerous limitations.
 ## Validations
 
 Checks and reporting on whether:
+
 * the timestamp on a photo is significantly earlier or later than the norm
 * the timestamp on some photos lies outside of the project start and stop times
 * the camera exposure settings coincide with the time configuration
