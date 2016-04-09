@@ -1,7 +1,7 @@
 # camelot
 Camelot is software for Camera Trap data management and analysis.
 
-Currently Camelot provides validation checking for survey data read from image metadata.
+Currently Camelot reports validation problems for survey data read from image metadata.
 
 ## Getting Started
 
@@ -15,55 +15,78 @@ This starts a web server which is available on TCP 8080 (by default).  If you wi
 
 You should connect to this port with your web browser.  Upon connecting, you'll be notified that Camelot is not configured.  Open the settings menu from the top right-hand corner, set the settings you wish to use, and press `Save' from the button left corner of the screen.
 
-### Configuration
+## Limitations
+This is a 'pre-alpha' release, and thus comes with numerous limitations.
 
-#### Required Fields
+* Only the latest versions of Firefox and Chrome are supported
+* Does not support video files
+* Does not provide correct handling for camera pairs
+* Does not provide for any processing
+* May not provide sufficient information to readily determine the cause of validation problems
+* English is the only supported language
+* Validations cannot be disabled
+
+## Validations
+
+Checks and reporting on whether:
+* the timestamp on a photo is significantly earlier or later than the norm
+* the timestamp on some photos lies outside of the project start and stop times
+* the camera exposure settings coincide with the time configuration
+* the photos do have a camera check at the beginning and end
+* the headline differs across photos in a folder
+* one or more required fields are missing from one or more photos
+* a sighting is incomplete (i.e., species without quantity or quantity without species)
+* a species was identified which is not known to the survey
+
+## Configuration
+
+### Required Fields
 
 A list of properties which must be present in the metadata of a file.  Should any one of these properties not be present, a problem will be flagged in the dataset.
 
-#### Project Start
+### Project Start
 
 A timestamp indicating the beginning of the project. Should the timestamp of any file in the dataset fall occur before this, a problem will be flagged.  The start time is _inclusive_.
 
-#### Project End
+### Project End
 
 Like :project-start, but for the project end date.  The end time is _exclusive_.
 
-#### Surveyed Species
+### Surveyed Species
 
 A list of strings with the names of the species in the survey.  Should any file's metadata include a species not present in this list, a problem will be flagged.
 
 `HUMAN-CAMERACHECK` is considered by Camelot as a special species used to verify the start and end of a phase.  Should a collection not contain a at least 2 files with this species, with unique dates, it will be flagged as a problem in the dataset.
 
-#### Language
+### Language
 
 Language used by Camelot. Currently only `English` is supported.  Support for `Vietnamese` is planned in the future.
 
-#### Night Start Hour
+### Night Start Hour
 
 One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night is guaranteed to have fallen.  This should be set to the hour after there is no sign of daylight.
 
-#### Night End Hour
+### Night End Hour
 
 One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night may have ended.  This should be set to the earliest time at which there's sign of daylight.
 
-#### Infrared ISO Value Threshold
+### Infrared ISO Value Threshold
 
 One of four properties used to (naively) identify camera time configuration issues.  The ISO value of the cameras which is used to suggest a photo was taken at night.
 
 File ISO values greater than this threshold are considered `night` photos and thus are expected to lie within :night-start-hour and :night-end-hour
 
-#### Erroneous Infrared Threshold
+### Erroneous Infrared Threshold
 
 One of four properties used to (naively) identify camera time configuration issues. This is the maximum allowable proportion of photos which are `night` photos, but do not fall within the block of time denoted by `Night Start Hour` and `Night End Hour`.
 
-#### Sighting Independence Minutes Threshold
+### Sighting Independence Minutes Threshold
 
 The number of minutes after a species is sighted before further photographs of that species at that location should be considered independent (and thus included in analysis).
 
 **Important:** Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
 
-#### Rename
+### Rename
 
 **Important:** This functionality is not currently user-accessible.
 
