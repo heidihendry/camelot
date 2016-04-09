@@ -12,7 +12,7 @@
 (defn navbar
   "Render the navbar"
   []
-  (om/root cnav/nav-component (state/nav-state)
+  (om/root cnav/nav-component state/app-state
            {:target (js/document.getElementById "navigation")}))
 
 (def footer

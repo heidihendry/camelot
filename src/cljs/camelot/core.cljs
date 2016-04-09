@@ -19,13 +19,16 @@
    #(do (om/update! (state/app-state-cursor) :application (:body %))
         (view/navbar)))
   (rest/get-settings
-   #(om/update! (state/app-state-cursor) :settings (:body %)))
+   #(do (om/update! (state/app-state-cursor) :settings (:body %))
+        (view/settings-menu-view))))
+
+(defn initialise-application
+  []
   (rest/get-configuration
-   #(do
-      (om/update! (state/app-state-cursor) :config (:body %))
-      (om/update! (state/app-state-cursor) :config-buffer (:body %))
-      (view/settings-menu-view)
-      (albums/reload-albums))))
+   #(do (om/update! (state/app-state-cursor) :config (:body %))
+        (om/update! (state/app-state-cursor) :config-buffer (:body %))
+        (initialise-state)
+        (albums/reload-albums))))
 
 (secretary/set-config! :prefix "#")
 
@@ -50,6 +53,6 @@
       (nav/nav!)))
 
 (defonce initial-state
-  (do (initialise-state)
+  (do (initialise-application)
       (disable-loading-screen)
       (navigate-dwim)))
