@@ -2,6 +2,7 @@
   (:require [camelot.processing.photo :as photo]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
+            [camelot.util.java-file :as jf]
             [schema.core :as s]))
 
 (defn- squares
@@ -56,9 +57,9 @@
     {:result :pass}
     (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
       (cond (t/before? (:datetime (first photos)) (:project-start (:config state)))
-            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (first photos))}
+            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (:filename (first photos)))}
             (t/after? (:datetime (last photos)) (:project-end (:config state)))
-            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (first photos))}
+            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (:filename (first photos)))}
             :else {:result :pass}))))
 
 (defn check-camera-checks
@@ -79,7 +80,7 @@
   "Compare two handlines, failing if they're not consistent."
   [state h1 h2]
   (if (not (= (:headline h1) (:headline h2)))
-    (reduced {:result :fail :reason ((:translate state) :checks/headline-consistency h1 h2)})
+    (reduced {:result :fail :reason ((:translate state) :checks/headline-consistency (:filename h1) (:filename h2))})
     h1))
 
 (defn check-headline-consistency
