@@ -38,13 +38,14 @@
 (defn config-path
   "Return the full path where the configuration file is stored."
   [dir]
-  (format "%s%scamelot%sconfig.clj" dir SystemUtils/FILE_SEPARATOR SystemUtils/FILE_SEPARATOR))
+  (format "%s%scamelot%sconfig.clj" dir SystemUtils/FILE_SEPARATOR
+          SystemUtils/FILE_SEPARATOR))
 
 (defn get-config-file
   "Return the OS-specific path to the configuration file."
   []
   (cond
-    SystemUtils/IS_OS_WINDOWS (env :appdata)
+    SystemUtils/IS_OS_WINDOWS (config-path (env :appdata))
     SystemUtils/IS_OS_LINUX (config-path (str (env :home) "/.config"))
     SystemUtils/IS_OS_MAC_OSX (config-path (str (env :home) "/Library/Preferences"))
     :else (config-path (str (env :pwd) ".camelot"))))
@@ -73,13 +74,40 @@
     (fn [t & vars]
       (apply format (tlookup t) vars))))
 
+(defn- save-config-helper
+  "Save the configuration data.  Overwrites the configuration file is the `overwrite?' flag is set."
+  [config overwrite?]
+  (let [translate (gen-translator config)
+        conf (get-config-file)
+        confdir (f/get-parent-file (io/file conf))]
+    (when (not (f/exists? confdir))
+      (f/mkdir confdir))
+    (if (and (not overwrite?) (f/exists? (io/file conf)))
+      (throw (RuntimeException. (translate :problems/default-config-exists conf)))
+      (do
+        (with-open [w (io/writer conf)]
+          (pp/write config :stream w))))
+    config))
+
+(defn save-config
+  "Save the configuration file.  Overwrites existing."
+  [config]
+  (save-config-helper (normalise-dates config) true))
+
+(defn create-default-config
+  "Save the default configuration file.  Does not overwrite existing."
+  []
+  (save-config-helper default-config nil))
+
 (defn read-config-file
   "Read the configuration file from storage,
 Throws a RuntimeException if the file cannot be read."
   [path]
   (if (and (f/exists? (io/file path)) (f/readable? (io/file path)))
     (io/reader path)
-    (throw (RuntimeException. ((gen-translator default-config) :problems/config-not-found)))))
+    (do
+      (create-default-config)
+      (io/reader path))))
 
 (defn decursorise
   "Remove :value keys used for Om cursors to leaves from the configuration data."
@@ -105,31 +133,6 @@ Throws a RuntimeException if the file cannot be read."
   []
   (merge (parse-dates default-config)
          (config-internal)))
-
-(defn- save-config-helper
-  "Save the configuration data.  Overwrites the configuration file is the `overwrite?' flag is set."
-  [config overwrite?]
-  (let [translate (gen-translator config)
-        conf (get-config-file)
-        confdir (f/get-parent-file (io/file conf))]
-    (when (not (f/exists? confdir))
-      (f/mkdir confdir))
-    (if (and (not overwrite?) (f/exists? (io/file conf)))
-      (throw (RuntimeException. (translate :problems/default-config-exists conf)))
-      (do
-        (with-open [w (io/writer conf)]
-          (pp/write config :stream w))))
-    config))
-
-(defn save-config
-  "Save the configuration file.  Overwrites existing."
-  [config]
-  (save-config-helper (normalise-dates config) true))
-
-(defn create-default-config
-  "Save the default configuration file.  Does not overwrite existing."
-  []
-  (save-config default-config nil))
 
 (defn gen-state
   "Return the global application state."

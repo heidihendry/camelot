@@ -24,6 +24,12 @@
     (assert (= (count parts) 6))
     (apply t/date-time (map #(Integer/parseInt %) parts))))
 
+(defn- read-metadata-string
+  [str]
+  (if str
+    (read-string str)
+    0))
+
 (s/defn normalise :- PhotoMetadata
   "Return a normalised data structure for the given vendor- and photo-specific metadata"
   [state metadata]
@@ -38,7 +44,7 @@
                  :flash (md "Flash")
                  :focal-length (md "Focal Length")
                  :fstop (md "F-Number")
-                 :iso (read-string (md "ISO Speed Ratings"))
+                 :iso (read-metadata-string (md "ISO Speed Ratings"))
                  :orientation (md "Orientation")
                  :width (read-string (md "Image Width"))
                  :height (read-string (md "Image Height"))})

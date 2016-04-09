@@ -22,5 +22,10 @@
   (reify
     om/IRender
     (render [_]
-      (apply dom/ul #js {:className "nav navbar-nav"}
-             (om/build-all nav-item-component (:menu-items data))))))
+      (dom/div nil
+               (when (= (:loading data) true)
+                 (dom/label #js {:className "loading"}
+                            (dom/img #js {:src "images/spinner.gif" :height "32px"})
+                            "Loading Data"))
+               (apply dom/ul #js {:className "nav navbar-nav"}
+                      (om/build-all nav-item-component (:menu-items (:nav (:application data)))))))))

@@ -263,3 +263,21 @@ a:hover {
     font-size: 140%;
     margin-bottom: 1rem;
 }
+.loading {
+    position: fixed;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 3px 10px 1px #333;
+    font-size: 130%;
+    top: 5rem;
+    left: calc(50vw - 15rem);
+    width: 30rem;
+    text-align: center;
+    padding: 3rem 5rem;
+}
+.loading img {
+    text-align: center;
+    margin: auto;
+    margin-bottom: 1rem;
+    display: block;
+}

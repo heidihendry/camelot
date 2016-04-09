@@ -75,7 +75,12 @@
 (defn reload-albums
   "Reload the available albums"
   []
+  (om/update! (state/app-state-cursor) :loading true)
   (rest/get-albums #(let [resp (:body %)]
+                      (om/update! (state/app-state-cursor) :loading false)
                       (if (= (type resp) js/String)
-                        (js/alert resp)
-                        (om/update! (state/app-state-cursor) :albums resp)))))
+                        (do
+                          (nav/settings-show!)
+                          (js/alert resp))
+                        (do
+                          (om/update! (state/app-state-cursor) :albums resp))))))
