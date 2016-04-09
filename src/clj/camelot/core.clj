@@ -9,6 +9,7 @@
             [compojure.route :refer [resources]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.util.response :refer [response]]
+            [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
             [ring.middleware.gzip :refer [wrap-gzip]]
@@ -43,6 +44,7 @@
     (-> routes
         (wrap-transit-response {:encoding :json, :opts tutil/transit-write-options})
         (wrap-transit-params {:opts tutil/transit-read-options})
+        (wrap-stacktrace-log)
         (wrap-defaults api-defaults)
         wrap-with-logger
         wrap-gzip)))
