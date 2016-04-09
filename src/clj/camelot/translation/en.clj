@@ -33,6 +33,7 @@
             :album-has-data "Album must not be empty"
             :sighting-consistency "Mismatch found in sighting data: species without quantity or quantity without species"
             :surveyed-species "A species was identified which is not known to the survey"
+            :future-timestamp "The timestamp on '%s' is in the future"
             }
    :language {:en "English"
               :vn "Vietnamese"}
