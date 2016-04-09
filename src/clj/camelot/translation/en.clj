@@ -6,7 +6,7 @@
               :info "[INFO] "
               :ignore "[IGNORE] "
               :okay "[OK] "
-              :root-path-missing "A directory for this survey has not been specified"
+              :root-path-missing "Please specify the absolute path to the Survey Directory in the settings panel."
               :root-path-not-found "The directory for the survey was not found or could not be read"
               :rename-field-not-found "Unable to resolve the following field selectors during photo renaming: '%s'"
               :rename-existing-conflict "%s: Not renaming as doing so may overwrite existing file '%s'"
