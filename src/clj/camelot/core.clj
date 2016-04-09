@@ -25,7 +25,8 @@
 (defroutes routes
   (GET "/" _ (retrieve-index))
   (GET "/default-config" [] (response (cursorise (config))))
-  (GET "/application" [] (response {:version (hs/get-version)}))
+  (GET "/application" [] (response {:version (hs/get-version)
+                                    :nav (hs/get-nav-menu (gen-state (config)))}))
   (GET "/settings" []
        (response (hs/settings-schema (gen-state (config)))))
   (POST "/settings" {{config :config} :params}

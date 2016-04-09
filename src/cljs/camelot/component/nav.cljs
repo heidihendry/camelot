@@ -3,15 +3,22 @@
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]))
 
-(defn nav-item-component [data owner]
+(defn nav-item-component
+  "Render a list item for an item in the navigation bar."
+  [data owner]
   (reify
     om/IRender
     (render [_]
-      (if (= (:label data) "Settings")
-        (dom/li #js {:id "settings-nav" :className "icon-only" :onClick #(nav/toggle-settings!)} (dom/a nil (dom/span #js {:className "fa fa-cogs fa-2x"})))
-        (dom/li #js {:onClick #(nav/nav! (:url data))} (dom/a nil (:label data)))))))
+      (if (= (:function data) "settings")
+        (dom/li #js {:id "settings-nav" :className "icon-only"
+                     :onClick #(nav/toggle-settings!)}
+                (dom/a nil (dom/span #js {:className "fa fa-cogs fa-2x"})))
+        (dom/li #js {:onClick #(nav/nav! (:url data))}
+                (dom/a nil (:label data)))))))
 
-(defn nav-component [data owner]
+(defn nav-component
+  "Render navigation bar and contents."
+  [data owner]
   (reify
     om/IRender
     (render [_]

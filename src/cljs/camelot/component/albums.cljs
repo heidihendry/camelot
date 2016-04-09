@@ -1,38 +1,26 @@
 (ns camelot.component.albums
   (:require [camelot.util :as util]
+            [camelot.nav :as nav]
+            [camelot.rest :as rest]
+            [camelot.state :as state]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [cljs-time.core :as t]
             [cljs-time.format :as tf]))
 
-(defn update-description [e owner {:keys [description]}]
-  (om/set-state! owner :description (.. e -target -value)))
-
 (def custom-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
 
-(defn photo-component [[file metadata] owner]
-  (reify
-    om/IRender
-    (render [this]
-      (dom/div nil
-               (dom/h4 nil (clojure.string/replace file #"^.*/" ""))
-               (dom/ul nil
-                       (dom/li nil "Date: " (tf/unparse custom-formatter (:datetime metadata)))
-                       (dom/li nil "Camera: " (:make (:camera metadata)) " - " (:model (:camera metadata)))
-                       (dom/li nil "Filesize: " (quot (:filesize metadata) 1024) " kB")
-                       (dom/li nil "Description: "
-                               (dom/input #js {:type "text" :ref "photo-description" :value (:description metadata)
-                                               :onChange #(om/update! metadata :description (.. % -target -value))
-                                               :onBlur #(util/postreq "update-photo-metadata" {:file (om/value file) :metadata (om/value metadata)} (fn [x] prn x))})))))))
-
 (defn problem-component
+  "Render a list item for a validation problem."
   [problem owner]
   (reify
     om/IRender
     (render [this]
       (dom/li #js {:className "album-problem"} (:reason problem)))))
 
-(defn album-component [data owner]
+(defn album-component
+  "Render a list of validation problems."
+  [data owner]
   (reify
     om/IRender
     (render [this]
@@ -43,15 +31,18 @@
                         (om/build-all problem-component (:problems data))))))))
 
 (defn albums-component [albums owner]
+  "Render a list of albums and their validation results."
   (reify
     om/IRender
     (render [this]
-      (dom/div nil
-               (dom/label nil (first albums))
-               (apply dom/div nil
-                      (om/build-all album-component (remove #(= (type %) js/String) albums)))))))
+      (let [contents (remove #(= (type %) js/String) albums)]
+        (dom/div nil
+                 (dom/label nil (first albums))
+                 (apply dom/div nil
+                        (om/build-all album-component contents)))))))
 
 (defn album-summary-component [albums owner]
+  "Render a summary of album validation results."
   (reify
     om/IRender
     (render [_]
@@ -61,17 +52,30 @@
                               (filter empty?)
                               (count))
                          (count albums))
-            col-bias (* pass-rate 200)]
+            inty 200
+            col-bias (* pass-rate inty)
+            fmt "Folders passing validation: %.1f%%"
+            colour (goog.string/format "rgb(%d, %d, 50)"
+                                       (- inty col-bias) col-bias)]
         (dom/div #js {:className "album-validation-summary"}
-                 (dom/label #js {:style #js {:color (goog.string/format "rgb(%d, %d, 50)" (- 200 col-bias) col-bias)}}
-                            (goog.string/format "Folders passing validation: %.1f%%"
-                                                (* pass-rate 100))))))))
+                 (dom/label #js {:style #js {:color colour}}
+                            (goog.string/format fmt (* pass-rate 100))))))))
 
 (defn album-view-component [app owner]
+  "Render an album validation summary."
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
+      (dom/div #js {:onClick nav/settings-hide!}
                (dom/div nil (om/build album-summary-component (:albums app)))
                (dom/h3 nil "Problems Identified")
-               (apply dom/div nil (om/build-all albums-component (:albums app)))))))
+               (apply dom/div nil (om/build-all albums-component
+                                                (:albums app)))))))
+
+(defn reload-albums
+  "Reload the available albums"
+  []
+  (rest/get-albums #(let [resp (:body %)]
+                      (if (= (type resp) js/String)
+                        (js/alert resp)
+                        (om/update! (state/app-state-cursor) :albums resp)))))
