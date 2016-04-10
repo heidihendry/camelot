@@ -166,7 +166,8 @@
                                     [:location :gps-longitude] [:location :gps-longitude-ref]
                                     [:location :gps-latitude] [:location :gps-latitude-ref]
                                     [:datetime] [:filename]]}
-          album [{:datetime true
+          album [{:filename "file1"
+                  :datetime true
                   :headline true
                   :artist true
                   :phase true
@@ -174,8 +175,7 @@
                   :location {:gps-longitude true
                              :gps-longitude-ref true
                              :gps-latitude true
-                             :gps-latitude-ref true}
-                  :filename true}]]
+                             :gps-latitude-ref true}}]]
       (:result (check-required-fields (gen-state-helper config) album)) => :pass))
 
   (fact "Required fields missing from any files should fail"
@@ -184,16 +184,19 @@
                                     [:location :gps-latitude] [:location :gps-latitude-ref]
                                     [:datetime] [:filename]]}
           ;; copyright missing
-          album [{:datetime true
+          album [{:filename "file1"
+                  :datetime true
                   :headline true
                   :artist true
                   :phase true
                   :location {:gps-longitude true
                              :gps-longitude-ref true
                              :gps-latitude true
-                             :gps-latitude-ref true}
-                  :filename true}]]
-      (:result (check-required-fields (gen-state-helper config) album)) => :fail)))
+                             :gps-latitude-ref true}}]]
+      (:result (check-required-fields (gen-state-helper config) album)) => :fail
+      (boolean (re-find #"file1"
+                        (:reason (check-required-fields
+                                  (gen-state-helper config) album)))) => true)))
 
 (facts "An album must have files"
   (fact "An empty album fails"
