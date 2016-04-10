@@ -31,7 +31,7 @@
   :plugins [[lein-cljsbuild "1.1.1"]
             [lein-environ "1.0.1"]]
 
-  :min-lein-version "0.2.2-SNAPSHOT"
+  :min-lein-version "2.6.1"
 
   :source-paths ["src/clj" "src/cljs" "dev"]
 
