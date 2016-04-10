@@ -30,7 +30,7 @@
             :time-light-sanity "The camera settings do not coincide with the timestamp on numerous photos"
             :camera-checks "The photos do not have a camera check at the beginning and end"
             :headline-consistency "The headline of the photos differs across photos (tested '%s' and '%s')"
-            :required-fields "One or more required fields are missing from one or more photos"
+            :required-fields "One or more required fields are missing from '%s'"
             :album-has-data "Album must not be empty"
             :sighting-consistency "Mismatch found in sighting data: species without quantity or quantity without species"
             :surveyed-species "A species was identified which is not known to the survey"

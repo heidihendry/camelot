@@ -17,7 +17,7 @@
         night-total (count (filter #(nightfn (t/hour (:datetime %))) photos))]
     (if (not (zero? night-total))
       (if (> (/ ir-failed night-total) (:erroneous-infrared-threshold (:config state)))
-        {:result :fail}
+        {:result :fail :reason ((:translate state) :checks/time-light-sanity)}
         {:result :pass})
       {:result :pass})))
 
@@ -87,7 +87,7 @@
   [state photos]
   (let [fields (:required-fields (:config state))]
     (or (reduce #(when (some nil? (map (partial photo/extract-path-value %2) fields))
-                   (reduced {:result :fail})) nil
+                   (reduced {:result :fail :reason ((:translate state) :checks/required-fields (:filename %2))})) nil
                    photos)
         {:result :pass})))
 
