@@ -3,22 +3,9 @@
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [camelot.util.java-file :as jf]
+            [incanter.core :as incanter]
+            [incanter.stats :as istats]
             [schema.core :as s]))
-
-(defn- squares
-  "Calculate the square of the difference from the average for the collection."
-  [avg coll]
-  (map #(let [n (-' % avg)] (*' n n)) coll))
-
-(defn- stddev
-  "Calculate the std.dev."
-  [coll]
-  (let [total (count coll)
-        mean (/ (reduce +' 0 coll) total)
-        squares (squares mean coll)]
-    (if (< total 2)
-      0
-      (Math/sqrt (/ (apply +' squares) (-' total 1))))))
 
 (defn check-ir-threshold
   "Check whether the album's photos exceed the user-defined infrared check thresholds."
@@ -39,16 +26,20 @@
   [state photos]
   (if (< (count photos) 2)
     {:result :pass}
-    (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)
-          gettime #(-> % (:datetime) (tc/to-long))
-          ftime (gettime (first photos))
-          times (map #(-' (gettime %) ftime) photos)
-          sd (stddev times)]
-      (if (nil? (reduce #(if (> %2 (+' %1 (*' sd 3)))
-                           (reduced nil)
-                           %2) 0 (rest times)))
-        {:result :fail}
-        {:result :pass}))))
+    (let [ms #(-> % :datetime (tc/to-long))
+          ptimes (map ms photos)
+          [_ p25 _ p75 _] (istats/quantile ptimes)
+          stddev (istats/sd ptimes)
+          belowt (- p25 (* 3 stddev))
+          below (filter #(< (ms %) belowt) photos)
+          abovet (+ p75 (* 3 stddev))
+          above (filter #(> (ms %) abovet) photos)]
+      (cond
+        (first below) {:result :fail :reason
+                       ((:translate state) :checks/stddev-before (:filename (first below)))}
+        (first above) {:result :fail :reason
+                       ((:translate state) :checks/stddev-after (:filename (first above)))}
+        :else {:result :pass}))))
 
 (defn check-project-dates
   "Check that photos fall within the defined project dates."

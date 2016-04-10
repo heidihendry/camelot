@@ -65,7 +65,8 @@
       (:result (check-photo-stddev (gen-state-helper config) album)) => :pass))
 
   (fact "Does flag std. dev issues if one or more date/times deviations are excessive"
-    (let [album [{:datetime (t/date-time 2015 1 1  6 00 00)}
+    (let [album [{:filename "file1"
+                  :datetime (t/date-time 2015 1 29  6 00 00)}
                  {:datetime (t/date-time 2015 3 24 6 10 00)}
                  {:datetime (t/date-time 2015 3 25 6 20 00)}
                  {:datetime (t/date-time 2015 3 26 6 30 00)}
@@ -77,7 +78,9 @@
                  {:datetime (t/date-time 2015 4 6  6 00)}
                  {:datetime (t/date-time 2015 4 7  6 40 00)}
                  {:datetime (t/date-time 2015 4 10 6 50 00)}]]
-      (:result (check-photo-stddev (gen-state-helper config) album)) => :fail))
+      (:result (check-photo-stddev (gen-state-helper config) album)) => :fail
+      (boolean (re-find #"file1.*before" (:reason (check-photo-stddev
+                                           (gen-state-helper config) album)))) => true))
 
   (fact "An album with one photo passes"
     (let [album [{:datetime (t/date-time 2015 4 10 6 50 00)}]]
