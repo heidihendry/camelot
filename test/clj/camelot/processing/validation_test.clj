@@ -94,9 +94,15 @@
   (fact "Fails if a date is prior to the project start"
     (let [config {:project-start (t/date-time 2015 1 1)
                   :project-end (t/date-time 2015 6 1)}
-          album [{:datetime (t/date-time 2014 12 31 0 0 0)}
-                 {:datetime (t/date-time 2015 6 1 0 0 0)}]]
-      (:result (check-project-dates (gen-state-helper config) album)) => :fail))
+          album [{:filename "file1"
+                  :datetime (t/date-time 2014 12 31 0 0 0)}
+                 {:filename "file2"
+                  :datetime (t/date-time 2015 6 1 0 0 0)}]]
+      (:result (check-project-dates (gen-state-helper config) album)) => :fail
+      (boolean
+       (re-find #"file1"
+                (:reason
+                 (check-project-dates (gen-state-helper config) album)))) => true))
 
   (fact "Fails if a date is after the project end"
     (let [config {:project-start (t/date-time 2015 1 1)
