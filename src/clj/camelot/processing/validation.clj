@@ -87,40 +87,48 @@
   [state photos]
   (let [fields (:required-fields (:config state))]
     (or (reduce #(when (some nil? (map (partial photo/extract-path-value %2) fields))
-                   (reduced {:result :fail :reason ((:translate state) :checks/required-fields (:filename %2))})) nil
-                   photos)
+                   (reduced {:result :fail
+                             :reason ((:translate state)
+                                      :checks/required-fields (:filename %2))}))
+                nil photos)
         {:result :pass})))
 
 (defn check-album-has-data
   "Ensure the album has data."
   [state photos]
   (if (empty? photos)
-    {:result :fail}
+    {:result :fail
+     :reason ((:translate state) :checks/album-has-data)}
     {:result :pass}))
 
 (defn check-sighting-consistency
   "Ensure the sighting data is fully completed."
   [state photos]
-  (or (reduce #(if (or (nil? (:quantity %2)) (nil? (:species %2)))
-                 (reduced {:result :fail})
-                 %1)
+  (or (reduce (fn [acc p] (if (or (some #(nil? (:quantity %)) (:sightings p))
+                                  (some #(nil? (:species %)) (:sightings p)))
+                        (reduced {:result :fail :reason ((:translate state)
+                                                         :checks/sighting-consistency
+                                                         (:filename p))})
+                        acc))
               {:result :pass}
-              (apply concat (map :sightings photos)))
+              photos)
       {:result :pass}))
 
 (defn check-species
   "Ensure the species of the photos are known to the survey"
   [state photos]
   (let [m (->> photos
-               (map #(map :species (:sightings %)))
+               (map #(hash-map :file (:filename %)
+                               :species (map :species (:sightings %))))
                (flatten)
-               (remove nil?)
-               (filter #(not (some #{(clojure.string/lower-case %)}
-                                   (map clojure.string/lower-case
-                                        (:surveyed-species (:config state))))))
+               (remove #(empty? (:species %)))
+               (filter #(not (every? (into #{} (map clojure.string/lower-case
+                                                    (:surveyed-species (:config state))))
+                                     (map clojure.string/lower-case (:species %)))))
                (first))]
     (if m
-      {:result :fail}
+      {:result :fail
+       :reason ((:translate state) :checks/surveyed-species (:file m))}
       {:result :pass})))
 
 (defn check-future
@@ -132,10 +140,6 @@
       {:result :fail
        :reason ((:translate state) :checks/future-timestamp
                 (:filename (first res)))})))
-
-(defn- problem-descriptions
-  [state problems]
-  (map #(hash-map :problem % :description ((:translate state) (keyword (str "checks/" (name %))))) problems))
 
 (s/defn list-problems :- [s/Keyword]
   "Return a list of all problems encountered while processing album data"
