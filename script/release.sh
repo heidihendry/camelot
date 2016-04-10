@@ -58,7 +58,7 @@ echo -n "Bumping version to *-SNAPSHOT... "
 patch_version=$(echo $released_version | cut -d\. -f3)
 new_patch_version=$(($patch_version+1))
 new_version="$(basename "${released_version}" ".${patch_version}").${new_patch_version}"
-sed -i "s/\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"$/ \"${new_version}-SNAPSHOT\"/" ${PROJECT_FILE}
+sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"$/${PROJECT_NAME} \"${new_version}-SNAPSHOT\"/" ${PROJECT_FILE}
 git commit -a -m "Version bump: ${new_version}-SNAPSHOT"
 echo "done"
 
