@@ -32,8 +32,8 @@
             :headline-consistency "The headline of the photos differs across photos (tested '%s' and '%s')"
             :required-fields "One or more required fields are missing from '%s'"
             :album-has-data "Album must not be empty"
-            :sighting-consistency "Mismatch found in sighting data: species without quantity or quantity without species"
-            :surveyed-species "A species was identified which is not known to the survey"
+            :sighting-consistency "Mismatch found in sighting data: one of the fields quantity or species is missing in '%s'"
+            :surveyed-species "A species was identified in '%s' which is not known to the survey"
             :future-timestamp "The timestamp on '%s' is in the future"
             }
    :language {:en "English"

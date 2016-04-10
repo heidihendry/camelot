@@ -219,9 +219,13 @@
 
   (fact "A sighting which has a species but no quantity fails"
     (let [config {}
-          album [{:sightings [{:species "Yellow Spotted Cat"
+          album [{:filename "file1"
+                  :sightings [{:species "Yellow Spotted Cat"
                                :quantity nil}]}]]
-      (:result (check-sighting-consistency (gen-state-helper config) album)) => :fail))
+      (:result (check-sighting-consistency (gen-state-helper config) album)) => :fail
+      (boolean
+       (re-find #"file1" (:reason (check-sighting-consistency
+                                   (gen-state-helper config) album)))) => true))
 
   (fact "A sighting which has a quantity but no species fails"
     (let [config {}
@@ -246,11 +250,47 @@
                                :quantity 1}]}]]
       (:result (check-species (gen-state-helper config) album)) => :pass))
 
-  (fact "Sightings with known species should pass"
+  (fact "Sightings with unknown species should fail"
     (let [config {:surveyed-species ["Smiley Wolf"]}
-          album [{:sightings [{:species "yellow spotted cat"
+          album [{:filename "file1"
+                  :sightings [{:species "yellow spotted cat"
                                :quantity 1}]}]]
-      (:result (check-species (gen-state-helper config) album)) => :fail)))
+      (:result (check-species (gen-state-helper config) album)) => :fail
+      (boolean
+       (re-find #"file1" (:reason (check-species
+                                   (gen-state-helper config) album)))) => true))
+
+  (fact "Sightings with any unknown species should fail"
+    (let [config {:surveyed-species ["Smiley Wolf"]}
+          album [{:filename "file1"
+                  :sightings [{:species "yellow spotted cat"
+                               :quantity 1}
+                              {:species "smiley wolf"
+                               :quantity 1}]}]]
+      (:result (check-species (gen-state-helper config) album)) => :fail
+      (boolean
+       (re-find #"file1" (:reason (check-species
+                                   (gen-state-helper config) album)))) => true))
+
+  (fact "Any sighting with an unknown species should cause all to fail"
+    (let [config {:surveyed-species ["Smiley Wolf"]}
+          album [{:filename "file1"
+                  :sightings [{:species "smiley wolf"
+                               :quantity 1}]}
+                 {:filename "file2"
+                  :sightings [{:species "yellow spotted cat"
+                               :quantity 1}]}]]
+      (:result (check-species (gen-state-helper config) album)) => :fail
+      (boolean
+       (re-find #"file2" (:reason (check-species
+                                   (gen-state-helper config) album)))) => true))
+
+  (fact "A sighting, even if it doesn't contain all known species, should pass"
+    (let [config {:surveyed-species ["Smiley Wolf" "Yellow Spotted Can"]}
+          album [{:filename "file1"
+                  :sightings [{:species "smiley wolf"
+                               :quantity 1}]}]]
+      (:result (check-species (gen-state-helper config) album)) => :pass)))
 
 (facts "Future timestamps"
   (fact "A timestamp in the future fails"
