@@ -57,9 +57,9 @@
     {:result :pass}
     (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
       (cond (t/before? (:datetime (first photos)) (:project-start (:config state)))
-            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (:filename (first photos)))}
+            {:result :fail :reason ((:translate state) :checks/project-date-before (:filename (first photos)))}
             (t/after? (:datetime (last photos)) (:project-end (:config state)))
-            {:result :fail :reason ((:translate state) :checks/photo-stddev-before (:filename (first photos)))}
+            {:result :fail :reason ((:translate state) :checks/project-date-after (:filename (first photos)))}
             :else {:result :pass}))))
 
 (defn check-camera-checks
@@ -165,7 +165,7 @@
                      (if (not= (:result res) :pass)
                        {:problem t
                         :reason (if (:reason res)
-                                  ((:translate state) (:reason res))
+                                  (:reason res)
                                   (->> t
                                        (name)
                                        (str "checks/")
