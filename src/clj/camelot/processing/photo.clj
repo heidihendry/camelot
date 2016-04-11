@@ -2,8 +2,14 @@
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
+            [camelot.processing.util :as putil]
             [camelot.model.photo :as mp])
   (:import [camelot.model.photo Camera CameraSettings PhotoMetadata]))
+
+(defn extract-path-value
+  "Return the metadata for a given path."
+  [metadata path]
+  (reduce (fn [acc n] (get acc n)) metadata path))
 
 (s/defn night? :- s/Bool
   "Check whether the given time is 'night'."
@@ -20,9 +26,10 @@
 (s/defn exif-date-to-datetime :- org.joda.time.DateTime
   "Exif metadata dates are strings like 2014:04:11 16:37:00.  This makes them real dates."
   [ed]
-  (let [parts (str/split ed #"[ :]")]
-    (assert (= (count parts) 6))
-    (apply t/date-time (map #(Integer/parseInt %) parts))))
+  (when (not (nil? ed))
+    (let [parts (str/split ed #"[ :]")]
+      (assert (= (count parts) 6))
+      (apply t/date-time (map #(Integer/parseInt %) parts)))))
 
 (defn- read-metadata-string
   [str]
@@ -30,10 +37,22 @@
     (read-string str)
     0))
 
+(s/defn parse
+  [state raw-metadata]
+  (validate state (normalise state raw-metadata)))
+
+(s/defn validate
+  [state photo-metadata]
+  (let [strictly-required-fields [[:datetime] [:filename]]
+        missing (remove #(extract-path-value photo-metadata %) strictly-required-fields)]
+    (if (empty? missing)
+      photo-metadata
+      {:invalid (str/join ", " (map (partial putil/path-description state) missing))})))
+
 (s/defn normalise :- PhotoMetadata
   "Return a normalised data structure for the given vendor- and photo-specific metadata"
-  [state metadata]
-  (let [md #(get metadata %)
+  [state raw-metadata]
+  (let [md #(get raw-metadata %)
         cam (mp/camera
              {:make (md "Make")
               :model (md "Model")
@@ -78,7 +97,3 @@
       :filesize (read-string (md "File Size"))
       :location location})))
 
-(defn extract-path-value
-  "Return the metadata for a given path."
-  [metadata path]
-  (reduce (fn [acc n] (get acc n)) metadata path))

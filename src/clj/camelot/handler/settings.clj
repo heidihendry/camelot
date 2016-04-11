@@ -13,17 +13,6 @@
 
 (def metadata-paths (flatten-metadata-structure ms/metadata-structure))
 
-(defn path-description
-  "Return a translation for a given path"
-  [state path]
-  (let [translate #((:translate state) %)]
-    (->> path
-         (map name)
-         (clojure.string/join ".")
-         (str "metadata/")
-         (keyword)
-         (translate))))
-
 (defn config-description
   "Add label and description data to the given schema definition"
   [state schema]

@@ -141,7 +141,16 @@
        :reason ((:translate state) :checks/future-timestamp
                 (:filename (first res)))})))
 
-(s/defn list-problems :- [s/Keyword]
+(defn check-invalid-photos
+  "Check the album for invalid photos"
+  [state photos]
+  (let [res (first (into [] (filter #(contains? % :invalid) photos)))]
+    (if (nil? res)
+      {:result :pass}
+      {:result :fail
+       :reason ((:translate state) :checks/invalid-photos (:invalid res))})))
+
+(s/defn list-problems
   "Return a list of all problems encountered while processing album data"
   [state album-data]
   (let [tests {:photo-stddev check-photo-stddev
@@ -154,18 +163,21 @@
                :sighting-consistency check-sighting-consistency
                :surveyed-species check-species
                :future-timestamp check-future}]
-    (remove nil?
-            (map (fn [[t f]]
-                   (let [res (f state (vals album-data))]
-                     (if (not= (:result res) :pass)
-                       {:problem t
-                        :reason (if (:reason res)
-                                  (:reason res)
-                                  (->> t
-                                       (name)
-                                       (str "checks/")
-                                       (keyword)
-                                       ((:translate state))
-                                       ((:translate state) :checks/problem-without-reason)))}
-                       nil)))
-                 tests))))
+    (let [baseline-check (check-invalid-photos state (vals album-data))]
+      (if (= (:result baseline-check) :fail)
+        [baseline-check]
+        (remove nil?
+                (map (fn [[t f]]
+                       (let [res (f state (vals album-data))]
+                         (if (not= (:result res) :pass)
+                           {:problem t
+                            :reason (if (:reason res)
+                                      (:reason res)
+                                      (->> t
+                                           (name)
+                                           (str "checks/")
+                                           (keyword)
+                                           ((:translate state))
+                                           ((:translate state) :checks/problem-without-reason)))}
+                           nil)))
+                     tests))))))
