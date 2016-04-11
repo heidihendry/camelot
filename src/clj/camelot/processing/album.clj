@@ -81,8 +81,7 @@
   {:datetime-start ((extract-start-date) album)
    :datetime-end ((extract-end-date) album)
    :make (extract-make album)
-   :model (extract-model album)
-   :sightings (extract-independent-sightings state album)})
+   :model (extract-model album)})
 
 (s/defn album :- ma/Album
   "Return the metadata for a single album, given raw tag data"
