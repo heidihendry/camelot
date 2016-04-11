@@ -30,6 +30,10 @@
     (let [album [{:datetime day :settings {:iso 1000}}]]
       (:result (check-ir-threshold (gen-state-helper config) album)) => :pass))
 
+  (fact "A photo which does not have IR should pass"
+    (let [album [{:datetime day :settings {}}]]
+      (:result (check-ir-threshold (gen-state-helper config) album)) => :pass))
+
   (fact "A photo which does not use IR at night is not okay"
     (let [album [{:datetime night :settings {:iso 999}}]]
       (:result (check-ir-threshold (gen-state-helper config) album)) => :fail))
@@ -158,6 +162,13 @@
                   :headline "AB-ABC-01"}
                  {:datetime (t/date-time 2015 1 5 0 0 0)
                   :headline "XY-PSQ-02"}]]
+      (:result (check-headline-consistency (gen-state-helper config) album)) => :fail))
+
+  (fact "A missing headline should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :headline "AB-ABC-01"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)}]]
       (:result (check-headline-consistency (gen-state-helper config) album)) => :fail)))
 
 (facts "Required fields are respected"
@@ -217,11 +228,15 @@
                                :quantity 1}]}]]
       (:result (check-sighting-consistency (gen-state-helper config) album)) => :pass))
 
+  (fact "A HUMAN-CAMERACHECK without a quantity passes"
+    (let [config {}
+          album [{:sightings [{:species "HUMAN-CAMERACHECK"}]}]]
+      (:result (check-sighting-consistency (gen-state-helper config) album)) => :pass))
+
   (fact "A sighting which has a species but no quantity fails"
     (let [config {}
           album [{:filename "file1"
-                  :sightings [{:species "Yellow Spotted Cat"
-                               :quantity nil}]}]]
+                  :sightings [{:species "Yellow Spotted Cat"}]}]]
       (:result (check-sighting-consistency (gen-state-helper config) album)) => :fail
       (boolean
        (re-find #"file1" (:reason (check-sighting-consistency
@@ -248,6 +263,11 @@
     (let [config {:surveyed-species ["Smiley Wolf"]}
           album [{:sightings [{:species "smiley wolf"
                                :quantity 1}]}]]
+      (:result (check-species (gen-state-helper config) album)) => :pass))
+
+  (fact "No sightings should pass"
+    (let [config {:surveyed-species ["Smiley Wolf"]}
+          album [{:sightings []}]]
       (:result (check-species (gen-state-helper config) album)) => :pass))
 
   (fact "Sightings with unknown species should fail"
