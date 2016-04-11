@@ -60,7 +60,9 @@
 (defn check-camera-checks
   "Ensure there are at least two camera-checks in the given set of photos with unique dates."
   [state photos]
-  (let [has-check #(some (fn [x] (re-matches #"(?i).*camera.?check" (:species x)))
+  (let [has-check #(some (fn [x] (if (nil? (:species x))
+                                   false
+                                   (re-matches #"(?i).*camera.?check" (:species x))))
                          (:sightings %))
         as-day #(let [d (:datetime %)] (t/date-time (t/year d) (t/month d) (t/day d)))
         check-photos (->> photos
@@ -138,7 +140,7 @@
                (remove #(empty? (:species %)))
                (filter #(not (every? (into #{} (map clojure.string/lower-case
                                                     (:surveyed-species (:config state))))
-                                     (map clojure.string/lower-case (:species %)))))
+                                     (map clojure.string/lower-case (remove nil? (:species %))))))
                (first))]
     (if m
       {:result :fail
