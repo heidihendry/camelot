@@ -13,7 +13,7 @@
                  [commons-io/commons-io "2.4"]
                  [compojure "1.5.0"]
                  [environ "1.0.2"]
-                 [incanter "1.5.7"]
+                 [incanter/incanter-core "1.5.7"]
                  [midje "1.8.3"]
                  [om-datepicker "0.0.6"]
                  [org.apache.commons/commons-lang3 "3.4"]
