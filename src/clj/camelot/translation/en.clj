@@ -35,6 +35,7 @@
             :sighting-consistency "Mismatch found in sighting data: one of the fields quantity or species is missing in '%s'"
             :surveyed-species "A species was identified in '%s' which is not known to the survey"
             :future-timestamp "The timestamp on '%s' is in the future"
+            :invalid-photos "A file is missing one or more essential fields: '%s'"
             }
    :language {:en "English"
               :vn "Vietnamese"}

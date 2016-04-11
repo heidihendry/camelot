@@ -87,7 +87,7 @@
 (s/defn album :- ma/Album
   "Return the metadata for a single album, given raw tag data"
   [state set-data]
-  (let [album-data (into {} (map (fn [[k v]] [k (photo/normalise state v)]) set-data))]
+  (let [album-data (into {} (map (fn [[k v]] [k (photo/parse state v)]) set-data))]
     {:photos album-data
      :metadata (extract-metadata state (vals album-data))
      :problems (list-problems state album-data)}))

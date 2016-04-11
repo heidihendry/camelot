@@ -59,13 +59,7 @@
     (let [album [chrono-second chrono-first chrono-last chrono-third]
           state (gen-state-helper config)
           result (extract-metadata state album)]
-      (:model result) => "MyCam"))
-
-  (fact "Sightings are extracted"
-    (let [album [sightings]
-          state (gen-state-helper config)
-          result (extract-metadata state album)]
-      (:sightings result) => {"Smiley Wolf" 3})))
+      (:model result) => "MyCam")))
 
 (facts "species extraction"
   (fact "A single sighting is extracted"

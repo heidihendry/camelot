@@ -23,3 +23,22 @@
       (:filesize output) => 513653
       (:make (:camera output)) => "CUDDEBACK"
       (:datetime output) => (t/date-time 2014 4 11 19 47 46))))
+
+(fact "Photo validation"
+  (fact "Metadata missing a datetime is not valid"
+    (let [metadata [{:filename "MyFile.jpg"}]
+          config {:language :en}]
+      (contains? (validate (gen-state config) metadata) :invalid) => true))
+
+  (fact "Metadata with nil required fields is not valid"
+    (let [metadata [{:filename nil
+                     :datetime nil}]
+          config {:language :en}
+          res (validate (gen-state config) metadata)]
+      (contains? res :invalid) => true
+      (boolean (re-find #"Date/Time" (:invalid res))) => true))
+
+  (fact "Metadata with the necessary field is valid"
+    (let [metadata {:filename "myfile"
+                    :datetime 0}]
+      (contains? (validate (gen-state []) metadata) :invalid) => false)))

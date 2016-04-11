@@ -302,3 +302,23 @@
     (let [album [{:datetime (t/date-time 2019 1 1 0 0 0)}]]
       (with-redefs [t/now #(t/date-time 2020 1 1)]
         (:result (check-future (gen-state-helper {}) album)) => :pass))))
+
+(facts "Invalid photos"
+  (fact "An album with one invalid photo fails the test"
+    (let [album [{:invalid "Date/Time, Filename"}]]
+      (:result (check-invalid-photos (gen-state-helper {}) album)) => :fail
+      (boolean (re-find #"Date/Time, Filename"
+                        (:reason (check-invalid-photos
+                                  (gen-state-helper {}) album)))) => true))
+
+  (fact "An album without any invalid photos passes the test"
+    (let [album [{:datetime (t/date-time 2019 1 1 0 0 0)}]]
+      (:result (check-invalid-photos (gen-state-helper {}) album)) => :pass))
+
+  (fact "An album without any invalid photos passes the test"
+    (let [album [{:datetime (t/date-time 2019 1 1 0 0 0)}
+                 {:invalid "Date/Time"}]]
+      (:result (check-invalid-photos (gen-state-helper {}) album)) => :fail
+      (boolean (re-find #"Date/Time"
+                        (:reason (check-invalid-photos
+                                  (gen-state-helper {}) album)))) => true)))
