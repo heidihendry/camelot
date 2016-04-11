@@ -17,12 +17,6 @@
     (let [search [:location :gps-longitude]]
       (some #{search} metadata-paths) => search)))
 
-(facts "Path Descriptions"
-  (fact "Metadata can be described with a keyword matching corresponding to its path"
-    (let [config {:language :en}]
-      (path-description (gen-state config) [:camera :make]) => "Camera Make"
-      (path-description (gen-state config) [:datetime]) => "Date/Time")))
-
 (facts "Config Descriptions"
   (fact "Labels are created for configuration data"
     (let [config {:language :en}
