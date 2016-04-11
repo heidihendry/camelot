@@ -1,5 +1,6 @@
 (ns camelot.handler.settings
   (:require [camelot.processing.settings :as ps]
+            [camelot.processing.util :as putil]
             [camelot.model.settings :as ms]))
 
 (defn- flatten-metadata-structure
@@ -27,7 +28,7 @@
   "Return paths alongside a (translated) description of the metadata represented
   by that path."
   [state]
-  (into {} (map #(hash-map % (path-description state %)) metadata-paths)))
+  (into {} (map #(hash-map % (putil/path-description state %)) metadata-paths)))
 
 (defn translate-menu-labels
   "Return a menu with its labels translated"

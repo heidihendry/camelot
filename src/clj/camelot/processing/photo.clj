@@ -37,10 +37,6 @@
     (read-string str)
     0))
 
-(s/defn parse
-  [state raw-metadata]
-  (validate state (normalise state raw-metadata)))
-
 (s/defn validate
   [state photo-metadata]
   (let [strictly-required-fields [[:datetime] [:filename]]
@@ -97,3 +93,6 @@
       :filesize (read-string (md "File Size"))
       :location location})))
 
+(s/defn parse
+  [state raw-metadata]
+  (validate state (normalise state raw-metadata)))
