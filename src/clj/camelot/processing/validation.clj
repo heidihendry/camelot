@@ -48,9 +48,13 @@
     {:result :pass}
     (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
       (cond (t/before? (:datetime (first photos)) (:project-start (:config state)))
-            {:result :fail :reason ((:translate state) :checks/project-date-before (:filename (first photos)))}
+            {:result :fail
+             :reason ((:translate state) :checks/project-date-before
+                      (:filename (first photos)))}
             (t/after? (:datetime (last photos)) (:project-end (:config state)))
-            {:result :fail :reason ((:translate state) :checks/project-date-after (:filename (first photos)))}
+            {:result :fail
+             :reason ((:translate state) :checks/project-date-after
+                      (:filename (first photos)))}
             :else {:result :pass}))))
 
 (defn check-camera-checks
@@ -71,7 +75,8 @@
   "Compare two handlines, failing if they're not consistent."
   [state h1 h2]
   (if (not (= (:headline h1) (:headline h2)))
-    (reduced {:result :fail :reason ((:translate state) :checks/headline-consistency (:filename h1) (:filename h2))})
+    (reduced {:result :fail :reason ((:translate state) :checks/headline-consistency
+                                     (:filename h1) (:filename h2))})
     h1))
 
 (defn check-headline-consistency
@@ -101,16 +106,25 @@
      :reason ((:translate state) :checks/album-has-data)}
     {:result :pass}))
 
+(defn sightings-reducer
+  [state photo]
+  (fn [acc sighting]
+    (let [special #"(?i)cameracheck"]
+      (when (or (and (nil? (:quantity sighting))
+                     (nil? (re-find special (:species sighting))))
+                (nil? (:species sighting)))
+        (reduced {:result :fail
+                  :reason ((:translate state)
+                                         :checks/sighting-consistency
+                                         (:filename photo))})))))
+
 (defn check-sighting-consistency
   "Ensure the sighting data is fully completed."
   [state photos]
-  (or (reduce (fn [acc p] (if (or (some #(nil? (:quantity %)) (:sightings p))
-                                  (some #(nil? (:species %)) (:sightings p)))
-                        (reduced {:result :fail :reason ((:translate state)
-                                                         :checks/sighting-consistency
-                                                         (:filename p))})
-                        acc))
-              {:result :pass}
+  (or (reduce #(let [r (reduce (sightings-reducer state %2) nil (:sightings %2))]
+                 (when r
+                   (reduced r)))
+              nil
               photos)
       {:result :pass}))
 

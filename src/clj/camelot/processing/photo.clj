@@ -21,7 +21,7 @@
   [nightfn isothresh photo]
   (let [hour (t/hour (:datetime photo))
         iso (:iso (:settings photo))]
-    (or (> iso isothresh) (not (nightfn hour)))))
+    (or (nil? iso) (> iso isothresh) (not (nightfn hour)))))
 
 (s/defn exif-date-to-datetime :- org.joda.time.DateTime
   "Exif metadata dates are strings like 2014:04:11 16:37:00.  This makes them real dates."
