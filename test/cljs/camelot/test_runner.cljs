@@ -1,8 +1,11 @@
 (ns camelot.test-runner
   (:require
    [doo.runner :refer-macros [doo-tests]]
-   [camelot.core-test]))
+   [camelot.core-test]
+   [om-datepicker.test-components]))
 
 (enable-console-print!)
 
-(doo-tests 'camelot.core-test)
+
+(doo-tests 'om-datepicker.test-components
+           'camelot.core-test)
