@@ -97,7 +97,7 @@
              :server-logfile "log/figwheel.log"}
 
   :doo {:build "test"
-        :alias {:browsers [:chrome :firefox]}}
+        :alias {:browsers [:chrome :phantom]}}
 
   :profiles {:dev
              {:dependencies [[figwheel "0.5.1"]
