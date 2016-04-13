@@ -35,7 +35,7 @@ echo "done"
 
 echo -n "Running tests... "
 lein with-profiles +test midje
-lein with-profiles +test,+uberjar cljsbuild test
+lein doo phantom test once
 echo "done"
 
 echo -n "Bumping release version... "
