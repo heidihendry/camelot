@@ -110,7 +110,7 @@
 (defn sightings-reducer
   [state photo]
   (fn [acc sighting]
-    (let [special #"(?i)cameracheck|unknown$"]
+    (let [special #"(?i)\bcamera-?check\b|\bunknown\b"]
       (cond
         (and (nil? (:quantity sighting))
              (nil? (re-find special (:species sighting))))
@@ -135,7 +135,7 @@
   [state photo]
   (let [m (->> (:sightings photo)
                (map :species)
-               (remove #(re-find #"(?i)cameracheck|unknown" %))
+               (remove #(re-find #"(?i)\bcamera-?check\b|\bunknown\b" %))
                (map str/lower-case)
                (remove (into #{} (map str/lower-case (:surveyed-species (:config state))))))]
     (if (empty? m)

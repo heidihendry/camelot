@@ -229,6 +229,11 @@
           photo {:sightings [{:species "HUMAN-CAMERACHECK"}]}]
       (:result (check-sighting-consistency (gen-state-helper config) photo)) => :pass))
 
+  (fact "An unknown species without a quantity passes"
+    (let [config {}
+          photo {:sightings [{:species "Unknown"}]}]
+      (:result (check-sighting-consistency (gen-state-helper config) photo)) => :pass))
+
   (fact "A sighting which has a species but no quantity fails"
     (let [config {}
           photo {:filename "file1"
