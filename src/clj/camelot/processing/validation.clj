@@ -1,7 +1,9 @@
 (ns camelot.processing.validation
   (:require [camelot.processing.photo :as photo]
+            [camelot.processing.util :as putil]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
+            [clojure.string :as str]
             [camelot.util.java-file :as jf]
             [incanter.core :as incanter]
             [incanter.stats :as istats]
@@ -43,19 +45,16 @@
 
 (defn check-project-dates
   "Check that photos fall within the defined project dates."
-  [state photos]
-  (if (empty? photos)
-    {:result :pass}
-    (let [photos (sort #(t/before? (:datetime %1) (:datetime %2)) photos)]
-      (cond (t/before? (:datetime (first photos)) (:project-start (:config state)))
-            {:result :fail
-             :reason ((:translate state) :checks/project-date-before
-                      (:filename (first photos)))}
-            (t/after? (:datetime (last photos)) (:project-end (:config state)))
-            {:result :fail
-             :reason ((:translate state) :checks/project-date-after
-                      (:filename (first photos)))}
-            :else {:result :pass}))))
+  [state photo]
+  (let [datetime (:datetime photo)
+        file (:filename photo)]
+    (cond (t/before? datetime (:project-start (:config state)))
+          {:result :fail
+           :reason ((:translate state) :checks/project-date-before file)}
+          (t/after? datetime (:project-end (:config state)))
+          {:result :fail
+           :reason ((:translate state) :checks/project-date-after file)}
+          :else {:result :pass})))
 
 (defn check-camera-checks
   "Ensure there are at least two camera-checks in the given set of photos with unique dates."
@@ -91,14 +90,14 @@
 
 (defn check-required-fields
   "Ensure all Require Fields contain data."
-  [state photos]
-  (let [fields (:required-fields (:config state))]
-    (or (reduce #(when (some nil? (map (partial photo/extract-path-value %2) fields))
-                   (reduced {:result :fail
-                             :reason ((:translate state)
-                                      :checks/required-fields (:filename %2))}))
-                nil photos)
-        {:result :pass})))
+  [state photo]
+  (let [fields (:required-fields (:config state))
+        missing (filter #(nil? (photo/extract-path-value photo %)) fields)]
+    (if (empty? missing)
+      {:result :pass}
+      {:result :fail
+       :reason ((:translate state)
+                :checks/required-fields (:filename photo) (str/join ", " (map #(putil/path-description state %) missing)))})))
 
 (defn check-album-has-data
   "Ensure the album has data."
@@ -111,51 +110,48 @@
 (defn sightings-reducer
   [state photo]
   (fn [acc sighting]
-    (let [special #"(?i)cameracheck"]
-      (when (or (and (nil? (:quantity sighting))
-                     (nil? (re-find special (:species sighting))))
-                (nil? (:species sighting)))
+    (let [special #"(?i)cameracheck|unknown$"]
+      (cond
+        (and (nil? (:quantity sighting))
+             (nil? (re-find special (:species sighting))))
         (reduced {:result :fail
                   :reason ((:translate state)
-                                         :checks/sighting-consistency
-                                         (:filename photo))})))))
+                           :checks/sighting-consistency-quantity-needed
+                           (:filename photo))})
+        (nil? (:species sighting))
+        (reduced {:result :fail
+                  :reason ((:translate state)
+                           :checks/sighting-consistency-species-needed
+                           (:filename photo))})))))
 
 (defn check-sighting-consistency
   "Ensure the sighting data is fully completed."
-  [state photos]
-  (or (reduce #(let [r (reduce (sightings-reducer state %2) nil (:sightings %2))]
-                 (when r
-                   (reduced r)))
-              nil
-              photos)
+  [state photo]
+  (or (reduce (sightings-reducer state photo) nil (:sightings photo))
       {:result :pass}))
 
 (defn check-species
   "Ensure the species of the photos are known to the survey"
-  [state photos]
-  (let [m (->> photos
-               (map #(hash-map :file (:filename %)
-                               :species (map :species (:sightings %))))
-               (flatten)
-               (remove #(empty? (:species %)))
-               (filter #(not (every? (into #{} (map clojure.string/lower-case
-                                                    (:surveyed-species (:config state))))
-                                     (map clojure.string/lower-case (remove nil? (:species %))))))
-               (first))]
-    (if m
+  [state photo]
+  (let [m (->> (:sightings photo)
+               (map :species)
+               (remove #(re-find #"(?i)cameracheck|unknown" %))
+               (map str/lower-case)
+               (remove (into #{} (map str/lower-case (:surveyed-species (:config state))))))]
+    (if (empty? m)
+      {:result :pass}
       {:result :fail
-       :reason ((:translate state) :checks/surveyed-species (:file m))}
-      {:result :pass})))
+       :reason ((:translate state) :checks/surveyed-species (:filename photo)
+                (str/join ", " m))})))
 
 (defn check-future
   "Ensure the timestamp on the photos is not in the future."
-  [state photos]
-  (let [res (filter #(t/after? (:datetime %) (t/now)) photos)]
-    (if (empty? res)
-      {:result :pass}
-      {:result :fail
-       :reason ((:translate state) :checks/future-timestamp
-                (:filename (first res)))})))
+  [state photo]
+  (if (t/after? (:datetime photo) (t/now))
+    {:result :fail
+     :reason ((:translate state) :checks/future-timestamp
+              (:filename photo))}
+    {:result :pass}))
 
 (defn check-invalid-photos
   "Check the album for invalid photos"
@@ -166,34 +162,46 @@
       {:result :fail
        :reason ((:translate state) :checks/invalid-photos (:invalid res))})))
 
-(s/defn list-problems
-  "Return a list of all problems encountered while processing album data"
-  [state album-data]
-  (let [tests {:photo-stddev check-photo-stddev
-               :project-dates check-project-dates
-               :time-light-sanity check-ir-threshold
-               :camera-checks check-camera-checks
-               :headline-consistency check-headline-consistency
+(s/defn list-photo-problems
+  [state photos]
+  (let [tests {:project-dates check-project-dates
                :required-fields check-required-fields
-               :album-has-data check-album-has-data
                :sighting-consistency check-sighting-consistency
                :surveyed-species check-species
                :future-timestamp check-future}]
-    (let [baseline-check (check-invalid-photos state (vals album-data))]
-      (if (= (:result baseline-check) :fail)
-        [baseline-check]
-        (remove nil?
-                (map (fn [[t f]]
-                       (let [res (f state (vals album-data))]
-                         (if (not= (:result res) :pass)
-                           {:problem t
-                            :reason (if (:reason res)
-                                      (:reason res)
-                                      (->> t
-                                           (name)
-                                           (str "checks/")
-                                           (keyword)
-                                           ((:translate state))
-                                           ((:translate state) :checks/problem-without-reason)))}
-                           nil)))
-                     tests))))))
+    (filter #(= (:result %) :fail)
+            (flatten (map #(map (fn [[t f]] (f state %)) tests) photos)))))
+
+(s/defn list-album-problems
+  "Return a list of all problems encountered at an album level"
+  [state photos]
+  (let [tests {:photo-stddev check-photo-stddev
+               :time-light-sanity check-ir-threshold
+               :camera-checks check-camera-checks
+               :headline-consistency check-headline-consistency
+               :album-has-data check-album-has-data}]
+    (remove nil?
+            (map (fn [[t f]]
+                   (let [res (f state photos)]
+                     (if (not= (:result res) :pass)
+                       {:problem t
+                        :reason (if (:reason res)
+                                  (:reason res)
+                                  (->> t
+                                       (name)
+                                       (str "checks/")
+                                       (keyword)
+                                       ((:translate state))
+                                       ((:translate state) :checks/problem-without-reason)))}
+                       nil)))
+                 tests))))
+
+(s/defn list-problems
+  "Return a list of all problems encountered while processing `album-data'"
+  [state album-data]
+  (let [photos (vals album-data)
+        baseline-check (check-invalid-photos state photos)]
+    (if (= (:result baseline-check) :fail)
+      [baseline-check]
+      (concat (list-album-problems state photos)
+              (list-photo-problems state photos)))))
