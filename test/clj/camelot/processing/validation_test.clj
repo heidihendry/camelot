@@ -94,29 +94,25 @@
   (fact "Passes if dates are within project start/end"
     (let [config {:project-start (t/date-time 2015 1 1)
                   :project-end (t/date-time 2015 6 1)}
-          album [{:datetime (t/date-time 2015 1 1 0 0 0)}
-                 {:datetime (t/date-time 2015 6 1 0 0 0)}]]
-      (:result (check-project-dates (gen-state-helper config) album)) => :pass))
+          photo {:datetime (t/date-time 2015 1 1 0 0 0)}]
+      (:result (check-project-dates (gen-state-helper config) photo)) => :pass))
 
   (fact "Fails if a date is prior to the project start"
     (let [config {:project-start (t/date-time 2015 1 1)
                   :project-end (t/date-time 2015 6 1)}
-          album [{:filename "file1"
-                  :datetime (t/date-time 2014 12 31 0 0 0)}
-                 {:filename "file2"
-                  :datetime (t/date-time 2015 6 1 0 0 0)}]]
-      (:result (check-project-dates (gen-state-helper config) album)) => :fail
+          photo {:filename "file1"
+                 :datetime (t/date-time 2014 12 31 0 0 0)}]
+      (:result (check-project-dates (gen-state-helper config) photo)) => :fail
       (boolean
        (re-find #"file1"
                 (:reason
-                 (check-project-dates (gen-state-helper config) album)))) => true))
+                 (check-project-dates (gen-state-helper config) photo)))) => true))
 
   (fact "Fails if a date is after the project end"
     (let [config {:project-start (t/date-time 2015 1 1)
                   :project-end (t/date-time 2015 6 1)}
-          album [{:datetime (t/date-time 2015 1 5 0 0 0)}
-                 {:datetime (t/date-time 2016 1 1 0 0 0)}]]
-      (:result (check-project-dates (gen-state-helper config) album)) => :fail)))
+          photo {:datetime (t/date-time 2016 1 1 0 0 0)}]
+      (:result (check-project-dates (gen-state-helper config) photo)) => :fail)))
 
 (facts "Check: camera check"
   (fact "Albums with 2 camera checks on different days should pass"
@@ -177,17 +173,17 @@
                                     [:location :gps-longitude] [:location :gps-longitude-ref]
                                     [:location :gps-latitude] [:location :gps-latitude-ref]
                                     [:datetime] [:filename]]}
-          album [{:filename "file1"
-                  :datetime true
-                  :headline true
-                  :artist true
-                  :phase true
-                  :copyright true
-                  :location {:gps-longitude true
-                             :gps-longitude-ref true
-                             :gps-latitude true
-                             :gps-latitude-ref true}}]]
-      (:result (check-required-fields (gen-state-helper config) album)) => :pass))
+          photo {:filename "file1"
+                 :datetime true
+                 :headline true
+                 :artist true
+                 :phase true
+                 :copyright true
+                 :location {:gps-longitude true
+                            :gps-longitude-ref true
+                            :gps-latitude true
+                            :gps-latitude-ref true}}]
+      (:result (check-required-fields (gen-state-helper config) photo)) => :pass))
 
   (fact "Required fields missing from any files should fail"
     (let [config {:required-fields [[:headline] [:artist] [:phase] [:copyright]
@@ -195,19 +191,19 @@
                                     [:location :gps-latitude] [:location :gps-latitude-ref]
                                     [:datetime] [:filename]]}
           ;; copyright missing
-          album [{:filename "file1"
-                  :datetime true
-                  :headline true
-                  :artist true
-                  :phase true
-                  :location {:gps-longitude true
-                             :gps-longitude-ref true
-                             :gps-latitude true
-                             :gps-latitude-ref true}}]]
-      (:result (check-required-fields (gen-state-helper config) album)) => :fail
-      (boolean (re-find #"file1"
+          photo {:filename "file1"
+                 :datetime true
+                 :headline true
+                 :artist true
+                 :phase true
+                 :location {:gps-longitude true
+                            :gps-longitude-ref true
+                            :gps-latitude true
+                            :gps-latitude-ref true}}]
+      (:result (check-required-fields (gen-state-helper config) photo)) => :fail
+      (boolean (re-find #"file1.*: Copyright"
                         (:reason (check-required-fields
-                                  (gen-state-helper config) album)))) => true)))
+                                  (gen-state-helper config) photo)))) => true)))
 
 (facts "An album must have files"
   (fact "An empty album fails"
@@ -224,104 +220,87 @@
 (fact "Sighting consistency"
   (fact "A sighting which has a species and quantity passes"
     (let [config {}
-          album [{:sightings [{:species "Yellow Spotted Cat"
-                               :quantity 1}]}]]
-      (:result (check-sighting-consistency (gen-state-helper config) album)) => :pass))
+          photo {:sightings [{:species "Yellow Spotted Cat"
+                              :quantity 1}]}]
+      (:result (check-sighting-consistency (gen-state-helper config) photo)) => :pass))
 
   (fact "A HUMAN-CAMERACHECK without a quantity passes"
     (let [config {}
-          album [{:sightings [{:species "HUMAN-CAMERACHECK"}]}]]
-      (:result (check-sighting-consistency (gen-state-helper config) album)) => :pass))
+          photo {:sightings [{:species "HUMAN-CAMERACHECK"}]}]
+      (:result (check-sighting-consistency (gen-state-helper config) photo)) => :pass))
 
   (fact "A sighting which has a species but no quantity fails"
     (let [config {}
-          album [{:filename "file1"
-                  :sightings [{:species "Yellow Spotted Cat"}]}]]
-      (:result (check-sighting-consistency (gen-state-helper config) album)) => :fail
+          photo {:filename "file1"
+                 :sightings [{:species "Yellow Spotted Cat"}]}]
+      (:result (check-sighting-consistency (gen-state-helper config) photo)) => :fail
       (boolean
        (re-find #"file1" (:reason (check-sighting-consistency
-                                   (gen-state-helper config) album)))) => true))
+                                   (gen-state-helper config) photo)))) => true))
 
   (fact "A sighting which has a quantity but no species fails"
     (let [config {}
-          album [{:sightings [{:species nil
-                               :quantity 1}]}]]
-      (:result (check-sighting-consistency (gen-state-helper config) album)) => :fail))
+          photo {:sightings [{:species nil
+                              :quantity 1}]}]
+      (:result (check-sighting-consistency (gen-state-helper config) photo)) => :fail))
 
-  (fact "An album which contains a bad sighting fails"
+  (fact "A sighting missing a species fails"
     (let [config {}
-          album [{:sightings [{:species "Yellow Spotted Cat"
-                               :quantity 1}]}
-                 {:sightings [{:species nil
-                               :quantity 1}]}
-                 {:sightings [{:species "Smiley Wolf"
-                               :quantity 2}]}]]
-      (:result (check-sighting-consistency (gen-state-helper config) album)) => :fail)))
+          photo {:sightings [{:species nil
+                              :quantity 1}]}]
+      (:result (check-sighting-consistency (gen-state-helper config) photo)) => :fail)))
 
 (facts "Species check"
   (fact "Sightings with known species should pass"
     (let [config {:surveyed-species ["Smiley Wolf"]}
-          album [{:sightings [{:species "smiley wolf"
-                               :quantity 1}]}]]
-      (:result (check-species (gen-state-helper config) album)) => :pass))
+          photo {:sightings [{:species "smiley wolf"
+                              :quantity 1}]}]
+      (:result (check-species (gen-state-helper config) photo)) => :pass))
 
   (fact "No sightings should pass"
     (let [config {:surveyed-species ["Smiley Wolf"]}
-          album [{:sightings []}]]
-      (:result (check-species (gen-state-helper config) album)) => :pass))
+          photo {:sightings []}]
+      (:result (check-species (gen-state-helper config) photo)) => :pass))
 
   (fact "Sightings with unknown species should fail"
     (let [config {:surveyed-species ["Smiley Wolf"]}
-          album [{:filename "file1"
-                  :sightings [{:species "yellow spotted cat"
-                               :quantity 1}]}]]
-      (:result (check-species (gen-state-helper config) album)) => :fail
+          photo {:filename "file1"
+                 :sightings [{:species "yellow spotted cat"
+                              :quantity 1}]}]
+      (:result (check-species (gen-state-helper config) photo)) => :fail
       (boolean
-       (re-find #"file1" (:reason (check-species
-                                   (gen-state-helper config) album)))) => true))
+       (re-find #"file1.*: 'yellow spotted cat'" (:reason (check-species
+                                   (gen-state-helper config) photo)))) => true))
 
   (fact "Sightings with any unknown species should fail"
     (let [config {:surveyed-species ["Smiley Wolf"]}
-          album [{:filename "file1"
-                  :sightings [{:species "yellow spotted cat"
-                               :quantity 1}
-                              {:species "smiley wolf"
-                               :quantity 1}]}]]
-      (:result (check-species (gen-state-helper config) album)) => :fail
+          photo {:filename "file1"
+                 :sightings [{:species "yellow spotted cat"
+                              :quantity 1}
+                             {:species "smiley wolf"
+                              :quantity 1}]}]
+      (:result (check-species (gen-state-helper config) photo)) => :fail
       (boolean
-       (re-find #"file1" (:reason (check-species
-                                   (gen-state-helper config) album)))) => true))
-
-  (fact "Any sighting with an unknown species should cause all to fail"
-    (let [config {:surveyed-species ["Smiley Wolf"]}
-          album [{:filename "file1"
-                  :sightings [{:species "smiley wolf"
-                               :quantity 1}]}
-                 {:filename "file2"
-                  :sightings [{:species "yellow spotted cat"
-                               :quantity 1}]}]]
-      (:result (check-species (gen-state-helper config) album)) => :fail
-      (boolean
-       (re-find #"file2" (:reason (check-species
-                                   (gen-state-helper config) album)))) => true))
+       (re-find #"file1.*: 'yellow spotted cat'" (:reason (check-species
+                                   (gen-state-helper config) photo)))) => true))
 
   (fact "A sighting, even if it doesn't contain all known species, should pass"
     (let [config {:surveyed-species ["Smiley Wolf" "Yellow Spotted Can"]}
-          album [{:filename "file1"
-                  :sightings [{:species "smiley wolf"
-                               :quantity 1}]}]]
-      (:result (check-species (gen-state-helper config) album)) => :pass)))
+          photo {:filename "file1"
+                 :sightings [{:species "smiley wolf"
+                              :quantity 1}]}]
+      (:result (check-species (gen-state-helper config) photo)) => :pass)))
 
 (facts "Future timestamps"
   (fact "A timestamp in the future fails"
-    (let [album [{:datetime (t/date-time 2021 1 1 0 0 0)}]]
+    (let [photo {:datetime (t/date-time 2021 1 1 0 0 0)}]
       (with-redefs [t/now #(t/date-time 2020 1 1)]
-        (:result (check-future (gen-state-helper {}) album)) => :fail)))
+        (:result (check-future (gen-state-helper {}) photo)) => :fail)))
 
   (fact "A timestamp in the past is okay"
-    (let [album [{:datetime (t/date-time 2019 1 1 0 0 0)}]]
+    (let [photo {:datetime (t/date-time 2019 1 1 0 0 0)}]
       (with-redefs [t/now #(t/date-time 2020 1 1)]
-        (:result (check-future (gen-state-helper {}) album)) => :pass))))
+        (:result (check-future (gen-state-helper {}) photo)) => :pass))))
 
 (facts "Invalid photos"
   (fact "An album with one invalid photo fails the test"
