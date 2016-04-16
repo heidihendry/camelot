@@ -21,7 +21,7 @@
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
-                 [org.clojure/java.jdbc "0.6.0-alpha1"]
+                 [org.clojure/java.jdbc "0.4.2"]
                  [org.omcljs/om "1.0.0-alpha32" :exclusions [com.cognitect/transit-cljs cljsjs/react]]
                  [prismatic/schema "1.0.5"]
                  [ragtime "0.5.3"]
@@ -37,7 +37,7 @@
 
   :min-lein-version "2.6.1"
 
-  :source-paths ["src/clj" "src/cljs" "dev"]
+  :source-paths ["src/clj" "src/cljs" "dev" "src/sql"]
 
   :test-paths ["test/clj"]
 
