@@ -34,12 +34,28 @@
             :date-format "YYYY-MM-dd HH.mm.ss"}})
 
 (def os (System/getProperty "os.name"))
+(def db-name "Database")
+
+(defn db-path
+  "Return the full path where the database is stored."
+  [dir]
+  (format "%s%scamelot%s%s" dir SystemUtils/FILE_SEPARATOR
+          SystemUtils/FILE_SEPARATOR db-name))
 
 (defn config-path
   "Return the full path where the configuration file is stored."
   [dir]
   (format "%s%scamelot%sconfig.clj" dir SystemUtils/FILE_SEPARATOR
           SystemUtils/FILE_SEPARATOR))
+
+(defn get-db-path
+  "Return the OS-specific path to the configuration file."
+  []
+  (cond
+    SystemUtils/IS_OS_WINDOWS (db-path (env :localappdata))
+    SystemUtils/IS_OS_LINUX (db-path (str (env :home) "/.local/share"))
+    SystemUtils/IS_OS_MAC_OSX (db-path (str (env :home) "/Library/Application Support"))
+    :else (db-path ".")))
 
 (defn get-config-file
   "Return the OS-specific path to the configuration file."
