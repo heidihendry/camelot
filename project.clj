@@ -122,7 +122,7 @@
                              :optimizations :none}}}}}
 
              :uberjar
-             {:source-paths ^:replace ["src/clj"]
+             {:source-paths ^:replace ["src/clj" "src/sql"]
               :hooks [leiningen.cljsbuild]
               :omit-source true
               :global-vars {*warn-on-reflection* true}

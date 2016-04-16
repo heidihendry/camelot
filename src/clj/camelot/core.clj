@@ -3,6 +3,7 @@
             [camelot.handler.settings :as hs]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
             [camelot.util.transit :as tutil]
+            [camelot.db :as db]
             [clojure.java.io :as io]
             [environ.core :refer [env]]
             [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
@@ -51,5 +52,6 @@
 
 (defn -main [& [mode directory]]
   (let [port (Integer. (or (env :camelot-port) 8080))]
+    (db/migrate)
     (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
     (run-jetty http-handler {:port port :join? false})))
