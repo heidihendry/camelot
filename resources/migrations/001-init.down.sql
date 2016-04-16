@@ -1,7 +1,3 @@
-DROP INDEX db_migration_name
---;;
-DROP VIEW db_migrations_active
---;;
 DROP TABLE sighting
 --;;
 DROP TABLE survey_species
@@ -27,5 +23,3 @@ DROP TABLE camera
 DROP TABLE camera_status
 --;;
 DROP TABLE survey
---;;
-DROP TABLE db_migrations

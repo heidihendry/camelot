@@ -124,15 +124,3 @@ CREATE TABLE sighting (
        sighting_species_id      INT NOT NULL REFERENCES survey_species,
        media_id                 INT NOT NULL REFERENCES media,
        PRIMARY KEY (sighting_id))
---;;
-CREATE TABLE db_migrations (
-       migration_id          INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 0, increment by 1),
-       migration_name        VARCHAR(255) NOT NULL,
-       migration_applied     TIMESTAMP NOT NULL,
-       migration_rolled_back TIMESTAMP,
-       PRIMARY KEY (migration_id))
---;;
-CREATE INDEX db_migration_name ON db_migrations (migration_name DESC)
---;;
-CREATE VIEW db_migrations_active (migration_name)
-  AS (SELECT migration_name FROM db_migrations WHERE migration_rolled_back IS NULL)
