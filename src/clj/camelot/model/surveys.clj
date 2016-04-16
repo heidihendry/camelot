@@ -1,4 +1,5 @@
 (ns camelot.model.surveys
-  (:require [camelot.db :as db]))
+  (:require [camelot.db :as db]
+            [yesql.core :as sql]))
 
-(defqueries "surveys.sql" {:connection db/spec})
+(sql/defqueries "surveys.sql" {:connection db/spec})
