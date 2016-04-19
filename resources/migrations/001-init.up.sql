@@ -89,8 +89,8 @@ CREATE TABLE photo (
        photo_created            TIMESTAMP NOT NULL,
        photo_updated            TIMESTAMP NOT NULL,
        photo_iso_setting        INT,
-       photo_aperture_setting   INT,
-       photo_exposure_value     INT,
+       photo_aperture_setting   DECIMAL,
+       photo_exposure_value     DECIMAL,
        photo_flash_setting      VARCHAR(255),
        photo_focal_length       VARCHAR(16),
        photo_fnumber_setting    VARCHAR(16),
@@ -102,7 +102,8 @@ CREATE TABLE photo (
 --;;
 CREATE TABLE species (
        species_id               INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 0, increment by 1),
-       species_name             VARCHAR(255) NOT NULL,
+       species_scientific_name  VARCHAR(255) NOT NULL,
+       species_common_name      VARCHAR(255) NOT NULL,
        species_created          TIMESTAMP NOT NULL,
        species_updated          TIMESTAMP NOT NULL,
        species_notes            LONG VARCHAR,
@@ -120,7 +121,7 @@ CREATE TABLE sighting (
        sighting_id              INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 0, increment by 1),
        sighting_created         TIMESTAMP NOT NULL,
        sighting_updated         TIMESTAMP NOT NULL,
-       sighting_quantity        INT,
+       sighting_quantity        INT NOT NULL,
        sighting_species_id      INT NOT NULL REFERENCES survey_species ON DELETE CASCADE ON UPDATE RESTRICT,
        media_id                 INT NOT NULL REFERENCES media ON DELETE CASCADE ON UPDATE RESTRICT,
        PRIMARY KEY (sighting_id))
