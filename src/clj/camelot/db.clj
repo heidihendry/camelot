@@ -17,3 +17,8 @@
   (rtc/migrate-all (:datastore config)
                    (rtc/into-index (:migrations config))
                    (:migrations config)))
+
+(defn rollback
+  []
+  (rtc/rollback-last (:datastore config)
+                     (rtc/into-index (:migrations config))))

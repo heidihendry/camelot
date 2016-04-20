@@ -13,7 +13,11 @@ WHERE survey_id = :id
 DELETE FROM survey
 WHERE survey_id = :id
 
--- name: -get
+-- name: -get-specific
 SELECT survey_id, survey_name, survey_directory
 FROM survey
 WHERE survey_id = :id
+
+-- name: -get-all
+SELECT survey_id, survey_name, survey_directory
+FROM survey
