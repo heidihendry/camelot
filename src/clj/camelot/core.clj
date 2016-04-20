@@ -61,6 +61,6 @@
 
 (defn -main [& [mode directory]]
   (let [port (Integer. (or (env :camelot-port) 8080))]
-    (db/migrate)
+    ;;(db/migrate)
     (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
     (run-jetty http-handler {:port port :join? false})))
