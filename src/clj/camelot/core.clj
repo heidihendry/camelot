@@ -38,14 +38,14 @@
        (let [conf (config)]
          (response (ha/read-albums (gen-state conf)
                                    (:root-path conf)))))
-  (GET "/surveys" [] (response (hsurv/get-all (gen-state (config)))))
-  (GET "/survey/:id" [id] (response (hsurv/get-specific (gen-state (config)) id)))
-  (POST "/survey" {{sid :id  sname :name sdir :directory} :params}
-        (hsurv/update! (gen-state (config)) sid sname sdir))
-  (PUT "/survey" {{sname :name sdir :directory} :params}
-       (hsurv/create! (gen-state (config)) sname sdir))
-  (DELETE "/survey" {{sid :id} :params}
-          (hsurv/delete! (gen-state (config)) sid))
+;;  (GET "/surveys" [] (response (hsurv/get-all (gen-state (config)))))
+;;  (GET "/survey/:id" [id] (response (hsurv/get-specific (gen-state (config)) id)))
+;;  (POST "/survey" {{sid :id  sname :name sdir :directory} :params}
+;;        (hsurv/update! (gen-state (config)) sid sname sdir))
+;;  (PUT "/survey" {{sname :name sdir :directory} :params}
+;;       (hsurv/create! (gen-state (config)) sname sdir))
+;;  (DELETE "/survey" {{sid :id} :params}
+;;          (hsurv/delete! (gen-state (config)) sid))
   (resources "/"))
 
 (def http-handler
