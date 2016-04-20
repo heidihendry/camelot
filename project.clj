@@ -37,7 +37,7 @@
 
   :min-lein-version "2.6.1"
 
-  :source-paths ["src/clj" "src/cljs" "dev" "src/sql"]
+  :source-paths ["src/clj" "src/cljs" "dev"]
 
   :test-paths ["test/clj"]
 
@@ -122,7 +122,7 @@
                              :optimizations :none}}}}}
 
              :uberjar
-             {:source-paths ^:replace ["src/clj" "src/sql"]
+             {:source-paths ^:replace ["src/clj"]
               :hooks [leiningen.cljsbuild]
               :omit-source true
               :global-vars {*warn-on-reflection* true}
