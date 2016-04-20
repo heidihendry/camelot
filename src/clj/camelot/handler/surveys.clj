@@ -1,6 +1,10 @@
 (ns camelot.handler.surveys
   (:require [camelot.util.java-file :as jf]
+            [camelot.db :as db]
+            [yesql.core :as sql]
             [clojure.java.io :as f]))
+
+(sql/defqueries "surveys.sql" {:connection db/spec})
 
 (defn- check-directory
   [state sdir]
@@ -20,9 +24,13 @@
       err
       (-create<! {:name sname :directory sdir}))))
 
-(defn get
+(defn get-specific
   [state sid]
-  (-get {:id sid}))
+  (-get-specific {:id sid}))
+
+(defn get-all
+  [state]
+  (-get-all))
 
 (defn update!
   [state sid sname sdir]

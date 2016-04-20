@@ -1,5 +1,6 @@
 (ns user
   (:require [camelot.core]
+            [camelot.db :as db]
             [ring.middleware.reload :refer [wrap-reload]]
             [figwheel-sidecar.repl-api :as figwheel]))
 
@@ -10,6 +11,12 @@
 (set! *unchecked-math* :warn-on-boxed)
 (def http-handler
   (wrap-reload #'camelot.core/http-handler))
+
+(defn migrate []
+  (db/migrate))
+
+(defn rollback []
+  (db/rollback))
 
 (defn run []
   (figwheel/start-figwheel!))
