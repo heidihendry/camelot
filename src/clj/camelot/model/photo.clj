@@ -2,12 +2,9 @@
   (:require [schema.core :as s]))
 
 (s/defrecord Location
-    [gps-longitude :- s/Str
-     gps-longitude-ref :- s/Str
-     gps-latitude :- s/Str
-     gps-latitude-ref :- s/Str
+    [gps-longitude :- (s/maybe s/Num)
+     gps-latitude :- (s/maybe s/Num)
      gps-altitude :- (s/maybe s/Str)
-     gps-altitude-ref :- (s/maybe s/Str)
      sublocation :- (s/maybe s/Str)
      city :- (s/maybe s/Str)
      state-province :- (s/maybe s/Str)
@@ -51,9 +48,8 @@
      location :- Location])
 
 (s/defn location :- Location
-  [{:keys [gps-lon gps-lon-ref gps-lat gps-lat-ref gps-alt gps-alt-ref subloc city state country country-code map-datum]}]
-  (->Location gps-lon gps-lon-ref gps-lat gps-lat-ref gps-alt gps-alt-ref
-              subloc city state country country-code map-datum))
+  [{:keys [gps-lon gps-lat gps-alt subloc city state country country-code map-datum]}]
+  (->Location gps-lon gps-lat gps-alt subloc city state country country-code map-datum))
 
 (s/defn sighting :- Sighting
   [{:keys [species quantity]}]

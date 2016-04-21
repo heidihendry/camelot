@@ -45,3 +45,7 @@
     (let [response (<! (util/request http/post (util/with-baseurl "/settings")
                                      params))]
       (cb response))))
+
+(defn get-maxent
+  [params]
+  (util/request http/get (util/with-baseurl "/maxent") params))

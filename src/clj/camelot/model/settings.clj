@@ -93,4 +93,5 @@
 (defn nav-menu
   [state]
   {:menu-items [{:url "/#/dashboard" :label ((:translate state) :application/dashboard)}
+                {:url "/#/analysis" :label "Analysis"}
                 {:function "settings"}]})
