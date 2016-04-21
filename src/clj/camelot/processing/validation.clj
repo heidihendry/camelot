@@ -162,6 +162,24 @@
       {:result :fail
        :reason ((:translate state) :checks/invalid-photos (:invalid res))})))
 
+(defn check-timeshift-consistency
+  "Check that any timeshift applied to files is consistent across the album."
+  [state photos]
+  (if (empty? photos)
+    {:result :pass}
+    (let [shifts (->> photos
+                      (map #(vector (:filename %)
+                                    (photo/get-timeshift (:datetime-original %)
+                                                         (:datetime %))))
+                      (group-by second)
+                      (into []))]
+      (if (= (count shifts) 1)
+        {:result :pass}
+        {:result :fail
+         :reason ((:translate state) :checks/inconsistent-timeshift
+                  (ffirst (second (first shifts)))
+                  (ffirst (second (second shifts))))}))))
+
 (s/defn list-photo-problems
   [state photos]
   (let [tests {:project-dates check-project-dates
@@ -179,7 +197,8 @@
                :time-light-sanity check-ir-threshold
                :camera-checks check-camera-checks
                :headline-consistency check-headline-consistency
-               :album-has-data check-album-has-data}]
+               :album-has-data check-album-has-data
+               :timeshift-consistency check-timeshift-consistency}]
     (remove nil?
             (map (fn [[t f]]
                    (let [res (f state photos)]

@@ -37,6 +37,7 @@
 
 (s/defrecord PhotoMetadata
     [datetime :- org.joda.time.DateTime
+     datetime-original :- (s/maybe org.joda.time.DateTime)
      headline :- (s/maybe s/Str)
      artist :- (s/maybe s/Str)
      phase :- (s/maybe s/Str)
@@ -71,5 +72,5 @@
 
 (s/defn photo :- PhotoMetadata
   "Photo constructor"
-  [{:keys [datetime headline artist phase copyright description filename filesize sightings camera camera-settings location]}]
-  (->PhotoMetadata datetime headline artist phase copyright description filename filesize sightings camera camera-settings location))
+  [{:keys [datetime datetime-original headline artist phase copyright description filename filesize sightings camera camera-settings location]}]
+  (->PhotoMetadata datetime datetime-original headline artist phase copyright description filename filesize sightings camera camera-settings location))

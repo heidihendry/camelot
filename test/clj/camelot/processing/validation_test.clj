@@ -326,3 +326,35 @@
       (boolean (re-find #"Date/Time"
                         (:reason (check-invalid-photos
                                   (gen-state-helper {}) album)))) => true)))
+
+(facts "Timeshift consistency"
+  (fact "All photos having the same timeshift is okay"
+    (let [album [{:datetime (t/date-time 2015 1 1 6 0 0)
+                  :datetime-original (t/date-time 2015 1 1 5 0 0)}
+                 {:datetime (t/date-time 2015 1 3 1 0 0)
+                  :datetime-original (t/date-time 2015 1 3 0 0 0)}
+                 {:datetime (t/date-time 2015 2 1 4 0 0)
+                  :datetime-original (t/date-time 2015 2 1 3 0 0)}]]
+      (:result (check-timeshift-consistency (gen-state-helper {}) album)) => :pass))
+
+  (fact "Photos having different timeshifts fails"
+    (let [album [{:datetime (t/date-time 2015 1 1 6 0 0)
+                  :datetime-original (t/date-time 2015 1 1 5 0 0)
+                  :filename "file1"}
+                 {:datetime (t/date-time 2015 1 3 1 0 0)
+                  :datetime-original (t/date-time 2015 1 3 0 0 0)
+                  :filename "file2"}
+                 {:datetime (t/date-time 2015 2 1 4 0 0)
+                  :datetime-original (t/date-time 2011 2 1 3 0 0)
+                  :filename "file3"}]]
+      (:result (check-timeshift-consistency (gen-state-helper {}) album)) => :fail
+      (boolean (re-find #"file1.*file3" (:reason (check-timeshift-consistency (gen-state-helper {}) album)))) => true))
+
+  (fact "Empty album passes"
+    (let [album []]
+      (:result (check-timeshift-consistency (gen-state-helper {}) album)) => :pass))
+
+  (fact "Single photo passes"
+    (let [album [{:datetime (t/date-time 2015 1 1 6 0 0)
+                  :datetime-original (t/date-time 2015 1 1 5 0 0)}]]
+      (:result (check-timeshift-consistency (gen-state-helper {}) album)) => :pass)))
