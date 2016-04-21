@@ -166,8 +166,7 @@
   [state photos]
   (let [tests {:project-dates check-project-dates
                :required-fields check-required-fields
-               ; disabled pending https://github.com/drewnoakes/metadata-extractor/pull/172
-               ;:sighting-consistency check-sighting-consistency
+               :sighting-consistency check-sighting-consistency
                :surveyed-species check-species
                :future-timestamp check-future}]
     (filter #(= (:result %) :fail)
