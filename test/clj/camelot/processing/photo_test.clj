@@ -77,3 +77,19 @@
     (let [dt-a (t/date-time 2015 3 14 13 5 26)
           dt-b (t/date-time 2001 3 14 13 5 26)]
       (get-timeshift dt-a dt-b) => -441763200)))
+
+(facts "GPS parsing"
+  (fact "GPS data is interpretted sanely"
+    (let [lon "104° 5' 44.56\""
+          lon-ref "E"]
+      (to-longitude lon lon-ref) => 104.095711))
+
+  (fact "Longitude west is negative"
+    (let [lon "104° 5' 44.56\""
+          lon-ref "W"]
+      (to-longitude lon lon-ref) => -104.095711))
+
+  (fact "Latitude south is negative"
+    (let [lon "30° 44' 11\""
+          lon-ref "S"]
+      (to-longitude lon lon-ref) => -30.736389)))

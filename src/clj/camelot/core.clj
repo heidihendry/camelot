@@ -2,6 +2,7 @@
   (:require [camelot.handler.albums :as ha]
             [camelot.handler.settings :as hs]
             [camelot.handler.surveys :as hsurv]
+            [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
             [camelot.util.transit :as tutil]
             [camelot.db :as db]
@@ -10,7 +11,7 @@
             [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
             [compojure.route :refer [resources]]
             [ring.adapter.jetty :refer [run-jetty]]
-            [ring.util.response :refer [response]]
+            [ring.util.response :as r]
             [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
@@ -27,19 +28,28 @@
 
 (defroutes routes
   (GET "/" _ (retrieve-index))
-  (GET "/default-config" [] (response (cursorise (config))))
-  (GET "/application" [] (response {:version (hs/get-version)
+  (GET "/default-config" [] (r/response (cursorise (config))))
+  (GET "/application" [] (r/response {:version (hs/get-version)
                                     :nav (hs/get-nav-menu (gen-state (config)))}))
+  (GET "/maxent" []
+       (let [conf (config)
+             data (ame/species-location-csv (gen-state conf)
+                                            (ha/read-albums (gen-state conf)
+                                                            (:root-path conf)))]
+          (-> (r/response data)
+              (r/content-type "text/csv; charset=utf-8")
+              (r/header "Content-Length" (count data))
+              (r/header "Content-Disposition" "attachment; filename=\"maxent.csv\""))))
   (GET "/settings" []
-       (response (hs/settings-schema (gen-state (config)))))
+       (r/response (hs/settings-schema (gen-state (config)))))
   (POST "/settings" {{config :config} :params}
-        (response (hs/settings-save (decursorise config))))
+        (r/response (hs/settings-save (decursorise config))))
   (GET "/albums" []
        (let [conf (config)]
-         (response (ha/read-albums (gen-state conf)
-                                   (:root-path conf)))))
-  (GET "/surveys" [] (response (hsurv/get-all (gen-state (config)))))
-  (GET "/survey/:id" [id] (response (hsurv/get-specific (gen-state (config)) id)))
+         (r/response (ha/read-albums (gen-state conf)
+                                     (:root-path conf)))))
+  (GET "/surveys" [] (r/response (hsurv/get-all (gen-state (config)))))
+  (GET "/survey/:id" [id] (r/response (hsurv/get-specific (gen-state (config)) id)))
   (POST "/survey" {{sid :id  sname :name sdir :directory} :params}
         (hsurv/update! (gen-state (config)) sid sname sdir))
   (PUT "/survey" {{sname :name sdir :directory} :params}
@@ -63,6 +73,6 @@
 (defn -main [& [mode directory]]
   (let [port (Integer. (or (env :camelot-port) 8080))]
     (do
-      (db/migrate)
+      ;;(db/migrate)
       (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
       (run-jetty http-handler {:port port :join? false}))))

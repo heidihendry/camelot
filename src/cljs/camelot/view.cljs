@@ -3,6 +3,7 @@
             [om.dom :as dom :include-macros true]
             [camelot.state :as state]
             [camelot.component.nav :as cnav]
+            [camelot.component.analysis :as analysis]
             [camelot.component.albums :as calb]
             [camelot.component.settings :as cset]
             [camelot.component.error :as cerr]
@@ -33,4 +34,5 @@
            {:target (js/document.getElementById "settings")}))
 
 (defroute "/#/dashboard" [] (generate-view calb/album-view-component))
+(defroute "/#/analysis" [] (generate-view analysis/analysis-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

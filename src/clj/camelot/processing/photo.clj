@@ -14,6 +14,24 @@
     (/ (- (tc/to-long actual)
           (tc/to-long orig)) 1000)))
 
+(defn- parse-gps
+  [pos-ref]
+  (fn [lon lon-ref]
+    (if (or (nil? lon) (nil? lon-ref))
+      nil
+      (let [parts (into [] (map read-string (map #(str/replace % #"[^\.0-9]" "")
+                                                 (str/split lon #" "))))
+            distance (+ (first parts)
+                        (/ (/ (nth parts 1) 0.6) 100)
+                        (/ (/ (nth parts 2) 0.36) 10000))
+            trunc (read-string (format "%.6f" distance))]
+        (if (= lon-ref pos-ref)
+          trunc
+          (* -1 trunc))))))
+
+(def to-longitude (parse-gps "E"))
+(def to-latitude (parse-gps "N"))
+
 (defn extract-path-value
   "Return the metadata for a given path."
   [metadata path]
@@ -78,12 +96,9 @@
                  :width (read-string (md "Image Width"))
                  :height (read-string (md "Image Height"))})
         location (mp/location
-                  {:gps-lon (md "GPS Longitude")
-                   :gps-lon-ref (md "GPS Longitude Ref")
-                   :gps-lat (md "GPS Latitude")
-                   :gps-lat-ref (md "GPS Latitude Ref")
+                  {:gps-lon (to-longitude (md "GPS Longitude") (md "GPS Longitude Ref"))
+                   :gps-lat (to-latitude (md "GPS Latitude") (md "GPS Latitude Ref"))
                    :gps-alt (md "GPS Altitude")
-                   :gps-alt-ref (md "GPS Altitude Ref")
                    :subloc (md "Sub-location")
                    :city (md "City")
                    :state (md "Province/State")
