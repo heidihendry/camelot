@@ -51,6 +51,7 @@ if [ $? -eq 0 ]; then
     kill $PID
     false
 else
+    echo "camelot is responsive."
     set -e
 fi
 
