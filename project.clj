@@ -9,7 +9,7 @@
                  [cljs-http "0.1.39"]
                  [cljsjs/react-with-addons "0.14.3-0"]
                  [com.andrewmcveigh/cljs-time "0.4.0"]
-                 [com.drewnoakes/metadata-extractor "2.8.1"]
+                 [com.drewnoakes/metadata-extractor "2.9.1"]
                  [com.taoensso/tower "3.1.0-beta4"]
                  [commons-io/commons-io "2.4"]
                  [compojure "1.5.0"]
