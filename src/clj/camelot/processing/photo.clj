@@ -1,10 +1,18 @@
 (ns camelot.processing.photo
   (:require [clojure.string :as str]
             [clj-time.core :as t]
+            [clj-time.coerce :as tc]
             [schema.core :as s]
             [camelot.processing.util :as putil]
             [camelot.model.photo :as mp])
   (:import [camelot.model.photo Camera CameraSettings PhotoMetadata]))
+
+(s/defn get-timeshift :- s/Num
+  [orig actual]
+  (if (or (nil? orig) (nil? actual))
+    0
+    (/ (- (tc/to-long actual)
+          (tc/to-long orig)) 1000)))
 
 (defn extract-path-value
   "Return the metadata for a given path."
@@ -36,6 +44,12 @@
   (if str
     (read-string str)
     0))
+
+(s/defn exif-gps-datetime
+  [date time]
+  (when (and (string? date)
+             (string? time))
+    (exif-date-to-datetime (str date " " (first (str/split time #"\."))))))
 
 (s/defn validate
   [state photo-metadata]
@@ -84,6 +98,8 @@
                                   :quantity (md "Object Name")})]
                    [])
       :datetime (exif-date-to-datetime (md "Date/Time"))
+      :datetime-original (exif-gps-datetime (md "GPS Date Stamp")
+                                            (md "GPS Time-Stamp"))
       :headline (md "Headline")
       :artist (md "Artist")
       :phase (md "Source")

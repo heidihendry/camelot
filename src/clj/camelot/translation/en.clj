@@ -40,6 +40,7 @@
             :surveyed-species "Species were identified in '%s' which are not known to the survey: '%s'"
             :future-timestamp "The timestamp on '%s' is in the future"
             :invalid-photos "A file is missing one or more essential fields: '%s'"
+            :inconsistent-timeshift "The timeshifts from the original date/time are not consistent in this folder.  See: %s and %s"
             }
    :language {:en "English"
               :vn "Vietnamese"}
