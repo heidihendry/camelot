@@ -20,7 +20,7 @@
               :config-not-found "A configuration file was not found.  Please run camelot with the 'init' option and adjust the configuration file created."
               }
 
-   :status {:rename-photos "Renaming photos in album: '%s'"
+   :status {:rename-photos "Renaming photos in the period's dataset: '%s'"
             :apply-rename "Renaming '%s' to '%s'..."}
 
    :checks {:starting "Running consistency checks..."
@@ -34,7 +34,7 @@
             :camera-checks "The photos do not have a camera check at the beginning and end"
             :headline-consistency "The headline of the photos differs across photos (tested '%s' and '%s')"
             :required-fields "Required fields are missing from '%s': %s"
-            :album-has-data "Album must not be empty"
+            :album-has-data "The dataset for a period must not be empty"
             :sighting-consistency-quantity-needed "Found a species sighting in '%s', but a quantity was not found."
             :sighting-consistency-species-needed "Found a sighting quantity in '%s', but a species was not found."
             :surveyed-species "Species were identified in '%s' which are not known to the survey: '%s'"

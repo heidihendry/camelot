@@ -222,5 +222,5 @@
         baseline-check (check-invalid-photos state photos)]
     (if (= (:result baseline-check) :fail)
       [baseline-check]
-      (concat (list-album-problems state photos)
-              (list-photo-problems state photos)))))
+      (into (list-album-problems state photos)
+            (list-photo-problems state photos)))))
