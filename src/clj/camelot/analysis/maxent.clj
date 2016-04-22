@@ -3,7 +3,7 @@
 
 (defn species-location-reducer
   [acc photo]
-  (concat acc (map #(vector (:species %)
+  (apply conj acc (map #(vector (:species %)
                             (:gps-longitude (:location photo))
                             (:gps-latitude (:location photo)))
                    (:sightings photo))))
