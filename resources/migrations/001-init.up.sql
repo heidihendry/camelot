@@ -11,6 +11,8 @@ CREATE TABLE site (
        site_name            VARCHAR(255) NOT NULL,
        site_created         TIMESTAMP NOT NULL,
        site_updated         TIMESTAMP NOT NULL,
+       site_sublocation     VARCHAR(128),
+       site_city            VARCHAR(128),
        site_state_province  VARCHAR(128),
        site_country         VARCHAR(128),
        site_notes           LONG VARCHAR,

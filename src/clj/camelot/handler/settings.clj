@@ -6,7 +6,7 @@
 (defn- flatten-metadata-structure
   "Transfor metadata structure in to a vector of paths"
   [md]
-  (vec (reduce #(concat %1 (if (= (type %2) clojure.lang.Keyword)
+  (vec (reduce #(into %1 (if (= (type %2) clojure.lang.Keyword)
                               [[%2]]
                               (mapv (fn [v] [(first %2) v]) (second %2))))
                    []
