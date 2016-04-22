@@ -26,8 +26,7 @@
    :sighting-independence-minutes-threshold 20
    :surveyed-species []
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
-                     [:location :gps-longitude] [:location :gps-longitude-ref]
-                     [:location :gps-latitude] [:location :gps-latitude-ref]
+                     [:location :gps-longitude] [:location :gps-latitude]
                      [:datetime] [:filename]]
    :rename {:format "%s-%s"
             :fields [[:datetime] [:camera :model]]
