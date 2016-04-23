@@ -57,8 +57,10 @@
   (reify
     om/IRender
     (render [_]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil}))
       (let [val (get-in s [k :value])]
-        (dom/select #js {:className "settings-input"
+        (dom/select #js {:className "field-input"
                          :onChange #((state/set-coerced-value! val) %
                                      (k s) :value owner)
                          :value
@@ -76,6 +78,8 @@
        :text-value ""})
     om/IRenderState
     (render-state [this state]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil}))
       (dom/div #js {:className "list-input"}
                (apply dom/div nil
                       (if (= (:list-of (:schema v)) :paths)
@@ -87,7 +91,7 @@
                                                                          (sort #(< %1 %2) (get-in s [k :value])))))))
                (if (= (:complete-with (:schema v)) :metadata)
                  (dom/div nil
-                          (dom/select #js {:className "settings-input" :value (get state :select-value)
+                          (dom/select #js {:className "field-input" :value (get state :select-value)
                                            :onChange #(om/set-state! owner :select-value (.. % -target -value))}
                                       (om/build-all select-option-component
                                                     (conj (sort #(< (second %1) (second %2)) (remove #(some (set %) (get-in s [k :value]))
@@ -96,7 +100,7 @@
                                            :onClick #(do (state/add-metadata-item! (into [] (map keyword (string/split (get state :select-value) "#"))) s k owner)
                                                          (om/set-state! owner :select-value ""))}))
                  (dom/div nil
-                          (dom/input #js {:type "text" :className "settings-input" :placeholder "Add item" :value (get state :text-value)
+                          (dom/input #js {:type "text" :className "field-input" :placeholder "Add item" :value (get state :text-value)
                                           :onKeyDown #(when (= (.-key %) "Enter")
                                                         (do (state/add-item! (get state :text-value) s k owner)
                                                             (om/set-state! owner :text-value "")))
@@ -110,6 +114,8 @@
   (reify
     om/IRender
     (render [_]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil}))
       (om/build datepicker (get s k)))))
 
 (defmethod input-field :percentage
@@ -117,7 +123,9 @@
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "number" :className "settings-input"
+      (when (nil? (get s k))
+        (om/update! s k {:value nil}))
+      (dom/input #js {:type "number" :className "field-input"
                       :onChange #(state/set-percentage! % (k s) :value owner)
                       :value (get-in s [k :value])}))))
 
@@ -126,15 +134,21 @@
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "number" :className "settings-input"
+      (when (and (not (nil? s)) (nil? (get s k)))
+        (om/update! s k {:value nil}))
+      (dom/input #js {:type "number" :className "field-input"
                       :onChange #(state/set-number! % (k s) :value owner)
                       :value (get-in s [k :value])}))))
 
 (defmethod input-field :default
   [[k v s :as d] owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (and (not (nil? s)) (nil? (get s k)))
+        (om/update! s k {:value nil})))
     om/IRender
     (render [_]
-      (dom/input #js {:type "text" :className "settings-input"
+      (dom/input #js {:type "text" :className "field-input"
                       :onChange #(state/set-unvalidated-text! % (k s) :value owner)
                       :value (get-in s [k :value])}))))

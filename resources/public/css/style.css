@@ -172,12 +172,12 @@ a:hover {
   clear: both;
   font-weight: normal;
 }
-#settings select.settings-input {
+#app select.field-input {
   padding: 0.5rem;
   font-size: 90%;
   min-width: 30rem;
 }
-#settings input.settings-input {
+#app input.field-input {
   min-width: 30rem;
   padding: 0.5rem;
   color: #666;
@@ -234,12 +234,12 @@ a:hover {
   cursor: pointer;
   color: #fafafa;
 }
-#settings .list-input select.settings-input {
+#app .list-input select.field-input {
   width: 26.7rem;
   min-width: auto;
   margin-right: 0.3rem;
 }
-#settings .list-input input.settings-input {
+#app .list-input input.field-input {
   width: 26.7rem;
   min-width: auto;
   margin-top: 0;
