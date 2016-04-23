@@ -9,6 +9,9 @@
             [incanter.stats :as istats]
             [schema.core :as s]))
 
+(def sighting-quantity-exclusions-re
+  #"(?i)\bcamera-?check\b|\bunknown\b|\bunidentified\b")
+
 (defn check-ir-threshold
   "Check whether the album's photos exceed the user-defined infrared check thresholds."
   [state photos]
@@ -110,19 +113,18 @@
 (defn sightings-reducer
   [state photo]
   (fn [acc sighting]
-    (let [special #"(?i)\bcamera-?check\b|\bunknown\b"]
-      (cond
-        (and (nil? (:quantity sighting))
-             (nil? (re-find special (:species sighting))))
-        (reduced {:result :fail
-                  :reason ((:translate state)
-                           :checks/sighting-consistency-quantity-needed
-                           (:filename photo))})
-        (nil? (:species sighting))
-        (reduced {:result :fail
-                  :reason ((:translate state)
-                           :checks/sighting-consistency-species-needed
-                           (:filename photo))})))))
+    (cond
+      (and (nil? (:quantity sighting))
+           (nil? (re-find sighting-quantity-exclusions-re (:species sighting))))
+      (reduced {:result :fail
+                :reason ((:translate state)
+                         :checks/sighting-consistency-quantity-needed
+                         (:filename photo))})
+      (nil? (:species sighting))
+      (reduced {:result :fail
+                :reason ((:translate state)
+                         :checks/sighting-consistency-species-needed
+                         (:filename photo))}))))
 
 (defn check-sighting-consistency
   "Ensure the sighting data is fully completed."
@@ -135,7 +137,7 @@
   [state photo]
   (let [m (->> (:sightings photo)
                (map :species)
-               (remove #(re-find #"(?i)\bcamera-?check\b|\bunknown\b" %))
+               (remove #(re-find sighting-quantity-exclusions-re %))
                (map str/lower-case)
                (remove (into #{} (map str/lower-case (:surveyed-species (:config state))))))]
     (if (empty? m)
