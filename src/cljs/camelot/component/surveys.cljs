@@ -25,7 +25,8 @@
   (reify
     om/IWillMount
     (om/will-mount [_]
-      (rest/get-surveys #(om/update! app :surveys %)))
+                                        ;(rest/get-surveys #(om/update! app :surveys %))
+      )
     om/IRender
     (render [_]
       (if (empty? (:surveys app))

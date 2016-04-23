@@ -106,8 +106,11 @@
     (reify
       om/IWillMount
       (will-mount [_]
-        (let [view-state (get (:view app) area)]
-          (om/update! view-state :buffer (deref (get resources key)))))
+        (let [view-state (get (:view app) area)
+              resource (get resources key)]
+          (om/update! view-state :buffer (if (empty? resource)
+                                           {}
+                                           (deref resource)))))
       om/IRender
       (render [_]
         (let [view-state (get (:view app) area)
@@ -119,7 +122,7 @@
                                  (get-in screen [:states :update :submit :error :event])
                                  view-state resources key)
                     rcancel #(cancel (get-in screen [:states :update :cancel :event])
-                                    view-state resources key)]
+                                     view-state resources key)]
                 (om/build resource-update-component {:screen screen
                                                      :view-state view-state
                                                      :save rsave
@@ -131,4 +134,6 @@
                                    view-state resources key)]
               (om/build resource-create-component {:screen screen
                                                    :view-state view-state
-                                                   :create create}))))))))
+                                                   :create create}))
+            nil (dom/div nil)
+            (dom/span nil (str "Unable to find mode: " (get-in view-state [:screen :mode])))))))))

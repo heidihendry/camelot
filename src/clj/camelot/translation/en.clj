@@ -21,8 +21,10 @@
               }
 
    :survey {:duplicate-name "A survey with the name '%s' already exists"
-            :survey-name "Survey Name"
-            :survey-directory "Survey Directory"}
+            :survey-name {:label "Survey Name"
+                          :description "The name which will be used to refer to the survey."}
+            :survey-directory {:label "Survey Directory"
+                               :description "The root directory of the survey's data"}}
 
    :status {:rename-photos "Renaming photos in the period's dataset: '%s'"
             :apply-rename "Renaming '%s' to '%s'..."}
