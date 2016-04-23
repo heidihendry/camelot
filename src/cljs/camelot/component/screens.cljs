@@ -71,7 +71,7 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/h4 nil (get-in screen [:resource :title]))
+               (dom/h4 nil (str "Update "  (get-in screen [:resource :title])))
                (dom/div nil (om/build body-component
                                       {:view-state view-state
                                        :screen screen}))
@@ -89,7 +89,7 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/h4 nil (get-in screen [:resource :title]))
+               (dom/h4 nil (str "Create " (get-in screen [:resource :title])))
                (dom/div nil (om/build body-component
                                       {:view-state view-state
                                        :screen screen}))
