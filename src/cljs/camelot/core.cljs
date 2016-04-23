@@ -20,6 +20,9 @@
          (view/navbar)))
   (rest/get-screens
    #(do (om/update! (state/app-state-cursor) :screens (:body %))
+        (om/update! (state/app-state-cursor) :view
+                    {:settings {:screen {:type :settings
+                                         :mode :update}}})
         (view/settings-menu-view))))
 
 (defn initialise-application
@@ -28,10 +31,10 @@
    (fn [x]
      (om/update! (state/app-state-cursor) :metadata (:body x))
      (rest/get-configuration
-            #(do (om/update! (state/app-state-cursor) :config (:body %))
-                 (om/update! (state/app-state-cursor) :config-buffer (:body %))
-                 (initialise-state)
-                 (albums/reload-albums))))))
+      #(do (om/update! (state/app-state-cursor) :resources {})
+           (om/update! (state/resources-state) :config (:body %))
+           (initialise-state)
+           (albums/reload-albums))))))
 
 (secretary/set-config! :prefix "#")
 

@@ -44,8 +44,8 @@
               (r/header "Content-Disposition" "attachment; filename=\"maxent.csv\""))))
   (GET "/screens" []
        (r/response (screens/all-screens (gen-state (config)))))
-  (POST "/settings" {{config :config} :params}
-        (r/response (hs/settings-save (decursorise config))))
+  (POST "/settings" {{data :data} :params}
+        (r/response (hs/settings-save (decursorise data))))
   (GET "/albums" []
        (let [conf (config)]
          (r/response (ha/read-albums (gen-state conf)

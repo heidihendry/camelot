@@ -6,7 +6,7 @@
             [camelot.component.analysis :as analysis]
             [camelot.component.albums :as calb]
             [camelot.component.surveys :as surveys]
-            [camelot.component.settings :as cset]
+            [camelot.component.screens :as screens]
             [camelot.component.error :as cerr]
             [camelot.component.footer :as cfoot]
             [secretary.core :as secretary :refer-macros [defroute]]))
@@ -31,7 +31,8 @@
 (defn settings-menu-view
   "Render the settings panel"
   []
-  (om/root cset/settings-view-component state/app-state
+  (om/root (screens/build-view-component :settings (state/resources-state)
+                                      :config) state/app-state
            {:target (js/document.getElementById "settings")}))
 
 (defroute "/#/dashboard" [] (generate-view calb/album-view-component))

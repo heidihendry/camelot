@@ -53,14 +53,14 @@
 (defmulti input-field (fn [[k v]] (:type (:schema v))))
 
 (defmethod input-field :select
-  [[k v] owner]
+  [[k v s] owner]
   (reify
     om/IRender
     (render [_]
-      (let [val (get-in (state/config-buffer-state) [k :value])]
+      (let [val (get-in s [k :value])]
         (dom/select #js {:className "settings-input"
                          :onChange #((state/set-coerced-value! val) %
-                                     (k (state/config-buffer-state)) :value owner)
+                                     (k s) :value owner)
                          :value
                          (if (= (type val) cljs.core/Keyword)
                            (name val)
@@ -110,7 +110,7 @@
   (reify
     om/IRender
     (render [_]
-      (om/build datepicker (get (state/config-buffer-state) k)))))
+      (om/build datepicker (get s k)))))
 
 (defmethod input-field :percentage
   [[k v s :as d] owner]
@@ -118,8 +118,8 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "number" :className "settings-input"
-                      :onChange #(state/set-percentage! % (k (state/config-buffer-state)) :value owner)
-                      :value (get-in (state/config-buffer-state) [k :value])}))))
+                      :onChange #(state/set-percentage! % (k s) :value owner)
+                      :value (get-in s [k :value])}))))
 
 (defmethod input-field :number
   [[k v s :as d] owner]
@@ -127,8 +127,8 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "number" :className "settings-input"
-                      :onChange #(state/set-number! % (k (state/config-buffer-state)) :value owner)
-                      :value (get-in (state/config-buffer-state) [k :value])}))))
+                      :onChange #(state/set-number! % (k s) :value owner)
+                      :value (get-in s [k :value])}))))
 
 (defmethod input-field :default
   [[k v s :as d] owner]
@@ -136,5 +136,5 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "text" :className "settings-input"
-                      :onChange #(state/set-unvalidated-text! % (k (state/config-buffer-state)) :value owner)
-                      :value (get-in (state/config-buffer-state) [k :value])}))))
+                      :onChange #(state/set-unvalidated-text! % (k s) :value owner)
+                      :value (get-in s [k :value])}))))

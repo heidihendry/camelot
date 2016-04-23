@@ -111,9 +111,6 @@ html > body {
 a:hover {
   cursor: pointer;
 }
-.settings-field {
-  margin-bottom: 1rem;
-}
 #footer {
   text-align: center;
   width: 100%;
@@ -159,6 +156,9 @@ a:hover {
   box-shadow: 10px 15px 60px 1px #333;
   border-top-left-radius: 1rem;
 }
+#settings .field-container {
+  margin-bottom: 1rem;
+}
 #settings button {
   margin: 0;
   width: 100%;
@@ -166,7 +166,7 @@ a:hover {
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
 }
-#settings .settings-label {
+#settings .field-label {
   color: #666;
   display: block;
   clear: both;
@@ -199,7 +199,7 @@ a:hover {
 #settings .button-container {
   padding: 0 1rem;
 }
-#settings #settings-inner {
+#settings .section-body {
   overflow-y: scroll;
   height: calc(100vh - 19.5rem);
   margin-bottom: 0.5rem;

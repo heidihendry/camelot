@@ -36,6 +36,22 @@
   "Retrieve configuration"
   (partial get-x "/surveys"))
 
+(defn put-resource
+  "PUT resource state"
+  [resource params cb]
+  (go
+    (let [response (<! (util/request http/put (util/with-baseurl resource)
+                                     params))]
+      (cb response))))
+
+(defn post-resource
+  "POST resource state"
+  [resource params cb]
+  (go
+    (let [response (<! (util/request http/post (util/with-baseurl resource)
+                                     params))]
+      (cb response))))
+
 (defn post-settings
   "POST configuration state"
   [params cb]

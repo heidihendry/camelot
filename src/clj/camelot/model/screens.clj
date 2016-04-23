@@ -72,5 +72,7 @@
                              :date-format {:type :string}}}}
    :states {:update {:submit {:success {:type :event
                                         :event :settings-save}
-                      :error {:type :event
-                              :event :settings-cancel}}}}})
+                              :error {:type :event
+                                      :event :settings-error}}
+                     :cancel {:type :event
+                              :event :settings-cancel}}}})
