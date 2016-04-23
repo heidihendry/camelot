@@ -31,19 +31,19 @@
 (defn settings-menu-view
   "Render the settings panel"
   []
-  (om/root (screens/build-view-component :settings (state/resources-state)
-                                      :config) state/app-state
-                                      {:target (js/document.getElementById "settings")}))
+  (let [f (screens/build-view-component :settings)]
+    (om/root f state/app-state
+             {:target (js/document.getElementById "settings")})))
 
 (defn page-content-view
   [type mode]
   (when (and (not (nil? (:view (state/app-state-cursor))))
              (not (nil? (:resources (state/app-state-cursor)))))
-    (om/update! (get (state/app-state-cursor) :view) :content {:screen {:type type
-                                                                        :mode mode}})
-    (om/root (screens/build-view-component :content (state/resources-state) :survey)
-             state/app-state
-             {:target (js/document.getElementById "page-content")})))
+    (om/update! (get (state/app-state-cursor) :view) :content
+                {:screen {:type type :mode mode} :buffer {}})
+    (let [f (screens/build-view-component :content)]
+      (om/root f state/app-state
+               {:target (js/document.getElementById "page-content")}))))
 
 (defroute "/#/dashboard" [] (generate-view calb/album-view-component))
 (defroute "/#/survey/create" [] (page-content-view :survey :create))

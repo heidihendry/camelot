@@ -9,7 +9,7 @@
 
 (defn get-screen
   [vs]
-  (get (:screens (state/app-state-cursor)) (get-in vs [:screen :type])))
+  (get (get (state/app-state-cursor) :screens) (get-in vs [:screen :type])))
 
 (def events
   {:settings-save (fn [d] (nav/toggle-settings!) (albums/reload-albums))
@@ -18,44 +18,42 @@
 (defn get-url
   [vs]
   (let [base (get-in (get-screen vs) [:resource :endpoint])
-        rid (:resource-id vs)]
+        rid (get vs :resource-id)]
     (if (nil? rid)
       base
       (str base "/" rid))))
 
 (defn create [success-key error-key vs resources key]
-  (do
-    (om/update! resources key (deref (:buffer vs)))
-    (rest/put-resource (get-url vs)
-                        {:data (deref (get resources key))}
-                        (get events success-key))))
+  (prn (get-url vs))
+  (rest/put-resource (get-url vs)
+                     {:data (deref (get vs :buffer))}
+                     (get events success-key)))
 
 (defn save [success-key error-key vs resources key]
   (do
-    (om/update! resources key (deref (:buffer vs)))
+    (om/update! resources key (deref (get vs :buffer)))
     (rest/post-resource (get-url vs)
                         {:data (deref (get resources key))}
                         (get events success-key))))
 
 (defn cancel [event-key vs resources key]
   (do
-    (om/update! vs :buffer (get resources key))
+    (om/update! vs :buffer (deref (get resources key)))
     ((get events event-key))))
 
 (defn field-component
-  [screen]
-  (fn [[menu-item s] owner]
-    (reify
-      om/IRender
-      (render [_]
-        (if (= (first menu-item) :label)
-          (dom/h4 #js {:className "section-heading"} (second menu-item))
-          (let [value (get-in screen [:schema (first menu-item)])]
-            (dom/div #js {:className "field-container"}
-                     (dom/label #js {:className "field-label"
-                                     :title (:description value)} (:label value))
-                     (om/build inputs/input-field
-                               [(first menu-item) value s]))))))))
+  [[menu-item screen buf] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (if (= (first menu-item) :label)
+        (dom/h4 #js {:className "section-heading"} (second menu-item))
+        (let [value (get-in screen [:schema (first menu-item)])]
+          (dom/div #js {:className "field-container"}
+                   (dom/label #js {:className "field-label"
+                                   :title (get value :description)} (get value :label))
+                   (om/build inputs/input-field
+                             [(first menu-item) value buf])))))))
 
 (defn body-component
   [data owner]
@@ -63,9 +61,9 @@
     om/IRender
     (render [_]
       (apply dom/div #js {:className "section-body"}
-             (om/build-all (field-component (:screen data))
-                           (map #(vector % (:buffer (:view-state data)))
-                                (:layout (:screen data))))))))
+             (om/build-all field-component
+                           (map #(vector % (get data :screen) (get-in data [:view-state :buffer]))
+                                (get-in data [:screen :layout])))))))
 
 (defn resource-update-component
   [{:keys [screen view-state save cancel]} owner]
@@ -73,7 +71,7 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/h4 nil (:title screen))
+               (dom/h4 nil (get screen :title))
                (dom/div nil (om/build body-component
                                       {:view-state view-state
                                        :screen screen}))
@@ -91,7 +89,7 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/h4 nil (:title screen))
+               (dom/h4 nil (get-in screen [:resource :title]))
                (dom/div nil (om/build body-component
                                       {:view-state view-state
                                        :screen screen}))
@@ -101,28 +99,23 @@
                                     "Create"))))))
 
 (defn build-view-component
-  [area resources key]
+  [type]
   (fn [app owner]
     (reify
-      om/IWillMount
-      (will-mount [_]
-        (let [view-state (get (:view app) area)
-              resource (get resources key)]
-          (om/update! view-state :buffer (if (empty? resource)
-                                           {}
-                                           (deref resource)))))
       om/IRender
       (render [_]
-        (let [view-state (get (:view app) area)
-              screen (get-screen view-state)]
+        (let [view-state (get-in app [:view type])
+              screen (get-screen view-state)
+              resource-key (get-in view-state [:screen :type])]
           (case (get-in view-state [:screen :mode])
             :update
-            (if (:buffer view-state)
+            (if (get view-state :buffer)
               (let [rsave #(save (get-in screen [:states :update :submit :success :event])
                                  (get-in screen [:states :update :submit :error :event])
-                                 view-state resources key)
+                                 view-state (state/resources-state) resource-key)
                     rcancel #(cancel (get-in screen [:states :update :cancel :event])
-                                     view-state resources key)]
+                                     view-state
+                                     (state/resources-state) resource-key)]
                 (om/build resource-update-component {:screen screen
                                                      :view-state view-state
                                                      :save rsave
@@ -131,9 +124,11 @@
             :create
             (let [rcreate #(create (get-in screen [:states :create :submit :success :event])
                                    (get-in screen [:states :create :submit :error :event])
-                                   view-state resources key)]
+                                   view-state
+                                   (state/resources-state)
+                                   resource-key)]
               (om/build resource-create-component {:screen screen
                                                    :view-state view-state
-                                                   :create create}))
+                                                   :create rcreate}))
             nil (dom/div nil)
             (dom/span nil (str "Unable to find mode: " (get-in view-state [:screen :mode])))))))))

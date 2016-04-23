@@ -156,7 +156,7 @@ a:hover {
   box-shadow: 10px 15px 60px 1px #333;
   border-top-left-radius: 1rem;
 }
-#settings .field-container {
+#app .field-container {
   margin-bottom: 1rem;
 }
 #settings button {
@@ -166,7 +166,7 @@ a:hover {
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
 }
-#settings .field-label {
+#app .field-label {
   color: #666;
   display: block;
   clear: both;
@@ -280,4 +280,7 @@ a:hover {
     margin: auto;
     margin-bottom: 1rem;
     display: block;
+}
+#page-content {
+    padding-top: 1rem;
 }
