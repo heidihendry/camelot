@@ -68,19 +68,28 @@
 
 (defn screen-config-state
   [screen]
-  (om/ref-cursor (:schema (screen (:screens (om/root-cursor app-state))))))
+  (om/ref-cursor (:schema (get (:screens (om/root-cursor app-state)) screen))))
 
 (defn metadata-schema-state
   []
   (om/ref-cursor (:metadata (om/root-cursor app-state))))
 
+(defn view-state
+  [area]
+  {:pre [(or (= area :settings) (= area :content))]}
+  (om/ref-cursor (get (:view (om/root-cursor app-state)) area)))
+
 (defn config-buffer-state
   []
   (om/ref-cursor (:config-buffer (om/root-cursor app-state))))
 
+(defn resources-state
+  []
+  (om/ref-cursor (:resources (om/root-cursor app-state))))
+
 (defn config-state
   []
-  (om/ref-cursor (:config (om/root-cursor app-state))))
+  (om/ref-cursor (:config (resources-state))))
 
 (defn nav-state
   []
