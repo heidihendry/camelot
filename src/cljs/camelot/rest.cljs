@@ -4,39 +4,37 @@
             [cljs-http.client :as http]
             [cljs.core.async :refer [<!]]))
 
-(defn get-application
-  "Retrieve global application details"
-  [cb]
-  (go
-    (let [response (<! (util/request
-                        http/get (util/with-baseurl "/application")
-                        nil))]
-      (cb response))))
-
-(defn get-albums
-  "Retrieve albums"
-  [cb]
-  (go
-    (let [response (<! (util/request
-                        http/get (util/with-baseurl "/albums")
-                        nil))]
-      (cb response))))
-
-(defn get-settings
+(defn get-x
   "Retrieve settings"
-  [cb]
+  [x-url cb]
   (go
     (let [response (<! (util/request
-                        http/get (util/with-baseurl "/settings") nil))]
+                        http/get (util/with-baseurl x-url) nil))]
       (cb response))))
 
-(defn get-configuration
+(def get-application
+  "Retrieve global application details"
+  (partial get-x "/application"))
+
+(def get-albums
+  "Retrieve albums"
+  (partial get-x "/albums"))
+
+(def get-screens
+  "Retrieve screens"
+  (partial get-x "/screens"))
+
+(def get-configuration
   "Retrieve configuration"
-  [cb]
-  (go
-    (let [response (<! (util/request
-                        http/get (util/with-baseurl "/default-config") nil))]
-      (cb response))))
+  (partial get-x "/default-config"))
+
+(def get-metadata
+  "Retrieve metadata"
+  (partial get-x "/metadata"))
+
+(def get-surveys
+  "Retrieve configuration"
+  (partial get-x "/surveys"))
 
 (defn post-settings
   "POST configuration state"
@@ -46,6 +44,3 @@
                                      params))]
       (cb response))))
 
-(defn get-maxent
-  [params]
-  (util/request http/get (util/with-baseurl "/maxent") params))
