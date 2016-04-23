@@ -20,7 +20,9 @@
               :config-not-found "A configuration file was not found.  Please run camelot with the 'init' option and adjust the configuration file created."
               }
 
-   :survey {:duplicate-name "A survey with the name '%s' already exists"}
+   :survey {:duplicate-name "A survey with the name '%s' already exists"
+            :survey-name "Survey Name"
+            :survey-directory "Survey Directory"}
 
    :status {:rename-photos "Renaming photos in the period's dataset: '%s'"
             :apply-rename "Renaming '%s' to '%s'..."}
@@ -46,29 +48,6 @@
             }
    :language {:en "English"
               :vn "Vietnamese"}
-
-   :config {:erroneous-infrared-threshold {:label "Erroneous Infrared Threshold"
-                                           :description "Value between 0.0 and 1.0 to set the treshold for date/time error detection"}
-            :infrared-iso-value-threshold {:label "Infrared ISO Value Threshold"
-                                           :description "ISO value of the photos beyond which it is considered 'night'"}
-            :sighting-independence-minutes-threshold {:label "Sighting Independence Threshold (mins)"
-                                                      :description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"}
-            :language {:label "Language"
-                       :description "Interface language to use"}
-            :root-path {:label "Survey Directory"
-                        :description "Pathname to the root directory of this survey's photo data. This must be as it would appear to the system running the Camelot server process."}
-            :night-start-hour {:label "Night Start Time"
-                               :description "Hour beyond which it is considered night"}
-            :night-end-hour {:label "Night End Time"
-                             :description "Hour at which it is considered daylight"}
-            :project-start {:label "Project Start Date"
-                            :description "The date which the project commenced.  Inclusive."}
-            :project-end {:label "Project End Date"
-                          :description "The date which the project finished.  Exclusive."}
-            :surveyed-species {:label "Survey Species"
-                               :description "A list of species included in this survey."}
-            :required-fields {:label "Required Fields"
-                              :description "A list of the fields required to be in the metadata."}}
 
    :metadata {:location.gps-longitude "GPS Longitude"
               :location.gps-longitude-ref "GPS Longitude Reference"
@@ -105,7 +84,30 @@
 
    :settings {:preferences "Preferences"
               :survey-settings "Survey Settings"
-              :title "Settings"}
+              :title "Settings"
+              :erroneous-infrared-threshold {:label "Erroneous Infrared Threshold"
+                                             :description "Value between 0.0 and 1.0 to set the treshold for date/time error detection"}
+              :infrared-iso-value-threshold {:label "Infrared ISO Value Threshold"
+                                             :description "ISO value of the photos beyond which it is considered 'night'"}
+              :sighting-independence-minutes-threshold {:label "Sighting Independence Threshold (mins)"
+                                                        :description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"}
+              :language {:label "Language"
+                         :description "Interface language to use"}
+              :root-path {:label "Survey Directory"
+                          :description "Pathname to the root directory of this survey's photo data. This must be as it would appear to the system running the Camelot server process."}
+              :night-start-hour {:label "Night Start Time"
+                                 :description "Hour beyond which it is considered night"}
+              :night-end-hour {:label "Night End Time"
+                               :description "Hour at which it is considered daylight"}
+              :project-start {:label "Project Start Date"
+                              :description "The date which the project commenced.  Inclusive."}
+              :project-end {:label "Project End Date"
+                            :description "The date which the project finished.  Exclusive."}
+              :surveyed-species {:label "Survey Species"
+                                 :description "A list of species included in this survey."}
+              :required-fields {:label "Required Fields"
+                                :description "A list of the fields required to be in the metadata."}}
+
    :application {:dashboard "Dashboard"
                  :surveys "Surveys"
                  :analysis "Analysis"}

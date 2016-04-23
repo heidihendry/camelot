@@ -3,8 +3,8 @@
 
 (defn translate-fn
   [state]
-  (fn [lookup]
-    ((:translate state) (keyword (format "config/%s" (subs (str lookup) 1))))))
+  (fn [resource lookup]
+    ((:translate state) (keyword (format "%s/%s" (name resource) (subs (str lookup) 1))))))
 
 (def smiths (atom {}))
 
@@ -13,6 +13,20 @@
   (smithy/build-smiths smiths (translate-fn state) state))
 
 ;;(settings-screen (settings/gen-state settings/default-config))
+
+(defsmith survey smiths
+  [state]
+  {:resource {:type :survey
+              :title ((:translate state) :survey/title)
+              :endpoint "/survey"}
+   :layout [[:survey-name]
+            [:survey-directory]]
+   :schema {:survey-name {:type :text}
+            :survey-directory {:type :text}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :settings-save}
+                              :error {:type :event
+                                      :event :settings-error}}}}})
 
 (defsmith settings smiths
   [state]

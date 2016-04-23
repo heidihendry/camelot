@@ -38,6 +38,6 @@
 (defn nav-menu
   [state]
   {:menu-items [{:url "/#/dashboard" :label ((:translate state) :application/dashboard)}
-                {:url "/#/surveys" :label ((:translate state) :application/surveys)}
+                {:url "/#/survey/create" :label ((:translate state) :application/surveys)}
                 {:url "/#/analysis" :label ((:translate state) :application/analysis)}
                 {:function "settings"}]})

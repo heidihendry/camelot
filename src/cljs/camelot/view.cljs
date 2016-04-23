@@ -33,9 +33,19 @@
   []
   (om/root (screens/build-view-component :settings (state/resources-state)
                                       :config) state/app-state
-           {:target (js/document.getElementById "settings")}))
+                                      {:target (js/document.getElementById "settings")}))
+
+(defn page-content-view
+  [type mode]
+  (when (and (not (nil? (:view (state/app-state-cursor))))
+             (not (nil? (:resources (state/app-state-cursor)))))
+    (om/update! (get (state/app-state-cursor) :view) :content {:screen {:type type
+                                                                        :mode mode}})
+    (om/root (screens/build-view-component :content (state/resources-state) :survey)
+             state/app-state
+             {:target (js/document.getElementById "page-content")})))
 
 (defroute "/#/dashboard" [] (generate-view calb/album-view-component))
-(defroute "/#/surveys" [] (generate-view surveys/surveys-view-component))
+(defroute "/#/survey/create" [] (page-content-view :survey :create))
 (defroute "/#/analysis" [] (generate-view analysis/analysis-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))
