@@ -54,8 +54,9 @@
   (GET "/survey/:id" [id] (r/response (hsurv/get-specific (gen-state (config)) id)))
   (POST "/survey" {{sid :id  sname :name sdir :directory} :params}
         (hsurv/update! (gen-state (config)) sid sname sdir))
-  (PUT "/survey" {{sname :name sdir :directory} :params}
-       (hsurv/create! (gen-state (config)) sname sdir))
+  (PUT "/survey" [data]
+       (let [{survname :survey-name sdir :survey-directory} (decursorise data)]
+         (r/response (hsurv/create! (gen-state (config)) survname sdir))))
   (DELETE "/survey" {{sid :id} :params}
           (hsurv/delete! (gen-state (config)) sid))
   (POST "/quit" [] (System/exit 0))

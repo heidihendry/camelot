@@ -55,10 +55,12 @@
 (defmethod input-field :select
   [[k v s] owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil})))
     om/IRender
     (render [_]
-      (when (nil? (get s k))
-        (om/update! s k {:value nil}))
       (let [val (get-in s [k :value])]
         (dom/select #js {:className "field-input"
                          :onChange #((state/set-coerced-value! val) %
@@ -76,10 +78,12 @@
     (init-state [_]
       {:select-value nil
        :text-value ""})
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil})))
     om/IRenderState
     (render-state [this state]
-      (when (nil? (get s k))
-        (om/update! s k {:value nil}))
       (dom/div #js {:className "list-input"}
                (apply dom/div nil
                       (if (= (:list-of (:schema v)) :paths)
@@ -112,19 +116,25 @@
 (defmethod input-field :datetime
   [[k v s :as d] owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil})))
     om/IRender
     (render [_]
-      (when (nil? (get s k))
-        (om/update! s k {:value nil}))
+      (prn s)
       (om/build datepicker (get s k)))))
 
 (defmethod input-field :percentage
   [[k v s :as d] owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil})))
     om/IRender
     (render [_]
-      (when (nil? (get s k))
-        (om/update! s k {:value nil}))
+      (prn s)
       (dom/input #js {:type "number" :className "field-input"
                       :onChange #(state/set-percentage! % (k s) :value owner)
                       :value (get-in s [k :value])}))))
@@ -132,10 +142,12 @@
 (defmethod input-field :number
   [[k v s :as d] owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get s k))
+        (om/update! s k {:value nil})))
     om/IRender
     (render [_]
-      (when (and (not (nil? s)) (nil? (get s k)))
-        (om/update! s k {:value nil}))
       (dom/input #js {:type "number" :className "field-input"
                       :onChange #(state/set-number! % (k s) :value owner)
                       :value (get-in s [k :value])}))))
@@ -145,7 +157,7 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (when (and (not (nil? s)) (nil? (get s k)))
+      (when (nil? (get s k))
         (om/update! s k {:value nil})))
     om/IRender
     (render [_]

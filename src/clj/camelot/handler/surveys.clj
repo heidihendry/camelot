@@ -19,11 +19,15 @@
   [state sid]
   (-get-specific {:id sid}))
 
+(defn get-specific-by-name
+  [state sname]
+  (-get-specific-by-name {:name sname}))
+
 (defn create!
   [state sname sdir]
   {:pre [(not (nil? sname))]}
-  (if (not (empty? (get-specific state name)))
-    ((:translate state) :survey/duplicate-name name)
+  (if (not (empty? (get-specific-by-name state sname)))
+    ((:translate state) :survey/duplicate-name sname)
     (let [err (check-directory state sdir)]
       (if err
         err

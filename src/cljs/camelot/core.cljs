@@ -23,6 +23,9 @@
         (om/update! (state/app-state-cursor) :view
                     {:settings {:screen {:type :settings
                                          :mode :update}}})
+        (om/update! (get-in (state/app-state-cursor) [:view :settings])
+                    :buffer (deref (get (state/resources-state)
+                                        (get-in (state/app-state-cursor) [:view :settings :screen :type]))))
         (view/settings-menu-view))))
 
 (defn initialise-application
@@ -32,7 +35,7 @@
      (om/update! (state/app-state-cursor) :metadata (:body x))
      (rest/get-configuration
       #(do (om/update! (state/app-state-cursor) :resources {})
-           (om/update! (state/resources-state) :config (:body %))
+           (om/update! (state/resources-state) :settings (:body %))
            (rest/get-resource "/surveys"
                               (fn [x] (om/update! (state/resources-state)
                                                   :survey (:body x))))
