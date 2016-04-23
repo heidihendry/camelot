@@ -32,9 +32,13 @@
   "Retrieve metadata"
   (partial get-x "/metadata"))
 
-(def get-surveys
-  "Retrieve configuration"
-  (partial get-x "/surveys"))
+(defn get-resource
+  "GET resource state"
+  [resource cb]
+  (go
+    (let [response (<! (util/request http/get (util/with-baseurl resource)
+                                     nil))]
+      (cb response))))
 
 (defn put-resource
   "PUT resource state"

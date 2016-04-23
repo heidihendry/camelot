@@ -14,18 +14,18 @@
 
 (defn describe-schema
   "Add label and description data to the given schema definition"
-  [schema translate-fn]
+  [rtype schema translate-fn]
   (reduce (fn [acc [k v]]
             (assoc acc k
-                   {:label (translate-fn (keyword (format "%s/label" (name k))))
-                    :description (translate-fn (keyword (format "%s/description" (name k))))
+                   {:label (translate-fn rtype (keyword (format "%s/label" (name k))))
+                    :description (translate-fn rtype (keyword (format "%s/description" (name k))))
                     :schema v})) {} schema))
 
 (defn build-smith-reducer
   [translate-fn params]
   (fn [acc k v]
     (let [ps (v params)]
-      (assoc acc k (assoc ps :schema (describe-schema (:schema ps)
+      (assoc acc k (assoc ps :schema (describe-schema (:type (:resource ps)) (:schema ps)
                                                       translate-fn))))))
 
 (defn build-smiths

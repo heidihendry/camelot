@@ -33,6 +33,9 @@
      (rest/get-configuration
       #(do (om/update! (state/app-state-cursor) :resources {})
            (om/update! (state/resources-state) :config (:body %))
+           (rest/get-resource "/surveys"
+                              (fn [x] (om/update! (state/resources-state)
+                                                  :survey (:body x))))
            (initialise-state)
            (albums/reload-albums))))))
 
