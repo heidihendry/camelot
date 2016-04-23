@@ -28,7 +28,7 @@
     (render [_]
       (if (= (first menu-item) :label)
         (dom/h4 #js {:className "section-heading"} (second menu-item))
-        (let [value (get (state/settings-config-state) (first menu-item))]
+        (let [value (get (state/screen-config-state :settings) (first menu-item))]
           (dom/div #js {:className "settings-field"}
                    (dom/label #js {:className "settings-label"
                                    :title (:description value)} (:label value))
@@ -43,16 +43,16 @@
       (apply dom/div #js {:id "settings-inner"}
              (om/build-all field-component
                            (map #(vector % (:config-state data))
-                                (:menu data)))))))
+                                (:layout data)))))))
 
 (defn settings-view-component [app owner]
   (reify
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/h4 nil "Settings")
+               (dom/h4 nil (:title (:resource (:settings (:screens app)))))
                (dom/div nil (om/build settings-component
-                                      {:menu (:menu (:settings app))
+                                      {:layout (:layout (:settings (:screens app)))
                                        :config-state (state/config-buffer-state)}))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"

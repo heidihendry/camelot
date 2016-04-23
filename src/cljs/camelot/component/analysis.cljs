@@ -8,13 +8,6 @@
             [cljs-time.core :as t]
             [cljs-time.format :as tf]))
 
-
-
-(defn maxent-csv
-  []
-  (rest/get-maxent {:config (deref (state/config-state))
-                    :albums (deref (get (state/app-state-cursor) :albums))}))
-
 (defn analysis-view-component [app owner]
   "Render the analysis screen."
   (reify

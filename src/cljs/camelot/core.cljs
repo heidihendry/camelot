@@ -17,18 +17,21 @@
   []
   (rest/get-application
    #(do (om/update! (state/app-state-cursor) :application (:body %))
-        (view/navbar)))
-  (rest/get-settings
-   #(do (om/update! (state/app-state-cursor) :settings (:body %))
+         (view/navbar)))
+  (rest/get-screens
+   #(do (om/update! (state/app-state-cursor) :screens (:body %))
         (view/settings-menu-view))))
 
 (defn initialise-application
   []
-  (rest/get-configuration
-   #(do (om/update! (state/app-state-cursor) :config (:body %))
-        (om/update! (state/app-state-cursor) :config-buffer (:body %))
-        (initialise-state)
-        (albums/reload-albums))))
+  (rest/get-metadata
+   (fn [x]
+     (om/update! (state/app-state-cursor) :metadata (:body x))
+     (rest/get-configuration
+            #(do (om/update! (state/app-state-cursor) :config (:body %))
+                 (om/update! (state/app-state-cursor) :config-buffer (:body %))
+                 (initialise-state)
+                 (albums/reload-albums))))))
 
 (secretary/set-config! :prefix "#")
 

@@ -15,18 +15,19 @@
       (not (jf/readable? dh)) ((:translate state) :problems/read-permission-denied sdir)
       :else nil)))
 
-(defn create!
-  [state sname sdir]
-  {:pre [(not (nil? sname))]}
-  ;; TODO handle attempt to add duplicate name to table
-  (let [err (check-directory state sdir)]
-    (if err
-      err
-      (-create<! {:name sname :directory sdir}))))
-
 (defn get-specific
   [state sid]
   (-get-specific {:id sid}))
+
+(defn create!
+  [state sname sdir]
+  {:pre [(not (nil? sname))]}
+  (if (not (empty? (get-specific state name)))
+    ((:translate state) :survey/duplicate-name name)
+    (let [err (check-directory state sdir)]
+      (if err
+        err
+        (-create<! {:name sname :directory sdir})))))
 
 (defn get-all
   [state]

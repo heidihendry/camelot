@@ -20,6 +20,8 @@
               :config-not-found "A configuration file was not found.  Please run camelot with the 'init' option and adjust the configuration file created."
               }
 
+   :survey {:duplicate-name "A survey with the name '%s' already exists"}
+
    :status {:rename-photos "Renaming photos in the period's dataset: '%s'"
             :apply-rename "Renaming '%s' to '%s'..."}
 
@@ -102,8 +104,11 @@
               :filesize "File Size"}
 
    :settings {:preferences "Preferences"
-              :survey-settings "Survey Settings"}
-   :application {:dashboard "Dashboard"}
+              :survey-settings "Survey Settings"
+              :title "Settings"}
+   :application {:dashboard "Dashboard"
+                 :surveys "Surveys"
+                 :analysis "Analysis"}
    :default-config-created "A default configuration has been created in '%s'"
 
    :missing  "|Missing translation: [%1$s %2$s %3$s]|"})

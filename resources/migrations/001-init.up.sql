@@ -3,7 +3,7 @@ CREATE TABLE survey (
        survey_name      VARCHAR(255) UNIQUE NOT NULL,
        survey_created   TIMESTAMP NOT NULL,
        survey_updated   TIMESTAMP NOT NULL,
-       survey_directory VARCHAR(1024) NOT NULL,
+       survey_directory VARCHAR(2048) NOT NULL,
        PRIMARY KEY (survey_id))
 --;;
 CREATE TABLE site (

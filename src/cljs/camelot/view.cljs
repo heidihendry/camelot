@@ -5,6 +5,7 @@
             [camelot.component.nav :as cnav]
             [camelot.component.analysis :as analysis]
             [camelot.component.albums :as calb]
+            [camelot.component.surveys :as surveys]
             [camelot.component.settings :as cset]
             [camelot.component.error :as cerr]
             [camelot.component.footer :as cfoot]
@@ -34,5 +35,6 @@
            {:target (js/document.getElementById "settings")}))
 
 (defroute "/#/dashboard" [] (generate-view calb/album-view-component))
+(defroute "/#/surveys" [] (generate-view surveys/surveys-view-component))
 (defroute "/#/analysis" [] (generate-view analysis/analysis-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

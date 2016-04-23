@@ -159,6 +159,13 @@ a:hover {
   box-shadow: 10px 15px 60px 1px #333;
   border-top-left-radius: 1rem;
 }
+#settings button {
+  margin: 0;
+  width: 100%;
+  padding: 0.7rem 2rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
 #settings .settings-label {
   color: #666;
   display: block;

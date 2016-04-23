@@ -2,6 +2,7 @@
   (:require [camelot.handler.albums :as ha]
             [camelot.handler.settings :as hs]
             [camelot.handler.surveys :as hsurv]
+            [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
             [camelot.util.transit :as tutil]
@@ -29,6 +30,7 @@
 (defroutes routes
   (GET "/" _ (retrieve-index))
   (GET "/default-config" [] (r/response (cursorise (config))))
+  (GET "/metadata" [] (r/response (hs/get-metadata (gen-state (config)))))
   (GET "/application" [] (r/response {:version (hs/get-version)
                                     :nav (hs/get-nav-menu (gen-state (config)))}))
   (GET "/maxent" []
@@ -40,8 +42,8 @@
               (r/content-type "text/csv; charset=utf-8")
               (r/header "Content-Length" (count data))
               (r/header "Content-Disposition" "attachment; filename=\"maxent.csv\""))))
-  (GET "/settings" []
-       (r/response (hs/settings-schema (gen-state (config)))))
+  (GET "/screens" []
+       (r/response (screens/all-screens (gen-state (config)))))
   (POST "/settings" {{config :config} :params}
         (r/response (hs/settings-save (decursorise config))))
   (GET "/albums" []
