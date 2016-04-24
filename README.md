@@ -88,7 +88,7 @@ The number of minutes after a species is sighted before further photographs of t
 
 ## Experimental Features
 
-Features which are under heavy development are hidden by default.  These can be enabled by setting the CAMELOT_DEV_MODE environment variable to 'true'.
+Features which are under heavy development are hidden by default.  These can be enabled by setting the `CAMELOT_DEV_MODE` environment variable to `true`.
 
 ## Development
 
