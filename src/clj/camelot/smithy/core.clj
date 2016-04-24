@@ -8,10 +8,6 @@
           (fn [~(first vars)]
             ~mould)))
 
-(defsmith survey smiths
-  [params]
-  {:thing params})
-
 (defn describe-schema
   "Add label and description data to the given schema definition"
   [rtype schema translate-fn]

@@ -22,6 +22,7 @@
 
    :survey {:duplicate-name "A survey with the name '%s' already exists"
             :title "Survey"
+            :sidebar-title "Surveys"
             :survey-name {:label "Survey Name"
                           :description "The name which will be used to refer to the survey."}
             :survey-directory {:label "Survey Directory"

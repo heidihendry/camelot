@@ -50,7 +50,7 @@
        (let [conf (config)]
          (r/response (ha/read-albums (gen-state conf)
                                      (:root-path conf)))))
-  (GET "/surveys" [] (r/response (hsurv/get-all (gen-state (config)))))
+  (GET "/survey" [] (r/response (hsurv/get-all (gen-state (config)))))
   (GET "/survey/:id" [id] (r/response (hsurv/get-specific (gen-state (config)) id)))
   (POST "/survey" {{sid :id  sname :name sdir :directory} :params}
         (hsurv/update! (gen-state (config)) sid sname sdir))
