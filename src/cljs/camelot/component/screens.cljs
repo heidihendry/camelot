@@ -98,6 +98,41 @@
                                          :onClick create}
                                     "Create"))))))
 
+(defn sidebar-item-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/li #js {:className "sidebar-item"}
+              (dom/a #js {:href (str (get data :endpoint) "/" (get (:item data) (:id data)))}
+                     (get (:item data) (get data :label)))))))
+
+(defn sidebar-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (let [res (get-in data [:screen :sidebar :resource])]
+        (rest/get-resource (get res :endpoint)
+                           #(om/update! (state/resources-state)
+                                        (get res :type)
+                                        (:body %)))))
+    om/IRender
+    (render [_]
+      (let [res (get-in data [:screen :sidebar :resource])]
+        (dom/div #js {:className "sidebar"}
+                 (dom/button #js {:className "create-record-btn btn btn-primary"
+                                  :onClick #(nav/nav! "/#/survey/create")} "+")
+                 (apply dom/ul nil
+                        (dom/li nil (get res :title))
+                        (om/build-all sidebar-item-component
+                                      (map #(hash-map :item %
+                                                      :label (get res :label)
+                                                      :id (get res :id)
+                                                      :endpoint (get res :endpoint))
+                                           (get (state/resources-state)
+                                                (get res :type))))))))))
+
 (defn build-view-component
   [type]
   (fn [app owner]
@@ -107,28 +142,34 @@
         (let [view-state (get-in app [:view type])
               screen (get-screen view-state)
               resource-key (get-in view-state [:screen :type])]
-          (case (get-in view-state [:screen :mode])
-            :update
-            (if (get view-state :buffer)
-              (let [rsave #(save (get-in screen [:states :update :submit :success :event])
-                                 (get-in screen [:states :update :submit :error :event])
-                                 view-state (state/resources-state) resource-key)
-                    rcancel #(cancel (get-in screen [:states :update :cancel :event])
-                                     view-state
-                                     (state/resources-state) resource-key)]
-                (om/build resource-update-component {:screen screen
-                                                     :view-state view-state
-                                                     :save rsave
-                                                     :cancel rcancel}))
-              (dom/span nil "Loading..."))
-            :create
-            (let [rcreate #(create (get-in screen [:states :create :submit :success :event])
-                                   (get-in screen [:states :create :submit :error :event])
-                                   view-state
-                                   (state/resources-state)
-                                   resource-key)]
-              (om/build resource-create-component {:screen screen
-                                                   :view-state view-state
-                                                   :create rcreate}))
-            nil (dom/div nil)
-            (dom/span nil (str "Unable to find mode: " (get-in view-state [:screen :mode])))))))))
+          (prn screen)
+          (dom/div nil
+                   (when (get screen :sidebar)
+                     (om/build sidebar-component {:screen screen
+                                                  :view-state view-state}))
+                   (dom/div #js {:className "main-content"}
+                            (case (get-in view-state [:screen :mode])
+                              :update
+                              (if (get view-state :buffer)
+                                (let [rsave #(save (get-in screen [:states :update :submit :success :event])
+                                                   (get-in screen [:states :update :submit :error :event])
+                                                   view-state (state/resources-state) resource-key)
+                                      rcancel #(cancel (get-in screen [:states :update :cancel :event])
+                                                       view-state
+                                                       (state/resources-state) resource-key)]
+                                  (om/build resource-update-component {:screen screen
+                                                                       :view-state view-state
+                                                                       :save rsave
+                                                                       :cancel rcancel}))
+                                (dom/span nil "Loading..."))
+                              :create
+                              (let [rcreate #(create (get-in screen [:states :create :submit :success :event])
+                                                     (get-in screen [:states :create :submit :error :event])
+                                                     view-state
+                                                     (state/resources-state)
+                                                     resource-key)]
+                                (om/build resource-create-component {:screen screen
+                                                                     :view-state view-state
+                                                                     :create rcreate}))
+                              nil (dom/div nil)
+                              (dom/span nil (str "Unable to find mode: " (get-in view-state [:screen :mode])))))))))))

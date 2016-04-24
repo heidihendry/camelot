@@ -19,6 +19,11 @@
   {:resource {:type :survey
               :title ((:translate state) :survey/title)
               :endpoint "/survey"}
+   :sidebar {:resource {:endpoint "/survey"
+                        :title ((:translate state) :survey/sidebar-title)
+                        :type :survey
+                        :id :survey_id
+                        :label :survey_name}}
    :layout [[:survey-name]
             [:survey-directory]]
    :schema {:survey-name {:type :text}

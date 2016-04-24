@@ -284,3 +284,43 @@ a:hover {
 #page-content {
     padding-top: 1rem;
 }
+.sidebar {
+    float: left;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    display: block;
+    height: 100%;
+    background: #eee;
+    width: 24rem;
+    position: absolute;
+    border-right: 1px solid #ddd;
+}
+.sidebar ul {
+    list-style: none;
+    padding-left: 1rem;
+    padding-top: 2rem;
+    margin-right: 1rem;
+}
+.sidebar ul li {
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+}
+.sidebar ul li:first-of-type {
+    padding: 1rem;
+    font-size: 120%;
+    color: #666;
+    border-top: none;
+}
+#page-content .main-content {
+    float: left;
+    display: block;
+    margin-left: 24rem;
+}
+.sidebar .create-record-btn {
+    float: right;
+    margin-top: 2.5rem;
+    margin-right: 1.5rem;
+    position: relative;
+}
