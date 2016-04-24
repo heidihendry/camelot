@@ -21,8 +21,6 @@ This is a 'pre-alpha' release, and thus comes with numerous limitations.
 * Only the latest versions of Firefox and Chrome are supported
 * Does not support video files
 * Does not provide correct handling for camera pairs
-* Does not provide for any processing
-* May not provide sufficient information to readily determine the cause of validation problems
 * English is the only supported language
 * Validations cannot be disabled
 
@@ -38,6 +36,7 @@ Checks and reporting on whether:
 * one or more required fields are missing from one or more photos
 * a sighting is incomplete (i.e., species without quantity or quantity without species)
 * a species was identified which is not known to the survey
+* a timeshift applied to photos is applied consistently throughout a camera trap operation period's dataset
 
 ## Configuration
 
@@ -51,7 +50,7 @@ A timestamp indicating the beginning of the project. Should the timestamp of any
 
 ### Project End
 
-Like :project-start, but for the project end date.  The end time is _exclusive_.
+Like 'project-start', but for the project end date.  The end time is _exclusive_.
 
 ### Surveyed Species
 
@@ -75,7 +74,7 @@ One of four properties used to (naively) identify camera time configuration issu
 
 One of four properties used to (naively) identify camera time configuration issues.  The ISO value of the cameras which is used to suggest a photo was taken at night.
 
-File ISO values greater than this threshold are considered `night` photos and thus are expected to lie within :night-start-hour and :night-end-hour
+File ISO values greater than this threshold are considered `night` photos and thus are expected to lie within 'Night Start Hour' and 'Night End Hour'
 
 ### Erroneous Infrared Threshold
 
@@ -87,27 +86,9 @@ The number of minutes after a species is sighted before further photographs of t
 
 **Important:** Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
 
-### Rename
+## Experimental Features
 
-**Important:** This functionality is not currently user-accessible.
-
-Rename files based on their metadata.  This setting consists of 3 properties:
-
-**Date Format**
-
-A string representing the format for which date metadata should be represented.  When setting this, be mindful of characters which may or may not be allowed in filenames (e.g., `:` is problematic).
-
-**Fields**
-
-A list of paths into file metadata (see `:required-fields` for more information about paths) for which data must be extracted to generate the filename.
-
-**Format**
-
-A [format string](https://en.wikipedia.org/wiki/Printf_format_string) denoting the filename format.
-
-The variables in this are expanded based on the information in the `:fields` property.
-
-There must be exactly as many parameters in this as paths in the `:fields` property.
+Features which are under heavy development are hidden by default.  These can be enabled by setting the CAMELOT_DEV_MODE environment variable to 'true'.
 
 ## Development
 
@@ -135,41 +116,6 @@ seconds.`, you're ready to go. Browse to `http://localhost:3449` and enjoy.
 
 **Attention: It is not needed to run `lein figwheel` separately. Instead we
 launch Figwheel directly from the REPL**
-
-### Trying it out
-
-If all is well you now have a browser window saying 'Hello Chestnut',
-and a REPL prompt that looks like `cljs.user=>`.
-
-Open `resources/public/css/style.css` and change some styling of the
-H1 element. Notice how it's updated instantly in the browser.
-
-Open `src/cljs/camelot/core.cljs`, and change `dom/h1` to
-`dom/h2`. As soon as you save the file, your browser is updated.
-
-In the REPL, type
-
-```
-(ns camelot.core)
-(swap! app-state assoc :text "Interactivity FTW")
-```
-
-Notice again how the browser updates.
-
-### Lighttable
-
-Lighttable provides a tighter integration for live coding with an inline
-browser-tab. Rather than evaluating cljs on the command line with weasel repl,
-evaluate code and preview pages inside Lighttable.
-
-Steps: After running `(run)`, open a browser tab in Lighttable. Open a cljs file
-from within a project, go to the end of an s-expression and hit Cmd-ENT.
-Lighttable will ask you which client to connect. Click 'Connect a client' and
-select 'Browser'. Browse to [http://localhost:3449](http://localhost:3449)
-
-View LT's console to see a Chrome js console.
-
-Hereafter, you can save a file and see changes or evaluate cljs code (without saving a file). Note that running a weasel server is not required to evaluate code in Lighttable.
 
 ### Emacs/Cider
 
