@@ -33,7 +33,7 @@
                  [yesql "0.5.2"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
-            [lein-environ "1.0.1"]]
+            [lein-environ "1.0.2"]]
 
   :min-lein-version "2.6.1"
 
@@ -109,7 +109,7 @@
                              [com.cemerick/piggieback "0.2.1"]
                              [org.clojure/tools.nrepl "0.2.12"]
                              [org.apache.derby/derbytools "10.12.1.1"]]
-
+              :env {:camelot-dev-mode true}
               :plugins [[lein-figwheel "0.5.1" :exclusions [org.clojure/clojure]]
                         [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]]
 

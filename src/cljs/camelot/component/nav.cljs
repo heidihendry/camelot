@@ -28,4 +28,4 @@
                             (dom/img #js {:src "images/spinner.gif" :height "32px"})
                             "Loading Data"))
                (apply dom/ul #js {:className "nav navbar-nav"}
-                      (om/build-all nav-item-component (:menu-items (:nav (:application data)))))))))
+                      (om/build-all nav-item-component (remove nil? (:menu-items (:nav (:application data))))))))))
