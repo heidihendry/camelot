@@ -13,7 +13,8 @@
         (dom/li #js {:id "settings-nav" :className "icon-only"
                      :onClick #(nav/toggle-settings!)}
                 (dom/a nil (dom/span #js {:className "fa fa-cogs fa-2x"})))
-        (dom/li #js {:onClick #(nav/nav! (:url data))}
+        (dom/li #js {:className (if (:experimental data) "experimental" "")
+                     :onClick #(nav/nav! (:url data))}
                 (dom/a nil (:label data)))))))
 
 (defn nav-component

@@ -87,6 +87,14 @@ html > body {
   height: 6rem;
   border-right: 1px solid #1175aa;
 }
+#navigation .nav li.experimental {
+    background: #bb3300;
+    border-right: 1px solid #bb9900;
+}
+#navigation .nav li.experimental:hover {
+    background: #bb3300;
+    background: #bb9900;
+}
 #navigation .nav li.icon-only {
   display: inline-block;
   margin: 0;

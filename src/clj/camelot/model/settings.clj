@@ -40,10 +40,13 @@
   [state]
   {:menu-items [{:url "/#/dashboard" :label ((:translate state) :application/dashboard)}
                 (when (feature/enabled? :survey)
-                  {:url "/#/surveys" :label ((:translate state) :application/surveys)})
+                  {:url "/#/surveys" :label ((:translate state) :application/surveys)
+                   :experimental true})
                 (when (feature/enabled? :survey)
-                  {:url "/#/sites" :label ((:translate state) :application/sites)})
-                (when (feature/enabled? :camera)
-                  {:url "/#/cameras" :label ((:translate state) :application/cameras)})
+                  {:url "/#/sites" :label ((:translate state) :application/sites)
+                   :experimental true})
+                (when (feature/enabled? :survey)
+                  {:url "/#/cameras" :label ((:translate state) :application/cameras)
+                   :experimental true})
                 {:url "/#/analysis" :label ((:translate state) :application/analysis)}
                 {:function "settings"}]})
