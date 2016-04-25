@@ -114,15 +114,17 @@
     (will-mount [_]
       (let [res (get-in data [:screen :sidebar :resource])]
         (rest/get-resource (get res :endpoint)
-                           #(om/update! (state/resources-state)
-                                        (get res :type)
+                           #(om/update! (get-in data [:view-state :selected-resource])
+                                        :children
                                         (:body %)))))
     om/IRender
     (render [_]
       (let [res (get-in data [:screen :sidebar :resource])]
         (dom/div #js {:className "sidebar"}
                  (dom/button #js {:className "create-record-btn btn btn-primary"
+                                  ;; TODO fixme
                                   :onClick #(nav/nav! "/#/survey/create")} "+")
+                 (prn data)
                  (apply dom/ul nil
                         (dom/li nil (get res :title))
                         (om/build-all sidebar-item-component
@@ -130,8 +132,7 @@
                                                       :label (get res :label)
                                                       :id (get res :id)
                                                       :endpoint (get res :endpoint))
-                                           (get (state/resources-state)
-                                                (get res :type))))))))))
+                                           (get-in data [:view-state :selected-resource :children])))))))))
 
 (defn build-view-component
   [type]
@@ -142,7 +143,6 @@
         (let [view-state (get-in app [:view type])
               screen (get-screen view-state)
               resource-key (get-in view-state [:screen :type])]
-          (prn screen)
           (dom/div nil
                    (when (get screen :sidebar)
                      (om/build sidebar-component {:screen screen
@@ -153,10 +153,10 @@
                               (if (get view-state :buffer)
                                 (let [rsave #(save (get-in screen [:states :update :submit :success :event])
                                                    (get-in screen [:states :update :submit :error :event])
-                                                   view-state (state/resources-state) resource-key)
+                                                   view-state (get view-state :selected-resource) :details)
                                       rcancel #(cancel (get-in screen [:states :update :cancel :event])
                                                        view-state
-                                                       (state/resources-state) resource-key)]
+                                                       (get view-state :selected-resource) :details)]
                                   (om/build resource-update-component {:screen screen
                                                                        :view-state view-state
                                                                        :save rsave
@@ -166,8 +166,8 @@
                               (let [rcreate #(create (get-in screen [:states :create :submit :success :event])
                                                      (get-in screen [:states :create :submit :error :event])
                                                      view-state
-                                                     (state/resources-state)
-                                                     resource-key)]
+                                                     (get view-state :selected-resource)
+                                                     :details)]
                                 (om/build resource-create-component {:screen screen
                                                                      :view-state view-state
                                                                      :create rcreate}))

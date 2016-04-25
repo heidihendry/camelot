@@ -43,16 +43,47 @@
                               :error {:type :event
                                       :event :site-error}}}}})
 
+(defsmith camera smiths
+  [state]
+  {:resource {:type :camera
+              :title ((:translate state) :camera/title)
+              :endpoint "/camera"}
+   :sidebar {:resource {:endpoint "/camera"
+                        :title ((:translate state) :camera/sidebar-title)
+                        :type :camera
+                        :id :camera_id
+                        :label :camera_name}}
+   :layout [[:camera-name]
+            [:camera-status]
+            [:camera-make]
+            [:camera-model]
+            [:camera-notes]]
+   :schema {:camera-name {:type :text}
+            :camera-status {:type :select
+                            :options {0 ((:translate state) :camera-status/available)
+                                      1 ((:translate state) :camera-status/active)
+                                      2 ((:translate state) :camera-status/lost)
+                                      3 ((:translate state) :camera-status/stolen)
+                                      4 ((:translate state) :camera-status/retired)}}
+            :camera-make {:type :text}
+            :camera-model {:type :text}
+            :camera-notes {:type :text}}
+   :states {:create {:submit {:success {:type :event
+                                        ;; TODO implement
+                                        :event :camera-create}
+                              :error {:type :event
+                                      :event :camera-error}}}}})
+
 (defsmith survey smiths
   [state]
   {:resource {:type :survey
               :title ((:translate state) :survey/title)
               :endpoint "/survey"}
-   :sidebar {:resource {:endpoint "/site"
+   :sidebar {:resource {:endpoint "/survey"
                         :title ((:translate state) :survey/sidebar-title)
-                        :type :site
-                        :id :site_id
-                        :label :site_name}}
+                        :type :survey
+                        :id :survey_id
+                        :label :survey_name}}
    :layout [[:survey-name]
             [:survey-directory]]
    :schema {:survey-name {:type :text}

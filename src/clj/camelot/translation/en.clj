@@ -28,6 +28,44 @@
             :survey-directory {:label "Survey Directory"
                                :description "The root directory of the survey's data"}}
 
+   :site {:duplicate-name "A site with the name '%s' already exists"
+          :title "Site"
+          :sidebar-title "Sites"
+          :site-name {:label "Site Name"
+                      :description "The name which will be used to refer to the site."}
+          :site-country {:label "Country"
+                         :description "The country within which this site resides."}
+          :site-state-province {:label "State/Province"
+                                :description "The state or province within which this site resides."}
+          :site-city {:label "City"
+                      :description "The city within which, or nearest city to which, this site resides."}
+          :site-sublocation {:label "Sublocation"
+                             :description "The name of the location which this site represents."}
+          :site-notes {:label "Site Notes"
+                       :description "Notes about this site."}}
+
+   :camera {:duplicate-name "A camera with the name '%s' already exists"
+            :title "Camera"
+            :sidebar-title "Cameras"
+            :camera-name {:label "Camera Name"
+                          :description "The name by which this camera will be known."}
+            :camera-status {:label "Status"
+                            :description "Whether this camera is active (deployed), available for use, or retired for some reason."}
+            :camera-make {:label "Make"
+                          :description "The manufacturer or brand of the camera"}
+            :camera-model {:label "Model"
+                           :description "The model name or number of the camera"}
+            :camera-software-version {:label "Camera Software Version"
+                                      :description "The version of the software running on the camera"}
+            :camera-notes {:label "Notes"
+                           :description "Notes about this camera"}}
+
+   :camera-status {:active "Active"
+                   :available "Available"
+                   :lost "Lost"
+                   :stolen "Stolen"
+                   :retired "Retired"}
+
    :status {:rename-photos "Renaming photos in the period's dataset: '%s'"
             :apply-rename "Renaming '%s' to '%s'..."}
 
@@ -114,7 +152,9 @@
 
    :application {:dashboard "Dashboard"
                  :surveys "Surveys"
-                 :analysis "Analysis"}
+                 :analysis "Analysis"
+                 :sites "Sites"
+                 :cameras "Cameras"}
    :default-config-created "A default configuration has been created in '%s'"
 
    :missing  "|Missing translation: [%1$s %2$s %3$s]|"})

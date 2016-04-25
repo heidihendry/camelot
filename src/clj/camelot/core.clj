@@ -3,6 +3,7 @@
             [camelot.handler.settings :as hs]
             [camelot.handler.surveys :as hsurv]
             [camelot.handler.sites :as hsite]
+            [camelot.handler.cameras :as hcamera]
             [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
@@ -64,6 +65,10 @@
   (GET "/site" [] (r/response (hsite/get-all (gen-state (config)))))
   (PUT "/site" [data]
        (r/response (hsite/create! (gen-state (config)) (decursorise data))))
+
+  (GET "/camera" [] (r/response (hcamera/get-all (gen-state (config)))))
+  (PUT "/camera" [data]
+       (r/response (hcamera/create! (gen-state (config)) (decursorise data))))
   (POST "/quit" [] (System/exit 0))
   (resources "/"))
 
