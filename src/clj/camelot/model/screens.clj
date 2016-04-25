@@ -14,24 +14,54 @@
 
 ;;(settings-screen (settings/gen-state settings/default-config))
 
+(defsmith site smiths
+  [state]
+  {:resource {:type :site
+              :title ((:translate state) :site/title)
+              :endpoint "/site"}
+   :sidebar {:resource {:endpoint "/site"
+                        :title ((:translate state) :site/sidebar-title)
+                        :type :site
+                        :id :site_id
+                        :label :site_name}}
+   :layout [[:site-name]
+            [:site-sublocation]
+            [:site-city]
+            [:site-state-province]
+            [:site-country]
+            [:site-notes]]
+   :schema {:site-name {:type :text}
+            :site-sublocation {:type :text}
+            :site-city {:type :text}
+            :site-state-province {:type :text}
+            :site-country {:type :text}
+            ;; TODO make textarea
+            :site-notes {:type :text}}
+   :states {:create {:submit {:success {:type :event
+                                        ;; TODO implement
+                                        :event :site-create}
+                              :error {:type :event
+                                      :event :site-error}}}}})
+
 (defsmith survey smiths
   [state]
   {:resource {:type :survey
               :title ((:translate state) :survey/title)
               :endpoint "/survey"}
-   :sidebar {:resource {:endpoint "/survey"
+   :sidebar {:resource {:endpoint "/site"
                         :title ((:translate state) :survey/sidebar-title)
-                        :type :survey
-                        :id :survey_id
-                        :label :survey_name}}
+                        :type :site
+                        :id :site_id
+                        :label :site_name}}
    :layout [[:survey-name]
             [:survey-directory]]
    :schema {:survey-name {:type :text}
             :survey-directory {:type :text}}
    :states {:create {:submit {:success {:type :event
-                                        :event :settings-save}
+                                        ;; TODO implement
+                                        :event :survey-create}
                               :error {:type :event
-                                      :event :settings-error}}}}})
+                                      :event :survey-error}}}}})
 
 (defsmith settings smiths
   [state]

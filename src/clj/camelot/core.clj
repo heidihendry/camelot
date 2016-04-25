@@ -2,6 +2,7 @@
   (:require [camelot.handler.albums :as ha]
             [camelot.handler.settings :as hs]
             [camelot.handler.surveys :as hsurv]
+            [camelot.handler.sites :as hsite]
             [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
@@ -59,6 +60,10 @@
          (r/response (hsurv/create! (gen-state (config)) survname sdir))))
   (DELETE "/survey" {{sid :id} :params}
           (hsurv/delete! (gen-state (config)) sid))
+
+  (GET "/site" [] (r/response (hsite/get-all (gen-state (config)))))
+  (PUT "/site" [data]
+       (r/response (hsite/create! (gen-state (config)) (decursorise data))))
   (POST "/quit" [] (System/exit 0))
   (resources "/"))
 
