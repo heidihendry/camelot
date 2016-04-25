@@ -50,10 +50,11 @@
     (or (nil? iso) (> iso isothresh) (not (nightfn hour)))))
 
 (s/defn exif-date-to-datetime :- org.joda.time.DateTime
-  "Exif metadata dates are strings like 2014:04:11 16:37:00.  This makes them real dates."
+  "Exif metadata dates are strings like 2014:04:11 16:37:00.  This makes them real dates.
+Important: Timezone information will be discarded."
   [ed]
   (when (not (nil? ed))
-    (let [parts (str/split ed #"[ :]")]
+    (let [parts (str/split (first (str/split ed #"\+")) #"[ :]")]
       (assert (= (count parts) 6))
       (apply t/date-time (map #(Integer/parseInt %) parts)))))
 
