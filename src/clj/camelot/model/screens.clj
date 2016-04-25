@@ -60,7 +60,9 @@
             [:camera-notes]]
    :schema {:camera-name {:type :text}
             :camera-status {:type :select
-                            :options {0 ((:translate state) :camera-status/available)
+                            ;; TODO pull values from DB
+                            :options {nil ""
+                                      0 ((:translate state) :camera-status/available)
                                       1 ((:translate state) :camera-status/active)
                                       2 ((:translate state) :camera-status/lost)
                                       3 ((:translate state) :camera-status/stolen)
