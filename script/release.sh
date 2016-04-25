@@ -71,7 +71,7 @@ echo "To Google Drive... "
 gdrive upload "target/${PROJECT_NAME}.jar" --name "$PROJECT_NAME-${released_version}.jar" -p ${CAMELOT_GDRIVE_RELEASE_PARENT}
 echo "To Bitbucket... "
 mv "target/${PROJECT_NAME}.jar" "target/$PROJECT_NAME-${released_version}.jar"
-curl -v -u ${BITBUCKET_CREDENTIALS} -X POST ${DOWNLOADS_URL} -F "files=@target/$PROJECT_NAME-${released_version}.jar"
+curl -u ${BITBUCKET_CREDENTIALS} -X POST ${DOWNLOADS_URL} -F "files=@target/$PROJECT_NAME-${released_version}.jar"
 
 echo "Bumping version to *-SNAPSHOT... "
 patch_version=$(echo $released_version | cut -d\. -f3)
