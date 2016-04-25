@@ -17,7 +17,8 @@
 (defn- exif-file?
   "Predicate for whether a given file is a usable, exif-containing file."
   [file]
-  (and (f/file? file) (f/readable? file) (re-find #"(?i)(.jpe?g|.tiff?)$" (f/get-name file))))
+  (and (f/file? file) (f/readable? file) (re-find #"(?i)(.jpe?g|.tiff?)$" (f/get-name file))
+       (not (re-find #"(?i)_original(.jpe?g|.tiff?)$" (f/get-name file)))))
 
 (defn- album-dir?
   "Return true if there are exif-containing files and the directory hasn't any subdirectories. False otherwise."
