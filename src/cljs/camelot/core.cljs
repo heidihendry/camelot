@@ -13,37 +13,6 @@
 
 (enable-console-print!)
 
-(defn initialise-state
-  []
-  (rest/get-application
-   #(do (om/update! (state/app-state-cursor) :application (:body %))
-         (view/navbar)))
-  (rest/get-screens
-   #(do (om/update! (state/app-state-cursor) :screens (:body %))
-        (om/update! (state/app-state-cursor) :view
-                    {:settings {:screen {:type :settings
-                                         :mode :update}}})
-        (om/update! (get-in (state/app-state-cursor) [:view :settings])
-                    :buffer (deref (get (state/resources-state)
-                                        (get-in (state/app-state-cursor) [:view :settings :screen :type]))))
-        (view/settings-menu-view))))
-
-(defn initialise-application
-  []
-  (rest/get-metadata
-   (fn [x]
-     (om/update! (state/app-state-cursor) :metadata (:body x))
-     (rest/get-configuration
-      #(do (om/update! (state/app-state-cursor) :resources {})
-           (om/update! (state/resources-state) :settings (:body %))
-           (rest/get-resource "/survey"
-                              (fn [x] (om/update! (state/resources-state)
-                                                  :survey (:body x))))
-           (initialise-state)
-           (albums/reload-albums))))))
-
-(secretary/set-config! :prefix "#")
-
 (defn default-page [hash]
   (if (= hash "")
     "/#/dashboard"
@@ -64,7 +33,38 @@
       default-page
       (nav/nav!)))
 
+(defn initialise-state
+  []
+  (rest/get-application
+   #(do (om/update! (state/app-state-cursor) :application (:body %))
+         (view/navbar)))
+  (rest/get-screens
+   #(do (om/update! (state/app-state-cursor) :screens (:body %))
+        (om/update! (state/app-state-cursor) :view
+                    {:settings {:screen {:type :settings
+                                         :mode :update}}})
+        (om/update! (get-in (state/app-state-cursor) [:view :settings])
+                    :buffer (deref (get (state/resources-state)
+                                        (get-in (state/app-state-cursor) [:view :settings :screen :type]))))
+        (view/settings-menu-view)
+        (disable-loading-screen)
+        (navigate-dwim))))
+
+(defn initialise-application
+  []
+  (rest/get-metadata
+   (fn [x]
+     (om/update! (state/app-state-cursor) :metadata (:body x))
+     (rest/get-configuration
+      #(do (om/update! (state/app-state-cursor) :resources {})
+           (om/update! (state/resources-state) :settings (:body %))
+           (rest/get-resource "/survey"
+                              (fn [x] (om/update! (state/resources-state)
+                                                  :survey (:body x))))
+           (initialise-state)
+           (albums/reload-albums))))))
+
+(secretary/set-config! :prefix "#")
+
 (defonce initial-state
-  (do (initialise-application)
-      (disable-loading-screen)
-      (navigate-dwim)))
+  (do (initialise-application)))
