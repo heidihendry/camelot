@@ -25,7 +25,7 @@ WHERE camera_name = :camera_name
 SELECT camera_id, camera_name, camera_status, camera_make, camera_model,
        camera_notes
 FROM camera
-WHERE camera_name = :camera_id
+WHERE camera_id = :camera_id
 
 -- name: -get-all
 SELECT camera_id, camera_name, camera_status, camera_make, camera_model,

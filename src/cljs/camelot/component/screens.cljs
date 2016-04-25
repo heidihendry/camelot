@@ -24,7 +24,6 @@
       (str base "/" rid))))
 
 (defn create [success-key error-key vs resources key]
-  (prn (get-url vs))
   (rest/put-resource (get-url vs)
                      {:data (deref (get vs :buffer))}
                      (get events success-key)))
@@ -60,6 +59,7 @@
   (reify
     om/IRender
     (render [_]
+      (prn get-in data [:screen :layout])
       (apply dom/div #js {:className "section-body"}
              (om/build-all field-component
                            (map #(vector % (get data :screen) (get-in data [:view-state :buffer]))
@@ -103,9 +103,17 @@
   (reify
     om/IRender
     (render [_]
-      (dom/li #js {:className "sidebar-item"}
-              (dom/a #js {:href (str (get data :endpoint) "/" (get (:item data) (:id data)))}
-                     (get (:item data) (get data :label)))))))
+            (dom/li #js {:className "sidebar-item"
+                         :onClick #(do (rest/get-resource
+                                        (str (get data :endpoint) "/"
+                                             (get (:item data) (:id data)))
+                                        (fn [resp]
+                                          (prn data)
+                                          (om/update! (get-in data [:view-state :screen]) :mode :update)
+                                          (om/update! (get data :view-state)
+                                                      :buffer (:body resp))
+                                          (prn data))))}
+              (dom/a nil (get (:item data) (get data :label)))))))
 
 (defn sidebar-component
   [data owner]
@@ -124,11 +132,11 @@
                  (dom/button #js {:className "create-record-btn btn btn-primary"
                                   ;; TODO fixme
                                   :onClick #(nav/nav! "/#/survey/create")} "+")
-                 (prn data)
                  (apply dom/ul nil
                         (dom/li nil (get res :title))
                         (om/build-all sidebar-item-component
                                       (map #(hash-map :item %
+                                                      :view-state (get data :view-state)
                                                       :label (get res :label)
                                                       :id (get res :id)
                                                       :endpoint (get res :endpoint))

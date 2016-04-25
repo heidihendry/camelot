@@ -161,6 +161,7 @@
         (om/update! s k {:value nil})))
     om/IRender
     (render [_]
+      (prn s)
       (dom/input #js {:type "text" :className "field-input"
                       :onChange #(state/set-unvalidated-text! % (k s) :value owner)
                       :value (get-in s [k :value])}))))

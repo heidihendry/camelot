@@ -53,7 +53,7 @@
          (r/response (ha/read-albums (gen-state conf)
                                      (:root-path conf)))))
   (GET "/survey" [] (r/response (hsurv/get-all (gen-state (config)))))
-  (GET "/survey/:id" [id] (r/response (hsurv/get-specific (gen-state (config)) id)))
+  (GET "/survey/:id" [id] (r/response (cursorise (hsurv/get-specific (gen-state (config)) id))))
   (POST "/survey" {{sid :id  sname :name sdir :directory} :params}
         (hsurv/update! (gen-state (config)) sid sname sdir))
   (PUT "/survey" [data]
@@ -63,10 +63,12 @@
           (hsurv/delete! (gen-state (config)) sid))
 
   (GET "/site" [] (r/response (hsite/get-all (gen-state (config)))))
+  (GET "/site/:id" [id] (r/response (cursorise (hsite/get-specific (gen-state (config)) id))))
   (PUT "/site" [data]
        (r/response (hsite/create! (gen-state (config)) (decursorise data))))
 
   (GET "/camera" [] (r/response (hcamera/get-all (gen-state (config)))))
+  (GET "/camera/:id" [id] (r/response (cursorise (hcamera/get-specific (gen-state (config)) id))))
   (PUT "/camera" [data]
        (r/response (hcamera/create! (gen-state (config)) (decursorise data))))
   (POST "/quit" [] (System/exit 0))

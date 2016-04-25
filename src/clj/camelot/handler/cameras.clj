@@ -7,6 +7,16 @@
 
 (sql/defqueries "sql/cameras.sql" {:connection db/spec})
 
+(defn clj-key
+  [acc k v]
+  (assoc acc (keyword (s/replace (name k) #"_" "-")) v))
+
+(defn clj-keys
+  [data]
+  (if (nil? data)
+    nil
+    (into {} (reduce-kv clj-key {} data))))
+
 (defn db-key
   [acc k v]
   (assoc acc (keyword (s/replace (name k) #"-" "_")) v))
@@ -16,8 +26,8 @@
   (f (reduce-kv db-key {} data)))
 
 (defn get-specific
-  [state sid]
-  (-get-specific {:camera-id sid}))
+  [state cid]
+  (clj-keys (first (-get-specific {:camera_id cid}))))
 
 (defn get-specific-by-name
   [state sname]

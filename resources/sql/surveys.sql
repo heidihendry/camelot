@@ -21,7 +21,7 @@ WHERE survey_name = :name
 -- name: -get-specific
 SELECT survey_id, survey_name, survey_directory
 FROM survey
-WHERE survey_name = :id
+WHERE survey_id = :id
 
 -- name: -get-all
 SELECT survey_id, survey_name, survey_directory

@@ -7,6 +7,16 @@
 
 (sql/defqueries "sql/sites.sql" {:connection db/spec})
 
+(defn clj-key
+  [acc k v]
+  (assoc acc (keyword (s/replace (name k) #"_" "-")) v))
+
+(defn clj-keys
+  [data]
+  (if (nil? data)
+    nil
+    (into {} (reduce-kv clj-key {} data))))
+
 (defn db-key
   [acc k v]
   (assoc acc (keyword (s/replace (name k) #"-" "_")) v))
@@ -15,9 +25,17 @@
   [data f]
   (f (reduce-kv db-key {} data)))
 
+(defn clj-key
+  [acc k v]
+  (assoc acc (keyword (s/replace (name k) #"_" "-")) v))
+
+(defn clj-keys
+  [data]
+  (reduce-kv clj-key {} data))
+
 (defn get-specific
   [state sid]
-  (-get-specific {:site-id sid}))
+  (clj-keys (first (-get-specific {:site_id sid}))))
 
 (defn get-specific-by-name
   [state sname]

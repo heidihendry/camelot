@@ -1,10 +1,21 @@
 (ns camelot.handler.surveys
   (:require [camelot.util.java-file :as jf]
             [camelot.db :as db]
+            [clojure.string :as s]
             [yesql.core :as sql]
             [clojure.java.io :as f]))
 
 (sql/defqueries "sql/surveys.sql" {:connection db/spec})
+
+(defn clj-key
+  [acc k v]
+  (assoc acc (keyword (s/replace (name k) #"_" "-")) v))
+
+(defn clj-keys
+  [data]
+  (if (nil? data)
+    nil
+    (into {} (reduce-kv clj-key {} data))))
 
 (defn- check-directory
   [state sdir]
@@ -17,7 +28,7 @@
 
 (defn get-specific
   [state sid]
-  (-get-specific {:id sid}))
+  (clj-keys (first (-get-specific {:id sid}))))
 
 (defn get-specific-by-name
   [state sname]

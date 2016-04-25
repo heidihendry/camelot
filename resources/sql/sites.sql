@@ -25,7 +25,7 @@ WHERE site_name = :site_name
 SELECT site_id, site_name, site_sublocation, site_city, site_state_province,
        site_country, site_notes
 FROM site
-WHERE site_name = :site_id
+WHERE site_id = :site_id
 
 -- name: -get-all
 SELECT site_id, site_name, site_sublocation, site_city, site_state_province,
