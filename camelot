@@ -1,0 +1,15 @@
+#!/bin/sh
+
+JAR="target/camelot.jar"
+
+grep "camelot" $0 &> /dev/null
+if [ $? -eq 0 ]; then
+    proj=$(dirname $0)
+    cd $proj
+fi
+
+if [ -e "${JAR}" ]; then
+    java -jar "${JAR}"
+else
+    script/build.sh && java -jar "target/camelot.jar"
+fi
