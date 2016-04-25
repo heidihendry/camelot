@@ -4,6 +4,7 @@ set -e
 
 PROJECT_NAME="camelot"
 PROJECT_FILE="project.clj"
+DOWNLOADS_URL="https://api.bitbucket.org/2.0/repositories/cshclm/camelot/downloads/"
 
 echo "Checking binaries in \$PATH... "
 which gdrive &> /dev/null
@@ -66,7 +67,11 @@ lein with-profiles -dev,-user,+uberjar uberjar
 
 echo "Uploading release... "
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
+echo "To Google Drive... "
 gdrive upload "target/${PROJECT_NAME}.jar" --name "$PROJECT_NAME-${released_version}.jar" -p ${CAMELOT_GDRIVE_RELEASE_PARENT}
+echo "To Bitbucket... "
+mv "target/${PROJECT_NAME}.jar" "target/$PROJECT_NAME-${released_version}.jar"
+curl -v -u ${BITBUCKET_CREDENTIALS} -X POST ${DOWNLOADS_URL} -F "files=@target/$PROJECT_NAME-${released_version}.jar"
 
 echo "Bumping version to *-SNAPSHOT... "
 patch_version=$(echo $released_version | cut -d\. -f3)
