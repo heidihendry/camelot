@@ -1,5 +1,6 @@
 (ns camelot.model.screens
-  (:require [camelot.smithy.core :refer [defsmith] :as smithy]))
+  (:require [camelot.smithy.core :refer [defsmith] :as smithy]
+            [camelot.handler.camera-status :as camstat]))
 
 (defn translate-fn
   [state]
@@ -13,6 +14,13 @@
   (smithy/build-smiths smiths (translate-fn state) state))
 
 ;;(settings-screen (settings/gen-state settings/default-config))
+
+(defn build-options
+  [state data idkey transkey]
+  (merge {nil ""}
+         (into {} (map #(hash-map (get % idkey)
+                                  ((:translate state) (keyword (get % transkey))))
+                       data))))
 
 (defsmith site smiths
   [state]
@@ -45,36 +53,33 @@
 
 (defsmith camera smiths
   [state]
-  {:resource {:type :camera
-              :title ((:translate state) :camera/title)
-              :endpoint "/camera"}
-   :sidebar {:resource {:endpoint "/camera"
-                        :title ((:translate state) :camera/sidebar-title)
-                        :type :camera
-                        :id :camera_id
-                        :label :camera_name}}
-   :layout [[:camera-name]
-            [:camera-status]
-            [:camera-make]
-            [:camera-model]
-            [:camera-notes]]
-   :schema {:camera-name {:type :text}
-            :camera-status {:type :select
-                            ;; TODO pull values from DB
-                            :options {nil ""
-                                      0 ((:translate state) :camera-status/available)
-                                      1 ((:translate state) :camera-status/active)
-                                      2 ((:translate state) :camera-status/lost)
-                                      3 ((:translate state) :camera-status/stolen)
-                                      4 ((:translate state) :camera-status/retired)}}
-            :camera-make {:type :text}
-            :camera-model {:type :text}
-            :camera-notes {:type :text}}
-   :states {:create {:submit {:success {:type :event
-                                        ;; TODO implement
-                                        :event :camera-create}
-                              :error {:type :event
-                                      :event :camera-error}}}}})
+  (let [camstats (camstat/get-all state)
+        opts (build-options state camstats :camera_status_id :camera_status_description)]
+    {:resource {:type :camera
+                :title ((:translate state) :camera/title)
+                :endpoint "/camera"}
+     :sidebar {:resource {:endpoint "/camera"
+                          :title ((:translate state) :camera/sidebar-title)
+                          :type :camera
+                          :id :camera_id
+                          :label :camera_name}}
+     :layout [[:camera-name]
+              [:camera-status]
+              [:camera-make]
+              [:camera-model]
+              [:camera-notes]]
+     :schema {:camera-name {:type :text}
+              :camera-status {:type :select
+                              ;; TODO pull values from DB
+                              :options opts}
+              :camera-make {:type :text}
+              :camera-model {:type :text}
+              :camera-notes {:type :text}}
+     :states {:create {:submit {:success {:type :event
+                                          ;; TODO implement
+                                          :event :camera-create}
+                                :error {:type :event
+                                        :event :camera-error}}}}}))
 
 (defsmith survey smiths
   [state]
