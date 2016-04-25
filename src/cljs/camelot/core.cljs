@@ -42,7 +42,8 @@
    #(do (om/update! (state/app-state-cursor) :screens (:body %))
         (om/update! (state/app-state-cursor) :view
                     {:settings {:screen {:type :settings
-                                         :mode :update}}})
+                                         :mode :update}
+                                :selected-resource {:details (get (state/resources-state) :settings)}}})
         (om/update! (get-in (state/app-state-cursor) [:view :settings])
                     :buffer (deref (get (state/resources-state)
                                         (get-in (state/app-state-cursor) [:view :settings :screen :type]))))

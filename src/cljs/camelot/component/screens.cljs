@@ -59,7 +59,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn get-in data [:screen :layout])
       (apply dom/div #js {:className "section-body"}
              (om/build-all field-component
                            (map #(vector % (get data :screen) (get-in data [:view-state :buffer]))
@@ -108,11 +107,9 @@
                                         (str (get data :endpoint) "/"
                                              (get (:item data) (:id data)))
                                         (fn [resp]
-                                          (prn data)
                                           (om/update! (get-in data [:view-state :screen]) :mode :update)
                                           (om/update! (get data :view-state)
-                                                      :buffer (:body resp))
-                                          (prn data))))}
+                                                      :buffer (:body resp)))))}
               (dom/a nil (get (:item data) (get data :label)))))))
 
 (defn sidebar-component
