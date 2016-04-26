@@ -37,10 +37,11 @@
 
 (defn cancel-update [event-key vs resources key]
   (do
-    (prn resources)
     (om/update! vs :buffer (deref (get resources key)))
     (om/update! (get vs :screen) :mode :readonly)
-    ((get events event-key))))
+    (let [cb (get events event-key)]
+      (when cb
+        (cb)))))
 
 (defn field-component
   [[menu-item screen buf opts] owner]
@@ -83,9 +84,18 @@
                         (dom/button #js {:className "btn btn-primary"
                                          :onClick save}
                                     "Save")
-                        (dom/button #js {:className "btn btn-default"
+                        (dom/button #js {:className "cancel-btn btn btn-default"
                                          :onClick cancel}
-                                    "Cancel"))))))
+                                    "Cancel")
+                        (dom/button #js {:className "delete-btn btn btn-danger fa fa-trash fa-2x"
+                                         :onClick #(when (js/confirm "Are you sure you wish to delete this?")
+                                                     (let [rid (get-in screen [:resource :id])]
+                                                       (prn (get-in view-state [:selected-resource :details rid :value]))
+                                                       (rest/delete-resource (str (get-in screen [:resource :endpoint]) "/"
+                                                                                  (get-in view-state [:selected-resource :details rid :value]))
+                                                                             {}
+                                                                             nil)))
+                                } " Delete"))))))
 
 (defn resource-view-component
   [{:keys [screen view-state]} owner]

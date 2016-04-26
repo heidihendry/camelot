@@ -342,5 +342,10 @@ a:hover {
 }
 #app .edit-btn {
     float: right;
-    font-size: 90%;
+}
+#app .cancel-btn {
+    margin-left: 1rem;
+}
+#app .delete-btn {
+    margin-left: 1rem;
 }

@@ -58,6 +58,15 @@
       (when cb
         (cb response)))))
 
+(defn delete-resource
+  "DELETE resource"
+  [resource params cb]
+  (go
+    (let [response (<! (util/request http/delete (util/with-baseurl resource)
+                                     params))]
+      (when cb
+        (cb response)))))
+
 (defn post-settings
   "POST configuration state"
   [params cb]

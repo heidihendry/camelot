@@ -26,7 +26,8 @@
   [state]
   {:resource {:type :site
               :title ((:translate state) :site/title)
-              :endpoint "/site"}
+              :endpoint "/site"
+              :id :site-id}
    :sidebar {:resource {:endpoint "/site"
                         :title ((:translate state) :site/sidebar-title)
                         :type :site
@@ -61,7 +62,8 @@
         opts (build-options state camstats :camera_status_id :camera_status_description)]
     {:resource {:type :camera
                 :title ((:translate state) :camera/title)
-                :endpoint "/camera"}
+                :endpoint "/camera"
+                :id :camera-id}
      :sidebar {:resource {:endpoint "/camera"
                           :title ((:translate state) :camera/sidebar-title)
                           :type :camera
@@ -93,7 +95,8 @@
   [state]
   {:resource {:type :survey
               :title ((:translate state) :survey/title)
-              :endpoint "/survey"}
+              :endpoint "/survey"
+              :id :survey-id}
    :sidebar {:resource {:endpoint "/survey"
                         :title ((:translate state) :survey/sidebar-title)
                         :type :survey
