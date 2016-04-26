@@ -28,16 +28,18 @@
                      {:data (deref (get vs :buffer))}
                      (get events success-key)))
 
-(defn save [success-key error-key vs resources key]
+(defn submit-update [success-key error-key vs resources key]
   (do
     (om/update! resources key (deref (get vs :buffer)))
     (rest/post-resource (get-url vs)
                         {:data (deref (get resources key))}
                         (get events success-key))))
 
-(defn cancel [event-key vs resources key]
+(defn cancel-update [event-key vs resources key]
   (do
+    (prn resources)
     (om/update! vs :buffer (deref (get resources key)))
+    (om/update! (get vs :screen) :mode :readonly)
     ((get events event-key))))
 
 (defn field-component
@@ -91,6 +93,9 @@
     om/IRender
     (render [_]
       (dom/div nil
+               (dom/button #js {:className "edit-btn btn btn-primary fa fa-edit fa-2x"
+                                :onClick #(om/update! (get view-state :screen) :mode :update)
+                                } " Edit")
                (dom/h4 nil (get-in screen [:resource :title]))
                (dom/div nil (om/build body-component
                                       {:view-state view-state
@@ -122,6 +127,7 @@
                                              (get (:item data) (:id data)))
                                         (fn [resp]
                                           (om/update! (get-in data [:view-state :screen]) :mode :readonly)
+                                          (om/update! (get-in data [:view-state :selected-resource]) :details (:body resp))
                                           (om/update! (get data :view-state)
                                                       :buffer (:body resp)))))}
               (dom/a nil (get (:item data) (get data :label)))))))
@@ -170,12 +176,12 @@
                             (case (get-in view-state [:screen :mode])
                               :update
                               (if (get view-state :buffer)
-                                (let [rsave #(save (get-in screen [:states :update :submit :success :event])
-                                                   (get-in screen [:states :update :submit :error :event])
-                                                   view-state (get view-state :selected-resource) :details)
-                                      rcancel #(cancel (get-in screen [:states :update :cancel :event])
-                                                       view-state
-                                                       (get view-state :selected-resource) :details)]
+                                (let [rsave #(submit-update (get-in screen [:states :update :submit :success :event])
+                                                            (get-in screen [:states :update :submit :error :event])
+                                                            view-state (get view-state :selected-resource) :details)
+                                      rcancel #(cancel-update (get-in screen [:states :update :cancel :event])
+                                                              view-state
+                                                              (get view-state :selected-resource) :details)]
                                   (om/build resource-update-component {:screen screen
                                                                        :view-state view-state
                                                                        :save rsave

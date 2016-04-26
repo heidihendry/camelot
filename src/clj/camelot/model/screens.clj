@@ -47,9 +47,13 @@
             :site-notes {:type :text}}
    :states {:create {:submit {:success {:type :event
                                         ;; TODO implement
-                                        :event :site-create}
+                                        :event :site-create-success}
                               :error {:type :event
-                                      :event :site-error}}}}})
+                                      :event :site-create-error}}}
+            :update {:submit {:success {:type :event
+                                        :event :site-update-success}
+                                :error {:type :event
+                                        :event :site-update-error}}}}})
 
 (defsmith camera smiths
   [state]
@@ -77,9 +81,13 @@
               :camera-notes {:type :text}}
      :states {:create {:submit {:success {:type :event
                                           ;; TODO implement
-                                          :event :camera-create}
+                                          :event :camera-create-success}
                                 :error {:type :event
-                                        :event :camera-error}}}}}))
+                                        :event :camera-create-error}}}
+              :update {:submit {:success {:type :event
+                                          :event :camera-update-success}
+                                :error {:type :event
+                                        :event :camera-update-error}}}}}))
 
 (defsmith survey smiths
   [state]
@@ -99,7 +107,12 @@
                                         ;; TODO implement
                                         :event :survey-create}
                               :error {:type :event
-                                      :event :survey-error}}}}})
+                                      :event :survey-error}}}
+            :update {:submit {:success {:type :event
+                                        ;; TODO implement
+                                        :event :survey-update-success}
+                              :error {:type :event
+                                      :event :survey-update-error}}}}})
 
 (defsmith settings smiths
   [state]

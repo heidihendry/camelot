@@ -46,7 +46,8 @@
   (go
     (let [response (<! (util/request http/put (util/with-baseurl resource)
                                      params))]
-      (cb response))))
+      (when cb
+        (cb response)))))
 
 (defn post-resource
   "POST resource state"
@@ -54,7 +55,8 @@
   (go
     (let [response (<! (util/request http/post (util/with-baseurl resource)
                                      params))]
-      (cb response))))
+      (when cb
+        (cb response)))))
 
 (defn post-settings
   "POST configuration state"
@@ -62,5 +64,5 @@
   (go
     (let [response (<! (util/request http/post (util/with-baseurl "/settings")
                                      params))]
-      (cb response))))
-
+      (when cb
+        (cb response)))))
