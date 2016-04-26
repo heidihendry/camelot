@@ -185,6 +185,13 @@ a:hover {
   font-size: 90%;
   min-width: 30rem;
 }
+#app select:disabled {
+    background: #ebebe4;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
+
+}
 #app input.field-input {
   min-width: 30rem;
   padding: 0.5rem;

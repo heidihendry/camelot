@@ -41,7 +41,7 @@
     ((get events event-key))))
 
 (defn field-component
-  [[menu-item screen buf] owner]
+  [[menu-item screen buf opts] owner]
   (reify
     om/IRender
     (render [_]
@@ -52,7 +52,7 @@
                    (dom/label #js {:className "field-label"
                                    :title (get value :description)} (get value :label))
                    (om/build inputs/input-field
-                             [(first menu-item) value buf])))))))
+                             [(first menu-item) value buf opts])))))))
 
 (defn body-component
   [data owner]
@@ -61,7 +61,10 @@
     (render [_]
       (apply dom/div #js {:className "section-body"}
              (om/build-all field-component
-                           (map #(vector % (get data :screen) (get-in data [:view-state :buffer]))
+                           (map #(vector % (get data :screen) (get-in data [:view-state :buffer])
+                                         (if (= (get-in data [:view-state :screen :mode]) :readonly)
+                                           {:disabled true}
+                                           {}))
                                 (get-in data [:screen :layout])))))))
 
 (defn resource-update-component
@@ -81,6 +84,17 @@
                         (dom/button #js {:className "btn btn-default"
                                          :onClick cancel}
                                     "Cancel"))))))
+
+(defn resource-view-component
+  [{:keys [screen view-state]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil
+               (dom/h4 nil (get-in screen [:resource :title]))
+               (dom/div nil (om/build body-component
+                                      {:view-state view-state
+                                       :screen screen}))))))
 
 (defn resource-create-component
   [{:keys [screen view-state create]} owner]
@@ -107,7 +121,7 @@
                                         (str (get data :endpoint) "/"
                                              (get (:item data) (:id data)))
                                         (fn [resp]
-                                          (om/update! (get-in data [:view-state :screen]) :mode :update)
+                                          (om/update! (get-in data [:view-state :screen]) :mode :readonly)
                                           (om/update! (get data :view-state)
                                                       :buffer (:body resp)))))}
               (dom/a nil (get (:item data) (get data :label)))))))
@@ -167,6 +181,12 @@
                                                                        :save rsave
                                                                        :cancel rcancel}))
                                 (dom/span nil "Loading..."))
+                              :readonly
+                              (do
+                                (if (get view-state :buffer)
+                                  (om/build resource-view-component {:screen screen
+                                                                     :view-state view-state})
+                                  (dom/span nil "Loading...")))
                               :create
                               (let [rcreate #(create (get-in screen [:states :create :submit :success :event])
                                                      (get-in screen [:states :create :submit :error :event])
@@ -176,5 +196,5 @@
                                 (om/build resource-create-component {:screen screen
                                                                      :view-state view-state
                                                                      :create rcreate}))
-                              nil (dom/div nil)
+                              nil (dom/div nil "")
                               (dom/span nil (str "Unable to find mode: " (get-in view-state [:screen :mode])))))))))))
