@@ -102,10 +102,11 @@
                         (dom/button #js {:className "cancel-btn btn btn-default fa fa-undo fa-2x"
                                          :onClick cancel}
                                     " Cancel")
-                        (dom/button #js {:className "delete-btn btn btn-danger fa fa-trash fa-2x"
-                                         :onClick #(when (js/confirm "Are you sure you wish to delete this?")
-                                                     (delete))}
-                                    " Delete"))))))
+                        (when-not (= (get-in (get-screen view-state) [:resource :type]) :settings)
+                          (dom/button #js {:className "delete-btn btn btn-danger fa fa-trash fa-2x"
+                                           :onClick #(when (js/confirm "Are you sure you wish to delete this?")
+                                                       (delete))}
+                                      " Delete")))))))
 
 (defn resource-view-component
   [{:keys [screen view-state]} owner]
@@ -188,8 +189,7 @@
       om/IRender
       (render [_]
         (let [view-state (get-in app [:view type])
-              screen (get-screen view-state)
-              resource-key (get-in view-state [:screen :type])]
+              screen (get-screen view-state)]
           (dom/div nil
                    (when (get screen :sidebar)
                      (om/build sidebar-component {:screen screen

@@ -341,12 +341,12 @@ a:hover {
     margin-right: 1.5rem;
     position: relative;
 }
-#app .edit-btn {
+#page-content .edit-btn {
     float: right;
 }
-#app .cancel-btn {
+#page-content .cancel-btn {
     margin-left: 1rem;
 }
-#app .delete-btn {
+#page-content .delete-btn {
     margin-left: 1rem;
 }
