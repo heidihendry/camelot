@@ -188,6 +188,7 @@ a:hover {
 }
 #app select:disabled {
     background: #ebebe4;
+    color: #666;
    -webkit-appearance: none;
    -moz-appearance: none;
    appearance: none;
