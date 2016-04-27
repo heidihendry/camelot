@@ -167,7 +167,7 @@
       (let [res (get-in data [:screen :sidebar :resource])]
         (dom/div #js {:className "sidebar"}
                  (dom/button #js {:className "create-record-btn btn btn-primary fa fa-plus fa-2x"
-                                  ;; TODO fixme
+                                  :disabled (= (get-in data [:view-state :screen :mode]) :create)
                                   :onClick #(let [vs (get data :view-state)]
                                               (om/update! vs :buffer {})
                                               (om/update! (get vs :screen) :mode :create))})
