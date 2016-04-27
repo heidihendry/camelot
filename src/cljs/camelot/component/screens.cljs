@@ -39,11 +39,15 @@
                      (get events success-key)))
 
 (defn submit-update [success-key error-key vs resources key]
-  (do
+  (let [cb (get events success-key)]
     (om/update! resources key (deref (get vs :buffer)))
     (rest/post-resource (get-endpoint vs)
                         {:data (deref (get resources key))}
-                        (get events success-key))))
+                        #(do
+                           (when-not (settings-screen? vs)
+                             (om/update! (get vs :screen) :mode :readonly))
+                           (when cb
+                             (cb))))))
 
 (defn delete [success-key error-key vs resources key]
   (let [cb (get events success-key)]
