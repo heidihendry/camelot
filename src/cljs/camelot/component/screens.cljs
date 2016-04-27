@@ -15,25 +15,40 @@
   {:settings-save (fn [d] (nav/toggle-settings!) (albums/reload-albums))
    :settings-cancel #(nav/toggle-settings!)})
 
+(defn get-endpoint
+  [vs]
+  (get-in (get-screen vs) [:resource :endpoint]))
+
 (defn get-url
   [vs]
-  (let [base (get-in (get-screen vs) [:resource :endpoint])
-        rid (get vs :resource-id)]
+  (let [screen (get-screen vs)
+        rid (get-in screen [:resource :id])
+        base (get-in screen [:resource :endpoint])]
     (if (nil? rid)
       base
-      (str base "/" rid))))
+      (str base "/"
+           (get-in vs [:selected-resource :details rid :value])))))
 
 (defn create [success-key error-key vs resources key]
-  (rest/put-resource (get-url vs)
+  (rest/put-resource (get-endpoint vs)
                      {:data (deref (get vs :buffer))}
                      (get events success-key)))
 
 (defn submit-update [success-key error-key vs resources key]
   (do
     (om/update! resources key (deref (get vs :buffer)))
-    (rest/post-resource (get-url vs)
+    (rest/post-resource (get-endpoint vs)
                         {:data (deref (get resources key))}
                         (get events success-key))))
+
+(defn delete [success-key error-key vs resources key]
+  (let [cb (get events success-key)]
+    (rest/delete-resource (get-url vs) {}
+                          #(do (om/update! resources key {})
+                               (om/update! vs :buffer {})
+                               (om/update! (get vs :screen) :mode :create)
+                               (when cb
+                                 (cb))))))
 
 (defn cancel-update [event-key vs resources key]
   (do
@@ -71,7 +86,7 @@
                                 (get-in data [:screen :layout])))))))
 
 (defn resource-update-component
-  [{:keys [screen view-state save cancel]} owner]
+  [{:keys [screen view-state update cancel delete]} owner]
   (reify
     om/IRender
     (render [_]
@@ -81,21 +96,16 @@
                                       {:view-state view-state
                                        :screen screen}))
                (dom/div #js {:className "button-container"}
-                        (dom/button #js {:className "btn btn-primary"
-                                         :onClick save}
-                                    "Save")
-                        (dom/button #js {:className "cancel-btn btn btn-default"
+                        (dom/button #js {:className "btn btn-primary fa fa-check fa-2x"
+                                         :onClick update}
+                                    " Update")
+                        (dom/button #js {:className "cancel-btn btn btn-default fa fa-undo fa-2x"
                                          :onClick cancel}
-                                    "Cancel")
+                                    " Cancel")
                         (dom/button #js {:className "delete-btn btn btn-danger fa fa-trash fa-2x"
                                          :onClick #(when (js/confirm "Are you sure you wish to delete this?")
-                                                     (let [rid (get-in screen [:resource :id])]
-                                                       (prn (get-in view-state [:selected-resource :details rid :value]))
-                                                       (rest/delete-resource (str (get-in screen [:resource :endpoint]) "/"
-                                                                                  (get-in view-state [:selected-resource :details rid :value]))
-                                                                             {}
-                                                                             nil)))
-                                } " Delete"))))))
+                                                     (delete))}
+                                    " Delete"))))))
 
 (defn resource-view-component
   [{:keys [screen view-state]} owner]
@@ -122,9 +132,9 @@
                                       {:view-state view-state
                                        :screen screen}))
                (dom/div #js {:className "button-container"}
-                        (dom/button #js {:className "btn btn-primary"
+                        (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
                                          :onClick create}
-                                    "Create"))))))
+                                    " Create"))))))
 
 (defn sidebar-item-component
   [data owner]
@@ -156,9 +166,11 @@
     (render [_]
       (let [res (get-in data [:screen :sidebar :resource])]
         (dom/div #js {:className "sidebar"}
-                 (dom/button #js {:className "create-record-btn btn btn-primary"
+                 (dom/button #js {:className "create-record-btn btn btn-primary fa fa-plus fa-2x"
                                   ;; TODO fixme
-                                  :onClick #(nav/nav! "/#/survey/create")} "+")
+                                  :onClick #(let [vs (get data :view-state)]
+                                              (om/update! vs :buffer {})
+                                              (om/update! (get vs :screen) :mode :create))})
                  (apply dom/ul nil
                         (dom/li nil (get res :title))
                         (om/build-all sidebar-item-component
@@ -186,16 +198,20 @@
                             (case (get-in view-state [:screen :mode])
                               :update
                               (if (get view-state :buffer)
-                                (let [rsave #(submit-update (get-in screen [:states :update :submit :success :event])
+                                (let [rupdate #(submit-update (get-in screen [:states :update :submit :success :event])
                                                             (get-in screen [:states :update :submit :error :event])
                                                             view-state (get view-state :selected-resource) :details)
                                       rcancel #(cancel-update (get-in screen [:states :update :cancel :event])
                                                               view-state
-                                                              (get view-state :selected-resource) :details)]
+                                                              (get view-state :selected-resource) :details)
+                                      rdelete #(delete (get-in screen [:states :delete :submit :success :event])
+                                                       (get-in screen [:states :delete :submit :error :event])
+                                                       view-state (get view-state :selected-resource) :details)]
                                   (om/build resource-update-component {:screen screen
                                                                        :view-state view-state
-                                                                       :save rsave
-                                                                       :cancel rcancel}))
+                                                                       :update rupdate
+                                                                       :cancel rcancel
+                                                                       :delete rdelete}))
                                 (dom/span nil "Loading..."))
                               :readonly
                               (do
