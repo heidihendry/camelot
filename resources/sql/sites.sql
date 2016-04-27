@@ -5,15 +5,19 @@ VALUES (:site_name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :site_sublocation,
         :site_city, :site_state_province, :site_country, :site_notes)
 
 -- name: -update!
---UPDATE survey
---SET survey_updated = CURRENT_TIMESTAMP,
---    survey_name = :name,
---    survey_directory = :directory
---WHERE survey_id = :id
+UPDATE site
+SET site_updated = CURRENT_TIMESTAMP,
+    site_name = :site_name,
+    site_sublocation = :site_sublocation,
+    site_city = :site_city,
+    site_state_province = :site_state_province,
+    site_country = :site_country,
+    site_notes = :site_notes
+WHERE site_id = :site_id
 
 -- name: -delete!
---DELETE FROM survey
---WHERE survey_id = :id
+DELETE FROM site
+WHERE site_id = :site_id
 
 -- name: -get-specific-by-name
 SELECT site_id, site_name, site_sublocation, site_city, site_state_province,

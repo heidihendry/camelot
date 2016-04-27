@@ -5,11 +5,14 @@ VALUES (:camera_name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :camera_status,
         :camera_make, :camera_model, :camera_notes)
 
 -- name: -update!
---UPDATE survey
---SET survey_updated = CURRENT_TIMESTAMP,
---    survey_name = :name,
---    survey_directory = :directory
---WHERE survey_id = :id
+UPDATE camera
+SET camera_updated = CURRENT_TIMESTAMP,
+    camera_name = :camera_name,
+    camera_make = :camera_make,
+    camera_model = :camera_model,
+    camera_status = :camera_status,
+    camera_notes = :camera_notes
+WHERE camera_id = :camera_id
 
 -- name: -delete!
 DELETE FROM camera

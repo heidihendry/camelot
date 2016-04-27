@@ -1,60 +1,37 @@
 (ns camelot.handler.surveys
-  (:require [camelot.util.java-file :as jf]
-            [camelot.db :as db]
-            [clojure.string :as s]
+  (:require [camelot.db :as db]
+            [schema.core :as s]
             [yesql.core :as sql]
-            [clojure.java.io :as f]))
+            [camelot.model.survey :refer [Survey SurveyCreate SurveyUpdate]]))
 
 (sql/defqueries "sql/surveys.sql" {:connection db/spec})
 
-(defn clj-key
-  [acc k v]
-  (assoc acc (keyword (s/replace (name k) #"_" "-")) v))
-
-(defn clj-keys
-  [data]
-  (if (nil? data)
-    nil
-    (into {} (reduce-kv clj-key {} data))))
-
-(defn- check-directory
-  [state sdir]
-  (let [dh (f/file sdir)]
-    (cond
-      (not (jf/exists? dh)) ((:translate state) :problems/path-not-found sdir)
-      (not (jf/directory? dh)) ((:translate state) :problems/not-directory sdir)
-      (not (jf/readable? dh)) ((:translate state) :problems/read-permission-denied sdir)
-      :else nil)))
-
-(defn get-specific
-  [state sid]
-  (clj-keys (first (-get-specific {:id sid}))))
-
-(defn get-specific-by-name
-  [state sname]
-  (-get-specific-by-name {:name sname}))
-
-(defn create!
-  [state sname sdir]
-  {:pre [(not (nil? sname))]}
-  (if (not (empty? (get-specific-by-name state sname)))
-    ((:translate state) :survey/duplicate-name sname)
-    (let [err (check-directory state sdir)]
-      (if err
-        err
-        (-create<! {:name sname :directory sdir})))))
-
-(defn get-all
+(s/defn get-all :- [Survey]
   [state]
   (-get-all))
 
-(defn update!
-  [state sid sname sdir]
-  (let [err (check-directory state sdir)]
-    (if err
-      err
-      (-update! {:id sid :name sname :directory sdir}))))
-
-(defn delete!
+(s/defn get-specific :- Survey
   [state id]
-  (-delete! id))
+  (first (db/with-db-keys -get-specific {:survey-id id})))
+
+(s/defn get-specific-by-name :- Survey
+  [state
+   data :- {:survey-name s/Str}]
+  (db/with-db-keys -get-specific-by-name data))
+
+(s/defn create!
+  [state
+   data :- SurveyCreate]
+  (let [record (db/with-db-keys -create<! data)]
+    (get-specific state (:1 record))))
+
+(s/defn update!
+  [state
+   data :- SurveyUpdate]
+  (db/with-db-keys -update! data)
+  (get-specific state (:survey-id data)))
+
+(s/defn delete!
+  [state
+   id :- s/Num]
+  (db/with-db-keys -delete! {:survey-id id}))

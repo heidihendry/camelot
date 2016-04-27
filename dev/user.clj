@@ -1,6 +1,7 @@
 (ns user
   (:require [camelot.core]
             [camelot.db :as db]
+            [schema.core :as s]
             [ring.middleware.reload :refer [wrap-reload]]
             [figwheel-sidecar.repl-api :as figwheel]))
 
@@ -9,6 +10,9 @@
 ;; degraded performance.
 (set! *warn-on-reflection* true)
 (set! *unchecked-math* :warn-on-boxed)
+
+(s/set-fn-validation! true)
+
 (def http-handler
   (wrap-reload #'camelot.core/http-handler))
 

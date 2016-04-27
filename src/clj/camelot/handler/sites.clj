@@ -1,61 +1,37 @@
 (ns camelot.handler.sites
-  (:require [camelot.util.java-file :as jf]
-            [camelot.db :as db]
+  (:require [camelot.db :as db]
+            [schema.core :as s]
             [yesql.core :as sql]
-            [clojure.string :as s]
-            [clojure.java.io :as f]))
+            [camelot.model.site :refer [Site SiteCreate SiteUpdate]]))
 
 (sql/defqueries "sql/sites.sql" {:connection db/spec})
 
-(defn clj-key
-  [acc k v]
-  (assoc acc (keyword (s/replace (name k) #"_" "-")) v))
-
-(defn clj-keys
-  [data]
-  (if (nil? data)
-    nil
-    (into {} (reduce-kv clj-key {} data))))
-
-(defn db-key
-  [acc k v]
-  (assoc acc (keyword (s/replace (name k) #"-" "_")) v))
-
-(defn with-db-keys
-  [data f]
-  (f (reduce-kv db-key {} data)))
-
-(defn clj-key
-  [acc k v]
-  (assoc acc (keyword (s/replace (name k) #"_" "-")) v))
-
-(defn clj-keys
-  [data]
-  (reduce-kv clj-key {} data))
-
-(defn get-specific
-  [state sid]
-  (clj-keys (first (-get-specific {:site_id sid}))))
-
-(defn get-specific-by-name
-  [state sname]
-  (with-db-keys {:site-name sname} -get-specific-by-name))
-
-(defn create!
-  [state data]
-  {:pre [(not (nil? (:site-name data)))]}
-  (if (not (empty? (get-specific-by-name state (:site-name data))))
-    ((:translate state) :site/duplicate-name (:site-name data))
-    (with-db-keys data -create<!)))
-
-(defn get-all
+(s/defn get-all :- [Site]
   [state]
   (-get-all))
 
-(defn update!
-  [state data]
-  (-update! data))
-
-(defn delete!
+(s/defn get-specific :- Site
   [state id]
-  (-delete! id))
+  (first (db/with-db-keys -get-specific {:site-id id})))
+
+(s/defn get-specific-by-name :- Site
+  [state
+   data :- {:site-name s/Str}]
+  (db/with-db-keys -get-specific-by-name data))
+
+(s/defn create!
+  [state
+   data :- SiteCreate]
+  (let [record (db/with-db-keys -create<! data)]
+    (get-specific state (:1 record))))
+
+(s/defn update!
+  [state
+   data :- SiteUpdate]
+  (db/with-db-keys -update! data)
+  (get-specific state (:site-id data)))
+
+(s/defn delete!
+  [state
+   id :- s/Num]
+  (db/with-db-keys -delete! {:site-id id}))

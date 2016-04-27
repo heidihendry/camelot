@@ -1,7 +1,7 @@
 (ns camelot.core
   (:require [camelot.handler.albums :as ha]
             [camelot.handler.settings :as hs]
-            [camelot.handler.surveys :as hsurv]
+            [camelot.handler.surveys :as hsurvey]
             [camelot.handler.sites :as hsite]
             [camelot.handler.cameras :as hcamera]
             [camelot.handler.screens :as screens]
@@ -52,25 +52,34 @@
        (let [conf (config)]
          (r/response (ha/read-albums (gen-state conf)
                                      (:root-path conf)))))
-  (GET "/survey" [] (r/response (hsurv/get-all (gen-state (config)))))
-  (GET "/survey/:id" [id] (r/response (cursorise (hsurv/get-specific (gen-state (config)) id))))
-  (POST "/survey" {{sid :id  sname :name sdir :directory} :params}
-        (hsurv/update! (gen-state (config)) sid sname sdir))
+
+  (GET "/survey" [] (r/response (hsurvey/get-all (gen-state (config)))))
+  (GET "/survey/:id" [id] (r/response (cursorise (hsurvey/get-specific (gen-state (config)) id))))
+  (POST "/survey" [data]
+        (r/response (cursorise (hsurvey/update! (gen-state (config)) (decursorise data)))))
   (PUT "/survey" [data]
-       (let [{survname :survey-name sdir :survey-directory} (decursorise data)]
-         (r/response (hsurv/create! (gen-state (config)) survname sdir))))
-  (DELETE "/survey" {{sid :id} :params}
-          (hsurv/delete! (gen-state (config)) sid))
+       (r/response (cursorise (hsurvey/create! (gen-state (config)) (decursorise data)))))
+  (DELETE "/survey/:id" [id]
+          (r/response {:data (hsurvey/delete! (gen-state (config)) id)}))
 
   (GET "/site" [] (r/response (hsite/get-all (gen-state (config)))))
   (GET "/site/:id" [id] (r/response (cursorise (hsite/get-specific (gen-state (config)) id))))
+  (POST "/site" [data]
+        (r/response (cursorise (hsite/update! (gen-state (config)) (decursorise data)))))
   (PUT "/site" [data]
-       (r/response (hsite/create! (gen-state (config)) (decursorise data))))
+       (r/response (cursorise (hsite/create! (gen-state (config)) (decursorise data)))))
+  (DELETE "/site/:id" [id]
+          (r/response {:data (hsite/delete! (gen-state (config)) id)}))
 
   (GET "/camera" [] (r/response (hcamera/get-all (gen-state (config)))))
   (GET "/camera/:id" [id] (r/response (cursorise (hcamera/get-specific (gen-state (config)) id))))
+  (POST "/camera" [data]
+        (r/response (cursorise (hcamera/update! (gen-state (config)) (decursorise data)))))
   (PUT "/camera" [data]
-       (r/response (hcamera/create! (gen-state (config)) (decursorise data))))
+       (r/response (cursorise (hcamera/create! (gen-state (config)) (decursorise data)))))
+  (DELETE "/camera/:id" [id]
+          (r/response {:data (hcamera/delete! (gen-state (config)) id)}))
+
   (POST "/quit" [] (System/exit 0))
   (resources "/"))
 

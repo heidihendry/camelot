@@ -1,6 +1,7 @@
 (ns camelot.db
   (:require [ragtime.core :as rtc]
             [ragtime.jdbc :as jdbc]
+            [clojure.string :as str]
             [camelot.processing.settings :as settings]))
 
 (def spec {:classname "org.apache.derby.jdbc.EmbeddedDriver",
@@ -11,6 +12,28 @@
 (def config
   {:datastore (jdbc/sql-database spec)
    :migrations (jdbc/load-resources "migrations")})
+
+(defn- clj-key
+  [acc k v]
+  (assoc acc (keyword (str/replace (name k) #"_" "-")) v))
+
+(defn- clj-keys
+  [data]
+  (if (nil? data)
+    nil
+    (if (coll? data)
+      (if (seq? data)
+        (map #(into {} (reduce-kv clj-key {} %)) data)
+        (into {} (reduce-kv clj-key {} data)))
+      data)))
+
+(defn- db-key
+  [acc k v]
+  (assoc acc (keyword (str/replace (name k) #"-" "_")) v))
+
+(defn with-db-keys
+  [f data]
+  (clj-keys (f (reduce-kv db-key {} data))))
 
 (defn migrate
   []
