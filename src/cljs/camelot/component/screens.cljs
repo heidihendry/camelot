@@ -29,6 +29,10 @@
       (str base "/"
            (get-in vs [:selected-resource :details rid :value])))))
 
+(defn settings-screen?
+  [view-state]
+  (= (get-in (get-screen view-state) [:resource :type]) :settings))
+
 (defn create [success-key error-key vs resources key]
   (rest/put-resource (get-endpoint vs)
                      {:data (deref (get vs :buffer))}
@@ -53,7 +57,8 @@
 (defn cancel-update [event-key vs resources key]
   (do
     (om/update! vs :buffer (deref (get resources key)))
-    (om/update! (get vs :screen) :mode :readonly)
+    (when-not (settings-screen? vs)
+      (om/update! (get vs :screen) :mode :readonly))
     (let [cb (get events event-key)]
       (when cb
         (cb)))))
@@ -102,7 +107,7 @@
                         (dom/button #js {:className "cancel-btn btn btn-default fa fa-undo fa-2x"
                                          :onClick cancel}
                                     " Cancel")
-                        (when-not (= (get-in (get-screen view-state) [:resource :type]) :settings)
+                        (when-not (settings-screen? view-state)
                           (dom/button #js {:className "delete-btn btn btn-danger fa fa-trash fa-2x"
                                            :onClick #(when (js/confirm "Are you sure you wish to delete this?")
                                                        (delete))}
