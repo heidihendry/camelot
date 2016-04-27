@@ -13,6 +13,9 @@
   (reify
     om/IRender
     (render [_]
-      (dom/a #js {:href (util/with-baseurl "/maxent") :target "_blank"}
-             (dom/button #js {:className "btn btn-primary"}
-                         "MaxEnt Export")))))
+      (dom/div nil
+               (dom/div nil
+                        (dom/h4 nil "Analysis Exports"))
+               (dom/a #js {:href (util/with-baseurl "/maxent") :target "_blank"}
+                      (dom/button #js {:className "btn btn-primary fa fa-download fa-2x"}
+                                  " MaxEnt Export"))))))
