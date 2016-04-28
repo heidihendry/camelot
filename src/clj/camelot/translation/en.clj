@@ -79,6 +79,7 @@
             :time-light-sanity "The camera settings do not coincide with the timestamp on numerous photos"
             :camera-checks "The photos do not have a camera check at the beginning and end"
             :headline-consistency "The headline of the photos differs across photos (tested '%s' and '%s')"
+            :camera-consistency "The camera used to take the photos differs (tested '%s' and '%s')"
             :required-fields "Required fields are missing from '%s': %s"
             :album-has-data "The dataset for a period must not be empty"
             :sighting-consistency-quantity-needed "Found a species sighting in '%s', but a quantity was not found."

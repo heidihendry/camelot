@@ -167,6 +167,84 @@
                  {:datetime (t/date-time 2015 1 5 0 0 0)}]]
       (:result (check-headline-consistency (gen-state-helper config) album)) => :fail)))
 
+(facts "Album camera consistency"
+  (fact "All files in an album containing the same camera should pass"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}]]
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :pass))
+
+  (fact "Any one file not containing the same camera as the rest should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "2.0"}}]]
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+
+  (fact "A missing camera should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)}]]
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+
+  (fact "The model being different should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "notmymake"
+                           :model "mymodel"
+                           :software "1.0"}}]]
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+
+  (fact "The model being different should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "adifferentmodel"
+                           :software "1.0"}}]]
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+
+  (fact "The software version being different should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "1.0"}}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :camera {:make "mymake"
+                           :model "mymodel"
+                           :software "2.0"}}]]
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail)))
+
 (facts "Required fields are respected"
   (fact "Required fields present across all files should pass"
     (let [config {:required-fields [[:headline] [:artist] [:phase] [:copyright]

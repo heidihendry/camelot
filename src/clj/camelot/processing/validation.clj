@@ -91,6 +91,24 @@
       r
       {:result :pass})))
 
+(defn compare-cameras
+  "Compare two cameras, failing if they're not consistent."
+  [state h1 h2]
+  (if (or (not (= (:make (:camera h1)) (:make (:camera h2))))
+          (not (= (:model (:camera h1)) (:model (:camera h2))))
+          (not (= (:software (:camera h1)) (:software (:camera h2)))))
+    (reduced {:result :fail :reason ((:translate state) :checks/camera-consistency
+                                     (:filename h1) (:filename h2))})
+    h1))
+
+(defn check-camera-consistency
+  "Check the headline of all photos is consistent."
+  [state photos]
+  (let [r (reduce (partial compare-cameras state) (first photos) (rest photos))]
+    (if (= (:result r) :fail)
+      r
+      {:result :pass})))
+
 (defn check-required-fields
   "Ensure all Require Fields contain data."
   [state photo]
@@ -199,13 +217,14 @@
                :time-light-sanity check-ir-threshold
                :camera-checks check-camera-checks
                :headline-consistency check-headline-consistency
+               :camera-consistency check-camera-consistency
                :album-has-data check-album-has-data
                :timeshift-consistency check-timeshift-consistency}]
     (remove nil?
             (map (fn [[t f]]
                    (let [res (f state photos)]
                      (if (not= (:result res) :pass)
-                       {:problem t
+                       {:result :fail
                         :reason (if (:reason res)
                                   (:reason res)
                                   (->> t

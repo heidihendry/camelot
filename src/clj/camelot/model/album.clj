@@ -14,10 +14,10 @@
    (s/required-key :datetime-end) org.joda.time.DateTime
    (s/required-key :make) s/Str
    (s/required-key :model) s/Str
-   (s/required-key :sightings) Sightings})
+   (s/optional-key :sightings) Sightings})
 
 (def Problem
-  {(s/required-key :problem) s/Keyword
+  {(s/required-key :result) s/Keyword
    (s/required-key :reason) s/Str})
 
 (def Album
