@@ -26,6 +26,14 @@
                       (dom/span #js {:className "list-item-delete fa fa-trash"
                                      :onClick rm-fn}))))))))
 
+(defn- list-react-key
+  [key]
+  (cond
+    (= (type key) cljs.core/Keyword) (name key)
+    (= (type key)
+       cljs.core/PersistentVector) (string/join "#" (map name key))
+       :else key))
+
 ;; TODO I don't think returning functions is a good idea here.
 (defn- string-list-item
   [k]
@@ -45,17 +53,12 @@
                                      :onClick rm-fn}))))))))
 
 (defn- select-option-component
-  [[key desc] owner]
+  [{:keys [vkey desc]} owner]
   (reify
     om/IRender
     (render [_]
       (dom/option
-       #js {:value (cond
-                     (= (type key)
-                        cljs.core/Keyword) (name key)
-                     (= (type key)
-                        cljs.core/PersistentVector) (string/join "#" (map name key))
-                     :else key)} desc))))
+       #js {:value vkey} desc))))
 
 (defmulti input-field (fn [[k v]] (:type (:schema v))))
 
@@ -77,7 +80,11 @@
                          (if (= (type val) cljs.core/Keyword)
                            (name val)
                            val)}
-                    (om/build-all select-option-component (:options (:schema v))))))))
+                    (om/build-all select-option-component
+                                  (map #(hash-map :vkey (list-react-key (first %))
+                                                  :desc (second %))
+                                       (:options (:schema v)))
+                                  {:key :vkey}))))))
 
 (defmethod input-field :list
   [[k v buf opts :as d] owner]
@@ -108,8 +115,12 @@
                             (dom/select #js {:className "field-input" :value (get state :select-value)
                                              :onChange #(om/set-state! owner :select-value (.. % -target -value))}
                                         (om/build-all select-option-component
-                                                      (conj (sort #(< (second %1) (second %2)) (remove #(some (set %) (get-in buf [k :value]))
-                                                                                                       (state/metadata-schema-state))) [])))
+                                                      (conj (sort #(< (:value %1) (:value %2))
+                                                                  (map #(hash-map :vkey (list-react-key (first %))
+                                                                                  :desc (second %))
+                                                                       (remove #(some (set %) (get-in buf [k :value]))
+                                                                               (state/metadata-schema-state)))) {:vkey "" :desc ""})
+                                                      {:key :vkey}))
                             (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
                                              :onClick #(do (state/add-metadata-item! (into [] (map keyword (string/split (get state :select-value) "#"))) buf k owner)
                                                            (om/set-state! owner :select-value ""))}))
