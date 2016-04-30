@@ -76,7 +76,11 @@
   (POST "/camera" [data]
         (r/response (cursorise (hcamera/update! (gen-state (config)) (decursorise data)))))
   (PUT "/camera" [data]
-       (r/response (cursorise (hcamera/create! (gen-state (config)) (decursorise data)))))
+       (let [data (decursorise data)]
+         (r/response
+          (cursorise (hcamera/create! (gen-state (config))
+                                      (assoc data :camera-status
+                                             (read-string (:camera-status data))))))))
   (DELETE "/camera/:id" [id]
           (r/response {:data (hcamera/delete! (gen-state (config)) id)}))
 

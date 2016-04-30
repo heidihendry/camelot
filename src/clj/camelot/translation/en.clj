@@ -26,7 +26,9 @@
             :survey-name {:label "Survey Name"
                           :description "The name which will be used to refer to the survey."}
             :survey-directory {:label "Survey Directory"
-                               :description "The root directory of the survey's data"}}
+                               :description "The root directory of the survey's data"}
+            :survey-notes {:label "Survey Notes"
+                           :description "Notes about this survey."}}
 
    :site {:duplicate-name "A site with the name '%s' already exists"
           :title "Site"

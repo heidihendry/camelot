@@ -3,7 +3,8 @@
 
 (def SurveyCreate
   {:survey-name s/Str
-   :survey-directory java.io.File})
+   :survey-directory s/Str
+   :survey-notes (s/maybe s/Str)})
 
 (def SurveyUpdate
   (merge SurveyCreate

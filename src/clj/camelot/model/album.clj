@@ -12,8 +12,8 @@
 (def ExtractedMetadata
   {(s/required-key :datetime-start) org.joda.time.DateTime
    (s/required-key :datetime-end) org.joda.time.DateTime
-   (s/required-key :make) s/Str
-   (s/required-key :model) s/Str
+   (s/required-key :make) (s/maybe s/Str)
+   (s/required-key :model) (s/maybe s/Str)
    (s/optional-key :sightings) Sightings})
 
 (def Problem

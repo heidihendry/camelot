@@ -12,6 +12,9 @@
 
 (def CameraCreate
   {:camera-name s/Str
+   :camera-make (s/maybe s/Str)
+   :camera-model (s/maybe s/Str)
+   :camera-notes (s/maybe s/Str)
    :camera-status s/Num})
 
 (def CameraUpdate

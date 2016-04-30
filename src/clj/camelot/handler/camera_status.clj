@@ -1,11 +1,12 @@
 (ns camelot.handler.camera-status
   (:require [camelot.util.java-file :as jf]
             [camelot.db :as db]
+            [schema.core :as s]
             [yesql.core :as sql]
-            [clojure.java.io :as f]))
+            [camelot.model.camera :refer [CameraStatus]]))
 
 (sql/defqueries "sql/camera-status.sql" {:connection db/spec})
 
-(defn get-all
+(s/defn get-all :- [CameraStatus]
   [state]
-  (-get-all))
+  (db/clj-keys (-get-all)))

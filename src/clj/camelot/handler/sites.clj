@@ -8,7 +8,7 @@
 
 (s/defn get-all :- [Site]
   [state]
-  (-get-all))
+  (db/clj-keys (-get-all)))
 
 (s/defn get-specific :- Site
   [state id]

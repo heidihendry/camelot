@@ -8,7 +8,7 @@
 
 (s/defn get-all :- [Survey]
   [state]
-  (-get-all))
+  (db/clj-keys (-get-all)))
 
 (s/defn get-specific :- Survey
   [state id]

@@ -10,27 +10,27 @@
      state-province :- (s/maybe s/Str)
      country :- (s/maybe s/Str)
      country-code :- (s/maybe s/Str)
-     map-datum :- (s/maybe s/Num)])
+     map-datum :- (s/maybe s/Str)])
 
 (s/defrecord CameraSettings
     [aperture :- (s/maybe s/Str)
-     exposure :- s/Str
-     flash :- s/Str
+     exposure :- (s/maybe s/Str)
+     flash :- (s/maybe s/Str)
      focal-length :- (s/maybe s/Str)
-     fstop :- s/Str
-     iso :- s/Num
+     fstop :- (s/maybe s/Str)
+     iso :- (s/maybe s/Num)
      orientation :- (s/maybe s/Str)
      resolution-x :- s/Num
      resolution-y :- s/Num])
 
 (s/defrecord Camera
-    [make :- s/Str
-     model :- s/Str
+    [make :- (s/maybe s/Str)
+     model :- (s/maybe s/Str)
      software :- (s/maybe s/Str)])
 
 (s/defrecord Sighting
-    [species :- s/Str
-     quantity :- s/Num])
+    [species :- (s/maybe s/Str)
+     quantity :- (s/maybe s/Num)])
 
 (s/defrecord PhotoMetadata
     [datetime :- org.joda.time.DateTime

@@ -151,15 +151,15 @@
   (reify
     om/IRender
     (render [_]
-            (dom/li #js {:className "sidebar-item"
-                         :onClick #(do (rest/get-resource
-                                        (str (get data :endpoint) "/"
-                                             (get (:item data) (:id data)))
-                                        (fn [resp]
-                                          (om/update! (get-in data [:view-state :screen]) :mode :readonly)
-                                          (om/update! (get-in data [:view-state :selected-resource]) :details (:body resp))
-                                          (om/update! (get data :view-state)
-                                                      :buffer (:body resp)))))}
+      (dom/li #js {:className "sidebar-item"
+                   :onClick #(do (rest/get-resource
+                                  (str (get data :endpoint) "/"
+                                       (get (:item data) (:id data)))
+                                  (fn [resp]
+                                    (om/update! (get-in data [:view-state :screen]) :mode :readonly)
+                                    (om/update! (get-in data [:view-state :selected-resource]) :details (:body resp))
+                                    (om/update! (get data :view-state)
+                                                :buffer (:body resp)))))}
               (dom/a nil (get (:item data) (get data :label)))))))
 
 (defn sidebar-component

@@ -8,7 +8,7 @@
 
 (s/defn get-all :- [Camera]
   [state]
-  (-get-all))
+  (db/clj-keys (-get-all)))
 
 (s/defn get-specific :- Camera
   [state id]

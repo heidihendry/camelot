@@ -111,7 +111,8 @@ Important: Timezone information will be discarded."
       :camera cam
       :sightings (if (or (md "Caption/Abstract") (md "Object Name"))
                    [(mp/sighting {:species (md "Caption/Abstract")
-                                  :quantity (md "Object Name")})]
+                                  :quantity (try (read-string (md "Object Name"))
+                                                 (catch java.lang.Exception e nil))})]
                    [])
       :datetime (exif-date-to-datetime (md "Date/Time"))
       :datetime-original (exif-gps-datetime (md "GPS Date Stamp")

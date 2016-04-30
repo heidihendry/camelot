@@ -1,6 +1,7 @@
 (ns camelot.db
   (:require [ragtime.core :as rtc]
             [ragtime.jdbc :as jdbc]
+            [clj-time.coerce :as tc]
             [clojure.string :as str]
             [camelot.processing.settings :as settings]))
 
@@ -15,9 +16,12 @@
 
 (defn- clj-key
   [acc k v]
-  (assoc acc (keyword (str/replace (name k) #"_" "-")) v))
+  (assoc acc (keyword (str/replace (name k) #"_" "-"))
+         (if (instance? java.sql.Timestamp v)
+           (tc/from-sql-time v)
+           v)))
 
-(defn- clj-keys
+(defn clj-keys
   [data]
   (if (nil? data)
     nil
