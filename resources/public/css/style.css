@@ -194,13 +194,18 @@ a:hover {
    appearance: none;
 
 }
-#app input.field-input {
+#app input.field-input, textarea.field-input, p.field-input {
   min-width: 30rem;
   padding: 0.5rem;
   color: #666;
   font-size: 90%;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
+}
+p.field-input {
+    background: #ebebe4;
+    color: #666;
+    min-height: 3rem;
 }
 #settings h4 {
   padding-left: 1rem;

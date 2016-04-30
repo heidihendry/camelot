@@ -31,8 +31,8 @@
    :sidebar {:resource {:endpoint "/site"
                         :title ((:translate state) :site/sidebar-title)
                         :type :site
-                        :id :site_id
-                        :label :site_name}}
+                        :id :site-id
+                        :label :site-name}}
    :layout [[:site-name]
             [:site-sublocation]
             [:site-city]
@@ -45,7 +45,9 @@
             :site-state-province {:type :text}
             :site-country {:type :text}
             ;; TODO make textarea
-            :site-notes {:type :text}}
+            :site-notes {:type :textarea
+                         :rows 4
+                         :cols 35}}
    :states {:create {:submit {:success {:type :event
                                         ;; TODO implement
                                         :event :site-create-success}
@@ -59,7 +61,7 @@
 (defsmith camera smiths
   [state]
   (let [camstats (camstat/get-all state)
-        opts (build-options state camstats :camera_status_id :camera_status_description)]
+        opts (build-options state camstats :camera-status-id :camera-status-description)]
     {:resource {:type :camera
                 :title ((:translate state) :camera/title)
                 :endpoint "/camera"
@@ -67,8 +69,8 @@
      :sidebar {:resource {:endpoint "/camera"
                           :title ((:translate state) :camera/sidebar-title)
                           :type :camera
-                          :id :camera_id
-                          :label :camera_name}}
+                          :id :camera-id
+                          :label :camera-name}}
      :layout [[:camera-name]
               [:camera-status]
               [:camera-make]
@@ -80,7 +82,9 @@
                               :options opts}
               :camera-make {:type :text}
               :camera-model {:type :text}
-              :camera-notes {:type :text}}
+              :camera-notes {:type :textarea
+                             :rows 4
+                             :cols 35}}
      :states {:create {:submit {:success {:type :event
                                           ;; TODO implement
                                           :event :camera-create-success}
@@ -100,12 +104,16 @@
    :sidebar {:resource {:endpoint "/survey"
                         :title ((:translate state) :survey/sidebar-title)
                         :type :survey
-                        :id :survey_id
-                        :label :survey_name}}
+                        :id :survey-id
+                        :label :survey-name}}
    :layout [[:survey-name]
-            [:survey-directory]]
+            [:survey-directory]
+            [:survey-notes]]
    :schema {:survey-name {:type :text}
-            :survey-directory {:type :text}}
+            :survey-directory {:type :text}
+            :survey-notes {:type :textarea
+                           :rows 4
+                           :cols 35}}
    :states {:create {:submit {:success {:type :event
                                         ;; TODO implement
                                         :event :survey-create}

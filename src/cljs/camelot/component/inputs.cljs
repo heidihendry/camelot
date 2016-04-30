@@ -165,6 +165,25 @@
                       :onChange #(state/set-number! % (k buf) :value owner)
                       :value (get-in buf [k :value])}))))
 
+(defmethod input-field :textarea
+  [[k v buf opts :as d] owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get buf k))
+        (om/update! buf k {:value nil})))
+    om/IRender
+    (render [_]
+      (let [schema (:schema v)]
+        (if (:disabled opts)
+          (dom/p #js {:className "field-input"}
+           (get-in buf [k :value]))
+          (dom/textarea #js {:className "field-input"
+                             :rows (:rows schema)
+                             :cols (:cols schema)
+                             :onChange #(state/set-unvalidated-text! % (k buf) :value owner)
+                             :value (get-in buf [k :value])}))))))
+
 (defmethod input-field :default
   [[k v buf opts :as d] owner]
   (reify
