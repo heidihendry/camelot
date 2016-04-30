@@ -17,7 +17,7 @@
 
 (defn build-options
   [state data idkey transkey]
-  (merge {nil ""}
+  (merge {"" ""}
          (into {} (map #(hash-map (get % idkey)
                                   ((:translate state) (keyword (get % transkey))))
                        data))))
