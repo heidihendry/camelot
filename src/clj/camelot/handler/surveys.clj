@@ -2,7 +2,7 @@
   (:require [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
-            [camelot.model.survey :refer [Survey SurveyCreate SurveyUpdate]]))
+            [camelot.model.survey :refer [Survey SurveyCreate]]))
 
 (sql/defqueries "sql/surveys.sql" {:connection db/spec})
 
@@ -27,7 +27,7 @@
 
 (s/defn update!
   [state
-   data :- SurveyUpdate]
+   data :- Survey]
   (db/with-db-keys -update! data)
   (get-specific state (:survey-id data)))
 

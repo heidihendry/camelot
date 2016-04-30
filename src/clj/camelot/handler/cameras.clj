@@ -2,7 +2,7 @@
   (:require [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
-            [camelot.model.camera :refer [Camera CameraCreate CameraUpdate]]))
+            [camelot.model.camera :refer [Camera CameraCreate]]))
 
 (sql/defqueries "sql/cameras.sql" {:connection db/spec})
 
@@ -27,7 +27,7 @@
 
 (s/defn update!
   [state
-   data :- CameraUpdate]
+   data :- Camera]
   (db/with-db-keys -update! data)
   (get-specific state (:camera-id data)))
 

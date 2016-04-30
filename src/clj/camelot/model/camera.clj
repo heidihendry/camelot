@@ -17,11 +17,9 @@
    :camera-notes (s/maybe s/Str)
    :camera-status s/Num})
 
-(def CameraUpdate
-  (merge CameraCreate
-         {:camera-id s/Num}))
-
 (def Camera
-  (merge CameraUpdate
-         {:camera-created org.joda.time.DateTime
+  (merge CameraCreate
+         {:camera-id s/Num
+          :camera-created org.joda.time.DateTime
           :camera-updated org.joda.time.DateTime}))
+

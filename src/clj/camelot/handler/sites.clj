@@ -2,7 +2,7 @@
   (:require [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
-            [camelot.model.site :refer [Site SiteCreate SiteUpdate]]))
+            [camelot.model.site :refer [Site SiteCreate]]))
 
 (sql/defqueries "sql/sites.sql" {:connection db/spec})
 
@@ -27,7 +27,7 @@
 
 (s/defn update!
   [state
-   data :- SiteUpdate]
+   data :- Site]
   (db/with-db-keys -update! data)
   (get-specific state (:site-id data)))
 
