@@ -54,7 +54,7 @@
          (r/response (ha/read-albums (gen-state conf)
                                      (:root-path conf)))))
 
-  (GET "/survey" [] (r/response (hsurvey/get-all (gen-state (config)))))
+  (GET "/surveys" [] (r/response (hsurvey/get-all (gen-state (config)))))
   (GET "/survey/:id" [id] (r/response (cursorise (hsurvey/get-specific (gen-state (config))
                                                                        (read-string id)))))
   (POST "/survey" [data]
@@ -64,7 +64,7 @@
   (DELETE "/survey/:id" [id]
           (r/response {:data (hsurvey/delete! (gen-state (config)) (read-string id))}))
 
-  (GET "/site" [] (r/response (hsite/get-all (gen-state (config)))))
+  (GET "/sites" [] (r/response (hsite/get-all (gen-state (config)))))
   (GET "/site/:id" [id] (r/response (cursorise (hsite/get-specific (gen-state (config)) (read-string id)))))
   (POST "/site" [data]
         (r/response (cursorise (hsite/update! (gen-state (config)) (decursorise data)))))
@@ -73,7 +73,7 @@
   (DELETE "/site/:id" [id]
           (r/response {:data (hsite/delete! (gen-state (config)) (read-string id))}))
 
-  (GET "/camera" [] (r/response (hcamera/get-all (gen-state (config)))))
+  (GET "/cameras" [] (r/response (hcamera/get-all (gen-state (config)))))
   (GET "/camera/:id" [id] (r/response (cursorise (hcamera/get-specific (gen-state (config)) (read-string id)))))
   (POST "/camera" [data]
         (r/response (cursorise (hcamera/update! (gen-state (config)) (decursorise data)))))
@@ -87,7 +87,7 @@
           (r/response {:data (hcamera/delete! (gen-state (config)) (read-string id))}))
 
 
-  (GET "/survey-site" [] (r/response (hsurvey-site/get-all (gen-state (config)))))
+  (GET "/survey-sites/:id" [id] (r/response (hsurvey-site/get-all (gen-state (config)) id)))
   (GET "/survey-site/:id" [id] (r/response (cursorise (hsurvey-site/get-specific (gen-state (config)) (read-string id)))))
   (POST "/survey-site" [data]
         (r/response (cursorise (hsurvey-site/update! (gen-state (config)) (decursorise data)))))

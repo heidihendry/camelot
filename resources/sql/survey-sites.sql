@@ -23,3 +23,4 @@ WHERE survey_site_id = :survey_site_id
 SELECT survey_site_id, survey_site_created, survey_site_updated, site_id, survey_id, site_name
 FROM survey_site
 LEFT JOIN site using (site_id)
+WHERE survey_id = :survey_id

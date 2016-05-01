@@ -11,10 +11,6 @@
 
 (def smiths (atom {}))
 
-(defn smith
-  [state]
-  (smithy/build-smiths smiths (translate-fn state) state))
-
 ;;(settings-screen (settings/gen-state settings/default-config))
 
 (defn build-options
@@ -30,7 +26,8 @@
               :title ((:translate state) :site/title)
               :endpoint "/site"
               :id :site-id}
-   :sidebar {:resource {:endpoint "/site"
+   :sidebar {:resource {:listing-endpoint "/sites"
+                        :specific-endpoint "/site"
                         :title ((:translate state) :site/sidebar-title)
                         :type :site
                         :id :site-id
@@ -71,7 +68,8 @@
                 :title ((:translate state) :camera/title)
                 :endpoint "/camera"
                 :id :camera-id}
-     :sidebar {:resource {:endpoint "/camera"
+     :sidebar {:resource {:listing-endpoint "/cameras"
+                          :specific-endpoint "/camera"
                           :title ((:translate state) :camera/sidebar-title)
                           :type :camera
                           :id :camera-id
@@ -110,7 +108,8 @@
               :endpoint "/survey-site"
               :parent-id-key :survey-id
               :id :survey-site-id}
-   :sidebar {:resource {:endpoint "/survey-site"
+   :sidebar {:resource {:listing-endpoint "/survey-sites"
+                        :specific-endpoint "/survey-site"
                         :title ((:translate state) :survey-site/sidebar-title)
                         :type :survey-site
                         :id :survey-site-id
@@ -134,7 +133,8 @@
               :title ((:translate state) :survey/title)
               :endpoint "/survey"
               :id :survey-id}
-   :sidebar {:resource {:endpoint "/survey"
+   :sidebar {:resource {:listing-endpoint "/surveys"
+                        :specific-endpoint "/survey"
                         :title ((:translate state) :survey/sidebar-title)
                         :type :survey
                         :id :survey-id
@@ -226,3 +226,7 @@
                                       :event :settings-error}}
                      :cancel {:type :event
                               :event :settings-cancel}}}})
+
+(defn smith
+  [state]
+  (smithy/build-smiths smiths (translate-fn state) state))

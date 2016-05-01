@@ -14,8 +14,12 @@
 (defn load-resource-children
   [vs]
   (let [screen (get-screen vs)
-        res (get-in screen [:sidebar :resource])]
-    (rest/get-resource (get res :endpoint)
+        res (get-in screen [:sidebar :resource])
+        id (get-in vs [:screen :id])
+        ep (if id
+             (str (get res :listing-endpoint) "/" id)
+             (get res :listing-endpoint))]
+    (rest/get-resource ep
                        #(om/update! (get vs :selected-resource)
                                     :children
                                     (:body %)))))
@@ -220,7 +224,7 @@
     (render [_]
       (dom/li #js {:className "sidebar-item"
                    :onClick #(do (rest/get-resource
-                                  (str (get data :endpoint) "/"
+                                  (str (get data :specific-endpoint) "/"
                                        (get (:item data) (:id data)))
                                   (fn [resp]
                                     (om/update! (get-in data [:view-state :screen]) :mode :readonly)
@@ -251,7 +255,7 @@
                                                       :view-state (get data :view-state)
                                                       :label (get res :label)
                                                       :id (get res :id)
-                                                      :endpoint (get res :endpoint))
+                                                      :specific-endpoint (get res :specific-endpoint))
                                            (get-in data [:view-state :selected-resource :children])))))))))
 
 (defn build-view-component
@@ -262,7 +266,6 @@
       (render [_]
         (let [view-state (get-in app [:view type])
               screen (get-screen view-state)]
-          (prn screen)
           (dom/div nil
                    (when (get screen :sidebar)
                      (om/build sidebar-component {:screen screen

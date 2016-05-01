@@ -7,8 +7,8 @@
 (sql/defqueries "sql/survey-sites.sql" {:connection db/spec})
 
 (s/defn get-all :- [SurveySite]
-  [state]
-  (db/clj-keys (-get-all)))
+  [state id]
+  (db/with-db-keys -get-all {:survey-id id}))
 
 (s/defn get-specific :- SurveySite
   [state
