@@ -106,6 +106,12 @@
                         :type :survey
                         :id :survey-id
                         :label :survey-name}}
+   :actionmenu {:title ((:translate state) :actionmenu/title)
+                :menu [{:label ((:translate state) :action/edit)
+                        :action :edit-mode}
+                       {:label ((:translate state) :action/manage-sites)
+                        :action :manage-sites}
+                       ]}
    :layout [[:survey-name]
             [:survey-directory]
             [:survey-notes]]

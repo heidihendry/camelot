@@ -24,19 +24,34 @@
   {:settings-save (fn [d] (nav/toggle-settings!) (albums/reload-albums))
    :settings-cancel #(nav/toggle-settings!)})
 
+(def actions
+  {:manage-sites (fn [vs rid] (nav/nav! (str "/manage-sites/" rid)))
+   :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))})
+
 (defn get-endpoint
   [vs]
   (get-in (get-screen vs) [:resource :endpoint]))
 
+(defn get-resource-id
+  [vs]
+  (let [screen (get-screen vs)
+        rid (get-in screen [:resource :id])]
+    (if (nil? rid)
+      nil
+      (get-in vs [:selected-resource :details rid :value]))))
+
+(defn get-action
+  [action]
+  (action actions))
+
 (defn get-url
   [vs]
   (let [screen (get-screen vs)
-        rid (get-in screen [:resource :id])
+        rid (get-resource-id vs)
         base (get-in screen [:resource :endpoint])]
     (if (nil? rid)
       base
-      (str base "/"
-           (get-in vs [:selected-resource :details rid :value])))))
+      (str base "/" rid))))
 
 (defn settings-screen?
   [view-state]
@@ -80,6 +95,35 @@
     (let [cb (get events event-key)]
       (when cb
         (cb)))))
+
+(defn actionmenu-item-component
+  [{:keys [vkey action desc]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value action} desc))))
+
+(defn actionmenu-component
+  [vs owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [screen (get-screen vs)]
+        (apply dom/select #js {:className "actionmenu"
+                               :onChange #(let [value (.. % -target -value)
+                                                action (get-action (keyword value))]
+                                            (prn (get-resource-id vs))
+                                            (if action
+                                              (action vs (get-resource-id vs))
+                                              (prn (str "Missing action: " (name value)))))}
+               (om/build-all actionmenu-item-component
+                             (conj (map #(hash-map
+                                          :vkey (:label %)
+                                          :action (name (:action %))
+                                          :desc (:label %))
+                                        (get-in screen [:actionmenu :menu]))
+                                   {:vkey "" :action nil :desc "Actions..."})
+                                             {:key :vkey}))))))
 
 (defn field-component
   [[menu-item screen buf opts] owner]
@@ -137,9 +181,8 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/button #js {:className "edit-btn btn btn-primary fa fa-edit fa-2x"
-                                :onClick #(om/update! (get view-state :screen) :mode :update)
-                                } " Edit")
+               (when (get screen :actionmenu)
+                 (om/build actionmenu-component view-state))
                (dom/h4 nil (get-in screen [:resource :title]))
                (dom/div nil (om/build body-component
                                       {:view-state view-state
@@ -214,38 +257,39 @@
                      (om/build sidebar-component {:screen screen
                                                   :view-state view-state}))
                    (dom/div #js {:className "main-content"}
-                            (case (get-in view-state [:screen :mode])
-                              :update
-                              (if (get view-state :buffer)
-                                (let [rupdate #(submit-update (get-in screen [:states :update :submit :success :event])
-                                                            (get-in screen [:states :update :submit :error :event])
-                                                            view-state (get view-state :selected-resource) :details)
-                                      rcancel #(cancel-update (get-in screen [:states :update :cancel :event])
+                            (dom/div #js {:className "resource-content"}
+                                     (case (get-in view-state [:screen :mode])
+                                       :update
+                                       (if (get view-state :buffer)
+                                         (let [rupdate #(submit-update (get-in screen [:states :update :submit :success :event])
+                                                                       (get-in screen [:states :update :submit :error :event])
+                                                                       view-state (get view-state :selected-resource) :details)
+                                               rcancel #(cancel-update (get-in screen [:states :update :cancel :event])
+                                                                       view-state
+                                                                       (get view-state :selected-resource) :details)
+                                               rdelete #(delete (get-in screen [:states :delete :submit :success :event])
+                                                                (get-in screen [:states :delete :submit :error :event])
+                                                                view-state (get view-state :selected-resource) :details)]
+                                           (om/build resource-update-component {:screen screen
+                                                                                :view-state view-state
+                                                                                :update rupdate
+                                                                                :cancel rcancel
+                                                                                :delete rdelete}))
+                                         (dom/span nil "Loading..."))
+                                       :readonly
+                                       (do
+                                         (if (get view-state :buffer)
+                                           (om/build resource-view-component {:screen screen
+                                                                              :view-state view-state})
+                                           (dom/span nil "Loading...")))
+                                       :create
+                                       (let [rcreate #(create (get-in screen [:states :create :submit :success :event])
+                                                              (get-in screen [:states :create :submit :error :event])
                                                               view-state
-                                                              (get view-state :selected-resource) :details)
-                                      rdelete #(delete (get-in screen [:states :delete :submit :success :event])
-                                                       (get-in screen [:states :delete :submit :error :event])
-                                                       view-state (get view-state :selected-resource) :details)]
-                                  (om/build resource-update-component {:screen screen
-                                                                       :view-state view-state
-                                                                       :update rupdate
-                                                                       :cancel rcancel
-                                                                       :delete rdelete}))
-                                (dom/span nil "Loading..."))
-                              :readonly
-                              (do
-                                (if (get view-state :buffer)
-                                  (om/build resource-view-component {:screen screen
-                                                                     :view-state view-state})
-                                  (dom/span nil "Loading...")))
-                              :create
-                              (let [rcreate #(create (get-in screen [:states :create :submit :success :event])
-                                                     (get-in screen [:states :create :submit :error :event])
-                                                     view-state
-                                                     (get view-state :selected-resource)
-                                                     :details)]
-                                (om/build resource-create-component {:screen screen
-                                                                     :view-state view-state
-                                                                     :create rcreate}))
-                              nil (dom/div nil "")
-                              (dom/span nil (str "Unable to find mode: " (get-in view-state [:screen :mode])))))))))))
+                                                              (get view-state :selected-resource)
+                                                              :details)]
+                                         (om/build resource-create-component {:screen screen
+                                                                              :view-state view-state
+                                                                              :create rcreate}))
+                                       nil (dom/div nil "")
+                                       (dom/span nil (str "Unable to find mode: " (get-in view-state [:screen :mode]))))))))))))

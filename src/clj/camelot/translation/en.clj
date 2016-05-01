@@ -153,6 +153,10 @@
               :required-fields {:label "Required Fields"
                                 :description "A list of the fields required to be in the metadata."}}
 
+   :actionmenu {:title "Actions"}
+   :action {:manage-sites "Manage Sites"
+            :edit "Edit"}
+
    :application {:dashboard "Dashboard"
                  :surveys "Surveys"
                  :analysis "Analysis"

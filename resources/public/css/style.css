@@ -303,9 +303,6 @@ p.field-input {
     margin-bottom: 1rem;
     display: block;
 }
-#page-content {
-    padding-top: 1rem;
-}
 .sidebar {
     float: left;
     left: 0;
@@ -338,7 +335,7 @@ p.field-input {
 #page-content .main-content {
     float: left;
     display: block;
-    margin-left: 24rem;
+    margin-left: 22rem;
 }
 .sidebar .create-record-btn {
     float: right;
@@ -354,4 +351,15 @@ p.field-input {
 }
 #page-content .delete-btn {
     margin-left: 1rem;
+}
+#page-content .resource-content {
+    float: left;
+    padding-left: 2rem;
+    position: relative;
+}
+#page-content .actionmenu {
+    float: right;
+    background: #eee;
+    border: 1px solid #ccc;
+    padding: 0.1rem 1rem;
 }
