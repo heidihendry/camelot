@@ -6,6 +6,7 @@
             [camelot.handler.cameras :as hcamera]
             [camelot.handler.camera-status :as hcamstat]
             [camelot.handler.survey-sites :as hsurvey-site]
+            [camelot.handler.trap-stations :as htrap-station]
             [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
@@ -30,6 +31,14 @@
   {:status 200
    :headers {"Content-Type" "text/html; charset=utf-8"}
    :body (io/input-stream (io/resource "public/index.html"))})
+
+(defn cast-to-float
+  [ks data]
+  (reduce #(let [v (get %1 %2)]
+             (assoc %1 %2 (if (string? v)
+                            (read-string v)
+                            v)))
+          data ks))
 
 (defroutes routes
   (GET "/" _ (retrieve-index))
@@ -104,6 +113,24 @@
                                                   (read-string (:survey-id data))))))))
   (DELETE "/survey-site/:id" [id]
           (r/response {:data (hsurvey-site/delete! (gen-state (config)) (read-string id))}))
+
+  (GET "/trap-stations/:id" [id] (r/response (htrap-station/get-all (gen-state (config)) id)))
+  (GET "/trap-station/:id" [id] (r/response (cursorise (htrap-station/get-specific (gen-state (config)) (read-string id)))))
+  (POST "/trap-station" [data]
+        (let [data (decursorise data)]
+          (r/response (cursorise (htrap-station/update!
+                                  (gen-state (config))
+                                  (cast-to-float [:trap-station-longitude
+                                                  :trap-station-latitude] data))))))
+  (PUT "/trap-station" [data]
+       (let [data (decursorise data)]
+         (r/response
+          (cursorise (htrap-station/create!
+                      (gen-state (config))
+                      (cast-to-float [:trap-station-longitude
+                                      :trap-station-latitude] data))))))
+  (DELETE "/trap-station/:id" [id]
+          (r/response {:data (htrap-station/delete! (gen-state (config)) (read-string id))}))
 
   (POST "/quit" [] (System/exit 0))
   (resources "/"))

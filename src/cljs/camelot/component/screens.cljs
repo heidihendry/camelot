@@ -118,6 +118,8 @@
 (def actions
   {:survey-sites (fn [vs rid]
                    (nav/nav! (str "/#/survey-sites/" rid)))
+   :trap-stations (fn [vs rid]
+                    (nav/nav! (str "/#/trap-stations/" rid)))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :delete (fn [vs rid] (let [screen (get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")

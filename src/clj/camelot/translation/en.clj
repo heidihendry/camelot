@@ -32,8 +32,23 @@
 
    :survey-site {:title "Survey Site"
                  :sidebar-title "Survey Sites"
-                 :site-id {:label " Site"
+                 :site-id {:label "Site"
                            :description "The site to add to the survey"}}
+
+   :trap-station {:title "Trap Station"
+                  :sidebar-title "Trap Stations"
+                  :trap-station-name {:label "Trap Station Name"
+                                      :description "Name of this Trap Station"}
+                  :trap-station-longitude {:label "Longitude"
+                                           :description "GPS Longitude in decimal format"}
+                  :trap-station-latitude {:label "Latitude"
+                                          :description "GPS Latitude in decimal format"}
+                  :trap-station-altitude {:label "Altitude (meters)"
+                                          :description "Altitude in meters relative to sea-level"}
+                  :trap-station-sublocation {:label "Sublocation"
+                                             :description "The name given to the location"}
+                  :trap-station-notes {:label "Trap Station Notes"
+                                       :description "Notes about this trap station"}}
 
    :site {:duplicate-name "A site with the name '%s' already exists"
           :title "Site"
@@ -160,6 +175,7 @@
 
    :actionmenu {:title "Actions"}
    :action {:survey-sites "Survey Sites"
+            :trap-stations "Trap Stations"
             :edit "Edit"
             :delete "Delete"}
 

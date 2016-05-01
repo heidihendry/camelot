@@ -115,7 +115,9 @@
                         :label :site-name}}
    :actionmenu {:title ((:translate state) :actionmenu/title)
                 :menu [{:label ((:translate state) :action/delete)
-                        :action :delete}]}
+                        :action :delete}
+                       {:label ((:translate state) :action/trap-stations)
+                        :action :trap-stations}]}
    :layout [[:site-id]]
    :schema {:site-id {:type :select
                       :generator :survey-sites-available}}
@@ -123,6 +125,43 @@
                                         :event :survey-site-create}
                               :error {:type :event
                                       :event :survey-site-error}}}}})
+
+(defsmith trap-station smiths
+  [state]
+  {:resource {:type :trap-station
+              :title ((:translate state) :trap-station/title)
+              :endpoint "/trap-station"
+              :parent-id-key :survey-site-id
+              :id :trap-station-id}
+   :sidebar {:resource {:listing-endpoint "/trap-stations"
+                        :specific-endpoint "/trap-station"
+                        :title ((:translate state) :trap-station/sidebar-title)
+                        :type :trap-station
+                        :id :trap-station-id
+                        :label :trap-station-name}}
+   :actionmenu {:title ((:translate state) :actionmenu/title)
+                :menu [{:label ((:translate state) :action/delete)
+                        :action :delete}
+                       {:label ((:translate state) :action/edit)
+                        :action :edit-mode}]}
+   :layout [[:trap-station-name]
+            [:trap-station-sublocation]
+            [:trap-station-longitude]
+            [:trap-station-latitude]
+            [:trap-station-altitude]
+            [:trap-station-notes]]
+   :schema {:trap-station-name {:type :text}
+            :trap-station-sublocation {:type :text}
+            :trap-station-longitude {:type :number}
+            :trap-station-latitude {:type :number}
+            :trap-station-altitude {:type :number}
+            :trap-station-notes {:type :textarea
+                                 :cols 35
+                                 :rows 4}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :trap-station-create}
+                              :error {:type :event
+                                      :event :trap-station-error}}}}})
 
 (defsmith survey smiths
   [state]
