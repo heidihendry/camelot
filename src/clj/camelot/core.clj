@@ -32,7 +32,7 @@
    :headers {"Content-Type" "text/html; charset=utf-8"}
    :body (io/input-stream (io/resource "public/index.html"))})
 
-(defn cast-to-float
+(defn read-strings
   [ks data]
   (reduce #(let [v (get %1 %2)]
              (assoc %1 %2 (if (string? v)
@@ -120,15 +120,14 @@
         (let [data (decursorise data)]
           (r/response (cursorise (htrap-station/update!
                                   (gen-state (config))
-                                  (cast-to-float [:trap-station-longitude
-                                                  :trap-station-latitude] data))))))
+                                  (read-strings [:trap-station-longitude
+                                                 :trap-station-latitude] data))))))
   (PUT "/trap-station" [data]
        (let [data (decursorise data)]
          (r/response
           (cursorise (htrap-station/create!
                       (gen-state (config))
-                      (cast-to-float [:trap-station-longitude
-                                      :trap-station-latitude] data))))))
+                      (read-strings [:survey-site-id] data))))))
   (DELETE "/trap-station/:id" [id]
           (r/response {:data (htrap-station/delete! (gen-state (config)) (read-string id))}))
 
