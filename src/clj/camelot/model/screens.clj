@@ -1,6 +1,8 @@
 (ns camelot.model.screens
   (:require [camelot.smithy.core :refer [defsmith] :as smithy]
-            [camelot.handler.camera-status :as camstat]))
+            [camelot.handler.camera-status :as camstat]
+            [camelot.handler.survey-sites :as survey-sites]
+            [camelot.handler.sites :as sites]))
 
 (defn translate-fn
   [state]
@@ -33,6 +35,9 @@
                         :type :site
                         :id :site-id
                         :label :site-name}}
+   :actionmenu {:title ((:translate state) :actionmenu/title)
+                :menu [{:label ((:translate state) :action/edit)
+                        :action :edit-mode}]}
    :layout [[:site-name]
             [:site-sublocation]
             [:site-city]
@@ -71,6 +76,9 @@
                           :type :camera
                           :id :camera-id
                           :label :camera-name}}
+     :actionmenu {:title ((:translate state) :actionmenu/title)
+                :menu [{:label ((:translate state) :action/edit)
+                        :action :edit-mode}]}
      :layout [[:camera-name]
               [:camera-status]
               [:camera-make]
@@ -95,6 +103,31 @@
                                 :error {:type :event
                                         :event :camera-update-error}}}}}))
 
+(defsmith survey-site smiths
+  [state]
+  {:resource {:type :survey-site
+              :title ((:translate state) :survey-site/title)
+              :endpoint "/survey-site"
+              :parent-id-key :survey-id
+              :id :survey-site-id}
+   :sidebar {:resource {:endpoint "/survey-site"
+                        :title ((:translate state) :survey-site/sidebar-title)
+                        :type :survey-site
+                        :id :survey-site-id
+                        :label :site-name}}
+   :actionmenu {:title ((:translate state) :actionmenu/title)
+                :menu [{:label ((:translate state) :action/edit)
+                        :action :edit-mode}]}
+   :layout [[:site-id]]
+   :schema {:site-id {:type :select
+                      :options (conj {"" ""}
+                                     (into {} (map #(hash-map (str (:site-id %)) (:site-name %))
+                                                   (sites/get-all state))))}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :survey-site-create}
+                              :error {:type :event
+                                      :event :survey-site-error}}}}})
+
 (defsmith survey smiths
   [state]
   {:resource {:type :survey
@@ -109,8 +142,8 @@
    :actionmenu {:title ((:translate state) :actionmenu/title)
                 :menu [{:label ((:translate state) :action/edit)
                         :action :edit-mode}
-                       {:label ((:translate state) :action/manage-sites)
-                        :action :manage-sites}
+                       {:label ((:translate state) :action/survey-sites)
+                        :action :survey-sites}
                        ]}
    :layout [[:survey-name]
             [:survey-directory]

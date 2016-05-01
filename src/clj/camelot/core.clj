@@ -4,6 +4,7 @@
             [camelot.handler.surveys :as hsurvey]
             [camelot.handler.sites :as hsite]
             [camelot.handler.cameras :as hcamera]
+            [camelot.handler.survey-sites :as hsurvey-site]
             [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
@@ -84,6 +85,22 @@
                                              (read-string (:camera-status data))))))))
   (DELETE "/camera/:id" [id]
           (r/response {:data (hcamera/delete! (gen-state (config)) (read-string id))}))
+
+
+  (GET "/survey-site" [] (r/response (hsurvey-site/get-all (gen-state (config)))))
+  (GET "/survey-site/:id" [id] (r/response (cursorise (hsurvey-site/get-specific (gen-state (config)) (read-string id)))))
+  (POST "/survey-site" [data]
+        (r/response (cursorise (hsurvey-site/update! (gen-state (config)) (decursorise data)))))
+  (PUT "/survey-site" [data]
+       (let [data (decursorise data)]
+         (r/response
+          (cursorise (hsurvey-site/create! (gen-state (config))
+                                           (assoc data :site-id
+                                                  (read-string (:site-id data))
+                                                  :survey-id
+                                                  (read-string (:survey-id data))))))))
+  (DELETE "/survey-site/:id" [id]
+          (r/response {:data (hsurvey-site/delete! (gen-state (config)) (read-string id))}))
 
   (POST "/quit" [] (System/exit 0))
   (resources "/"))

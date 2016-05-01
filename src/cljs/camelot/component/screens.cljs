@@ -25,7 +25,8 @@
    :settings-cancel #(nav/toggle-settings!)})
 
 (def actions
-  {:manage-sites (fn [vs rid] (nav/nav! (str "/manage-sites/" rid)))
+  {:survey-sites (fn [vs rid]
+                   (nav/nav! (str "/#/survey-sites/" rid)))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))})
 
 (defn get-endpoint
@@ -39,6 +40,10 @@
     (if (nil? rid)
       nil
       (get-in vs [:selected-resource :details rid :value]))))
+
+(defn get-parent-resource-id
+  [vs]
+  (get-in vs [:screen :id]))
 
 (defn get-action
   [action]
@@ -58,12 +63,18 @@
   (= (get-in (get-screen view-state) [:resource :type]) :settings))
 
 (defn create [success-key error-key vs resources key]
-  (rest/put-resource (get-endpoint vs)
-                     {:data (deref (get vs :buffer))}
-                     #(do
-                        (load-resource-children vs)
-                        (om/update! vs :buffer {})
-                        (get events success-key))))
+  (let [parent-id (get-parent-resource-id vs)
+        basedata (deref (get vs :buffer))
+        data (if parent-id
+               (assoc basedata (get-in (get-screen vs) [:resource :parent-id-key])
+                      {:value parent-id})
+               basedata)]
+    (rest/put-resource (get-endpoint vs)
+                       {:data data}
+                       #(do
+                          (load-resource-children vs)
+                          (om/update! vs :buffer {})
+                          (get events success-key)))))
 
 (defn submit-update [success-key error-key vs resources key]
   (let [cb (get events success-key)]
@@ -112,7 +123,6 @@
         (apply dom/select #js {:className "actionmenu"
                                :onChange #(let [value (.. % -target -value)
                                                 action (get-action (keyword value))]
-                                            (prn (get-resource-id vs))
                                             (if action
                                               (action vs (get-resource-id vs))
                                               (prn (str "Missing action: " (name value)))))}
@@ -252,6 +262,7 @@
       (render [_]
         (let [view-state (get-in app [:view type])
               screen (get-screen view-state)]
+          (prn screen)
           (dom/div nil
                    (when (get screen :sidebar)
                      (om/build sidebar-component {:screen screen
