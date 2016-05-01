@@ -11,6 +11,15 @@
   [vs]
   (get (get (state/app-state-cursor) :screens) (get-in vs [:screen :type])))
 
+(defn load-resource-children
+  [vs]
+  (let [screen (get-screen vs)
+        res (get-in screen [:sidebar :resource])]
+    (rest/get-resource (get res :endpoint)
+                       #(om/update! (get vs :selected-resource)
+                                    :children
+                                    (:body %)))))
+
 (def events
   {:settings-save (fn [d] (nav/toggle-settings!) (albums/reload-albums))
    :settings-cancel #(nav/toggle-settings!)})
@@ -36,7 +45,10 @@
 (defn create [success-key error-key vs resources key]
   (rest/put-resource (get-endpoint vs)
                      {:data (deref (get vs :buffer))}
-                     (get events success-key)))
+                     #(do
+                        (load-resource-children vs)
+                        (om/update! vs :buffer {})
+                        (get events success-key))))
 
 (defn submit-update [success-key error-key vs resources key]
   (let [cb (get events success-key)]
@@ -45,6 +57,7 @@
                         {:data (deref (get resources key))}
                         #(do
                            (when-not (settings-screen? vs)
+                             (load-resource-children vs)
                              (om/update! (get vs :screen) :mode :readonly))
                            (when cb
                              (cb))))))
@@ -54,6 +67,7 @@
     (rest/delete-resource (get-url vs) {}
                           #(do (om/update! resources key {})
                                (om/update! vs :buffer {})
+                               (load-resource-children vs)
                                (om/update! (get vs :screen) :mode :create)
                                (when cb
                                  (cb))))))
@@ -167,11 +181,7 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (let [res (get-in data [:screen :sidebar :resource])]
-        (rest/get-resource (get res :endpoint)
-                           #(om/update! (get-in data [:view-state :selected-resource])
-                                        :children
-                                        (:body %)))))
+      (load-resource-children (:view-state data)))
     om/IRender
     (render [_]
       (let [res (get-in data [:screen :sidebar :resource])]
