@@ -54,25 +54,26 @@
                                      (:root-path conf)))))
 
   (GET "/survey" [] (r/response (hsurvey/get-all (gen-state (config)))))
-  (GET "/survey/:id" [id] (r/response (cursorise (hsurvey/get-specific (gen-state (config)) id))))
+  (GET "/survey/:id" [id] (r/response (cursorise (hsurvey/get-specific (gen-state (config))
+                                                                       (read-string id)))))
   (POST "/survey" [data]
         (r/response (cursorise (hsurvey/update! (gen-state (config)) (decursorise data)))))
   (PUT "/survey" [data]
        (r/response (cursorise (hsurvey/create! (gen-state (config)) (decursorise data)))))
   (DELETE "/survey/:id" [id]
-          (r/response {:data (hsurvey/delete! (gen-state (config)) id)}))
+          (r/response {:data (hsurvey/delete! (gen-state (config)) (read-string id))}))
 
   (GET "/site" [] (r/response (hsite/get-all (gen-state (config)))))
-  (GET "/site/:id" [id] (r/response (cursorise (hsite/get-specific (gen-state (config)) id))))
+  (GET "/site/:id" [id] (r/response (cursorise (hsite/get-specific (gen-state (config)) (read-string id)))))
   (POST "/site" [data]
         (r/response (cursorise (hsite/update! (gen-state (config)) (decursorise data)))))
   (PUT "/site" [data]
        (r/response (cursorise (hsite/create! (gen-state (config)) (decursorise data)))))
   (DELETE "/site/:id" [id]
-          (r/response {:data (hsite/delete! (gen-state (config)) id)}))
+          (r/response {:data (hsite/delete! (gen-state (config)) (read-string id))}))
 
   (GET "/camera" [] (r/response (hcamera/get-all (gen-state (config)))))
-  (GET "/camera/:id" [id] (r/response (cursorise (hcamera/get-specific (gen-state (config)) id))))
+  (GET "/camera/:id" [id] (r/response (cursorise (hcamera/get-specific (gen-state (config)) (read-string id)))))
   (POST "/camera" [data]
         (r/response (cursorise (hcamera/update! (gen-state (config)) (decursorise data)))))
   (PUT "/camera" [data]
@@ -82,7 +83,7 @@
                                       (assoc data :camera-status
                                              (read-string (:camera-status data))))))))
   (DELETE "/camera/:id" [id]
-          (r/response {:data (hcamera/delete! (gen-state (config)) id)}))
+          (r/response {:data (hcamera/delete! (gen-state (config)) (read-string id))}))
 
   (POST "/quit" [] (System/exit 0))
   (resources "/"))

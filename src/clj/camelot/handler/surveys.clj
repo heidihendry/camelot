@@ -11,7 +11,8 @@
   (db/clj-keys (-get-all)))
 
 (s/defn get-specific :- Survey
-  [state id]
+  [state
+   id :- s/Num]
   (first (db/with-db-keys -get-specific {:survey-id id})))
 
 (s/defn get-specific-by-name :- Survey

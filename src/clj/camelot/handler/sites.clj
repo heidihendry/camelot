@@ -11,7 +11,8 @@
   (db/clj-keys (-get-all)))
 
 (s/defn get-specific :- Site
-  [state id]
+  [state
+   id :- s/Num]
   (first (db/with-db-keys -get-specific {:site-id id})))
 
 (s/defn get-specific-by-name :- Site
