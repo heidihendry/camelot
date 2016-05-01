@@ -41,7 +41,8 @@
              (not (nil? (:resources (state/app-state-cursor)))))
       (om/update! (get (state/app-state-cursor) :view) :content
                   {:screen {:type type :mode mode :id id} :buffer {}
-                   :selected-resource {}})
+                   :selected-resource {}
+                   :generator-data {}})
     (let [f (screens/build-view-component :content)]
       (om/root f state/app-state
                {:target (js/document.getElementById "page-content")}))))

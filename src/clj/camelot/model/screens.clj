@@ -84,8 +84,7 @@
               [:camera-notes]]
      :schema {:camera-name {:type :text}
               :camera-status {:type :select
-                              ;; TODO pull values from DB
-                              :options opts}
+                              :generator :camera-statuses}
               :camera-make {:type :text}
               :camera-model {:type :text}
               :camera-notes {:type :textarea
@@ -115,13 +114,11 @@
                         :id :survey-site-id
                         :label :site-name}}
    :actionmenu {:title ((:translate state) :actionmenu/title)
-                :menu [{:label ((:translate state) :action/edit)
-                        :action :edit-mode}]}
+                :menu [{:label ((:translate state) :action/delete)
+                        :action :delete}]}
    :layout [[:site-id]]
    :schema {:site-id {:type :select
-                      :options (conj {"" ""}
-                                     (into {} (map #(hash-map (str (:site-id %)) (:site-name %))
-                                                   (sites/get-all state))))}}
+                      :generator :survey-sites-available}}
    :states {:create {:submit {:success {:type :event
                                         :event :survey-site-create}
                               :error {:type :event

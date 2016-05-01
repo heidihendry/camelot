@@ -160,7 +160,8 @@
 
    :actionmenu {:title "Actions"}
    :action {:survey-sites "Survey Sites"
-            :edit "Edit"}
+            :edit "Edit"
+            :delete "Delete"}
 
    :application {:dashboard "Dashboard"
                  :surveys "Surveys"

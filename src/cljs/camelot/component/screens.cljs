@@ -24,14 +24,22 @@
                                     :children
                                     (:body %)))))
 
+(def generators
+  {:camera-statuses (fn [gendata gen genargs] (rest/get-resource "/camera-statuses"
+                                                                 #(om/update! gendata gen (conj (map (fn [x] (hash-map :vkey (:camera-status-id x)
+                                                                                                                       :desc (:camera-status-description x)))
+                                                                                                     (:body %))
+                                                                                                {:vkey "" :desc ""}))))
+   :survey-sites-available (fn [gendata gen genargs]
+                             (rest/get-resource (str "/survey-sites-available/" (get genargs :id))
+                                                #(om/update! gendata gen (conj (map (fn [x] (hash-map :vkey (:site-id x)
+                                                                                                      :desc (:site-name x)))
+                                                                                    (:body %))
+                                                                               {:vkey "" :desc ""}))))})
+
 (def events
   {:settings-save (fn [d] (nav/toggle-settings!) (albums/reload-albums))
    :settings-cancel #(nav/toggle-settings!)})
-
-(def actions
-  {:survey-sites (fn [vs rid]
-                   (nav/nav! (str "/#/survey-sites/" rid)))
-   :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))})
 
 (defn get-endpoint
   [vs]
@@ -48,10 +56,6 @@
 (defn get-parent-resource-id
   [vs]
   (get-in vs [:screen :id]))
-
-(defn get-action
-  [action]
-  (action actions))
 
 (defn get-url
   [vs]
@@ -77,7 +81,7 @@
                        {:data data}
                        #(do
                           (load-resource-children vs)
-                          (om/update! vs :buffer {})
+                          (om/update! (get vs :screen) :mode :readonly)
                           (get events success-key)))))
 
 (defn submit-update [success-key error-key vs resources key]
@@ -110,6 +114,20 @@
     (let [cb (get events event-key)]
       (when cb
         (cb)))))
+
+(def actions
+  {:survey-sites (fn [vs rid]
+                   (nav/nav! (str "/#/survey-sites/" rid)))
+   :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
+   :delete (fn [vs rid] (let [screen (get-screen vs)]
+                          (when (js/confirm "Are you sure you wish to delete this?")
+                            (delete (get-in screen [:states :delete :submit :success :event])
+                                    (get-in screen [:states :delete :submit :error :event])
+                                    vs (get vs :selected-resource) :details))))})
+
+(defn get-action
+  [action]
+  (action actions))
 
 (defn actionmenu-item-component
   [{:keys [vkey action desc]} owner]
@@ -154,17 +172,24 @@
                              [(first menu-item) value buf opts])))))))
 
 (defn body-component
+  "Render all fields in the body"
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (apply dom/div #js {:className "section-body"}
-             (om/build-all field-component
-                           (map #(vector % (get data :screen) (get-in data [:view-state :buffer])
-                                         (if (= (get-in data [:view-state :screen :mode]) :readonly)
-                                           {:disabled true}
-                                           {}))
-                                (get-in data [:screen :layout])))))))
+      (let [vs (:view-state data)]
+        (apply dom/div #js {:className "section-body"}
+               (om/build-all field-component
+                             (map #(vector % (get data :screen) (get vs :buffer)
+                                           (if (= (get-in vs [:screen :mode]) :readonly)
+                                             {:disabled true
+                                              :generators generators
+                                              :generator-data (get vs :generator-data)
+                                              :generator-args {:id (get-parent-resource-id vs)}}
+                                             {:generators generators
+                                              :generator-data (get vs :generator-data)
+                                              :generator-args {:id (get-parent-resource-id vs)}}))
+                                  (get-in data [:screen :layout]))))))))
 
 (defn resource-update-component
   [{:keys [screen view-state update cancel delete]} owner]

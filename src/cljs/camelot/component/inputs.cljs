@@ -68,10 +68,16 @@
     om/IWillMount
     (will-mount [_]
       (when (nil? (get buf k))
-        (om/update! buf k {:value nil})))
+        (om/update! buf k {:value nil}))
+      (let [generator (get-in v [:schema :generator])
+            generator-fn (get (:generators opts) generator)]
+        (when (and generator generator-fn)
+          (om/update! (get opts :generator-data) generator {})
+          (generator-fn (get opts :generator-data) generator (get opts :generator-args)))))
     om/IRender
     (render [_]
-      (let [val (get-in buf [k :value])]
+      (let [val (get-in buf [k :value])
+            generator (get-in v [:schema :generator])]
         (dom/select #js {:className "field-input"
                          :disabled (:disabled opts)
                          :onChange #((state/set-coerced-value! val) %
@@ -81,9 +87,11 @@
                            (name val)
                            val)}
                     (om/build-all select-option-component
-                                  (map #(hash-map :vkey (list-react-key (first %))
-                                                  :desc (second %))
-                                       (:options (:schema v)))
+                                  (if generator
+                                    (get-in opts [:generator-data generator])
+                                    (map #(hash-map :vkey (list-react-key (first %))
+                                                    :desc (second %))
+                                         (get-in v [:schema :options])))
                                   {:key :vkey}))))))
 
 (defmethod input-field :list

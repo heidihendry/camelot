@@ -31,3 +31,7 @@
   [state
    id :- s/Num]
   (db/with-db-keys -delete! {:survey-site-id id}))
+
+(s/defn get-available
+  [state id]
+  (db/with-db-keys -get-available {:survey-id id}))

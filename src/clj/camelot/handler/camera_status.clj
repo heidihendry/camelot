@@ -9,4 +9,6 @@
 
 (s/defn get-all :- [CameraStatus]
   [state]
-  (db/clj-keys (-get-all)))
+  (map #(assoc % :camera-status-description
+               ((:translate state) (keyword (:camera-status-description %))))
+       (db/clj-keys (-get-all))))
