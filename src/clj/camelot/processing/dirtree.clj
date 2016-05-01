@@ -24,7 +24,7 @@
   "Return true if there are exif-containing files and the directory hasn't any subdirectories. False otherwise."
   [files]
   (and (some exif-file? files)
-       (not (some f/directory? files))))
+       (not-any? f/directory? files)))
 
 (defn- parse-tag
   "Map tag names to their descriptions, returning the result as a hash"

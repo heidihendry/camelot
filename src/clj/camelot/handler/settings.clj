@@ -29,7 +29,7 @@
   "Get the version string from the system properties or the jar metadata."
   []
   (or (System/getProperty "camelot.version")
-      (-> (ps/version-property-from-pom 'camelot))))
+      (ps/version-property-from-pom 'camelot)))
 
 (defn get-nav-menu
   [state]

@@ -17,7 +17,7 @@
   "Serialise Joda DateTime for transit."
   (transit/write-handler
    (constantly "m")
-   #(-> % c/to-long)
+   #(c/to-long %)
    #(-> % c/to-long .toString)))
 
 (def file-writer
@@ -25,7 +25,7 @@
   (transit/write-handler
    (constantly "f")
    #(identity %)
-   #(-> % (get-path))))
+   #(get-path %)))
 
 (def transit-write-options
   "Transit writer options."

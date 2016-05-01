@@ -15,7 +15,7 @@
        (-> js/window (aget "location") (aget "protocol"))
        "//"
        (-> js/window (aget "location") (aget "hostname"))
-       (when (not (zero? (count port)))
+       (when-not (zero? (count port))
          (str ":" port))
        path)
       (str "http://localhost:3449" path))))

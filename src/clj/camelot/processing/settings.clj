@@ -95,13 +95,12 @@
   (let [translate (gen-translator config)
         conf (get-config-file)
         confdir (f/get-parent-file (io/file conf))]
-    (when (not (f/exists? confdir))
+    (when-not (f/exists? confdir)
       (f/mkdir confdir))
     (if (and (not overwrite?) (f/exists? (io/file conf)))
       (throw (RuntimeException. (translate :problems/default-config-exists conf)))
-      (do
-        (with-open [w (io/writer conf)]
-          (pp/write config :stream w))))
+      (with-open [w (io/writer conf)]
+        (pp/write config :stream w)))
     config))
 
 (defn save-config
@@ -155,8 +154,9 @@ Throws a RuntimeException if the file cannot be read."
   {:config conf
    :translate (gen-translator conf)})
 
-(defn version-property-from-pom [dep]
+(defn version-property-from-pom
   "Return a version string from the Jar metadata."
+  [dep]
   (let [path (str "META-INF/maven/" (or (namespace dep) (name dep))
                   "/" (name dep) "/pom.properties")
         props (io/resource path)]

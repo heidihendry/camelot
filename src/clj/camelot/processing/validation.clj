@@ -20,11 +20,11 @@
                              (:infrared-iso-value-threshold (:config state)))
         ir-failed (count (remove identity (map ir-check-fn photos)))
         night-total (count (filter #(nightfn (t/hour (:datetime %))) photos))]
-    (if (not (zero? night-total))
+    (if (zero? night-total)
+      {:result :pass}
       (if (> (/ ir-failed night-total) (:erroneous-infrared-threshold (:config state)))
         {:result :fail :reason ((:translate state) :checks/time-light-sanity)}
-        {:result :pass})
-      {:result :pass})))
+        {:result :pass}))))
 
 (defn check-photo-stddev
   "Check the given photos have no outliers by date/time"
@@ -78,7 +78,7 @@
 (defn compare-headlines
   "Compare two handlines, failing if they're not consistent."
   [state h1 h2]
-  (if (not (= (:headline h1) (:headline h2)))
+  (if (not= (:headline h1) (:headline h2))
     (reduced {:result :fail :reason ((:translate state) :checks/headline-consistency
                                      (:filename h1) (:filename h2))})
     h1))
@@ -94,9 +94,9 @@
 (defn compare-cameras
   "Compare two cameras, failing if they're not consistent."
   [state h1 h2]
-  (if (or (not (= (:make (:camera h1)) (:make (:camera h2))))
-          (not (= (:model (:camera h1)) (:model (:camera h2))))
-          (not (= (:software (:camera h1)) (:software (:camera h2)))))
+  (if (or (not= (:make (:camera h1)) (:make (:camera h2)))
+          (not= (:model (:camera h1)) (:model (:camera h2)))
+          (not= (:software (:camera h1)) (:software (:camera h2))))
     (reduced {:result :fail :reason ((:translate state) :checks/camera-consistency
                                      (:filename h1) (:filename h2))})
     h1))
@@ -157,7 +157,7 @@
                (map :species)
                (remove #(re-find sighting-quantity-exclusions-re %))
                (map str/lower-case)
-               (remove (into #{} (map str/lower-case (:surveyed-species (:config state))))))]
+               (remove (set (map str/lower-case (:surveyed-species (:config state))))))]
     (if (empty? m)
       {:result :pass}
       {:result :fail
@@ -176,7 +176,7 @@
 (defn check-invalid-photos
   "Check the album for invalid photos"
   [state photos]
-  (let [res (first (into [] (filter #(contains? % :invalid) photos)))]
+  (let [res (first (vec (filter #(contains? % :invalid) photos)))]
     (if (nil? res)
       {:result :pass}
       {:result :fail
@@ -223,7 +223,7 @@
     (remove nil?
             (map (fn [[t f]]
                    (let [res (f state photos)]
-                     (if (not= (:result res) :pass)
+                     (when (not= (:result res) :pass)
                        {:result :fail
                         :reason (if (:reason res)
                                   (:reason res)
@@ -232,8 +232,7 @@
                                        (str "checks/")
                                        (keyword)
                                        ((:translate state))
-                                       ((:translate state) :checks/problem-without-reason)))}
-                       nil)))
+                                       ((:translate state) :checks/problem-without-reason)))})))
                  tests))))
 
 (s/defn list-problems

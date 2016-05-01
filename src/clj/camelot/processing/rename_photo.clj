@@ -30,7 +30,7 @@ Throw IllegalStateException should fields not be present in the metadata."
                               (if (nil? v)
                                 (conj acc (get fields i))
                                 acc))
-                            [] (into [] extract))]
+                            [] (vec extract))]
     (if (empty? problems)
       (map #(stringify-field (:config state) metadata %) extract)
       (throw (java.lang.IllegalStateException.
@@ -53,7 +53,7 @@ Should renaming not be possible, return nil."
         extension (FilenameUtils/getExtension (f/get-name file))
         basename (FilenameUtils/removeExtension (f/get-name file))
         new-file (io/file (str dir "/" new-name "." (str/lower-case extension)))]
-    (when (not (= file new-file))
+    (when-not (= file new-file)
       (if (f/exists? new-file)
         (println (str ((:translate state) :problems/warn)
                       ((:translate state) :problems/rename-existing-conflict

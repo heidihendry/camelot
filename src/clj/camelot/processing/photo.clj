@@ -17,9 +17,8 @@
 (defn- parse-gps
   [pos-ref]
   (fn [lon lon-ref]
-    (if (or (nil? lon) (nil? lon-ref))
-      nil
-      (let [parts (into [] (map read-string (map #(str/replace % #"[^\.0-9]" "")
+    (when-not (or (nil? lon) (nil? lon-ref))
+      (let [parts (vec (map read-string (map #(str/replace % #"[^\.0-9]" "")
                                                  (str/split lon #" "))))
             distance (+ (first parts)
                         (/ (/ (nth parts 1) 0.6) 100)
@@ -35,7 +34,7 @@
 (defn extract-path-value
   "Return the metadata for a given path."
   [metadata path]
-  (reduce (fn [acc n] (get acc n)) metadata path))
+  (reduce get metadata path))
 
 (s/defn night? :- s/Bool
   "Check whether the given time is 'night'."
@@ -53,7 +52,7 @@
   "Exif metadata dates are strings like 2014:04:11 16:37:00.  This makes them real dates.
 Important: Timezone information will be discarded."
   [ed]
-  (when (not (nil? ed))
+  (when-not (nil? ed)
     (let [parts (str/split (first (str/split ed #"\+")) #"[ :]")]
       (assert (= (count parts) 6))
       (apply t/date-time (map #(Integer/parseInt %) parts)))))
@@ -66,8 +65,7 @@ Important: Timezone information will be discarded."
 
 (s/defn exif-gps-datetime
   [date time]
-  (when (and (string? date)
-             (string? time))
+  (when (and (string? date) (string? time))
     (exif-date-to-datetime (str date " " (first (str/split time #"\."))))))
 
 (s/defn validate
