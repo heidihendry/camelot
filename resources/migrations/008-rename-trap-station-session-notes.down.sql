@@ -1,0 +1,1 @@
+RENAME COLUMN trap_station_session.trap_station_session_notes TO trap_station_notes
