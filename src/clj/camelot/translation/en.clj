@@ -50,6 +50,15 @@
                   :trap-station-notes {:label "Trap Station Notes"
                                        :description "Notes about this trap station"}}
 
+   :trap-station-session {:title "Trap Station Session"
+                          :sidebar-title "Sessions"
+                          :trap-station-session-start-date {:label "Session Start Date"
+                                                    :description "The date the Trap Station started recording for this session."}
+                          :trap-station-session-end-date {:label "Session End Date"
+                                                  :description "The date the Trap Station finished recording for this session."}
+                          :trap-station-session-notes {:label "Session Notes"
+                                                       :description "Notes about this session for the trap station."}}
+
    :site {:duplicate-name "A site with the name '%s' already exists"
           :title "Site"
           :sidebar-title "Sites"
@@ -176,6 +185,7 @@
    :actionmenu {:title "Actions"}
    :action {:survey-sites "Survey Sites"
             :trap-stations "Trap Stations"
+            :sessions "Sessions"
             :edit "Edit"
             :delete "Delete"}
 

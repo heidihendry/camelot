@@ -7,6 +7,7 @@
             [camelot.handler.camera-status :as hcamstat]
             [camelot.handler.survey-sites :as hsurvey-site]
             [camelot.handler.trap-stations :as htrap-station]
+            [camelot.handler.trap-station-sessions :as htrap-station-session]
             [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
@@ -131,23 +132,36 @@
   (DELETE "/trap-station/:id" [id]
           (r/response {:data (htrap-station/delete! (gen-state (config)) (read-string id))}))
 
+  (GET "/trap-station-sessions/:id" [id] (r/response (htrap-station-session/get-all (gen-state (config)) id)))
+  (GET "/trap-station-session/:id" [id] (r/response (cursorise (htrap-station-session/get-specific (gen-state (config)) (read-string id)))))
+  (POST "/trap-station-session" [data]
+        (let [data (decursorise data)]
+          (r/response (cursorise (htrap-station-session/update!
+                                  (gen-state (config)) data)))))
+  (PUT "/trap-station-session" [data]
+       (let [data (decursorise data)]
+         (r/response
+          (cursorise (htrap-station-session/create!
+                      (gen-state (config))
+                      (read-strings [:trap-station-id] data))))))
+  (DELETE "/trap-station-session/:id" [id]
+          (r/response {:data (htrap-station-session/delete! (gen-state (config)) (read-string id))}))
+
   (POST "/quit" [] (System/exit 0))
   (resources "/"))
 
 (def http-handler
   "Handler for HTTP requests"
-  (do
-    (-> routes
-        (wrap-transit-response {:encoding :json, :opts tutil/transit-write-options})
-        (wrap-transit-params {:opts tutil/transit-read-options})
-        (wrap-stacktrace-log)
-        (wrap-defaults api-defaults)
-        wrap-with-logger
-        wrap-gzip)))
+  (-> routes
+      (wrap-transit-response {:encoding :json, :opts tutil/transit-write-options})
+      (wrap-transit-params {:opts tutil/transit-read-options})
+      (wrap-stacktrace-log)
+      (wrap-defaults api-defaults)
+      wrap-with-logger
+      wrap-gzip))
 
 (defn -main [& [mode directory]]
   (let [port (Integer. (or (env :camelot-port) 8080))]
-    (do
-      ;;(db/migrate)
-      (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
-      (run-jetty http-handler {:port port :join? false}))))
+    ;;(db/migrate)
+    (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
+    (run-jetty http-handler {:port port :join? false})))

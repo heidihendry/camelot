@@ -20,6 +20,5 @@
 (def TrapStation
   (merge TrapStationCreate
          {:trap-station-id s/Num
-          (s/optional-key :site-name) (s/maybe s/Str)
           :trap-station-created org.joda.time.DateTime
           :trap-station-updated org.joda.time.DateTime}))

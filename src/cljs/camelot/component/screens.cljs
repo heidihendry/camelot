@@ -5,7 +5,9 @@
             [camelot.component.inputs :as inputs]
             [camelot.state :as state]
             [camelot.nav :as nav]
-            [camelot.rest :as rest]))
+            [camelot.rest :as rest])
+    (:import [goog.date DateTime]
+             [goog.i18n DateTimeFormat]))
 
 (defn get-screen
   "Return the screen corresponding to the given view-state."
@@ -146,6 +148,8 @@
                    (nav/nav! (str "/#/survey-sites/" rid)))
    :trap-stations (fn [vs rid]
                     (nav/nav! (str "/#/trap-stations/" rid)))
+   :trap-station-sessions (fn [vs rid]
+                            (nav/nav! (str "/#/trap-station-sessions/" rid)))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :delete (fn [vs rid] (let [screen (get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")
@@ -301,7 +305,11 @@
                                     (om/update! (get-in data [:view-state :selected-resource]) :details (:body resp))
                                     (om/update! (get data :view-state)
                                                 :buffer (:body resp)))))}
-              (dom/a nil (get (:item data) (get data :label)))))))
+              (let [label (get (:item data) (get data :label))]
+                (if (= (type label) DateTime)
+                  (let [df (DateTimeFormat. "yyyy-MM-dd")]
+                    (dom/a nil (.format df label)))
+                  (dom/a nil label)))))))
 
 (defn build-sidebar-item-components
   "Return the built components for the sidebar items."

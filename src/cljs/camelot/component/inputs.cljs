@@ -148,13 +148,14 @@
     om/IWillMount
     (will-mount [_]
       (when (nil? (get buf k))
-        (om/update! buf k {:value nil})))
+        (om/update! buf k {:value (DateTime.)})))
     om/IRender
     (render [_]
       (if (:disabled opts)
         (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
           (dom/div nil (.format df (get-in buf [k :value]))))
-        (om/build datepicker (get buf k))))))
+        (when (get buf k)
+          (om/build datepicker (get buf k)))))))
 
 (defmethod input-field :percentage
   [[k v buf opts :as d] owner]

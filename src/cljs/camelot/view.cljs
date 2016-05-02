@@ -49,6 +49,7 @@
 
 (defroute "/#/dashboard" [] (generate-view calb/album-view-component))
 (defroute "/#/surveys" [] (page-content-view :survey :create))
+(defroute "/#/trap-station-sessions/:id" [id] (page-content-view :trap-station-session :create id))
 (defroute "/#/trap-stations/:id" [id] (page-content-view :trap-station :create id))
 (defroute "/#/survey-sites/:id" [id] (page-content-view :survey-site :create id))
 (defroute "/#/sites" [] (page-content-view :site :create))

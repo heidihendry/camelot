@@ -23,8 +23,7 @@
 
 (defn clj-keys
   [data]
-  (if (nil? data)
-    nil
+  (when-not (nil? data)
     (if (coll? data)
       (if (seq? data)
         (map #(into {} (reduce-kv clj-key {} %)) data)
@@ -33,7 +32,10 @@
 
 (defn- db-key
   [acc k v]
-  (assoc acc (keyword (str/replace (name k) #"-" "_")) v))
+  (assoc acc (keyword (str/replace (name k) #"-" "_"))
+         (if (instance? org.joda.time.DateTime v)
+           (tc/to-sql-time v)
+           v)))
 
 (defn with-db-keys
   [f data]

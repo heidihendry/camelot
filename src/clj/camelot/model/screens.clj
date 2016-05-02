@@ -143,7 +143,9 @@
                 :menu [{:label ((:translate state) :action/delete)
                         :action :delete}
                        {:label ((:translate state) :action/edit)
-                        :action :edit-mode}]}
+                        :action :edit-mode}
+                       {:label ((:translate state) :action/sessions)
+                        :action :trap-station-sessions}]}
    :layout [[:trap-station-name]
             [:trap-station-sublocation]
             [:trap-station-longitude]
@@ -162,6 +164,37 @@
                                         :event :trap-station-create}
                               :error {:type :event
                                       :event :trap-station-error}}}}})
+
+(defsmith trap-station-session smiths
+  [state]
+  {:resource {:type :trap-station-session
+              :title ((:translate state) :trap-station-session/title)
+              :endpoint "/trap-station-session"
+              :parent-id-key :trap-station-id
+              :id :trap-station-session-id}
+   :sidebar {:resource {:listing-endpoint "/trap-station-sessions"
+                        :specific-endpoint "/trap-station-session"
+                        :title ((:translate state) :trap-station-session/sidebar-title)
+                        :type :trap-station-session
+                        :id :trap-station-session-id
+                        :label :trap-station-session-start-date}}
+   :actionmenu {:title ((:translate state) :actionmenu/title)
+                :menu [{:label ((:translate state) :action/delete)
+                        :action :delete}
+                       {:label ((:translate state) :action/edit)
+                        :action :edit-mode}]}
+   :layout [[:trap-station-session-start-date]
+            [:trap-station-session-end-date]
+            [:trap-station-session-notes]]
+   :schema {:trap-station-session-start-date {:type :datetime}
+            :trap-station-session-end-date {:type :datetime}
+            :trap-station-session-notes {:type :textarea
+                                 :cols 35
+                                 :rows 4}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :trap-station-session-create}
+                              :error {:type :event
+                                      :event :trap-station-session-error}}}}})
 
 (defsmith survey smiths
   [state]
