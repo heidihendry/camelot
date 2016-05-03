@@ -126,6 +126,32 @@
                               :error {:type :event
                                       :event :survey-site-error}}}}})
 
+(defsmith trap-station-session-camera smiths
+  [state]
+  {:resource {:type :trap-station-session-camera
+              :title ((:translate state) :trap-station-session-camera/title)
+              :endpoint "/trap-station-session-camera"
+              :parent-id-key :trap-station-session-id
+              :id :trap-station-session-camera-id}
+   :sidebar {:resource {:listing-endpoint "/trap-station-session-cameras"
+                        :specific-endpoint "/trap-station-session-camera"
+                        :title ((:translate state) :trap-station-session-camera/sidebar-title)
+                        :type :trap-station-session-camera
+                        :id :trap-station-session-camera-id
+                        :label :camera-name}}
+   :actionmenu {:title ((:translate state) :actionmenu/title)
+                :menu [{:label ((:translate state) :action/delete)
+                        :action :delete}
+                       {:label ((:translate state) :action/import-media)
+                        :action :import-media}]}
+   :layout [[:camera-id]]
+   :schema {:camera-id {:type :select
+                        :generator :trap-station-session-cameras-available}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :trap-station-session-camera-create}
+                              :error {:type :event
+                                      :event :trap-station-session-camera-error}}}}})
+
 (defsmith trap-station smiths
   [state]
   {:resource {:type :trap-station
@@ -182,7 +208,9 @@
                 :menu [{:label ((:translate state) :action/delete)
                         :action :delete}
                        {:label ((:translate state) :action/edit)
-                        :action :edit-mode}]}
+                        :action :edit-mode}
+                       {:label ((:translate state) :action/trap-station-session-cameras)
+                        :action :trap-station-session-cameras}]}
    :layout [[:trap-station-session-start-date]
             [:trap-station-session-end-date]
             [:trap-station-session-notes]]

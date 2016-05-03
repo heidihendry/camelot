@@ -8,6 +8,7 @@
             [camelot.handler.survey-sites :as hsurvey-site]
             [camelot.handler.trap-stations :as htrap-station]
             [camelot.handler.trap-station-sessions :as htrap-station-session]
+            [camelot.handler.trap-station-session-cameras :as htrap-station-session-camera]
             [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as ame]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
@@ -146,6 +147,22 @@
                       (read-strings [:trap-station-id] data))))))
   (DELETE "/trap-station-session/:id" [id]
           (r/response {:data (htrap-station-session/delete! (gen-state (config)) (read-string id))}))
+
+  (GET "/trap-station-session-cameras/:id" [id] (r/response (htrap-station-session-camera/get-all (gen-state (config)) id)))
+  (GET "/trap-station-session-cameras-available/:id" [id] (r/response (htrap-station-session-camera/get-available (gen-state (config)) id)))
+  (GET "/trap-station-session-camera/:id" [id] (r/response (cursorise (htrap-station-session-camera/get-specific (gen-state (config)) (read-string id)))))
+  (POST "/trap-station-session-camera" [data]
+        (r/response (cursorise (htrap-station-session-camera/update! (gen-state (config)) (decursorise data)))))
+  (PUT "/trap-station-session-camera" [data]
+       (let [data (decursorise data)]
+         (r/response
+          (cursorise (htrap-station-session-camera/create! (gen-state (config))
+                                                           (assoc data :camera-id
+                                                                  (read-string (:camera-id data))
+                                                                  :trap-station-session-id
+                                                                  (read-string (:trap-station-session-id data))))))))
+  (DELETE "/trap-station-session-camera/:id" [id]
+          (r/response {:data (htrap-station-session-camera/delete! (gen-state (config)) (read-string id))}))
 
   (POST "/quit" [] (System/exit 0))
   (resources "/"))

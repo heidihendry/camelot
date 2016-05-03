@@ -35,6 +35,11 @@
                  :site-id {:label "Site"
                            :description "The site to add to the survey"}}
 
+   :trap-station-session-camera {:title "Session Camera"
+                                 :sidebar-title "Session Cameras"
+                                 :camera-id {:label "Camera"
+                                             :description "The camera to add to the Trap Station Session"}}
+
    :trap-station {:title "Trap Station"
                   :sidebar-title "Trap Stations"
                   :trap-station-name {:label "Trap Station Name"
@@ -183,9 +188,11 @@
                                 :description "A list of the fields required to be in the metadata."}}
 
    :actionmenu {:title "Actions"}
-   :action {:survey-sites "Survey Sites"
-            :trap-stations "Trap Stations"
-            :sessions "Sessions"
+   :action {:survey-sites "View Survey Sites"
+            :trap-stations "View Trap Stations"
+            :sessions "View Sessions"
+            :trap-station-session-cameras "View Cameras"
+            :import-media "Import Media"
             :edit "Edit"
             :delete "Delete"}
 

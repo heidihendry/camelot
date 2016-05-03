@@ -39,6 +39,16 @@
                   (conj (map to-dropdown (:body %))
                         {:vkey "" :desc ""})))))
 
+(defn trap-station-session-cameras-available-generator
+  "Drop-down menu generator for the available survey sites."
+  [gendata gen genargs]
+  (let [to-dropdown #(hash-map :vkey (:camera-id %)
+                               :desc (:camera-name %))]
+    (rest/get-resource (str "/trap-station-session-cameras-available/" (get genargs :id))
+                       #(om/update! gendata gen
+                                    (conj (map to-dropdown (:body %))
+                                          {:vkey "" :desc ""})))))
+
 (defn survey-sites-available-generator
   "Drop-down menu generator for the available survey sites."
   [gendata gen genargs]
@@ -52,7 +62,8 @@
 (def generators
   "Mapping of keys to functions to generate drop-down menus."
   {:camera-statuses camera-status-generator
-   :survey-sites-available survey-sites-available-generator})
+   :survey-sites-available survey-sites-available-generator
+   :trap-station-session-cameras-available trap-station-session-cameras-available-generator})
 
 (def events
   "Mapping of events to event functions."
@@ -150,6 +161,9 @@
                     (nav/nav! (str "/#/trap-stations/" rid)))
    :trap-station-sessions (fn [vs rid]
                             (nav/nav! (str "/#/trap-station-sessions/" rid)))
+   :trap-station-session-cameras (fn [vs rid]
+                                   (nav/nav! (str "/#/trap-station-session-cameras/" rid)))
+   :import-media (fn [vs rid] (js/alert "Not yet implemented."))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :delete (fn [vs rid] (let [screen (get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")
