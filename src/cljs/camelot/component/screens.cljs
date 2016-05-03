@@ -226,6 +226,7 @@
                              {:key key}))))))
 
 (defn field-component
+  "Component for input fields of any type."
   [[menu-item screen buf opts] owner]
   (reify
     om/IRender
@@ -258,6 +259,7 @@
                                   (get screen :layout))))))))
 
 (defn update-button-component
+  "Button-group component for finalising an update"
   [{:keys [view-state update cancel delete]}]
   (reify
     om/IRender
@@ -276,6 +278,7 @@
                              " Delete"))))))
 
 (defn resource-update-component
+  "Component for Update Mode"
   [{:keys [view-state update cancel delete] :as k} owner]
   (reify
     om/IRender
@@ -287,6 +290,7 @@
                  (om/build update-button-component k))))))
 
 (defn resource-view-component
+  "Component for Readonly Mode"
   [vs owner]
   (reify
     om/IRender
@@ -299,6 +303,7 @@
                  (dom/div nil (om/build body-component vs)))))))
 
 (defn resource-create-component
+  "Component for Create Mode"
   [{:keys [view-state create]} owner]
   (reify
     om/IRender
@@ -349,6 +354,7 @@
                               (get-in vs [:selected-resource :children]))))))
 
 (defn sidebar-component
+  "Component for the navigation sidebar."
   [vs owner]
   (reify
     om/IWillMount
@@ -365,6 +371,7 @@
                (build-sidebar-item-components vs)))))
 
 (defn build-update-component
+  "Builder for a Update-Mode component"
   [vs]
   (let [screen (get-screen vs)]
     (if (get vs :buffer)
@@ -384,6 +391,7 @@
       (dom/span nil "Loading..."))))
 
 (defn build-readonly-component
+  "Builder for a Readonly-Mode component"
   [vs]
   (do
     (if (get vs :buffer)
@@ -391,6 +399,7 @@
       (dom/span nil "Loading..."))))
 
 (defn build-create-component
+  "Builder for a Create-Mode component"
   [vs]
   (let [screen (get-screen vs)
         create-fn #(create (get-in screen [:states :create :submit :success :event])
@@ -402,6 +411,7 @@
                                          :create create-fn})))
 
 (defn breadcrumb-item-component
+  "A single segment in the breadcrumbs component."
   [{:keys [token label]} owner]
   (reify
     om/IRender
@@ -410,13 +420,16 @@
                 (dom/a #js {:onClick #(nav/breadnav-consume! token)} label)))))
 
 (defn breadcrumb-component
+  "Navigation Breadcrumbs component."
   [vs owner]
   (reify
     om/IRender
     (render [_]
       (when-not (empty? (get (state/app-state-cursor) :nav-history))
-        (dom/div #js {:className "breadcrumbs"}
-                 (om/build-all breadcrumb-item-component (get (state/app-state-cursor) :nav-history)))))))
+        (let [history (get (state/app-state-cursor) :nav-history)]
+          (dom/div #js {:className "breadcrumbs"}
+                   (om/build-all breadcrumb-item-component history
+                                 {:key :token})))))))
 
 (defn content-component
   "Wrap a component for the current view mode."
@@ -425,7 +438,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "main-content"}
-               (om/build breadcrumb-component vs {:key :token})
+               (om/build breadcrumb-component vs)
                (case (get-in vs [:screen :mode])
                  :update (build-update-component vs)
                  :readonly (build-readonly-component vs)

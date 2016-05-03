@@ -195,7 +195,7 @@ a:hover {
 
 }
 #app input.field-input, textarea.field-input, p.field-input {
-  min-width: 30rem;
+  width: 30rem;
   padding: 0.5rem;
   color: #666;
   font-size: 90%;
@@ -336,6 +336,7 @@ p.field-input {
     float: left;
     display: block;
     margin-left: 24rem;
+    min-width: 40rem;
 }
 .sidebar .create-record-btn {
     float: right;
@@ -359,10 +360,9 @@ p.field-input {
     padding: 0.1rem 1rem;
 }
 #page-content .breadcrumbs {
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid #eee;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 #page-content .breadcrumb-item::after {
     padding: 0 0.5rem;

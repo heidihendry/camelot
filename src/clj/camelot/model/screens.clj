@@ -11,8 +11,6 @@
 
 (def smiths (atom {}))
 
-;;(settings-screen (settings/gen-state settings/default-config))
-
 (defn build-options
   [state data idkey transkey]
   (merge {"" ""}
@@ -46,7 +44,6 @@
             :site-city {:type :text}
             :site-state-province {:type :text}
             :site-country {:type :text}
-            ;; TODO make textarea
             :site-notes {:type :textarea
                          :rows 4
                          :cols 35}}
