@@ -156,13 +156,21 @@
 (def actions
   "Mapping of actions to the corresponding action function."
   {:survey-sites (fn [vs rid]
-                   (nav/nav! (str "/#/survey-sites/" rid)))
+                   (nav/breadnav! (str "/#/survey-sites/" rid)
+                                  (let [screen (get-screen vs)]
+                                             (get-in screen [:resource :title]))))
    :trap-stations (fn [vs rid]
-                    (nav/nav! (str "/#/trap-stations/" rid)))
+                    (nav/breadnav! (str "/#/trap-stations/" rid)
+                                   (let [screen (get-screen vs)]
+                                             (get-in screen [:resource :title]))))
    :trap-station-sessions (fn [vs rid]
-                            (nav/nav! (str "/#/trap-station-sessions/" rid)))
+                            (nav/breadnav! (str "/#/trap-station-sessions/" rid)
+                                           (let [screen (get-screen vs)]
+                                             (get-in screen [:resource :title]))))
    :trap-station-session-cameras (fn [vs rid]
-                                   (nav/nav! (str "/#/trap-station-session-cameras/" rid)))
+                                   (nav/breadnav! (str "/#/trap-station-session-cameras/" rid)
+                                                  (let [screen (get-screen vs)]
+                                             (get-in screen [:resource :title]))))
    :import-media (fn [vs rid] (js/alert "Not yet implemented."))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :delete (fn [vs rid] (let [screen (get-screen vs)]
@@ -393,6 +401,23 @@
     (om/build resource-create-component {:view-state vs
                                          :create create-fn})))
 
+(defn breadcrumb-item-component
+  [{:keys [token label]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/span #js {:className "breadcrumb-item"}
+                (dom/a #js {:onClick #(nav/breadnav-consume! token)} label)))))
+
+(defn breadcrumb-component
+  [vs owner]
+  (reify
+    om/IRender
+    (render [_]
+      (when-not (empty? (get (state/app-state-cursor) :nav-history))
+        (dom/div #js {:className "breadcrumbs"}
+                 (om/build-all breadcrumb-item-component (get (state/app-state-cursor) :nav-history)))))))
+
 (defn content-component
   "Wrap a component for the current view mode."
   [vs]
@@ -400,6 +425,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "main-content"}
+               (om/build breadcrumb-component vs {:key :token})
                (case (get-in vs [:screen :mode])
                  :update (build-update-component vs)
                  :readonly (build-readonly-component vs)

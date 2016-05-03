@@ -358,3 +358,17 @@ p.field-input {
     border: 1px solid #ccc;
     padding: 0.1rem 1rem;
 }
+#page-content .breadcrumbs {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 0.5rem;
+}
+#page-content .breadcrumb-item::after {
+    padding: 0 0.5rem;
+    content: ">"
+}
+#page-content .breadcrumb-item:last-of-type::after {
+    padding: 0 0.5rem;
+    content: normal;
+}

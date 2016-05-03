@@ -1,13 +1,15 @@
 (ns camelot.nav
   (:require [goog.events :as events]
             [goog.history.EventType :as EventType]
-            [secretary.core :as secretary :refer-macros [defroute]])
+            [secretary.core :as secretary :refer-macros [defroute]]
+            [om.core :as om]
+            [camelot.state :as state])
   (:import [goog.history Html5History EventType]))
 
 (defn- get-token
   "Get the current location token"
   []
-  (str js/window.location.pathname js/window.location.search))
+  (str js/window.location.pathname js/window.location.hash))
 
 (defn- make-history
   "Initialise the HTML5 History"
@@ -23,9 +25,26 @@
     (goog.events/listen EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (.setEnabled true)))
 
+(defn breadnav!
+  "Navigate to a URL token, creating a breadcrumb"
+  [token breadcrumb]
+  (prn (get-token))
+  (om/transact! (state/app-state-cursor) :nav-history
+                (fn [h] (conj (vec h) {:token (get-token)
+                                       :label breadcrumb})))
+  (.setToken history token))
+
+(defn breadnav-consume!
+  "Navigate to a URL token"
+  [token]
+  (om/transact! (state/app-state-cursor) :nav-history
+                (fn [h] (take-while #(not= (:token %) token) h)))
+  (.setToken history token))
+
 (defn nav!
   "Navigate to a URL token"
   [token]
+  (om/update! (state/app-state-cursor) :nav-history [])
   (.setToken history token))
 
 (defn settings-hide!
