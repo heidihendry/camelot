@@ -2,7 +2,7 @@
   (:require [environ.core :refer [env]]))
 
 (def features
-  {:survey false})
+  {:survey true})
 
 (defn enabled?
   [feature]
