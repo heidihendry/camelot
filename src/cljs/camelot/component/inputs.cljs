@@ -196,7 +196,7 @@
     (render [_]
       (let [schema (:schema v)]
         (if (:disabled opts)
-          (dom/p #js {:className "field-input"}
+          (dom/pre #js {:className "field-input"}
            (get-in buf [k :value]))
           (dom/textarea #js {:className "field-input"
                              :rows (:rows schema)

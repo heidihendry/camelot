@@ -194,7 +194,7 @@ a:hover {
    appearance: none;
 
 }
-#app input.field-input, textarea.field-input, p.field-input {
+#app input.field-input, textarea.field-input, pre.field-input {
   width: 30rem;
   padding: 0.5rem;
   color: #666;
@@ -202,10 +202,11 @@ a:hover {
   border-radius: 0.5rem;
   border: 1px solid #ccc;
 }
-p.field-input {
+pre.field-input {
     background: #ebebe4;
     color: #666;
     min-height: 3rem;
+    font-family: Arial, sans-serif;
 }
 #settings h4 {
   padding-left: 1rem;
