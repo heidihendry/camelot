@@ -155,7 +155,7 @@
   [state photo]
   (let [m (->> (:sightings photo)
                (map :species)
-               (remove #(re-find sighting-quantity-exclusions-re %))
+               (remove #(or (nil? %) (re-find sighting-quantity-exclusions-re %)))
                (map str/lower-case)
                (remove (set (map str/lower-case (:surveyed-species (:config state))))))]
     (if (empty? m)
