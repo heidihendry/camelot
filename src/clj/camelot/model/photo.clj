@@ -48,8 +48,24 @@
      location :- Location])
 
 (s/defn location :- Location
-  [{:keys [gps-lon gps-lat gps-alt subloc city state country country-code map-datum]}]
-  (->Location gps-lon gps-lat gps-alt subloc city state country country-code map-datum))
+  [{:keys [gps-longitude
+           gps-latitude
+           gps-altitude
+           sublocation
+           city
+           state
+           country
+           country-code
+           map-datum]}]
+  (->Location gps-longitude
+              gps-latitude
+              gps-altitude
+              sublocation
+              city
+              state
+              country
+              country-code
+              map-datum))
 
 (s/defn sighting :- Sighting
   [{:keys [species quantity]}]
