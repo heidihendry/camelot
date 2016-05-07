@@ -5,12 +5,15 @@
             [clojure.string :as str]
             [camelot.processing.settings :as settings]))
 
-(def spec {:classname "org.apache.derby.jdbc.EmbeddedDriver",
-           :subprotocol "derby",
-           :subname (settings/get-db-path),
-           :create true})
+(def spec
+  "JDBC spec for the primary database."
+  {:classname "org.apache.derby.jdbc.EmbeddedDriver",
+   :subprotocol "derby",
+   :subname (settings/get-db-path),
+   :create true})
 
-(def config
+(def ragtime-config
+  "Ragtime configuration"
   {:datastore (jdbc/sql-database spec)
    :migrations (jdbc/load-resources "migrations")})
 
@@ -42,11 +45,12 @@
            v)))
 
 (defn db-keys
+  "Translate data into database-suitable types."
   [data]
   (reduce-kv db-key {} data))
 
 (defn with-db-keys
-  "Run a query, translating the parameters and results as needed."
+  "Run a function, translating the parameters and results as needed."
   [f data]
   (->> data
        (db-keys)
@@ -55,13 +59,20 @@
 
 (defn migrate
   "Apply the available database migrations."
-  []
-  (rtc/migrate-all (:datastore config)
-                   (rtc/into-index (:migrations config))
-                   (:migrations config)))
+  ([]
+   (rtc/migrate-all (:datastore ragtime-config)
+                    (rtc/into-index (:migrations ragtime-config))
+                    (:migrations ragtime-config)))
+  ([c]
+   (rtc/migrate-all (:datastore c)
+                    (rtc/into-index (:migrations c))
+                    (:migrations c))))
 
 (defn rollback
   "Rollback the last migration."
-  []
-  (rtc/rollback-last (:datastore config)
-                     (rtc/into-index (:migrations config))))
+  ([]
+   (rtc/rollback-last (:datastore ragtime-config)
+                      (rtc/into-index (:migrations ragtime-config))))
+  ([c]
+   (rtc/rollback-last (:datastore c)
+                      (rtc/into-index (:migrations c)))))
