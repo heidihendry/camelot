@@ -17,4 +17,5 @@
 
 (def routes
   (context "/camera-statuses" []
-           (GET "/" [] (rest/list-resources get-all :camera-status))))
+           (GET "/available/" [] (rest/list-resources get-all :camera-status))
+           (GET "/alternatives/:id" [id] (rest/list-resources get-all :camera-status))))

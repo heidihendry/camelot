@@ -72,13 +72,13 @@
                          {:label ((:translate state) :action/edit)
                           :action :edit-mode}]}
      :layout [[:camera-name]
-              [:camera-status]
+              [:camera-status-id]
               [:camera-make]
               [:camera-model]
               [:camera-notes]]
      :schema {:camera-name {:type :text}
-              :camera-status {:type :select
-                              :generator :camera-statuses}
+              :camera-status-id {:type :select
+                                 :generator :camera-statuses}
               :camera-make {:type :text}
               :camera-model {:type :text}
               :camera-notes {:type :textarea

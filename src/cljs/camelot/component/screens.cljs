@@ -49,21 +49,34 @@
                                     (conj (map to-dropdown (:body %))
                                           {:vkey "" :desc ""})))))
 
-(defn survey-sites-available-generator
-  "Drop-down menu generator for the available survey sites."
-  [gendata gen genargs]
-  (let [to-dropdown #(hash-map :vkey (:site-id %)
-                               :desc (:site-name %))]
-    (rest/get-resource (str "/survey-sites/available/" (get genargs :id))
-                       #(om/update! gendata gen
-                                    (conj (map to-dropdown (:body %))
-                                          {:vkey "" :desc ""})))))
+(defn build-generator
+  "Drop-down menu generator for the given view-state."
+  [vs]
+  (fn [template gendata gen genargs]
+    (let [to-dropdown #(hash-map :vkey (get % (:vkey template))
+                                 :desc (get % (:desc template)))]
+      (rest/get-resource (str (get template :baseurl)
+                              "/"
+                              (if (= (get-in vs [:screen :mode]) :create)
+                                "available"
+                                "alternatives")
+                              "/"
+                              (get genargs :id))
+                         #(om/update! gendata gen
+                                      (conj (map to-dropdown (:body %))
+                                            {:vkey "" :desc ""}))))))
 
 (def generators
   "Mapping of keys to functions to generate drop-down menus."
-  {:camera-statuses camera-status-generator
-   :survey-sites-available survey-sites-available-generator
-   :trap-station-session-cameras-available trap-station-session-cameras-available-generator})
+  {:camera-statuses {:vkey :camera-status-id
+                     :desc :camera-status-description
+                     :baseurl "/camera-statuses"}
+   :survey-sites-available {:vkey :site-id
+                            :desc :site-name
+                            :baseurl "/survey-sites"}
+   :trap-station-session-cameras-available {:vkey :camera-id
+                                            :desc :camera-name
+                                            :baseurl "/trap-station-session-cameras"}})
 
 (def events
   "Mapping of events to event functions."
@@ -248,9 +261,12 @@
     om/IRender
     (render [_]
       (let [screen (get-screen vs)
-            gens {:generators generators
+            gens {:generator-fn (build-generator vs)
+                  :generators generators
                   :generator-data (get vs :generator-data)
-                  :generator-args {:id (get-parent-resource-id vs)}}]
+                  :generator-args {:id (if (= (get-in vs [:screen :mode]) :create)
+                                         (get-parent-resource-id vs)
+                                         (get-resource-id vs))}}]
         (apply dom/div #js {:className "section-body"}
                (om/build-all field-component
                              (map #(vector % screen (get vs :buffer)

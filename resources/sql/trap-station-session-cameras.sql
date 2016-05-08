@@ -31,3 +31,11 @@ FROM camera
 WHERE camera_id NOT IN (SELECT camera_id
                         FROM trap_station_session_camera
                         WHERE trap_station_session_id = :trap_station_session_id)
+
+-- name: -get-alternatives
+SELECT camera_id, camera_name
+FROM camera
+WHERE camera_id NOT IN (SELECT camera_id
+                      FROM trap_station_session_camera
+                      WHERE trap_station_session_id = :trap_station_session_id)
+  OR camera_id = :camera_id

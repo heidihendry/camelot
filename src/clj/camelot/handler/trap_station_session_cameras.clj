@@ -40,11 +40,17 @@
   [state id]
   (db/with-db-keys -get-available {:trap-station-session-id id}))
 
+(s/defn get-alternatives
+  [state id]
+  (let [res (get-specific state id)]
+    (db/with-db-keys -get-alternatives res)))
+
 (def routes
   (context "/trap-station-session-cameras" []
            (GET "/trap-station-session/:id" [id]
                 (rest/list-resources get-all :trap-station-session-camera id))
            (GET "/available/:id" [id] (rest/list-available get-available id))
+           (GET "/alternatives/:id" [id] (rest/list-available get-alternatives id))
            (GET "/:id" [id] (rest/specific-resource get-specific id))
            (PUT "/:id" [id data] (rest/update-resource update! id data))
            (POST "/" [data] (rest/create-resource create! data))

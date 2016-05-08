@@ -68,12 +68,16 @@
     om/IWillMount
     (will-mount [_]
       (when (nil? (get buf k))
-        (om/update! buf k {:value nil}))
+        (om/update! buf k {:value nil})))
+    om/IWillUpdate
+    (will-update [this next-props next-state]
       (let [generator (get-in v [:schema :generator])
-            generator-fn (get (:generators opts) generator)]
+            gen-template (get (:generators opts) generator)
+            generator-fn (:generator-fn opts)]
         (when (and generator generator-fn)
           (om/update! (get opts :generator-data) generator {})
-          (generator-fn (get opts :generator-data) generator (get opts :generator-args)))))
+          (generator-fn gen-template (get opts :generator-data) generator
+                        (get opts :generator-args)))))
     om/IRender
     (render [_]
       (let [val (get-in buf [k :value])

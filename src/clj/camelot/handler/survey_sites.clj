@@ -39,11 +39,17 @@
   [state id]
   (db/with-db-keys -get-available {:survey-id id}))
 
+(s/defn get-alternatives
+  [state id]
+  (let [res (get-specific state id)]
+    (db/with-db-keys -get-alternatives res)))
+
 (def routes
   (context "/survey-sites" []
            (GET "/survey/:id" [id] (rest/list-resources get-all :survey-site id))
            (GET "/:id" [id] (rest/specific-resource get-specific id))
            (GET "/available/:id" [id] (rest/list-available get-available id))
+           (GET "/alternatives/:id" [id] (rest/list-available get-alternatives id))
            (PUT "/:id" [id data] (rest/update-resource update! id data))
            (POST "/" [data] (rest/create-resource create! data))
            (DELETE "/:id" [id] (rest/delete-resource delete! id))))

@@ -31,3 +31,10 @@ FROM site
 WHERE site_id NOT IN (SELECT site_id
                       FROM survey_site
                       WHERE survey_id = :survey_id)
+
+-- name: -get-alternatives
+SELECT site_id, site_name
+FROM site
+WHERE site_id NOT IN (SELECT site_id
+                      FROM survey_site
+                      WHERE survey_id = :survey_id) OR site_id = :site_id

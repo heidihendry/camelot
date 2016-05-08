@@ -85,8 +85,8 @@
             :sidebar-title "Cameras"
             :camera-name {:label "Camera Name"
                           :description "The name by which this camera will be known."}
-            :camera-status {:label "Status"
-                            :description "Whether this camera is active (deployed), available for use, or retired for some reason."}
+            :camera-status-id {:label "Status"
+                               :description "Whether this camera is active (deployed), available for use, or retired for some reason."}
             :camera-make {:label "Make"
                           :description "The manufacturer or brand of the camera"}
             :camera-model {:label "Model"
