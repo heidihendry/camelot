@@ -56,7 +56,7 @@
 (defn- add-resource-uris
   "Add URIs to all resources in `data'."
   [data resource-key]
-  (reduce (resource-uri-generator resource-key) '() data))
+  (reduce (resource-uri-generator resource-key) [] data))
 
 (defn list-available
   "Return a list of the available resources for `id-str'.
@@ -74,7 +74,10 @@
 (defn list-resources
   "Return a list of resources.
   `f' is a function which takes the configuration as its first argument.
-  If `id-str' is provided, this will be parsed and passed as the second argument to `f'."
+  `resource-key' is a key which will be used to generate a resource URI for
+  each record.  It should be the key representing the ID of a record, sans the
+  '-id' suffix.  If `id-str' is provided, this will be parsed and passed as
+  the second argument to `f'."
   ([f resource-key]
    (-> (config)
        (gen-state)
@@ -117,7 +120,7 @@
         (r/response))))
 
 (defn create-resource
-  "Return a single resource.
+  "Create a single resource.
   `f' is a function which creates a resource.  It will take the configuration
   as its first argument, and a (processed) map of the data for the resource as
   its second argument."
