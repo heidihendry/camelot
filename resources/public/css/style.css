@@ -377,3 +377,6 @@ pre.field-input {
     padding: 0 0.5rem;
     content: normal;
 }
+.datepicker .label {
+    color: black;
+}
