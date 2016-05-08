@@ -1,13 +1,8 @@
 (ns camelot.model.screens
   (:require [camelot.smithy.core :refer [defsmith] :as smithy]
-            [camelot.handler.camera-status :as camstat]
+            [camelot.handler.camera-statuses :as camstat]
             [camelot.handler.survey-sites :as survey-sites]
             [camelot.handler.sites :as sites]))
-
-(defn translate-fn
-  [state]
-  (fn [resource lookup]
-    ((:translate state) (keyword (format "%s/%s" (name resource) (subs (str lookup) 1))))))
 
 (def smiths (atom {}))
 
@@ -313,7 +308,3 @@
                                       :event :settings-error}}
                      :cancel {:type :event
                               :event :settings-cancel}}}})
-
-(defn smith
-  [state]
-  (smithy/build-smiths smiths (translate-fn state) state))
