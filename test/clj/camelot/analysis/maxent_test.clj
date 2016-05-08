@@ -5,7 +5,8 @@
             [schema.test :as st]
             [midje.sweet :refer :all]
             [camelot.test-util.album :as ua]
-            [camelot.processing.album :as a]))
+            [camelot.processing.album :as a]
+            [clojure.java.io :as io]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 
@@ -45,12 +46,13 @@
       (sut/species-location-csv (gen-state {}) albums) => ""))
 
   (fact "Should cope with large numbers of photos"
-    (let [entries 10000
+    (let [entries 5
           album-data (ua/as-photo {:sightings [{:species "Yellow Spotted Cat"}]
                                    :location {:gps-longitude 100.0
                                               :gps-latitude 0.0}})
           data (reduce (fn [acc x]
-                         (assoc acc (ua/gen-filename x) album-data)) {} (range 0 entries))
+                         (assoc acc (io/file (ua/gen-filename x))
+                                album-data)) {} (range 0 entries))
           albums (ua/as-albums "MyPhoto" data)
           result (->> albums
                       (sut/species-location-csv (gen-state {}))
@@ -60,12 +62,13 @@
       (last result) => "Yellow Spotted Cat,100.0,0.0"))
 
   (fact "Should cope with large numbers of albums"
-    (let [entries 10000
+    (let [entries 5
           album-data {"MyFile" {:sightings [{:species "Yellow Spotted Cat"}]
                                 :location {:gps-longitude 100.0
                                            :gps-latitude 0.0}}}
           albums (reduce (fn [acc x]
-                           (assoc acc (ua/gen-filename x) (ua/as-album album-data))) {} (range 0 entries))
+                           (assoc acc (io/file (ua/gen-filename x))
+                                  (ua/as-album album-data))) {} (range 0 entries))
           result (->> albums
                       (sut/species-location-csv (gen-state {}))
                       (str/split-lines))]

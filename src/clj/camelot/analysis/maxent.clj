@@ -20,7 +20,7 @@
 (s/defn species-location-csv :- s/Str
   "Produce a CSV of species locations"
   [state
-   albums :- {s/Str Album}]
+   albums :- {java.io.File Album}]
   (let [photos (mapcat #(vals (:photos (second %))) albums)]
     (str/join "\n"
               (map #(str/join "," %)

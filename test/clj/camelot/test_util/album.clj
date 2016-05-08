@@ -47,7 +47,7 @@
 
 (defn as-albums
   [k album]
-  {k (as-album album)})
+  {(io/file k) (as-album album)})
 
 (defn gen-filename
   [n]
