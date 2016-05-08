@@ -1,5 +1,7 @@
 (ns camelot.handler.cameras
-  (:require [camelot.db :as db]
+  (:require [compojure.core :refer [ANY GET PUT POST DELETE context]]
+            [camelot.util.rest :as rest]
+            [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
             [camelot.model.camera :refer [Camera CameraCreate]]))
@@ -28,11 +30,20 @@
 
 (s/defn update!
   [state
+   id :- s/Num
    data :- Camera]
-  (db/with-db-keys -update! data)
+  (db/with-db-keys -update! (merge data {:camera-id id}))
   (get-specific state (:camera-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
   (db/with-db-keys -delete! {:camera-id id}))
+
+(def routes
+  (context "/cameras" []
+           (GET "/" [] (rest/list-resources get-all :camera))
+           (GET "/:id" [id] (rest/specific-resource get-specific id))
+           (PUT "/:id" [id data] (rest/update-resource update! id data))
+           (POST "/" [data] (rest/create-resource create! data))
+           (DELETE "/:id" [id] (rest/delete-resource delete! id))))

@@ -21,8 +21,8 @@
         res (get-in screen [:sidebar :resource])
         id (get-in vs [:screen :id])
         ep (if id
-             (str (get res :listing-endpoint) "/" id)
-             (get res :listing-endpoint))]
+             (str (get res :endpoint) "/" id)
+             (get res :endpoint))]
     (rest/get-resource ep
                        #(om/update! (get vs :selected-resource)
                                     :children
@@ -44,7 +44,7 @@
   [gendata gen genargs]
   (let [to-dropdown #(hash-map :vkey (:camera-id %)
                                :desc (:camera-name %))]
-    (rest/get-resource (str "/trap-station-session-cameras-available/" (get genargs :id))
+    (rest/get-resource (str "/trap-station-session-cameras/available/" (get genargs :id))
                        #(om/update! gendata gen
                                     (conj (map to-dropdown (:body %))
                                           {:vkey "" :desc ""})))))
@@ -54,7 +54,7 @@
   [gendata gen genargs]
   (let [to-dropdown #(hash-map :vkey (:site-id %)
                                :desc (:site-name %))]
-    (rest/get-resource (str "/survey-sites-available/" (get genargs :id))
+    (rest/get-resource (str "/survey-sites/available/" (get genargs :id))
                        #(om/update! gendata gen
                                     (conj (map to-dropdown (:body %))
                                           {:vkey "" :desc ""})))))
@@ -112,7 +112,7 @@
                (assoc basedata (get-in (get-screen vs) [:resource :parent-id-key])
                       {:value parent-id})
                basedata)]
-    (rest/put-resource (get-endpoint vs)
+    (rest/post-resource (get-endpoint vs)
                        {:data data}
                        #(do
                           (load-resource-children vs)
@@ -123,7 +123,7 @@
   "Submit the buffer state and return to readonly mode."
   (let [cb (get events success-key)]
     (om/update! resources key (deref (get vs :buffer)))
-    (rest/post-resource (get-endpoint vs)
+    (rest/put-resource (get-url vs)
                         {:data (deref (get resources key))}
                         #(do
                            (when-not (settings-screen? vs)
@@ -324,9 +324,7 @@
     om/IRender
     (render [_]
       (dom/li #js {:className "sidebar-item"
-                   :onClick #(do (rest/get-resource
-                                  (str (get data :specific-endpoint) "/"
-                                       (get (:item data) (:id data)))
+                   :onClick #(do (rest/get-resource (get data :uri)
                                   (fn [resp]
                                     (om/update! (get-in data [:view-state :screen]) :mode :readonly)
                                     (om/update! (get-in data [:view-state :selected-resource]) :details (:body resp))
@@ -350,7 +348,7 @@
                                          :view-state vs
                                          :label (get res :label)
                                          :id (get res :id)
-                                         :specific-endpoint (get res :specific-endpoint))
+                                         :uri (get % :uri))
                               (get-in vs [:selected-resource :children]))))))
 
 (defn sidebar-component

@@ -1,5 +1,7 @@
 (ns camelot.handler.camera-status
-  (:require [camelot.util.java-file :as jf]
+  (:require [compojure.core :refer [ANY GET PUT POST DELETE context]]
+            [camelot.util.rest :as rest]
+            [camelot.util.java-file :as jf]
             [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
@@ -12,3 +14,7 @@
   (map #(assoc % :camera-status-description
                ((:translate state) (keyword (:camera-status-description %))))
        (db/clj-keys (-get-all))))
+
+(def routes
+  (context "/camera-statuses" []
+           (GET "/" [] (rest/list-resources get-all :camera-status))))

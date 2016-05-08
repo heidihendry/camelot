@@ -22,10 +22,9 @@
   [state]
   {:resource {:type :site
               :title ((:translate state) :site/title)
-              :endpoint "/site"
+              :endpoint "/sites"
               :id :site-id}
-   :sidebar {:resource {:listing-endpoint "/sites"
-                        :specific-endpoint "/site"
+   :sidebar {:resource {:endpoint "/sites"
                         :title ((:translate state) :site/sidebar-title)
                         :type :site
                         :id :site-id
@@ -63,10 +62,9 @@
         opts (build-options state camstats :camera-status-id :camera-status-description)]
     {:resource {:type :camera
                 :title ((:translate state) :camera/title)
-                :endpoint "/camera"
+                :endpoint "/cameras"
                 :id :camera-id}
-     :sidebar {:resource {:listing-endpoint "/cameras"
-                          :specific-endpoint "/camera"
+     :sidebar {:resource {:endpoint "/cameras"
                           :title ((:translate state) :camera/sidebar-title)
                           :type :camera
                           :id :camera-id
@@ -101,11 +99,10 @@
   [state]
   {:resource {:type :survey-site
               :title ((:translate state) :survey-site/title)
-              :endpoint "/survey-site"
+              :endpoint "/survey-sites"
               :parent-id-key :survey-id
               :id :survey-site-id}
-   :sidebar {:resource {:listing-endpoint "/survey-sites"
-                        :specific-endpoint "/survey-site"
+   :sidebar {:resource {:endpoint "/survey-sites/survey"
                         :title ((:translate state) :survey-site/sidebar-title)
                         :type :survey-site
                         :id :survey-site-id
@@ -127,11 +124,10 @@
   [state]
   {:resource {:type :trap-station-session-camera
               :title ((:translate state) :trap-station-session-camera/title)
-              :endpoint "/trap-station-session-camera"
+              :endpoint "/trap-station-session-cameras"
               :parent-id-key :trap-station-session-id
               :id :trap-station-session-camera-id}
-   :sidebar {:resource {:listing-endpoint "/trap-station-session-cameras"
-                        :specific-endpoint "/trap-station-session-camera"
+   :sidebar {:resource {:endpoint "/trap-station-session-cameras/trap-station-session"
                         :title ((:translate state) :trap-station-session-camera/sidebar-title)
                         :type :trap-station-session-camera
                         :id :trap-station-session-camera-id
@@ -153,11 +149,10 @@
   [state]
   {:resource {:type :trap-station
               :title ((:translate state) :trap-station/title)
-              :endpoint "/trap-station"
+              :endpoint "/trap-stations"
               :parent-id-key :survey-site-id
               :id :trap-station-id}
-   :sidebar {:resource {:listing-endpoint "/trap-stations"
-                        :specific-endpoint "/trap-station"
+   :sidebar {:resource {:endpoint "/trap-stations/site"
                         :title ((:translate state) :trap-station/sidebar-title)
                         :type :trap-station
                         :id :trap-station-id
@@ -192,11 +187,10 @@
   [state]
   {:resource {:type :trap-station-session
               :title ((:translate state) :trap-station-session/title)
-              :endpoint "/trap-station-session"
+              :endpoint "/trap-station-sessions"
               :parent-id-key :trap-station-id
               :id :trap-station-session-id}
-   :sidebar {:resource {:listing-endpoint "/trap-station-sessions"
-                        :specific-endpoint "/trap-station-session"
+   :sidebar {:resource {:endpoint "/trap-station-sessions/trap-station"
                         :title ((:translate state) :trap-station-session/sidebar-title)
                         :type :trap-station-session
                         :id :trap-station-session-id
@@ -225,10 +219,9 @@
   [state]
   {:resource {:type :survey
               :title ((:translate state) :survey/title)
-              :endpoint "/survey"
+              :endpoint "/surveys"
               :id :survey-id}
-   :sidebar {:resource {:listing-endpoint "/surveys"
-                        :specific-endpoint "/survey"
+   :sidebar {:resource {:endpoint "/surveys"
                         :title ((:translate state) :survey/sidebar-title)
                         :type :survey
                         :id :survey-id

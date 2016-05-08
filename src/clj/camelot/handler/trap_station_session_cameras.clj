@@ -1,5 +1,7 @@
 (ns camelot.handler.trap-station-session-cameras
-  (:require [camelot.db :as db]
+  (:require [compojure.core :refer [ANY GET PUT POST DELETE context]]
+            [camelot.util.rest :as rest]
+            [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
             [camelot.model.trap-station-session-camera :refer
@@ -24,8 +26,9 @@
 
 (s/defn update!
   [state
+   id :- s/Num
    data :- TrapStationSessionCamera]
-  (db/with-db-keys -update! data)
+  (db/with-db-keys -update! (merge data {:trap-station-session-camera-id id}))
   (get-specific state (:trap-station-session-camera-id data)))
 
 (s/defn delete!
@@ -36,3 +39,13 @@
 (s/defn get-available
   [state id]
   (db/with-db-keys -get-available {:trap-station-session-id id}))
+
+(def routes
+  (context "/trap-station-session-cameras" []
+           (GET "/trap-station-session/:id" [id]
+                (rest/list-resources get-all :trap-station-session-camera id))
+           (GET "/available/:id" [id] (rest/list-available get-available id))
+           (GET "/:id" [id] (rest/specific-resource get-specific id))
+           (PUT "/:id" [id data] (rest/update-resource update! id data))
+           (POST "/" [data] (rest/create-resource create! data))
+           (DELETE "/:id" [id] (rest/delete-resource delete! id))))

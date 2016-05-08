@@ -8,7 +8,7 @@ VALUES (:trap_station_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
 
 -- name: -update!
 UPDATE trap_station_session
-SET trap_station_updated = CURRENT_TIMESTAMP,
+SET trap_station_session_updated = CURRENT_TIMESTAMP,
     trap_station_id = :trap_station_id,
     trap_station_session_start_date = :trap_station_session_start_date,
     trap_station_session_end_date = :trap_station_session_end_date,

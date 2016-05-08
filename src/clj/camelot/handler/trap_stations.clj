@@ -1,5 +1,7 @@
 (ns camelot.handler.trap-stations
-  (:require [camelot.db :as db]
+  (:require [compojure.core :refer [ANY GET PUT POST DELETE context]]
+            [camelot.util.rest :as rest]
+            [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
             [camelot.model.trap-station :refer [TrapStation TrapStationCreate]]))
@@ -23,11 +25,21 @@
 
 (s/defn update!
   [state
+   id :- s/Num
    data :- TrapStation]
-  (db/with-db-keys -update! data)
+  (db/with-db-keys -update! (merge data {:trap-station-id id}))
   (get-specific state (:trap-station-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
   (db/with-db-keys -delete! {:trap-station-id id}))
+
+(def routes
+  (context "/trap-stations" []
+           (GET "/site/:id" [id]
+                (rest/list-resources get-all :trap-station id))
+           (GET "/:id" [id] (rest/specific-resource get-specific id))
+           (PUT "/:id" [id data] (rest/update-resource update! id data))
+           (POST "/" [data] (rest/create-resource create! data))
+           (DELETE "/:id" [id] (rest/delete-resource delete! id))))

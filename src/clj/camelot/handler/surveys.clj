@@ -2,6 +2,8 @@
   (:require [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
+            [compojure.core :refer [ANY GET PUT POST DELETE context]]
+            [camelot.util.rest :as rest]
             [camelot.model.survey :refer [Survey SurveyCreate]]))
 
 (sql/defqueries "sql/surveys.sql" {:connection db/spec})
@@ -28,11 +30,20 @@
 
 (s/defn update!
   [state
+   id :- s/Num
    data :- Survey]
-  (db/with-db-keys -update! data)
+  (db/with-db-keys -update! (merge data {:survey-id id}))
   (get-specific state (:survey-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
   (db/with-db-keys -delete! {:survey-id id}))
+
+(def routes
+  (context "/surveys" []
+           (GET "/" [] (rest/list-resources get-all :survey))
+           (GET "/:id" [id] (rest/specific-resource get-specific id))
+           (PUT "/:id" [id data] (rest/update-resource update! id data))
+           (POST "/" [data] (rest/create-resource create! data))
+           (DELETE "/:id" [id] (rest/delete-resource delete! id))))

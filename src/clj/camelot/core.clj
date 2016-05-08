@@ -16,7 +16,7 @@
             [camelot.db :as db]
             [clojure.java.io :as io]
             [environ.core :refer [env]]
-            [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
+            [compojure.core :refer [ANY GET PUT POST DELETE defroutes routes]]
             [compojure.route :refer [resources]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.util.response :as r]
@@ -42,12 +42,18 @@
                             v)))
           data ks))
 
-(defroutes routes
+(defroutes misc-routes
   (GET "/" _ (retrieve-index))
   (GET "/default-config" [] (r/response (cursorise (config))))
+  (PUT "/settings" [data]
+        (r/response (hs/settings-save (decursorise data))))
   (GET "/metadata" [] (r/response (hs/get-metadata (gen-state (config)))))
   (GET "/application" [] (r/response {:version (hs/get-version)
                                     :nav (hs/get-nav-menu (gen-state (config)))}))
+  (GET "/albums" []
+       (let [conf (config)]
+         (r/response (ha/read-albums (gen-state conf)
+                                     (:root-path conf)))))
   (GET "/maxent" []
        (let [conf (config)
              data (ame/species-location-csv (gen-state conf)
@@ -59,117 +65,22 @@
               (r/header "Content-Disposition" "attachment; filename=\"maxent.csv\""))))
   (GET "/screens" []
        (r/response (screens/all-screens (gen-state (config)))))
-  (POST "/settings" {{data :data} :params}
-        (r/response (hs/settings-save (decursorise data))))
-  (GET "/albums" []
-       (let [conf (config)]
-         (r/response (ha/read-albums (gen-state conf)
-                                     (:root-path conf)))))
-
-  (GET "/surveys" [] (r/response (hsurvey/get-all (gen-state (config)))))
-  (GET "/survey/:id" [id] (r/response (cursorise (hsurvey/get-specific (gen-state (config))
-                                                                       (read-string id)))))
-  (POST "/survey" [data]
-        (r/response (cursorise (hsurvey/update! (gen-state (config)) (decursorise data)))))
-  (PUT "/survey" [data]
-       (r/response (cursorise (hsurvey/create! (gen-state (config)) (decursorise data)))))
-  (DELETE "/survey/:id" [id]
-          (r/response {:data (hsurvey/delete! (gen-state (config)) (read-string id))}))
-
-  (GET "/sites" [] (r/response (hsite/get-all (gen-state (config)))))
-  (GET "/site/:id" [id] (r/response (cursorise (hsite/get-specific (gen-state (config)) (read-string id)))))
-  (POST "/site" [data]
-        (r/response (cursorise (hsite/update! (gen-state (config)) (decursorise data)))))
-  (PUT "/site" [data]
-       (r/response (cursorise (hsite/create! (gen-state (config)) (decursorise data)))))
-  (DELETE "/site/:id" [id]
-          (r/response {:data (hsite/delete! (gen-state (config)) (read-string id))}))
-
-  (GET "/camera-statuses" [] (r/response (hcamstat/get-all (gen-state (config)))))
-  (GET "/cameras" [] (r/response (hcamera/get-all (gen-state (config)))))
-  (GET "/camera/:id" [id] (r/response (cursorise (hcamera/get-specific (gen-state (config)) (read-string id)))))
-  (POST "/camera" [data]
-        (r/response (cursorise (hcamera/update! (gen-state (config)) (decursorise data)))))
-  (PUT "/camera" [data]
-       (let [data (decursorise data)]
-         (r/response
-          (cursorise (hcamera/create! (gen-state (config))
-                                      (assoc data :camera-status
-                                             (read-string (:camera-status data))))))))
-  (DELETE "/camera/:id" [id]
-          (r/response {:data (hcamera/delete! (gen-state (config)) (read-string id))}))
-
-
-  (GET "/survey-sites/:id" [id] (r/response (hsurvey-site/get-all (gen-state (config)) id)))
-  (GET "/survey-sites-available/:id" [id] (r/response (hsurvey-site/get-available (gen-state (config)) id)))
-  (GET "/survey-site/:id" [id] (r/response (cursorise (hsurvey-site/get-specific (gen-state (config)) (read-string id)))))
-  (POST "/survey-site" [data]
-        (r/response (cursorise (hsurvey-site/update! (gen-state (config)) (decursorise data)))))
-  (PUT "/survey-site" [data]
-       (let [data (decursorise data)]
-         (r/response
-          (cursorise (hsurvey-site/create! (gen-state (config))
-                                           (assoc data :site-id
-                                                  (read-string (:site-id data))
-                                                  :survey-id
-                                                  (read-string (:survey-id data))))))))
-  (DELETE "/survey-site/:id" [id]
-          (r/response {:data (hsurvey-site/delete! (gen-state (config)) (read-string id))}))
-
-  (GET "/trap-stations/:id" [id] (r/response (htrap-station/get-all (gen-state (config)) id)))
-  (GET "/trap-station/:id" [id] (r/response (cursorise (htrap-station/get-specific (gen-state (config)) (read-string id)))))
-  (POST "/trap-station" [data]
-        (let [data (decursorise data)]
-          (r/response (cursorise (htrap-station/update!
-                                  (gen-state (config))
-                                  (read-strings [:trap-station-longitude
-                                                 :trap-station-latitude] data))))))
-  (PUT "/trap-station" [data]
-       (let [data (decursorise data)]
-         (r/response
-          (cursorise (htrap-station/create!
-                      (gen-state (config))
-                      (read-strings [:survey-site-id] data))))))
-  (DELETE "/trap-station/:id" [id]
-          (r/response {:data (htrap-station/delete! (gen-state (config)) (read-string id))}))
-
-  (GET "/trap-station-sessions/:id" [id] (r/response (htrap-station-session/get-all (gen-state (config)) id)))
-  (GET "/trap-station-session/:id" [id] (r/response (cursorise (htrap-station-session/get-specific (gen-state (config)) (read-string id)))))
-  (POST "/trap-station-session" [data]
-        (let [data (decursorise data)]
-          (r/response (cursorise (htrap-station-session/update!
-                                  (gen-state (config)) data)))))
-  (PUT "/trap-station-session" [data]
-       (let [data (decursorise data)]
-         (r/response
-          (cursorise (htrap-station-session/create!
-                      (gen-state (config))
-                      (read-strings [:trap-station-id] data))))))
-  (DELETE "/trap-station-session/:id" [id]
-          (r/response {:data (htrap-station-session/delete! (gen-state (config)) (read-string id))}))
-
-  (GET "/trap-station-session-cameras/:id" [id] (r/response (htrap-station-session-camera/get-all (gen-state (config)) id)))
-  (GET "/trap-station-session-cameras-available/:id" [id] (r/response (htrap-station-session-camera/get-available (gen-state (config)) id)))
-  (GET "/trap-station-session-camera/:id" [id] (r/response (cursorise (htrap-station-session-camera/get-specific (gen-state (config)) (read-string id)))))
-  (POST "/trap-station-session-camera" [data]
-        (r/response (cursorise (htrap-station-session-camera/update! (gen-state (config)) (decursorise data)))))
-  (PUT "/trap-station-session-camera" [data]
-       (let [data (decursorise data)]
-         (r/response
-          (cursorise (htrap-station-session-camera/create! (gen-state (config))
-                                                           (assoc data :camera-id
-                                                                  (read-string (:camera-id data))
-                                                                  :trap-station-session-id
-                                                                  (read-string (:trap-station-session-id data))))))))
-  (DELETE "/trap-station-session-camera/:id" [id]
-          (r/response {:data (htrap-station-session-camera/delete! (gen-state (config)) (read-string id))}))
-
   (POST "/quit" [] (System/exit 0))
   (resources "/"))
 
+(def app-routes (routes misc-routes
+                        hsurvey/routes
+                        hsite/routes
+                        hcamera/routes
+                        hcamstat/routes
+                        hsurvey-site/routes
+                        htrap-station/routes
+                        htrap-station-session/routes
+                        htrap-station-session-camera/routes))
+
 (def http-handler
   "Handler for HTTP requests"
-  (-> routes
+  (-> app-routes
       (wrap-transit-response {:encoding :json, :opts tutil/transit-write-options})
       (wrap-transit-params {:opts tutil/transit-read-options})
       (wrap-stacktrace-log)
