@@ -113,11 +113,12 @@
                       {:value parent-id})
                basedata)]
     (rest/post-resource (get-endpoint vs)
-                       {:data data}
-                       #(do
-                          (load-resource-children vs)
-                          (om/update! (get vs :screen) :mode :readonly)
-                          (get events success-key)))))
+                        {:data data}
+                        #(do
+                           (load-resource-children vs)
+                           (om/update! (get vs :screen) :mode :readonly)
+                           (om/update! (get vs :selected-resource) :details (:body %))
+                           (get events success-key)))))
 
 (defn submit-update [success-key error-key vs resources key]
   "Submit the buffer state and return to readonly mode."
@@ -270,12 +271,7 @@
                            " Update")
                (dom/button #js {:className "cancel-btn btn btn-default fa fa-undo fa-2x"
                                 :onClick cancel}
-                           " Cancel")
-               (when-not (settings-screen? view-state)
-                 (dom/button #js {:className "delete-btn btn btn-danger fa fa-trash fa-2x"
-                                  :onClick #(when (js/confirm "Are you sure you wish to delete this?")
-                                              (delete))}
-                             " Delete"))))))
+                           " Cancel")))))
 
 (defn resource-update-component
   "Component for Update Mode"

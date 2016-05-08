@@ -48,6 +48,9 @@ html > body {
   margin: 0;
   width: 100%;
 }
+#page-content .button-container button {
+    width: 14.5rem;
+}
 #app button.btn-default {
   padding: 0.7rem 2rem;
 }

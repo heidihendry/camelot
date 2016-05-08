@@ -25,7 +25,9 @@
                         :id :site-id
                         :label :site-name}}
    :actionmenu {:title ((:translate state) :actionmenu/title)
-                :menu [{:label ((:translate state) :action/edit)
+                :menu [{:label ((:translate state) :action/delete)
+                        :action :delete}
+                       {:label ((:translate state) :action/edit)
                         :action :edit-mode}]}
    :layout [[:site-name]
             [:site-sublocation]
@@ -65,8 +67,10 @@
                           :id :camera-id
                           :label :camera-name}}
      :actionmenu {:title ((:translate state) :actionmenu/title)
-                :menu [{:label ((:translate state) :action/edit)
-                        :action :edit-mode}]}
+                  :menu [{:label ((:translate state) :action/delete)
+                          :action :delete}
+                         {:label ((:translate state) :action/edit)
+                          :action :edit-mode}]}
      :layout [[:camera-name]
               [:camera-status]
               [:camera-make]
@@ -222,7 +226,9 @@
                         :id :survey-id
                         :label :survey-name}}
    :actionmenu {:title ((:translate state) :actionmenu/title)
-                :menu [{:label ((:translate state) :action/edit)
+                :menu [{:label ((:translate state) :action/delete)
+                        :action :delete}
+                       {:label ((:translate state) :action/edit)
                         :action :edit-mode}
                        {:label ((:translate state) :action/survey-sites)
                         :action :survey-sites}
