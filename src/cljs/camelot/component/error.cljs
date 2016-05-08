@@ -3,6 +3,34 @@
             [om.dom :as dom :include-macros true]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
+(def new-issue-url "http://bitbucket.org/cshclm/camelot/issues/new")
+
+(defn error-dialog-component
+  [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (if (get app :error)
+        (dom/div #js {:className "content"}
+                 (dom/h3 #js {:className "error-title"}
+                         "Oh No!")
+                 (dom/p #js {:className "error-paragraph"}
+                        "A problem was encountered while communicating with the server:")
+                 (dom/textarea #js {:className "error-text"
+                                    :disabled "disabled"
+                                    :rows 10
+                                    :cols 55}
+                               (get app :error))
+                 (dom/p #js {:className "error-paragraph"}
+                        "If you think this is a bug, please "
+                        (dom/a #js {:href new-issue-url
+                                    :target "_blank"}
+                               "Report an Issue"))
+                 (dom/button #js {:className "error-ack btn btn-danger"
+                                  :onClick #(om/update! app :error nil)}
+                             "Acknowledge"))
+        (dom/span nil "")))))
+
 (defn not-found-page-component
   "Page not found"
   [data owner]

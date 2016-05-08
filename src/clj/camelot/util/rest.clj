@@ -6,12 +6,18 @@
   "Set of keys for floating-point fields."
   #{:trap-station-longitude :trap-station-latitude})
 
+(defn- as-long
+  [v]
+  (if (and (instance? String v)
+           (re-find #"[0-9]" v))
+    (read-string v)
+    v))
+
 (defn- normalise-field-types
   "Reducer to parse strings for ID fields."
   [acc k v]
-  (if (and (re-find #"-id$" (name k))
-           (instance? String v))
-    (assoc acc k (read-string v))
+  (if (re-find #"-id$" (name k))
+    (assoc acc k (as-long v))
     (assoc acc k v)))
 
 (defn- parse-ids
@@ -58,12 +64,6 @@
   "Add URIs to all resources in `data'."
   [data resource-key]
   (reduce (resource-uri-generator resource-key) [] data))
-
-(defn as-long
-  [v]
-  (if (instance? String v)
-    (read-string v)
-    v))
 
 (defn list-available
   "Return a list of the available resources for `id-str'.

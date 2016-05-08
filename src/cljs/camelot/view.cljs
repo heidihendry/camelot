@@ -22,6 +22,11 @@
   (om/root cfoot/footer-component state/app-state
            {:target (js/document.getElementById "footer")}))
 
+(def error-dialog
+  "Render the error dialog"
+  (om/root cerr/error-dialog-component state/app-state
+           {:target (js/document.getElementById "error-dialog")}))
+
 (defn generate-view
   "Render the main page content"
   [view]
