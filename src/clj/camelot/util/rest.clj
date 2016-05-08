@@ -22,7 +22,8 @@
 (defn- parse-float-reducer
   "Reducer to parse strings for floating-point fields."
   [acc k v]
-  (if (some #{k} floating-point-fields)
+  (if (and (some #{k} floating-point-fields)
+           (instance? String v))
     (assoc acc k (read-string v))
     (assoc acc k v)))
 
@@ -58,6 +59,12 @@
   [data resource-key]
   (reduce (resource-uri-generator resource-key) [] data))
 
+(defn as-long
+  [v]
+  (if (instance? String v)
+    (read-string v)
+    v))
+
 (defn list-available
   "Return a list of the available resources for `id-str'.
   `f' is a function which takes the configuration as its first argument, and
@@ -65,7 +72,7 @@
   desired resource ID.  This is typically used for finding possible resources
   where there's a constraint that they must be unique."
   [f id-str]
-  (let [id (read-string id-str)]
+  (let [id (as-long id-str)]
     (-> (config)
         (gen-state)
         (f id)
@@ -85,7 +92,7 @@
        (add-resource-uris resource-key)
        (r/response)))
   ([f resource-key id-str]
-   (let [id (read-string id-str)]
+   (let [id (as-long id-str)]
      (-> (config)
          (gen-state)
          (f id)
@@ -97,7 +104,7 @@
   `f' is a resource-fetching function which takes the configuration as its
   first argument, and a parsed ID is its second argument."
   [f id-str]
-  (let [id (read-string id-str)]
+  (let [id (as-long id-str)]
     (-> (config)
         (gen-state)
         (f id)
@@ -112,7 +119,7 @@
   - a (processed) map as its third argument"
   [f id-str data]
   (let [stddata (parse-floats (parse-ids (decursorise data)))
-        id (read-string id-str)]
+        id (as-long id-str)]
     (-> (config)
         (gen-state)
         (f id stddata)
@@ -137,7 +144,7 @@
   `f' is a function which deletes a resource given a (parsed) ID.  `id-str' is
   the string representation of a resource to delete."
   [f id-str]
-  (let [id (read-string id-str)]
+  (let [id (as-long id-str)]
     (-> (config)
         (gen-state)
         (f id)
