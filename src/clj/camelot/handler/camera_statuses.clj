@@ -1,4 +1,4 @@
-(ns camelot.handler.camera-status
+(ns camelot.handler.camera-statuses
   (:require [compojure.core :refer [ANY GET PUT POST DELETE context]]
             [camelot.util.rest :as rest]
             [camelot.util.java-file :as jf]

@@ -14,7 +14,7 @@
 
 (def get-application
   "Retrieve global application details"
-  (partial get-x "/application"))
+  (partial get-x "/settings/application"))
 
 (def get-albums
   "Retrieve albums"
@@ -26,11 +26,11 @@
 
 (def get-configuration
   "Retrieve configuration"
-  (partial get-x "/default-config"))
+  (partial get-x "/settings"))
 
 (def get-metadata
   "Retrieve metadata"
-  (partial get-x "/metadata"))
+  (partial get-x "/settings/metadata"))
 
 (defn get-resource
   "GET resource state"
