@@ -11,10 +11,6 @@ which lein &> /dev/null
 which git &> /dev/null
 which sed &> /dev/null
 
-echo "Checking working directory is clean... "
-git diff --exit-code
-git diff --cached --exit-code
-
 echo "Cleaning... "
 lein clean
 
