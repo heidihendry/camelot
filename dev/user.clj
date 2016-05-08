@@ -23,6 +23,7 @@
   (db/rollback))
 
 (defn run []
+  (migrate)
   (figwheel/start-figwheel!))
 
 (def browser-repl figwheel/cljs-repl)
