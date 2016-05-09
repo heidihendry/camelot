@@ -125,8 +125,7 @@
                (assoc basedata (get-in (get-screen vs) [:resource :parent-id-key])
                       {:value parent-id})
                basedata)]
-    (rest/post-resource (get-endpoint vs)
-                        {:data data}
+    (rest/post-resource (get-endpoint vs) {:data data}
                         #(do
                            (load-resource-children vs)
                            (om/update! (get vs :screen) :mode :readonly)
@@ -137,14 +136,13 @@
   "Submit the buffer state and return to readonly mode."
   (let [cb (get events success-key)]
     (om/update! resources key (deref (get vs :buffer)))
-    (rest/put-resource (get-url vs)
-                        {:data (deref (get resources key))}
-                        #(do
-                           (when-not (settings-screen? vs)
-                             (load-resource-children vs)
-                             (om/update! (get vs :screen) :mode :readonly))
-                           (when cb
-                             (cb))))))
+    (rest/put-resource (get-url vs) {:data (deref (get vs :buffer))}
+                       #(do
+                          (when-not (settings-screen? vs)
+                            (load-resource-children vs)
+                            (om/update! (get vs :screen) :mode :readonly))
+                          (when cb
+                            (cb))))))
 
 (defn cancel-update [event-key vs resources key]
   "Revert the buffer state and return to readonly mode."
