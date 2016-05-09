@@ -11,13 +11,15 @@
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
 
 (defn build-error
-  ([method url response]
+  ([method url status response]
    (str response
         "\n--------\n"
+        "Status Code: " status "\n"
         "Requested: " url " via " method))
-  ([method url params response]
+  ([method url params status response]
    (str response
         "\n--------\n"
+        "Status Code: " status "\n"
         "Requested: " url " via " method "\n"
         "With parameters: " params "\n")))
 
@@ -34,6 +36,7 @@
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "GET"
                                                      (util/with-baseurl x-url)
+                                                     (:status response)
                                                      (:body response)))))))
 
 (def get-application
@@ -69,6 +72,7 @@
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "GET"
                                                      (util/with-baseurl resource)
+                                                     (:status response)
                                                      (:body response)))))))
 
 (defn put-resource
@@ -85,6 +89,7 @@
                                                      "PUT"
                                                      (util/with-baseurl resource)
                                                      params
+                                                     (:status response)
                                                      (:body response)))))))
 
 (defn post-resource
@@ -101,6 +106,7 @@
                                                      "POST"
                                                      (util/with-baseurl resource)
                                                      params
+                                                     (:status response)
                                                      (:body response)))))))
 
 (defn delete-resource
@@ -117,6 +123,7 @@
                                                      "DELETE"
                                                      (util/with-baseurl resource)
                                                      params
+                                                     (:status response)
                                                      (:body response)))))))
 
 (defn post-settings
@@ -133,4 +140,5 @@
                                                      "POST"
                                                      (util/with-baseurl "/settings")
                                                      params
+                                                     (:status response)
                                                      (:body response)))))))

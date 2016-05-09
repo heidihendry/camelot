@@ -386,12 +386,14 @@ pre.field-input {
     z-index: 1000;
     top: 8rem;
     left: calc(50vw - 25rem);
+    border-radius: 0.5rem;
 }
 #error-dialog .content {
     background: #fff;
     height: 38rem;
     width: 50rem;
     padding: 1rem 2rem;
+    border-radius: 0.5rem;
 }
 #error-dialog .error-title {
     margin-top: 0;
