@@ -193,7 +193,7 @@
                         :title ((:translate state) :trap-station-session/sidebar-title)
                         :type :trap-station-session
                         :id :trap-station-session-id
-                        :label :trap-station-session-start-date}}
+                        :label :trap-station-session-label}}
    :actionmenu {:title ((:translate state) :actionmenu/title)
                 :menu [{:label ((:translate state) :action/delete)
                         :action :delete}

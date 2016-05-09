@@ -5,13 +5,28 @@
             [schema.core :as s]
             [yesql.core :as sql]
             [camelot.model.trap-station-session :refer
-             [TrapStationSession TrapStationSessionCreate]]))
+             [TrapStationSession TrapStationSessionCreate TrapStationSessionLabeled]]
+            [clj-time.format :as tf]))
 
 (sql/defqueries "sql/trap-station-sessions.sql" {:connection db/spec})
 
-(s/defn get-all :- [TrapStationSession]
+(def date-formatter (tf/formatter "yyyy-MM-dd"))
+
+(defn build-label
+  [start end]
+  (let [sp (tf/unparse date-formatter start)
+        ep (tf/unparse date-formatter end)]
+    (format "%s to %s" sp ep)))
+
+(defn add-label
+  [rec]
+  (assoc rec :trap-station-session-label
+         (build-label (:trap-station-session-start-date rec)
+                      (:trap-station-session-end-date rec))))
+
+(s/defn get-all :- [TrapStationSessionLabeled]
   [state id]
-  (db/with-db-keys -get-all {:trap-station-id id}))
+  (map add-label (db/with-db-keys -get-all {:trap-station-id id})))
 
 (s/defn get-specific :- TrapStationSession
   [state

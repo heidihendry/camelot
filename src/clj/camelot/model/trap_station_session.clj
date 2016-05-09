@@ -12,3 +12,7 @@
          {:trap-station-session-id s/Num
           :trap-station-session-created org.joda.time.DateTime
           :trap-station-session-updated org.joda.time.DateTime}))
+
+(def TrapStationSessionLabeled
+  (merge TrapStationSession
+         {:trap-station-session-label s/Str}))
