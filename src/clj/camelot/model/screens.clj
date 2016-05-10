@@ -35,7 +35,8 @@
             [:site-state-province]
             [:site-country]
             [:site-notes]]
-   :schema {:site-name {:type :text}
+   :schema {:site-name {:type :text
+                        :required true}
             :site-sublocation {:type :text}
             :site-city {:type :text}
             :site-state-province {:type :text}
@@ -76,9 +77,11 @@
               [:camera-make]
               [:camera-model]
               [:camera-notes]]
-     :schema {:camera-name {:type :text}
+     :schema {:camera-name {:type :text
+                            :required true}
               :camera-status-id {:type :select
-                                 :generator :camera-statuses}
+                                 :generator :camera-statuses
+                                 :required true}
               :camera-make {:type :text}
               :camera-model {:type :text}
               :camera-notes {:type :textarea
@@ -113,6 +116,7 @@
                         :action :trap-stations}]}
    :layout [[:site-id]]
    :schema {:site-id {:type :select
+                      :required true
                       :generator :survey-sites-available}}
    :states {:create {:submit {:success {:type :event
                                         :event :survey-site-create}
@@ -138,6 +142,7 @@
                         :action :import-media}]}
    :layout [[:camera-id]]
    :schema {:camera-id {:type :select
+                        :required true
                         :generator :trap-station-session-cameras-available}}
    :states {:create {:submit {:success {:type :event
                                         :event :trap-station-session-camera-create}
@@ -169,7 +174,8 @@
             [:trap-station-latitude]
             [:trap-station-altitude]
             [:trap-station-notes]]
-   :schema {:trap-station-name {:type :text}
+   :schema {:trap-station-name {:type :text
+                                :required true}
             :trap-station-sublocation {:type :text}
             :trap-station-longitude {:type :number}
             :trap-station-latitude {:type :number}
@@ -204,8 +210,10 @@
    :layout [[:trap-station-session-start-date]
             [:trap-station-session-end-date]
             [:trap-station-session-notes]]
-   :schema {:trap-station-session-start-date {:type :datetime}
-            :trap-station-session-end-date {:type :datetime}
+   :schema {:trap-station-session-start-date {:type :datetime
+                                              :required true}
+            :trap-station-session-end-date {:type :datetime
+                                            :required true}
             :trap-station-session-notes {:type :textarea
                                  :cols 35
                                  :rows 4}}
@@ -236,8 +244,10 @@
    :layout [[:survey-name]
             [:survey-directory]
             [:survey-notes]]
-   :schema {:survey-name {:type :text}
-            :survey-directory {:type :text}
+   :schema {:survey-name {:type :text
+                          :required true}
+            :survey-directory {:type :text
+                               :required true}
             :survey-notes {:type :textarea
                            :rows 4
                            :cols 35}}
@@ -270,13 +280,18 @@
             [:sighting-independence-minutes-threshold]
             [:infrared-iso-value-threshold]
             [:erroneous-infrared-threshold]]
-   :schema {:erroneous-infrared-threshold {:type :percentage}
-            :infrared-iso-value-threshold {:type :number}
-            :sighting-independence-minutes-threshold {:type :number}
+   :schema {:erroneous-infrared-threshold {:type :percentage
+                                           :required true}
+            :infrared-iso-value-threshold {:type :number
+                                           :required true}
+            :sighting-independence-minutes-threshold {:type :number
+                                                      :required true}
             :language {:type :select
+                       :required true
                        :options {:en ((:translate state) :language/en)
                                  :vn ((:translate state) :language/vn)}}
             :night-start-hour {:type :select
+                               :required true
                                :options {17 "17:00"
                                          18 "18:00"
                                          19 "19:00"
@@ -285,6 +300,7 @@
                                          22 "22:00"
                                          23 "23:00"}}
             :night-end-hour {:type :select
+                             :required true
                              :options {0 "0:00"
                                        1 "1:00"
                                        2 "2:00"
@@ -294,9 +310,12 @@
                                        6 "6:00"
                                        7 "7:00"
                                        8 "8:00"}}
-            :project-start {:type :datetime}
-            :project-end {:type :datetime}
-            :root-path {:type :string}
+            :project-start {:type :datetime
+                            :required true}
+            :project-end {:type :datetime
+                          :required true}
+            :root-path {:type :string
+                        :required true}
             :surveyed-species {:type :list
                                :list-of :string}
             :required-fields {:type :list

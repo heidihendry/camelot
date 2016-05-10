@@ -169,7 +169,24 @@ a:hover {
   border-top-left-radius: 1rem;
 }
 #app .field-container {
-  margin-bottom: 1rem;
+    margin-bottom: 1rem;
+    width: 30rem;
+}
+#app .field-required-label {
+    display: none;
+    float: right;
+    margin-right: 1rem;
+    position: relative;
+}
+#app .field-container .required-asterisk {
+    padding-left: 1pt;
+}
+#app .field-container.show-validations .required-asterisk {
+    color: #800;
+}
+#app .field-container.show-validations .field-required-label {
+    display: inline;
+    color: #800;
 }
 #settings button {
   margin: 0;
@@ -180,7 +197,7 @@ a:hover {
 }
 #app .field-label {
   color: #666;
-  display: block;
+  display: inline-block;
   clear: both;
   font-weight: normal;
 }
@@ -195,9 +212,9 @@ a:hover {
    -webkit-appearance: none;
    -moz-appearance: none;
    appearance: none;
-
 }
 #app input.field-input, textarea.field-input, pre.field-input {
+  display: block;
   width: 30rem;
   padding: 0.5rem;
   color: #666;

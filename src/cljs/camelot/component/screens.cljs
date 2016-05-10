@@ -49,6 +49,20 @@
                                     (conj (map to-dropdown (:body %))
                                           {:vkey "" :desc ""})))))
 
+(defn validate
+  "Check required fields against the entered data"
+  [vs]
+  (let [entries (get (get-screen vs) :schema)
+        reqd (filter (fn [[k v]] (get-in v [:schema :required])) entries)
+        invalid (filter #(let [data (get-in vs [:buffer (first %) :value])]
+                           (or (nil? data) (= data "")
+                               (and (coll? data) (empty? data)))) reqd)]
+    (if (zero? (count invalid))
+      (do (om/update! (get vs :selected-resource) :show-validations false)
+          true)
+      (do (om/update! (get vs :selected-resource) :show-validations true)
+          false))))
+
 (defn build-generator
   "Drop-down menu generator for the given view-state."
   [vs]
@@ -125,34 +139,36 @@
                (assoc basedata (get-in (get-screen vs) [:resource :parent-id-key])
                       {:value parent-id})
                basedata)]
-    (rest/post-resource (get-endpoint vs) {:data data}
-                        #(do
-                           (load-resource-children vs)
-                           (om/update! (get vs :screen) :mode :readonly)
-                           (om/update! (get vs :selected-resource) :details (:body %))
-                           (get events success-key)))))
+    (when (validate vs)
+      (rest/post-resource (get-endpoint vs) {:data data}
+                          #(do
+                             (load-resource-children vs)
+                             (om/update! (get vs :screen) :mode :readonly)
+                             (om/update! (get vs :selected-resource) :details (:body %))
+                             (get events success-key))))))
 
 (defn submit-update [success-key error-key vs resources key]
   "Submit the buffer state and return to readonly mode."
   (let [cb (get events success-key)]
-    (om/update! resources key (deref (get vs :buffer)))
-    (rest/put-resource (get-url vs) {:data (deref (get vs :buffer))}
-                       #(do
-                          (when-not (settings-screen? vs)
-                            (load-resource-children vs)
-                            (om/update! (get vs :screen) :mode :readonly))
-                          (when cb
-                            (cb))))))
+    (when (validate vs)
+      (om/update! resources key (deref (get vs :buffer)))
+      (rest/put-resource (get-url vs) {:data (deref (get vs :buffer))}
+                         #(do
+                            (when-not (settings-screen? vs)
+                              (load-resource-children vs)
+                              (om/update! (get vs :screen) :mode :readonly))
+                            (when cb
+                              (cb)))))))
 
 (defn cancel-update [event-key vs resources key]
   "Revert the buffer state and return to readonly mode."
-  (do
-    (om/update! vs :buffer (deref (get resources key)))
-    (when-not (settings-screen? vs)
-      (om/update! (get vs :screen) :mode :readonly))
-    (let [cb (get events event-key)]
-      (when cb
-        (cb)))))
+  (om/update! vs :buffer (deref (get resources key)))
+  (om/update! (get vs :selected-resource) :show-validations false)
+  (when-not (settings-screen? vs)
+    (om/update! (get vs :screen) :mode :readonly))
+  (let [cb (get events event-key)]
+    (when cb
+      (cb))))
 
 (defn delete [success-key error-key vs resources key]
   "Delete the resource with `key'."
@@ -239,16 +255,22 @@
 
 (defn field-component
   "Component for input fields of any type."
-  [[menu-item screen buf opts] owner]
+  [[menu-item vs buf opts] owner]
   (reify
     om/IRender
     (render [_]
       (if (= (first menu-item) :label)
         (dom/h4 #js {:className "section-heading"} (second menu-item))
-        (let [value (get-in screen [:schema (first menu-item)])]
-          (dom/div #js {:className "field-container"}
+        (let [value (get-in (get-screen vs) [:schema (first menu-item)])]
+          (dom/div #js {:className (if (and (get-in vs [:selected-resource :show-validations])
+                                            (get-in value [:schema :required]))
+                                     "field-container show-validations"
+                                     "field-container")}
+                   (dom/label #js {:className "field-required-label"} "Required")
                    (dom/label #js {:className "field-label"
-                                   :title (get value :description)} (get value :label))
+                                   :title (get value :description)} (get value :label)
+                                   (when (get-in value [:schema :required])
+                                     (dom/label #js {:className "required-asterisk"} "*")))
                    (om/build inputs/input-field
                              [(first menu-item) value buf opts])))))))
 
@@ -267,7 +289,7 @@
                                          (get-resource-id vs))}}]
         (apply dom/div #js {:className "section-body"}
                (om/build-all field-component
-                             (map #(vector % screen (get vs :buffer)
+                             (map #(vector % vs (get vs :buffer)
                                            (if (= (get-in vs [:screen :mode]) :readonly)
                                              (merge gens {:disabled true})
                                              gens))
