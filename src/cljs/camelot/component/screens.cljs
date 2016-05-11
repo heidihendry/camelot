@@ -14,6 +14,10 @@
   [vs]
   (get (get (state/app-state-cursor) :screens) (get-in vs [:screen :type])))
 
+(defn get-resource-name
+  [vs]
+  (name (get-in (get-screen vs) [:resource :type])))
+
 (defn load-resource-children
   "Update the state of the children defined for the selected resource type."
   [vs]
@@ -140,6 +144,7 @@
                       {:value parent-id})
                basedata)]
     (when (validate vs)
+      (nav/analytics-event "create" (get-resource-name vs))
       (rest/post-resource (get-endpoint vs) {:data data}
                           #(do
                              (load-resource-children vs)
@@ -152,6 +157,7 @@
   (let [cb (get events success-key)]
     (when (validate vs)
       (om/update! resources key (deref (get vs :buffer)))
+      (nav/analytics-event "update" (get-resource-name vs))
       (rest/put-resource (get-url vs) {:data (deref (get vs :buffer))}
                          #(do
                             (when-not (settings-screen? vs)
@@ -164,6 +170,7 @@
   "Revert the buffer state and return to readonly mode."
   (om/update! vs :buffer (deref (get resources key)))
   (om/update! (get vs :selected-resource) :show-validations false)
+  (nav/analytics-event "cancel-update" (get-resource-name vs))
   (when-not (settings-screen? vs)
     (om/update! (get vs :screen) :mode :readonly))
   (let [cb (get events event-key)]
@@ -173,6 +180,7 @@
 (defn delete [success-key error-key vs resources key]
   "Delete the resource with `key'."
   (let [cb (get events success-key)]
+    (nav/analytics-event "delete" (get-resource-name vs))
     (rest/delete-resource (get-url vs) {}
                           #(do (om/update! resources key {})
                                (om/update! vs :buffer {})
@@ -248,7 +256,11 @@
       (let [screen (get-screen vs)
             key :vkey]
         (apply dom/select #js {:className "actionmenu"
-                               :onChange #(select-action-event-handler vs %)}
+                               :onChange #(do
+                                            (nav/analytics-event
+                                             (str (get-resource-name vs) "-actionmenu")
+                                             (.. % -target -value))
+                                            (select-action-event-handler vs %))}
                (om/build-all actionmenu-item-component
                              (actionmenu-builder-list screen key)
                              {:key key}))))))
@@ -356,7 +368,11 @@
     om/IRender
     (render [_]
       (dom/li #js {:className "sidebar-item"
-                   :onClick #(do (rest/get-resource (get data :uri)
+                   :onClick #(do
+                               (nav/analytics-event "sidebar-navigate"
+                                                    (get-resource-name
+                                                     (get data :view-state)))
+                               (rest/get-resource (get data :uri)
                                   (fn [resp]
                                     (om/update! (get-in data [:view-state :screen]) :mode :readonly)
                                     (om/update! (get-in data [:view-state :selected-resource]) :details (:body resp))
@@ -396,6 +412,8 @@
                (dom/button #js {:className "create-record-btn btn btn-primary fa fa-plus fa-2x"
                                 :disabled (= (get-in vs [:screen :mode]) :create)
                                 :onClick #(do
+                                            (nav/analytics-event "sidebar-create"
+                                                                 (get-resource-name vs))
                                             (om/update! vs :buffer {})
                                             (om/update! (get vs :screen) :mode :create))})
                (build-sidebar-item-components vs)))))

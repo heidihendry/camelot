@@ -25,6 +25,24 @@
     (goog.events/listen EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (.setEnabled true)))
 
+(defn analytics-event
+  [component action]
+  (let [ga (aget js/window "ga")]
+    (when ga
+      (ga "send" "event" component action))))
+
+(defn analytics-pageview
+  [page]
+  (let [ga (aget js/window "ga")]
+    (when ga
+      (ga "set" "page" page)
+      (ga "send" "pageview"))))
+
+(defn set-token!
+  [history token]
+  (analytics-pageview token)
+  (.setToken history token))
+
 (defn breadnav!
   "Navigate to a URL token, creating a breadcrumb"
   [token breadcrumb]
@@ -32,20 +50,20 @@
   (om/transact! (state/app-state-cursor) :nav-history
                 (fn [h] (conj (vec h) {:token (get-token)
                                        :label breadcrumb})))
-  (.setToken history token))
+  (set-token! history token))
 
 (defn breadnav-consume!
   "Navigate to a URL token"
   [token]
   (om/transact! (state/app-state-cursor) :nav-history
                 (fn [h] (take-while #(not= (:token %) token) h)))
-  (.setToken history token))
+  (set-token! history token))
 
 (defn nav!
   "Navigate to a URL token"
   [token]
   (om/update! (state/app-state-cursor) :nav-history [])
-  (.setToken history token))
+  (set-token! history token))
 
 (defn settings-hide!
   "Hide the settings panel"

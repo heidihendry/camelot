@@ -16,6 +16,7 @@
       (dom/div nil
                (dom/div nil
                         (dom/h4 nil "Analysis Exports"))
-               (dom/a #js {:href (util/with-baseurl "/maxent") :target "_blank"}
+               (dom/a #js {:href (util/with-baseurl "/maxent") :target "_blank"
+                           :onClick #(nav/analytics-event "maxent" "export")}
                       (dom/button #js {:className "btn btn-primary fa fa-download fa-2x"}
                                   " MaxEnt Export"))))))
