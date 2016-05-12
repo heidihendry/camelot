@@ -5,23 +5,15 @@
             [camelot.component.inputs :as inputs]
             [camelot.state :as state]
             [camelot.nav :as nav]
+            [camelot.util.screen :as us]
             [camelot.rest :as rest])
     (:import [goog.date DateTime]
              [goog.i18n DateTimeFormat]))
 
-(defn get-screen
-  "Return the screen corresponding to the given view-state."
-  [vs]
-  (get (get (state/app-state-cursor) :screens) (get-in vs [:screen :type])))
-
-(defn get-resource-name
-  [vs]
-  (name (get-in (get-screen vs) [:resource :type])))
-
 (defn load-resource-children
   "Update the state of the children defined for the selected resource type."
   [vs]
-  (let [screen (get-screen vs)
+  (let [screen (us/get-screen vs)
         res (get-in screen [:sidebar :resource])
         id (get-in vs [:screen :id])
         ep (if id
@@ -32,31 +24,10 @@
                                     :children
                                     (:body %)))))
 
-(defn camera-status-generator
-  "Drop-down menu generator for camera statuses."
-  [gendata gen genargs]
-  (let [to-dropdown #(hash-map :vkey (:camera-status-id %)
-                               :desc (:camera-status-description %))]
-    (rest/get-resource
-     "/camera-statuses"
-     #(om/update! gendata gen
-                  (conj (map to-dropdown (:body %))
-                        {:vkey "" :desc ""})))))
-
-(defn trap-station-session-cameras-available-generator
-  "Drop-down menu generator for the available survey sites."
-  [gendata gen genargs]
-  (let [to-dropdown #(hash-map :vkey (:camera-id %)
-                               :desc (:camera-name %))]
-    (rest/get-resource (str "/trap-station-session-cameras/available/" (get genargs :id))
-                       #(om/update! gendata gen
-                                    (conj (map to-dropdown (:body %))
-                                          {:vkey "" :desc ""})))))
-
 (defn validate
   "Check required fields against the entered data"
   [vs]
-  (let [entries (get (get-screen vs) :schema)
+  (let [entries (get (us/get-screen vs) :schema)
         reqd (filter (fn [[k v]] (get-in v [:schema :required])) entries)
         invalid (filter #(let [data (get-in vs [:buffer (first %) :value])]
                            (or (nil? data) (= data "")
@@ -101,51 +72,17 @@
   {:settings-save (fn [d] (nav/toggle-settings!) (albums/reload-albums))
    :settings-cancel #(nav/toggle-settings!)})
 
-(defn get-endpoint
-  "Return the current resource's endpoint."
-  [vs]
-  (get-in (get-screen vs) [:resource :endpoint]))
-
-(defn get-resource-id
-  "Return the ID of the current resource for this view-state."
-  [vs]
-  (let [screen (get-screen vs)
-        rid (get-in screen [:resource :id])]
-    (if (nil? rid)
-      nil
-      (get-in vs [:selected-resource :details rid :value]))))
-
-(defn get-parent-resource-id
-  "Return the parent resource's endpoint URL for the current view-state."
-  [vs]
-  (get-in vs [:screen :id]))
-
-(defn get-url
-  "Return the endpoint URL for the current view-state."
-  [vs]
-  (let [screen (get-screen vs)
-        rid (get-resource-id vs)
-        base (get-in screen [:resource :endpoint])]
-    (if (nil? rid)
-      base
-      (str base "/" rid))))
-
-(defn settings-screen?
-  "Predicate for whether this view-state is for the settings screen."
-  [vs]
-  (= (get-in (get-screen vs) [:resource :type]) :settings))
-
 (defn create [success-key error-key vs resources key]
   "Create the item in the buffer and view it in readonly mode."
-  (let [parent-id (get-parent-resource-id vs)
+  (let [parent-id (us/get-parent-resource-id vs)
         basedata (deref (get vs :buffer))
         data (if parent-id
-               (assoc basedata (get-in (get-screen vs) [:resource :parent-id-key])
+               (assoc basedata (us/get-screen-resource vs :parent-id-key)
                       {:value parent-id})
                basedata)]
     (when (validate vs)
-      (nav/analytics-event "create" (get-resource-name vs))
-      (rest/post-resource (get-endpoint vs) {:data data}
+      (nav/analytics-event "create" (us/get-resource-name vs))
+      (rest/post-resource (us/get-endpoint vs) {:data data}
                           #(do
                              (load-resource-children vs)
                              (om/update! (get vs :screen) :mode :readonly)
@@ -157,10 +94,10 @@
   (let [cb (get events success-key)]
     (when (validate vs)
       (om/update! resources key (deref (get vs :buffer)))
-      (nav/analytics-event "update" (get-resource-name vs))
-      (rest/put-resource (get-url vs) {:data (deref (get vs :buffer))}
+      (nav/analytics-event "update" (us/get-resource-name vs))
+      (rest/put-resource (us/get-url vs) {:data (deref (get vs :buffer))}
                          #(do
-                            (when-not (settings-screen? vs)
+                            (when-not (us/settings-screen? vs)
                               (load-resource-children vs)
                               (om/update! (get vs :screen) :mode :readonly))
                             (when cb
@@ -170,8 +107,8 @@
   "Revert the buffer state and return to readonly mode."
   (om/update! vs :buffer (deref (get resources key)))
   (om/update! (get vs :selected-resource) :show-validations false)
-  (nav/analytics-event "cancel-update" (get-resource-name vs))
-  (when-not (settings-screen? vs)
+  (nav/analytics-event "cancel-update" (us/get-resource-name vs))
+  (when-not (us/settings-screen? vs)
     (om/update! (get vs :screen) :mode :readonly))
   (let [cb (get events event-key)]
     (when cb
@@ -180,8 +117,8 @@
 (defn delete [success-key error-key vs resources key]
   "Delete the resource with `key'."
   (let [cb (get events success-key)]
-    (nav/analytics-event "delete" (get-resource-name vs))
-    (rest/delete-resource (get-url vs) {}
+    (nav/analytics-event "delete" (us/get-resource-name vs))
+    (rest/delete-resource (us/get-url vs) {}
                           #(do (om/update! resources key {})
                                (om/update! vs :buffer {})
                                (load-resource-children vs)
@@ -192,33 +129,20 @@
 (def actions
   "Mapping of actions to the corresponding action function."
   {:survey-sites (fn [vs rid]
-                   (nav/breadnav! (str "/#/survey-sites/" rid)
-                                  (let [screen (get-screen vs)]
-                                             (get-in screen [:resource :title]))))
+                   (nav/breadnav! (str "/#/survey-sites/" rid) (us/get-screen-title vs)))
    :trap-stations (fn [vs rid]
-                    (nav/breadnav! (str "/#/trap-stations/" rid)
-                                   (let [screen (get-screen vs)]
-                                             (get-in screen [:resource :title]))))
+                    (nav/breadnav! (str "/#/trap-stations/" rid) (us/get-screen-title vs)))
    :trap-station-sessions (fn [vs rid]
-                            (nav/breadnav! (str "/#/trap-station-sessions/" rid)
-                                           (let [screen (get-screen vs)]
-                                             (get-in screen [:resource :title]))))
+                            (nav/breadnav! (str "/#/trap-station-sessions/" rid) (us/get-screen-title vs)))
    :trap-station-session-cameras (fn [vs rid]
-                                   (nav/breadnav! (str "/#/trap-station-session-cameras/" rid)
-                                                  (let [screen (get-screen vs)]
-                                             (get-in screen [:resource :title]))))
+                                   (nav/breadnav! (str "/#/trap-station-session-cameras/" rid) (us/get-screen-title vs)))
    :import-media (fn [vs rid] (js/alert "Not yet implemented."))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
-   :delete (fn [vs rid] (let [screen (get-screen vs)]
+   :delete (fn [vs rid] (let [screen (us/get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")
                             (delete (get-in screen [:states :delete :submit :success :event])
                                     (get-in screen [:states :delete :submit :error :event])
                                     vs (get vs :selected-resource) :details))))})
-
-(defn get-action
-  "Return the corresponding `action' function or nil if one's not found."
-  [action]
-  (action actions))
 
 (defn actionmenu-item-component
   "Component for an item in the action menu."
@@ -232,19 +156,19 @@
   "Handler for action menu selection events."
   [vs e]
   (let [value (.. e -target -value)
-        action (get-action (keyword value))]
+        action (get actions (keyword value))]
     (if action
-      (action vs (get-resource-id vs))
+      (action vs (us/get-resource-id vs))
       (prn (str "Missing action: " (name value))))))
 
 (defn actionmenu-builder-list
   "Return the menu options formatted for on Om's build-all."
-  [screen key]
+  [vs key]
   (conj (map #(hash-map
                key (:label %)
                :action (name (:action %))
                :desc (:label %))
-             (get-in screen [:actionmenu :menu]))
+             (get-in (us/get-screen vs) [:actionmenu :menu]))
         {key "" :action nil :desc "Actions..."}))
 
 (defn actionmenu-component
@@ -253,16 +177,15 @@
   (reify
     om/IRender
     (render [_]
-      (let [screen (get-screen vs)
-            key :vkey]
+      (let [key :vkey]
         (apply dom/select #js {:className "actionmenu"
                                :onChange #(do
                                             (nav/analytics-event
-                                             (str (get-resource-name vs) "-actionmenu")
+                                             (str (us/get-resource-name vs) "-actionmenu")
                                              (.. % -target -value))
                                             (select-action-event-handler vs %))}
                (om/build-all actionmenu-item-component
-                             (actionmenu-builder-list screen key)
+                             (actionmenu-builder-list vs key)
                              {:key key}))))))
 
 (defn field-component
@@ -273,7 +196,7 @@
     (render [_]
       (if (= (first menu-item) :label)
         (dom/h4 #js {:className "section-heading"} (second menu-item))
-        (let [value (get-in (get-screen vs) [:schema (first menu-item)])]
+        (let [value (get-in (us/get-screen vs) [:schema (first menu-item)])]
           (dom/div #js {:className (if (and (get-in vs [:selected-resource :show-validations])
                                             (get-in value [:schema :required]))
                                      "field-container show-validations"
@@ -292,20 +215,19 @@
   (reify
     om/IRender
     (render [_]
-      (let [screen (get-screen vs)
-            gens {:generator-fn (build-generator vs)
+      (let [gens {:generator-fn (build-generator vs)
                   :generators generators
                   :generator-data (get vs :generator-data)
                   :generator-args {:id (if (= (get-in vs [:screen :mode]) :create)
-                                         (get-parent-resource-id vs)
-                                         (get-resource-id vs))}}]
+                                         (us/get-parent-resource-id vs)
+                                         (us/get-resource-id vs))}}]
         (apply dom/div #js {:className "section-body"}
                (om/build-all field-component
                              (map #(vector % vs (get vs :buffer)
                                            (if (= (get-in vs [:screen :mode]) :readonly)
                                              (merge gens {:disabled true})
                                              gens))
-                                  (get screen :layout))))))))
+                                  (get (us/get-screen vs) :layout))))))))
 
 (defn update-button-component
   "Button-group component for finalising an update"
@@ -327,11 +249,10 @@
   (reify
     om/IRender
     (render [_]
-      (let [screen (get-screen view-state)]
-        (dom/div nil
-                 (dom/h4 nil (str "Update "  (get-in screen [:resource :title])))
-                 (dom/div nil (om/build body-component view-state))
-                 (om/build update-button-component k))))))
+      (dom/div nil
+               (dom/h4 nil (str "Update "  (us/get-screen-title view-state)))
+               (dom/div nil (om/build body-component view-state))
+               (om/build update-button-component k)))))
 
 (defn resource-view-component
   "Component for Readonly Mode"
@@ -339,12 +260,11 @@
   (reify
     om/IRender
     (render [_]
-      (let [screen (get-screen vs)]
-        (dom/div nil
-                 (when (get screen :actionmenu)
-                   (om/build actionmenu-component vs))
-                 (dom/h4 nil (get-in screen [:resource :title]))
-                 (dom/div nil (om/build body-component vs)))))))
+      (dom/div nil
+               (when (get (us/get-screen vs) :actionmenu)
+                 (om/build actionmenu-component vs))
+               (dom/h4 nil (us/get-screen-title vs))
+               (dom/div nil (om/build body-component vs))))))
 
 (defn resource-create-component
   "Component for Create Mode"
@@ -352,14 +272,13 @@
   (reify
     om/IRender
     (render [_]
-      (let [screen (get-screen view-state)]
-        (dom/div nil
-                 (dom/h4 nil (str "Create " (get-in screen [:resource :title])))
-                 (dom/div nil (om/build body-component view-state))
-                 (dom/div #js {:className "button-container"}
-                          (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
-                                           :onClick create}
-                                      " Create")))))))
+      (dom/div nil
+               (dom/h4 nil (str "Create " (us/get-screen-title view-state)))
+               (dom/div nil (om/build body-component view-state))
+               (dom/div #js {:className "button-container"}
+                        (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
+                                         :onClick create}
+                                    " Create"))))))
 
 (defn sidebar-item-component
   "Component for a single navigation item in the sidebar."
@@ -370,8 +289,7 @@
       (dom/li #js {:className "sidebar-item"
                    :onClick #(do
                                (nav/analytics-event "sidebar-navigate"
-                                                    (get-resource-name
-                                                     (get data :view-state)))
+                                                    (us/get-resource-name (get data :view-state)))
                                (rest/get-resource (get data :uri)
                                   (fn [resp]
                                     (om/update! (get-in data [:view-state :screen]) :mode :readonly)
@@ -387,7 +305,7 @@
 (defn build-sidebar-item-components
   "Return the built components for the sidebar items."
   [vs]
-  (let [screen (get-screen vs)
+  (let [screen (us/get-screen vs)
         res (get-in screen [:sidebar :resource])]
     (apply dom/ul nil
            (dom/li nil (get res :title))
@@ -413,7 +331,7 @@
                                 :disabled (= (get-in vs [:screen :mode]) :create)
                                 :onClick #(do
                                             (nav/analytics-event "sidebar-create"
-                                                                 (get-resource-name vs))
+                                                                 (us/get-resource-name vs))
                                             (om/update! vs :buffer {})
                                             (om/update! (get vs :screen) :mode :create))})
                (build-sidebar-item-components vs)))))
@@ -421,7 +339,7 @@
 (defn build-update-component
   "Builder for a Update-Mode component"
   [vs]
-  (let [screen (get-screen vs)]
+  (let [screen (us/get-screen vs)]
     (if (get vs :buffer)
       (let [rupdate #(submit-update (get-in screen [:states :update :submit :success :event])
                                     (get-in screen [:states :update :submit :error :event])
@@ -449,7 +367,7 @@
 (defn build-create-component
   "Builder for a Create-Mode component"
   [vs]
-  (let [screen (get-screen vs)
+  (let [screen (us/get-screen vs)
         create-fn #(create (get-in screen [:states :create :submit :success :event])
                            (get-in screen [:states :create :submit :error :event])
                            vs
@@ -502,7 +420,7 @@
       om/IRender
       (render [_]
         (let [vs (get-in app [:view type])
-              screen (get-screen vs)]
+              screen (us/get-screen vs)]
           (dom/div nil
                    (when (get screen :sidebar)
                      (om/build sidebar-component vs))
