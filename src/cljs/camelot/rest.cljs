@@ -10,18 +10,22 @@
 (def success-status-codes
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
 
+(defn- -build-error
+  [method url params status response]
+  (let [sep "\n--------\n"
+        req (str "Requested: " url " via " method)
+        stat (str "Status Code: " status "\n")]
+    (cond
+      (zero? status) (str "Unable to contact server" sep req)
+      (nil? params) (str response sep stat req)
+      :else (str response sep stat req
+                 "\nWith parameters: " params "\n"))))
+
 (defn build-error
   ([method url status response]
-   (str response
-        "\n--------\n"
-        "Status Code: " status "\n"
-        "Requested: " url " via " method))
+   (-build-error method url nil status response))
   ([method url params status response]
-   (str response
-        "\n--------\n"
-        "Status Code: " status "\n"
-        "Requested: " url " via " method "\n"
-        "With parameters: " params "\n")))
+   (-build-error method url params status response)))
 
 (defn get-x
   "Retrieve settings"
