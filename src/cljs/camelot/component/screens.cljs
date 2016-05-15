@@ -87,6 +87,7 @@
                              (load-resource-children vs)
                              (om/update! (get vs :screen) :mode :readonly)
                              (om/update! (get vs :selected-resource) :details (:body %))
+                             (om/update! vs :buffer (:body %))
                              (get events success-key))))))
 
 (defn submit-update [success-key error-key vs resources key]
