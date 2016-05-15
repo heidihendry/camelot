@@ -81,7 +81,7 @@
                       {:value parent-id})
                basedata)]
     (when (validate vs)
-      (nav/analytics-event "create" (us/get-resource-name vs))
+      (nav/analytics-event "create" (us/get-resource-type-name vs))
       (rest/post-resource (us/get-endpoint vs) {:data data}
                           #(do
                              (load-resource-children vs)
@@ -95,7 +95,7 @@
   (let [cb (get events success-key)]
     (when (validate vs)
       (om/update! resources key (deref (get vs :buffer)))
-      (nav/analytics-event "update" (us/get-resource-name vs))
+      (nav/analytics-event "update" (us/get-resource-type-name vs))
       (rest/put-resource (us/get-url vs) {:data (deref (get vs :buffer))}
                          #(do
                             (when-not (us/settings-screen? vs)
@@ -108,7 +108,7 @@
   "Revert the buffer state and return to readonly mode."
   (om/update! vs :buffer (deref (get resources key)))
   (om/update! (get vs :selected-resource) :show-validations false)
-  (nav/analytics-event "cancel-update" (us/get-resource-name vs))
+  (nav/analytics-event "cancel-update" (us/get-resource-type-name vs))
   (when-not (us/settings-screen? vs)
     (om/update! (get vs :screen) :mode :readonly))
   (let [cb (get events event-key)]
@@ -118,7 +118,7 @@
 (defn delete [success-key error-key vs resources key]
   "Delete the resource with `key'."
   (let [cb (get events success-key)]
-    (nav/analytics-event "delete" (us/get-resource-name vs))
+    (nav/analytics-event "delete" (us/get-resource-type-name vs))
     (rest/delete-resource (us/get-url vs) {}
                           #(do (om/update! resources key {})
                                (om/update! vs :buffer {})
@@ -130,13 +130,21 @@
 (def actions
   "Mapping of actions to the corresponding action function."
   {:survey-sites (fn [vs rid]
-                   (nav/breadnav! (str "/#/survey-sites/" rid) (us/get-screen-title vs)))
+                   (nav/breadnav! (str "/#/survey-sites/" rid)
+                                  (us/get-breadcrumb-label vs)
+                                  (get-in vs [:selected-resource :details])))
    :trap-stations (fn [vs rid]
-                    (nav/breadnav! (str "/#/trap-stations/" rid) (us/get-screen-title vs)))
+                    (nav/breadnav! (str "/#/trap-stations/" rid)
+                                   (us/get-breadcrumb-label vs)
+                                   (get-in vs [:selected-resource :details])))
    :trap-station-sessions (fn [vs rid]
-                            (nav/breadnav! (str "/#/trap-station-sessions/" rid) (us/get-screen-title vs)))
+                            (nav/breadnav! (str "/#/trap-station-sessions/" rid)
+                                           (us/get-breadcrumb-label vs)
+                                           (get-in vs [:selected-resource :details])))
    :trap-station-session-cameras (fn [vs rid]
-                                   (nav/breadnav! (str "/#/trap-station-session-cameras/" rid) (us/get-screen-title vs)))
+                                   (nav/breadnav! (str "/#/trap-station-session-cameras/" rid)
+                                                  (us/get-breadcrumb-label vs)
+                                                  (get-in vs [:selected-resource :details])))
    :import-media (fn [vs rid] (js/alert "Not yet implemented."))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :delete (fn [vs rid] (let [screen (us/get-screen vs)]
@@ -182,7 +190,7 @@
         (apply dom/select #js {:className "actionmenu"
                                :onChange #(do
                                             (nav/analytics-event
-                                             (str (us/get-resource-name vs) "-actionmenu")
+                                             (str (us/get-resource-type-name vs) "-actionmenu")
                                              (.. % -target -value))
                                             (select-action-event-handler vs %))}
                (om/build-all actionmenu-item-component
@@ -290,7 +298,7 @@
       (dom/li #js {:className "sidebar-item"
                    :onClick #(do
                                (nav/analytics-event "sidebar-navigate"
-                                                    (us/get-resource-name (get data :view-state)))
+                                                    (us/get-resource-type-name (get data :view-state)))
                                (rest/get-resource (get data :uri)
                                   (fn [resp]
                                     (om/update! (get-in data [:view-state :screen]) :mode :readonly)
@@ -332,7 +340,7 @@
                                 :disabled (= (get-in vs [:screen :mode]) :create)
                                 :onClick #(do
                                             (nav/analytics-event "sidebar-create"
-                                                                 (us/get-resource-name vs))
+                                                                 (us/get-resource-type-name vs))
                                             (om/update! vs :buffer {})
                                             (om/update! (get vs :screen) :mode :create))})
                (build-sidebar-item-components vs)))))
@@ -379,12 +387,17 @@
 
 (defn breadcrumb-item-component
   "A single segment in the breadcrumbs component."
-  [{:keys [token label]} owner]
+  [{:keys [vs token label state]} owner]
   (reify
     om/IRender
     (render [_]
       (dom/span #js {:className "breadcrumb-item"}
-                (dom/a #js {:onClick #(nav/breadnav-consume! token)} label)))))
+                (dom/a #js {:onClick #(do
+                                        (nav/breadnav-consume! token)
+                                        (om/update! (get vs :screen) :mode :readonly)
+                                        (om/update! (get vs :selected-resource) :details state)
+                                        (om/update! vs :buffer state))}
+                       label)))))
 
 (defn breadcrumb-component
   "Navigation Breadcrumbs component."
@@ -395,7 +408,7 @@
       (when-not (empty? (get (state/app-state-cursor) :nav-history))
         (let [history (get (state/app-state-cursor) :nav-history)]
           (dom/div #js {:className "breadcrumbs"}
-                   (om/build-all breadcrumb-item-component history
+                   (om/build-all breadcrumb-item-component (map #(assoc % :vs vs) history)
                                  {:key :token})))))))
 
 (defn content-component

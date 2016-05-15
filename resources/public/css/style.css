@@ -362,10 +362,14 @@ pre.field-input {
     border-top: none;
 }
 #page-content .main-content {
+    position: relative;
     float: left;
     display: block;
     margin-left: 24rem;
+    margin-right: 26rem;
+    padding-right: 26rem;
     min-width: 40rem;
+    width: 100%;
 }
 .sidebar .create-record-btn {
     float: right;
@@ -383,7 +387,9 @@ pre.field-input {
     margin-left: 1rem;
 }
 #page-content .actionmenu {
-    float: right;
+    position: absolute;
+    left: 23rem;
+    float: left;
     background: #eee;
     border: 1px solid #ccc;
     padding: 0.1rem 1rem;

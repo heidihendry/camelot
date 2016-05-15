@@ -21,10 +21,19 @@
   [vs]
   (get-screen-resource vs :title))
 
-(defn get-resource-name
+(defn get-resource-type-name
   "Get the name for the current screen's resource type."
   [vs]
   (name (get-in (get-screen vs) [:resource :type])))
+
+(defn get-resource-name
+  [vs]
+  (let [namekey (get-in (get-screen vs) [:sidebar :resource :label])]
+    (get-in vs [:selected-resource :details namekey :value])))
+
+(defn get-breadcrumb-label
+  [vs]
+  (str (get-screen-title vs) ": " (get-resource-name vs)))
 
 (defn get-resource-id
   "Return the ID of the current resource for this view-state."

@@ -28,10 +28,10 @@
   [state id]
   (map add-label (db/with-db-keys -get-all {:trap-station-id id})))
 
-(s/defn get-specific :- TrapStationSession
+(s/defn get-specific :- TrapStationSessionLabeled
   [state
    id :- s/Num]
-  (first (db/with-db-keys -get-specific {:trap-station-session-id id})))
+  (add-label (first (db/with-db-keys -get-specific {:trap-station-session-id id}))))
 
 (s/defn create!
   [state
@@ -42,9 +42,10 @@
 (s/defn update!
   [state
    id :- s/Num
-   data :- TrapStationSession]
-  (db/with-db-keys -update! (merge data {:trap-station-session-id id}))
-  (get-specific state (:trap-station-session-id data)))
+   data :- TrapStationSessionLabeled]
+  (let [data (dissoc data :trap-station-session-label)]
+    (db/with-db-keys -update! (merge data {:trap-station-session-id id}))
+    (get-specific state (:trap-station-session-id data))))
 
 (s/defn delete!
   [state

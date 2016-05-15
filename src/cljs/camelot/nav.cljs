@@ -45,11 +45,12 @@
 
 (defn breadnav!
   "Navigate to a URL token, creating a breadcrumb"
-  [token breadcrumb]
+  [token breadcrumb state]
   (prn (get-token))
   (om/transact! (state/app-state-cursor) :nav-history
                 (fn [h] (conj (vec h) {:token (get-token)
-                                       :label breadcrumb})))
+                                       :label breadcrumb
+                                       :state (deref state)})))
   (set-token! history token))
 
 (defn breadnav-consume!
