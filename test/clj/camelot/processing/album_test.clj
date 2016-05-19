@@ -66,7 +66,8 @@
     (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
                   :sightings [{:species "Yellow Spotted Housecat" :quantity 1}]}]
           state (gen-state-helper config)]
-      (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 1}))
+      (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
+                                                        :count 1})))
 
   (fact "Multiple species are extracted if present"
     (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
@@ -74,8 +75,10 @@
                  {:datetime (t/date-time 2015 01 01 06 05 00)
                   :sightings [{:species "Smiley Wolf" :quantity 2}]}]
           state (gen-state-helper config)]
-      (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 1
-                                                      "Smiley Wolf" 2}))
+      (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
+                                                        :count 1}
+                                                       {:species "Smiley Wolf"
+                                                        :count 2})))
 
   (fact "Sightings are only considered independent if having sufficient temporal distance"
     (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
@@ -85,7 +88,8 @@
                  {:datetime (t/date-time 2015 01 01 07 00 00)
                   :sightings [{:species "Yellow Spotted Housecat" :quantity 2}]}]
           state (gen-state-helper config)]
-      (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 3}))
+      (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
+                                                        :count 3})))
 
   (fact "A sighting may later need to be updated with a higher quantity"
     (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
@@ -97,7 +101,8 @@
                  {:datetime (t/date-time 2015 01 01 07 10 00)
                   :sightings [{:species "Yellow Spotted Housecat" :quantity 2}]}]
           state (gen-state-helper config)]
-      (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 4}))
+      (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
+                                                        :count 4})))
 
   (fact "A single sighting may contain multiple species"
     (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
@@ -111,8 +116,10 @@
                   :sightings [{:species "Yellow Spotted Housecat" :quantity 2}
                               {:species "Smiley Wolf" :quantity 5}]}]
           state (gen-state-helper config)]
-      (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 4
-                                                      "Smiley Wolf" 7}))
+      (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
+                                                        :count 4}
+                                                       {:species "Smiley Wolf"
+                                                        :count 7})))
 
   (fact "Results are correct regardless of ordering of input"
     (let [album [{:datetime (t/date-time 2015 01 01 06 10 00)
@@ -126,5 +133,7 @@
                  {:datetime (t/date-time 2015 01 01 07 00 00)
                   :sightings [{:species "Smiley Wolf" :quantity 1}]}]
           state (gen-state-helper config)]
-      (extract-independent-sightings state album) => {"Yellow Spotted Housecat" 4
-                                                      "Smiley Wolf" 7})))
+      (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
+                                                        :count 4}
+                                                       {:species "Smiley Wolf"
+                                                        :count 7}))))

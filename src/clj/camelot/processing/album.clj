@@ -80,18 +80,18 @@
   [ta tb]
   (t/after? (:datetime tb) (:datetime ta)))
 
-(defn extract-independent-sightings
+(s/defn extract-independent-sightings :- [ma/Sightings]
   "Extract the sightings, accounting for the independence threshold, for an album."
   [state album]
   (let [indep-reducer (partial independence-reducer state)
-        total-spp (fn [[spp data]] {spp (reduce + (map :quantity data))})]
+        total-spp (fn [[spp data]] {:species spp
+                                    :count (reduce + (map :quantity data))})]
     (->> album
          (map add-times-to-sightings)
          (flatten)
          (sort datetime-comparison)
          (reduce indep-reducer {})
-         (map total-spp)
-         (into {}))))
+         (map total-spp))))
 
 (s/defn extract-metadata :- ma/ExtractedMetadata
   "Return aggregated metadata for a given album"
