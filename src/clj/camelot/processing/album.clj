@@ -58,22 +58,40 @@
 
 (defn- independence-reducer
   "Reducing function, adding or updating the sightings based on their dependence."
-  [state datetime acc this-sighting]
-  (let [species (:species this-sighting)
-        previous-sighting (dependent-sighting datetime (get acc species))]
+  [state acc this-sighting]
+  (let [datetime (:datetime this-sighting)
+        species (:species this-sighting)
+        previous-sighting (dependent-sighting datetime (get acc species))
+        qty (:quantity this-sighting)
+        known-sightings (get acc species)]
     (assoc acc species
            (if previous-sighting
-             (update-sighting (remove #(= previous-sighting %) (get acc species)) previous-sighting (:quantity this-sighting))
-             (add-sighting state (get acc species) datetime (:quantity this-sighting))))))
+             (update-sighting (remove #(= previous-sighting %) known-sightings)
+                              previous-sighting qty)
+             (add-sighting state known-sightings datetime qty)))))
+
+(defn- add-times-to-sightings
+  "Assoc date/time information into the sighting."
+  [p]
+  (map #(assoc % :datetime (:datetime p)) (:sightings p)))
+
+(s/defn datetime-comparison :- s/Bool
+  "Predicate for whether photo-a is prior to photo-b."
+  [ta tb]
+  (t/after? (:datetime tb) (:datetime ta)))
 
 (defn extract-independent-sightings
-  "Extract the camera model from an album"
+  "Extract the sightings, accounting for the independence threshold, for an album."
   [state album]
-  (into {} (map (fn [[k v]] {k (reduce + (map :quantity v))})
-                (reduce #(reduce (partial independence-reducer state (:datetime %2)) %1
-                                 (:sightings %2)) {} (sort #(t/before? (:datetime %1)
-                                                                       (:datetime %2))
-                                                           album)))))
+  (let [indep-reducer (partial independence-reducer state)
+        total-spp (fn [[spp data]] {spp (reduce + (map :quantity data))})]
+    (->> album
+         (map add-times-to-sightings)
+         (flatten)
+         (sort datetime-comparison)
+         (reduce indep-reducer {})
+         (map total-spp)
+         (into {}))))
 
 (s/defn extract-metadata :- ma/ExtractedMetadata
   "Return aggregated metadata for a given album"
