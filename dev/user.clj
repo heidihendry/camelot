@@ -2,6 +2,7 @@
   (:require [camelot.core]
             [camelot.db :as db]
             [schema.core :as s]
+            [midje.repl :as midje]
             [ring.middleware.reload :refer [wrap-reload]]
             [figwheel-sidecar.repl-api :as figwheel]))
 
@@ -25,5 +26,8 @@
 (defn run []
   (migrate)
   (figwheel/start-figwheel!))
+
+(defn autotest []
+  (midje/autotest))
 
 (def browser-repl figwheel/cljs-repl)
