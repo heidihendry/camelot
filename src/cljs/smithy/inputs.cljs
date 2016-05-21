@@ -1,30 +1,29 @@
-(ns camelot.component.inputs
+(ns smithy.inputs
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [camelot.state :as state]
+            [smithy.util :as util]
             [clojure.string :as string]
             [om-datepicker.components :refer [datepicker]])
   (:import [goog.date DateTime]
            [goog.i18n DateTimeFormat]))
 
 (defn- lookup-md-desc
-  [md]
-  (get (state/metadata-schema-state) md))
+  [mddata md]
+  (get mddata md))
 
 (defn- path-list-item
-  [k]
-  (fn [data owner]
-    (reify
-      om/IRender
-      (render [_]
-        (let [rm-fn #(state/remove-item! (:elt data)
-                                         (get (:state data) (:key data))
-                                         :value owner)]
-          (if (:disabled (:opts data))
-            (dom/span #js {:className "list-item"} (lookup-md-desc (:elt data)))
-            (dom/span #js {:className "list-item"} (lookup-md-desc (:elt data))
-                      (dom/span #js {:className "list-item-delete fa fa-trash"
-                                     :onClick rm-fn}))))))))
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [rm-fn #(util/remove-item! (:elt data)
+                                      (get (:state data) (:key data))
+                                      :value owner)]
+        (if (:disabled (:opts data))
+          (dom/span #js {:className "list-item"} (lookup-md-desc (get-in data [:opts :metadata]) (:elt data)))
+          (dom/span #js {:className "list-item"} (lookup-md-desc (get-in data [:opts :metadata]) (:elt data))
+                    (dom/span #js {:className "list-item-delete fa fa-trash"
+                                   :onClick rm-fn})))))))
 
 (defn- list-react-key
   [key]
@@ -42,7 +41,7 @@
     (reify
       om/IRender
       (render [_]
-        (let [rm-fn #(state/remove-item! (:elt data)
+        (let [rm-fn #(util/remove-item! (:elt data)
                                          (get (:state data) (:key data))
                                          :value owner)]
           (if (:disabled (:opts data))
@@ -72,7 +71,7 @@
     om/IWillUpdate
     (will-update [this next-props next-state]
       (let [generator (get-in v [:schema :generator])
-            gen-template (get (:generators opts) generator)
+            gen-template (get-in opts [:generators generator])
             generator-fn (:generator-fn opts)]
         (when (and generator generator-fn)
           (om/update! (get opts :generator-data) generator {})
@@ -84,7 +83,7 @@
             generator (get-in v [:schema :generator])]
         (dom/select #js {:className "field-input"
                          :disabled (:disabled opts)
-                         :onChange #((state/set-coerced-value! val) %
+                         :onChange #((util/set-coerced-value! val) %
                                      (k buf) :value owner)
                          :value
                          (if (= (type val) cljs.core/Keyword)
@@ -114,9 +113,9 @@
       (dom/div #js {:className "list-input"}
                (apply dom/div nil
                       (if (= (:list-of (:schema v)) :paths)
-                        (om/build-all (path-list-item k)
+                        (om/build-all path-list-item
                                       (into [] (map #(hash-map :state buf :key k :elt % :opts opts)
-                                                    (sort #(< (lookup-md-desc %1) (lookup-md-desc %2))
+                                                    (sort #(< (lookup-md-desc (:metadata opts) %1) (lookup-md-desc (:metadata opts) %2))
                                                           (get-in buf [k :value])))))
                         (om/build-all (string-list-item k) (into [] (map #(hash-map :state buf :key k :elt % :opts opts)
                                                                          (sort #(< %1 %2) (get-in buf [k :value])))))))
@@ -131,19 +130,19 @@
                                                                   (map #(hash-map :vkey (list-react-key (first %))
                                                                                   :desc (second %))
                                                                        (remove #(some (set %) (get-in buf [k :value]))
-                                                                               (state/metadata-schema-state)))) {:vkey "" :desc ""})
+                                                                               (:metadata opts)))) {:vkey "" :desc ""})
                                                       {:key :vkey}))
                             (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
-                                             :onClick #(do (state/add-metadata-item! (into [] (map keyword (string/split (get state :select-value) "#"))) buf k owner)
+                                             :onClick #(do (util/add-metadata-item! (into [] (map keyword (string/split (get state :select-value) "#"))) buf k owner)
                                                            (om/set-state! owner :select-value ""))}))
                    (dom/div nil
                             (dom/input #js {:type "text" :className "field-input" :placeholder "Add item" :value (get state :text-value)
                                             :onKeyDown #(when (= (.-key %) "Enter")
-                                                          (do (state/add-item! (get state :text-value) buf k owner)
+                                                          (do (util/add-item! (get state :text-value) buf k owner)
                                                               (om/set-state! owner :text-value "")))
                                             :onChange #(om/set-state! owner :text-value (.. % -target -value))})
                             (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
-                                             :onClick #(do (state/add-item! (get state :text-value) buf k owner)
+                                             :onClick #(do (util/add-item! (get state :text-value) buf k owner)
                                                            (om/set-state! owner :text-value ""))}))))))))
 
 (defmethod input-field :datetime
@@ -172,7 +171,7 @@
     (render [_]
       (dom/input #js {:type "number" :className "field-input"
                       :disabled (:disabled opts)
-                      :onChange #(state/set-percentage! % (k buf) :value owner)
+                      :onChange #(util/set-percentage! % (k buf) :value owner)
                       :value (get-in buf [k :value])}))))
 
 (defmethod input-field :number
@@ -186,7 +185,7 @@
     (render [_]
       (dom/input #js {:type "number" :className "field-input"
                       :disabled (:disabled opts)
-                      :onChange #(state/set-number! % (k buf) :value owner)
+                      :onChange #(util/set-number! % (k buf) :value owner)
                       :value (get-in buf [k :value])}))))
 
 (defmethod input-field :textarea
@@ -205,7 +204,7 @@
           (dom/textarea #js {:className "field-input"
                              :rows (:rows schema)
                              :cols (:cols schema)
-                             :onChange #(state/set-unvalidated-text! % (k buf) :value owner)
+                             :onChange #(util/set-unvalidated-text! % (k buf) :value owner)
                              :value (get-in buf [k :value])}))))))
 
 (defmethod input-field :default
@@ -219,5 +218,5 @@
     (render [_]
       (dom/input #js {:type "text" :className "field-input"
                       :disabled (:disabled opts)
-                      :onChange #(state/set-unvalidated-text! % (k buf) :value owner)
+                      :onChange #(util/set-unvalidated-text! % (k buf) :value owner)
                       :value (get-in buf [k :value])}))))

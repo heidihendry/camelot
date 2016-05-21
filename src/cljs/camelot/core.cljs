@@ -1,7 +1,7 @@
 (ns camelot.core
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [camelot.nav :as nav]
+            [camelot.nav :as snav]
             [camelot.view :as view]
             [camelot.state :as state]
             [camelot.rest :as rest]
@@ -31,7 +31,7 @@
       .-location
       .-hash
       default-page
-      (nav/nav!)))
+      (snav/nav!)))
 
 (defn initialise-state
   []

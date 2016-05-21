@@ -1,6 +1,5 @@
 (ns camelot.component.albums
-  (:require [camelot.util :as util]
-            [camelot.nav :as nav]
+  (:require [camelot.component.nav :as nav]
             [camelot.rest :as rest]
             [camelot.state :as state]
             [om.core :as om :include-macros true]

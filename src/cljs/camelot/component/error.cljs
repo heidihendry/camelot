@@ -2,7 +2,7 @@
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [secretary.core :as secretary :refer-macros [defroute]]
-            [camelot.nav :as nav]))
+            [smithy.util :as util]))
 
 (def new-issue-url "http://bitbucket.org/cshclm/camelot/issues/new")
 
@@ -29,7 +29,7 @@
                                "Report an Issue"))
                  (dom/button #js {:className "error-ack btn btn-danger"
                                   :onClick #(do (om/update! app :error nil)
-                                                (nav/analytics-event "error" "acknowledge-button"))}
+                                                (util/analytics-event "error" "acknowledge-button"))}
                              "Acknowledge"))
         (dom/span nil "")))))
 

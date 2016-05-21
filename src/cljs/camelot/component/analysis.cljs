@@ -1,6 +1,6 @@
 (ns camelot.component.analysis
   (:require [camelot.util :as util]
-            [camelot.nav :as nav]
+            [smithy.util :as sutil]
             [camelot.rest :as rest]
             [camelot.state :as state]
             [om.core :as om :include-macros true]
@@ -17,6 +17,6 @@
                (dom/div nil
                         (dom/h4 nil "Analysis Exports"))
                (dom/a #js {:href (util/with-baseurl "/maxent") :target "_blank"
-                           :onClick #(nav/analytics-event "maxent" "export")}
+                           :onClick #(sutil/analytics-event "maxent" "export")}
                       (dom/button #js {:className "btn btn-primary fa fa-download fa-2x"}
                                   " MaxEnt Export"))))))
