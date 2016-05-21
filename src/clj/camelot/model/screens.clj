@@ -1,5 +1,5 @@
 (ns camelot.model.screens
-  (:require [camelot.smithy.core :refer [defsmith] :as smithy]
+  (:require [smithy.core :refer [defsmith] :as smithy]
             [camelot.handler.camera-statuses :as camstat]
             [camelot.handler.survey-sites :as survey-sites]
             [camelot.handler.sites :as sites]))

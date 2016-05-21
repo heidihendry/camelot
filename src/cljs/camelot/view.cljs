@@ -15,8 +15,6 @@
             [camelot.component.footer :as cfoot]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
-
-
 (defn load-resource-children
   "Update the state of the children defined for the selected resource type."
   [vs]
@@ -66,7 +64,7 @@
                       {:value parent-id})
                basedata)]
     (when (validate vs)
-      (util/analytics-event "create" (util/get-resource-type-name vs))
+      (cnav/analytics-event "create" (util/get-resource-type-name vs))
       (rest/post-resource (util/get-endpoint vs) {:data data}
                           #(do
                              (load-resource-children vs)
@@ -81,7 +79,8 @@
   (let [cb (get-in vs [:events-ref success-key])]
     (when (validate vs)
       (om/update! resources key (deref (get vs :buffer)))
-      (util/analytics-event "update" (util/get-resource-type-name vs))
+      (nav/settings-hide!)
+      (cnav/analytics-event "update" (util/get-resource-type-name vs))
       (rest/put-resource (util/get-url vs) {:data (deref (get vs :buffer))}
                          #(do
                             (when-not (util/settings-screen? vs)
@@ -95,7 +94,7 @@
   (om/update! vs :buffer (deref (get resources key)))
   (om/update! (get vs :selected-resource) :show-validations false)
   (nav/settings-hide!)
-  (util/analytics-event "cancel-update" (util/get-resource-type-name vs))
+  (cnav/analytics-event "cancel-update" (util/get-resource-type-name vs))
   (when-not (util/settings-screen? vs)
     (om/update! (get vs :screen) :mode :readonly))
   (let [cb (get-in vs [:events-ref event-key])]
@@ -105,7 +104,7 @@
 (defn delete [success-key error-key vs resources key]
   "Delete the resource with `key'."
   (let [cb (get-in vs [:events-ref success-key])]
-    (util/analytics-event "delete" (util/get-resource-type-name vs))
+    (cnav/analytics-event "delete" (util/get-resource-type-name vs))
     (rest/delete-resource (util/get-url vs) {}
                           #(do (om/update! resources key {})
                                (om/update! vs :buffer {})
@@ -117,9 +116,7 @@
 (defn build-generator
   "Drop-down menu generator for the given view-state."
   [vs]
-  (prn "returning generator function")
   (fn [template gendata gen genargs]
-    (prn "building")
     (let [to-dropdown #(hash-map :vkey (get % (:vkey template))
                                  :desc (get % (:desc template)))]
       (rest/get-resource (str (get template :baseurl)
@@ -165,8 +162,10 @@
   {:settings-save (fn [d] (albums/reload-albums))
    :settings-cancel #(identity 1)
    :build-generator build-generator
+   :analytics-event (fn [event action] (cnav/analytics-event event action))
+   :metadata-schema #(state/metadata-schema-state)
    :sidebar-item-click (fn [uri vs]
-                         (util/analytics-event "sidebar-navigate"
+                         (cnav/analytics-event "sidebar-navigate"
                                               (util/get-resource-type-name vs))
                          (rest/get-resource uri
                                             (fn [resp]
@@ -174,7 +173,7 @@
                                               (om/update! (get vs :selected-resource) :details (:body resp))
                                               (om/update! vs :buffer (:body resp)))))
    :sidebar-create-click (fn [vs]
-                           (util/analytics-event "sidebar-create"
+                           (cnav/analytics-event "sidebar-create"
                                                 (util/get-resource-type-name vs))
                            (om/update! vs :buffer {})
                            (om/update! (get vs :screen) :mode :create))

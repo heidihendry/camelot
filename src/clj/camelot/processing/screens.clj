@@ -1,6 +1,6 @@
 (ns camelot.processing.screens
   (:require [camelot.model.screens :as model]
-            [camelot.smithy.core :as smithy]))
+            [smithy.core :as smithy]))
 
 (defn translate-fn
   "Return a key translation function for the smithy build process."

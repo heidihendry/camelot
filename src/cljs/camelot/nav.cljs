@@ -3,7 +3,6 @@
             [goog.history.EventType :as EventType]
             [secretary.core :as secretary :refer-macros [defroute]]
             [om.core :as om]
-            [smithy.util :as util]
             [camelot.state :as state])
   (:import [goog.history Html5History EventType]))
 
@@ -26,9 +25,22 @@
     (goog.events/listen EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (.setEnabled true)))
 
+(defn analytics-event
+  [component action]
+  (let [ga (aget js/window "ga")]
+    (when ga
+      (ga "send" "event" component action))))
+
+(defn analytics-pageview
+  [page]
+  (let [ga (aget js/window "ga")]
+    (when ga
+      (ga "set" "page" page)
+      (ga "send" "pageview"))))
+
 (defn set-token!
   [history token]
-  (util/analytics-pageview token)
+  (analytics-pageview token)
   (.setToken history token))
 
 (defn breadnav!
