@@ -38,29 +38,74 @@
   (and (some exif-file? files)
        (not-any? f/directory? files)))
 
+(defn- describe-raw-tag
+  "Return a description for the given tag."
+  [tag]
+  (->> tag
+       (im/getDescription)
+       (str/trim)))
+
 (defn- tag-key-value-pair
   "Return the key-value pair for the raw metadata tag given."
   [tag]
-  (hash-map (im/getTagName tag) (->> tag (im/getDescription) (str/trim))))
+  (hash-map (im/getTagName tag) (describe-raw-tag tag)))
 
 (defn- parse-tag
   "Map tag names to their descriptions, returning the result as a hash"
   [tag]
   (into {} (map tag-key-value-pair tag)))
 
+(defn- extract-tags
+  "Extract a list of raw tags from the directories of metadata."
+  [metadata]
+  (map im/getTags (im/getDirectories metadata)))
+
 (s/defn file-metadata :- ma/RawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
   [reader file]
-  (let [metadata (reader file)
-        tags (map im/getTags (im/getDirectories metadata))]
-    (into {} (map parse-tag tags))))
+  (->> file
+       (reader)
+       (extract-tags)
+       (map parse-tag)
+       (into {})))
 
-(s/defn exif-files :- RawAlbum
+(defn- exif-files-in-dir
+  "Return a list of the exif files in dir."
+  [dir]
+  (->> dir
+       (io/file)
+       (file-seq)
+       (filter exif-file?)))
+
+(s/defn file-raw-metadata-pair
+  "Return a pair of the file and its raw metadata."
+  [reader file]
+  (vector file (file-metadata reader file)))
+
+(s/defn album-dir-raw-metadata :- RawAlbum
   "Return the raw exif data for files in `dir'."
   [state dir]
-  (let [files (filter exif-file? (file-seq (io/file dir)))
-        reader #(ImageMetadataReader/readMetadata ^File %)]
-    (into {} (map #(vector % (file-metadata reader %)) files))))
+  (let [reader #(ImageMetadataReader/readMetadata ^File %)]
+    (->> dir
+         (exif-files-in-dir)
+         (map (partial file-raw-metadata-pair reader))
+         (into {}))))
+
+(defn- album-dir-list
+  "Return a list of valid album directories under `root'."
+  [root]
+  (let [dirname #(f/get-parent-file (io/file %))]
+    (->> root
+         (io/file root)
+         (file-seq)
+         (group-by dirname)
+         (filter (fn [[k v]] (album-dir? v)))
+         (keys))))
+
+(defn- dir-raw-album-pair
+  "Return a pair consisting of the directory and the raw album data."
+  [state dir]
+  (vector dir (album-dir-raw-metadata state dir)))
 
 (s/defn read-tree :- RawAlbumSet
   "Extract photo metadata from all directories in the root.
@@ -69,7 +114,7 @@ considered valid.  Result is Either an error or a map with the directory name
 and the photo metadata."
   [state root]
   {:pre [(string? root)]}
-  (let [dirname #(f/get-parent-file (io/file %))
-        dirs (keys (filter (fn [[k v]] (album-dir? v))
-                           (group-by dirname (file-seq (clojure.java.io/file root)))))]
-    (into {} (map #(vector % (exif-files state %)) dirs))))
+  (->> root
+       (album-dir-list)
+       (map (partial dir-raw-album-pair state))
+       (into {})))
