@@ -91,6 +91,17 @@
       (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
                                                         :count 3})))
 
+  (fact "A sighting exactly on the threshold is independent"
+      (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
+                    :sightings [{:species "Yellow Spotted Housecat" :quantity 1}]}
+                   {:datetime (t/date-time 2015 01 01 06 20 00)
+                    :sightings [{:species "Yellow Spotted Housecat" :quantity 1}]}
+                   {:datetime (t/date-time 2015 01 01 06 40 00)
+                    :sightings [{:species "Yellow Spotted Housecat" :quantity 2}]}]
+            state (gen-state-helper config)]
+        (extract-independent-sightings state album) => '({:species "Yellow Spotted Housecat"
+                                                          :count 4})))
+
   (fact "A sighting may later need to be updated with a higher quantity"
     (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
                   :sightings [{:species "Yellow Spotted Housecat" :quantity 1}]}

@@ -14,11 +14,23 @@
 
 (def RawAlbumSet {java.io.File RawAlbum})
 
-(defn- exif-file?
+(def file-inclusion-regexp
+    "Regexp for filenames to include.
+  `file-exclusion-regexp' takes precedence."
+    #"(?i)(.jpe?g|.tiff?)$")
+
+(def file-exclusion-regexp
+  "Regexp file filenames to exclude.
+  Takes precedence over `file-inclusion-regexp'."
+   #"(?i)_original(.jpe?g|.tiff?)$")
+
+(s/defn exif-file? :- s/Bool
   "Predicate for whether a given file is a usable, exif-containing file."
   [file]
-  (and (f/file? file) (f/readable? file) (re-find #"(?i)(.jpe?g|.tiff?)$" (f/get-name file))
-       (not (re-find #"(?i)_original(.jpe?g|.tiff?)$" (f/get-name file)))))
+  (and (f/file? file)
+       (f/readable? file)
+       (re-find file-inclusion-regexp (f/get-name file))
+       (not (re-find file-exclusion-regexp (f/get-name file)))))
 
 (defn- album-dir?
   "Return true if there are exif-containing files and the directory hasn't any subdirectories. False otherwise."
@@ -26,10 +38,15 @@
   (and (some exif-file? files)
        (not-any? f/directory? files)))
 
+(defn- tag-key-value-pair
+  "Return the key-value pair for the raw metadata tag given."
+  [tag]
+  (hash-map (im/getTagName tag) (->> tag (im/getDescription) (str/trim))))
+
 (defn- parse-tag
   "Map tag names to their descriptions, returning the result as a hash"
   [tag]
-  (into {} (map #(hash-map (im/getTagName %) (->> % (im/getDescription) (str/trim))) tag)))
+  (into {} (map tag-key-value-pair tag)))
 
 (s/defn file-metadata :- ma/RawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
@@ -39,6 +56,7 @@
     (into {} (map parse-tag tags))))
 
 (s/defn exif-files :- RawAlbum
+  "Return the raw exif data for files in `dir'."
   [state dir]
   (let [files (filter exif-file? (file-seq (io/file dir)))
         reader #(ImageMetadataReader/readMetadata ^File %)]

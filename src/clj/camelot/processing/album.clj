@@ -37,24 +37,26 @@
   (let [duration (:sighting-independence-minutes-threshold (:config state))]
     (conj previous-sightings {:start datetime
                               :end (t/plus datetime (t/minutes duration))
-                              :quantity quantity
-                              })))
+                              :quantity quantity})))
 
 (defn- update-sighting
   "Update the set of previous (i.e., dependent) sightings"
   [previous-sightings sighting quantity]
-  (conj previous-sightings
-        (assoc sighting :quantity (max (or (get sighting :quantity) 0)
-                                       quantity))))
+  (let [new-qty (max (or (get sighting :quantity) 0) quantity)]
+    (conj previous-sightings
+          (assoc sighting :quantity new-qty))))
+
+(defn- dependent-sighting?
+  "Predicate for whether the sighting would be dependent for a timespan."
+  [sighting timespan]
+  (or (= sighting (:start timespan))
+      (and (t/after? sighting (:start timespan))
+           (t/before? sighting (:end timespan)))))
 
 (defn- dependent-sighting
   "Return the first dependent sighting, if any."
   [sighting datespans]
-  (first (filter #(or (= sighting (:start %))
-                      (= sighting (:end %))
-                      (and (t/after? sighting (:start %))
-                           (t/before? sighting (:end %))))
-                 datespans)))
+  (first (filter (partial dependent-sighting? sighting) datespans)))
 
 (defn- independence-reducer
   "Reducing function, adding or updating the sightings based on their dependence."
@@ -104,7 +106,8 @@
 (s/defn album :- ma/Album
   "Return the metadata for a single album, given raw tag data"
   [state set-data]
-  (let [album-data (into {} (map (fn [[k v]] [k (photo/parse state v)]) set-data))]
+  (let [parse-photo (fn [[k v]] [k (photo/parse state v)])
+        album-data (into {} (map parse-photo set-data))]
     {:photos album-data
      :metadata (extract-metadata state (vals album-data))
      :problems (list-problems state album-data)}))
@@ -112,4 +115,5 @@
 (s/defn album-set
   "Return a datastructure representing all albums and their metadata"
   [state tree-data]
-  (into {} (map (fn [[k v]] (vector k (album state v))) tree-data)))
+  (let [to-album (fn [[k v]] (vector k (album state v)))]
+    (into {} (map to-album tree-data))))
