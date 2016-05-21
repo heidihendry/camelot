@@ -377,6 +377,9 @@ pre.field-input {
     margin-right: 1.5rem;
     position: relative;
 }
+#page-content ul {
+    padding-left: 2rem;
+}
 #page-content .edit-btn {
     float: right;
 }
