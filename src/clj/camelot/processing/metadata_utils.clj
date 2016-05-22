@@ -2,7 +2,8 @@
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
-            [camelot.model.photo :as mp])
+            [camelot.model.photo :as mp]
+            [clojure.tools.logging :as log])
   (:import [camelot.model.photo Camera CameraSettings PhotoMetadata]))
 
 (s/defn gps-parts-to-decimal :- s/Num
@@ -40,14 +41,22 @@ direction is considered negative."
   [lon :- (s/maybe s/Str)
    lon-ref :- (s/maybe s/Str)]
   (when-not (or (nil? lon) (nil? lon-ref))
-    (parse-gps "E" lon lon-ref)))
+    (try (parse-gps "E" lon lon-ref)
+         (catch java.lang.Exception e
+           (do
+             (log/warn "to-longitude: Attempt to parse " lon " as GPS")
+             nil)))))
 
 (s/defn to-latitude :- (s/maybe s/Num)
   "Convert latitude in degrees and a latitude reference to a decimal."
   [lat :- (s/maybe s/Str)
    lat-ref :- (s/maybe s/Str)]
   (when-not (or (nil? lat) (nil? lat-ref))
-    (parse-gps "N" lat lat-ref)))
+    (try (parse-gps "N" lat lat-ref)
+         (catch java.lang.Exception e
+           (do
+             (log/warn "to-latitude: Attempt to parse " lat " as GPS")
+             nil)))))
 
 (s/defn exif-date-to-datetime :- org.joda.time.DateTime
   "Exif metadata dates are strings like 2014:04:11 16:37:00.  This makes them real dates.
@@ -59,10 +68,15 @@ Important: Timezone information will be discarded."
 
 (s/defn read-metadata-string :- s/Num
   "Return str as a number, or zero if nil."
-  [str :- (s/maybe s/Str)]
+  [str :- (s/maybe s/Str)
+   default]
   (if str
-    (read-string str)
-    0))
+    (try (read-string str)
+         (catch java.lang.Exception e
+           (do
+             (log/warn "read-metadata-string: Attempt to read-string on '" str "'")
+             default)))
+    default))
 
 (s/defn exif-gps-datetime
   "Concatenate a date and time, returning the result as a DateTime."
@@ -93,10 +107,10 @@ invalid entry if not."
                  :flash (md "Flash")
                  :focal-length (md "Focal Length")
                  :fstop (md "F-Number")
-                 :iso (read-metadata-string (md "ISO Speed Ratings"))
+                 :iso (read-metadata-string (md "ISO Speed Ratings") 0)
                  :orientation (md "Orientation")
-                 :width (read-metadata-string (md "Image Width"))
-                 :height (read-metadata-string (md "Image Height"))})
+                 :width (read-metadata-string (md "Image Width") 0)
+                 :height (read-metadata-string (md "Image Height") 0)})
         location (mp/location
                   {:gps-longitude (to-longitude (md "GPS Longitude") (md "GPS Longitude Ref"))
                    :gps-latitude (to-latitude (md "GPS Latitude") (md "GPS Latitude Ref"))
@@ -112,8 +126,7 @@ invalid entry if not."
       :camera cam
       :sightings (if (or (md "Caption/Abstract") (md "Object Name"))
                    [(mp/sighting {:species (md "Caption/Abstract")
-                                  :quantity (try (read-string (md "Object Name"))
-                                                 (catch java.lang.Exception e nil))})]
+                                  :quantity (read-metadata-string (md "Object Name") nil)})]
                    [])
       :datetime (exif-date-to-datetime (md "Date/Time"))
       :datetime-original (exif-gps-datetime (md "GPS Date Stamp")
@@ -124,5 +137,5 @@ invalid entry if not."
       :copyright (md "Copyright Notice")
       :description (md "Description")
       :filename (md "File Name")
-      :filesize (read-metadata-string (md "File Size"))
+      :filesize (read-metadata-string (md "File Size") 0)
       :location location})))

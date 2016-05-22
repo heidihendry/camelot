@@ -1,5 +1,6 @@
 (ns camelot.util.rest
   (:require [ring.util.response :as r]
+            [clojure.tools.logging :as log]
             [camelot.processing.settings :refer [gen-state config cursorise decursorise]]))
 
 (def floating-point-fields
@@ -7,10 +8,15 @@
   #{:trap-station-longitude :trap-station-latitude})
 
 (defn- as-long
+  "Return value as a Long if it can be parsed, otherwise return v."
   [v]
   (if (and (instance? String v)
            (re-find #"[0-9]" v))
-    (read-string v)
+    (try (read-string v)
+         (catch java.lang.Exception e
+           (do
+             (log/warn "as-long: Attemp to read-string on " v)
+             v)))))
     v))
 
 (defn- normalise-field-types
