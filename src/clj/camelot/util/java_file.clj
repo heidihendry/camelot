@@ -1,47 +1,56 @@
 (ns camelot.util.java-file
   (:import [java.io File]))
 
-(def get-parent
+(defn get-parent
+  [file]
   "Return the parent as a path."
-  #(.getParent ^File %))
+  (.getParent ^File file))
 
-(def get-parent-file
+(defn get-parent-file
+  [file]
   "Return the parent as a file."
-  #(.getParentFile ^File %))
+  (.getParentFile ^File file))
 
-(def get-name
+(defn get-name
+  [file]
   "Return the name of the given file."
-  #(.getName ^File %))
+  (.getName ^File file))
 
-(def directory?
+(defn directory?
+  [file]
   "Predicate for whether the file is a directory."
-  #(.isDirectory ^File %))
+  (.isDirectory ^File file))
 
-(def to-path
-  #(.toPath ^File %))
+(defn to-path
+  [file]
+  (.toPath ^File file))
 
-(def file?
+(defn file?
+  [file]
   "Predicate for whether the File object is a file."
-  #(.isFile ^File %))
+  (.isFile ^File file))
 
-(def get-path
+(defn get-path
+  [file]
   "Return the path to the given file as a String."
-  #(.getPath ^File %))
+  (.getPath ^File file))
 
-(def exists?
+(defn exists?
+  [file]
   "Predicate for whether the file exists"
-  #(.exists ^File %))
+  (.exists ^File file))
 
-(def readable?
+(defn readable?
+  [file]
   "Predicate for whether the given file is readable."
-  #(.canRead ^File %))
+  (.canRead ^File file))
 
-(def rename-to
-  #(.renameTo ^File %1 %2))
-
-(def mkdir
+(defn mkdir
+  [file]
   "Create the directory referred to by the given File."
-  #(.mkdir ^File %1))
+  (.mkdir ^File file))
 
-(def pushback-reader
-  #(java.io.PushbackReader. ^FileReader %))
+(defn pushback-reader
+  [file-reader]
+  "Create a pushback reader given a file reader"
+  (java.io.PushbackReader. ^FileReader file-reader))
