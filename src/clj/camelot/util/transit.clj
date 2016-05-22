@@ -15,17 +15,15 @@
 
 (def joda-time-writer
   "Serialise Joda DateTime for transit."
-  (transit/write-handler
-   (constantly "m")
-   #(c/to-long %)
-   #(-> % c/to-long .toString)))
+  (transit/write-handler (constantly "m")
+                         #(c/to-long %)
+                         #(-> % c/to-long .toString)))
 
 (def file-writer
   "Serialise Java Files for transit."
-  (transit/write-handler
-   (constantly "f")
-   #(identity %)
-   #(get-path %)))
+  (transit/write-handler (constantly "f")
+                         #(identity %)
+                         #(get-path %)))
 
 (def transit-write-options
   "Transit writer options."
