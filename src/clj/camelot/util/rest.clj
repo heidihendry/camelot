@@ -16,7 +16,7 @@
          (catch java.lang.Exception e
            (do
              (log/warn "as-long: Attemp to read-string on " v)
-             v)))))
+             v)))
     v))
 
 (defn- normalise-field-types
