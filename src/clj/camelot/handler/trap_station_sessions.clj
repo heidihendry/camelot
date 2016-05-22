@@ -19,6 +19,7 @@
     (format "%s to %s" sp ep)))
 
 (defn add-label
+  "Assoc a key for the label, which is a computed value."
   [rec]
   (assoc rec :trap-station-session-label
          (build-label (:trap-station-session-start-date rec)
@@ -40,6 +41,7 @@
     (get-specific state (:1 record))))
 
 (s/defn update!
+  "Update the value, dissoc'ing the label, as it's a computed field."
   [state
    id :- s/Num
    data :- TrapStationSessionLabeled]

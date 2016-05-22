@@ -1,5 +1,5 @@
-(ns camelot.handler.settings-test
-  (:require [camelot.handler.settings :refer :all]
+(ns camelot.handler.application-test
+  (:require [camelot.handler.application :refer :all]
             [midje.sweet :refer :all]
             [schema.test :as st]))
 

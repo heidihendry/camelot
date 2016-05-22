@@ -10,11 +10,19 @@
 
 (sql/defqueries "sql/camera-status.sql" {:connection db/spec})
 
-(s/defn get-all :- [CameraStatus]
-  [state]
+(defn- translate-statuses
+  "Translate the description of camera statuses."
+  [state statuses]
   (map #(assoc % :camera-status-description
                (tr/translate (:config state) (keyword (:camera-status-description %))))
-       (db/clj-keys (-get-all))))
+       statuses))
+
+(s/defn get-all :- [CameraStatus]
+  "Retrieve, translate and return all available camera statuses."
+  [state]
+  (->> (-get-all)
+       (db/clj-keys)
+       (translate-statuses state)))
 
 (def routes
   (context "/camera-statuses" []

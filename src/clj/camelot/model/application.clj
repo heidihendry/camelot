@@ -1,4 +1,4 @@
-(ns camelot.model.settings
+(ns camelot.model.application
   (:require [camelot.translation.core :as tr]
             [camelot.util
              [config :as settings]

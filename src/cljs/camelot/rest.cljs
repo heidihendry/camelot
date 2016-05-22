@@ -45,7 +45,7 @@
 
 (def get-application
   "Retrieve global application details"
-  (partial get-x "/settings/application"))
+  (partial get-x "/application"))
 
 (def get-albums
   "Retrieve albums"
@@ -61,7 +61,7 @@
 
 (def get-metadata
   "Retrieve metadata"
-  (partial get-x "/settings/metadata"))
+  (partial get-x "/application/metadata"))
 
 (defn get-resource
   "GET resource state"
@@ -126,23 +126,6 @@
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "DELETE"
                                                      (util/with-baseurl resource)
-                                                     params
-                                                     (:status response)
-                                                     (:body response)))))))
-
-(defn post-settings
-  "POST configuration state"
-  [params cb]
-  (go
-    (let [response (<! (util/request http/post (util/with-baseurl "/settings")
-                                     params))
-          success (some #{(:status response)} success-status-codes)]
-      (if success
-        (when cb
-          (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "POST"
-                                                     (util/with-baseurl "/settings")
                                                      params
                                                      (:status response)
                                                      (:body response)))))))

@@ -11,8 +11,9 @@
   "Return a key translation function for the smithy build process."
   [state]
   (fn [resource lookup]
-    (tr/translate (:config state) (keyword (format "%s/%s" (name resource)
-                                         (subs (str lookup) 1))))))
+    (tr/translate (:config state) (keyword (format "%s/%s"
+                                                   (name resource)
+                                                   (subs (str lookup) 1))))))
 
 (defn all-screens
   "Build the available screen smiths."

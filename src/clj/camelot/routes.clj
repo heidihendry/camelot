@@ -1,19 +1,22 @@
 (ns camelot.routes
-  (:require [compojure.core :refer [GET POST defroutes routes]]
+  (:require [camelot.handler
+             [albums :as albums]
+             [config :as config]
+             [application :as app]
+             [camera-statuses :as camera-statuses]
+             [cameras :as cameras]
+             [maxent :as maxent]
+             [screens :as screens]
+             [sites :as sites]
+             [survey-sites :as survey-sites]
+             [surveys :as surveys]
+             [trap-station-session-cameras :as trap-station-session-cameras]
+             [trap-station-sessions :as trap-station-sessions]
+             [trap-stations :as trap-stations]]
             [clojure.java.io :as io]
-            [compojure.route :as route]
-            [camelot.handler.albums :as albums]
-            [camelot.handler.settings :as settings]
-            [camelot.handler.surveys :as surveys]
-            [camelot.handler.sites :as sites]
-            [camelot.handler.cameras :as cameras]
-            [camelot.handler.camera-statuses :as camera-statuses]
-            [camelot.handler.survey-sites :as survey-sites]
-            [camelot.handler.trap-stations :as trap-stations]
-            [camelot.handler.trap-station-sessions :as trap-station-sessions]
-            [camelot.handler.trap-station-session-cameras :as trap-station-session-cameras]
-            [camelot.handler.screens :as screens]
-            [camelot.handler.maxent :as maxent]))
+            [compojure
+             [core :refer [defroutes GET POST routes]]
+             [route :as route]]))
 
 (defn- retrieve-index
   "Return a response for index.html"
@@ -32,7 +35,8 @@
   "All application routes."
   (routes misc-routes
           maxent/routes
-          settings/routes
+          app/routes
+          config/routes
           albums/routes
           screens/routes
           surveys/routes
