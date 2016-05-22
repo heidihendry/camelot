@@ -185,6 +185,19 @@
                       :onChange #(state/set-number! % (k buf) :value owner)
                       :value (get-in buf [k :value])}))))
 
+(defmethod input-field :directory
+  [[k v buf opts :as d] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [schema (:schema v)]
+        ;; setting the `is' property bypasses filtering performed by React,
+        ;; allowing directory and webkitdirectory to be set.
+        (dom/input #js {:is "special"
+                        "directory" ""
+                        "webkitdirectory" ""
+                        :type "file"})))))
+
 (defmethod input-field :textarea
   [[k v buf opts :as d] owner]
   (reify
