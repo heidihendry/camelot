@@ -1,15 +1,17 @@
 (ns camelot.handler.screens
   (:require [camelot.model.screens :as model]
-            [smithy.core :as smithy]
-            [compojure.core :refer [ANY GET PUT POST DELETE context]]
-            [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
-            [ring.util.response :as r]))
+            [camelot.translation.core :as tr]
+            [camelot.util.config :as conf]
+            [camelot.util.application :as app]
+            [compojure.core :refer [ANY context DELETE GET POST PUT]]
+            [ring.util.response :as r]
+            [smithy.core :as smithy]))
 
 (defn translate-fn
   "Return a key translation function for the smithy build process."
   [state]
   (fn [resource lookup]
-    ((:translate state) (keyword (format "%s/%s" (name resource)
+    (tr/translate (:config state) (keyword (format "%s/%s" (name resource)
                                          (subs (str lookup) 1))))))
 
 (defn all-screens
@@ -19,4 +21,4 @@
 
 (def routes
   (context "/screens" []
-           (GET "/" [] (r/response (all-screens (gen-state (config)))))))
+           (GET "/" [] (r/response (all-screens (app/gen-state (conf/config)))))))

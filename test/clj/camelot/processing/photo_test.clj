@@ -1,32 +1,32 @@
 (ns camelot.processing.photo-test
-  (:require [midje.sweet :refer :all]
-            [clojure.data :refer [diff]]
+  (:require [camelot.fixtures.exif-test-metadata :refer :all]
             [camelot.processing.photo :refer :all]
-            [camelot.processing.settings :refer [gen-state]]
-            [schema.test :as st]
+            [camelot.util.application :as app]
             [clj-time.core :as t]
-            [camelot.fixtures.exif-test-metadata :refer :all]))
+            [clojure.data :refer [diff]]
+            [midje.sweet :refer :all]
+            [schema.test :as st]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 
 (facts "Metadata parsing"
   (fact "Maginon metadata normalises okay"
     (let [config []
-          output (parse (gen-state config) maginon-metadata)]
+          output (parse (app/gen-state config) maginon-metadata)]
       (:filesize output) => 1175819
       (:make (:camera output)) => "Maginon"
       (:datetime output) => (t/date-time 2014 4 11 16 37 52)))
 
   (fact "Cuddeback metadata normalises okay"
     (let [config []
-          output (parse (gen-state config) cuddeback-metadata)]
+          output (parse (app/gen-state config) cuddeback-metadata)]
       (:filesize output) => 513653
       (:make (:camera output)) => "CUDDEBACK"
       (:datetime output) => (t/date-time 2014 4 11 19 47 46)))
 
   (fact "Metadata with nil required fields is not valid"
     (let [config {:language :en}
-          res (parse (gen-state config) {})]
+          res (parse (app/gen-state config) {})]
       (contains? res :invalid) => true
       (boolean (re-find #"Date/Time" (:invalid res))) => true)))
 

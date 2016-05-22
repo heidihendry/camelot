@@ -1,9 +1,10 @@
 (ns camelot.db
-  (:require [ragtime.core :as rtc]
-            [ragtime.jdbc :as jdbc]
+  (:require [camelot.util.config :as settings]
             [clj-time.coerce :as tc]
             [clojure.string :as str]
-            [camelot.processing.settings :as settings]))
+            [ragtime
+             [core :as rtc]
+             [jdbc :as jdbc]]))
 
 (def spec
   "JDBC spec for the primary database."

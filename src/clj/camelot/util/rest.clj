@@ -1,7 +1,18 @@
 (ns camelot.util.rest
-  (:require [ring.util.response :as r]
+  (:require [camelot.util.config :as conf]
+            [camelot.util.application :as app]
             [clojure.tools.logging :as log]
-            [camelot.processing.settings :refer [gen-state config cursorise decursorise]]))
+            [ring.util.response :as r]))
+
+(defn decursorise
+  "Remove :value keys used for Om cursors to leaves from the configuration data."
+  [conf]
+  (into {} (map (fn [[k v]] {k (:value v)}) conf)))
+
+(defn cursorise
+  "Add :value keys used for Om cursors to leaves from the configuration data."
+  [conf]
+  (into {} (map (fn [[k v]] {k {:value v}}) conf)))
 
 (def floating-point-fields
   "Set of keys for floating-point fields."
@@ -79,8 +90,8 @@
   where there's a constraint that they must be unique."
   [f id-str]
   (let [id (as-long id-str)]
-    (-> (config)
-        (gen-state)
+    (-> (conf/config)
+        (app/gen-state)
         (f id)
         (r/response))))
 
@@ -92,15 +103,15 @@
   '-id' suffix.  If `id-str' is provided, this will be parsed and passed as
   the second argument to `f'."
   ([f resource-key]
-   (-> (config)
-       (gen-state)
+   (-> (conf/config)
+       (app/gen-state)
        (f)
        (add-resource-uris resource-key)
        (r/response)))
   ([f resource-key id-str]
    (let [id (as-long id-str)]
-     (-> (config)
-         (gen-state)
+     (-> (conf/config)
+         (app/gen-state)
          (f id)
          (add-resource-uris resource-key)
          (r/response)))))
@@ -111,8 +122,8 @@
   first argument, and a parsed ID is its second argument."
   [f id-str]
   (let [id (as-long id-str)]
-    (-> (config)
-        (gen-state)
+    (-> (conf/config)
+        (app/gen-state)
         (f id)
         (cursorise)
         (r/response))))
@@ -126,8 +137,8 @@
   [f id-str data]
   (let [stddata (parse-floats (parse-ids (decursorise data)))
         id (as-long id-str)]
-    (-> (config)
-        (gen-state)
+    (-> (conf/config)
+        (app/gen-state)
         (f id stddata)
         (cursorise)
         (r/response))))
@@ -139,8 +150,8 @@
   its second argument."
   [f data]
   (let [stddata (parse-ids (decursorise data))]
-    (-> (config)
-        (gen-state)
+    (-> (conf/config)
+        (app/gen-state)
         (f stddata)
         (cursorise)
         (r/response))))
@@ -151,8 +162,8 @@
   the string representation of a resource to delete."
   [f id-str]
   (let [id (as-long id-str)]
-    (-> (config)
-        (gen-state)
+    (-> (conf/config)
+        (app/gen-state)
         (f id)
         ((fn [v] (hash-map :data v)))
         (r/response))))

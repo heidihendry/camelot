@@ -1,8 +1,7 @@
 (ns camelot.handler.settings-test
   (:require [camelot.handler.settings :refer :all]
             [midje.sweet :refer :all]
-            [schema.test :as st]
-            [camelot.processing.settings :refer [gen-state]]))
+            [schema.test :as st]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 

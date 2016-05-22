@@ -66,10 +66,9 @@ Important: Timezone information will be discarded."
     (assert (= (count parts) 6))
     (apply t/date-time (map #(Integer/parseInt %) parts))))
 
-(s/defn read-metadata-string :- s/Num
+(defn read-metadata-string
   "Return str as a number, or zero if nil."
-  [str :- (s/maybe s/Str)
-   default]
+  [str default]
   (if str
     (try (read-string str)
          (catch java.lang.Exception e

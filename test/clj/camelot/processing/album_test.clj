@@ -1,15 +1,15 @@
 (ns camelot.processing.album-test
-  (:require [clojure.data :refer [diff]]
+  (:require [camelot.fixtures.exif-test-metadata :refer :all]
             [camelot.processing.album :refer :all]
-            [camelot.processing.settings :as settings]
             [clj-time.core :as t]
+            [clojure.data :refer [diff]]
             [midje.sweet :refer :all]
             [schema.test :as st]
-            [camelot.fixtures.exif-test-metadata :refer :all]))
+            [camelot.util.application :as app]))
 
 (defn gen-state-helper
   [config]
-  (settings/gen-state (assoc config :language :en)))
+  (app/gen-state (assoc config :language :en)))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 

@@ -1,9 +1,9 @@
 (ns camelot.processing.validation-test
-  (:require [midje.sweet :refer :all]
-            [camelot.processing.validation :refer :all]
-            [camelot.processing.settings :as settings]
-            [schema.test :as st]
-            [clj-time.core :as t]))
+  (:require [camelot.processing.validation :refer :all]
+            [camelot.util.application :as app]
+            [clj-time.core :as t]
+            [midje.sweet :refer :all]
+            [schema.test :as st]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 
@@ -16,7 +16,7 @@
 
 (defn gen-state-helper
   [config]
-  (settings/gen-state (assoc config :language :en)))
+  (app/gen-state (assoc config :language :en)))
 
 (def night (t/date-time 2015 1 1 0 0 0))
 (def day (t/date-time 2015 1 1 12 0 0))

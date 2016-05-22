@@ -1,12 +1,14 @@
 (ns camelot.handler.maxent
-  (:require [clojure.string :as str]
+  (:require [camelot.model.album :refer [Album]]
+            [camelot.processing
+             [album :as album]
+             [photo :as photo]]
+            [camelot.util.config :as conf]
+            [camelot.util.application :as app]
             [clojure.data.csv :as csv]
-            [compojure.core :refer [ANY GET PUT POST DELETE context]]
-            [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
+            [clojure.string :as str]
+            [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [ring.util.response :as r]
-            [camelot.model.album :refer [Album]]
-            [camelot.processing.photo :as photo]
-            [camelot.processing.album :as album]
             [schema.core :as s]))
 
 (def output-descriptor
@@ -62,9 +64,9 @@
 (defn export
   "Handler for an export request."
   []
-  (let [conf (config)
-        albums (album/read-albums (gen-state conf) (:root-path conf))
-        data (species-location-csv (gen-state conf) albums)]
+  (let [conf (conf/config)
+        albums (album/read-albums (app/gen-state conf) (:root-path conf))
+        data (species-location-csv (app/gen-state conf) albums)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")
         (r/header "Content-Length" (count data))

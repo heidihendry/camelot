@@ -1,6 +1,8 @@
 (ns camelot.model.settings
-  (:require [camelot.processing.settings :as settings]
-            [camelot.util.feature :as feature]))
+  (:require [camelot.translation.core :as tr]
+            [camelot.util
+             [config :as settings]
+             [feature :as feature]]))
 
 (def metadata-structure
   [[:location [:gps-longitude
@@ -38,9 +40,9 @@
 
 (defn nav-menu
   [state]
-  {:menu-items [{:url "/#/dashboard" :label ((:translate state) :application/dashboard)}
-                {:url "/#/surveys" :label ((:translate state) :application/surveys)}
-                {:url "/#/sites" :label ((:translate state) :application/sites)}
-                {:url "/#/cameras" :label ((:translate state) :application/cameras)}
-                {:url "/#/analysis" :label ((:translate state) :application/analysis)}
+  {:menu-items [{:url "/#/dashboard" :label (tr/translate (:config state) :application/dashboard)}
+                {:url "/#/surveys" :label (tr/translate (:config state) :application/surveys)}
+                {:url "/#/sites" :label (tr/translate (:config state) :application/sites)}
+                {:url "/#/cameras" :label (tr/translate (:config state) :application/cameras)}
+                {:url "/#/analysis" :label (tr/translate (:config state) :application/analysis)}
                 {:function "settings"}]})

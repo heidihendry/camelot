@@ -3,6 +3,7 @@
             [clj-time.coerce :as tc]
             [schema.core :as s]
             [camelot.util.java-file :as jf]
+            [camelot.translation.core :as tr]
             [camelot.processing.dirtree :as dt]
             [camelot.model.photo :as mp]
             [camelot.model.album :as ma]
@@ -136,9 +137,8 @@
   [state dir]
   (let [fdir (io/file dir)]
     (cond
-      (nil? dir) ((:translate state) :problems/root-path-missing)
-      (not (and (jf/exists? fdir) (jf/readable? fdir)))
-      ((:translate state) :problems/root-path-not-found)
+      (nil? dir) (tr/translate (:config state) :problems/root-path-missing)
+      (not (jf/readable? fdir)) (tr/translate (:config state) :problems/root-path-not-found)
       :else
       (->> dir
            (dt/read-tree state)

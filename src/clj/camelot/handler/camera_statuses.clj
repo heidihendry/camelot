@@ -2,6 +2,7 @@
   (:require [compojure.core :refer [ANY GET PUT POST DELETE context]]
             [camelot.util.rest :as rest]
             [camelot.util.java-file :as jf]
+            [camelot.translation.core :as tr]
             [camelot.db :as db]
             [schema.core :as s]
             [yesql.core :as sql]
@@ -12,7 +13,7 @@
 (s/defn get-all :- [CameraStatus]
   [state]
   (map #(assoc % :camera-status-description
-               ((:translate state) (keyword (:camera-status-description %))))
+               (tr/translate (:config state) (keyword (:camera-status-description %))))
        (db/clj-keys (-get-all))))
 
 (def routes

@@ -1,10 +1,12 @@
 (ns camelot.handler.settings
-  (:require [camelot.processing.settings :as ps]
-            [compojure.core :refer [ANY GET PUT POST DELETE context]]
-            [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
-            [ring.util.response :as r]
+  (:require [camelot.model.settings :as ms]
             [camelot.processing.util :as putil]
-            [camelot.model.settings :as ms]))
+            [camelot.util
+             [config :as conf]
+             [application :as app]
+             [rest :as rest-util]]
+            [compojure.core :refer [ANY context DELETE GET POST PUT]]
+            [ring.util.response :as r]))
 
 (defn- flatten-metadata-structure
   "Transfor metadata structure in to a vector of paths"
@@ -26,13 +28,13 @@
 (defn settings-save
   "Save a configuration."
   [config]
-  (ps/save-config config))
+  (conf/save-config config))
 
 (defn get-version
   "Get the version string from the system properties or the jar metadata."
   []
   (or (System/getProperty "camelot.version")
-      (ps/version-property-from-pom 'camelot)))
+      (app/version-property-from-pom 'camelot)))
 
 (defn get-nav-menu
   [state]
@@ -40,8 +42,8 @@
 
 (def routes
   (context "/settings" []
-           (GET "/" [] (r/response (cursorise (config))))
-           (PUT "/" [data] (r/response (settings-save (decursorise data))))
-           (GET "/metadata" [] (r/response (get-metadata (gen-state (config)))))
+           (GET "/" [] (r/response (rest-util/cursorise (conf/config))))
+           (PUT "/" [data] (r/response (settings-save (rest-util/decursorise data))))
+           (GET "/metadata" [] (r/response (get-metadata (app/gen-state (conf/config)))))
            (GET "/application" [] (r/response {:version (get-version)
-                                               :nav (get-nav-menu (gen-state (config)))}))))
+                                               :nav (get-nav-menu (app/gen-state (conf/config)))}))))

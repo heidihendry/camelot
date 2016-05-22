@@ -1,15 +1,15 @@
 (ns camelot.handler.albums
-  (:require [compojure.core :refer [ANY GET PUT POST DELETE context]]
-            [camelot.processing.settings :refer [gen-state config cursorise decursorise]]
-            [ring.util.response :as r]
-            [camelot.processing.album :as a]
-            [camelot.processing.settings :refer [gen-state]]))
+  (:require [camelot.processing.album :as a]
+            [camelot.util.config :as conf]
+            [camelot.util.application :as app]
+            [compojure.core :refer [ANY context DELETE GET POST PUT]]
+            [ring.util.response :as r]))
 
 (defn get-all
   "Return all albums for the current configuration."
   []
-  (let [conf (config)]
-    (r/response (a/read-albums (gen-state conf) (:root-path conf)))))
+  (let [c (conf/config)]
+    (r/response (a/read-albums (app/gen-state c) (:root-path c)))))
 
 (def routes
   "Album routes"

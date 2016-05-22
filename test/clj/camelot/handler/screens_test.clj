@@ -1,11 +1,11 @@
 (ns camelot.handler.screens-test
   (:require [camelot.handler.screens :as sut]
-            [camelot.processing.settings :as settings]
+            [camelot.util.application :as app]
             [midje.sweet :refer :all]))
 
 (defn gen-state-helper
   [config]
-  (settings/gen-state (assoc config :language :en)))
+  (app/gen-state (assoc config :language :en)))
 
 (def defined-screens
   #{:camera :survey :survey-site :site :trap-station :trap-station-session
