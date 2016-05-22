@@ -13,7 +13,7 @@
             [camelot.handler.trap-station-sessions :as trap-station-sessions]
             [camelot.handler.trap-station-session-cameras :as trap-station-session-cameras]
             [camelot.handler.screens :as screens]
-            [camelot.analysis.maxent :as maxent]))
+            [camelot.handler.maxent :as maxent]))
 
 (defn- retrieve-index
   "Return a response for index.html"

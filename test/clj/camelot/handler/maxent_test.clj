@@ -1,5 +1,5 @@
-(ns camelot.analysis.maxent-test
-  (:require [camelot.analysis.maxent :as sut]
+(ns camelot.handler.maxent-test
+  (:require [camelot.handler.maxent :as sut]
             [camelot.processing.settings :refer [gen-state]]
             [clojure.string :as str]
             [schema.test :as st]
@@ -15,7 +15,7 @@
     (let [albums (ua/as-albums "AnAlbum" {"File" {:sightings [{:species "Yellow Spotted Cat"}]
                                                   :location {:gps-longitude 100.0
                                                              :gps-latitude 0.0}}})]
-      (sut/species-location-csv (gen-state {}) albums) => "Yellow Spotted Cat,100.0,0.0"))
+      (sut/species-location-csv (gen-state {}) albums) => "Yellow Spotted Cat,100.0,0.0\n"))
 
   (fact "Missing sighting information should not produce results"
     (let [albums (ua/as-albums "AnAlbum" {"File" {:sightings []

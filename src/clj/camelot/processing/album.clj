@@ -2,9 +2,13 @@
   (:require [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [schema.core :as s]
+            [camelot.util.java-file :as jf]
+            [camelot.processing.dirtree :as dt]
+            [camelot.model.photo :as mp]
             [camelot.model.album :as ma]
             [camelot.processing.photo :as photo]
-            [camelot.processing.validation :refer [list-problems check-invalid-photos]]))
+            [camelot.processing.validation :refer [list-problems check-invalid-photos]]
+            [clojure.java.io :as io]))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."
@@ -89,11 +93,14 @@
         total-spp (fn [[spp data]] {:species spp
                                     :count (reduce + (map :quantity data))})]
     (->> album
-         (map add-times-to-sightings)
-         (flatten)
+         (photo/flatten-sightings)
          (sort datetime-comparison)
          (reduce indep-reducer {})
          (map total-spp))))
+
+(defn album-photos
+  [album]
+  (vals (:photos (second album))))
 
 (s/defn extract-metadata :- ma/ExtractedMetadata
   "Return aggregated metadata for a given album"
@@ -121,3 +128,16 @@
   [state tree-data]
   (let [to-album (fn [[k v]] (vector k (album state v)))]
     (into {} (map to-album tree-data))))
+
+(defn read-albums
+  "Read photo directories and return metadata structured as albums."
+  [state dir]
+  (let [fdir (io/file dir)]
+    (cond
+      (nil? dir) ((:translate state) :problems/root-path-missing)
+      (not (and (jf/exists? fdir) (jf/readable? fdir)))
+      ((:translate state) :problems/root-path-not-found)
+      :else
+      (->> dir
+           (dt/read-tree state)
+           (album-set state)))))

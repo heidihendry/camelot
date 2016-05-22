@@ -17,6 +17,10 @@
     (/ (- (tc/to-long actual)
           (tc/to-long orig)) 1000)))
 
+(defn flatten-sightings
+  [photo]
+  (flatten (mapv #(merge (dissoc photo :sightings) {:sighting %}) (:sightings photo))))
+
 (defn extract-path-value
   "Return the metadata for a given path."
   [metadata path]

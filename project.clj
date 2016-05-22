@@ -21,6 +21,7 @@
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
+                 [org.clojure/data.csv "0.1.3"]
                  [org.clojure/java.jdbc "0.4.2"]
                  [org.omcljs/om "1.0.0-alpha32" :exclusions [com.cognitect/transit-cljs cljsjs/react]]
                  [prismatic/schema "1.0.5"]
