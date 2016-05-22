@@ -5,6 +5,7 @@
              [feature :as feature]]))
 
 (def metadata-structure
+  "Layout of all photo metadata fields."
   [[:location [:gps-longitude
                :gps-longitude-ref
                :gps-latitude
@@ -39,10 +40,16 @@
    :filesize])
 
 (defn nav-menu
+  "Main navigation menu structure."
   [state]
-  {:menu-items [{:url "/#/dashboard" :label (tr/translate (:config state) :application/dashboard)}
-                {:url "/#/surveys" :label (tr/translate (:config state) :application/surveys)}
-                {:url "/#/sites" :label (tr/translate (:config state) :application/sites)}
-                {:url "/#/cameras" :label (tr/translate (:config state) :application/cameras)}
-                {:url "/#/analysis" :label (tr/translate (:config state) :application/analysis)}
+  {:menu-items [{:url "/#/dashboard"
+                 :label (tr/translate (:config state) :application/dashboard)}
+                {:url "/#/surveys"
+                 :label (tr/translate (:config state) :application/surveys)}
+                {:url "/#/sites"
+                 :label (tr/translate (:config state) :application/sites)}
+                {:url "/#/cameras"
+                 :label (tr/translate (:config state) :application/cameras)}
+                {:url "/#/analysis"
+                 :label (tr/translate (:config state) :application/analysis)}
                 {:function "settings"}]})
