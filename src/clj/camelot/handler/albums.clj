@@ -5,7 +5,6 @@
             [camelot.processing.dirtree :as dt]
             [camelot.processing.album :as a]
             [camelot.processing.settings :refer [gen-state]]
-            [camelot.processing.rename-photo :as rp]
             [camelot.util.java-file :as jf]))
 
 (defn read-albums

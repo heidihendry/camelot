@@ -320,13 +320,7 @@
                                :list-of :string}
             :required-fields {:type :list
                               :list-of :paths
-                              :complete-with :metadata}
-            :rename {:type :setting-group
-                     :group {:format {:type :string}
-                             :fields {:type :list
-                                      :list-of :paths
-                                      :complete-with :metadata}
-                             :date-format {:type :string}}}}
+                              :complete-with :metadata}}
    :states {:update {:submit {:success {:type :event
                                         :event :settings-save}
                               :error {:type :event

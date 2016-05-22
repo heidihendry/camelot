@@ -27,10 +27,7 @@
    :surveyed-species []
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
                      [:location :gps-longitude] [:location :gps-latitude]
-                     [:datetime] [:filename]]
-   :rename {:format "%s-%s"
-            :fields [[:datetime] [:camera :model]]
-            :date-format "YYYY-MM-dd HH.mm.ss"}})
+                     [:datetime] [:filename]]})
 
 (def os (System/getProperty "os.name"))
 (def db-name "Database")

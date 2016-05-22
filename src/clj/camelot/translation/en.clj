@@ -11,9 +11,6 @@
               :path-not-found "%s: Path not found"
               :not-directory "%s: Is not a directory"
               :read-permission-denied "%s: Could not be read: permission denied"
-              :rename-field-not-found "Unable to resolve the following field selectors during photo renaming: '%s'"
-              :rename-existing-conflict "%s: Not renaming as doing so may overwrite existing file '%s'"
-              :rename-conflict "%s: Not performing renames, as not all results would be unique. A file with this named would be the result of renaming the following files:"
               :species-quantity-missing "%s: has species without a quantity"
               :species-name-missing "%s: has quantity without a species"
               :default-config-exists "A default configuration file already exists. Please delete '%s' and try again."
@@ -101,9 +98,6 @@
                    :lost "Lost"
                    :stolen "Stolen"
                    :retired "Retired"}
-
-   :status {:rename-photos "Renaming photos in the period's dataset: '%s'"
-            :apply-rename "Renaming '%s' to '%s'..."}
 
    :checks {:starting "Running consistency checks..."
             :failure-notice "FAIL: %s:"
