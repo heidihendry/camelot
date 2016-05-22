@@ -34,7 +34,13 @@
     (let [f (clojure.java.io/file "file")
           data {f maginon-metadata}
           result (album (gen-state-helper config) data)]
-      (:make (:camera (get (:photos result) f))) => "Maginon")))
+      (:make (:camera (get (:photos result) f))) => "Maginon"))
+
+  (fact "Can handle invalid metadata"
+    (let [f (clojure.java.io/file "file")
+          data {f invalid-metadata}
+          result (album (gen-state-helper config) data)]
+      (keys (get (:photos result) f))) => '(:invalid)))
 
 (facts "metadata extraction"
   (fact "Start date is extracted"

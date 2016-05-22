@@ -27,10 +27,12 @@
 (s/defn exif-file? :- s/Bool
   "Predicate for whether a given file is a usable, exif-containing file."
   [file]
-  (and (f/file? file)
-       (f/readable? file)
-       (re-find file-inclusion-regexp (f/get-name file))
-       (not (re-find file-exclusion-regexp (f/get-name file)))))
+  (or (and (f/file? file)
+           (f/readable? file)
+           (re-find file-inclusion-regexp (f/get-name file))
+           (not (re-find file-exclusion-regexp (f/get-name file)))
+           true)
+      false))
 
 (defn- album-dir?
   "Return true if there are exif-containing files and the directory hasn't any subdirectories. False otherwise."
@@ -96,7 +98,7 @@
   [root]
   (let [dirname #(f/get-parent-file (io/file %))]
     (->> root
-         (io/file root)
+         (io/file)
          (file-seq)
          (group-by dirname)
          (filter (fn [[k v]] (album-dir? v)))

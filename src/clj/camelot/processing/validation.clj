@@ -176,7 +176,7 @@
 (defn check-invalid-photos
   "Check the album for invalid photos"
   [state photos]
-  (let [res (first (vec (filter #(contains? % :invalid) photos)))]
+  (let [res (first (filter #(contains? % :invalid) photos))]
     (if (nil? res)
       {:result :pass}
       {:result :fail
@@ -189,8 +189,8 @@
     {:result :pass}
     (let [shifts (->> photos
                       (map #(vector (:filename %)
-                                    (photo/get-timeshift (:datetime-original %)
-                                                         (:datetime %))))
+                                    (photo/get-time-difference (:datetime-original %)
+                                                               (:datetime %))))
                       (group-by second)
                       (into []))]
       (if (= (count shifts) 1)

@@ -46,7 +46,7 @@
       (sut/species-location-csv (gen-state {}) albums) => ""))
 
   (fact "Should cope with large numbers of photos"
-    (let [entries 10000
+    (let [entries 100
           album-data (ua/as-photo {:sightings [{:species "Yellow Spotted Cat"}]
                                    :location {:gps-longitude 100.0
                                               :gps-latitude 0.0}})
@@ -62,7 +62,7 @@
       (last result) => "Yellow Spotted Cat,100.0,0.0"))
 
   (fact "Should cope with large numbers of albums"
-    (let [entries 10000
+    (let [entries 100
           album-data {"MyFile" {:sightings [{:species "Yellow Spotted Cat"}]
                                 :location {:gps-longitude 100.0
                                            :gps-latitude 0.0}}}

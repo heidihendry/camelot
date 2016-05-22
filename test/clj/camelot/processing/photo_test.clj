@@ -9,87 +9,39 @@
 
 (namespace-state-changes (before :facts st/validate-schemas))
 
-(facts "metadata normalisation"
+(facts "Metadata parsing"
   (fact "Maginon metadata normalises okay"
     (let [config []
-          output (normalise (gen-state config) maginon-metadata)]
+          output (parse (gen-state config) maginon-metadata)]
       (:filesize output) => 1175819
       (:make (:camera output)) => "Maginon"
       (:datetime output) => (t/date-time 2014 4 11 16 37 52)))
 
   (fact "Cuddeback metadata normalises okay"
     (let [config []
-          output (normalise (gen-state config) cuddeback-metadata)]
+          output (parse (gen-state config) cuddeback-metadata)]
       (:filesize output) => 513653
       (:make (:camera output)) => "CUDDEBACK"
-      (:datetime output) => (t/date-time 2014 4 11 19 47 46))))
-
-(fact "Photo validation"
-  (fact "Metadata missing a datetime is not valid"
-    (let [metadata [{:filename "MyFile.jpg"}]
-          config {:language :en}]
-      (contains? (validate (gen-state config) metadata) :invalid) => true))
+      (:datetime output) => (t/date-time 2014 4 11 19 47 46)))
 
   (fact "Metadata with nil required fields is not valid"
-    (let [metadata [{:filename nil
-                     :datetime nil}]
-          config {:language :en}
-          res (validate (gen-state config) metadata)]
+    (let [config {:language :en}
+          res (parse (gen-state config) {})]
       (contains? res :invalid) => true
-      (boolean (re-find #"Date/Time" (:invalid res))) => true))
-
-  (fact "Metadata with the necessary field is valid"
-    (let [metadata {:filename "myfile"
-                    :datetime 0}]
-      (contains? (validate (gen-state []) metadata) :invalid) => false)))
-
-(facts "GPS Date/Time"
-  (fact "Produces the correct date from the components"
-    (let [expected (t/date-time 2015 3 14 13 1 26)
-          date "2015:03:14"
-          time "13:01:26.33 UTC"]
-      (exif-gps-datetime date time) => expected))
-
-  (fact "nil if date is nil"
-    (let [expected (t/date-time 2015 3 14 13 1 26)
-          date nil
-          time "13:01:26.33 UTC"]
-      (exif-gps-datetime date time) => nil))
-
-  (fact "nil if time is nil"
-    (let [expected (t/date-time 2015 3 14 13 1 26)
-          date "2015:03:14"
-          time nil]
-      (exif-gps-datetime date time) => nil)))
+      (boolean (re-find #"Date/Time" (:invalid res))) => true)))
 
 (facts "Timeshift"
   (fact "Small positive timeshift is correct"
     (let [dt-a (t/date-time 2015 3 14 13 1 26)
           dt-b (t/date-time 2015 3 14 13 3 26)]
-      (get-timeshift dt-a dt-b) => 120))
+      (get-time-difference dt-a dt-b) => 120))
 
   (fact "Small negative timeshift is correct"
     (let [dt-a (t/date-time 2015 3 14 13 5 26)
           dt-b (t/date-time 2015 3 14 13 2 10)]
-      (get-timeshift dt-a dt-b) => -196))
+      (get-time-difference dt-a dt-b) => -196))
 
   (fact "Large timeshift is correct"
     (let [dt-a (t/date-time 2015 3 14 13 5 26)
           dt-b (t/date-time 2001 3 14 13 5 26)]
-      (get-timeshift dt-a dt-b) => -441763200)))
-
-(facts "GPS parsing"
-  (fact "GPS data is interpretted sanely"
-    (let [lon "104° 5' 44.56\""
-          lon-ref "E"]
-      (to-longitude lon lon-ref) => 104.095711))
-
-  (fact "Longitude west is negative"
-    (let [lon "104° 5' 44.56\""
-          lon-ref "W"]
-      (to-longitude lon lon-ref) => -104.095711))
-
-  (fact "Latitude south is negative"
-    (let [lon "30° 44' 11\""
-          lon-ref "S"]
-      (to-longitude lon lon-ref) => -30.736389)))
+      (get-time-difference dt-a dt-b) => -441763200)))

@@ -4,7 +4,7 @@
             [schema.core :as s]
             [camelot.model.album :as ma]
             [camelot.processing.photo :as photo]
-            [camelot.processing.validation :refer [list-problems]]))
+            [camelot.processing.validation :refer [list-problems check-invalid-photos]]))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."
@@ -108,11 +108,15 @@
   [state set-data]
   (let [parse-photo (fn [[k v]] [k (photo/parse state v)])
         album-data (into {} (map parse-photo set-data))]
-    {:photos album-data
-     :metadata (extract-metadata state (vals album-data))
-     :problems (list-problems state album-data)}))
+    (if (= (:result (check-invalid-photos state (vals album-data))) :fail)
+      {:photos album-data
+       :invalid true
+       :problems (list-problems state album-data)}
+      {:photos album-data
+       :metadata (extract-metadata state (vals album-data))
+       :problems (list-problems state album-data)})))
 
-(s/defn album-set
+(s/defn album-set :- {java.io.File ma/Album}
   "Return a datastructure representing all albums and their metadata"
   [state tree-data]
   (let [to-album (fn [[k v]] (vector k (album state v)))]

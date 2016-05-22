@@ -100,3 +100,6 @@
  "Exposure Bias Value" "0 EV",
  "Exif Image Width" "2592 pixels",
  "Exif Image Height" "2000 pixels"})
+
+(def invalid-metadata
+  {})

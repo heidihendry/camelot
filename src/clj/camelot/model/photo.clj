@@ -1,6 +1,13 @@
 (ns camelot.model.photo
   (:require [schema.core :as s]))
 
+(defn valid?
+  [photo]
+  (not (:invalid photo)))
+
+(def InvalidPhoto
+  {(s/required-key :invalid) s/Str})
+
 (s/defrecord Location
     [gps-longitude :- (s/maybe s/Num)
      gps-latitude :- (s/maybe s/Num)

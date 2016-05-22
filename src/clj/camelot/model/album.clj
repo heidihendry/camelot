@@ -21,6 +21,7 @@
    (s/required-key :reason) s/Str})
 
 (def Album
-  {(s/required-key :photos) {java.io.File PhotoMetadata}
-   (s/required-key :metadata) ExtractedMetadata
+  {(s/required-key :photos) {java.io.File (s/if mp/valid? PhotoMetadata mp/InvalidPhoto)}
+   (s/optional-key :metadata) ExtractedMetadata
+   (s/optional-key :invalid) s/Bool
    (s/required-key :problems) [Problem]})
