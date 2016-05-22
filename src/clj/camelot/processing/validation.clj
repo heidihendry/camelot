@@ -129,6 +129,10 @@
     {:result :pass}))
 
 (defn sightings-reducer
+  "Reduce sighting validity.
+  A sighting is considered valid if it has both a species and quantity.
+  'Special' species (those matching `sighting-quantity-exclusions-re') are
+  exempt from this condition."
   [state photo]
   (fn [acc sighting]
     (cond

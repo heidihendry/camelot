@@ -4,9 +4,9 @@
             [clj-time.core :as t]
             [schema.core :as s]
             [camelot.model.album :as ma]
-            [camelot.util.java-file :as f]
-            [camelot.util.image-metadata :as im])
+            [camelot.util.java-file :as f])
   (:import [com.drew.imaging ImageMetadataReader]
+           [com.drew.metadata Metadata Directory Tag]
            [camelot.model.photo PhotoMetadata]
            [java.io File]))
 
@@ -23,6 +23,22 @@
   "Regexp file filenames to exclude.
   Takes precedence over `file-inclusion-regexp'."
    #"(?i)_original(.jpe?g|.tiff?)$")
+
+(defn get-description
+  [tag]
+  (.getDescription ^Tag tag))
+
+(defn get-tag-name
+  [tag]
+  (.getTagName ^Tag tag))
+
+(defn get-tags
+  [directory]
+  (.getTags ^Directory directory))
+
+(defn get-directories
+  [metadata]
+  (.getDirectories ^Metadata metadata))
 
 (s/defn exif-file? :- s/Bool
   "Predicate for whether a given file is a usable, exif-containing file."
@@ -44,13 +60,13 @@
   "Return a description for the given tag."
   [tag]
   (->> tag
-       (im/getDescription)
+       (get-description)
        (str/trim)))
 
 (defn- tag-key-value-pair
   "Return the key-value pair for the raw metadata tag given."
   [tag]
-  (hash-map (im/getTagName tag) (describe-raw-tag tag)))
+  (hash-map (get-tag-name tag) (describe-raw-tag tag)))
 
 (defn- parse-tag
   "Map tag names to their descriptions, returning the result as a hash"
@@ -60,7 +76,7 @@
 (defn- extract-tags
   "Extract a list of raw tags from the directories of metadata."
   [metadata]
-  (map im/getTags (im/getDirectories metadata)))
+  (map get-tags (get-directories metadata)))
 
 (s/defn file-metadata :- ma/RawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"

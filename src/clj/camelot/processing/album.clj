@@ -66,9 +66,9 @@
   "Reducing function, adding or updating the sightings based on their dependence."
   [state acc this-sighting]
   (let [datetime (:datetime this-sighting)
-        species (:species this-sighting)
+        species (photo/extract-path-value this-sighting [:sighting :species])
         previous-sighting (dependent-sighting datetime (get acc species))
-        qty (:quantity this-sighting)
+        qty (photo/extract-path-value this-sighting [:sighting :quantity])
         known-sightings (get acc species)]
     (assoc acc species
            (if previous-sighting
@@ -86,6 +86,11 @@
   [ta tb]
   (t/after? (:datetime tb) (:datetime ta)))
 
+(defn album-photos
+  "Return a list of photos in album."
+  [album]
+  (vals (:photos (second album))))
+
 (s/defn extract-independent-sightings :- [ma/Sightings]
   "Extract the sightings, accounting for the independence threshold, for an album."
   [state album]
@@ -93,14 +98,11 @@
         total-spp (fn [[spp data]] {:species spp
                                     :count (reduce + (map :quantity data))})]
     (->> album
-         (photo/flatten-sightings)
+         (map photo/flatten-sightings)
+         (flatten)
          (sort datetime-comparison)
          (reduce indep-reducer {})
          (map total-spp))))
-
-(defn album-photos
-  [album]
-  (vals (:photos (second album))))
 
 (s/defn extract-metadata :- ma/ExtractedMetadata
   "Return aggregated metadata for a given album"

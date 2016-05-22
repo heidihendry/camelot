@@ -39,11 +39,8 @@
 (defn nav-menu
   [state]
   {:menu-items [{:url "/#/dashboard" :label ((:translate state) :application/dashboard)}
-                (when (feature/enabled? :survey)
-                  {:url "/#/surveys" :label ((:translate state) :application/surveys)})
-                (when (feature/enabled? :survey)
-                  {:url "/#/sites" :label ((:translate state) :application/sites)})
-                (when (feature/enabled? :survey)
-                  {:url "/#/cameras" :label ((:translate state) :application/cameras)})
+                {:url "/#/surveys" :label ((:translate state) :application/surveys)}
+                {:url "/#/sites" :label ((:translate state) :application/sites)}
+                {:url "/#/cameras" :label ((:translate state) :application/cameras)}
                 {:url "/#/analysis" :label ((:translate state) :application/analysis)}
                 {:function "settings"}]})

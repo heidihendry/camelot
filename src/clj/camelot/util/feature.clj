@@ -1,11 +1,13 @@
 (ns camelot.util.feature
-  (:require [environ.core :refer [env]]))
+  (:require [environ.core :refer [env]]
+            [schema.core :as s]))
 
 (def features
-  {:survey true})
+  "Map of feature keys and whether or not they're enabled"
+  {})
 
-(defn enabled?
-  [feature]
+(s/defn enabled? :- s/Bool
+  [feature :- s/Keyword]
   (or (env :camelot-dev-mode)
       (env (keyword (str "camelot-feature-" (name feature))))
-      (get features feature)))
+      (or (get features feature) false)))

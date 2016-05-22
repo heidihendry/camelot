@@ -55,9 +55,9 @@
    :trap-station-session {:title "Trap Station Session"
                           :sidebar-title "Sessions"
                           :trap-station-session-start-date {:label "Session Start Date"
-                                                    :description "The date the Trap Station started recording for this session."}
+                                                            :description "The date the Trap Station started recording for this session."}
                           :trap-station-session-end-date {:label "Session End Date"
-                                                  :description "The date the Trap Station finished recording for this session."}
+                                                          :description "The date the Trap Station finished recording for this session."}
                           :trap-station-session-notes {:label "Session Notes"
                                                        :description "Notes about this session for the trap station."}}
 

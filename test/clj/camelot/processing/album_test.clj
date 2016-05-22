@@ -67,7 +67,7 @@
           result (extract-metadata state album)]
       (:model result) => "MyCam")))
 
-(facts "species extraction"
+(facts "Species Independence"
   (fact "A single sighting is extracted"
     (let [album [{:datetime (t/date-time 2015 01 01 06 00 00)
                   :sightings [{:species "Yellow Spotted Housecat" :quantity 1}]}]
