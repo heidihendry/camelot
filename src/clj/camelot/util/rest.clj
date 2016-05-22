@@ -1,5 +1,6 @@
 (ns camelot.util.rest
   (:require [camelot.util.config :as conf]
+            [clojure.edn :as edn]
             [camelot.util.application :as app]
             [clojure.tools.logging :as log]
             [ring.util.response :as r]))
@@ -23,7 +24,7 @@
   [v]
   (if (and (instance? String v)
            (re-find #"[0-9]" v))
-    (try (read-string v)
+    (try (edn/read-string v)
          (catch java.lang.Exception e
            (do
              (log/warn "as-long: Attemp to read-string on " v)
@@ -47,7 +48,7 @@
   [acc k v]
   (if (and (some #{k} floating-point-fields)
            (instance? String v))
-    (assoc acc k (read-string v))
+    (assoc acc k (edn/read-string v))
     (assoc acc k v)))
 
 (defn- parse-floats

@@ -1,6 +1,7 @@
 (ns camelot.processing.metadata-utils
   (:require [clojure.string :as str]
             [clj-time.core :as t]
+            [clojure.edn :as edn]
             [schema.core :as s]
             [camelot.model.photo :as mp]
             [clojure.tools.logging :as log])
@@ -13,14 +14,14 @@
   (let [exact (+ (first parts)
                  (/ (/ (nth parts 1) 0.6) 100)
                  (/ (/ (nth parts 2) 0.36) 10000))]
-    (read-string (format "%.6f" exact))))
+    (edn/read-string (format "%.6f" exact))))
 
 (s/defn gps-degrees-as-parts
   "Return the numeric parts of a GPS location as a vector, given a string in degrees."
   [deg]
   (->> (str/split deg #" ")
        (map #(str/replace % #"[^\.0-9]" ""))
-       (mapv read-string)))
+       (mapv edn/read-string)))
 
 (s/defn parse-gps :- s/Num
   "Convert degrees string with a reference to a decimal.
@@ -70,7 +71,7 @@ Important: Timezone information will be discarded."
   "Return str as a number, or zero if nil."
   [str default]
   (if str
-    (try (read-string str)
+    (try (edn/read-string str)
          (catch java.lang.Exception e
            (do
              (log/warn "read-metadata-string: Attempt to read-string on '" str "'")
