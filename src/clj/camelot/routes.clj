@@ -1,7 +1,7 @@
 (ns camelot.routes
-  (:require [compojure.core :refer [ANY GET PUT POST DELETE defroutes routes]]
+  (:require [compojure.core :refer [GET POST defroutes routes]]
             [clojure.java.io :as io]
-            [compojure.route :refer [resources]]
+            [compojure.route :as route]
             [camelot.handler.albums :as albums]
             [camelot.handler.settings :as settings]
             [camelot.handler.surveys :as surveys]
@@ -15,7 +15,7 @@
             [camelot.handler.screens :as screens]
             [camelot.analysis.maxent :as maxent]))
 
-(defn retrieve-index
+(defn- retrieve-index
   "Return a response for index.html"
   []
   {:status 200
@@ -23,11 +23,13 @@
    :body (io/input-stream (io/resource "public/index.html"))})
 
 (defroutes misc-routes
+  "Miscellaneous application routes."
   (GET "/" _ (retrieve-index))
   (POST "/quit" [] (System/exit 0))
-  (resources "/"))
+  (route/resources "/"))
 
 (def app-routes
+  "All application routes."
   (routes misc-routes
           maxent/routes
           settings/routes
