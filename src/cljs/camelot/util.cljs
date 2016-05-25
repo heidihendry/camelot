@@ -1,8 +1,14 @@
 (ns camelot.util
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-http.client :as http]
-            [cognitect.transit :as transit])
+            [cognitect.transit :as transit]
+            [cljs-time.core :as t])
   (:import [goog.date DateTime]))
+
+(defn nights-elapsed
+  "Calculate the number of `nights' between two dates."
+  [start end]
+  (t/in-days (t/interval (t/at-midnight start) (t/at-midnight end))))
 
 (defn with-baseurl
   "Return the given path along with the correct base URL."

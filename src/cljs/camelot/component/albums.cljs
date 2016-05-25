@@ -2,12 +2,35 @@
   (:require [camelot.component.nav :as nav]
             [camelot.rest :as rest]
             [camelot.state :as state]
+            [camelot.util :as util]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [cljs-time.core :as t]
             [cljs-time.format :as tf]))
 
-(def custom-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
+(def day-formatter (tf/formatter "yyyy-MM-dd"))
+
+(defn timespan-component
+  "Display details about the time span covered by an album."
+  [data owner]
+  (reify
+    om/IRender
+    (render [this]
+      (let [start (:datetime-start (:metadata data))
+            end (:datetime-end (:metadata data))]
+        (dom/span nil
+                  (if (empty? (:problems data))
+                    (dom/span #js {:className "fa fa-2x fa-check album-result success-result"})
+                    (dom/span #js {:className "fa fa-2x fa-remove album-result failure-result"}))
+         (if (or (nil? start) (nil? end))
+           (dom/label nil "Timespan information missing")
+           (dom/span nil
+                     (dom/label nil (str ""
+                                         (util/nights-elapsed start end)
+                                         " nights"))
+                     (dom/div #js {:className "date-range"}
+                              (str (tf/unparse day-formatter start)
+                                   " — "
+                                   (tf/unparse day-formatter end))))))))))
 
 (defn problem-component
   "Render a list item for a validation problem."
@@ -25,7 +48,8 @@
     (render [this]
       (dom/div nil
                (if (empty? (:problems data))
-                 (dom/label nil "No problems found. Time to analyse!")
+                 (dom/label #js {:className "no-problems"}
+                            "No problems found. Time to analyse!")
                  (apply dom/ul nil
                         (om/build-all problem-component (:problems data))))))))
 
@@ -35,10 +59,14 @@
     om/IRender
     (render [this]
       (let [contents (remove #(= (type %) js/String) albums)]
-        (dom/div nil
-                 (dom/label nil (first albums))
-                 (apply dom/div nil
-                        (om/build-all album-component contents)))))))
+        (dom/div #js {:className "album-container"}
+                 (dom/div #js {:className "timespan"}
+                          (apply dom/div nil
+                                 (om/build-all timespan-component contents)))
+                 (dom/div #js {:className "album-details"}
+                          (dom/label nil (first albums))
+                          (apply dom/div nil
+                                 (om/build-all album-component contents))))))))
 
 (defn album-summary-component [albums owner]
   "Render a summary of album validation results."
@@ -66,8 +94,9 @@
     om/IRender
     (render [_]
       (dom/div #js {:onClick nav/settings-hide!}
-               (dom/div nil (om/build album-summary-component (:albums app)))
-               (dom/h3 nil "Problems Identified")
+               (dom/div #js {:className "validation-heading"}
+                        (dom/h3 nil "Validation Results")
+                        (dom/div nil (om/build album-summary-component (:albums app))))
                (apply dom/div nil (om/build-all albums-component
                                                 (:albums app)))))))
 

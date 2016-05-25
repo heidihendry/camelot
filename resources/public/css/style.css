@@ -22,7 +22,7 @@
 }
 html > body {
   font-family: 'Open Sans', Arial, sans-serif;
-  background-color: #fafafa;
+  background-color: #fff;
   color: #333;
   width: 100%;
   overflow-x: hidden;
@@ -32,11 +32,9 @@ html > body {
   box-shadow: 0px 5px 15px 5px #000;
   margin-top: 6rem;
   padding-top: 2rem;
-  padding-left: 2rem;
   width: 100%;
   overflow: hidden;
   max-width: 100%;
-  padding-bottom: 2rem;
   min-height: 500px;
 }
 #app h1,
@@ -311,7 +309,6 @@ pre.field-input {
 }
 .album-validation-summary {
     font-size: 140%;
-    margin-bottom: 1rem;
 }
 .loading {
     position: fixed;
@@ -340,10 +337,11 @@ pre.field-input {
     top: 0;
     display: block;
     height: 100%;
-    background: #eee;
+    background: #fafafa;
     width: 24rem;
     position: absolute;
     border-right: 1px solid #ddd;
+    margin-bottom: 2rem;
 }
 .sidebar ul {
     list-style: none;
@@ -368,8 +366,15 @@ pre.field-input {
     margin-left: 24rem;
     margin-right: 26rem;
     padding-right: 26rem;
+    margin-bottom: 2rem;
     min-width: 40rem;
     width: 100%;
+}
+#page-content .main-content-container {
+    padding-left: 1rem;
+}
+#page-content .no-problems {
+    color: #283;
 }
 .sidebar .create-record-btn {
     float: right;
@@ -377,7 +382,10 @@ pre.field-input {
     margin-right: 1.5rem;
     position: relative;
 }
-#page-content ul {
+#page-content .section-body {
+
+}
+#page-content .album-details ul {
     padding-left: 2rem;
 }
 #page-content .edit-btn {
@@ -409,6 +417,55 @@ pre.field-input {
 #page-content .breadcrumb-item:last-of-type::after {
     padding: 0 0.5rem;
     content: normal;
+}
+#page-content .album-container {
+    position: relative;
+    float: left;
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    border-bottom: 1px solid #eee;
+}
+#page-content div.timespan {
+    float: left;
+    width: 20rem;
+    background: white;
+    display: block;
+    position: relative;
+    clear: left;
+    text-align: right;
+    padding: 0.5rem 1.5rem;
+}
+#page-content .album-result {
+    float: left;
+}
+#page-content .timespan .date-range {
+    clear: both;
+}
+#page-content .album-result.success-result {
+    color: #283;
+}
+#page-content .album-result.failure-result {
+    color: #a32;
+}
+#page-content div.album-details {
+    position: relative;
+    display: inline-block;
+    white-space: normal;
+    float: left;
+    flex: 1 1 auto;
+    overflow: hidden;
+    padding-right: 6rem;
+    padding: 0.5rem 0;
+    padding-left: 2rem;
+    background: #fafafa;
+    border-left: 1px solid #eee;
+}
+#page-content .validation-heading {
+    padding-left: 1.5rem;
+    width: 100%;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0;
 }
 .datepicker .label {
     color: black;

@@ -13,7 +13,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
+      (dom/div #js {:className "main-content-container"}
                (dom/div nil
                         (dom/h4 nil "Analysis Exports"))
                (dom/a #js {:href (util/with-baseurl "/maxent") :target "_blank"

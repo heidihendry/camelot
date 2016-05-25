@@ -290,7 +290,7 @@
       (render [_]
         (let [vs (get-in app [:view type])
               screen (util/get-screen vs)]
-          (dom/div nil
+          (dom/div #js {:className "main-content-container"}
                    (when (get screen :sidebar)
                      (om/build sidebar-component vs))
                    (om/build content-component vs)))))))
