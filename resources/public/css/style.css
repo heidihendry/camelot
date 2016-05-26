@@ -445,8 +445,14 @@ pre.field-input {
 #page-content .album-result.success-result {
     color: #283;
 }
+#page-content .album-result.warning-result {
+    color: #db0;
+}
 #page-content .album-result.failure-result {
     color: #a32;
+}
+#page-content .import {
+    width: 100%;
 }
 #page-content div.album-details {
     position: relative;

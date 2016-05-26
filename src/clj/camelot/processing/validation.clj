@@ -24,7 +24,7 @@
     (if (zero? night-total)
       {:result :pass}
       (if (> (/ ir-failed night-total) (:erroneous-infrared-threshold (:config state)))
-        {:result :fail :reason (tr/translate (:config state) :checks/time-light-sanity)}
+        {:result :warn :reason (tr/translate (:config state) :checks/time-light-sanity)}
         {:result :pass}))))
 
 (defn check-photo-stddev
@@ -41,9 +41,9 @@
           abovet (+ p75 (* 3 stddev))
           above (filter #(> (ms %) abovet) photos)]
       (cond
-        (first below) {:result :fail :reason
+        (first below) {:result :warn :reason
                        (tr/translate (:config state) :checks/stddev-before (:filename (first below)))}
-        (first above) {:result :fail :reason
+        (first above) {:result :warn :reason
                        (tr/translate (:config state) :checks/stddev-after (:filename (first above)))}
         :else {:result :pass}))))
 
@@ -74,7 +74,7 @@
                           (into #{}))]
     (if (> (count check-photos) 1)
       {:result :pass}
-      {:result :fail :reason (tr/translate (:config state) :checks/camera-checks)})))
+      {:result :warn :reason (tr/translate (:config state) :checks/camera-checks)})))
 
 (defn compare-headlines
   "Compare two handlines, failing if they're not consistent."
@@ -103,7 +103,7 @@
     h1))
 
 (defn check-camera-consistency
-  "Check the headline of all photos is consistent."
+  "Check the camera used for all photos is consistent."
   [state photos]
   (let [r (reduce (partial compare-cameras state) (first photos) (rest photos))]
     (if (= (:result r) :fail)
@@ -179,7 +179,7 @@
     {:result :pass}))
 
 (defn check-invalid-photos
-  "Check the album for invalid photos"
+  "Check the album for invalid photos."
   [state photos]
   (let [res (first (filter #(contains? % :invalid) photos))]
     (if (nil? res)
@@ -229,15 +229,15 @@
             (map (fn [[t f]]
                    (let [res (f state photos)]
                      (when (not= (:result res) :pass)
-                       {:result :fail
-                        :reason (if (:reason res)
-                                  (:reason res)
-                                  (->> t
-                                       (name)
-                                       (str "checks/")
-                                       (keyword)
-                                       (tr/translate (:config state))
-                                       (tr/translate (:config state) :checks/problem-without-reason)))})))
+                       (assoc res 
+                              :reason (if (:reason res)
+                                        (:reason res)
+                                        (->> t
+                                             (name)
+                                             (str "checks/")
+                                             (keyword)
+                                             (tr/translate (:config state))
+                                             (tr/translate (:config state) :checks/problem-without-reason)))))))
                  tests))))
 
 (s/defn list-problems

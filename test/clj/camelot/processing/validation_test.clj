@@ -36,12 +36,12 @@
 
   (fact "A photo which does not use IR at night is not okay"
     (let [album [{:datetime night :settings {:iso 999}}]]
-      (:result (check-ir-threshold (gen-state-helper config) album)) => :fail))
+      (:result (check-ir-threshold (gen-state-helper config) album)) => :warn))
 
   (fact "One valid and one invalid photo is not okay"
     (let [album [{:datetime night :settings {:iso 999}}
                  {:datetime day :settings {:iso 999}}]]
-      (:result (check-ir-threshold (gen-state-helper config) album)) => :fail))
+      (:result (check-ir-threshold (gen-state-helper config) album)) => :warn))
 
   (fact "Two valid and one invalid photos is okay"
     (let [album [{:datetime night :settings {:iso 999}}
@@ -82,7 +82,7 @@
                  {:datetime (t/date-time 2015 4 6  6 00)}
                  {:datetime (t/date-time 2015 4 7  6 40 00)}
                  {:datetime (t/date-time 2015 4 10 6 50 00)}]]
-      (:result (check-photo-stddev (gen-state-helper config) album)) => :fail
+      (:result (check-photo-stddev (gen-state-helper config) album)) => :warn
       (boolean (re-find #"file1.*before" (:reason (check-photo-stddev
                                            (gen-state-helper config) album)))) => true))
 
@@ -129,7 +129,7 @@
                   :sightings [{:species "Smiley Wolf" :quantity 1}]}
                  {:datetime (t/date-time 2015 1 7 0 0 0)
                   :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}]]
-      (:result (check-camera-checks (gen-state-helper config) album)) => :fail))
+      (:result (check-camera-checks (gen-state-helper config) album)) => :warn))
 
   (fact "Albums with 2 camera checks on the same day should fail"
     (let [config {}
@@ -137,7 +137,7 @@
                   :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}
                  {:datetime (t/date-time 2015 1 5 0 0 0)
                   :sightings [{:species "HUMAN-CAMERACHECK" :quantity 1}]}]]
-      (:result (check-camera-checks (gen-state-helper config) album)) => :fail)))
+      (:result (check-camera-checks (gen-state-helper config) album)) => :warn)))
 
 (facts "Album headline consistency"
   (fact "All files in an album containing the same headline should pass"

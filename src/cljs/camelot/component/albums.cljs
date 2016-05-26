@@ -16,21 +16,34 @@
     om/IRender
     (render [this]
       (let [start (:datetime-start (:metadata data))
-            end (:datetime-end (:metadata data))]
+            end (:datetime-end (:metadata data))
+            checks (group-by :result (:problems data))]
         (dom/span nil
-                  (if (empty? (:problems data))
-                    (dom/span #js {:className "fa fa-2x fa-check album-result success-result"})
-                    (dom/span #js {:className "fa fa-2x fa-remove album-result failure-result"}))
-         (if (or (nil? start) (nil? end))
-           (dom/label nil "Timespan information missing")
-           (dom/span nil
-                     (dom/label nil (str ""
-                                         (util/nights-elapsed start end)
-                                         " nights"))
-                     (dom/div #js {:className "date-range"}
-                              (str (tf/unparse day-formatter start)
-                                   " — "
-                                   (tf/unparse day-formatter end))))))))))
+                  (cond
+                    (:fail checks) (dom/span #js {:className "fa fa-2x fa-remove album-result failure-result"})
+                    (:warn checks) (dom/span #js {:className "fa fa-2x fa-exclamation-triangle album-result warning-result"})
+                    :else (dom/span #js {:className "fa fa-2x fa-check album-result success-result"}))
+                  (if (or (nil? start) (nil? end))
+                    (dom/label nil "Timespan information missing")
+                    (dom/span nil
+                              (dom/label nil (str ""
+                                                  (util/nights-elapsed start end)
+                                                  " nights"))
+                              (dom/div #js {:className "date-range"}
+                                       (str (tf/unparse day-formatter start)
+                                            " — "
+                                            (tf/unparse day-formatter end)))))
+                  (dom/button #js {:className (cond
+                                                (:fail checks) "btn btn-default import"
+                                                (:warn checks) "btn btn-default import"
+                                                :else "btn btn-primary import")
+                                   :disabled (when (:fail checks) "disabled")
+                                   :title (when (:fail checks)
+                                            "Unable to import due to validation errors.")
+                                   :onClick #(if (:warn checks)
+                                               (when (js/confirm "This folder contains data with flaws. Importing it many compromise the accuracy of future analyses. Do you want to continue?")
+                                                 nil))}
+                              "Import"))))))
 
 (defn problem-component
   "Render a list item for a validation problem."
