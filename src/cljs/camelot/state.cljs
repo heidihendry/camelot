@@ -37,3 +37,9 @@
 (defn nav-state
   []
   (om/ref-cursor (:nav (:application (om/root-cursor app-state)))))
+
+(defn import-dialog-state
+  []
+  (when (nil? (:import-dialog (om/root-cursor app-state)))
+    (om/update! (app-state-cursor) :import-dialog {:visible false}))
+  (om/ref-cursor (:import-dialog (om/root-cursor app-state))))

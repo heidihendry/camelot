@@ -9,6 +9,10 @@
 
 (def day-formatter (tf/formatter "yyyy-MM-dd"))
 
+(defn show-import-dialog
+  []
+  (om/update! (state/import-dialog-state) :visible true))
+
 (defn timespan-component
   "Display details about the time span covered by an album."
   [data owner]
@@ -41,8 +45,10 @@
                                    :title (when (:fail checks)
                                             "Unable to import due to validation errors.")
                                    :onClick #(if (:warn checks)
-                                               (when (js/confirm "This folder contains data with flaws. Importing it many compromise the accuracy of future analyses. Do you want to continue?")
-                                                 nil))}
+                                               (when (js/confirm
+                                                      "This folder may contain data with flaws. Importing it may compromise the accuracy of future analyses. Do you want to continue?")
+                                                 (show-import-dialog))
+                                               (show-import-dialog))}
                               "Import"))))))
 
 (defn problem-component

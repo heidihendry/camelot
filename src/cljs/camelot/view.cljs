@@ -7,6 +7,7 @@
             [camelot.component.albums :as calb]
             [camelot.component.surveys :as surveys]
             [camelot.component.nav :as nav]
+            [camelot.component.import-dialog :as import]
             [smithy.core :as smithy]
             [camelot.nav :as cnav]
             [smithy.util :as util]
@@ -203,6 +204,11 @@
   "Render the error dialog"
   (om/root cerr/error-dialog-component state/app-state
            {:target (js/document.getElementById "error-dialog")}))
+
+(def import-dialog
+  "Render the import dialog"
+  (om/root import/import-dialog-component state/app-state
+           {:target (js/document.getElementById "import-dialog")}))
 
 (defn generate-view
   "Render the main page content"
