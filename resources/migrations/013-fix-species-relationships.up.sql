@@ -1,0 +1,5 @@
+ALTER TABLE sighting DROP COLUMN sighting_species_id
+--;;
+ALTER TABLE sighting ADD COLUMN species_id INT NOT NULL DEFAULT 0 REFERENCES species ON DELETE CASCADE ON UPDATE RESTRICT
+--;;
+DROP TABLE survey_species
