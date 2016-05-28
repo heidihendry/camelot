@@ -27,3 +27,23 @@
    data]
   (let [record (db/with-db-keys -create<! data)]
     (get-specific state (:1 record))))
+
+(s/defn update!
+  [state
+   id :- s/Num
+   data]
+  (db/with-db-keys -update! (merge data {:species-id id}))
+  (get-specific state (:species-id data)))
+
+(s/defn delete!
+  [state
+   id :- s/Num]
+  (db/with-db-keys -delete! {:species-id id}))
+
+(def routes
+  (context "/species" []
+           (GET "/" [] (rest/list-resources get-all :species))
+           (GET "/:id" [id] (rest/specific-resource get-specific id))
+           (PUT "/:id" [id data] (rest/update-resource update! id data))
+           (POST "/" [data] (rest/create-resource create! data))
+           (DELETE "/:id" [id] (rest/delete-resource delete! id))))

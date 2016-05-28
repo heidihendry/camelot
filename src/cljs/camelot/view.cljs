@@ -246,5 +246,6 @@
 (defroute "/#/survey-sites/:id" [id] (page-content-view :survey-site :create id))
 (defroute "/#/sites" [] (page-content-view :site :create))
 (defroute "/#/cameras" [] (page-content-view :camera :create))
+(defroute "/#/species" [] (page-content-view :species :create))
 (defroute "/#/analysis" [] (generate-view analysis/analysis-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

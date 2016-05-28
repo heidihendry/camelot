@@ -20,3 +20,15 @@ WHERE species_scientific_name = :species_scientific_name
 SELECT species_id, species_created, species_updated, species_scientific_name,
        species_common_name, species_notes
 FROM species
+
+-- name: -update!
+UPDATE species
+SET species_updated = CURRENT_TIMESTAMP,
+    species_scientific_name = :species_scientific_name,
+    species_common_name = :species_common_name,
+    species_notes = :species_notes
+WHERE species_id = :species_id
+
+-- name: -delete!
+DELETE FROM species
+WHERE species_id = :species_id

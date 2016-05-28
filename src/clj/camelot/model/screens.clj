@@ -210,6 +210,37 @@
                               :error {:type :event
                                       :event :trap-station-session-error}}}}})
 
+(defsmith species smiths
+  [state]
+  {:resource {:type :species
+              :title (tr/translate (:config state) :species/title)
+              :endpoint "/species"
+              :id :species-id}
+   :sidebar {:resource {:endpoint "/species"
+                        :title (tr/translate (:config state) :species/sidebar-title)
+                        :type :species
+                        :id :species-id
+                        :label :species-scientific-name}}
+   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
+                :menu [{:label (tr/translate (:config state) :action/delete)
+                        :action :delete}
+                       {:label (tr/translate (:config state) :action/edit)
+                        :action :edit-mode}]}
+   :layout [[:species-scientific-name]
+            [:species-common-name]
+            [:species-notes]]
+   :schema {:species-scientific-name {:type :text
+                                      :required true}
+            :species-common-name {:type :text
+                                  :required false}
+            :species-notes {:type :textarea
+                            :cols 35
+                            :rows 4}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :species-create}
+                              :error {:type :event
+                                      :event :species-error}}}}})
+
 (defsmith survey smiths
   [state]
   {:resource {:type :survey

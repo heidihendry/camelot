@@ -50,6 +50,8 @@
                  :label (tr/translate (:config state) :application/sites)}
                 {:url "/#/cameras"
                  :label (tr/translate (:config state) :application/cameras)}
+                {:url "/#/species"
+                 :label (tr/translate (:config state) :application/species)}
                 {:url "/#/analysis"
                  :label (tr/translate (:config state) :application/analysis)}
                 {:function "settings"}]})

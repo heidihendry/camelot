@@ -17,7 +17,8 @@
             [clojure.java.io :as io]
             [compojure
              [core :refer [defroutes GET POST routes]]
-             [route :as route]]))
+             [route :as route]]
+            [camelot.handler.species :as species]))
 
 (defn- retrieve-index
   "Return a response for index.html"
@@ -40,6 +41,7 @@
           config/routes
           albums/routes
           screens/routes
+          species/routes
           import/routes
           surveys/routes
           sites/routes

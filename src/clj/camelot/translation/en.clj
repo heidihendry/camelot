@@ -190,11 +190,19 @@
             :import-media "Import Media"
             :edit "Edit"
             :delete "Delete"}
-
+   :species {:sidebar-title "Species"
+             :title "Species"
+             :species-scientific-name {:label "Scientific Name"
+                                       :description "Scientific name by which this species is known."}
+             :species-common-name {:label "Common Name"
+                                   :description "Common name by which this species is known."}
+             :species-notes {:label "Notes"
+                             :description "Notes about this species or its identification."}}
    :application {:dashboard "Dashboard"
                  :surveys "Surveys"
                  :analysis "Analysis"
                  :sites "Sites"
+                 :species "Species"
                  :cameras "Cameras"}
    :default-config-created "A default configuration has been created in '%s'"
 
