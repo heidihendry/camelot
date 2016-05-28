@@ -6,10 +6,25 @@
             [clojure.string :as str]
             [camelot.rest :as rest]))
 
-(defn generic-select
+(def select-priorities
+  {:survey 0
+   :survey-site 1
+   :trap-station 2
+   :trap-station-session 3
+   :trap-station-session-camera 4})
+
+(defn- invalidate-settings-following
+  [field]
+  (let [p (get select-priorities field)]
+    (doseq [[k v] select-priorities]
+      (when (> v p)
+        (om/update! (:selections (state/import-dialog-state)) k nil)))))
+
+(defn- generic-select
   [field e]
   (when-not (:selections (state/import-dialog-state))
     (om/update! (state/import-dialog-state) :selections {}))
+  (invalidate-settings-following field)
   (om/update! (:selections (state/import-dialog-state)) field (.. e -target -value))
   (rest/post-import-state {:data (deref (:selections (state/import-dialog-state)))}
                           #(om/update! (state/import-dialog-state)
@@ -47,14 +62,15 @@
   (reify
     om/IRender
     (render [_]
-      (prn (get-in (state/resources-state) [:settings :root-path :value]))
+      (when-not (get-in (state/import-dialog-state) [:selections :folder])
+        (om/update! (get (state/import-dialog-state) :selections)
+                    :folder (subs (get (state/import-dialog-state) :path)
+                                  (count (get-in (state/resources-state) [:settings :root-path :value])))))
       (dom/div #js {:className "import-location-selector"}
                (dom/div nil
                         (dom/label nil "Import from")
                         (dom/div #js {:className "import-folder"}
-                                 (subs
-                                  (get (state/import-dialog-state) :path)
-                                  (count (get-in (state/resources-state) [:settings :root-path :value])))))
+                                 (get-in (state/import-dialog-state) [:selections :folder])))
                (dom/div nil
                         (dom/label nil "Survey")
                         (dom/select #js {:className "field-input" :onChange survey-select}
@@ -64,7 +80,8 @@
                                                                 [:options :surveys])) {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Survey Site")
-                        (dom/select #js {:className "field-input" :onChange survey-site-select}
+                        (dom/select #js {:className "field-input"
+                                         :onChange survey-site-select}
                                     (om/build-all option-component
                                                   (cons {:vkey nil :desc "Select..."}
                                                         (get-in (state/import-dialog-state)
@@ -92,7 +109,10 @@
                                                                 [:options :trap-station-session-cameras])) {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Notes")
-                        (dom/textarea #js {:className "field-input" :cols "42" :rows "2"}))))))
+                        (dom/textarea #js {:className "field-input" :cols "42" :rows "2"
+                                           :onChange #(om/transact! (:selections (state/import-dialog-state))
+                                                                    :notes
+                                                                    (fn [_] (.. % -target -value)))}))))))
 
 (defn import-dialog-component
   [app owner]
@@ -110,10 +130,14 @@
                    (om/build location-selector-component (:import-dialog app))
                    (dom/div #js {:className "button-container"}
                             (dom/button #js {:className "btn btn-primary"
-                                             :onClick #(om/update! (state/import-dialog-state) :visible false)}
+                                             :onClick #(do
+                                                         (om/update! (state/import-dialog-state) :selections {})
+                                                         (om/update! (state/import-dialog-state) :visible false))}
                                         "Import")
                             (dom/button #js {:className "btn btn-default"
-                                             :onClick #(om/update! (state/import-dialog-state) :visible false)}
+                                             :onClick #(do
+                                                         (om/update! (state/import-dialog-state) :selections {})
+                                                         (om/update! (state/import-dialog-state) :visible false))}
                                         "Cancel"))))
         (dom/span nil "")))))
 
