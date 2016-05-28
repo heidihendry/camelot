@@ -79,6 +79,22 @@
                                                      (:status response)
                                                      (:body response)))))))
 
+(defn post-import-state
+  "POST import state"
+  [params cb]
+  (go
+    (let [response (<! (util/request http/post (util/with-baseurl "/import-options")
+                                     params))
+          success (some #{(:status response)} success-status-codes)]
+      (if success
+        (when cb
+          (cb response))
+        (om/update! (state/app-state-cursor) :error (build-error
+                                                     "GET"
+                                                     (util/with-baseurl "/import-options")
+                                                     (:status response)
+                                                     (:body response)))))))
+
 (defn put-resource
   "PUT resource state"
   [resource params cb]

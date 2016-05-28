@@ -3,27 +3,38 @@
             [om.dom :as dom :include-macros true]
             [camelot.state :as state]
             [camelot.nav :as nav]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [camelot.rest :as rest]))
+
+(defn generic-select
+  [field e]
+  (when-not (:selections (state/import-dialog-state))
+    (om/update! (state/import-dialog-state) :selections {}))
+  (om/update! (:selections (state/import-dialog-state)) field (.. e -target -value))
+  (prn (:selections (state/import-dialog-state)))
+  (rest/post-import-state (deref (:selections (state/import-dialog-state)))
+                          #(om/update! (state/import-dialog-state)
+                                       :options (:body %))))
 
 (defn survey-select
-  []
-  nil)
+  [e]
+  (generic-select :survey e))
 
 (defn survey-site-select
-  []
-  nil)
+  [e]
+  (generic-select :survey-site e))
 
 (defn trap-station-select
-  []
-  nil)
+  [e]
+  (generic-select :trap-station e))
 
 (defn trap-station-session-select
-  []
-  nil)
+  [e]
+  (generic-select :trap-station-session e))
 
-(defn camera-select
-  []
-  nil)
+(defn trap-station-session-camera-select
+  [e]
+  (generic-select :trap-station-session-camera e))
 
 (defn option-component
   [data owner]
@@ -47,19 +58,19 @@
                                   (count (get-in (state/resources-state) [:settings :root-path :value])))))
                (dom/div nil
                         (dom/label nil "Survey")
-                        (dom/select #js {:className "field-input" :onChange survey-select} (om/build-all option-component [1] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange survey-select} (om/build-all option-component [{:vkey 1} {:vkey 2}] {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Survey Site")
-                        (dom/select #js {:className "field-input" :onChange survey-site-select} (om/build-all option-component [1] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange survey-site-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Trap Station")
-                        (dom/select #js {:className "field-input" :onChange trap-station-select} (om/build-all option-component [1] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange trap-station-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Trap Station Session")
-                        (dom/select #js {:className "field-input" :onChange trap-station-session-select} (om/build-all option-component [1] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange trap-station-session-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Camera")
-                        (dom/select #js {:className "field-input" :onChange camera-select} (om/build-all option-component [1] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange trap-station-session-camera-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Notes")
                         (dom/textarea #js {:className "field-input" :cols "42" :rows "2"}))))))
