@@ -67,7 +67,7 @@
         (sites/create! state (merge data
                                     {:site-sublocation (:sublocation loc)
                                      :site-city (:city loc)
-                                     :site-state-province (:state loc)
+                                     :site-state-province (:state-province loc)
                                      :site-country (:country loc)
                                      :site-notes "Auto-created by Camelot"})))))
 
