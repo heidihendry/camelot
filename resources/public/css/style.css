@@ -521,13 +521,13 @@ pre.field-input {
     position: fixed;
     box-shadow: 0px 0px 15px 1px #000;
     z-index: 1000;
-    top: 8rem;
+    top: 4rem;
     left: calc(50vw - 17rem);
     border-radius: 0.5rem;
 }
 #import-dialog .content {
     background: #fff;
-    height: 38rem;
+    height: 58rem;
     width: 34rem;
     padding: 1rem 2rem;
     border-radius: 0.5rem;

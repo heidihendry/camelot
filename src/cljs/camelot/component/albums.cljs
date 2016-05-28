@@ -28,7 +28,8 @@
        (reduce #(+ (get ratings %2) %1) 0 (sevs alb-b)))))
 
 (defn show-import-dialog
-  []
+  [path]
+  (om/update! (state/import-dialog-state) :path path)
   (om/update! (state/import-dialog-state) :visible true))
 
 (defn timespan-component
@@ -37,9 +38,11 @@
   (reify
     om/IRender
     (render [this]
-      (let [start (:datetime-start (:metadata data))
-            end (:datetime-end (:metadata data))
-            checks (group-by :result (:problems data))]
+      (let [path (first data)
+            album (second data)
+            start (:datetime-start (:metadata album))
+            end (:datetime-end (:metadata album))
+            checks (group-by :result (:problems album))]
         (dom/span nil
                   (cond
                     (:fail checks) (dom/span #js {:className "fa fa-2x fa-remove album-result failure-result"})
@@ -65,8 +68,8 @@
                                    :onClick #(if (:warn checks)
                                                (when (js/confirm
                                                       "This folder may contain data with flaws. Importing it may compromise the accuracy of future analyses. Do you want to continue?")
-                                                 (show-import-dialog))
-                                               (show-import-dialog))}
+                                                 (show-import-dialog path))
+                                               (show-import-dialog path))}
                               "Import"))))))
 
 (defn problem-component
@@ -93,36 +96,35 @@
                  (dom/label #js {:className "album-problem"}
                            (dom/span #js {:className "fa fa-check album-result success-result"})
                            "No problems found. Time to analyse!")
-                 (apply dom/ul nil
+                 (apply dom/span nil
                         (om/build-all problem-component (sort compare-validity
                                                               (:problems data)))))))))
 
-(defn albums-component [albums owner]
+(defn albums-component
   "Render a list of albums and their validation results."
+  [album owner]
   (reify
     om/IRender
     (render [this]
-      (let [contents (remove #(= (type %) js/String) albums)]
-        (dom/div #js {:className "album-container"}
-                 (dom/div #js {:className "timespan"}
-                          (apply dom/div nil
-                                 (om/build-all timespan-component contents)))
-                 (dom/div #js {:className "album-details"}
-                          (dom/label nil (first albums))
-                          (apply dom/div nil
-                                 (om/build-all album-component contents))))))))
+      (dom/div #js {:className "album-container"}
+               (dom/div #js {:className "timespan"}
+                        (om/build timespan-component album))
+               (dom/div #js {:className "album-details"}
+                        (dom/label nil (first album))
+                        (om/build album-component (second album)))))))
 
-(defn album-view-component [app owner]
+(defn album-view-component
   "Render an album validation summary."
+  [app owner]
   (reify
     om/IRender
     (render [_]
-      (let [albums  (sort (comparator compare-album-validity)
-                          (sort-by first (vec (:albums app))))]
+      (let [albums (sort (comparator compare-album-validity)
+                         (sort-by first (vec (:albums app))))]
         (dom/div #js {:onClick nav/settings-hide!}
                  (dom/div #js {:className "validation-heading"}
                           (dom/h3 nil "Validation Results"))
-                 (apply dom/div nil (om/build-all albums-component albums)))))))
+                 (apply dom/div nil (om/build-all albums-component (into [] albums))))))))
 
 (defn reload-albums
   "Reload the available albums"
