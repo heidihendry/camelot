@@ -9,6 +9,24 @@
 
 (def day-formatter (tf/formatter "yyyy-MM-dd"))
 
+(defn compare-validity
+  "Predicate for comparing the severity of two problems."
+  [val-a val-b]
+  (let [ratings {:pass 0
+                 :warn 1
+                 :fail 2}]
+    (< (get ratings (:result val-a)) (get ratings (:result val-b)))))
+
+(defn compare-album-validity
+  "Predicate for sort ordering on problem results."
+  [[path-a alb-a] [path-b alb-b]]
+  (let [sevs #(keys (group-by :result (:problems %)))
+        ratings {:pass 0
+                 :warn 1
+                 :fail 2}]
+    (< (reduce #(+ (get ratings %2) %1) 0 (sevs alb-a))
+       (reduce #(+ (get ratings %2) %1) 0 (sevs alb-b)))))
+
 (defn show-import-dialog
   []
   (om/update! (state/import-dialog-state) :visible true))
@@ -57,7 +75,12 @@
   (reify
     om/IRender
     (render [this]
-      (dom/li #js {:className "album-problem"} (:reason problem)))))
+      (dom/div nil
+               (dom/span #js {:className "album-problem"}
+                         (condp = (:result problem)
+                           :fail (dom/span #js {:className "fa fa-remove album-result failure-result"})
+                           :warn (dom/span #js {:className "fa fa-exclamation-triangle album-result warning-result"}))
+                         (:reason problem))))))
 
 (defn album-component
   "Render a list of validation problems."
@@ -67,10 +90,12 @@
     (render [this]
       (dom/div nil
                (if (empty? (:problems data))
-                 (dom/label #js {:className "no-problems"}
-                            "No problems found. Time to analyse!")
+                 (dom/label #js {:className "album-problem"}
+                           (dom/span #js {:className "fa fa-check album-result success-result"})
+                           "No problems found. Time to analyse!")
                  (apply dom/ul nil
-                        (om/build-all problem-component (:problems data))))))))
+                        (om/build-all problem-component (sort compare-validity
+                                                              (:problems data)))))))))
 
 (defn albums-component [albums owner]
   "Render a list of albums and their validation results."
@@ -87,37 +112,17 @@
                           (apply dom/div nil
                                  (om/build-all album-component contents))))))))
 
-(defn album-summary-component [albums owner]
-  "Render a summary of album validation results."
-  (reify
-    om/IRender
-    (render [_]
-      (let [pass-rate (/ (->> albums
-                              (vals)
-                              (map :problems)
-                              (filter empty?)
-                              (count))
-                         (count albums))
-            inty 200
-            col-bias (* pass-rate inty)
-            fmt "Folders passing validation: %.1f%%"
-            colour (goog.string/format "rgb(%d, %d, 50)"
-                                       (- inty col-bias) col-bias)]
-        (dom/div #js {:className "album-validation-summary"}
-                 (dom/label #js {:style #js {:color colour}}
-                            (goog.string/format fmt (* pass-rate 100))))))))
-
 (defn album-view-component [app owner]
   "Render an album validation summary."
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:onClick nav/settings-hide!}
-               (dom/div #js {:className "validation-heading"}
-                        (dom/h3 nil "Validation Results")
-                        (dom/div nil (om/build album-summary-component (:albums app))))
-               (apply dom/div nil (om/build-all albums-component
-                                                (:albums app)))))))
+      (let [albums  (sort (comparator compare-album-validity)
+                          (sort-by first (vec (:albums app))))]
+        (dom/div #js {:onClick nav/settings-hide!}
+                 (dom/div #js {:className "validation-heading"}
+                          (dom/h3 nil "Validation Results"))
+                 (apply dom/div nil (om/build-all albums-component albums)))))))
 
 (defn reload-albums
   "Reload the available albums"

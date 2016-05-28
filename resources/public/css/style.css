@@ -388,9 +388,6 @@ pre.field-input {
 #page-content .section-body {
 
 }
-#page-content .album-details ul {
-    padding-left: 2rem;
-}
 #page-content .edit-btn {
     float: right;
 }
@@ -441,6 +438,12 @@ pre.field-input {
 }
 #page-content .album-result {
     float: left;
+}
+#page-content .album-problem .album-result {
+    padding-right: 0.6rem;
+    padding-top: 0.2rem;
+    width: 2rem;
+    text-align: center;
 }
 #page-content .timespan .date-range {
     clear: both;
