@@ -83,7 +83,7 @@
   "POST import state"
   [params cb]
   (go
-    (let [response (<! (util/request http/post (util/with-baseurl "/import-options")
+    (let [response (<! (util/request http/post (util/with-baseurl "/import/options")
                                      params))
           success (some #{(:status response)} success-status-codes)]
       (if success
@@ -91,7 +91,7 @@
           (cb response))
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "GET"
-                                                     (util/with-baseurl "/import-options")
+                                                     (util/with-baseurl "/import/options")
                                                      (:status response)
                                                      (:body response)))))))
 

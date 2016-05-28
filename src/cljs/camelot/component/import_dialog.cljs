@@ -11,8 +11,7 @@
   (when-not (:selections (state/import-dialog-state))
     (om/update! (state/import-dialog-state) :selections {}))
   (om/update! (:selections (state/import-dialog-state)) field (.. e -target -value))
-  (prn (:selections (state/import-dialog-state)))
-  (rest/post-import-state (deref (:selections (state/import-dialog-state)))
+  (rest/post-import-state {:data (deref (:selections (state/import-dialog-state)))}
                           #(om/update! (state/import-dialog-state)
                                        :options (:body %))))
 
@@ -41,7 +40,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/option #js {:value (:vkey data)} "Select..."))))
+      (dom/option #js {:value (:vkey data)} (:desc data)))))
 
 (defn location-selector-component
   [data owner]
@@ -58,19 +57,39 @@
                                   (count (get-in (state/resources-state) [:settings :root-path :value])))))
                (dom/div nil
                         (dom/label nil "Survey")
-                        (dom/select #js {:className "field-input" :onChange survey-select} (om/build-all option-component [{:vkey 1} {:vkey 2}] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange survey-select}
+                                    (om/build-all option-component
+                                                  (cons {:vkey nil :desc "Select..."}
+                                                        (get-in (state/import-dialog-state)
+                                                                [:options :surveys])) {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Survey Site")
-                        (dom/select #js {:className "field-input" :onChange survey-site-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange survey-site-select}
+                                    (om/build-all option-component
+                                                  (cons {:vkey nil :desc "Select..."}
+                                                        (get-in (state/import-dialog-state)
+                                                                [:options :survey-sites])) {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Trap Station")
-                        (dom/select #js {:className "field-input" :onChange trap-station-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange trap-station-select}
+                                    (om/build-all option-component
+                                                  (cons {:vkey nil :desc "Select..."}
+                                                        (get-in (state/import-dialog-state)
+                                                                [:options :trap-stations])) {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Trap Station Session")
-                        (dom/select #js {:className "field-input" :onChange trap-station-session-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
+                        (dom/select #js {:className "field-input" :onChange trap-station-session-select}
+                                    (om/build-all option-component
+                                                  (cons {:vkey nil :desc "Select..."}
+                                                        (get-in (state/import-dialog-state)
+                                                                [:options :trap-station-sessions])) {:key :vkey})))
                (dom/div nil
-                        (dom/label nil "Camera")
-                        (dom/select #js {:className "field-input" :onChange trap-station-session-camera-select} (om/build-all option-component [{:vkey 1}] {:key :vkey})))
+                        (dom/label nil "Session Camera")
+                        (dom/select #js {:className "field-input" :onChange trap-station-session-camera-select}
+                                    (om/build-all option-component
+                                                  (cons {:vkey nil :desc "Select..."}
+                                                        (get-in (state/import-dialog-state)
+                                                                [:options :trap-station-session-cameras])) {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Notes")
                         (dom/textarea #js {:className "field-input" :cols "42" :rows "2"}))))))
@@ -81,16 +100,21 @@
     om/IRender
     (render [_]
       (if (get-in app [:import-dialog :visible])
-        (dom/div #js {:className "content"}
-                 (dom/h3 nil "Import Media")
-                 (om/build location-selector-component (:import-dialog app))
-                 (dom/div #js {:className "button-container"}
-                          (dom/button #js {:className "btn btn-primary"
-                                           :onClick #(om/update! (state/import-dialog-state) :visible false)}
-                                      "Import")
-                          (dom/button #js {:className "btn btn-default"
-                                           :onClick #(om/update! (state/import-dialog-state) :visible false)}
-                                      "Cancel")))
+        (do
+          (when-not (:options (state/import-dialog-state))
+            (rest/post-import-state {:data (deref (:selections (state/import-dialog-state)))}
+                                    #(om/update! (state/import-dialog-state)
+                                                 :options (:body %))))
+          (dom/div #js {:className "content"}
+                   (dom/h3 nil "Import Media")
+                   (om/build location-selector-component (:import-dialog app))
+                   (dom/div #js {:className "button-container"}
+                            (dom/button #js {:className "btn btn-primary"
+                                             :onClick #(om/update! (state/import-dialog-state) :visible false)}
+                                        "Import")
+                            (dom/button #js {:className "btn btn-default"
+                                             :onClick #(om/update! (state/import-dialog-state) :visible false)}
+                                        "Cancel"))))
         (dom/span nil "")))))
 
 (defn not-found-page-component

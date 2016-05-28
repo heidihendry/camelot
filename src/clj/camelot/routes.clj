@@ -12,7 +12,8 @@
              [surveys :as surveys]
              [trap-station-session-cameras :as trap-station-session-cameras]
              [trap-station-sessions :as trap-station-sessions]
-             [trap-stations :as trap-stations]]
+             [trap-stations :as trap-stations]
+             [import :as import]]
             [clojure.java.io :as io]
             [compojure
              [core :refer [defroutes GET POST routes]]
@@ -39,6 +40,7 @@
           config/routes
           albums/routes
           screens/routes
+          import/routes
           surveys/routes
           sites/routes
           cameras/routes
