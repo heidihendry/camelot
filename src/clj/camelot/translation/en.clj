@@ -198,7 +198,7 @@
                                    :description "Common name by which this species is known."}
              :species-notes {:label "Notes"
                              :description "Notes about this species or its identification."}}
-   :application {:dashboard "Dashboard"
+   :application {:import "Data Import"
                  :surveys "Surveys"
                  :analysis "Analysis"
                  :sites "Sites"

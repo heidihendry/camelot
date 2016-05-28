@@ -123,7 +123,7 @@
                          (sort-by first (vec (:albums app))))]
         (dom/div #js {:onClick nav/settings-hide!}
                  (dom/div #js {:className "validation-heading"}
-                          (dom/h3 nil "Validation Results"))
+                          (dom/h4 nil "Data Import"))
                  (apply dom/div nil (om/build-all albums-component (into [] albums))))))))
 
 (defn reload-albums

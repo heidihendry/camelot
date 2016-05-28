@@ -43,7 +43,7 @@
   "Main navigation menu structure."
   [state]
   {:menu-items [{:url "/#/dashboard"
-                 :label (tr/translate (:config state) :application/dashboard)}
+                 :label (tr/translate (:config state) :application/import)}
                 {:url "/#/surveys"
                  :label (tr/translate (:config state) :application/surveys)}
                 {:url "/#/sites"
