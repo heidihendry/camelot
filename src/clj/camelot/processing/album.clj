@@ -9,7 +9,8 @@
             [camelot.model.album :as ma]
             [camelot.processing.photo :as photo]
             [camelot.processing.validation :refer [list-problems check-invalid-photos]]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [camelot.handler.trap-station-session-cameras :as trap-station-session-cameras]))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."
@@ -129,8 +130,13 @@
 (s/defn album-set :- {java.io.File ma/Album}
   "Return a datastructure representing all albums and their metadata"
   [state tree-data]
-  (let [to-album (fn [[k v]] (vector k (album state v)))]
-    (into {} (map to-album tree-data))))
+  (let [to-album (fn [[k v]] (hash-map k (album state v)))]
+    (into {} (mapv to-album tree-data))))
+
+(defn imported-album?
+  [state [file _]]
+  (nil? (trap-station-session-cameras/get-specific-by-import-path
+         state (.toString file))))
 
 (defn read-albums
   "Read photo directories and return metadata structured as albums."
@@ -142,4 +148,6 @@
       :else
       (->> dir
            (dt/read-tree state)
-           (album-set state)))))
+           (album-set state)
+           (filter (partial imported-album? state))
+           (into {})))))

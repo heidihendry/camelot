@@ -17,6 +17,11 @@
    id :- s/Num]
   (first (db/with-db-keys -get-specific {:trap-station-id id})))
 
+(s/defn get-specific-by-location :- (s/maybe TrapStation)
+  [state
+   data]
+  (first (db/with-db-keys -get-specific-by-location data)))
+
 (s/defn create!
   [state
    data :- TrapStationCreate]

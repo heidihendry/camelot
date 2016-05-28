@@ -43,6 +43,22 @@
                                                      (:status response)
                                                      (:body response)))))))
 
+(defn post-x
+  "POST import state"
+  [resource params cb]
+  (go
+    (let [response (<! (util/request http/post (util/with-baseurl resource)
+                                     params))
+          success (some #{(:status response)} success-status-codes)]
+      (if success
+        (when cb
+          (cb response))
+        (om/update! (state/app-state-cursor) :error (build-error
+                                                     "GET"
+                                                     (util/with-baseurl "/import/options")
+                                                     (:status response)
+                                                     (:body response)))))))
+
 (def get-application
   "Retrieve global application details"
   (partial get-x "/application"))
@@ -76,22 +92,6 @@
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "GET"
                                                      (util/with-baseurl resource)
-                                                     (:status response)
-                                                     (:body response)))))))
-
-(defn post-import-state
-  "POST import state"
-  [params cb]
-  (go
-    (let [response (<! (util/request http/post (util/with-baseurl "/import/options")
-                                     params))
-          success (some #{(:status response)} success-status-codes)]
-      (if success
-        (when cb
-          (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "GET"
-                                                     (util/with-baseurl "/import/options")
                                                      (:status response)
                                                      (:body response)))))))
 

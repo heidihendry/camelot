@@ -17,14 +17,14 @@
    id :- s/Num]
   (first (db/with-db-keys -get-specific {:site-id id})))
 
-(s/defn get-specific-by-name :- Site
+(s/defn get-specific-by-name
   [state
    data :- {:site-name s/Str}]
-  (db/with-db-keys -get-specific-by-name data))
+  (first (db/with-db-keys -get-specific-by-name data)))
 
 (s/defn create!
   [state
-   data :- SiteCreate]
+   data]
   (let [record (db/with-db-keys -create<! data)]
     (get-specific state (:1 record))))
 

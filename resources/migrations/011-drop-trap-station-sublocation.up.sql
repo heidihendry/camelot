@@ -1,0 +1,1 @@
+ALTER TABLE trap_station DROP COLUMN trap_station_sublocation

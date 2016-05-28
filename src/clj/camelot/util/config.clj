@@ -31,6 +31,7 @@
 
 (def os (System/getProperty "os.name"))
 (def db-name "Database")
+(def media-directory-name "Media")
 
 (defn- config-path
   "Return the full path where the configuration file is stored."
@@ -61,6 +62,21 @@
     SystemUtils/IS_OS_LINUX (db-path (str (env :home) "/.local/share"))
     SystemUtils/IS_OS_MAC_OSX (db-path (str (env :home) "/Library/Application Support"))
     :else (db-path ".")))
+
+(defn- media-path
+  "Return the full path where the database is stored."
+  [dir]
+  (format "%s%scamelot%s%s" dir SystemUtils/FILE_SEPARATOR
+          SystemUtils/FILE_SEPARATOR media-directory-name))
+
+(defn get-media-path
+  "Return the OS-specific path to the configuration file."
+  []
+  (cond
+    SystemUtils/IS_OS_WINDOWS (media-path (env :localappdata))
+    SystemUtils/IS_OS_LINUX (media-path (str (env :home) "/.local/share"))
+    SystemUtils/IS_OS_MAC_OSX (media-path (str (env :home) "/Library/Application Support"))
+    :else (media-path ".")))
 
 (defn- serialise-dates
   "Convert configuration dates to long (e.g., for serialisation)."

@@ -17,6 +17,11 @@
    id :- s/Num]
   (first (db/with-db-keys -get-specific {:survey-site-id id})))
 
+(s/defn get-specific-by-site :- (s/maybe SurveySite)
+  [state
+   data :- SurveySiteCreate]
+  (first (db/with-db-keys -get-specific-by-site data)))
+
 (s/defn create!
   [state
    data :- SurveySiteCreate]

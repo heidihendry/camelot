@@ -129,9 +129,7 @@
                         :label :camera-name}}
    :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
                 :menu [{:label (tr/translate (:config state) :action/delete)
-                        :action :delete}
-                       {:label (tr/translate (:config state) :action/import-media)
-                        :action :import-media}]}
+                        :action :delete}]}
    :layout [[:camera-id]]
    :schema {:camera-id {:type :select
                         :required true
@@ -161,14 +159,12 @@
                        {:label (tr/translate (:config state) :action/sessions)
                         :action :trap-station-sessions}]}
    :layout [[:trap-station-name]
-            [:trap-station-sublocation]
             [:trap-station-longitude]
             [:trap-station-latitude]
             [:trap-station-altitude]
             [:trap-station-notes]]
    :schema {:trap-station-name {:type :text
                                 :required true}
-            :trap-station-sublocation {:type :text}
             :trap-station-longitude {:type :number}
             :trap-station-latitude {:type :number}
             :trap-station-altitude {:type :number}

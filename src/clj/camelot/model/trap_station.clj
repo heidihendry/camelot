@@ -14,7 +14,6 @@
    :trap-station-longitude (s/pred valid-longitude?)
    :trap-station-latitude (s/pred valid-latitude?)
    :trap-station-altitude (s/maybe s/Num)
-   :trap-station-sublocation (s/maybe s/Str)
    :trap-station-notes (s/maybe s/Str)})
 
 (def TrapStation

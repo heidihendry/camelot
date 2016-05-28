@@ -1,0 +1,1 @@
+ALTER TABLE trap_station_session_camera DROP COLUMN trap_station_session_camera_import_path

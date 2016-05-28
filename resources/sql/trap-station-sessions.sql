@@ -26,6 +26,15 @@ SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
 FROM trap_station_session
 WHERE trap_station_session_id = :trap_station_session_id
 
+-- name: -get-specific-by-dates
+SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
+       trap_station_session_updated, trap_station_session_start_date,
+       trap_station_session_end_date, trap_station_session_notes
+FROM trap_station_session
+WHERE trap_station_id = :trap_station_id
+      AND trap_station_session_start_date = :trap_station_session_start_date
+      AND trap_station_session_end_date = :trap_station_session_end_date
+
 -- name: -get-all
 SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
        trap_station_session_updated, trap_station_session_start_date,

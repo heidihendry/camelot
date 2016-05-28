@@ -3,7 +3,8 @@
 
 (def TrapStationSessionCameraCreate
   {:camera-id s/Num
-   :trap-station-session-id s/Num})
+   :trap-station-session-id s/Num
+   :trap-station-session-camera-import-path (s/maybe s/Str)})
 
 (def TrapStationSessionCamera
   (merge TrapStationSessionCameraCreate

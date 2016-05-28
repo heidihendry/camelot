@@ -1,6 +1,7 @@
 (ns camelot.component.import-dialog
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
+            [camelot.component.albums :as albums]
             [camelot.state :as state]
             [camelot.nav :as nav]
             [clojure.string :as str]
@@ -20,15 +21,22 @@
       (when (> v p)
         (om/update! (:selections (state/import-dialog-state)) k nil)))))
 
+(defn post-import-state
+  []
+  (rest/post-x "/import/options" {:data (deref (:selections (state/import-dialog-state)))}
+               #(om/update! (state/import-dialog-state)
+                            :options (:body %))))
+
+(defn post-import
+  []
+  (rest/post-x "/import/media" {:data (deref (:selections (state/import-dialog-state)))}
+               #(albums/reload-albums)))
+
 (defn- generic-select
   [field e]
-  (when-not (:selections (state/import-dialog-state))
-    (om/update! (state/import-dialog-state) :selections {}))
   (invalidate-settings-following field)
   (om/update! (:selections (state/import-dialog-state)) field (.. e -target -value))
-  (rest/post-import-state {:data (deref (:selections (state/import-dialog-state)))}
-                          #(om/update! (state/import-dialog-state)
-                                       :options (:body %))))
+  (post-import-state))
 
 (defn survey-select
   [e]
@@ -56,6 +64,27 @@
     om/IRender
     (render [_]
       (dom/option #js {:value (:vkey data)} (:desc data)))))
+
+(defn simple-import-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (when-not (get-in (state/import-dialog-state) [:selections :folder])
+        (om/update! (get (state/import-dialog-state) :selections)
+                    :folder (subs (get (state/import-dialog-state) :path)
+                                  (count (get-in (state/resources-state) [:settings :root-path :value])))))
+      (dom/div #js {:className "import-location-selector"}
+               (dom/div nil
+                        (dom/label nil "Import from")
+                        (dom/div #js {:className "import-folder"}
+                                 (get-in (state/import-dialog-state) [:selections :folder])))
+               (dom/div nil
+                        (dom/label nil "Notes")
+                        (dom/textarea #js {:className "field-input" :cols "42" :rows "4"
+                                           :onChange #(om/transact! (:selections (state/import-dialog-state))
+                                                                    :notes
+                                                                    (fn [_] (.. % -target -value)))}))))))
 
 (defn location-selector-component
   [data owner]
@@ -121,16 +150,17 @@
     (render [_]
       (if (get-in app [:import-dialog :visible])
         (do
+          (when-not (:selections (state/import-dialog-state))
+            (om/update! (state/import-dialog-state) :selections {}))
           (when-not (:options (state/import-dialog-state))
-            (rest/post-import-state {:data (deref (:selections (state/import-dialog-state)))}
-                                    #(om/update! (state/import-dialog-state)
-                                                 :options (:body %))))
+            (post-import-state))
           (dom/div #js {:className "content"}
                    (dom/h3 nil "Import Media")
-                   (om/build location-selector-component (:import-dialog app))
+                   (om/build simple-import-component (:import-dialog app))
                    (dom/div #js {:className "button-container"}
                             (dom/button #js {:className "btn btn-primary"
                                              :onClick #(do
+                                                         (post-import)
                                                          (om/update! (state/import-dialog-state) :selections {})
                                                          (om/update! (state/import-dialog-state) :visible false))}
                                         "Import")

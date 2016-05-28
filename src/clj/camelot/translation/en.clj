@@ -118,6 +118,7 @@
             :future-timestamp "The timestamp on '%s' is in the future"
             :invalid-photos "A file is missing one or more essential fields: '%s'"
             :inconsistent-timeshift "The timeshifts from the original date/time are not consistent in this folder. (Tested '%s' and '%s')"
+            :gps-data-missing "GPS data is missing from '%s'. For the time being, media cannot be imported without GPS longitude and latitudes set."
             }
    :language {:en "English"
               :vn "Vietnamese"}

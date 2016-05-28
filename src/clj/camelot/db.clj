@@ -76,4 +76,8 @@
                       (rtc/into-index (:migrations ragtime-config))))
   ([c]
    (rtc/rollback-last (:datastore c)
-                      (rtc/into-index (:migrations c)))))
+                      (rtc/into-index (:migrations c))))
+  ([c n]
+   (rtc/rollback-last (:datastore c)
+                      (rtc/into-index (:migrations c))
+                      n)))

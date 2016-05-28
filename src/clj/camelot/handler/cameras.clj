@@ -17,10 +17,10 @@
    id :- s/Num]
   (first (db/with-db-keys -get-specific {:camera-id id})))
 
-(s/defn get-specific-by-name :- Camera
+(s/defn get-specific-by-name :- (s/maybe Camera)
   [state
    data :- {:camera-name s/Str}]
-  (db/with-db-keys -get-specific-by-name data))
+  (first (db/with-db-keys -get-specific-by-name data)))
 
 (s/defn create!
   [state

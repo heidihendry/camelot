@@ -1,12 +1,13 @@
 -- name: -create<!
-INSERT INTO trap_station_session_camera (trap_station_session_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id)
-VALUES (:trap_station_session_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :camera_id)
+INSERT INTO trap_station_session_camera (trap_station_session_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_camera_import_path)
+VALUES (:trap_station_session_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :camera_id, :trap_station_session_camera_import_path)
 
 -- name: -update!
 UPDATE trap_station_session_camera
 SET trap_station_session_camera_updated = CURRENT_TIMESTAMP,
     camera_id = :camera_id,
-    trap_station_session_id = :trap_station_session_id
+    trap_station_session_id = :trap_station_session_id,
+    trap_station_session_camera_import_path = :trap_station_session_camera_import_path
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 
 -- name: -delete!
@@ -14,13 +15,26 @@ DELETE FROM trap_station_session_camera
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 
 -- name: -get-specific
-SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_id, camera_name
+SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_id, camera_name, trap_station_session_camera_import_path
 FROM trap_station_session_camera
 LEFT JOIN camera using (camera_id)
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 
+-- name: -get-specific-by-camera
+SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_id, camera_name, trap_station_session_camera_import_path
+FROM trap_station_session_camera
+LEFT JOIN camera using (camera_id)
+WHERE trap_station_session_id = :trap_station_session_id
+      AND camera_id = :camera_id
+
+-- name: -get-specific-by-import-path
+SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_id, camera_name, trap_station_session_camera_import_path
+FROM trap_station_session_camera
+LEFT JOIN camera using (camera_id)
+WHERE trap_station_session_camera_import_path = :trap_station_session_camera_import_path
+
 -- name: -get-all
-SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, trap_station_session_id, camera_id, camera_name
+SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, trap_station_session_id, camera_id, camera_name, trap_station_session_camera_import_path
 FROM trap_station_session_camera
 LEFT JOIN camera using (camera_id)
 WHERE trap_station_session_id = :trap_station_session_id

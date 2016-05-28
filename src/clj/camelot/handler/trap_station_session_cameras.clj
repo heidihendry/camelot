@@ -18,6 +18,16 @@
    id :- s/Num]
   (first (db/with-db-keys -get-specific {:trap-station-session-camera-id id})))
 
+(s/defn get-specific-by-camera :- (s/maybe TrapStationSessionCamera)
+  [state
+   data]
+  (first (db/with-db-keys -get-specific-by-camera data)))
+
+(s/defn get-specific-by-import-path :- (s/maybe TrapStationSessionCamera)
+  [state
+   path]
+  (first (db/with-db-keys -get-specific-by-import-path {:trap-station-session-camera-import-path path})))
+
 (s/defn create!
   [state
    data :- TrapStationSessionCameraCreate]

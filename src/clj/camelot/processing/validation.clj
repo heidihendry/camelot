@@ -205,13 +205,22 @@
                   (ffirst (second (first shifts)))
                   (ffirst (second (second shifts))))}))))
 
+(defn check-location-gps-set
+  [state photo]
+  (let [loc (:location photo)]
+    (if (or (nil? (:gps-longitude loc))
+            (nil? (:gps-latitude loc)))
+      {:result :fail :reason (tr/translate (:config state) :checks/gps-data-missing
+                                           (:filename photo))})))
+
 (s/defn list-photo-problems
   [state photos]
   (let [tests {:project-dates check-project-dates
                :required-fields check-required-fields
                :sighting-consistency check-sighting-consistency
                :surveyed-species check-species
-               :future-timestamp check-future}]
+               :future-timestamp check-future
+               :location-gps-set check-location-gps-set}]
     (filter #(= (:result %) :fail)
             (flatten (map #(map (fn [[t f]] (f state %)) tests) photos)))))
 

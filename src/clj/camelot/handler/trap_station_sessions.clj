@@ -34,6 +34,13 @@
    id :- s/Num]
   (add-label (first (db/with-db-keys -get-specific {:trap-station-session-id id}))))
 
+(s/defn get-specific-by-dates :- (s/maybe TrapStationSessionLabeled)
+  [state
+   data]
+  (let [result (first (db/with-db-keys -get-specific-by-dates data))]
+    (when-not (or (nil? result) (empty? result))
+      (add-label result))))
+
 (s/defn create!
   [state
    data :- TrapStationSessionCreate]
