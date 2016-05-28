@@ -545,3 +545,6 @@ pre.field-input {
 #import-dialog .field-input {
     margin-bottom: 1rem;
 }
+#import-dialog .import-folder {
+    padding-bottom: 1rem;
+}

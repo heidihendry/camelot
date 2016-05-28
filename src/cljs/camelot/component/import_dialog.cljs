@@ -40,8 +40,8 @@
       (prn (get-in (state/resources-state) [:settings :root-path :value]))
       (dom/div #js {:className "import-location-selector"}
                (dom/div nil
-                        (dom/label nil "Folder")
-                        (dom/div nil
+                        (dom/label nil "Import from")
+                        (dom/div #js {:className "import-folder"}
                                  (subs
                                   (get (state/import-dialog-state) :path)
                                   (count (get-in (state/resources-state) [:settings :root-path :value])))))
@@ -62,7 +62,7 @@
                         (dom/select #js {:className "field-input" :onChange camera-select} (om/build-all option-component [1] {:key :vkey})))
                (dom/div nil
                         (dom/label nil "Notes")
-                        (dom/textarea #js {:className "field-input" :cols "42" :rows "3"}))))))
+                        (dom/textarea #js {:className "field-input" :cols "42" :rows "2"}))))))
 
 (defn import-dialog-component
   [app owner]
