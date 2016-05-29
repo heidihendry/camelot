@@ -58,6 +58,20 @@
 
 (defmulti input-field (fn [[k v]] (:type (:schema v))))
 
+(defmethod input-field :image
+  [[k v buf opts]]
+  (reify
+    om/IRender
+    (render [_]
+      (prn k)
+      (prn buf)
+      (let [val (get-in buf [k :value])]
+        (if (nil? val)
+          (dom/div nil "Preview not available")
+          (dom/a #js {:href (str (:image-resource-url opts) "/" val)}
+                 (dom/img #js {:className "input-field"
+                               :src (str (:image-resource-url opts) "/" val)})))))))
+
 (defmethod input-field :select
   [[k v buf opts] owner]
   (reify
@@ -152,8 +166,14 @@
     om/IRender
     (render [_]
       (if (:disabled opts)
-        (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
-          (dom/div nil (.format df (get-in buf [k :value]))))
+        (if (:detailed opts)
+          (let [df (DateTimeFormat. "EEE, dd LLL yyyy")
+                tf (DateTimeFormat. "HH:MM:ss")]
+            (dom/div nil
+                     (.format tf (get-in buf [k :value])) " on "
+                     (.format df (get-in buf [k :value]))))
+          (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
+            (dom/div nil (.format df (get-in buf [k :value])))))
         (when (get buf k)
           (om/build datepicker (get buf k)))))))
 

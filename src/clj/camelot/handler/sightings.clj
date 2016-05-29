@@ -10,7 +10,7 @@
 (s/defn get-all
   [state
    id :- s/Num]
-  (db/clj-keys (-get-all {:media-id id})))
+  (db/with-db-keys -get-all {:media-id id}))
 
 (s/defn get-specific
   [state
@@ -22,3 +22,34 @@
    data]
   (let [record (db/with-db-keys -create<! data)]
     (get-specific state (:1 record))))
+
+(s/defn update!
+  [state
+   id :- s/Num
+   data]
+  (db/with-db-keys -update! (merge data {:sighting-id id}))
+  (get-specific state (:sighting-id data)))
+
+(s/defn delete!
+  [state
+   id :- s/Num]
+  (db/with-db-keys -delete! {:sighting-id id}))
+
+(s/defn get-available
+  [state id]
+  (db/with-db-keys -get-available {:sighting-id id}))
+
+(s/defn get-alternatives
+  [state id]
+  (let [res (get-specific state id)]
+    (db/with-db-keys -get-alternatives res)))
+
+(def routes
+  (context "/sightings" []
+           (GET "/media/:id" [id] (rest/list-resources get-all :sighting id))
+           (GET "/:id" [id] (rest/specific-resource get-specific id))
+           (PUT "/:id" [id data] (rest/update-resource update! id data))
+           (GET "/available/:id" [id] (rest/list-available get-available id))
+           (GET "/alternatives/:id" [id] (rest/list-available get-alternatives id))
+           (POST "/" [data] (rest/create-resource create! data))
+           (DELETE "/:id" [id] (rest/delete-resource delete! id))))

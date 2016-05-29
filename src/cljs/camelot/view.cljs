@@ -53,6 +53,9 @@
    :survey-sites-available {:vkey :site-id
                             :desc :site-name
                             :baseurl "/survey-sites"}
+   :species-available {:vkey :species-id
+                       :desc :species-scientific-name
+                       :baseurl "/sightings"}
    :trap-station-session-cameras-available {:vkey :camera-id
                                             :desc :camera-name
                                             :baseurl "/trap-station-session-cameras"}})
@@ -150,7 +153,14 @@
                                    (cnav/breadnav! (str "/#/trap-station-session-cameras/" rid)
                                                   (util/get-breadcrumb-label vs)
                                                   (get-in vs [:selected-resource :details])))
-   :import-media (fn [vs rid] (js/alert "Not yet implemented."))
+   :media (fn [vs rid]
+            (cnav/breadnav! (str "/#/media/" rid)
+                            (util/get-breadcrumb-label vs)
+                            (get-in vs [:selected-resource :details])))
+   :sightings (fn [vs rid]
+                (cnav/breadnav! (str "/#/sightings/" rid)
+                                (util/get-breadcrumb-label vs)
+                                (get-in vs [:selected-resource :details])))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :load-resource-children load-resource-children
    :delete (fn [vs rid] (let [screen (util/get-screen vs)]
@@ -243,6 +253,8 @@
 (defroute "/#/surveys" [] (page-content-view :survey :create))
 (defroute "/#/trap-station-session-cameras/:id" [id] (page-content-view :trap-station-session-camera :create id))
 (defroute "/#/trap-station-sessions/:id" [id] (page-content-view :trap-station-session :create id))
+(defroute "/#/media/:id" [id] (page-content-view :media :create id))
+(defroute "/#/sightings/:id" [id] (page-content-view :sighting :create id))
 (defroute "/#/trap-stations/:id" [id] (page-content-view :trap-station :create id))
 (defroute "/#/survey-sites/:id" [id] (page-content-view :survey-site :create id))
 (defroute "/#/sites" [] (page-content-view :site :create))

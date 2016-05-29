@@ -90,7 +90,7 @@ invalid entry if not."
   [state raw-metadata]
   (let [strictly-required-fields ["Date/Time" "File Name"]
         missing (remove #(get raw-metadata %) strictly-required-fields)]
-    (when-not (empty? missing)
+    (when (seq missing)
       (str/join ", " missing))))
 
 (s/defn normalise :- PhotoMetadata

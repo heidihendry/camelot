@@ -19,13 +19,13 @@
   (let [nightfn (partial photo/night? (:night-start-hour (:config state)) (:night-end-hour (:config state)))
         ir-check-fn (partial photo/infrared-sane? nightfn
                              (:infrared-iso-value-threshold (:config state)))
-        ir-failed (count (remove identity (map ir-check-fn photos)))
-        night-total (count (filter #(nightfn (t/hour (:datetime %))) photos))]
-    (if (zero? night-total)
-      {:result :pass}
-      (if (> (/ ir-failed night-total) (:erroneous-infrared-threshold (:config state)))
+        ir-failed (count (remove identity (map ir-check-fn photos)))]
+    (if-let [night-violations (seq (filter #(nightfn (t/hour (:datetime %))) photos))]
+      (if (> (/ ir-failed (count night-violations))
+             (:erroneous-infrared-threshold (:config state)))
         {:result :warn :reason (tr/translate (:config state) :checks/time-light-sanity)}
-        {:result :pass}))))
+        {:result :pass})
+      {:result :pass})))
 
 (defn check-photo-stddev
   "Check the given photos have no outliers by date/time"
@@ -113,13 +113,12 @@
 (defn check-required-fields
   "Ensure all Require Fields contain data."
   [state photo]
-  (let [fields (:required-fields (:config state))
-        missing (filter #(nil? (photo/extract-path-value photo %)) fields)]
-    (if (empty? missing)
-      {:result :pass}
+  (let [fields (:required-fields (:config state))]
+    (if-let [missing (seq (filter #(nil? (photo/extract-path-value photo %)) fields))]
       {:result :fail
        :reason (tr/translate (:config state)
-                :checks/required-fields (:filename photo) (str/join ", " (map #(putil/path-description state %) missing)))})))
+                             :checks/required-fields (:filename photo) (str/join ", " (map #(putil/path-description state %) missing)))}
+      {:result :pass})))
 
 (defn check-album-has-data
   "Ensure the album has data."
@@ -158,16 +157,15 @@
 (defn check-species
   "Ensure the species of the photos are known to the survey"
   [state photo]
-  (let [m (->> (:sightings photo)
-               (map :species)
-               (remove #(or (nil? %) (re-find sighting-quantity-exclusions-re %)))
-               (map str/lower-case)
-               (remove (set (map str/lower-case (:surveyed-species (:config state))))))]
-    (if (empty? m)
-      {:result :pass}
-      {:result :fail
-       :reason (tr/translate (:config state) :checks/surveyed-species (:filename photo)
-                (str/join ", " m))})))
+  (if-let [m (seq (->> (:sightings photo)
+                    (map :species)
+                    (remove #(or (nil? %) (re-find sighting-quantity-exclusions-re %)))
+                    (map str/lower-case)
+                    (remove (set (map str/lower-case (:surveyed-species (:config state)))))))]
+    {:result :fail
+     :reason (tr/translate (:config state) :checks/surveyed-species (:filename photo)
+                           (str/join ", " m))}
+    {:result :pass}))
 
 (defn check-future
   "Ensure the timestamp on the photos is not in the future."
@@ -181,11 +179,10 @@
 (defn check-invalid-photos
   "Check the album for invalid photos."
   [state photos]
-  (let [res (first (filter #(contains? % :invalid) photos))]
-    (if (nil? res)
-      {:result :pass}
-      {:result :fail
-       :reason (tr/translate (:config state) :checks/invalid-photos (:invalid res))})))
+  (if-let [res (first (filter #(contains? % :invalid) photos))]
+    {:result :fail
+     :reason (tr/translate (:config state) :checks/invalid-photos (:invalid res))}
+    {:result :pass}))
 
 (defn check-timeshift-consistency
   "Check that any timeshift applied to files is consistent across the album."
@@ -238,7 +235,7 @@
             (map (fn [[t f]]
                    (let [res (f state photos)]
                      (when (not= (:result res) :pass)
-                       (assoc res 
+                       (assoc res
                               :reason (if (:reason res)
                                         (:reason res)
                                         (->> t

@@ -185,11 +185,26 @@
    :actionmenu {:title "Actions"}
    :action {:survey-sites "View Survey Sites"
             :trap-stations "View Trap Stations"
+            :sightings "View Sightings"
+            :media "View Media"
             :sessions "View Sessions"
             :trap-station-session-cameras "View Cameras"
-            :import-media "Import Media"
             :edit "Edit"
             :delete "Delete"}
+   :sighting {:sidebar-title "Sightings"
+              :title "Sighting"
+              :species-id {:label "Species"
+                           :description "Species in the media"}
+              :sighting-quantity {:label "Quantity"
+                                  :description "Quantity of this species in the media."}}
+   :media {:sidebar-title "Media"
+           :title "Media"
+           :media-filename {:label "Capture"
+                            :description "The photo"}
+           :media-capture-timestamp {:label "Capture Time"
+                                     :description "Capture time"}
+           :media-notes {:label "Notes"
+                         :description "Notes about this capture"}}
    :species {:sidebar-title "Species"
              :title "Species"
              :species-scientific-name {:label "Scientific Name"

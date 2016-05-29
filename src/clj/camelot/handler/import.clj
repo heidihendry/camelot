@@ -179,14 +179,14 @@
             targetname (str (util.config/get-media-path) "/"
                             (str/lower-case filename))
             media (media/create! state {:media-capture-timestamp (:datetime photo)
-                                  :media-filename filename
-                                  :media-cameracheck (if (nil? (:species (first (:sightings photo))))
-                                                       false
-                                                       (not (nil? (re-matches #"(?i)\bcamera-check\b"
-                                                                              (:species (first (:sightings photo)))))))
-                                  :media-attention-needed false
-                                  :media-notes notes
-                                  :trap-station-session-camera-id (:trap-station-session-camera-id trap-station-session-camera)})]
+                                        :media-filename (str/lower-case filename)
+                                        :media-cameracheck (if (nil? (:species (first (:sightings photo))))
+                                                             false
+                                                             (not (nil? (re-matches #"(?i)\bcamera-check\b"
+                                                                                    (:species (first (:sightings photo)))))))
+                                        :media-attention-needed false
+                                        :media-notes notes
+                                        :trap-station-session-camera-id (:trap-station-session-camera-id trap-station-session-camera)})]
 
         (photos/create! state {:photo-iso-setting (:iso camset)
                                :photo-aperture-setting (:aperture camset)

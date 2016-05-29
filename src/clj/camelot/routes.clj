@@ -8,6 +8,8 @@
              [maxent :as maxent]
              [screens :as screens]
              [sites :as sites]
+             [media :as media]
+             [sightings :as sightings]
              [survey-sites :as survey-sites]
              [surveys :as surveys]
              [trap-station-session-cameras :as trap-station-session-cameras]
@@ -46,6 +48,8 @@
           surveys/routes
           sites/routes
           cameras/routes
+          media/routes
+          sightings/routes
           camera-statuses/routes
           survey-sites/routes
           trap-stations/routes

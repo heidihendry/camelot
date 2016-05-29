@@ -67,7 +67,10 @@
                                    (when (get-in value [:schema :required])
                                      (dom/label #js {:className "required-asterisk"} "*")))
                    (om/build inputs/input-field
-                             [(first menu-item) value buf opts])))))))
+                             [(first menu-item) value buf
+                              (if (get-in value [:schema :detailed])
+                                (merge opts {:detailed true})
+                                opts)])))))))
 
 (defn body-component
   "Render all fields in the body"
@@ -83,6 +86,7 @@
                   :generator-args {:id (if (= (get-in vs [:screen :mode]) :create)
                                          (util/get-parent-resource-id vs)
                                          (util/get-resource-id vs))}
+                  :image-resource-url "/media/photo"
                   :metadata (let [md-schema (get-in vs [:events-ref :metadata-schema])]
                               (and md-schema (md-schema)))}]
         (apply dom/div #js {:className "section-body"}
@@ -156,7 +160,7 @@
                               (get data :view-state))}
               (let [label (get (:item data) (get data :label))]
                 (if (= (type label) DateTime)
-                  (let [df (DateTimeFormat. "yyyy-MM-dd")]
+                  (let [df (DateTimeFormat. "yyyy-MM-dd HH:MM:ss")]
                     (dom/a nil (.format df label)))
                   (dom/a nil label)))))))
 

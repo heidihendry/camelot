@@ -34,9 +34,9 @@
 (defn- species-location-reducer
   "Reducing function for species location."
   [acc photo]
-  (let [maybe-conj #(if (or (nil? %) (empty? %))
-                       acc
-                       (conj acc %))]
+  (let [maybe-conj #(if (seq %)
+                      (conj acc %)
+                      acc)]
     (->> photo
          (photo/flatten-sightings)
          (map build-row-descriptor)

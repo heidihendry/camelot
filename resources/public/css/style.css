@@ -267,6 +267,11 @@ pre.field-input {
   font-size: 100%;
   color: #333;
 }
+#page-content img.input-field {
+    position: relative;
+    max-height: 30rem;
+    display: block;
+}
 #settings .list-item {
   background: #1175aa;
   padding: 0.5rem;

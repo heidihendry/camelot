@@ -38,7 +38,7 @@
   [state
    data]
   (let [result (first (db/with-db-keys -get-specific-by-dates data))]
-    (when-not (or (nil? result) (empty? result))
+    (when (seq result)
       (add-label result))))
 
 (s/defn create!

@@ -129,7 +129,9 @@
                         :label :camera-name}}
    :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
                 :menu [{:label (tr/translate (:config state) :action/delete)
-                        :action :delete}]}
+                        :action :delete}
+                       {:label (tr/translate (:config state) :action/media)
+                        :action :media}]}
    :layout [[:camera-id]]
    :schema {:camera-id {:type :select
                         :required true
@@ -209,6 +211,67 @@
                                         :event :trap-station-session-create}
                               :error {:type :event
                                       :event :trap-station-session-error}}}}})
+
+(defsmith media smiths
+  [state]
+  {:resource {:type :media
+              :title (tr/translate (:config state) :media/title)
+              :endpoint "/media"
+              :parent-id-key :camera-trap-session-camera-id
+              :id :media-id}
+   :sidebar {:resource {:endpoint "/media/trap-station-session-camera"
+                        :title (tr/translate (:config state) :media/sidebar-title)
+                        :type :media
+                        :id :media-id
+                        :label :media-capture-timestamp}}
+   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
+                :menu [{:label (tr/translate (:config state) :action/delete)
+                        :action :delete}
+                       {:label (tr/translate (:config state) :action/edit)
+                        :action :edit-mode}
+                       {:label (tr/translate (:config state) :action/sightings)
+                        :action :sightings}]}
+   :layout [[:media-filename]
+            [:media-capture-timestamp]
+            [:media-notes]]
+   :schema {:media-filename {:type :image}
+            :media-capture-timestamp {:type :datetime
+                                      :required true
+                                      :detailed true}
+            :media-notes {:type :textarea}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :media-create}
+                              :error {:type :event
+                                      :event :media-error}}}}})
+
+(defsmith sighting smiths
+  [state]
+  {:resource {:type :sighting
+              :title (tr/translate (:config state) :sighting/title)
+              :endpoint "/sightings"
+              :parent-id-key :media-id
+              :id :sighting-id}
+   :sidebar {:resource {:endpoint "/sightings/media"
+                        :title (tr/translate (:config state) :sighting/sidebar-title)
+                        :type :sighting
+                        :id :sighting-id
+                        :label :species-scientific-name}}
+   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
+                :menu [{:label (tr/translate (:config state) :action/delete)
+                        :action :delete}
+                       {:label (tr/translate (:config state) :action/edit)
+                        :action :edit-mode}]}
+   :layout [[:species-id]
+            [:sighting-quantity]]
+   :schema {:species-id {:type :select
+                         :required true
+                         :generator :species-available}
+            :sighting-quantity {:type :number
+                                :required true}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :sighting-create}
+                              :error {:type :event
+                                      :event :sighting-error}}}}})
 
 (defsmith species smiths
   [state]

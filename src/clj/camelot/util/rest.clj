@@ -62,7 +62,9 @@
   (format "/%s/%s"
           (if (= (name resource-key) "species")
             "species"
-            (str (name resource-key) "s"))
+            (if (= (name resource-key) "media")
+              "media"
+              (str (name resource-key) "s")))
           id))
 
 (defn- resource-key-to-id
