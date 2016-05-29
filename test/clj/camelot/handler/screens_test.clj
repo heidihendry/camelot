@@ -9,7 +9,7 @@
 
 (def defined-screens
   #{:camera :survey :survey-site :site :trap-station :trap-station-session
-    :trap-station-session-camera :settings :species})
+    :trap-station-session-camera :settings :species :photo :media :sighting})
 
 (facts "Screen smith"
   (fact "Should contain keys for all known screens"
