@@ -10,7 +10,7 @@
 (s/defn get-all
   [state
    id :- s/Num]
-  (db/clj-keys (-get-all {:media-id id})))
+  (db/with-db-keys -get-all {:media-id id}))
 
 (s/defn get-specific
   [state
@@ -22,3 +22,23 @@
    data]
   (let [record (db/with-db-keys -create<! data)]
     (get-specific state (:1 record))))
+
+(s/defn update!
+  [state
+   id :- s/Num
+   data]
+  (db/with-db-keys -update! (merge data {:photo-id id}))
+  (get-specific state (:photo-id data)))
+
+(s/defn delete!
+  [state
+   id :- s/Num]
+  (db/with-db-keys -delete! {:photo-id id}))
+
+(def routes
+  (context "/photos" []
+           (GET "/media/:id" [id] (rest/list-resources get-all :photo id))
+           (GET "/:id" [id] (rest/specific-resource get-specific id))
+           (PUT "/:id" [id data] (rest/update-resource update! id data))
+           (POST "/" [data] (rest/create-resource create! data))
+           (DELETE "/:id" [id] (rest/delete-resource delete! id))))

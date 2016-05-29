@@ -230,7 +230,9 @@
                        {:label (tr/translate (:config state) :action/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/sightings)
-                        :action :sightings}]}
+                        :action :sightings}
+                       {:label (tr/translate (:config state) :action/photo)
+                        :action :photos}]}
    :layout [[:media-filename]
             [:media-capture-timestamp]
             [:media-notes]]
@@ -243,6 +245,44 @@
                                         :event :media-create}
                               :error {:type :event
                                       :event :media-error}}}}})
+
+(defsmith photo smiths
+  [state]
+  {:resource {:type :photo
+              :title (tr/translate (:config state) :photo/title)
+              :endpoint "/photos"
+              :parent-id-key :media-id
+              :id :photo-id}
+   :sidebar {:resource {:endpoint "/photos/media"
+                        :title (tr/translate (:config state) :photo/sidebar-title)
+                        :type :photo
+                        :id :photo-id
+                        :label :photo-created}}
+   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
+                :menu [{:label (tr/translate (:config state) :action/delete)
+                        :action :delete}
+                       {:label (tr/translate (:config state) :action/edit)
+                        :action :edit-mode}]}
+   :layout [[:photo-iso-setting]
+            [:photo-exposure-value]
+            [:photo-flash-setting]
+            [:photo-focal-length]
+            [:photo-fnumber-setting]
+            [:photo-orientation]
+            [:photo-resolution-x]
+            [:photo-resolution-y]]
+   :schema {:photo-iso-setting {:type :number}
+            :photo-exposure-value {:type :text}
+            :photo-focal-length {:type :text}
+            :photo-flash-setting {:type :text}
+            :photo-fnumber-setting {:type :text}
+            :photo-orientation {:type :text}
+            :photo-resolution-x {:type :number}
+            :photo-resolution-y {:type :number}}
+   :states {:create {:submit {:success {:type :event
+                                        :event :photo-create}
+                              :error {:type :event
+                                      :event :photo-error}}}}})
 
 (defsmith sighting smiths
   [state]

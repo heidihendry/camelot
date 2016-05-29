@@ -8,6 +8,7 @@
              [maxent :as maxent]
              [screens :as screens]
              [sites :as sites]
+             [photos :as photos]
              [media :as media]
              [sightings :as sightings]
              [survey-sites :as survey-sites]
@@ -49,6 +50,7 @@
           sites/routes
           cameras/routes
           media/routes
+          photos/routes
           sightings/routes
           camera-statuses/routes
           survey-sites/routes

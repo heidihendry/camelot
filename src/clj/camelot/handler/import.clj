@@ -174,8 +174,8 @@
     (doseq [photo (vals (:photos album))]
       (let [filename (str (java.util.UUID/randomUUID)
                           (subs (:filename photo)
-                                (- (count (:filename photo)) 4)))
-            camset (:camera-settings sample)
+                                (- (count (:filename photo)) 4))) 
+            camset (:settings sample)
             targetname (str (util.config/get-media-path) "/"
                             (str/lower-case filename))
             media (media/create! state {:media-capture-timestamp (:datetime photo)
@@ -195,8 +195,8 @@
                                :photo-focal-length (:focal-length camset)
                                :photo-fnumber-setting (:fstop camset)
                                :photo-orientation (:orientation camset)
-                               :photo-resolution-x (:width camset)
-                               :photo-resolution-y (:height camset)
+                               :photo-resolution-x (:resolution-x camset)
+                               :photo-resolution-y (:resolution-y camset)
                                :media-id (:media-id media)})
 
         (create-sightings state (:media-id media) (:sightings photo))

@@ -157,6 +157,10 @@
             (cnav/breadnav! (str "/#/media/" rid)
                             (util/get-breadcrumb-label vs)
                             (get-in vs [:selected-resource :details])))
+   :photos (fn [vs rid]
+             (cnav/breadnav! (str "/#/photos/" rid)
+                             (util/get-breadcrumb-label vs)
+                             (get-in vs [:selected-resource :details])))
    :sightings (fn [vs rid]
                 (cnav/breadnav! (str "/#/sightings/" rid)
                                 (util/get-breadcrumb-label vs)
@@ -254,6 +258,7 @@
 (defroute "/#/trap-station-session-cameras/:id" [id] (page-content-view :trap-station-session-camera :create id))
 (defroute "/#/trap-station-sessions/:id" [id] (page-content-view :trap-station-session :create id))
 (defroute "/#/media/:id" [id] (page-content-view :media :create id))
+(defroute "/#/photos/:id" [id] (page-content-view :photo :create id))
 (defroute "/#/sightings/:id" [id] (page-content-view :sighting :create id))
 (defroute "/#/trap-stations/:id" [id] (page-content-view :trap-station :create id))
 (defroute "/#/survey-sites/:id" [id] (page-content-view :survey-site :create id))

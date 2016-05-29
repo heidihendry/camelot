@@ -188,6 +188,7 @@
             :sightings "View Sightings"
             :media "View Media"
             :sessions "View Sessions"
+            :photo "View Photo Metadata"
             :trap-station-session-cameras "View Cameras"
             :edit "Edit"
             :delete "Delete"}
@@ -205,6 +206,26 @@
                                      :description "Capture time"}
            :media-notes {:label "Notes"
                          :description "Notes about this capture"}}
+   :photo {:sidebar-title "Photo"
+           :title "Photo Details"
+           :photo-iso-setting {:label "ISO setting"
+                               :description "The ISO setting at the time the photo was taken."}
+           :photo-aperture-setting {:label "Aperture"
+                                    :description "The aperture of the lens at the time the photo was taken."}
+           :photo-exposure-value {:label "Exposure value"
+                                  :description "The calculated exposure value of the photo."}
+           :photo-flash-setting {:label "Flash setting"
+                                 :description "The flash setting at the time the photo was taken."}
+           :photo-fnumber-setting {:label "F-Number"
+                                   :description "The f-number setting at the time the photo was taken."}
+           :photo-orientation {:label "Orientation"
+                               :description "The orientation of the camera when the photo was taken."}
+           :photo-resolution-x {:label "Width (pixels)"
+                                :description "The width of the photo in pixels."}
+           :photo-resolution-y {:label "Height (pixels)"
+                                :description "The height of the photo in pixels."}
+           :photo-focal-length {:label "Focal length"
+                                :description "The focal length at the time the photo was taken."}}
    :species {:sidebar-title "Species"
              :title "Species"
              :species-scientific-name {:label "Scientific Name"
