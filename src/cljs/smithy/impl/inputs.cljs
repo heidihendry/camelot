@@ -63,8 +63,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn k)
-      (prn buf)
       (let [val (get-in buf [k :value])]
         (if (nil? val)
           (dom/div nil "Preview not available")
@@ -78,7 +76,14 @@
     om/IWillMount
     (will-mount [_]
       (when (nil? (get buf k))
-        (om/update! buf k {:value nil})))
+        (om/update! buf k {:value nil}))
+      (let [generator (get-in v [:schema :generator])
+            gen-template (get-in opts [:generators generator])
+            generator-fn (:generator-fn opts)]
+        (when (and generator generator-fn)
+          (om/update! (get opts :generator-data) generator {})
+          (generator-fn gen-template (get opts :generator-data) generator
+                        (get opts :generator-args)))))
     om/IWillUpdate
     (will-update [this next-props next-state]
       (let [generator (get-in v [:schema :generator])
