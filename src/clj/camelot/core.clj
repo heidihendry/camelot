@@ -1,4 +1,6 @@
 (ns camelot.core
+  "Camelot - Camera Trap management software for conservation research.
+  Core initialisation."
   (:require [camelot.util.transit :as tutil]
             [camelot.db :as db]
             [camelot.routes :refer [app-routes]]

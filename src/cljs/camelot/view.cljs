@@ -1,4 +1,5 @@
 (ns camelot.view
+  "Top-level application view definitions."
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [camelot.state :as state]

@@ -9,7 +9,7 @@
 
 (def defined-screens
   #{:camera :survey :survey-site :site :trap-station :trap-station-session
-    :trap-station-session-camera :settings})
+    :trap-station-session-camera :settings :species})
 
 (facts "Screen smith"
   (fact "Should contain keys for all known screens"
@@ -24,7 +24,7 @@
       (type (get-in (sut/all-screens (gen-state-helper {})) path)) => String))
 
   (fact "Schemas should have field schema types"
-    (let [path [:trap-station :schema :trap-station-sublocation :schema :type]]
+    (let [path [:site :schema :site-sublocation :schema :type]]
       (get-in (sut/all-screens (gen-state-helper {})) path) => :text))
 
   (fact "Schemas should have layouts"
