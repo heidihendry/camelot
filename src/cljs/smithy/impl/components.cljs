@@ -3,7 +3,7 @@
             [om.dom :as dom :include-macros true]
             [smithy.impl.inputs :as inputs]
             [smithy.util :as util])
-  (:import [goog.date DateTime]
+  (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat]))
 
 (defn actionmenu-item-component
@@ -159,7 +159,7 @@
                               (get data :uri)
                               (get data :view-state))}
               (let [label (get (:item data) (get data :label))]
-                (if (= (type label) DateTime)
+                (if (= (type label) UtcDateTime)
                   (let [df (DateTimeFormat. "yyyy-MM-dd HH:MM:ss")]
                     (dom/a nil (.format df label)))
                   (dom/a nil label)))))))

@@ -3,7 +3,7 @@
   (:require [cljs-http.client :as http]
             [cognitect.transit :as transit]
             [cljs-time.core :as t])
-  (:import [goog.date DateTime]))
+  (:import [goog.date UtcDateTime]))
 
 (defn nights-elapsed
   "Calculate the number of `nights' between two dates."
@@ -37,7 +37,7 @@
 (defn- transit-date-reader
   "Transit date/time reader"
   [s]
-  (DateTime.fromTimestamp s))
+  (UtcDateTime.fromTimestamp s))
 
 (def transit-read-handlers
   "Transit readers"
@@ -46,7 +46,7 @@
 
 (def transit-write-handlers
   "Transite writers"
-  {DateTime transit-date-writer})
+  {UtcDateTime transit-date-writer})
 
 (defn- request
   "Make a GET or POST request."

@@ -4,7 +4,7 @@
             [smithy.impl.state :as state]
             [clojure.string :as string]
             [om-datepicker.components :refer [datepicker]])
-  (:import [goog.date DateTime]
+  (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat]))
 
 (defn- lookup-md-desc
@@ -162,7 +162,7 @@
     om/IWillMount
     (will-mount [_]
       (when (nil? (get buf k))
-        (om/update! buf k {:value (DateTime.)})))
+        (om/update! buf k {:value (UtcDateTime.)})))
     om/IRender
     (render [_]
       (if (:disabled opts)
