@@ -174,7 +174,7 @@
     (doseq [photo (vals (:photos album))]
       (let [filename (str (java.util.UUID/randomUUID)
                           (subs (:filename photo)
-                                (- (count (:filename photo)) 4))) 
+                                (- (count (:filename photo)) 4)))
             camset (:settings sample)
             targetname (str (util.config/get-media-path) "/"
                             (str/lower-case filename))

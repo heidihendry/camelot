@@ -129,9 +129,9 @@
 (defn reload-albums
   "Reload the available albums"
   []
-  (om/update! (state/app-state-cursor) :loading true)
+  (om/update! (state/app-state-cursor) :loading "Loading Data")
   (rest/get-albums #(let [resp (:body %)]
-                      (om/update! (state/app-state-cursor) :loading false)
+                      (om/update! (state/app-state-cursor) :loading nil)
                       (if (= (type resp) js/String)
                         (do
                           (nav/settings-show!)

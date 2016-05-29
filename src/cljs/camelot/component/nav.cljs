@@ -49,10 +49,10 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (when (= (:loading data) true)
+               (when (:loading data)
                  (dom/label #js {:className "loading"}
                             (dom/img #js {:src "images/spinner.gif" :height "32px"})
-                            "Loading Data"))
+                            (:loading data)))
                (apply dom/ul #js {:className "nav navbar-nav"}
                       (om/build-all nav-item-component
                                     (remove nil? (:menu-items (:nav (:application data))))))))))

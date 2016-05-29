@@ -29,8 +29,11 @@
 
 (defn post-import
   []
+  (om/update! (state/app-state-cursor) :loading "Uploading")
   (rest/post-x "/import/media" {:data (deref (:selections (state/import-dialog-state)))}
-               #(albums/reload-albums)))
+               #(do
+                  (om/update! (state/app-state-cursor) :loading nil)
+                  (albums/reload-albums))))
 
 (defn- generic-select
   [field e]
