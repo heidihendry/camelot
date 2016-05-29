@@ -1,4 +1,4 @@
-(defproject camelot "0.3.5"
+(defproject camelot "0.3.6-SNAPSHOT"
   :description "Camelot - Camera Trap Management"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
