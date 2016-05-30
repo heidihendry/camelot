@@ -130,6 +130,8 @@
    :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
                 :menu [{:label (tr/translate (:config state) :action/delete)
                         :action :delete}
+                       {:label (tr/translate (:config state) :action/edit)
+                        :action :edit-mode}
                        {:label (tr/translate (:config state) :action/media)
                         :action :media}]}
    :layout [[:camera-id]]
