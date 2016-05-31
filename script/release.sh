@@ -67,8 +67,6 @@ lein with-profiles -dev,-user,+uberjar uberjar
 
 echo "Uploading release... "
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
-echo "To Google Drive... "
-gdrive upload "target/${PROJECT_NAME}.jar" --name "$PROJECT_NAME-${released_version}.jar" -p ${CAMELOT_GDRIVE_RELEASE_PARENT}
 echo "To Bitbucket... "
 mv "target/${PROJECT_NAME}.jar" "target/$PROJECT_NAME-${released_version}.jar"
 curl -u ${BITBUCKET_CREDENTIALS} -X POST ${DOWNLOADS_URL} -F "files=@target/$PROJECT_NAME-${released_version}.jar"
