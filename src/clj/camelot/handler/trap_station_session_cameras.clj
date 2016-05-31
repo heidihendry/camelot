@@ -15,51 +15,51 @@
   [state session-id]
   (let [session (trap-station-sessions/get-specific state session-id)]
     (when session
-      (db/with-db-keys -get-active session))))
+      (db/with-db-keys state -get-active session))))
 
 (s/defn get-all :- [TrapStationSessionCamera]
   [state id]
-  (db/with-db-keys -get-all {:trap-station-session-id id}))
+  (db/with-db-keys state -get-all {:trap-station-session-id id}))
 
 (s/defn get-specific :- TrapStationSessionCamera
   [state
    id :- s/Num]
-  (first (db/with-db-keys -get-specific {:trap-station-session-camera-id id})))
+  (first (db/with-db-keys state -get-specific {:trap-station-session-camera-id id})))
 
 (s/defn get-specific-by-camera :- (s/maybe TrapStationSessionCamera)
   [state
    data]
-  (first (db/with-db-keys -get-specific-by-camera data)))
+  (first (db/with-db-keys state -get-specific-by-camera data)))
 
 (s/defn get-specific-by-import-path :- (s/maybe TrapStationSessionCamera)
   [state
    path]
-  (first (db/with-db-keys -get-specific-by-import-path {:trap-station-session-camera-import-path path})))
+  (first (db/with-db-keys state -get-specific-by-import-path {:trap-station-session-camera-import-path path})))
 
 (s/defn create!
   [state
    data :- TrapStationSessionCameraCreate]
-  (let [record (db/with-db-keys -create<! data)]
+  (let [record (db/with-db-keys state -create<! data)]
     (get-specific state (:1 record))))
 
 (s/defn update!
   [state
    id :- s/Num
    data :- TrapStationSessionCamera]
-  (db/with-db-keys -update! (merge data {:trap-station-session-camera-id id}))
+  (db/with-db-keys state -update! (merge data {:trap-station-session-camera-id id}))
   (get-specific state (:trap-station-session-camera-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
-  (db/with-db-keys -delete! {:trap-station-session-camera-id id}))
+  (db/with-db-keys state -delete! {:trap-station-session-camera-id id}))
 
 (s/defn get-available
   "Return the available cameras, factoring in whether they're in use elsewhere."
   [state id]
   (let [active (map :camera-id (get-active state id))]
     (->> {:trap-station-session-id id}
-         (db/with-db-keys -get-available)
+         (db/with-db-keys state -get-available)
          (remove #(some #{(:camera-id %)} active)))))
 
 (s/defn get-alternatives
@@ -69,7 +69,7 @@
         active (map :camera-id (get-active state (:trap-station-session-id res)))]
     (prn active)
     (->> res
-         (db/with-db-keys -get-alternatives)
+         (db/with-db-keys state -get-alternatives)
          (remove #(and (some #{(:camera-id %)} active)
                        (not= (:camera-id res) (:camera-id %)))))))
 

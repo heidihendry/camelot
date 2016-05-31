@@ -20,7 +20,7 @@
 (s/defn get-all :- [CameraStatus]
   "Retrieve, translate and return all available camera statuses."
   [state]
-  (->> (-get-all)
+  (->> (db/with-connection (:connection state) -get-all)
        (db/clj-keys)
        (translate-statuses state)))
 

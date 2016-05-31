@@ -10,39 +10,39 @@
 (s/defn get-all
   [state
    id :- s/Num]
-  (db/with-db-keys -get-all {:media-id id}))
+  (db/with-db-keys state -get-all {:media-id id}))
 
 (s/defn get-specific
   [state
    id :- s/Num]
-  (first (db/with-db-keys -get-specific {:sighting-id id})))
+  (first (db/with-db-keys state -get-specific {:sighting-id id})))
 
 (s/defn create!
   [state
    data]
-  (let [record (db/with-db-keys -create<! data)]
+  (let [record (db/with-db-keys state -create<! data)]
     (get-specific state (:1 record))))
 
 (s/defn update!
   [state
    id :- s/Num
    data]
-  (db/with-db-keys -update! (merge data {:sighting-id id}))
+  (db/with-db-keys state -update! (merge data {:sighting-id id}))
   (get-specific state (:sighting-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
-  (db/with-db-keys -delete! {:sighting-id id}))
+  (db/with-db-keys state -delete! {:sighting-id id}))
 
 (s/defn get-available
   [state id]
-  (db/with-db-keys -get-available {:sighting-id id}))
+  (db/with-db-keys state -get-available {:sighting-id id}))
 
 (s/defn get-alternatives
   [state id]
   (let [res (get-specific state id)]
-    (db/with-db-keys -get-alternatives res)))
+    (db/with-db-keys state -get-alternatives res)))
 
 (def routes
   (context "/sightings" []

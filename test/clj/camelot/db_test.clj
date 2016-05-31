@@ -37,21 +37,33 @@
 
 (facts "Converting to database types"
   (fact "Converts columns in a single record"
-    (let [data {:column-name "MyData"}]
+    (let [data {:column-name "MyData"}
+          state {}]
       (sut/db-keys data) => {:column_name "MyData"}))
 
   (fact "Returns an empty hash when passed nil"
-    (let [data nil]
+    (let [data nil
+          state {}]
       (sut/db-keys data) => {}))
 
   (fact "Converts to SQL Timestamps"
     (let [date (t/date-time 2015 10 10 1 1 5)
           date-long (tc/to-long date)
-          data {:column-name date}]
+          data {:column-name date}
+          state {}]
       (sut/db-keys data) => {:column_name (java.sql.Timestamp. date-long)})))
 
 (facts "Converting between database types"
   (fact "Calls a function with the `db' data, returning a `clj' result."
     (let [fn #(update % :column_name inc)
-          data {:column-name 5}]
-      (sut/with-db-keys fn data) => {:column-name 6})))
+          data {:column-name 5}
+          state {}]
+      (sut/with-db-keys state fn data) => {:column-name 6}))
+
+  (fact "Calls function with a connection should one be provided."
+    (let [fn (fn
+               ([data opts] (:connection opts))
+               ([data] false))
+          data {:column-name 5}
+          state {:connection true}]
+      (sut/with-db-keys state fn data) => true)))

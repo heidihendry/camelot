@@ -10,44 +10,44 @@
 
 (s/defn get-all :- [SurveySite]
   [state id]
-  (db/with-db-keys -get-all {:survey-id id}))
+  (db/with-db-keys state -get-all {:survey-id id}))
 
 (s/defn get-specific :- SurveySite
   [state
    id :- s/Num]
-  (first (db/with-db-keys -get-specific {:survey-site-id id})))
+  (first (db/with-db-keys state -get-specific {:survey-site-id id})))
 
 (s/defn get-specific-by-site :- (s/maybe SurveySite)
   [state
    data :- SurveySiteCreate]
-  (first (db/with-db-keys -get-specific-by-site data)))
+  (first (db/with-db-keys state -get-specific-by-site data)))
 
 (s/defn create!
   [state
    data :- SurveySiteCreate]
-  (let [record (db/with-db-keys -create<! data)]
+  (let [record (db/with-db-keys state -create<! data)]
     (get-specific state (:1 record))))
 
 (s/defn update!
   [state
    id :- s/Num
    data :- SurveySite]
-  (db/with-db-keys -update! (merge data {:survey-site-id id}))
+  (db/with-db-keys state -update! (merge data {:survey-site-id id}))
   (get-specific state (:survey-site-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
-  (db/with-db-keys -delete! {:survey-site-id id}))
+  (db/with-db-keys state -delete! {:survey-site-id id}))
 
 (s/defn get-available
   [state id]
-  (db/with-db-keys -get-available {:survey-id id}))
+  (db/with-db-keys state -get-available {:survey-id id}))
 
 (s/defn get-alternatives
   [state id]
   (let [res (get-specific state id)]
-    (db/with-db-keys -get-alternatives res)))
+    (db/with-db-keys state -get-alternatives res)))
 
 (def routes
   (context "/survey-sites" []

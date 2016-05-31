@@ -44,20 +44,25 @@
                                                      (:body response)))))))
 
 (defn post-x
-  "POST import state"
-  [resource params cb]
-  (go
-    (let [response (<! (util/request http/post (util/with-baseurl resource)
-                                     params))
-          success (some #{(:status response)} success-status-codes)]
-      (if success
-        (when cb
-          (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "GET"
-                                                     (util/with-baseurl "/import/options")
-                                                     (:status response)
-                                                     (:body response)))))))
+  "POST state"
+  ([resource params cb] (post-x resource params cb nil))
+  ([resource params cb failcb]
+   (go
+     (let [response (<! (util/request http/post (util/with-baseurl resource)
+                                      params))
+           success (some #{(:status response)} success-status-codes)]
+       (if success
+         (when cb
+           (cb response))
+         (do
+           (when failcb
+             (failcb))
+           (om/update! (state/app-state-cursor) :error (build-error
+                                                        "POST"
+                                                        (util/with-baseurl resource)
+                                                        params
+                                                        (:status response)
+                                                        (:body response)))))))))
 
 (def get-application
   "Retrieve global application details"

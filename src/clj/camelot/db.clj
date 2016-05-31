@@ -2,9 +2,10 @@
   (:require [camelot.util.config :as settings]
             [clj-time.coerce :as tc]
             [clojure.string :as str]
+            [clojure.java.jdbc :as jdbc]
             [ragtime
              [core :as rtc]
-             [jdbc :as jdbc]]))
+             [jdbc :as ragjdbc]]))
 
 (def spec
   "JDBC spec for the primary database."
@@ -13,10 +14,17 @@
    :subname (settings/get-db-path),
    :create true})
 
+(defmacro with-transaction
+  "Run `body' with a new transaction added to the binding for state."
+  [[bind state] & body]
+  `(jdbc/with-db-transaction [tx# spec]
+     (let [~bind (merge ~state {:connection tx#})]
+       ~@body)))
+
 (def ragtime-config
   "Ragtime configuration"
-  {:datastore (jdbc/sql-database spec)
-   :migrations (jdbc/load-resources "migrations")})
+  {:datastore (ragjdbc/sql-database spec)
+   :migrations (ragjdbc/load-resources "migrations")})
 
 (defn- clj-key
   "Reducer for translating from database types.
@@ -50,13 +58,24 @@
   [data]
   (reduce-kv db-key {} data))
 
+(defn with-connection
+  "Run a query with the given connection, if any."
+  ([ks conn q]
+   (if conn
+     (q ks {:connection conn})
+     (q ks)))
+  ([conn q]
+   (if conn
+     (q {} {:connection conn})
+     (q))))
+
 (defn with-db-keys
   "Run a function, translating the parameters and results as needed."
-  [f data]
-  (->> data
-       (db-keys)
-       (f)
-       (clj-keys)))
+  [state f data]
+  (-> data
+      (db-keys)
+      (with-connection (:connection state) f)
+      (clj-keys)))
 
 (defn migrate
   "Apply the available database migrations."

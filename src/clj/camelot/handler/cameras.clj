@@ -10,35 +10,35 @@
 
 (s/defn get-all :- [Camera]
   [state]
-  (db/clj-keys (-get-all)))
+  (db/clj-keys (db/with-connection (:connection state) -get-all)))
 
 (s/defn get-specific :- Camera
   [state
    id :- s/Num]
-  (first (db/with-db-keys -get-specific {:camera-id id})))
+  (first (db/with-db-keys state -get-specific {:camera-id id})))
 
 (s/defn get-specific-by-name :- (s/maybe Camera)
   [state
    data :- {:camera-name s/Str}]
-  (first (db/with-db-keys -get-specific-by-name data)))
+  (first (db/with-db-keys state -get-specific-by-name data)))
 
 (s/defn create!
   [state
    data :- CameraCreate]
-  (let [record (db/with-db-keys -create<! data)]
+  (let [record (db/with-db-keys state -create<! data)]
     (get-specific state (:1 record))))
 
 (s/defn update!
   [state
    id :- s/Num
    data :- Camera]
-  (db/with-db-keys -update! (merge data {:camera-id id}))
+  (db/with-db-keys state -update! (merge data {:camera-id id}))
   (get-specific state (:camera-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
-  (db/with-db-keys -delete! {:camera-id id}))
+  (db/with-db-keys state -delete! {:camera-id id}))
 
 (def routes
   (context "/cameras" []

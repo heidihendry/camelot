@@ -22,7 +22,8 @@
             [camelot.handler.camera-statuses :as camera-statuses]
             [clojure.java.io :as io]
             [camelot.util.config :as util.config]
-            [camelot.util.java-file :as jf]))
+            [camelot.util.java-file :as jf]
+            [camelot.db :as db]))
 
 (defn- canonicalise
   [resources vkey desckey]
@@ -44,22 +45,22 @@
   (let [surveys (canonicalise (surveys/get-all (app/gen-state (conf/config)))
                               :survey-id :survey-name)
         survey-sites (canonicalise (maybe-get survey-sites/get-all (:survey params))
-                                :survey-site-id :site-name)
+                                   :survey-site-id :site-name)
         trap-stations (canonicalise (maybe-get trap-stations/get-all (:survey-site params))
-                                 :trap-station-id :trap-station-name)
-        trap-station-sessions (canonicalise (maybe-get trap-station-sessions/get-all (:trap-station params))
-                                         :trap-station-session-id :trap-station-session-label)
-        trap-station-session-cameras (canonicalise (maybe-get trap-station-session-cameras/get-all
-                                                (:trap-station-session params))
-                                                :trap-station-session-camera-id
-                                                :camera-name)]
+                                    :trap-station-id :trap-station-name)
+        trap-sessions (canonicalise (maybe-get trap-station-sessions/get-all (:trap-station params))
+                                    :trap-station-session-id :trap-station-session-label)
+        trap-cameras (canonicalise (maybe-get trap-station-session-cameras/get-all
+                                              (:trap-station-session params))
+                                   :trap-station-session-camera-id
+                                   :camera-name)]
     {:surveys surveys
      :survey-sites survey-sites
      :trap-stations trap-stations
-     :trap-station-sessions trap-station-sessions
-     :trap-station-session-cameras trap-station-session-cameras}))
+     :trap-station-sessions trap-sessions
+     :trap-station-session-cameras trap-cameras}))
 
-(defn get-or-create-site
+(defn- get-or-create-site
   [state sitename sample]
   (let [data {:site-name sitename}
         loc (:location sample)]
@@ -71,7 +72,7 @@
                                      :site-country (:country loc)
                                      :site-notes "Auto-created by Camelot"})))))
 
-(defn get-or-create-camera
+(defn- get-or-create-camera
   [state cameraname sample]
   (let [data {:camera-name cameraname}
         settings (:camera-settings sample)
@@ -83,25 +84,25 @@
                                        :camera-model (:model (:camera sample))
                                        :camera-notes "Auto-created by Camelot"})))))
 
-(defn get-or-create-survey
+(defn- get-or-create-survey
   [state directory]
   (or (first (surveys/get-all state))
       (surveys/create! state {:survey-name "Initial survey"
                               :survey-directory directory
                               :survey-notes "Auto-created by Camelot"})))
 
-(defn get-or-create-survey-site
-  [state survey-id site-id]
-  (let [data {:survey-id survey-id
-              :site-id site-id}]
+(defn- get-or-create-survey-site
+  [state survey site]
+  (let [data {:survey-id (:survey-id survey)
+              :site-id (:site-id site)}]
     (or (survey-sites/get-specific-by-site state data)
         (survey-sites/create! state data))))
 
-(defn get-or-create-trap-station
-  [state survey-site-id sample]
+(defn- get-or-create-trap-station
+  [state sample survey-site]
   (let [longitude (:gps-longitude (:location sample))
         latitude (:gps-latitude (:location sample))
-        data {:survey-site-id survey-site-id
+        data {:survey-site-id (:survey-site-id survey-site)
               :trap-station-name (str "Trap at " longitude ", " latitude)
               :trap-station-longitude longitude
               :trap-station-latitude latitude}]
@@ -110,31 +111,44 @@
                                             {:trap-station-notes "Auto-created by Camelot"
                                              :trap-station-altitude nil})))))
 
-(defn get-or-create-trap-station-session
-  [state trap-station-id start end]
-  (let [data {:trap-station-id trap-station-id
-              :trap-station-session-start-date start
-              :trap-station-session-end-date end
+(defn- get-or-create-trap-session
+  [state album trap-station]
+  (let [data {:trap-station-id (:trap-station-id trap-station)
+              :trap-station-session-start-date (:datetime-start (:metadata album))
+              :trap-station-session-end-date (:datetime-end (:metadata album))
               :trap-station-session-notes "Auto-created by Camelot"}]
     (or (trap-station-sessions/get-specific-by-dates state data)
         (trap-station-sessions/create! state data))))
 
-(defn get-or-create-trap-station-session-camera
-  [state trap-station-session-id camera-id folder-path]
-  (let [data {:trap-station-session-id trap-station-session-id
-              :camera-id camera-id
+(defn- get-or-create-trap-camera
+  [state camera folder-path trap-station-session]
+  (let [data {:trap-station-session-id (:trap-station-session-id trap-station-session)
+              :camera-id (:camera-id camera)
               :trap-station-session-camera-import-path folder-path}]
     (or (trap-station-session-cameras/get-specific-by-camera state data)
         (trap-station-session-cameras/create! state data))))
 
-(defn get-or-create-species
+(defn- get-or-create-species
   [state sighting]
   (or (species/get-specific-by-scientific-name state (:species sighting))
       (species/create! state {:species-scientific-name (:species sighting)
                               :species-common-name ""
                               :species-notes "Auto-created by Camelot"})))
 
-(defn create-sightings
+(defn- create-photo
+  [state media-id camset]
+  (photos/create! state {:photo-iso-setting (:iso camset)
+                         :photo-aperture-setting (:aperture camset)
+                         :photo-exposure-value (:exposure camset)
+                         :photo-flash-setting (:flash camset)
+                         :photo-focal-length (:focal-length camset)
+                         :photo-fnumber-setting (:fstop camset)
+                         :photo-orientation (:orientation camset)
+                         :photo-resolution-x (:resolution-x camset)
+                         :photo-resolution-y (:resolution-y camset)
+                         :media-id media-id}))
+
+(defn- create-sightings
   [state media-id sightings]
   (doseq [sighting sightings]
     (when-not (re-find validation/sighting-quantity-exclusions-re (:species sighting))
@@ -143,67 +157,73 @@
                                   :species-id (:species-id species)
                                   :media-id media-id})))))
 
+(def cameracheck-re
+  "Regexp for determining whether a sighting species is actually a camera check."
+  #"(?i)\bcamera-check\b")
+
+(defn- is-cameracheck?
+  [photo]
+  (let [spp (:species (first (:sightings photo)))]
+    (= (and spp (re-matches cameracheck-re spp)) true)))
+
+(defn- get-unique-filename
+  [filename]
+  (str (java.util.UUID/randomUUID)
+       (subs filename (- (count filename) 4))))
+
+(defn- copy-pathname
+  [src dest]
+  (io/make-parents dest)
+  (let [d (io/file dest)]
+    (if (jf/exists? d)
+      (throw (java.io.IOException. (format "copy-pathname: file '%s' already exists", dest)))
+      (io/copy (io/file src) d))))
+
+(defn- create-media
+  [state photo filename notes trap-camera-id]
+  (media/create! state {:media-capture-timestamp (:datetime photo)
+                        :media-filename (str/lower-case filename)
+                        :media-cameracheck (is-cameracheck? photo)
+                        :media-attention-needed false
+                        :media-notes notes
+                        :trap-station-session-camera-id trap-camera-id}))
+
+(defn- get-album
+  [state root-path path]
+  (-> (album/read-albums state root-path)
+      (get (io/file path))))
+
+(defn- import-media-for-camera
+  [state notes full-path trap-camera photos]
+  (doseq [photo photos]
+    (let [filename (get-unique-filename (:filename photo))
+          camset (:settings photo)
+          photopath (str full-path "/" (:filename photo))
+          targetname (str (util.config/get-media-path) "/" (str/lower-case filename))
+          media (create-media state photo filename notes trap-camera)]
+      (create-photo state (:media-id media) camset)
+      (create-sightings state (:media-id media) (:sightings photo))
+      (copy-pathname photopath targetname))))
+
 (defn media
   "Import media"
-  [{:keys [folder trap-station-session-camera notes]}]
-  (let [state (app/gen-state (conf/config))
-        root-path (:root-path (:config state))
-        albums (album/read-albums state root-path)
-        full-path (str root-path folder)
-        album (get albums (io/file full-path))
-        sample (second (first (:photos album)))
-        pps (prn sample)
-        [_ sitename phase cameraname] (str/split folder #"/")
-        survey (get-or-create-survey state root-path)
-        site (get-or-create-site state sitename sample)
-        camera (get-or-create-camera state cameraname sample)
-        survey-site (get-or-create-survey-site state
-                                               (:survey-id survey)
-                                               (:site-id site))
-        trap-station (get-or-create-trap-station state
-                                                 (:survey-site-id survey-site)
-                                                 sample)
-        trap-station-session (get-or-create-trap-station-session state
-                                                                 (:trap-station-id trap-station)
-                                                                 (:datetime-start (:metadata album))
-                                                                 (:datetime-end (:metadata album)))
-        trap-station-session-camera (get-or-create-trap-station-session-camera state
-                                                                               (:trap-station-session-id trap-station-session)
-                                                                               (:camera-id camera)
-                                                                               full-path)]
-    (doseq [photo (vals (:photos album))]
-      (let [filename (str (java.util.UUID/randomUUID)
-                          (subs (:filename photo)
-                                (- (count (:filename photo)) 4)))
-            camset (:settings sample)
-            targetname (str (util.config/get-media-path) "/"
-                            (str/lower-case filename))
-            media (media/create! state {:media-capture-timestamp (:datetime photo)
-                                        :media-filename (str/lower-case filename)
-                                        :media-cameracheck (if (nil? (:species (first (:sightings photo))))
-                                                             false
-                                                             (not (nil? (re-matches #"(?i)\bcamera-check\b"
-                                                                                    (:species (first (:sightings photo)))))))
-                                        :media-attention-needed false
-                                        :media-notes notes
-                                        :trap-station-session-camera-id (:trap-station-session-camera-id trap-station-session-camera)})]
-
-        (photos/create! state {:photo-iso-setting (:iso camset)
-                               :photo-aperture-setting (:aperture camset)
-                               :photo-exposure-value (:exposure camset)
-                               :photo-flash-setting (:flash camset)
-                               :photo-focal-length (:focal-length camset)
-                               :photo-fnumber-setting (:fstop camset)
-                               :photo-orientation (:orientation camset)
-                               :photo-resolution-x (:resolution-x camset)
-                               :photo-resolution-y (:resolution-y camset)
-                               :media-id (:media-id media)})
-
-        (create-sightings state (:media-id media) (:sightings photo))
-
-        (io/make-parents targetname)
-        (io/copy (io/file (str full-path "/" (:filename photo)))
-                 (io/file targetname))))))
+  [{:keys [folder session-camera-id notes]}]
+  (db/with-transaction [state (app/gen-state (conf/config))]
+    (let [[_ sitename phase cameraname] (str/split folder #"/")
+          root-path (:root-path (:config state))
+          full-path (str root-path folder)
+          album (get-album state root-path full-path)
+          sample (second (first (:photos album)))
+          survey (get-or-create-survey state root-path)
+          camera (get-or-create-camera state cameraname sample)
+          trap-camera (->> (get-or-create-site state sitename sample)
+                           (get-or-create-survey-site state survey)
+                           (get-or-create-trap-station state sample)
+                           (get-or-create-trap-session state album)
+                           (get-or-create-trap-camera state camera full-path))]
+      (import-media-for-camera state notes full-path
+                               (:trap-station-session-camera-id trap-camera)
+                               (vals (:photos album))))))
 
 (def routes
   "Import routes"

@@ -10,30 +10,30 @@
 (s/defn get-all
   [state
    id :- s/Num]
-  (db/with-db-keys -get-all {:media-id id}))
+  (db/with-db-keys state -get-all {:media-id id}))
 
 (s/defn get-specific
   [state
    id :- s/Num]
-  (first (db/with-db-keys -get-specific {:photo-id id})))
+  (first (db/with-db-keys state -get-specific {:photo-id id})))
 
 (s/defn create!
   [state
    data]
-  (let [record (db/with-db-keys -create<! data)]
+  (let [record (db/with-db-keys state -create<! data)]
     (get-specific state (:1 record))))
 
 (s/defn update!
   [state
    id :- s/Num
    data]
-  (db/with-db-keys -update! (merge data {:photo-id id}))
+  (db/with-db-keys state -update! (merge data {:photo-id id}))
   (get-specific state (:photo-id data)))
 
 (s/defn delete!
   [state
    id :- s/Num]
-  (db/with-db-keys -delete! {:photo-id id}))
+  (db/with-db-keys state -delete! {:photo-id id}))
 
 (def routes
   (context "/photos" []

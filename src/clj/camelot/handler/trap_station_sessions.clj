@@ -27,24 +27,24 @@
 
 (s/defn get-all :- [TrapStationSessionLabeled]
   [state id]
-  (map add-label (db/with-db-keys -get-all {:trap-station-id id})))
+  (map add-label (db/with-db-keys state -get-all {:trap-station-id id})))
 
 (s/defn get-specific :- TrapStationSessionLabeled
   [state
    id :- s/Num]
-  (add-label (first (db/with-db-keys -get-specific {:trap-station-session-id id}))))
+  (add-label (first (db/with-db-keys state -get-specific {:trap-station-session-id id}))))
 
 (s/defn get-specific-by-dates :- (s/maybe TrapStationSessionLabeled)
   [state
    data]
-  (let [result (first (db/with-db-keys -get-specific-by-dates data))]
+  (let [result (first (db/with-db-keys state -get-specific-by-dates data))]
     (when (seq result)
       (add-label result))))
 
 (s/defn create!
   [state
    data :- TrapStationSessionCreate]
-  (let [record (db/with-db-keys -create<! data)]
+  (let [record (db/with-db-keys state -create<! data)]
     (get-specific state (:1 record))))
 
 (s/defn update!
@@ -53,13 +53,13 @@
    id :- s/Num
    data :- TrapStationSessionLabeled]
   (let [data (dissoc data :trap-station-session-label)]
-    (db/with-db-keys -update! (merge data {:trap-station-session-id id}))
+    (db/with-db-keys state -update! (merge data {:trap-station-session-id id}))
     (get-specific state (:trap-station-session-id data))))
 
 (s/defn delete!
   [state
    id :- s/Num]
-  (db/with-db-keys -delete! {:trap-station-session-id id}))
+  (db/with-db-keys state -delete! {:trap-station-session-id id}))
 
 (def routes
   (context "/trap-station-sessions" []
