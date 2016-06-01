@@ -12,6 +12,7 @@
             [smithy.core :as smithy]
             [camelot.nav :as cnav]
             [smithy.util :as util]
+            [camelot.util :as cam.util]
             [camelot.rest :as rest]
             [camelot.component.error :as cerr]
             [camelot.component.footer :as cfoot]
@@ -167,6 +168,7 @@
                                 (get-in vs [:selected-resource :details])))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :load-resource-children load-resource-children
+   :species-summary-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/species-summary/" rid))))
    :delete (fn [vs rid] (let [screen (util/get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")
                             (delete (get-in screen [:states :delete :submit :success :event])

@@ -130,10 +130,11 @@
 
 (defn- get-or-create-species
   [state sighting]
-  (or (species/get-specific-by-scientific-name state (:species sighting))
-      (species/create! state {:species-scientific-name (:species sighting)
-                              :species-common-name ""
-                              :species-notes "Auto-created by Camelot"})))
+  (let [spp (str/lower-case (:species sighting))]
+    (or (species/get-specific-by-scientific-name state spp)
+        (species/create! state {:species-scientific-name spp
+                                :species-common-name "N/A"
+                                :species-notes "Auto-created by Camelot"}))))
 
 (defn- create-photo
   [state media-id camset]

@@ -67,10 +67,10 @@
 (defn- independence-reducer
   "Reducing function, adding or updating the sightings based on their dependence."
   [state acc this-sighting]
-  (let [datetime (:datetime this-sighting)
-        species (photo/extract-path-value this-sighting [:sighting :species])
+  (let [datetime (:media-capture-timestamp this-sighting)
+        species (:species-scientific-name this-sighting)
         previous-sighting (dependent-sighting datetime (get acc species))
-        qty (photo/extract-path-value this-sighting [:sighting :quantity])
+        qty (:sighting-quantity this-sighting)
         known-sightings (get acc species)]
     (assoc acc species
            (if previous-sighting
@@ -84,9 +84,11 @@
   (map #(assoc % :datetime (:datetime p)) (:sightings p)))
 
 (s/defn datetime-comparison :- s/Bool
-  "Predicate for whether photo-a is prior to photo-b."
-  [ta tb]
-  (t/after? (:datetime tb) (:datetime ta)))
+  "Predicate for whether photo-a is prior to photo-b.
+`f' is a function applied to both prior to the comparison."
+  [f ta tb]
+  (prn ta)
+  (t/after? (get tb f) (get ta f)))
 
 (defn album-photos
   "Return a list of photos in album."
@@ -95,14 +97,12 @@
 
 (s/defn extract-independent-sightings :- [ma/Sightings]
   "Extract the sightings, accounting for the independence threshold, for an album."
-  [state album]
+  [state sightings]
   (let [indep-reducer (partial independence-reducer state)
         total-spp (fn [[spp data]] {:species spp
                                     :count (reduce + (map :quantity data))})]
-    (->> album
-         (map photo/flatten-sightings)
-         (flatten)
-         (sort datetime-comparison)
+    (->> sightings
+         (sort (partial datetime-comparison :media-capture-timestamp))
          (reduce indep-reducer {})
          (map total-spp))))
 

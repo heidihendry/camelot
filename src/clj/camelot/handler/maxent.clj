@@ -5,8 +5,8 @@
              [photo :as photo]]
             [camelot.util.config :as conf]
             [camelot.util.application :as app]
-            [clojure.data.csv :as csv]
             [clojure.string :as str]
+            [camelot.util.report :as report-util]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [ring.util.response :as r]
             [schema.core :as s]))
@@ -45,13 +45,6 @@
          (mapv :value)
          (maybe-conj))))
 
-(s/defn to-csv-string :- s/Str
-  "Return data as a CSV string."
-  [data]
-  (with-open [io-str (java.io.StringWriter.)]
-    (csv/write-csv io-str data)
-    (.toString io-str)))
-
 (s/defn species-location-csv :- s/Str
   "Produce a CSV of species locations"
   [state
@@ -59,7 +52,7 @@
   (->> albums
        (mapcat album/album-photos)
        (reduce species-location-reducer [])
-       (to-csv-string)))
+       (report-util/to-csv-string)))
 
 (defn export
   "Handler for an export request."
