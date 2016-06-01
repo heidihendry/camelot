@@ -100,7 +100,7 @@
         sightings (get-sightings-for-survey state survey-id)]
     (report-util/to-csv-string
      (cons ["Species" "Locations" "Independent Observations" "Nights" "Observations / Night"]
-           (build-report state sightings)))))
+           (report state sightings)))))
 
 (defn export
   [survey-id]
