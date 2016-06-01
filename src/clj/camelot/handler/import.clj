@@ -209,7 +209,7 @@
   "Import media"
   [{:keys [folder session-camera-id notes]}]
   (db/with-transaction [state (app/gen-state (conf/config))]
-    (let [[_ sitename phase cameraname] (str/split folder #"/")
+    (let [[_ sitename cameraname] (str/split folder #"/")
           root-path (:root-path (:config state))
           full-path (str root-path folder)
           album (get-album state root-path full-path)
