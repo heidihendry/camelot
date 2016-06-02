@@ -23,7 +23,8 @@
             [clojure.java.io :as io]
             [camelot.util.config :as util.config]
             [camelot.util.java-file :as jf]
-            [camelot.db :as db]))
+            [camelot.db :as db])
+  (:import [org.apache.commons.lang3 SystemUtils]))
 
 (defn- canonicalise
   [resources vkey desckey]
@@ -199,8 +200,8 @@
   (doseq [photo photos]
     (let [filename (get-unique-filename (:filename photo))
           camset (:settings photo)
-          photopath (str full-path "/" (:filename photo))
-          targetname (str (util.config/get-media-path) "/" (str/lower-case filename))
+          photopath (str full-path SystemUtils/FILE_SEPARATOR (:filename photo))
+          targetname (str (util.config/get-media-path) SystemUtils/FILE_SEPARATOR (str/lower-case filename))
           media (create-media state photo filename notes trap-camera)]
       (create-photo state (:media-id media) camset)
       (create-sightings state (:media-id media) (:sightings photo))
@@ -210,7 +211,7 @@
   "Import media"
   [{:keys [folder session-camera-id notes]}]
   (db/with-transaction [state (app/gen-state (conf/config))]
-    (let [[_ sitename cameraname] (str/split folder #"/")
+    (let [[_ sitename cameraname] (str/split folder (re-pattern SystemUtils/FILE_SEPARATOR))
           root-path (:root-path (:config state))
           full-path (str root-path folder)
           album (get-album state root-path full-path)

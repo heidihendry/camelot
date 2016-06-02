@@ -7,7 +7,8 @@
             [schema.core :as s]
             [yesql.core :as sql]
             [camelot.util.java-file :as jf]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import [org.apache.commons.lang3 SystemUtils]))
 
 (sql/defqueries "sql/media.sql" {:connection db/spec})
 
@@ -39,11 +40,13 @@
 
 (defn read-media-file
   [filename]
-  (let [f (io/file (str (config/get-media-path) "/" filename))]
+  (let [f (io/file (str (config/get-media-path) SystemUtils/FILE_SEPARATOR
+                        filename))]
     (io/input-stream
      (if (jf/readable? f)
        f
-       (io/file (str (config/get-media-path) "/" (str/lower-case filename)))))))
+       (io/file (str (config/get-media-path) SystemUtils/FILE_SEPARATOR
+                     (str/lower-case filename)))))))
 
 (def routes
   (context "/media" []
