@@ -24,6 +24,8 @@
                           :description "The name which will be used to refer to the survey."}
             :survey-directory {:label "Survey Directory"
                                :description "The root directory of the survey's data"}
+            :survey-sampling-point-density {:label "Sampling Point Density (metres)"
+                                            :description "The distance between camera trap stations across the survey."}
             :survey-notes {:label "Survey Notes"
                            :description "Notes about this survey."}}
 

@@ -90,6 +90,7 @@
   (or (first (surveys/get-all state))
       (surveys/create! state {:survey-name "Initial survey"
                               :survey-directory directory
+                              :survey-sampling-point-density nil
                               :survey-notes "Auto-created by Camelot"})))
 
 (defn- get-or-create-survey-site

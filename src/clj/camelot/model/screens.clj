@@ -369,11 +369,13 @@
                        ]}
    :layout [[:survey-name]
             [:survey-directory]
+            [:survey-sampling-point-density]
             [:survey-notes]]
    :schema {:survey-name {:type :text
                           :required true}
             :survey-directory {:type :text
                                :required true}
+            :survey-sampling-point-density {:type :number}
             :survey-notes {:type :textarea
                            :rows 4
                            :cols 35}}

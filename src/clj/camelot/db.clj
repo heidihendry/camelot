@@ -14,17 +14,17 @@
    :subname (settings/get-db-path),
    :create true})
 
+(def ragtime-config
+  "Ragtime configuration"
+  {:datastore (ragjdbc/sql-database spec)
+   :migrations (ragjdbc/load-resources "migrations")})
+
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]
   `(jdbc/with-db-transaction [tx# spec]
      (let [~bind (merge ~state {:connection tx#})]
        ~@body)))
-
-(def ragtime-config
-  "Ragtime configuration"
-  {:datastore (ragjdbc/sql-database spec)
-   :migrations (ragjdbc/load-resources "migrations")})
 
 (defn- clj-key
   "Reducer for translating from database types.

@@ -4,6 +4,7 @@
 (def SurveyCreate
   {:survey-name s/Str
    :survey-directory s/Str
+   :survey-sampling-point-density (s/maybe s/Num)
    :survey-notes (s/maybe s/Str)})
 
 (def Survey
