@@ -1,8 +1,6 @@
 -- name: -get-sightings-for-survey
 SELECT species.species_scientific_name,
        sighting.sighting_quantity,
-       site.site_sublocation,
-       site.site_city,
        trap_station_session.trap_station_session_id,
        trap_station_session.trap_station_session_start_date,
        trap_station_session.trap_station_session_end_date,

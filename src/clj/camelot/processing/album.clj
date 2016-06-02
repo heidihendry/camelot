@@ -87,7 +87,6 @@
   "Predicate for whether photo-a is prior to photo-b.
 `f' is a function applied to both prior to the comparison."
   [f ta tb]
-  (prn ta)
   (t/after? (get tb f) (get ta f)))
 
 (defn album-photos

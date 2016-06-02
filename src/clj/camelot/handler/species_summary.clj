@@ -31,7 +31,6 @@
 
 (defn- get-nights-for-group
   [group]
-  (prn group)
   (let [start (:trap-station-session-start-date (first group))
         end (:trap-station-session-end-date (first group))]
     (t/in-days (t/interval start end))))
@@ -85,8 +84,8 @@
     (vector spp (get locs spp) spp-obs spp-nights
             (if (= spp-nights 0)
               "-"
-              (format "%.5f"
-                      (double (/ spp-obs spp-nights)))))))
+              (format "%.3f"
+                      (* 100 (double (/ spp-obs spp-nights))))))))
 
 (defn report
   [state sightings]
@@ -95,16 +94,16 @@
          (map (partial report-row obs locs nights)))))
 
 (defn csv-report
-  [survey-id]
-  (let [state (app/gen-state (config/config))
-        sightings (get-sightings-for-survey state survey-id)]
-    (report-util/to-csv-string
-     (cons ["Species" "Locations" "Independent Observations" "Nights" "Observations / Night"]
-           (report state sightings)))))
+  [state sightings]
+  (report-util/to-csv-string
+   (cons ["Species" "Locations" "Independent Observations" "Nights" "Observations / Night (%)"]
+         (report state sightings))))
 
 (defn export
   [survey-id]
-  (let [data (csv-report survey-id)]
+  (let [state (app/gen-state (config/config))
+        sightings (get-sightings-for-survey state survey-id)
+        data (csv-report state sightings)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")
         (r/header "Content-Length" (count data))
