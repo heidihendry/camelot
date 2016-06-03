@@ -161,7 +161,9 @@
                        {:label (tr/translate (:config state) :action/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/sessions)
-                        :action :trap-station-sessions}]}
+                        :action :trap-station-sessions}
+                       {:label (tr/translate (:config state) :action/trap-station-report)
+                        :action :trap-station-report}]}
    :layout [[:trap-station-name]
             [:trap-station-longitude]
             [:trap-station-latitude]

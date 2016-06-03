@@ -189,6 +189,7 @@
             :trap-stations "View Trap Stations"
             :sightings "View Sightings"
             :summary-statistics-report "Download Summary Statistics"
+            :trap-station-report "Download Camera Trap Statistics"
             :media "View Media"
             :sessions "View Sessions"
             :photo "View Photo Metadata"

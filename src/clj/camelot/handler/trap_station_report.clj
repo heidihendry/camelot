@@ -1,4 +1,4 @@
-(ns camelot.handler.summary-statistics-report
+(ns camelot.handler.trap-station-report
   (:require [camelot.db :as db]
             [yesql.core :as sql]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
@@ -12,9 +12,13 @@
 
 (sql/defqueries "sql/reports.sql" {:connection db/spec})
 
-(defn- get-sightings-for-survey
+(defn- get-sightings-for-trap-station
   [state id]
-  (db/with-db-keys state -get-sightings-for-survey {:survey-id id}))
+  (db/with-db-keys state -get-sightings-for-trap-station {:trap-station-id id}))
+
+(defn- get-all-species
+  [state]
+  (db/clj-keys (-get-all-species)))
 
 (defn- species-sighting-reducer
   [acc v]
@@ -23,8 +27,11 @@
     (assoc acc spp (+ (or (get acc spp) 0) qty))))
 
 (defn- get-independent-sightings
-  [state grouped-sightings]
-  (->> grouped-sightings
+  [state sightings]
+  (->> sightings
+       (group-by :trap-station-session-id)
+       (vals)
+       (map #(remove (fn [x] (nil? (:species-scientific-name x))) %))
        (map (partial album/extract-independent-sightings state))
        (flatten)
        (reduce species-sighting-reducer {})))
@@ -42,7 +49,6 @@
 (defn- get-species-nights
   [grouped-sightings]
   (->> grouped-sightings
-       (flatten)
        (group-by :trap-station-session-id)
        (vals)
        (reduce #(+ %1 (get-nights-for-group %2)) 0)))
@@ -53,62 +59,48 @@
     1
     (inc v)))
 
-(defn- get-species-locations
-  [grouped-sightings]
-  (->> grouped-sightings
-       (map get-species-in-group)
-       (flatten)
-       (reduce #(update %1 %2 inc-or-one) {})))
-
 (defn- get-report-aggregate-data
   [state sightings]
   (->> sightings
-       (group-by :trap-station-id)
-       (vals)
        ((juxt (partial get-independent-sightings state)
-              get-species-locations
               get-species-nights))))
 
-(defn- get-species-photo-data
-  [state sightings]
-  (->> sightings
-       (group-by :species-scientific-name)
-       (reduce (fn [acc [k v]] (assoc acc k (count v))) {})))
-
 (defn- report-row
-  [obs locs nights photo-counts spp]
+  [obs nights spp]
   (let [spp-obs (get obs spp)]
-    (vector spp (get locs spp) (get photo-counts spp)
-            spp-obs nights
+    (vector spp
+            (if (or (nil? spp-obs) (zero? spp-obs)) "" "X")
+            (or spp-obs "0")
+            nights
             (if (= nights 0)
               "-"
               (format "%.3f"
-                      (* 100 (double (/ spp-obs nights))))))))
+                      (* 100 (double (/ (or spp-obs 0) nights))))))))
 
 (defn report
-  [state sightings]
-  (let [[obs locs nights] (get-report-aggregate-data state sightings)
-        photo-counts (get-species-photo-data state sightings)]
-    (->> (keys obs)
-         (map (partial report-row obs locs nights photo-counts)))))
+  [state species sightings]
+  (let [[obs nights] (get-report-aggregate-data state sightings)]
+    (->> species
+         (map (partial report-row obs nights)))))
 
 (defn csv-report
-  [state sightings]
+  [state species sightings]
   (report-util/to-csv-string
-   (cons ["Species" "Sites" "Photos" "Independent Observations" "Nights" "Observations / Night (%)"]
-         (report state sightings))))
+   (cons ["Species" "Presence" "Independent Observations" "Nights" "Observations / Night (%)"]
+         (report state species sightings))))
 
 (defn export
   [survey-id]
   (let [state (app/gen-state (config/config))
-        sightings (get-sightings-for-survey state survey-id)
-        data (csv-report state sightings)]
+        sightings (get-sightings-for-trap-station state survey-id)
+        species (map :species-scientific-name (get-all-species state))
+        data (csv-report state species sightings)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")
         (r/header "Content-Length" (count data))
-        (r/header "Content-Disposition" "attachment; filename=\"summary-statistics-report.csv\""))))
+        (r/header "Content-Disposition" "attachment; filename=\"trap-station-report.csv\""))))
 
 (def routes
   "Species summary report routes."
-  (context "/report/summary-statistics" []
+  (context "/report/trap-station-statistics" []
            (GET "/:id" [id] (export id))))
