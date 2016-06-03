@@ -188,7 +188,7 @@
    :action {:survey-sites "View Survey Sites"
             :trap-stations "View Trap Stations"
             :sightings "View Sightings"
-            :species-summary-report "Download Species Summary"
+            :summary-statistics-report "Download Summary Statistics"
             :media "View Media"
             :sessions "View Sessions"
             :photo "View Photo Metadata"

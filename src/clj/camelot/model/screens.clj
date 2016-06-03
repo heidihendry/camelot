@@ -364,8 +364,8 @@
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/survey-sites)
                         :action :survey-sites}
-                       {:label (tr/translate (:config state) :action/species-summary-report)
-                        :action :species-summary-report}
+                       {:label (tr/translate (:config state) :action/summary-statistics-report)
+                        :action :summary-statistics-report}
                        ]}
    :layout [[:survey-name]
             [:survey-directory]

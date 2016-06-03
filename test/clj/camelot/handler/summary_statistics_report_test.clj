@@ -1,5 +1,5 @@
-(ns camelot.handler.species-summary-test
-  (:require [camelot.handler.species-summary :as sut]
+(ns camelot.handler.summary-statistics-report-test
+  (:require [camelot.handler.summary-statistics-report :as sut]
             [midje.sweet :refer :all]
             [camelot.util.application :as app]
             [clj-time.core :as t]
@@ -14,12 +14,13 @@
   (format "%.3f" (* 100 (double (/ obs nights)))))
 
 (def headings ["Species"
-               "Locations"
+               "Sites"
+               "Photos"
                "Independent Observations"
                "Nights"
                "Observations / Night (%)"])
 
-(facts "Species Summary Report"
+(facts "Summary Statistics Report"
   (fact "Report data form empty sightings is empty"
     (let [sightings '()
           state (gen-state-helper {})
@@ -36,7 +37,7 @@
                            :trap-station-id 1})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (sut/report state sightings)]
-      result => (list ["Smiley Wolf" 1 3 7 (calc-obs-nights 3 7)])))
+      result => (list ["Smiley Wolf" 1 1 3 7 (calc-obs-nights 3 7)])))
 
   (fact "Should account for dependence in sightings"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -55,7 +56,7 @@
                            :trap-station-id 1})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (sut/report state sightings)]
-      result => (list ["Smiley Wolf" 1 5 7 (calc-obs-nights 5 7)])))
+      result => (list ["Smiley Wolf" 1 2 5 7 (calc-obs-nights 5 7)])))
 
   (fact "Should respect independence threshold setting"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -74,7 +75,7 @@
                            :trap-station-id 1})
           state (gen-state-helper {:sighting-independence-minutes-threshold 10})
           result (sut/report state sightings)]
-      result => (list ["Smiley Wolf" 1 8 7 (calc-obs-nights 8 7)])))
+      result => (list ["Smiley Wolf" 1 2 8 7 (calc-obs-nights 8 7)])))
 
   (fact "Should not consider sightings dependent across trap stations"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -93,7 +94,7 @@
                            :trap-station-id 2})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (sut/report state sightings)]
-      result => (list ["Smiley Wolf" 2 8 14 (calc-obs-nights 8 14)])))
+      result => (list ["Smiley Wolf" 2 2 8 14 (calc-obs-nights 8 14)])))
 
   (fact "Should return a result per species, sightings across different trap stations"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -119,9 +120,9 @@
                            :trap-station-id 3})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (sut/report state sightings)]
-      result => (list ["Smiley Wolf" 1 3 7 (calc-obs-nights 3 7)]
-                      ["Yellow Spotted Cat" 1 5 7 (calc-obs-nights 5 7)]
-                      ["A. Meerkat" 1 1 31 (calc-obs-nights 1 31)])))
+      result => (list ["Smiley Wolf" 1 1 3 45 (calc-obs-nights 3 45)]
+                      ["Yellow Spotted Cat" 1 1 5 45 (calc-obs-nights 5 45)]
+                      ["A. Meerkat" 1 1 1 45 (calc-obs-nights 1 45)])))
 
   (fact "Should return a result per species, sightings in same trap station session"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -147,9 +148,9 @@
                            :trap-station-id 1})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (sut/report state sightings)]
-      result => (list ["Smiley Wolf" 1 3 7 (calc-obs-nights 3 7)]
-                      ["Yellow Spotted Cat" 1 5 7 (calc-obs-nights 5 7)]
-                      ["A. Meerkat" 1 1 7 (calc-obs-nights 1 7)])))
+      result => (list ["Smiley Wolf" 1 1 3 7 (calc-obs-nights 3 7)]
+                      ["Yellow Spotted Cat" 1 1 5 7 (calc-obs-nights 5 7)]
+                      ["A. Meerkat" 1 1 1 7 (calc-obs-nights 1 7)])))
 
   (fact "Should group multiple sightings from different camera traps"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -175,8 +176,8 @@
                            :trap-station-id 3})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (sut/report state sightings)]
-      result => (list ["Smiley Wolf" 2 4 14 (calc-obs-nights 4 14)]
-                      ["Yellow Spotted Cat" 1 5 7 (calc-obs-nights 5 7)]))))
+      result => (list ["Smiley Wolf" 2 2 4 14 (calc-obs-nights 4 14)]
+                      ["Yellow Spotted Cat" 1 1 5 14 (calc-obs-nights 5 14)]))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
@@ -210,5 +211,5 @@
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (sut/csv-report state sightings)]
       result => (str (str/join "," headings) "\n"
-                     "Smiley Wolf,2,4,14," (calc-obs-nights 4 14) "\n"
-                     "Yellow Spotted Cat,1,5,7," (calc-obs-nights 5 7) "\n"))))
+                     "Smiley Wolf,2,2,4,14," (calc-obs-nights 4 14) "\n"
+                     "Yellow Spotted Cat,1,1,5,14," (calc-obs-nights 5 14) "\n"))))

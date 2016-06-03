@@ -1,4 +1,4 @@
-(ns camelot.handler.species-summary
+(ns camelot.handler.summary-statistics-report
   (:require [camelot.db :as db]
             [yesql.core :as sql]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
@@ -10,7 +10,7 @@
             [camelot.util.report :as report-util]
             [ring.util.response :as r]))
 
-(sql/defqueries "sql/species-summary-report.sql" {:connection db/spec})
+(sql/defqueries "sql/summary-statistics-report.sql" {:connection db/spec})
 
 (defn- get-sightings-for-survey
   [state id]
@@ -50,10 +50,7 @@
        (flatten)
        (group-by :trap-station-session-id)
        (vals)
-       (map #((juxt get-species-in-group
-                    get-nights-for-group)
-              %))
-       (reduce species-nights-reducer {})))
+       (reduce #(+ %1 (get-nights-for-group %2)) 0)))
 
 (defn- inc-or-one
   [v]
@@ -77,26 +74,33 @@
               get-species-locations
               get-species-nights))))
 
+(defn- get-species-photo-data
+  [state sightings]
+  (->> sightings
+       (group-by :species-scientific-name)
+       (reduce (fn [acc [k v]] (assoc acc k (count v))) {})))
+
 (defn- report-row
-  [obs locs nights spp]
-  (let [spp-obs (get obs spp)
-        spp-nights (get nights spp)]
-    (vector spp (get locs spp) spp-obs spp-nights
-            (if (= spp-nights 0)
+  [obs locs nights photo-counts spp]
+  (let [spp-obs (get obs spp)]
+    (vector spp (get locs spp) (get photo-counts spp)
+            spp-obs nights
+            (if (= nights 0)
               "-"
               (format "%.3f"
-                      (* 100 (double (/ spp-obs spp-nights))))))))
+                      (* 100 (double (/ spp-obs nights))))))))
 
 (defn report
   [state sightings]
-  (let [[obs locs nights] (get-report-aggregate-data state sightings)]
+  (let [[obs locs nights] (get-report-aggregate-data state sightings)
+        photo-counts (get-species-photo-data state sightings)]
     (->> (keys obs)
-         (map (partial report-row obs locs nights)))))
+         (map (partial report-row obs locs nights photo-counts)))))
 
 (defn csv-report
   [state sightings]
   (report-util/to-csv-string
-   (cons ["Species" "Locations" "Independent Observations" "Nights" "Observations / Night (%)"]
+   (cons ["Species" "Sites" "Photos" "Independent Observations" "Nights" "Observations / Night (%)"]
          (report state sightings))))
 
 (defn export
@@ -107,9 +111,9 @@
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")
         (r/header "Content-Length" (count data))
-        (r/header "Content-Disposition" "attachment; filename=\"species-summary.csv\""))))
+        (r/header "Content-Disposition" "attachment; filename=\"summary-statistics-report.csv\""))))
 
 (def routes
   "Species summary report routes."
-  (context "/species-summary" []
+  (context "/report/summary-statistics" []
            (GET "/:id" [id] (export id))))

@@ -10,7 +10,7 @@
              [sites :as sites]
              [photos :as photos]
              [media :as media]
-             [species-summary :as species-summary]
+             [summary-statistics-report :as summary-statistics-report]
              [sightings :as sightings]
              [survey-sites :as survey-sites]
              [surveys :as surveys]
@@ -54,7 +54,7 @@
           photos/routes
           sightings/routes
           camera-statuses/routes
-          species-summary/routes
+          summary-statistics-report/routes
           survey-sites/routes
           trap-stations/routes
           trap-station-sessions/routes

@@ -168,7 +168,7 @@
                                 (get-in vs [:selected-resource :details])))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :load-resource-children load-resource-children
-   :species-summary-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/species-summary/" rid))))
+   :summary-statistics-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/summary-statistics/" rid))))
    :delete (fn [vs rid] (let [screen (util/get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")
                             (delete (get-in screen [:states :delete :submit :success :event])
