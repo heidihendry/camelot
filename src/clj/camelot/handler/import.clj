@@ -127,7 +127,7 @@
   (let [data {:trap-station-session-id (:trap-station-session-id trap-station-session)
               :camera-id (:camera-id camera)
               :trap-station-session-camera-import-path folder-path}]
-    (or (trap-station-session-cameras/get-specific-by-camera state data)
+    (or (trap-station-session-cameras/get-specific-by-import-path state folder-path)
         (trap-station-session-cameras/create! state data))))
 
 (defn- get-or-create-species
@@ -223,7 +223,7 @@
                            (get-or-create-survey-site state survey)
                            (get-or-create-trap-station state sample)
                            (get-or-create-trap-session state album)
-                           (get-or-create-trap-camera state camera full-path))]
+                           (get-or-create-trap-camera state camera folder))]
       (import-media-for-camera state notes full-path
                                (:trap-station-session-camera-id trap-camera)
                                (vals (:photos album))))))

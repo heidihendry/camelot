@@ -135,7 +135,7 @@
 (defn imported-album?
   [state [file _]]
   (nil? (trap-station-session-cameras/get-specific-by-import-path
-         state (.toString file))))
+         state (subs (.toString file) (count (:root-path (:config state)))))))
 
 (defn read-albums
   "Read photo directories and return metadata structured as albums."

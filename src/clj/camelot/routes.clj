@@ -17,6 +17,8 @@
              [survey-sites :as survey-sites]
              [surveys :as surveys]
              [trap-station-session-cameras :as trap-station-session-cameras]
+             [raw-data-export :as raw-data-export]
+             [species-statistics-report :as species-statistics-report]
              [trap-station-sessions :as trap-station-sessions]
              [trap-stations :as trap-stations]
              [import :as import]]
@@ -57,6 +59,8 @@
           sightings/routes
           camera-statuses/routes
           summary-statistics-report/routes
+          species-statistics-report/routes
+          raw-data-export/routes
           survey-site-report/routes
           trap-station-report/routes
           survey-sites/routes

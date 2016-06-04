@@ -338,7 +338,9 @@
                 :menu [{:label (tr/translate (:config state) :action/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :action/edit)
-                        :action :edit-mode}]}
+                        :action :edit-mode}
+                       {:label (tr/translate (:config state) :action/species-statistics-report)
+                        :action :species-statistics-report}]}
    :layout [[:species-scientific-name]
             [:species-common-name]
             [:species-notes]]
@@ -374,6 +376,8 @@
                         :action :survey-sites}
                        {:label (tr/translate (:config state) :action/summary-statistics-report)
                         :action :summary-statistics-report}
+                       {:label (tr/translate (:config state) :action/raw-data-export)
+                        :action :raw-data-export}
                        ]}
    :layout [[:survey-name]
             [:survey-directory]
