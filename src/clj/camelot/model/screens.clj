@@ -136,10 +136,14 @@
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/media)
                         :action :media}]}
-   :layout [[:camera-id]]
+   :layout [[:camera-id]
+            [:trap-station-session-camera-import-path]]
    :schema {:camera-id {:type :select
                         :required true
-                        :generator :trap-station-session-cameras-available}}
+                        :generator :trap-station-session-cameras-available}
+            :trap-station-session-camera-import-path {:type :text
+                                                      :required false}}
+   
    :states {:create {:submit {:success {:type :event
                                         :event :trap-station-session-camera-create}
                               :error {:type :event
@@ -341,7 +345,7 @@
    :schema {:species-scientific-name {:type :text
                                       :required true}
             :species-common-name {:type :text
-                                  :required false}
+                                  :required true}
             :species-notes {:type :textarea
                             :cols 35
                             :rows 4}}

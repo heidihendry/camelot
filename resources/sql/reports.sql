@@ -12,7 +12,7 @@ LEFT JOIN trap_station USING (survey_site_id)
 LEFT JOIN trap_station_session USING (trap_station_id)
 LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
 LEFT JOIN media USING (trap_station_session_camera_id)
-LEFT JOIN sightings USING (media_id)
+LEFT JOIN sighting USING (media_id)
 LEFT JOIN species USING (species_id)
 WHERE survey_site.survey_id = :survey_id
 
@@ -267,7 +267,3 @@ LEFT OUTER JOIN media USING (trap_station_session_camera_id)
 LEFT OUTER JOIN sighting USING (media_id)
 LEFT OUTER JOIN species USING (species_id)
 LEFT OUTER JOIN photo USING (media_id)
-
--- name: -get-all-species
-SELECT species.species_scientific_name
-FROM species

@@ -36,6 +36,8 @@
 
    :trap-station-session-camera {:title "Session Camera"
                                  :sidebar-title "Session Cameras"
+                                 :trap-station-session-camera-import-path {:label "Import Path"
+                                                                           :description "The path to the files originally imported to this camera"}
                                  :camera-id {:label "Camera"
                                              :description "The camera to add to the Trap Station Session"}}
 
@@ -249,7 +251,7 @@
 
    :report {:nights-elapsed "Nights Elapsed"
             :independent-observations "Independent Observations"
-            :independent-observations-per-night "Observations / Night (%)"
+            :independent-observations-per-night "Observations / Night (%%)"
             :presence-absence "Presence"
             :survey-id "Survey ID"
             :survey-name "Survey Name"
@@ -282,6 +284,10 @@
             :trap-station-session-id "Trap Station Session ID"
             :trap-station-session-camera-id "Trap Station Session Camera ID"
             :media-id "Media ID"
+            :trap-station-session-camera-count "Number of Cameras in Sessions"
+            :trap-station-session-count "Number of Trap Station Sessions"
+            :trap-station-count "Number of Trap Stations"
+            :media-count "Number of Photos"
             :media-capture-timestamp "Media Capture Timestamp"
             :media-notes "Media Notes"
             :media-filename "Media Filename"

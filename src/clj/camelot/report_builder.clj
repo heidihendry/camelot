@@ -94,6 +94,32 @@
       "-"
       (format "%.3f" (* 100 (double (/ obs nights)))))))
 
+(defn sum-group
+  [group-col col data]
+  (reduce + 0
+          (flatten (map
+                    (fn [d] (get (first d) col))
+                    (vals (group-by group-col data))))))
+
+(defn night-group-value-for
+  [col data]
+  (reduce + 0
+          (flatten (map
+                    (fn [d] (get (first d) col))
+                    (vals (group-by :trap-station-session-id data))))))
+
+(defn indep-obs-group-value-for
+  [col data]
+  (reduce + 0
+          (flatten (map
+                    (fn [d] (get (first d) col))
+                    (vals (group-by :trap-station-session-id data))))))
+
+(defn presense-absence-group-value-for
+  [col data]
+  (let [obs (indep-obs-group-value-for :independent-observations data)]
+    (if (zero? obs) "" "X")))
+
 (defn- calculate-independent-observations-per-night
   [state data]
   (->> data
@@ -173,39 +199,42 @@
 (def add-calculated-columns (build-calculated-columns :calculate))
 (def add-post-aggregate-columns (build-calculated-columns :post-aggregate))
 
+(defn fill-keys
+  [columns data]
+  (map
+   #(reduce (fn [acc c]
+              (if (contains? acc c)
+                acc
+                (assoc acc c nil)))
+            %
+            columns)
+   data))
+
+(defn distinct-for-known-keys
+  [test-rec comp-rec]
+  (let [ks (keys test-rec)]
+    (if (= test-rec comp-rec)
+      true
+      (if (every? #(= (test-rec %) (comp-rec %)) ks)
+        false
+        true))))
+
+(defn distinct-in-results
+  [result-set testrec]
+  (every? #(distinct-for-known-keys testrec %) result-set))
+
 (defn project
   [columns data]
-  (set/project data columns))
+  (let [result (set/project data columns)]
+    (into #{} (fill-keys columns
+                         (filter #(distinct-in-results result %) result)))))
 
 (defn filter-records
   [state filters data]
-  (filter (fn [r] (every? #(% r) filters)) data))
-
-(defn sum-group
-  [group-col col data]
-  (reduce + 0
-          (flatten (map
-                    (fn [d] (get (first d) col))
-                    (vals (group-by group-col data))))))
-
-(defn night-group-value-for
-  [col data]
-  (reduce + 0
-          (flatten (map
-                    (fn [d] (get (first d) col))
-                    (vals (group-by :trap-station-session-id data))))))
-
-(defn presense-absence-group-value-for
-  [col data]
-  (let [obs (indep-obs-group-value-for :independent-observations data)]
-    (if (zero? obs) "" "X")))
-
-(defn indep-obs-group-value-for
-  [col data]
-  (reduce + 0
-          (flatten (map
-                    (fn [d] (get (first d) col))
-                    (vals (group-by :trap-station-session-id data))))))
+  (filter (fn [r] (if (seq filters)
+                    (every? #(% r) filters)
+                    true))
+          data))
 
 (defn aggregate-groups
   [aggregated-columns group]
@@ -229,24 +258,55 @@
                  {}
                  groups)))))
 
+(defn- sort-result
+  [order-by data]
+  (if (seq order-by)
+    (apply sorted-set-by (fn [a b]
+                     (->> order-by
+                          (map #(fn [x y] (compare (get x %) (get y %))))
+                          (map #(% a b))
+                          (cons (compare (into [] a) (into [] b)))
+                          (reduce #(if (zero? %2)
+                                     %1
+                                     (reduced %2)) 0)))
+                   data)
+    data))
+
+(defn- transform-records
+  [state transforms data]
+  (map
+   (fn [r] (reduce #(%2 %1) r transforms))
+   data))
+
 (defn report
-  [state columns filters aggregated-columns data]
+  [state {:keys [columns filters transforms aggregate-on order-by]} data]
   (->> data
        (add-calculated-columns state columns)
-       (aggregate-data columns aggregated-columns)
+       (aggregate-data columns aggregate-on)
        (add-post-aggregate-columns state columns)
+       (transform-records state transforms)
        (filter-records state filters)
-       (project columns)))
+       (project columns)
+       (sort-result order-by)))
 
 (defn cons-headings
   [state columns data]
   (cons (map #(tr/translate (:config state) (keyword (str "report/" (name %)))) columns)
         data))
 
+(defn- as-row
+  [state cols row]
+  (map #(get row %) cols))
+
+(defn as-rows
+  [state params data]
+  (let [cols (:columns params)]
+    (map (partial as-row state cols) data)))
+
 (defn exportable-report
-  [state columns filters aggregated-columns data]
+  [state params data]
   (->> data
-       (report state columns filters aggregated-columns)
-       (map vals)
-       (cons-headings state columns)
+       (report state params)
+       (as-rows state params)
+       (cons-headings state (:columns params))
        (report-util/to-csv-string)))
