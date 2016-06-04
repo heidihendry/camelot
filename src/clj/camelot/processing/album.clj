@@ -99,7 +99,7 @@
   [state sightings]
   (let [indep-reducer (partial independence-reducer state)
         total-spp (fn [[spp data]] {:species spp
-                                    :count (reduce + (map :quantity data))})]
+                                    :count (reduce + 0 (map :quantity data))})]
     (->> sightings
          (sort (partial datetime-comparison :media-capture-timestamp))
          (reduce indep-reducer {})

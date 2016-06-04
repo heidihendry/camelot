@@ -170,6 +170,7 @@
    :load-resource-children load-resource-children
    :summary-statistics-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/summary-statistics/" rid))))
    :trap-station-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/trap-station-statistics/" rid))))
+   :survey-site-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/survey-site-statistics/" rid))))
    :delete (fn [vs rid] (let [screen (util/get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")
                             (delete (get-in screen [:states :delete :submit :success :event])

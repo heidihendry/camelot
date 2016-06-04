@@ -12,6 +12,7 @@
              [media :as media]
              [summary-statistics-report :as summary-statistics-report]
              [trap-station-report :as trap-station-report]
+             [survey-site-report :as survey-site-report]
              [sightings :as sightings]
              [survey-sites :as survey-sites]
              [surveys :as surveys]
@@ -56,6 +57,7 @@
           sightings/routes
           camera-statuses/routes
           summary-statistics-report/routes
+          survey-site-report/routes
           trap-station-report/routes
           survey-sites/routes
           trap-stations/routes

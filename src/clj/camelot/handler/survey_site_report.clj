@@ -1,4 +1,4 @@
-(ns camelot.handler.trap-station-report
+(ns camelot.handler.survey-site-report
   (:require [camelot.db :as db]
             [yesql.core :as sql]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
@@ -12,9 +12,9 @@
 
 (sql/defqueries "sql/reports.sql" {:connection db/spec})
 
-(defn- get-sightings-for-trap-station
+(defn- get-sightings-for-survey-site
   [state id]
-  (db/with-db-keys state -get-sightings-for-trap-station {:trap-station-id id}))
+  (db/with-db-keys state -get-sightings-for-survey-site {:survey-site-id id}))
 
 (defn- get-all-species
   [state]
@@ -92,15 +92,15 @@
 (defn export
   [survey-id]
   (let [state (app/gen-state (config/config))
-        sightings (get-sightings-for-trap-station state survey-id)
+        sightings (get-sightings-for-survey-site state survey-id)
         species (map :species-scientific-name (get-all-species state))
         data (csv-report state species sightings)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")
         (r/header "Content-Length" (count data))
-        (r/header "Content-Disposition" "attachment; filename=\"trap-station-statistics.csv\""))))
+        (r/header "Content-Disposition" "attachment; filename=\"survey-site-statistics.csv\""))))
 
 (def routes
   "Species summary report routes."
-  (context "/report/trap-station-statistics" []
+  (context "/report/survey-site-statistics" []
            (GET "/:id" [id] (export id))))

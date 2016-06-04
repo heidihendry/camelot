@@ -105,7 +105,9 @@
                 :menu [{:label (tr/translate (:config state) :action/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :action/trap-stations)
-                        :action :trap-stations}]}
+                        :action :trap-stations}
+                       {:label (tr/translate (:config state) :action/survey-site-report)
+                        :action :survey-site-report}]}
    :layout [[:site-id]]
    :schema {:site-id {:type :select
                       :required true
