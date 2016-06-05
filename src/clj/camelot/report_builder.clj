@@ -90,7 +90,10 @@
 (defn- aggregate-groups
   [aggregated-columns group]
   (let [col-vals (reduce (partial aggregate-reducer group) {} aggregated-columns)
-        update-vals #(reduce-kv (fn [acc col v] (assoc acc col v))
+        update-vals #(reduce-kv (fn [acc col v]
+                                  (if (nil? (acc col))
+                                    acc
+                                    (assoc acc col v)))
                                 % col-vals)]
     (map update-vals group)))
 

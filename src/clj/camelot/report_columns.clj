@@ -55,9 +55,10 @@
   [record]
   (let [obs (:independent-observations record)
         nights (:nights-elapsed record)]
-    (if (or (nil? nights) (zero? nights))
-      "-"
-      (format "%.3f" (* 100 (double (/ obs nights)))))))
+    (cond
+        (nil? obs) nil
+        (or (nil? nights) (zero? nights)) "-"
+        :else (format "%.3f" (* 100 (double (/ obs nights)))))))
 
 (defn- aggregate-numeric
   [group-col col data]
