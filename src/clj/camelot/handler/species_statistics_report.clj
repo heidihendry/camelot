@@ -7,25 +7,37 @@
             [camelot.util.report :as report-util]
             [ring.util.response :as r]
             [clojure.edn :as edn]
-            [camelot.report-builder :as report-builder]))
+            [camelot.report-builder :as report-builder]
+            [camelot.handler.species :as species]))
 
 (defn report-configuration
-  [species-id]
-  {:columns [:species-scientific-name
-             :trap-station-longitude
-             :trap-station-latitude
-             :presence-absence
-             :independent-observations
-             :nights-elapsed
-             :independent-observations-per-night]
-   :aggregate-on [:independent-observations
-                  :nights-elapsed]
-   :filters [#(= (:species-id %) species-id)]
-   :order-by [:species-scientific-name ]})
+  [state species-id]
+  (let [spp (species/get-specific state species-id)]
+    {:columns [:species-scientific-name
+               :trap-station-longitude
+               :trap-station-latitude
+               :presence-absence
+               :independent-observations
+               :nights-elapsed
+               :independent-observations-per-night]
+     :aggregate-on [:independent-observations
+                    :nights-elapsed]
+     :filters [#(or (= (:species-id %) species-id)
+                    (nil? (:species-id %)))]
+     :transforms [#(if (= (:species-id %) species-id)
+                     %
+                     (select-keys % [:trap-station-longitude
+                                     :trap-station-latitude
+                                     :nights-elapsed]))
+                  #(if (nil? (:species-id %))
+                     (assoc % :species-scientific-name
+                            (:species-scientific-name spp))
+                     %)]
+     :order-by [:species-scientific-name]}))
 
 (defn report
   [state species-id sightings]
-  (let [conf (report-configuration species-id)]
+  (let [conf (report-configuration state species-id)]
     (->> sightings
          (report-builder/report state conf)
          (report-builder/as-rows state conf))))
@@ -34,7 +46,7 @@
   [state species-id sightings]
   (report-builder/exportable-report
    state
-   (report-configuration species-id) sightings))
+   (report-configuration state species-id) sightings))
 
 (defn export
   [species-id]

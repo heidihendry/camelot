@@ -18,9 +18,15 @@
              :independent-observations-per-night]
    :aggregate-on [:independent-observations
                   :nights-elapsed]
+   :pre-transforms [#(if (= (:trap-station-id %) trap-station-id)
+                       %
+                       (select-keys % [:species-scientific-name
+                                       :nights-elapsed]))]
    :transforms [#(if (= (:trap-station-id %) trap-station-id)
-                   %
-                  (select-keys % [:species-scientific-name :nights-elapsed :trap-station-id]))]
+                       %
+                       (select-keys % [:species-scientific-name
+                                       :nights-elapsed]))]
+   :filters [#(:species-scientific-name %)]
    :order-by [:species-scientific-name ]})
 
 (defn report
