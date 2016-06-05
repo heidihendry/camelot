@@ -109,7 +109,8 @@ LEFT OUTER JOIN camera USING (camera_id)
 LEFT OUTER JOIN photo USING (media_id)
 
 -- name: -get-all-by-species
-SELECT survey.survey_name,
+SELECT survey.survey_id,
+       survey.survey_name,
        survey.survey_directory,
        survey.survey_notes,
        site.site_id,

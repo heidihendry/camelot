@@ -190,6 +190,7 @@
    :action {:survey-sites "View Survey Sites"
             :trap-stations "View Trap Stations"
             :sightings "View Sightings"
+            :maxent-report "Download MaxEnt Export"
             :summary-statistics-report "Download Summary Statistics"
             :species-statistics-report "Download Species Statistics"
             :raw-data-export "Export Raw Data"

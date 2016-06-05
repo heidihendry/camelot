@@ -378,6 +378,8 @@
                         :action :summary-statistics-report}
                        {:label (tr/translate (:config state) :action/raw-data-export)
                         :action :raw-data-export}
+                       {:label (tr/translate (:config state) :action/maxent-report)
+                        :action :maxent-report}
                        ]}
    :layout [[:survey-name]
             [:survey-directory]

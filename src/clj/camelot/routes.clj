@@ -5,7 +5,6 @@
              [application :as app]
              [camera-statuses :as camera-statuses]
              [cameras :as cameras]
-             [maxent :as maxent]
              [screens :as screens]
              [sites :as sites]
              [photos :as photos]
@@ -19,6 +18,7 @@
              [trap-stations :as trap-stations]
              [import :as import]]
             [camelot.report
+             [maxent :as r.maxent]
              [summary-statistics :as r.summary-statistics]
              [trap-station :as r.trap-station]
              [survey-site :as r.survey-site]
@@ -45,7 +45,6 @@
 (def app-routes
   "All application routes."
   (routes misc-routes
-          maxent/routes
           app/routes
           config/routes
           albums/routes
@@ -64,6 +63,7 @@
           trap-stations/routes
           trap-station-sessions/routes
           trap-station-session-cameras/routes
+          r.maxent/routes
           r.summary-statistics/routes
           r.species-statistics/routes
           r.survey-site/routes
