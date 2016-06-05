@@ -1,10 +1,10 @@
-(ns camelot.report-builder
+(ns camelot.report.core
   (:require [camelot.db :as db]
             [yesql.core :as sql]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [clojure.set :as set]
-            [camelot.report-columns :as columns]
-            [camelot.util.report :as report-util]
+            [camelot.report.columns :as columns]
+            [camelot.report.util :as util]
             [ring.util.response :as r]
             [camelot.translation.core :as tr]))
 
@@ -26,7 +26,7 @@
   []
   (db/clj-keys (-get-all-by-camera)))
 
-(def query-fn-map
+(def ^:private query-fn-map
   {:survey get-all-by-survey
    :species get-all-by-species
    :site get-all-by-site
@@ -35,10 +35,6 @@
 (defn get-by
   [by]
   ((get query-fn-map by)))
-
-;;
-;; Result Processing
-;;
 
 (defn- fill-keys
   [columns data]
@@ -167,4 +163,4 @@
        (report state params)
        (as-rows state params)
        (cons-headings state (:columns params))
-       (report-util/to-csv-string)))
+       (util/to-csv-string)))

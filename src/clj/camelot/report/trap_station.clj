@@ -1,4 +1,4 @@
-(ns camelot.handler.trap-station-report
+(ns camelot.report.trap-station
   (:require [camelot.db :as db]
             [yesql.core :as sql]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
@@ -7,7 +7,7 @@
             [camelot.util.report :as report-util]
             [ring.util.response :as r]
             [clojure.edn :as edn]
-            [camelot.report-builder :as report-builder]))
+            [camelot.report.core :as report]))
 
 (defn report-configuration
   [trap-station-id]
@@ -33,19 +33,19 @@
   [state trap-station-id sightings]
   (let [conf (report-configuration trap-station-id)]
     (->> sightings
-         (report-builder/report state conf)
-         (report-builder/as-rows state conf))))
+         (report/report state conf)
+         (report/as-rows state conf))))
 
 (defn csv-report
   [state trap-station-id sightings]
-  (report-builder/exportable-report
+  (report/exportable-report
    state
    (report-configuration trap-station-id) sightings))
 
 (defn export
   [trap-station-id]
   (let [state (app/gen-state (config/config))
-        sightings (report-builder/get-data-by state :species)
+        sightings (report/get-by :species)
         data (csv-report state trap-station-id sightings)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")

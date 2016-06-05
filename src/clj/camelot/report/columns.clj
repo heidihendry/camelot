@@ -1,11 +1,6 @@
-(ns camelot.report-columns
+(ns camelot.report.columns
   (:require [camelot.processing.album :as album]
-            [clj-time.core :as t]
-))
-
-;;
-;; Column calculations
-;;
+            [clj-time.core :as t]))
 
 (defn- species-sighting-reducer
   [acc v]

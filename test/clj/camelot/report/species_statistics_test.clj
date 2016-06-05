@@ -1,5 +1,5 @@
-(ns camelot.handler.species-statistics-report-test
-  (:require [camelot.handler.species-statistics-report :as sut]
+(ns camelot.report.species-statistics-test
+  (:require [camelot.report.species-statistics :as sut]
             [midje.sweet :refer :all]
             [camelot.util.application :as app]
             [clj-time.core :as t]

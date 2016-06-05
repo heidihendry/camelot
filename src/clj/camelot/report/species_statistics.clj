@@ -1,4 +1,4 @@
-(ns camelot.handler.species-statistics-report
+(ns camelot.report.species-statistics
   (:require [camelot.db :as db]
             [yesql.core :as sql]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
@@ -7,7 +7,7 @@
             [camelot.util.report :as report-util]
             [ring.util.response :as r]
             [clojure.edn :as edn]
-            [camelot.report-builder :as report-builder]
+            [camelot.report.core :as report]
             [camelot.handler.species :as species]))
 
 (defn report-configuration
@@ -39,19 +39,19 @@
   [state species-id sightings]
   (let [conf (report-configuration state species-id)]
     (->> sightings
-         (report-builder/report state conf)
-         (report-builder/as-rows state conf))))
+         (report/report state conf)
+         (report/as-rows state conf))))
 
 (defn csv-report
   [state species-id sightings]
-  (report-builder/exportable-report
+  (report/exportable-report
    state
    (report-configuration state species-id) sightings))
 
 (defn export
   [species-id]
   (let [state (app/gen-state (config/config))
-        sightings (report-builder/get-data-by state :species)
+        sightings (report/get-by :species)
         data (csv-report state species-id sightings)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")

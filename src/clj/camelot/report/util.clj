@@ -1,4 +1,4 @@
-(ns camelot.util.report
+(ns camelot.report.util
   (:require [clojure.data.csv :as csv]
             [schema.core :as s]))
 
