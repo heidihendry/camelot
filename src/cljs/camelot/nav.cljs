@@ -4,24 +4,16 @@
             [secretary.core :as secretary :refer-macros [defroute]]
             [om.core :as om]
             [camelot.state :as state])
-  (:import [goog.history Html5History EventType]))
+  (:import [goog History]
+           [goog.history EventType]))
 
 (defn- get-token
   "Get the current location token"
   []
   (str js/window.location.pathname js/window.location.hash))
 
-(defn- make-history
-  "Initialise the HTML5 History"
-  []
-  (doto (Html5History.)
-    (.setPathPrefix (str js/window.location.protocol
-                         "//"
-                         js/window.location.host))
-    (.setUseFragment false)))
-
 (defonce history
-  (doto (make-history)
+  (doto (History.)
     (goog.events/listen EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (.setEnabled true)))
 
@@ -40,8 +32,13 @@
 
 (defn set-token!
   [history token]
-  (analytics-pageview token)
-  (.setToken history token))
+  (prn token)
+  (let [token (if (= (subs token 0 2) "/#")
+                (subs token 2)
+                token)]
+    (analytics-pageview token)
+    (.setToken history token)
+    token))
 
 (defn breadnav!
   "Navigate to a URL token, creating a breadcrumb"

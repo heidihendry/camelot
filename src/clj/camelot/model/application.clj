@@ -42,14 +42,14 @@
 (defn nav-menu
   "Main navigation menu structure."
   [state]
-  {:menu-items [{:url "/#/dashboard"
+  {:menu-items [{:url "/dashboard"
                  :label (tr/translate (:config state) :application/import)}
-                {:url "/#/surveys"
+                {:url "/surveys"
                  :label (tr/translate (:config state) :application/surveys)}
-                {:url "/#/sites"
+                {:url "/sites"
                  :label (tr/translate (:config state) :application/sites)}
-                {:url "/#/cameras"
+                {:url "/cameras"
                  :label (tr/translate (:config state) :application/cameras)}
-                {:url "/#/species"
+                {:url "/species"
                  :label (tr/translate (:config state) :application/species)}
                 {:function "settings"}]})

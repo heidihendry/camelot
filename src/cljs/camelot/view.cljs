@@ -138,35 +138,47 @@
 (def actions
   "Mapping of actions to the corresponding action function."
   {:survey-sites (fn [vs rid]
-                   (cnav/breadnav! (str "/#/survey-sites/" rid)
+                   (cnav/breadnav! (str "/survey-sites/" rid)
                                   (util/get-breadcrumb-label vs)
                                   (get-in vs [:selected-resource :details])))
    :trap-stations (fn [vs rid]
-                    (cnav/breadnav! (str "/#/trap-stations/" rid)
+                    (cnav/breadnav! (str "/trap-stations/" rid)
                                    (util/get-breadcrumb-label vs)
                                    (get-in vs [:selected-resource :details])))
    :trap-station-sessions (fn [vs rid]
-                            (cnav/breadnav! (str "/#/trap-station-sessions/" rid)
+                            (cnav/breadnav! (str "/trap-station-sessions/" rid)
                                            (util/get-breadcrumb-label vs)
                                            (get-in vs [:selected-resource :details])))
    :trap-station-session-cameras (fn [vs rid]
-                                   (cnav/breadnav! (str "/#/trap-station-session-cameras/" rid)
+                                   (cnav/breadnav! (str "/trap-station-session-cameras/" rid)
                                                   (util/get-breadcrumb-label vs)
                                                   (get-in vs [:selected-resource :details])))
    :media (fn [vs rid]
-            (cnav/breadnav! (str "/#/media/" rid)
+            (cnav/breadnav! (str "/media/" rid)
                             (util/get-breadcrumb-label vs)
                             (get-in vs [:selected-resource :details])))
    :photos (fn [vs rid]
-             (cnav/breadnav! (str "/#/photos/" rid)
+             (cnav/breadnav! (str "/photos/" rid)
                              (util/get-breadcrumb-label vs)
                              (get-in vs [:selected-resource :details])))
    :sightings (fn [vs rid]
-                (cnav/breadnav! (str "/#/sightings/" rid)
+                (cnav/breadnav! (str "/sightings/" rid)
                                 (util/get-breadcrumb-label vs)
                                 (get-in vs [:selected-resource :details])))
    :edit-mode (fn [vs rid] (om/update! (get vs :screen) :mode :update))
    :load-resource-children load-resource-children
+   :load-resource (fn [vs id]
+                    (let [cs (get-in vs [:selected-resource :children])
+                          rkey (get-in (util/get-screen vs) [:resource :id])
+                          resource (->> cs
+                                        (filter #(= (int id) (get % rkey)))
+                                        (first))]
+                      (when resource
+                        (rest/get-resource (:uri resource)
+                                           (fn [resp]
+                                             (om/update! (get vs :selected-resource) :details (:body resp))
+                                             (om/update! vs :buffer (:body resp))
+                                             (om/update! (get vs :screen) :resource-id nil))))))
    :summary-statistics-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/summary-statistics/" rid))))
    :trap-station-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/trap-station-statistics/" rid))))
    :survey-site-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/survey-site-statistics/" rid))))
@@ -186,14 +198,11 @@
    :build-generator build-generator
    :analytics-event (fn [event action] (cnav/analytics-event event action))
    :metadata-schema #(state/metadata-schema-state)
-   :sidebar-item-click (fn [uri vs]
+   :sidebar-item-click (fn [vs id]
                          (cnav/analytics-event "sidebar-navigate"
-                                              (util/get-resource-type-name vs))
-                         (rest/get-resource uri
-                                            (fn [resp]
-                                              (om/update! (get vs :screen) :mode :readonly)
-                                              (om/update! (get vs :selected-resource) :details (:body resp))
-                                              (om/update! vs :buffer (:body resp)))))
+                                               (util/get-resource-type-name vs))
+                         (om/update! (get vs :screen) :mode :readonly)
+                         ((:load-resource actions) vs id))
    :sidebar-create-click (fn [vs]
                            (cnav/analytics-event "sidebar-create"
                                                 (util/get-resource-type-name vs))
@@ -248,27 +257,37 @@
              {:target (js/document.getElementById "settings")})))
 
 (defn page-content-view
-  [type mode & [id]]
+  [type mode {:keys [id resource-id]}]
   (when (and (not (nil? (:view (state/app-state-cursor))))
              (not (nil? (:resources (state/app-state-cursor)))))
     (om/update! (get (state/app-state-cursor) :view) :content
-                {:screen {:type type :mode mode :id id} :buffer {}
+                {:screen {:type type :mode mode :id id :resource-id resource-id}
+                 :buffer {}
                  :selected-resource {}
                  :generator-data {}})
+    (prn resource-id)
     (let [f (smithy/build-view-component :content)]
       (om/root f state/app-state
                {:target (js/document.getElementById "page-content")}))))
 
-(defroute "/#/dashboard" [] (generate-view calb/album-view-component))
-(defroute "/#/surveys" [] (page-content-view :survey :create))
-(defroute "/#/trap-station-session-cameras/:id" [id] (page-content-view :trap-station-session-camera :create id))
-(defroute "/#/trap-station-sessions/:id" [id] (page-content-view :trap-station-session :create id))
-(defroute "/#/media/:id" [id] (page-content-view :media :create id))
-(defroute "/#/photos/:id" [id] (page-content-view :photo :create id))
-(defroute "/#/sightings/:id" [id] (page-content-view :sighting :create id))
-(defroute "/#/trap-stations/:id" [id] (page-content-view :trap-station :create id))
-(defroute "/#/survey-sites/:id" [id] (page-content-view :survey-site :create id))
-(defroute "/#/sites" [] (page-content-view :site :create))
-(defroute "/#/cameras" [] (page-content-view :camera :create))
-(defroute "/#/species" [] (page-content-view :species :create))
+(defroute "/dashboard" [] (generate-view calb/album-view-component) {})
+(defroute "/surveys" [] (page-content-view :survey :create {}))
+(defroute "/surveys/:mode/:rid" [mode rid] (page-content-view :survey (keyword mode)
+                                                              {:resource-id rid}))
+(defroute "/trap-station-session-cameras/:id" [id] (page-content-view :trap-station-session-camera :create
+                                                                        {:id id}))
+(defroute "/trap-station-session-cameras/:id/:mode/:resource-id" [id mode resource-id]
+  (page-content-view :trap-station-session-camera (keyword mode) {:resource-id resource-id
+                                                                  :id id}))
+(defroute "/trap-station-sessions/:id" [id] (page-content-view :trap-station-session :create
+                                                                 {:id id}))
+(defroute "/media/:id" [id] (page-content-view :media :create
+                                                 {:id id}))
+(defroute "/photos/:id" [id] (page-content-view :photo :create {:id id}))
+(defroute "/sightings/:id" [id] (page-content-view :sighting :create {:id id}))
+(defroute "/trap-stations/:id" [id] (page-content-view :trap-station :create {:id id}))
+(defroute "/survey-sites/:id" [id] (page-content-view :survey-site :create {:id id}))
+(defroute "/sites" [] (page-content-view :site :create {}))
+(defroute "/cameras" [] (page-content-view :camera :create {}))
+(defroute "/species" [] (page-content-view :species :create {}))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

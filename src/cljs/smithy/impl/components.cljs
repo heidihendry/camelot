@@ -156,8 +156,8 @@
     (render [_]
       (dom/li #js {:className "sidebar-item"
                    :onClick #((get-in data [:view-state :events-ref :sidebar-item-click])
-                              (get data :uri)
-                              (get data :view-state))}
+                              (get data :view-state)
+                              (get data :id))}
               (let [label (get (:item data) (get data :label))]
                 (if (= (type label) UtcDateTime)
                   (let [df (DateTimeFormat. "yyyy-MM-dd HH:MM:ss")]
@@ -175,7 +175,7 @@
                          (map #(hash-map :item %
                                          :view-state vs
                                          :label (get res :label)
-                                         :id (get res :id)
+                                         :id (get % (get res :id))
                                          :uri (get % :uri))
                               (get-in vs [:selected-resource :children]))))))
 
@@ -294,6 +294,9 @@
       (render [_]
         (let [vs (get-in app [:view type])
               screen (util/get-screen vs)]
+          (if-let [rid (get-in vs [:screen :resource-id])]
+            (if-let [f (get-in vs [:actions-ref :load-resource])]
+              (f vs rid)))
           (dom/div #js {:className "main-content-container"}
                    (when (get screen :sidebar)
                      (om/build sidebar-component vs))

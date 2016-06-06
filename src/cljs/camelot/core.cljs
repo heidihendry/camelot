@@ -15,7 +15,7 @@
 
 (defn default-page [hash]
   (if (= hash "")
-    "/#/dashboard"
+    "/dashboard"
     (str "/" hash)))
 
 (defn disable-loading-screen
@@ -31,7 +31,8 @@
       .-location
       .-hash
       default-page
-      (snav/nav!)))
+      (snav/nav!)
+      (secretary/dispatch!)))
 
 (defn initialise-state
   []
@@ -65,4 +66,4 @@
 (secretary/set-config! :prefix "#")
 
 (defonce initial-state
-  (do (initialise-application)))
+  (initialise-application))
