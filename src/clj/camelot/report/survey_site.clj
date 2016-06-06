@@ -1,10 +1,7 @@
 (ns camelot.report.survey-site
-  (:require [camelot.db :as db]
-            [yesql.core :as sql]
-            [compojure.core :refer [ANY context DELETE GET POST PUT]]
+  (:require [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [camelot.util.application :as app]
             [camelot.util.config :as config]
-            [camelot.util.report :as report-util]
             [ring.util.response :as r]
             [camelot.report.core :as report]
             [clojure.edn :as edn]))

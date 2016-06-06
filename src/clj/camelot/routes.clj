@@ -13,11 +13,11 @@
              [survey-sites :as survey-sites]
              [surveys :as surveys]
              [trap-station-session-cameras :as trap-station-session-cameras]
-             [raw-data-export :as raw-data-export]
              [trap-station-sessions :as trap-station-sessions]
              [trap-stations :as trap-stations]
              [import :as import]]
             [camelot.report
+             [raw-data-export :as r.raw-data-export]
              [maxent :as r.maxent]
              [summary-statistics :as r.summary-statistics]
              [trap-station :as r.trap-station]
@@ -58,11 +58,11 @@
           photos/routes
           sightings/routes
           camera-statuses/routes
-          raw-data-export/routes
           survey-sites/routes
           trap-stations/routes
           trap-station-sessions/routes
           trap-station-session-cameras/routes
+          r.raw-data-export/routes
           r.maxent/routes
           r.summary-statistics/routes
           r.species-statistics/routes

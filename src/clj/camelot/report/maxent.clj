@@ -2,7 +2,6 @@
   (:require [camelot.util.application :as app]
             [camelot.util.config :as config]
             [clojure.string :as str]
-            [camelot.util.report :as report-util]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [ring.util.response :as r]
             [schema.core :as s]

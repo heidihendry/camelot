@@ -1,13 +1,10 @@
-(ns camelot.handler.raw-data-export
-  (:require [camelot.db :as db]
-            [yesql.core :as sql]
-            [compojure.core :refer [ANY context DELETE GET POST PUT]]
+(ns camelot.report.raw-data-export
+  (:require [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [camelot.util.application :as app]
             [camelot.util.config :as config]
-            [camelot.util.report :as report-util]
             [ring.util.response :as r]
             [clojure.edn :as edn]
-            [camelot.report-builder :as report-builder]))
+            [camelot.report.core :as report]))
 
 (defn report-configuration
   [survey-id]
@@ -27,19 +24,19 @@
   [state survey-id sightings]
   (let [conf (report-configuration survey-id)]
     (->> sightings
-         (report-builder/report state conf)
-         (report-builder/as-rows state conf))))
+         (report/report state conf)
+         (report/as-rows state conf))))
 
 (defn csv-report
   [state survey-id sightings]
-  (report-builder/exportable-report
+  (report/exportable-report
    state
    (report-configuration survey-id) sightings))
 
 (defn export
   [survey-id]
   (let [state (app/gen-state (config/config))
-        sightings (report-builder/get-data-by state :survey)
+        sightings (report/get-by state :survey)
         data (csv-report state survey-id sightings)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")
