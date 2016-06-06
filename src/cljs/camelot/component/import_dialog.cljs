@@ -30,14 +30,14 @@
 (defn post-import
   []
   (om/update! (state/app-state-cursor) :loading "Uploading")
-  (cnav/analytics-event "upload" "import-begin")
+  (nav/analytics-event "upload" "import-begin")
   (rest/post-x "/import/media"
                {:data (deref (:selections (state/import-dialog-state)))}
                #(do (om/update! (state/app-state-cursor) :loading nil)
-                    (cnav/analytics-event "upload" "import-success")
+                    (nav/analytics-event "upload" "import-success")
                     (albums/reload-albums))
                #(do (om/update! (state/app-state-cursor) :loading nil)
-                    (cnav/analytics-event "upload" "import-failure"))))
+                    (nav/analytics-event "upload" "import-failure"))))
 
 (defn- generic-select
   [field e]

@@ -1,6 +1,7 @@
 (ns camelot.component.albums
   (:require [camelot.component.nav :as nav]
             [camelot.rest :as rest]
+            [camelot.nav :as cnav]
             [camelot.state :as state]
             [camelot.util :as util]
             [om.core :as om :include-macros true]
@@ -29,6 +30,7 @@
 
 (defn show-import-dialog
   [path]
+  (cnav/analytics-event "upload" "open-dialog")
   (om/update! (state/import-dialog-state) :path path)
   (om/update! (state/import-dialog-state) :visible true))
 

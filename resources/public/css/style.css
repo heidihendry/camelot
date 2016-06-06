@@ -530,13 +530,16 @@ pre.field-input {
     top: 10rem;
     left: calc(50vw - 17rem);
     border-radius: 0.5rem;
+    margin: 0;
+    padding: 0;
 }
 #import-dialog .content {
     background: #fff;
-    height: 28rem;
     width: 34rem;
     padding: 1rem 2rem;
+    padding-bottom: 1.5rem;
     border-radius: 0.5rem;
+    margin: 0;
 }
 #import-dialog .button-container {
     padding-top: 1rem;
