@@ -178,7 +178,9 @@
                                            (fn [resp]
                                              (om/update! (get vs :selected-resource) :details (:body resp))
                                              (om/update! vs :buffer (:body resp))
-                                             (om/update! (get vs :screen) :resource-id nil))))))
+                                             (if (get-in vs [:screen :resource-id])
+                                               (om/update! (get vs :screen) :resource-id nil)
+                                               (om/update! (get vs :screen) :mode :readonly)))))))
    :summary-statistics-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/summary-statistics/" rid))))
    :trap-station-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/trap-station-statistics/" rid))))
    :survey-site-report (fn [vs rid] (.open js/window (cam.util/with-baseurl (str "/report/survey-site-statistics/" rid))))
@@ -201,7 +203,6 @@
    :sidebar-item-click (fn [vs id]
                          (cnav/analytics-event "sidebar-navigate"
                                                (util/get-resource-type-name vs))
-                         (om/update! (get vs :screen) :mode :readonly)
                          ((:load-resource actions) vs id))
    :sidebar-create-click (fn [vs]
                            (cnav/analytics-event "sidebar-create"

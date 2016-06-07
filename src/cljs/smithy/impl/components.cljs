@@ -157,7 +157,7 @@
       (dom/li #js {:className "sidebar-item"
                    :onClick #((get-in data [:view-state :events-ref :sidebar-item-click])
                               (get data :view-state)
-                              (get data :id))}
+                              (get data :resource-id))}
               (let [label (get (:item data) (get data :label))]
                 (if (= (type label) UtcDateTime)
                   (let [df (DateTimeFormat. "yyyy-MM-dd HH:MM:ss")]
@@ -175,7 +175,8 @@
                          (map #(hash-map :item %
                                          :view-state vs
                                          :label (get res :label)
-                                         :id (get % (get res :id))
+                                         :id (get res :id)
+                                         :resource-id (get % (get res :id))
                                          :uri (get % :uri))
                               (get-in vs [:selected-resource :children]))))))
 
