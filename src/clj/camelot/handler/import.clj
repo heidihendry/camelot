@@ -208,11 +208,17 @@
       (create-sightings state (:media-id media) (:sightings photo))
       (copy-pathname photopath targetname))))
 
+(defn- path-separator-re
+  []
+  (if SystemUtils/IS_OS_WINDOWS
+    #"\\"
+    #"/"))
+
 (defn media
   "Import media"
   [{:keys [folder session-camera-id notes]}]
   (db/with-transaction [state (app/gen-state (conf/config))]
-    (let [[_ sitename cameraname] (str/split folder (re-pattern SystemUtils/FILE_SEPARATOR))
+    (let [[_ sitename cameraname] (str/split folder (path-separator-re))
           root-path (:root-path (:config state))
           full-path (str root-path folder)
           album (get-album state root-path full-path)
