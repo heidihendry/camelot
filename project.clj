@@ -25,6 +25,7 @@
                  [org.clojure/java.jdbc "0.4.2"]
                  [org.omcljs/om "1.0.0-alpha32" :exclusions [com.cognitect/transit-cljs cljsjs/react]]
                  [prismatic/schema "1.0.5"]
+                 ;; Note: ragtime.jdbc/basename has been redefined in camelot.db.
                  [ragtime "0.5.3"]
                  [ring "1.4.0"]
                  [ring-transit "0.1.4"]

@@ -100,3 +100,10 @@
    (rtc/rollback-last (:datastore c)
                       (rtc/into-index (:migrations c))
                       n)))
+
+;; Work around for https://github.com/weavejester/ragtime/issues/103
+(let [pattern (re-pattern (str "([^\\/]*)\\/?$"))]
+  (defn- -resource-basename
+    [file]
+    (second (re-find pattern (str file)))))
+(intern 'ragtime.jdbc 'basename #'-resource-basename)
