@@ -32,7 +32,6 @@
 
 (defn set-token!
   [history token]
-  (prn token)
   (let [token (if (= (subs token 0 2) "/#")
                 (subs token 2)
                 token)]

@@ -266,7 +266,6 @@
                  :buffer {}
                  :selected-resource {}
                  :generator-data {}})
-    (prn resource-id)
     (let [f (smithy/build-view-component :content)]
       (om/root f state/app-state
                {:target (js/document.getElementById "page-content")}))))
