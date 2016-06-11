@@ -1,6 +1,6 @@
 (ns camelot.report.survey-site
   (:require [compojure.core :refer [ANY context DELETE GET POST PUT]]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [camelot.util.config :as config]
             [ring.util.response :as r]
             [camelot.report.core :as report]

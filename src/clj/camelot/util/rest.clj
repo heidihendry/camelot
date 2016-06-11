@@ -1,7 +1,7 @@
 (ns camelot.util.rest
   (:require [camelot.util.config :as conf]
             [clojure.edn :as edn]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [clojure.tools.logging :as log]
             [ring.util.response :as r]))
 
@@ -139,27 +139,42 @@
   - the configuration as its first argument,
   - a parsed ID is its second argument,
   - a (processed) map as its third argument"
-  [f id-str data]
-  (let [stddata (parse-floats (parse-ids (decursorise data)))
-        id (as-long id-str)]
-    (-> (conf/config)
-        (app/gen-state)
-        (f id stddata)
-        (cursorise)
-        (r/response))))
+  ([f id-str data]
+   (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))
+         id (as-long id-str)]
+     (-> (conf/config)
+         (app/gen-state)
+         (f id stddata)
+         (cursorise)
+         (r/response))))
+  ([f id-str ctor data]
+   (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))
+         id (as-long id-str)]
+     (-> (conf/config)
+         (app/gen-state)
+         (f id stddata)
+         (cursorise)
+         (r/response)))))
 
 (defn create-resource
   "Create a single resource.
   `f' is a function which creates a resource.  It will take the configuration
   as its first argument, and a (processed) map of the data for the resource as
   its second argument."
-  [f data]
-  (let [stddata (parse-ids (decursorise data))]
-    (-> (conf/config)
-        (app/gen-state)
-        (f stddata)
-        (cursorise)
-        (r/response))))
+  ([f data]
+   (let [stddata (-> data (decursorise) (parse-ids))]
+     (-> (conf/config)
+         (app/gen-state)
+         (f stddata)
+         (cursorise)
+         (r/response))))
+  ([f ctor data]
+   (let [stddata (-> data (decursorise) (parse-ids) (ctor))]
+     (-> (conf/config)
+         (app/gen-state)
+         (f stddata)
+         (cursorise)
+         (r/response)))))
 
 (defn delete-resource
   "Delete a resource.

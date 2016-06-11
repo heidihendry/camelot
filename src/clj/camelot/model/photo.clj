@@ -1,95 +1,82 @@
 (ns camelot.model.photo
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [camelot.db :as db]
+            [camelot.model.state :refer [State]]
+            [yesql.core :as sql]))
 
-(defn valid?
-  [photo]
-  (not (:invalid photo)))
+(sql/defqueries "sql/photos.sql" {:connection db/spec})
 
-(def InvalidPhoto
-  {(s/required-key :invalid) s/Str})
+(s/defrecord TPhoto
+    [photo_iso_setting :- s/Int
+     photo_exposure_value :- s/Str
+     photo_flash_setting :- s/Str
+     photo_focal_length :- s/Str
+     photo_fnumber_setting :- s/Str
+     photo_orientation :- s/Str
+     photo_resolution_x :- s/Int
+     photo_resolution_y :- s/Int
+     media_id :- s/Int])
 
-(s/defrecord Location
-    [gps-longitude :- (s/maybe s/Num)
-     gps-latitude :- (s/maybe s/Num)
-     gps-altitude :- (s/maybe s/Str)
-     sublocation :- (s/maybe s/Str)
-     city :- (s/maybe s/Str)
-     state-province :- (s/maybe s/Str)
-     country :- (s/maybe s/Str)
-     country-code :- (s/maybe s/Str)
-     map-datum :- (s/maybe s/Str)])
+(s/defrecord Photo
+    [photo-id :- s/Int
+     photo-created :- org.joda.time.DateTime
+     photo-updated :- org.joda.time.DateTime
+     photo_iso_setting :- s/Int
+     photo_exposure_value :- s/Str
+     photo_flash_setting :- s/Str
+     photo_focal_length :- s/Str
+     photo_fnumber_setting :- s/Str
+     photo_orientation :- s/Str
+     photo_resolution_x :- s/Int
+     photo_resolution_y :- s/Int
+     media_id :- s/Int])
 
-(s/defrecord CameraSettings
-    [aperture :- (s/maybe s/Str)
-     exposure :- (s/maybe s/Str)
-     flash :- (s/maybe s/Str)
-     focal-length :- (s/maybe s/Str)
-     fstop :- (s/maybe s/Str)
-     iso :- (s/maybe s/Num)
-     orientation :- (s/maybe s/Str)
-     resolution-x :- s/Num
-     resolution-y :- s/Num])
+(s/defn tphoto :- TPhoto
+  [{:keys [photo_iso_setting photo_exposure_value photo_flash_setting
+           photo_focal_length photo_fnumber_setting photo_orientation
+           photo_resolution_x photo_resolution_y media_id]}]
+  (->TPhoto photo_iso_setting photo_exposure_value photo_flash_setting
+            photo_focal_length photo_fnumber_setting photo_orientation
+            photo_resolution_x photo_resolution_y media_id))
 
-(s/defrecord Camera
-    [make :- (s/maybe s/Str)
-     model :- (s/maybe s/Str)
-     software :- (s/maybe s/Str)])
+(s/defn photo :- Photo
+  [{:keys [photo-id photo-created photo-updated photo_iso_setting
+           photo_exposure_value photo_flash_setting photo_focal_length
+           photo_fnumber_setting photo_orientation photo_resolution_x
+           photo_resolution_y media_id]}]
+  (->Photo photo-id photo-created photo-updated photo_iso_setting
+           photo_exposure_value photo_flash_setting photo_focal_length
+           photo_fnumber_setting photo_orientation photo_resolution_x
+           photo_resolution_y media_id))
 
-(s/defrecord Sighting
-    [species :- (s/maybe s/Str)
-     quantity :- (s/maybe s/Num)])
+(s/defn get-all :- [Photo]
+  [state :- State
+   id :- s/Num]
+  (map photo (db/with-db-keys state -get-all {:media-id id})))
 
-(s/defrecord PhotoMetadata
-    [datetime :- org.joda.time.DateTime
-     datetime-original :- (s/maybe org.joda.time.DateTime)
-     headline :- (s/maybe s/Str)
-     artist :- (s/maybe s/Str)
-     phase :- (s/maybe s/Str)
-     copyright :- (s/maybe s/Str)
-     description :- (s/maybe s/Str)
-     filename :- s/Str
-     filesize :- s/Num
-     sightings :- [Sighting]
-     camera :- (s/maybe Camera)
-     settings :- (s/maybe CameraSettings)
-     location :- Location])
+(s/defn get-specific :- Photo
+  [state :- State
+   id :- s/Num]
+  (some->> {:photo-id id}
+           (db/with-db-keys state -get-specific)
+           (first)
+           (photo)))
 
-(s/defn location :- Location
-  [{:keys [gps-longitude
-           gps-latitude
-           gps-altitude
-           sublocation
-           city
-           state
-           country
-           country-code
-           map-datum]}]
-  (->Location gps-longitude
-              gps-latitude
-              gps-altitude
-              sublocation
-              city
-              state
-              country
-              country-code
-              map-datum))
+(s/defn create! :- Photo
+  [state :- State
+   data :- TPhoto]
+  (let [record (db/with-db-keys state -create<! data)]
+    (photo (get-specific state (int (:1 record))))))
 
-(s/defn sighting :- Sighting
-  [{:keys [species quantity]}]
-  (->Sighting species quantity))
+(s/defn update! :- Photo
+  [state :- State
+   id :- s/Int
+   data :- TPhoto]
+  (db/with-db-keys state -update! (merge data {:photo-id id}))
+  (photo (get-specific state id)))
 
-(s/defn camera :- Camera
-  "Camera constructor"
-  [{:keys [make model sw]}]
-  (->Camera make model sw))
-
-(s/defn camera-settings :- CameraSettings
-  "CameraSettings constructor"
-  [{:keys [aperture exposure flash focal-length fstop iso orientation width height]}]
-  (->CameraSettings aperture exposure flash focal-length
-                    fstop iso orientation width height))
-
-(s/defn photo :- PhotoMetadata
-  "Photo constructor"
-  [{:keys [datetime datetime-original headline artist phase copyright description filename filesize sightings camera camera-settings location]}]
-  (->PhotoMetadata datetime datetime-original headline artist phase copyright description filename filesize sightings camera camera-settings location))
+(s/defn delete!
+  [state :- State
+   id :- s/Int]
+  (db/with-db-keys state -delete! {:photo-id id})
+  nil)

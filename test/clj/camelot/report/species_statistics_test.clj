@@ -1,19 +1,15 @@
 (ns camelot.report.species-statistics-test
   (:require [camelot.report.species-statistics :as sut]
             [midje.sweet :refer :all]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
+            [camelot.test-util.state :as state]
             [clj-time.core :as t]
             [clojure.string :as str]
-            [camelot.handler.species :as species]))
-
-(defn- gen-state-helper
-  [config]
-  (app/gen-state (assoc config :language :en)))
+            [camelot.model.species :as species]))
 
 (defn- calc-obs-nights
   [obs nights]
   (format "%.3f" (* 100 (double (/ obs nights)))))
-
 
 (def headings ["Species Scientific Name"
                "Trap Station Longitude"
@@ -39,12 +35,12 @@
 (facts "Species Statistics Report"
   (fact "Report data form empty sightings is empty"
     (let [sightings '()
-          state (gen-state-helper {})
+          state (state/gen-state {})
           result (sut/report state 1 sightings)]
       result => '()))
 
   (fact "Media without sightings should be excluded"
-    (with-redefs [camelot.handler.species/get-specific
+    (with-redefs [species/get-specific
                   (fn [state id]
                     {:species-scientific-name "Smiley Wolf"})]
       (let [sightings (list (as-sample {})
@@ -53,7 +49,7 @@
                                         :media-id 1
                                         :species-id 1
                                         :trap-station-session-id 1}))
-            state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+            state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (sut/report state 1 sightings)]
         result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]))))
 
@@ -63,7 +59,7 @@
                                       :media-id 1
                                       :species-id 1
                                       :trap-station-session-id 1}))
-          state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+          state (state/gen-state {:sighting-independence-minutes-threshold 20})
           result (sut/report state 1 sightings)]
       result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)])))
 
@@ -82,7 +78,7 @@
                                       :trap-station-id 2
                                       :media-capture-timestamp (t/date-time 2015 1 4 10 50 15)
                                       :trap-station-session-id 2}))
-          state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+          state (state/gen-state {:sighting-independence-minutes-threshold 20})
           result (sut/report state 1 sightings)]
       result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]
                       ["Smiley Wolf" 30.5 5.5 "X" 5 7 (calc-obs-nights 5 7)])))
@@ -100,12 +96,12 @@
                                       :species-id 1
                                       :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                       :trap-station-session-id 1}))
-          state (gen-state-helper {:sighting-independence-minutes-threshold 10})
+          state (state/gen-state {:sighting-independence-minutes-threshold 10})
           result (sut/report state 1 sightings)]
       result => (list ["Smiley Wolf" 30 5 "X" 8 7 (calc-obs-nights 8 7)])))
 
   (fact "Should include entries for locations the species was not found in"
-    (with-redefs [camelot.handler.species/get-specific
+    (with-redefs [species/get-specific
                   (fn [state id]
                     {:species-scientific-name "Smiley Wolf"})]
       (let [sightings (list (as-sample {:species-scientific-name "Smiley Wolf"
@@ -124,14 +120,14 @@
                                         :trap-station-latitude 50
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 30 15)
                                         :trap-station-session-id 3}))
-            state (gen-state-helper {:sighting-independence-minutes-threshold 10})
+            state (state/gen-state {:sighting-independence-minutes-threshold 10})
             result (sut/report state 1 sightings)]
         result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]
                         ["Smiley Wolf" 40 10 nil nil 7 nil]
                         ["Smiley Wolf" 90 50 nil nil 7 nil]))))
 
   (fact "Should return only the species searched"
-    (with-redefs [camelot.handler.species/get-specific
+    (with-redefs [species/get-specific
                   (fn [state id]
                     {:species-scientific-name "A. Meerkat"})]
       (let [sightings (list (as-sample {:species-scientific-name "Smiley Wolf"
@@ -149,14 +145,14 @@
                                         :species-id 3
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                         :trap-station-session-id 3}))
-            state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+            state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (sut/report state 3 sightings)]
         result => (list ["A. Meerkat" 30 5 "X" 1 7 (calc-obs-nights 1 7)])))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
     (let [sightings '()
-          state (gen-state-helper {})
+          state (state/gen-state {})
           result (sut/csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n")))
 
@@ -175,7 +171,7 @@
                                       :trap-station-id 2
                                       :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                       :trap-station-session-id 2}))
-          state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+          state (state/gen-state {:sighting-independence-minutes-threshold 20})
           result (sut/csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n"
                      "Smiley Wolf,30,5,X,3,7," (calc-obs-nights 3 7) "\n"

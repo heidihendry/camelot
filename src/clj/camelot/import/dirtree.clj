@@ -1,16 +1,16 @@
-(ns camelot.processing.dirtree
+(ns camelot.import.dirtree
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [clj-time.core :as t]
             [schema.core :as s]
-            [camelot.model.album :as ma]
+            [camelot.model.import :as mi]
             [camelot.util.java-file :as f])
   (:import [com.drew.imaging ImageMetadataReader]
            [com.drew.metadata Metadata Directory Tag]
-           [camelot.model.photo PhotoMetadata]
+           [camelot.model.import ImportPhotoMetadata]
            [java.io File]))
 
-(def RawAlbum {java.io.File ma/RawMetadata})
+(def RawAlbum {java.io.File mi/ImportRawMetadata})
 
 (def RawAlbumSet {java.io.File RawAlbum})
 
@@ -78,7 +78,7 @@
   [metadata]
   (map get-tags (get-directories metadata)))
 
-(s/defn file-metadata :- ma/RawMetadata
+(s/defn file-metadata :- mi/ImportRawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
   [reader file]
   (->> file

@@ -1,25 +1,25 @@
 (ns camelot.handler.import
-  (:require [camelot.processing.album :as a]
+  (:require [camelot.import.album :as a]
             [camelot.util.config :as conf]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [ring.util.response :as r]
-            [camelot.handler.surveys :as surveys]
-            [camelot.handler.survey-sites :as survey-sites]
-            [camelot.handler.trap-stations :as trap-stations]
-            [camelot.handler.trap-station-sessions :as trap-station-sessions]
-            [camelot.handler.trap-station-session-cameras :as trap-station-session-cameras]
-            [camelot.handler.media :as media]
-            [camelot.handler.photos :as photos]
-            [camelot.handler.sightings :as sightings]
-            [camelot.handler.species :as species]
-            [camelot.processing.validation :as validation]
+            [camelot.model.survey :as survey]
+            [camelot.model.survey-site :as survey-site]
+            [camelot.model.trap-station :as trap-station]
+            [camelot.model.trap-station-session :as trap-station-session]
+            [camelot.model.trap-station-session-camera :as trap-station-session-camera]
+            [camelot.model.media :as media]
+            [camelot.model.photo :as photo]
+            [camelot.model.sighting :as sighting]
+            [camelot.model.species :as species]
+            [camelot.model.site :as site]
+            [camelot.model.camera :as camera]
+            [camelot.model.camera-status :as camera-status]
+            [camelot.import.validation :as validation]
             [clojure.edn :as edn]
-            [camelot.processing.album :as album]
+            [camelot.import.album :as album]
             [clojure.string :as str]
-            [camelot.handler.sites :as sites]
-            [camelot.handler.cameras :as cameras]
-            [camelot.handler.camera-statuses :as camera-statuses]
             [clojure.java.io :as io]
             [camelot.util.config :as util.config]
             [camelot.util.java-file :as jf]
@@ -43,15 +43,15 @@
 (defn options
   "Return all albums for the current configuration."
   [params]
-  (let [surveys (canonicalise (surveys/get-all (app/gen-state (conf/config)))
+  (let [surveys (canonicalise (survey/get-all (app/gen-state (conf/config)))
                               :survey-id :survey-name)
-        survey-sites (canonicalise (maybe-get survey-sites/get-all (:survey params))
+        survey-sites (canonicalise (maybe-get survey-site/get-all (:survey params))
                                    :survey-site-id :site-name)
-        trap-stations (canonicalise (maybe-get trap-stations/get-all (:survey-site params))
+        trap-stations (canonicalise (maybe-get trap-station/get-all (:survey-site params))
                                     :trap-station-id :trap-station-name)
-        trap-sessions (canonicalise (maybe-get trap-station-sessions/get-all (:trap-station params))
+        trap-sessions (canonicalise (maybe-get trap-station-session/get-all (:trap-station params))
                                     :trap-station-session-id :trap-station-session-label)
-        trap-cameras (canonicalise (maybe-get trap-station-session-cameras/get-all
+        trap-cameras (canonicalise (maybe-get trap-station-session-camera/get-all
                                               (:trap-station-session params))
                                    :trap-station-session-camera-id
                                    :camera-name)]
@@ -65,8 +65,8 @@
   [state sitename sample]
   (let [data {:site-name sitename}
         loc (:location sample)]
-    (or (sites/get-specific-by-name state data)
-        (sites/create! state (merge data
+    (or (site/get-specific-by-name state data)
+        (site/create! state (merge data
                                     {:site-sublocation (:sublocation loc)
                                      :site-city (:city loc)
                                      :site-state-province (:state-province loc)
@@ -77,9 +77,9 @@
   [state cameraname sample]
   (let [data {:camera-name cameraname}
         settings (:camera-settings sample)
-        camera-status (first (camera-statuses/get-all state))]
-    (or (cameras/get-specific-by-name state data)
-        (cameras/create! state (merge data
+        camera-status (first (camera-status/get-all state))]
+    (or (camera/get-specific-by-name state data)
+        (camera/create! state (merge data
                                       {:camera-status-id (:camera-status-id camera-status)
                                        :camera-make (:make (:camera sample))
                                        :camera-model (:model (:camera sample))
@@ -87,8 +87,8 @@
 
 (defn- get-or-create-survey
   [state directory]
-  (or (first (surveys/get-all state))
-      (surveys/create! state {:survey-name "Initial survey"
+  (or (first (survey/get-all state))
+      (survey/create! state {:survey-name "Initial survey"
                               :survey-directory directory
                               :survey-sampling-point-density nil
                               :survey-notes "Auto-created by Camelot"})))
@@ -97,8 +97,8 @@
   [state survey site]
   (let [data {:survey-id (:survey-id survey)
               :site-id (:site-id site)}]
-    (or (survey-sites/get-specific-by-site state data)
-        (survey-sites/create! state data))))
+    (or (survey-site/get-specific-by-site state data)
+        (survey-site/create! state data))))
 
 (defn- get-or-create-trap-station
   [state sample survey-site]
@@ -108,8 +108,8 @@
               :trap-station-name (str "Trap at " longitude ", " latitude)
               :trap-station-longitude longitude
               :trap-station-latitude latitude}]
-    (or (trap-stations/get-specific-by-location state data)
-        (trap-stations/create! state (merge data
+    (or (trap-station/get-specific-by-location state data)
+        (trap-station/create! state (merge data
                                             {:trap-station-notes "Auto-created by Camelot"
                                              :trap-station-altitude nil})))))
 
@@ -119,16 +119,16 @@
               :trap-station-session-start-date (:datetime-start (:metadata album))
               :trap-station-session-end-date (:datetime-end (:metadata album))
               :trap-station-session-notes "Auto-created by Camelot"}]
-    (or (trap-station-sessions/get-specific-by-dates state data)
-        (trap-station-sessions/create! state data))))
+    (or (trap-station-session/get-specific-by-dates state data)
+        (trap-station-session/create! state data))))
 
 (defn- get-or-create-trap-camera
   [state camera folder-path trap-station-session]
   (let [data {:trap-station-session-id (:trap-station-session-id trap-station-session)
               :camera-id (:camera-id camera)
               :trap-station-session-camera-import-path folder-path}]
-    (or (trap-station-session-cameras/get-specific-by-import-path state folder-path)
-        (trap-station-session-cameras/create! state data))))
+    (or (trap-station-session-camera/get-specific-by-import-path state folder-path)
+        (trap-station-session-camera/create! state data))))
 
 (defn- get-or-create-species
   [state sighting]
@@ -140,7 +140,7 @@
 
 (defn- create-photo
   [state media-id camset]
-  (photos/create! state {:photo-iso-setting (:iso camset)
+  (photo/create! state {:photo-iso-setting (:iso camset)
                          :photo-aperture-setting (:aperture camset)
                          :photo-exposure-value (:exposure camset)
                          :photo-flash-setting (:flash camset)
@@ -156,7 +156,7 @@
   (doseq [sighting sightings]
     (when-not (re-find validation/sighting-quantity-exclusions-re (:species sighting))
       (let [species (get-or-create-species state sighting)]
-        (sightings/create! state {:sighting-quantity (:quantity sighting)
+        (sighting/create! state {:sighting-quantity (:quantity sighting)
                                   :species-id (:species-id species)
                                   :media-id media-id})))))
 

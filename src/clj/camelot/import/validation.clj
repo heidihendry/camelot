@@ -1,6 +1,6 @@
-(ns camelot.processing.validation
-  (:require [camelot.processing.photo :as photo]
-            [camelot.processing.util :as putil]
+(ns camelot.import.validation
+  (:require [camelot.import.photo :as photo]
+            [camelot.import.util :as putil]
             [camelot.translation.core :as tr]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]

@@ -20,13 +20,6 @@ FROM trap_station_session_camera
 LEFT JOIN camera using (camera_id)
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 
--- name: -get-specific-by-camera
-SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_id, camera_name, trap_station_session_camera_import_path
-FROM trap_station_session_camera
-LEFT JOIN camera using (camera_id)
-WHERE trap_station_session_id = :trap_station_session_id
-      AND camera_id = :camera_id
-
 -- name: -get-specific-by-import-path
 SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_id, camera_name, trap_station_session_camera_import_path
 FROM trap_station_session_camera

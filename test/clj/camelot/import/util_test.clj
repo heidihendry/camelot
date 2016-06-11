@@ -1,6 +1,6 @@
-(ns camelot.processing.util-test
-  (:require [camelot.processing.util :refer :all]
-            [camelot.util.application :as app]
+(ns camelot.import.util-test
+  (:require [camelot.import.util :refer :all]
+            [camelot.application :as app]
             [midje.sweet :refer :all]))
 
 (facts "Path Descriptions"

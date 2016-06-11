@@ -1,6 +1,6 @@
-(ns camelot.processing.validation-test
-  (:require [camelot.processing.validation :refer :all]
-            [camelot.util.application :as app]
+(ns camelot.import.validation-test
+  (:require [camelot.import.validation :refer :all]
+            [camelot.application :as app]
             [clj-time.core :as t]
             [midje.sweet :refer :all]
             [schema.test :as st]))

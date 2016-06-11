@@ -1,11 +1,11 @@
-(ns camelot.processing.metadata-utils
+(ns camelot.import.metadata-utils
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [clojure.edn :as edn]
             [schema.core :as s]
-            [camelot.model.photo :as mp]
+            [camelot.model.import :as mi]
             [clojure.tools.logging :as log])
-  (:import [camelot.model.photo Camera CameraSettings PhotoMetadata]))
+  (:import [camelot.model.import ImportPhotoMetadata]))
 
 (s/defn gps-parts-to-decimal :- s/Num
   "Return the GPS parts as a decimal."
@@ -93,15 +93,15 @@ invalid entry if not."
     (when (seq missing)
       (str/join ", " missing))))
 
-(s/defn normalise :- PhotoMetadata
+(s/defn normalise :- ImportPhotoMetadata
   "Return a normalised data structure for the given vendor- and photo-specific metadata"
   [state raw-metadata]
   (let [md #(get raw-metadata %)
-        cam (mp/camera
+        cam (mi/camera
              {:make (md "Make")
               :model (md "Model")
               :sw (md "Software")})
-        camset (mp/camera-settings
+        camset (mi/camera-settings
                 {:aperture (md "Aperture Value")
                  :exposure (md "Exposure Time")
                  :flash (md "Flash")
@@ -111,7 +111,7 @@ invalid entry if not."
                  :orientation (md "Orientation")
                  :width (read-metadata-string (md "Image Width") 0)
                  :height (read-metadata-string (md "Image Height") 0)})
-        location (mp/location
+        location (mi/location
                   {:gps-longitude (to-longitude (md "GPS Longitude") (md "GPS Longitude Ref"))
                    :gps-latitude (to-latitude (md "GPS Latitude") (md "GPS Latitude Ref"))
                    :gps-altitude (md "GPS Altitude")
@@ -121,11 +121,11 @@ invalid entry if not."
                    :country (md "Country/Primary Location Name")
                    :country-code (md "Country/Primary Location Code")
                    :map-datum (md "GPS Map Datum")})]
-    (mp/photo
+    (mi/photo
      {:camera-settings camset
       :camera cam
       :sightings (if (or (md "Caption/Abstract") (md "Object Name"))
-                   [(mp/sighting {:species (md "Caption/Abstract")
+                   [(mi/sighting {:species (md "Caption/Abstract")
                                   :quantity (read-metadata-string (md "Object Name") nil)})]
                    [])
       :datetime (exif-date-to-datetime (md "Date/Time"))

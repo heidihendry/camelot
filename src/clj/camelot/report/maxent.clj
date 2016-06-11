@@ -1,5 +1,5 @@
 (ns camelot.report.maxent
-  (:require [camelot.util.application :as app]
+  (:require [camelot.application :as app]
             [camelot.util.config :as config]
             [clojure.string :as str]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]

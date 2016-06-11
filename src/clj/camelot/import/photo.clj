@@ -1,13 +1,12 @@
-(ns camelot.processing.photo
+(ns camelot.import.photo
   (:require [clojure.string :as str]
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [schema.core :as s]
-            [camelot.processing.util :as putil]
-            [camelot.model.photo :as mp]
-            [camelot.processing.metadata-utils :as metadata]
-            [camelot.model.album :as ma])
-  (:import [camelot.model.photo PhotoMetadata]))
+            [camelot.import.util :as putil]
+            [camelot.model.import :as mi]
+            [camelot.import.metadata-utils :as metadata])
+  (:import [camelot.model.import ImportPhotoMetadata]))
 
 (s/defn get-time-difference :- s/Num
   "Return the difference between two dates in seconds."
@@ -38,10 +37,10 @@
         iso (:iso (:settings photo))]
     (or (nil? iso) (> iso isothresh) (not (nightfn hour)))))
 
-(s/defn parse :- (s/if mp/valid? PhotoMetadata mp/InvalidPhoto)
+(s/defn parse :- (s/if mi/valid-photo? ImportPhotoMetadata mi/ImportInvalidPhoto)
   "Validate a photo's raw metadata and normalise if possible."
   [state
-   raw-metadata :- ma/RawMetadata]
+   raw-metadata :- mi/ImportRawMetadata]
   (let [errors (metadata/validate-raw-data state raw-metadata)]
     (if errors
       {:invalid errors}

@@ -1,7 +1,7 @@
 (ns camelot.handler.albums
-  (:require [camelot.processing.album :as a]
+  (:require [camelot.import.album :as a]
             [camelot.util.config :as conf]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [ring.util.response :as r]))
 

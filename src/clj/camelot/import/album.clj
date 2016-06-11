@@ -1,16 +1,15 @@
-(ns camelot.processing.album
+(ns camelot.import.album
   (:require [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [schema.core :as s]
             [camelot.util.java-file :as jf]
             [camelot.translation.core :as tr]
-            [camelot.processing.dirtree :as dt]
-            [camelot.model.photo :as mp]
-            [camelot.model.album :as ma]
-            [camelot.processing.photo :as photo]
-            [camelot.processing.validation :refer [list-problems check-invalid-photos]]
+            [camelot.import.dirtree :as dt]
+            [camelot.model.import :as mi]
+            [camelot.import.photo :as photo]
+            [camelot.import.validation :refer [list-problems check-invalid-photos]]
             [clojure.java.io :as io]
-            [camelot.handler.trap-station-session-cameras :as trap-station-session-cameras]))
+            [camelot.model.trap-station-session-camera :as trap-station-session-camera]))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."
@@ -94,7 +93,7 @@
   [album]
   (vals (:photos (second album))))
 
-(s/defn extract-independent-sightings :- [ma/Sightings]
+(s/defn extract-independent-sightings :- [mi/ImportIndependentSightings]
   "Extract the sightings, accounting for the independence threshold, for an album."
   [state sightings]
   (let [indep-reducer (partial independence-reducer state)
@@ -105,7 +104,7 @@
          (reduce indep-reducer {})
          (map total-spp))))
 
-(s/defn extract-metadata :- ma/ExtractedMetadata
+(s/defn extract-metadata :- mi/ImportExtractedMetadata
   "Return aggregated metadata for a given album"
   [state album]
   {:datetime-start ((extract-start-date) album)
@@ -113,7 +112,7 @@
    :make (extract-make album)
    :model (extract-model album)})
 
-(s/defn album :- ma/Album
+(s/defn album :- mi/ImportAlbum
   "Return the metadata for a single album, given raw tag data"
   [state set-data]
   (let [parse-photo (fn [[k v]] [k (photo/parse state v)])
@@ -126,7 +125,7 @@
        :metadata (extract-metadata state (vals album-data))
        :problems (list-problems state album-data)})))
 
-(s/defn album-set :- {java.io.File ma/Album}
+(s/defn album-set :- {java.io.File mi/ImportAlbum}
   "Return a datastructure representing all albums and their metadata"
   [state tree-data]
   (let [to-album (fn [[k v]] (hash-map k (album state v)))]
@@ -134,7 +133,7 @@
 
 (defn imported-album?
   [state [file _]]
-  (nil? (trap-station-session-cameras/get-specific-by-import-path
+  (nil? (trap-station-session-camera/get-specific-by-import-path
          state (subs (.toString file) (count (:root-path (:config state)))))))
 
 (defn read-albums

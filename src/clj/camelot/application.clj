@@ -1,11 +1,45 @@
-(ns camelot.model.screens
+(ns camelot.application
   (:require [smithy.core :refer [defsmith] :as smithy]
-            [camelot.handler.camera-statuses :as camstat]
             [camelot.translation.core :as tr]
-            [camelot.handler.survey-sites :as survey-sites]
-            [camelot.handler.sites :as sites]))
+            [camelot.util
+             [config :as settings]
+             [feature :as feature]]))
+
+(defn gen-state
+  "Return the global application state.
+Currently the only application state is the user's configuration."
+  [conf]
+  {:config conf})
+
+(defn nav-menu
+  "Main navigation menu structure."
+  [state]
+  {:menu-items [{:url "/dashboard"
+                 :label (tr/translate (:config state) :application/import)}
+                {:url "/surveys"
+                 :label (tr/translate (:config state) :application/surveys)}
+                {:url "/sites"
+                 :label (tr/translate (:config state) :application/sites)}
+                {:url "/cameras"
+                 :label (tr/translate (:config state) :application/cameras)}
+                {:url "/species"
+                 :label (tr/translate (:config state) :application/species)}
+                {:function "settings"}]})
 
 (def smiths (atom {}))
+
+(defn- translate-fn
+  "Return a key translation function for the smithy build process."
+  [state]
+  (fn [resource lookup]
+    (tr/translate (:config state) (keyword (format "%s/%s"
+                                                   (name resource)
+                                                   (subs (str lookup) 1))))))
+
+(defn all-screens
+  "Build the available screen smiths."
+  [state]
+  (smithy/build-smiths smiths (translate-fn state) state))
 
 (defsmith site smiths
   [state]
@@ -143,7 +177,6 @@
                         :generator :trap-station-session-cameras-available}
             :trap-station-session-camera-import-path {:type :text
                                                       :required false}}
-   
    :states {:create {:submit {:success {:type :event
                                         :event :trap-station-session-camera-create}
                               :error {:type :event
@@ -469,3 +502,38 @@
                                       :event :settings-error}}
                      :cancel {:type :event
                               :event :settings-cancel}}}})
+
+(def metadata-structure
+  "Layout of all photo metadata fields."
+  [[:location [:gps-longitude
+               :gps-longitude-ref
+               :gps-latitude
+               :gps-latitude-ref
+               :gps-altitude
+               :gps-altitude-ref
+               :sublocation
+               :city
+               :state-province
+               :country
+               :country-code
+               :map-datum]]
+   [:camera-settings [:aperture
+                      :exposure
+                      :flash
+                      :focal-length
+                      :fstop
+                      :iso
+                      :orientation
+                      :resolution-x
+                      :resolution-y]]
+   [:camera [:make
+             :model
+             :software]]
+   :datetime
+   :headline
+   :artist
+   :phase
+   :copyright
+   :description
+   :filename
+   :filesize])

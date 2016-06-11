@@ -1,5 +1,5 @@
-(ns camelot.processing.metadata-utils-test
-  (:require [camelot.processing.metadata-utils :as sut]
+(ns camelot.import.metadata-utils-test
+  (:require [camelot.import.metadata-utils :as sut]
             [clj-time.core :as t]
             [midje.sweet :refer :all]))
 

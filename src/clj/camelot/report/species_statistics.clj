@@ -1,11 +1,11 @@
 (ns camelot.report.species-statistics
   (:require [compojure.core :refer [ANY context DELETE GET POST PUT]]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [camelot.util.config :as config]
             [ring.util.response :as r]
             [clojure.edn :as edn]
             [camelot.report.core :as report]
-            [camelot.handler.species :as species]))
+            [camelot.model.species :as species]))
 
 (defn report-configuration
   [state species-id]

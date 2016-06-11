@@ -1,5 +1,5 @@
 (ns camelot.test-util.album
-  (:require [camelot.model.photo :as mp]
+  (:require [camelot.model.import :as mi]
             [clojure.java.io :as io]
             [clj-time.core :as t]
             [clj-time.core :as t]))
@@ -32,9 +32,9 @@
 
 (defn as-photo
   [p]
-  (let [loc (mp/location (merge std-location (:location p)))
-        sightings (map #(mp/sighting %) (:sightings p))]
-    (mp/photo (std-photo p loc sightings))))
+  (let [loc (mi/location (merge std-location (:location p)))
+        sightings (map #(mi/sighting %) (:sightings p))]
+    (mi/photo (std-photo p loc sightings))))
 
 (defn as-album
   [photos]

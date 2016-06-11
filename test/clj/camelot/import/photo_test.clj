@@ -1,7 +1,7 @@
-(ns camelot.processing.photo-test
+(ns camelot.import.photo-test
   (:require [camelot.fixtures.exif-test-metadata :refer :all]
-            [camelot.processing.photo :refer :all]
-            [camelot.util.application :as app]
+            [camelot.import.photo :refer :all]
+            [camelot.application :as app]
             [clj-time.core :as t]
             [clojure.data :refer [diff]]
             [midje.sweet :refer :all]

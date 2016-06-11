@@ -1,4 +1,4 @@
-(ns camelot.processing.util
+(ns camelot.import.util
   (:require [clojure.string :as str]
             [camelot.translation.core :as tr]))
 

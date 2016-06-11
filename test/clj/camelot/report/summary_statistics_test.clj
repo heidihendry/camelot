@@ -1,7 +1,7 @@
 (ns camelot.report.summary-statistics-test
   (:require [camelot.report.summary-statistics :as sut]
             [midje.sweet :refer :all]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [clj-time.core :as t]
             [clojure.string :as str]))
 

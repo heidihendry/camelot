@@ -1,6 +1,6 @@
 (ns camelot.report.maxent-test
   (:require [camelot.report.maxent :as sut]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [clojure.java.io :as io]
             [clojure.string :as str]
             [midje.sweet :refer :all]

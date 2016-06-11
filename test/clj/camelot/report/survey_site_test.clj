@@ -1,7 +1,7 @@
 (ns camelot.report.survey-site-test
   (:require [camelot.report.survey-site :as sut]
             [midje.sweet :refer :all]
-            [camelot.util.application :as app]
+            [camelot.application :as app]
             [clj-time.core :as t]
             [clojure.string :as str]))
 

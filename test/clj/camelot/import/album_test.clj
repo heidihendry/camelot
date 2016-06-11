@@ -1,11 +1,11 @@
-(ns camelot.processing.album-test
+(ns camelot.import.album-test
   (:require [camelot.fixtures.exif-test-metadata :refer :all]
-            [camelot.processing.album :refer :all]
+            [camelot.import.album :refer :all]
             [clj-time.core :as t]
             [clojure.data :refer [diff]]
             [midje.sweet :refer :all]
             [schema.test :as st]
-            [camelot.util.application :as app]))
+            [camelot.application :as app]))
 
 (defn gen-state-helper
   [config]
