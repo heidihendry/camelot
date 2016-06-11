@@ -34,7 +34,7 @@
   (map species (db/clj-keys (db/with-connection (:connection state)
                               -get-all))))
 
-(s/defn get-specific
+(s/defn get-specific :- (s/maybe Species)
   [state :- State
    id :- s/Int]
   (some->> {:species-id id}
@@ -42,15 +42,15 @@
            (first)
            (species)))
 
-(s/defn get-specific-by-scientific-name :- Species
+(s/defn get-specific-by-scientific-name :- (s/maybe Species)
   [state :- State
-   scientific-name :- s/Str]
-  (some->> {:species-scientific-name scientific-name}
+   data :- TSpecies]
+  (some->> data
            (db/with-db-keys state -get-specific-by-scientific-name)
            (first)
            (species)))
 
-(s/defn create!
+(s/defn create! :- Species
   [state :- State
    data :- TSpecies]
   (let [record (db/with-db-keys state -create<! data)]
@@ -68,3 +68,9 @@
    id :- s/Int]
   (db/with-db-keys state -delete! {:species-id id})
   nil)
+
+(s/defn get-or-create! :- Species
+  [state :- State
+   data :- TSpecies]
+  (or (get-specific-by-scientific-name state data)
+      (create! state data)))

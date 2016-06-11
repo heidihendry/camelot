@@ -78,3 +78,9 @@
    id :- s/Int]
   (let [res (get-specific state id)]
     (db/with-db-keys state -get-alternatives res)))
+
+(s/defn get-or-create! :- SurveySite
+  [state :- State
+   data :- TSurveySite]
+  (or (get-specific-by-site state data)
+      (create! state data)))

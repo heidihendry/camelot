@@ -72,3 +72,9 @@
   [state :- State
    id :- s/Num]
   (db/with-db-keys state -delete! {:camera-id id}))
+
+(s/defn get-or-create! :- Camera
+  [state :- State
+   data :- TCamera]
+  (or (get-specific-by-name state (select-keys data [:camera-name]))
+      (create! state data)))

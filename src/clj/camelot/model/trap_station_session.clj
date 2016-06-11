@@ -74,7 +74,7 @@
 
 (s/defn get-specific-by-dates :- (s/maybe TrapStationSession)
   [state :- State
-   data :- s/Int]
+   data :- TTrapStationSession]
   (some->> data
            (db/with-db-keys state -get-specific-by-dates)
            (first)
@@ -100,3 +100,9 @@
   [state :- State
    id :- s/Num]
   (db/with-db-keys state -delete! {:trap-station-session-id id}))
+
+(s/defn get-or-create! :- TrapStationSession
+  [state :- State
+   data :- TTrapStationSession]
+  (or (get-specific-by-dates state data)
+      (create! state data)))

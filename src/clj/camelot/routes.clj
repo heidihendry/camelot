@@ -1,5 +1,6 @@
 (ns camelot.routes
   (:require [camelot.application :as app]
+            [camelot.import.db :as im.db]
             [camelot.handler
              [albums :as albums]
              [config :as config]
@@ -172,10 +173,13 @@
    (context "/screens" []
             (GET "/" [] (r/response (app/all-screens (app/gen-state (conf/config))))))
 
+   (context "/import" []
+            (POST "/options" [data] (r/response (im.db/options data)))
+            (POST "/media" [data] (r/response (import/media data))))
+
    misc-routes
    config/routes
    albums/routes
-   import/routes
    r.raw-data-export/routes
    r.maxent/routes
    r.summary-statistics/routes

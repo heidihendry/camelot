@@ -75,3 +75,9 @@
            (db/with-db-keys state -get-specific-by-name)
            (first)
            (survey)))
+
+(s/defn get-or-create! :- Survey
+  [state :- State
+   data :- TSurvey]
+  (or (get-specific-by-name state (select-keys data [:survey-name]))
+      (create! state data)))

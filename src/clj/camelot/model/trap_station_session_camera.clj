@@ -71,7 +71,7 @@
   [state :- State
    path :- s/Str]
   (some->> {:trap-station-session-camera-import-path path}
-           (db/with-db-keys state -get-specific-by-import-path )
+           (db/with-db-keys state -get-specific-by-import-path)
            (first)
            (trap-station-session-camera)))
 
@@ -114,3 +114,9 @@
          (db/with-db-keys state -get-alternatives)
          (remove #(and (some #{(:camera-id %)} active)
                        (not= (:camera-id res) (:camera-id %)))))))
+(s/defn get-or-create! :- TrapStationSessionCamera
+  [state :- State
+   data :- TTrapStationSessionCamera]
+  (or (get-specific-by-import-path
+       state (:trap-station-session-camera-import-path data))
+      (create! state data)))

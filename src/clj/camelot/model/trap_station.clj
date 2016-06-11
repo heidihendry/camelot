@@ -69,7 +69,7 @@
   [state :- State
    data :- TTrapStation]
   (some->> data
-           (db/with-db-keys state -get-specific)
+           (db/with-db-keys state -get-specific-by-location)
            (first)
            (trap-station)))
 
@@ -90,3 +90,9 @@
   [state :- State
    id :- s/Int]
   (db/with-db-keys state -delete! {:trap-station-id id}))
+
+(s/defn get-or-create! :- TrapStation
+  [state :- State
+   data :- TTrapStation]
+  (or (get-specific-by-location state data)
+      (create! state data)))

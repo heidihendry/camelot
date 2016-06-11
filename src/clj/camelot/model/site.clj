@@ -74,3 +74,9 @@
   [state :- State
    id :- s/Int]
   (db/with-db-keys state -delete! {:site-id id}))
+
+(s/defn get-or-create! :- Site
+  [state :- State
+   data :- TSite]
+  (or (get-specific-by-name state (select-keys data [:site-name]))
+      (create! state data)))

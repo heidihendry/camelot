@@ -33,8 +33,8 @@
 (s/defn tmedia
   [{:keys [media-filename media-notes media-cameracheck media-attention-needed
            media-capture-timestamp trap-station-session-camera-id]}]
-  (->Media media-filename media-notes media-cameracheck media-attention-needed
-           media-capture-timestamp trap-station-session-camera-id))
+  (->TMedia media-filename media-notes media-cameracheck media-attention-needed
+            media-capture-timestamp trap-station-session-camera-id))
 
 (s/defn media
   [{:keys [media-id media-created media-updated media-filename media-notes
