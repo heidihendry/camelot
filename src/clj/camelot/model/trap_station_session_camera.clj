@@ -75,9 +75,15 @@
            (first)
            (trap-station-session-camera)))
 
+(defn- camera-available?
+  [state data]
+  (not (some #(= % (:camera-id data))
+             (get-active state (int (:trap-station-session-id data))))))
+
 (s/defn create! :- TrapStationSessionCamera
   [state :- State
    data :- TTrapStationSessionCamera]
+  {:pre [(camera-available? state data)]}
   (let [record (db/with-db-keys state -create<! data)]
     (trap-station-session-camera (get-specific state (int (:1 record))))))
 

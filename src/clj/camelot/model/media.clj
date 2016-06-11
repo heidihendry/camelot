@@ -49,7 +49,7 @@
    id :- s/Int]
   (map media (db/with-db-keys state -get-all {:trap-station-session-camera-id id})))
 
-(s/defn get-specific :- Media
+(s/defn get-specific :- (s/maybe Media)
   [state :- State
    id :- s/Int]
   (some->> {:media-id id}
@@ -57,13 +57,13 @@
            (first)
            (media)))
 
-(s/defn create!
+(s/defn create! :- Media
   [state :- State
    data :- TMedia]
   (let [record (db/with-db-keys state -create<! data)]
     (media (get-specific state (int (:1 record))))))
 
-(s/defn update!
+(s/defn update! :- Media
   [state :- State
    id :- s/Int
    data :- TMedia]
