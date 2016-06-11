@@ -45,12 +45,7 @@
                                trap-station-session-id
                                trap-station-session-camera-import-path))
 
-(defn- get-active
-  "Return cameras which are active over the time range of the session with the given id."
-  [state session-id]
-  (let [session (trap-station-session/get-specific state session-id)]
-    (when session
-      (map :camera-id (db/with-db-keys state -get-active session)))))
+
 
 (s/defn get-all :- [TrapStationSessionCamera]
   [state :- State
@@ -78,7 +73,8 @@
 (defn- camera-available?
   [state data]
   (not (some #(= % (:camera-id data))
-             (get-active state (int (:trap-station-session-id data))))))
+             (trap-station-session/get-active
+              state (int (:trap-station-session-id data))))))
 
 (s/defn create! :- TrapStationSessionCamera
   [state :- State
@@ -87,10 +83,18 @@
   (let [record (db/with-db-keys state -create<! data)]
     (trap-station-session-camera (get-specific state (int (:1 record))))))
 
+(defn- camera-available-for-update?
+  [state id data]
+  (not (some #(= % (:camera-id data))
+             (get-active state
+                         (int (:trap-station-session-id data))
+                         id))))
+
 (s/defn update! :- TrapStationSessionCamera
   [state :- State
    id :- s/Int
    data :- TTrapStationSessionCamera]
+  {:pre [(camera-available-for-update? state id data)]}
   (db/with-db-keys state -update!
     (merge data {:trap-station-session-camera-id id}))
   (trap-station-session-camera (get-specific state id)))

@@ -3,7 +3,8 @@
             [camelot.db :as db]
             [clj-time.format :as tf]
             [camelot.model.state :refer [State]]
-            [yesql.core :as sql]))
+            [yesql.core :as sql]
+            [clj-time.core :as t]))
 
 (sql/defqueries "sql/trap-station-sessions.sql" {:connection db/spec})
 
@@ -55,6 +56,20 @@
          (build-label (:trap-station-session-start-date rec)
                       (:trap-station-session-end-date rec))))
 
+(defn get-active
+  "Return cameras which are active over the time range of the session with the given id."
+  ([state session-id]
+   (let [session (get-specific state session-id)]
+     (when session
+       (map :camera-id (db/with-db-keys state -get-active session)))))
+  ([state session-id session-camera-id]
+   (let [session (get-specific state session-id)]
+     (when session
+       (->> session
+            (db/with-db-keys state -get-active)
+            (remove #(= (:trap-station-session-camera-id %) session-camera-id))
+            (map :camera-id))))))
+
 (s/defn get-all :- [TrapStationSession]
   [state :- State
    id :- s/Int]
@@ -81,20 +96,31 @@
            (add-label)
            (trap-station-session)))
 
+(defn- start-date-before-end-date?
+  [data]
+  (let [start (:trap-station-session-start-date data)
+        end(:trap-station-session-end-date data)]
+    (or (= start end) (t/before? start end))))
+
 (s/defn create! :- TrapStationSession
   [state :- State
    data :- TTrapStationSession]
+  {:pre [(start-date-before-end-date? data)]}
   (let [record (db/with-db-keys state -create<! data)]
     (trap-station-session (get-specific state (int (:1 record))))))
 
 (s/defn update!
   "Update the value, dissoc'ing the label, as it's a computed field."
   [state :- State
-   id :- s/Num
+   id :- s/Int
    data :- TTrapStationSession]
-  (let [data (dissoc data :trap-station-session-label)]
-    (db/with-db-keys state -update! (merge data {:trap-station-session-id id}))
-    (get-specific state id)))
+  {:pre [(start-date-before-end-date? data)]}
+  (db/with-transaction [s state]
+    (let [data (dissoc data :trap-station-session-label)]
+      (db/with-db-keys s -update! (merge data {:trap-station-session-id id}))
+      (let [active (get-active s id)]
+        (assert (= (count active) (count (distinct active)))))
+      (get-specific s id))))
 
 (s/defn delete!
   [state :- State

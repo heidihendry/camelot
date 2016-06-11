@@ -41,3 +41,17 @@ SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
        trap_station_session_end_date, trap_station_session_notes
 FROM trap_station_session
 WHERE trap_station_id = :trap_station_id
+
+-- name: -get-active
+SELECT camera_id, camera_name, trap_station_session_camera_id
+FROM camera
+LEFT JOIN trap_station_session_camera USING (camera_id)
+LEFT JOIN trap_station_session USING (trap_station_session_id)
+WHERE (trap_station_session_start_date >= :trap_station_session_start_date AND
+       trap_station_session_start_date < :trap_station_session_end_date)
+       OR
+      (trap_station_session_end_date <= :trap_station_session_end_date AND
+       trap_station_session_end_date > :trap_station_session_start_date)
+       OR
+      (trap_station_session_start_date <= :trap_station_session_start_date AND
+       trap_station_session_end_date >= :trap_station_session_end_date)
