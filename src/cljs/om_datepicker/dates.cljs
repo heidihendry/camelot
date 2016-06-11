@@ -1,5 +1,17 @@
 (ns om-datepicker.dates)
 
+(defn- truncate-tz
+  ([]
+   (truncate-tz (js/Date.)))
+  ([date]
+   (let [year (.getFullYear date)
+         month (.getMonth date)
+         day (.getDate date)
+         hour (.getHours date)
+         minute (.getMinutes date)
+         second (.getSeconds date)]
+     (js/Date. (.UTC js/Date year month day hour minute second)))))
+
 (defn leap-year?
   [year]
   (or (and (= 0 (mod year 4))
@@ -12,11 +24,11 @@
 
 (defn date-instance
   [date]
-  (js/Date. (.getFullYear date) (.getMonth date) (.getDate date)))
+  (truncate-tz (js/Date. (.getFullYear date) (.getMonth date) (.getDate date))))
 
 (defn today
   []
-  (date-instance (js/Date.)))
+  (date-instance (truncate-tz)))
 
 (defn first-of-month
   [date]
@@ -26,7 +38,7 @@
   [date]
   (let [year (.getFullYear date)
         month (.getMonth date)]
-    (js/Date. year month (days-in-month year month))))
+    (truncate-tz (js/Date. year month (days-in-month year month)))))
 
 (defn- switch-date!
   [date offset]
@@ -35,13 +47,13 @@
 
 (defn current-month
   []
-  (first-of-month (js/Date.)))
+  (first-of-month (truncate-tz)))
 
 (defn add-months
   [date months]
   (let [day  (.getDate date)
-        date (js/Date. (.getFullYear date)
-                       (+ (.getMonth date) months) 1)]
+        date (truncate-tz (js/Date. (.getFullYear date)
+                                    (+ (.getMonth date) months) 1))]
     (.setDate date (min day (days-in-month (.getFullYear date) (.getMonth date))))
     date))
 
@@ -81,7 +93,7 @@
              (.getTime end))))
 
   (is-future? [this]
-    (> (.getTime this) (.getTime (js/Date.))))
+    (> (.getTime this) (.getTime (truncate-tz))))
 
   (same-month? [this that]
     (and (= (.getFullYear this) (.getFullYear that))

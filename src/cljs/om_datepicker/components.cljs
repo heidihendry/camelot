@@ -40,7 +40,7 @@
 
 (defn- calendar-start-date
   [month-date first-day]
-  (let [month-date (doto (js/Date. month-date) (.setDate 1))
+  (let [month-date (doto (d/truncate-tz (js/Date. month-date)) (.setDate 1))
         day        (.getDay month-date)
         offset     (- day (dec first-day))
         offset     (if (pos? offset) offset (+ offset 7))]
@@ -292,7 +292,7 @@
                        select-ch       (do
                                          (if result-ch
                                            (put! result-ch v)
-                                           (om/update! cursor [:value] v))
+                                           (om/update! cursor [:value] (d/truncate-tz v)))
                                          (om/set-state! owner :value (d/first-of-month v))
                                          (recur))
                        kill-ch         (do
@@ -372,7 +372,7 @@
                      select-ch      (do
                                       (if result-ch
                                         (put! result-ch v)
-                                        (om/update! cursor [:value] v))
+                                        (om/update! cursor [:value] (d/truncate-tz v)))
                                       (om/set-state! owner :expanded false)
                                       (recur))
                      kill-ch        (do
