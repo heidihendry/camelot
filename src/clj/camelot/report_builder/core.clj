@@ -146,8 +146,9 @@
 
 (defn- cons-headings
   [state columns data]
-  (cons (map #(tr/translate (:config state)
-                            (keyword (str "report/" (name %)))) columns)
+  (cons (map #(or (get-in @module/known-columns [% :heading])
+                  (tr/translate (:config state)
+                                (keyword (str "report/" (name %))))) columns)
         data))
 
 (defn- as-row
