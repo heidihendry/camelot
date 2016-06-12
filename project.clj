@@ -106,13 +106,13 @@
         :alias {:browsers [:chrome :phantom]}}
 
   :profiles {:dev
-             {:dependencies [[figwheel "0.5.1"]
-                             [figwheel-sidecar "0.5.1"]
+             {:dependencies [[figwheel "0.5.4"]
+                             [figwheel-sidecar "0.5.4"]
                              [com.cemerick/piggieback "0.2.1"]
                              [org.clojure/tools.nrepl "0.2.12"]
                              [org.apache.derby/derbytools "10.12.1.1"]]
               :env {:camelot-dev-mode "true"}
-              :plugins [[lein-figwheel "0.5.1" :exclusions [org.clojure/clojure]]
+              :plugins [[lein-figwheel "0.5.4" :exclusions [org.clojure/clojure]]
                         [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]]
 
               :cljsbuild {:builds
