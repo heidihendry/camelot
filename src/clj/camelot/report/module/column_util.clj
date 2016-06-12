@@ -1,5 +1,5 @@
 (ns camelot.report.module.column-util
-  (:require [camelot.import.album :as album]
+  (:require [camelot.report.sighting-independence :as indep]
             [clj-time.core :as t]))
 
 (defn aggregate-numeric
@@ -28,7 +28,7 @@
   (->> v
        (filter :species-scientific-name)
        (filter :media-capture-timestamp)
-       (album/extract-independent-sightings state)
+       (indep/extract-independent-sightings state)
        (flatten)
        (reduce species-sighting-reducer {})))
 
