@@ -20,9 +20,7 @@ This is a 'pre-alpha' release, and thus comes with numerous limitations.
 
 * Only the latest versions of Firefox and Chrome are supported
 * Does not support video files
-* Does not provide correct handling for camera pairs
 * English is the only supported language
-* Validations cannot be disabled
 
 ## Validations
 
