@@ -65,11 +65,12 @@
 (s/defn album-set :- {java.io.File mi/ImportAlbum}
   "Return a datastructure representing all albums and their metadata"
   [state tree-data]
-  (let [to-album (fn [[k v]] (hash-map k (album state v)))]
-    (into {} (mapv to-album tree-data))))
+  (let [to-album (fn [[k v]] (hash-map k (album state v)))
+        is-imported-fn (fn [[k v]] (imported-album? state k))]
+    (into {} (mapv to-album (filter is-imported-fn tree-data)))))
 
 (defn imported-album?
-  [state [file _]]
+  [state file]
   (nil? (trap-station-session-camera/get-specific-by-import-path
          state (subs (.toString file) (count (:root-path (:config state)))))))
 
@@ -84,5 +85,4 @@
       (->> dir
            (dt/read-tree state)
            (album-set state)
-           (filter (partial imported-album? state))
            (into {})))))
