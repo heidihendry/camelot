@@ -1,10 +1,9 @@
-(ns camelot.report-builder.module.loader
+(ns camelot.report.module.loader
   (:require [camelot.util.java-file :as f]
             [camelot.util.config :as conf]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [camelot.report.module.builtin.core])
   (:import [org.apache.commons.lang3 SystemUtils]))
-
-(load "builtin/core")
 
 (def modules-dir-name "modules")
 

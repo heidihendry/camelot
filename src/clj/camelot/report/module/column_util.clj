@@ -1,4 +1,4 @@
-(ns camelot.report-builder.module.column-util
+(ns camelot.report.module.column-util
   (:require [camelot.import.album :as album]
             [clj-time.core :as t]))
 

@@ -1,8 +1,8 @@
-(ns camelot.report-builder.module.builtin.report.survey-site
-  (:require [camelot.report-builder.module.core :as module]))
+(ns camelot.report.module.builtin.reports.trap-station
+  (:require [camelot.report.module.core :as module]))
 
 (defn report-configuration
-  [state survey-site-id]
+  [state trap-station-id]
   {:columns [:species-scientific-name
              :presence-absence
              :independent-observations
@@ -10,11 +10,11 @@
              :independent-observations-per-night]
    :aggregate-on [:independent-observations
                   :nights-elapsed]
-   :pre-transforms [#(if (= (:survey-site-id %) survey-site-id)
+   :pre-transforms [#(if (= (:trap-station-id %) trap-station-id)
                        %
                        (select-keys % [:species-scientific-name
                                        :nights-elapsed]))]
-   :transforms [#(if (= (:survey-site-id %) survey-site-id)
+   :transforms [#(if (= (:trap-station-id %) trap-station-id)
                        %
                        (select-keys % [:species-scientific-name
                                        :nights-elapsed]))]
@@ -22,8 +22,8 @@
    :order-by [:species-scientific-name ]})
 
 (module/register-report
- :survey-site-statistics
- {:file-prefix "survey-site-statistics"
+ :trap-station-statistics
+ {:file-prefix "trap-station-statistics"
   :configuration report-configuration
   :by :species
-  :for :survey-site})
+  :for :trap-station})

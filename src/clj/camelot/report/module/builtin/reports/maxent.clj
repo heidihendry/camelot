@@ -1,5 +1,5 @@
-(ns camelot.report-builder.module.builtin.report.maxent
-  (:require [camelot.report-builder.module.core :as module]))
+(ns camelot.report.module.builtin.reports.maxent
+  (:require [camelot.report.module.core :as module]))
 
 (defn report-configuration
   [state survey-id]

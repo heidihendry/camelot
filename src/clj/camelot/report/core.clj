@@ -1,17 +1,19 @@
-(ns camelot.report-builder.core
+(ns camelot.report.core
   "Generate a report from a DSL."
-  (:require [camelot.db :as db]
-            [yesql.core :as sql]
-            [schema.core :as s]
-            [clojure.set :as set]
-            [clj-time.core :as t]
-            [clj-time.format :as tf]
-            [camelot.application :as app]
+  (:require [camelot
+             [application :as app]
+             [db :as db]]
+            [camelot.report.module.core :as module]
+            [camelot.translation.core :as tr]
             [camelot.util.config :as config]
-            [camelot.report-builder.module.core :as module]
+            [clj-time
+             [core :as t]
+             [format :as tf]]
             [clojure.data.csv :as csv]
+            [clojure.set :as set]
             [ring.util.response :as r]
-            [camelot.translation.core :as tr]))
+            [schema.core :as s]
+            [yesql.core :as sql]))
 
 (sql/defqueries "sql/reports.sql" {:connection db/spec})
 

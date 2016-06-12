@@ -1,5 +1,5 @@
-(ns camelot.report-builder.module.builtin.report.summary-statistics
-  (:require [camelot.report-builder.module.core :as module]))
+(ns camelot.report.module.builtin.reports.summary-statistics
+  (:require [camelot.report.module.core :as module]))
 
 (defn report-configuration
   [state survey-id]

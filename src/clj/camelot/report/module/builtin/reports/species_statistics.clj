@@ -1,6 +1,6 @@
-(ns camelot.report-builder.module.builtin.report.species-statistics
+(ns camelot.report.module.builtin.reports.species-statistics
   (:require [camelot.model.species :as species]
-            [camelot.report-builder.module.core :as module]))
+            [camelot.report.module.core :as module]))
 
 (defn report-configuration
   [state species-id]

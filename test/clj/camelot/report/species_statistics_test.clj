@@ -1,11 +1,11 @@
 (ns camelot.report.species-statistics-test
-  (:require [camelot.report-builder.core :as sut]
-            [midje.sweet :refer :all]
-            [camelot.application :as app]
+  (:require [camelot.application :as app]
+            [camelot.model.species :as species]
+            [camelot.report.core :as sut]
             [camelot.test-util.state :as state]
             [clj-time.core :as t]
             [clojure.string :as str]
-            [camelot.model.species :as species]))
+            [midje.sweet :refer :all]))
 
 (defn- calc-obs-nights
   [obs nights]

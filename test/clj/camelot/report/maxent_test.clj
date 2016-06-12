@@ -1,11 +1,12 @@
 (ns camelot.report.maxent-test
-  (:require [camelot.report-builder.core :as sut]
-            [camelot.application :as app]
+  (:require [camelot.application :as app]
+            [camelot.report.core :as sut]
+            [clojure
+             [edn :as edn]
+             [string :as str]]
             [clojure.java.io :as io]
-            [clojure.string :as str]
             [midje.sweet :refer :all]
-            [schema.test :as st]
-            [clojure.edn :as edn]))
+            [schema.test :as st]))
 
 (namespace-state-changes (before :facts st/validate-schemas))
 

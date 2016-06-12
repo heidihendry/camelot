@@ -1,9 +1,9 @@
 (ns camelot.report.trap-station-test
-  (:require [camelot.report-builder.core :as sut]
-            [midje.sweet :refer :all]
-            [camelot.application :as app]
+  (:require [camelot.application :as app]
+            [camelot.report.core :as sut]
             [clj-time.core :as t]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [midje.sweet :refer :all]))
 
 (defn- gen-state-helper
   [config]

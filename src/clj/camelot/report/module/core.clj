@@ -1,4 +1,4 @@
-(ns camelot.report-builder.module.core
+(ns camelot.report.module.core
   "Column definitions for the report builder.")
 
 (defonce known-columns

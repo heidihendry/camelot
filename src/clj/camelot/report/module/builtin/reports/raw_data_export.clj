@@ -1,5 +1,5 @@
-(ns camelot.report-builder.module.builtin.report.raw-data-export
-  (:require [camelot.report-builder.module.core :as module]))
+(ns camelot.report.module.builtin.reports.raw-data-export
+  (:require [camelot.report.module.core :as module]))
 
 (defn report-configuration
   [state survey-id]

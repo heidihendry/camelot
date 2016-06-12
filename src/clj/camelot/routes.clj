@@ -1,33 +1,34 @@
 (ns camelot.routes
   (:require [camelot.application :as app]
-            [camelot.import.db :as im.db]
             [camelot.handler
              [albums :as albums]
-             [config :as config]
              [application :as application]
+             [config :as config]
              [import :as import]]
+            [camelot.import.db :as im.db]
             [camelot.model
-             [camera-status :as camera-status]
              [camera :as camera]
+             [camera-status :as camera-status]
+             [media :as media]
+             [photo :as photo]
+             [sighting :as sighting]
              [site :as site]
              [species :as species]
-             [photo :as photo]
-             [media :as media]
-             [sighting :as sighting]
-             [survey-site :as survey-site]
              [survey :as survey]
-             [trap-station-session-camera :as trap-station-session-camera]
+             [survey-site :as survey-site]
+             [trap-station :as trap-station]
              [trap-station-session :as trap-station-session]
-             [trap-station :as trap-station]]
+             [trap-station-session-camera :as trap-station-session-camera]]
+            [camelot.report.core :as report]
+            [camelot.util
+             [config :as conf]
+             [rest :as rest]]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [compojure
-             [core :refer [defroutes GET POST PUT DELETE routes context]]
+             [core :refer [context defroutes DELETE GET POST PUT routes]]
              [route :as route]]
-            [camelot.util.rest :as rest]
-            [camelot.util.config :as conf]
-            [ring.util.response :as r]
-            [camelot.report-builder.core :as report]
-            [clojure.edn :as edn]))
+            [ring.util.response :as r]))
 
 (defn- retrieve-index
   "Return a response for index.html"

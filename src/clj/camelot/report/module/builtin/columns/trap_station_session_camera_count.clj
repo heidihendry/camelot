@@ -1,6 +1,7 @@
-(ns camelot.report-builder.module.builtin.column.trap-station-session-camera-count
-  (:require [camelot.report-builder.module.core :as module]
-            [camelot.report-builder.module.column-util :as col-util]))
+(ns camelot.report.module.builtin.columns.trap-station-session-camera-count
+  (:require [camelot.report.module
+             [column-util :as col-util]
+             [core :as module]]))
 
 (module/register-column
  :trap-station-session-camera-count
