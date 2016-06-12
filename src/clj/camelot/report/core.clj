@@ -3,6 +3,7 @@
   (:require [camelot
              [application :as app]
              [db :as db]]
+            [camelot.report.module.loader :as loader]
             [camelot.report.module.core :as module]
             [camelot.translation.core :as tr]
             [camelot.util.config :as config]
@@ -184,6 +185,7 @@
 
 (defn report
   [report-key state id data]
+  (loader/load-user-modules)
   (let [report (module/get-report report-key)
         conf ((:configuration report) state id)]
     (->> data
@@ -210,12 +212,14 @@
 (defn export
   "Handler for an export request."
   [report-key survey-id]
-  (let [report (module/get-report report-key)
-        state (app/gen-state (config/config))
-        sightings (get-by (:by report))
-        data (csv-report report-key state survey-id sightings)]
-    (-> (r/response data)
-        (r/content-type "text/csv; charset=utf-8")
-        (r/header "Content-Length" (count data))
-        (r/header "Content-Disposition"
-                  (content-disposition report survey-id)))))
+  (loader/load-user-modules)
+  (if-let [report (module/get-report report-key)]
+    (let [state (app/gen-state (config/config))
+          sightings (get-by (:by report))
+          data (csv-report report-key state survey-id sightings)]
+      (-> (r/response data)
+          (r/content-type "text/csv; charset=utf-8")
+          (r/header "Content-Length" (count data))
+          (r/header "Content-Disposition"
+                    (content-disposition report survey-id))))
+    (format "Report '%s' is not known" (name report-key))))

@@ -5,15 +5,15 @@
             [camelot.report.module.builtin.core])
   (:import [org.apache.commons.lang3 SystemUtils]))
 
-(def modules-dir-name "modules")
+(def report-dir-name "reports")
 
 (def clj-file-re #"(?i)\.clj$")
 
-(defn- report-path
+(defn- module-path
   [subdir]
   (format "%s%s%s" (conf/get-config-dir)
           SystemUtils/FILE_SEPARATOR
-          "reports"
+          "modules"
           SystemUtils/FILE_SEPARATOR
           subdir))
 
@@ -28,7 +28,7 @@
 
 (defn load-user-modules
   []
-  (let [modules (file-seq (io/file (report-path modules-dir-name)))]
+  (let [modules (file-seq (io/file (module-path report-dir-name)))]
     (doseq [file (filter clj-file? modules)]
       (try
         (load-file (f/get-path file))

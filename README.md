@@ -86,6 +86,89 @@ The number of minutes after a species is sighted before further photographs of t
 
 **Important:** Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
 
+## Administration and Advanced Configuration
+
+Camelot has two directories: one for configuration, and one for data storage.  The location of these directories depends on the OS.
+
+### Locations
+#### Windows
+
+* **Data**: %LOCALAPPDATA%\camelot
+* **Config**: %APPDATA%\camelot
+
+#### OSX
+
+* **Data**: $HOME/Library/Application Support/camelot
+* **Config**: $HOME/Library/Preferences/camelot
+
+#### Linux
+
+* **Data**: $HOME/.local/share/camelot
+* **Data**: $HOME/.config/camelot
+
+### Data Directory
+
+The data directory will contain two subdirectories: `Database` and `Media`.  Database is an Apache Derby database.  Imported media is not stored in the database, but in the `Mdia' folder
+.
+Both of these directories should be backed up routinely.
+
+### Config Directory
+
+#### config.clj
+
+`config.clj` is the global camelot configuration file.  All configuration values available in this can also be set through the settings panel in the UI.
+
+#### Custom Reports
+
+Custom reports and column definitions for reports can be registered by creating a reports module.
+
+Reports modules are clojure files (`.clj` extension) and are stored under the config directory, in the subdirectory `/modules/reports/`.  These files are loaded when Camelot is first started.  Any name you choose can be given to the clojure file.
+
+Modules in this directory are read each time a report is ran.
+
+Here's an example module with a simple custom report and custom column.
+
+```clojure
+(ns custom.camelot.module.custom_column
+  (:require [camelot.report.module.core :as module]))
+
+(defn custom-column
+  [state data]
+  (map #(assoc % :custom-column
+               (if (:survey-id %)
+                 "YES"
+                 "NO"))
+       data))
+
+(module/register-column
+ :custom-column
+ {:calculate custom-column
+  :heading "Custom Column"})
+
+(defn report-configuration
+  [state survey-id]
+  {:columns [:species-scientific-name
+             :trap-station-longitude
+             :trap-station-latitude
+             :custom-column]
+   :aggregate-on [:independent-observations
+                  :nights-elapsed]
+   :filters [#(:trap-station-longitude %)
+             #(:trap-station-latitude %)
+             #(:species-scientific-name %)
+             #(= (:survey-id %) survey-id)]
+   :order-by [:species-scientific-name
+              :trap-station-longitude
+              :trap-station-latitude]})
+
+(module/register-report
+ :custom-report
+ {:file-prefix "my custom report"
+  :configuration report-configuration
+  :by :species
+  :for :survey})
+```
+
 ## Experimental Features
 
 Features which are under heavy development are hidden by default.  These can be enabled by setting the `CAMELOT_DEV_MODE` environment variable to `true`.
