@@ -71,43 +71,6 @@
 
     (done)))
 
-(deftest ^:async test-datepicker-panel-navigation-back
-  (async done
-    (go
-      (let [state     (atom {:panel {:value (js/Date. 2015 3 5)}})
-            test-node (u/html->dom "<div class='content'></div>")]
-        (om/root datepicker-panel state {:path   [:panel]
-                                         :target test-node
-                                         :opts   {:first-day 0
-                                                  :min-date  (js/Date. 2015 2 5)}})
-
-        (testing "Renders correctly initial state"
-          (is (= "April 2015" (node-text test-node ".label")))
-
-          (is (= ["Su" "Mo" "Tu" "We" "Th" "Fr" "Sa"]
-                 (mapv text (sel test-node ".days .cell"))))
-
-          (is (= ["29" "30" "31" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "23" "24" "25" "26" "27" "28" "29" "30" "1" "2" "3" "4" "5" "6" "7" "8" "9"]
-                 (mapv text (sel test-node ".week > .cell"))))
-
-          (is (every? true?
-                      (mapv #(u/has-class? % "weekend") (sel test-node ".week > .cell:first-child"))))
-
-          (is (every? true?
-                      (mapv #(u/has-class? % "weekend") (sel test-node ".week > .cell:last-child")))))
-
-        (testing "Shows previous month on click on .left control"
-          (dotimes [_ 5]
-            (click (sel1 test-node ".left")))
-          (<! (timeout 100))
-
-          (is (= "March 2015" (node-text test-node ".label")))
-
-          (is (= ["1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22" "23" "24" "25" "26" "27" "28" "29" "30" "31" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11"]
-                 (mapv text (sel test-node ".week > .cell"))))))
-
-      (done))))
-
 (deftest ^:async test-datepicker-panel-navigation-forward
   (async done
     (go

@@ -4,7 +4,7 @@
   (:require [camelot.util.transit :as tutil]
             [camelot.db :as db]
             [camelot.routes :refer [app-routes]]
-            [camelot.report-builder.module.loader :as module.loader]
+            [camelot.report.module.loader :as module.loader]
             [environ.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
