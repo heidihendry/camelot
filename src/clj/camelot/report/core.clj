@@ -7,7 +7,7 @@
             [camelot.translation.core :as tr]
             [camelot.util.config :as config]
             [clj-time
-             [core :as t]
+             [local :as tl]
              [format :as tf]]
             [clojure.data.csv :as csv]
             [clojure.set :as set]
@@ -198,14 +198,14 @@
      ((:configuration report) state id)
      data)))
 
-(def time-formatter (tf/formatter "yyyy-MM-dd_hhmm"))
+(def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
 
 (defn content-disposition
   [report survey-id]
   (format "attachment; filename=\"%s_ID_%d_%s.csv\""
           (get report :file-prefix)
           survey-id
-          (tf/unparse time-formatter (t/now))))
+          (tf/unparse time-formatter (tl/local-now))))
 
 (defn export
   "Handler for an export request."
