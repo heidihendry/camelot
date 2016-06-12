@@ -77,7 +77,7 @@
       (second result) => "1,Yellow Spotted Cat,100.0,0.0"
       (last result) => "1000,Yellow Spotted Cat,100.0,0.0"))
 
-  (fact "Time should no more than quadruple when doubling amount of records"
+  (fact "Time should increase by less than 5-fold when doubling amount of records"
     (let [counter (atom 0)
           sightings500 (repeatedly 250
                                    #(hash-map :media-id (swap! counter inc)
@@ -95,4 +95,4 @@
           result500 (with-out-str (time (doall (repeatedly 4 #(runset sightings500)))))
           result1000 (with-out-str (time (doall (repeatedly 4 #(runset sightings1000)))))
           read-result #(edn/read-string (nth (str/split % #" ") 2))]
-      (< (read-result result1000) (* 4 (read-result result500))) => true)))
+      (< (read-result result1000) (* 5 (read-result result500))) => true)))
