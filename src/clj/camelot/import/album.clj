@@ -62,17 +62,17 @@
        :metadata (extract-metadata state (vals album-data))
        :problems (list-problems state album-data)})))
 
+(defn imported-album?
+  [state file]
+  (nil? (trap-station-session-camera/get-specific-by-import-path
+         state (subs (.toString file) (count (:root-path (:config state)))))))
+
 (s/defn album-set :- {java.io.File mi/ImportAlbum}
   "Return a datastructure representing all albums and their metadata"
   [state tree-data]
   (let [to-album (fn [[k v]] (hash-map k (album state v)))
         is-imported-fn (fn [[k v]] (imported-album? state k))]
     (into {} (mapv to-album (filter is-imported-fn tree-data)))))
-
-(defn imported-album?
-  [state file]
-  (nil? (trap-station-session-camera/get-specific-by-import-path
-         state (subs (.toString file) (count (:root-path (:config state)))))))
 
 (defn read-albums
   "Read photo directories and return metadata structured as albums."
