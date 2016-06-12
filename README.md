@@ -169,7 +169,7 @@ Here's an example module to create and register a custom column, and a custom re
   :for :survey})
 ```
 
-For more advanced reports, check out Camelot's [built-in reports and columns](https://bitbucket.org/cshclm/camelot/src/master/src/clj/camelot/report/module/builtin/?at=master)
+For more module examples, check out Camelot's [built-in reports and columns](https://bitbucket.org/cshclm/camelot/src/master/src/clj/camelot/report/module/builtin/?at=master)
 
 ## Experimental Features
 
