@@ -1,5 +1,5 @@
 (ns camelot.report.species-statistics-test
-  (:require [camelot.report.species-statistics :as sut]
+  (:require [camelot.report-builder.core :as sut]
             [midje.sweet :refer :all]
             [camelot.application :as app]
             [camelot.test-util.state :as state]
@@ -19,6 +19,12 @@
                "Nights Elapsed"
                "Observations / Night (%)"])
 
+(def report
+  (partial sut/report :species-statistics))
+
+(def csv-report
+  (partial sut/csv-report :species-statistics))
+
 (def default-sample
   {:media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
    :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
@@ -36,7 +42,7 @@
   (fact "Report data form empty sightings is empty"
     (let [sightings '()
           state (state/gen-state {})
-          result (sut/report state 1 sightings)]
+          result (report state 1 sightings)]
       result => '()))
 
   (fact "Media without sightings should be excluded"
@@ -50,7 +56,7 @@
                                         :species-id 1
                                         :trap-station-session-id 1}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
-            result (sut/report state 1 sightings)]
+            result (report state 1 sightings)]
         result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]))))
 
   (fact "Report for one sighting should contain its summary"
@@ -60,7 +66,7 @@
                                       :species-id 1
                                       :trap-station-session-id 1}))
           state (state/gen-state {:sighting-independence-minutes-threshold 20})
-          result (sut/report state 1 sightings)]
+          result (report state 1 sightings)]
       result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)])))
 
   (fact "Should return a record per location."
@@ -79,7 +85,7 @@
                                       :media-capture-timestamp (t/date-time 2015 1 4 10 50 15)
                                       :trap-station-session-id 2}))
           state (state/gen-state {:sighting-independence-minutes-threshold 20})
-          result (sut/report state 1 sightings)]
+          result (report state 1 sightings)]
       result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]
                       ["Smiley Wolf" 30.5 5.5 "X" 5 7 (calc-obs-nights 5 7)])))
 
@@ -97,7 +103,7 @@
                                       :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                       :trap-station-session-id 1}))
           state (state/gen-state {:sighting-independence-minutes-threshold 10})
-          result (sut/report state 1 sightings)]
+          result (report state 1 sightings)]
       result => (list ["Smiley Wolf" 30 5 "X" 8 7 (calc-obs-nights 8 7)])))
 
   (fact "Should include entries for locations the species was not found in"
@@ -121,7 +127,7 @@
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 30 15)
                                         :trap-station-session-id 3}))
             state (state/gen-state {:sighting-independence-minutes-threshold 10})
-            result (sut/report state 1 sightings)]
+            result (report state 1 sightings)]
         result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]
                         ["Smiley Wolf" 40 10 nil nil 7 nil]
                         ["Smiley Wolf" 90 50 nil nil 7 nil]))))
@@ -146,14 +152,14 @@
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                         :trap-station-session-id 3}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
-            result (sut/report state 3 sightings)]
+            result (report state 3 sightings)]
         result => (list ["A. Meerkat" 30 5 "X" 1 7 (calc-obs-nights 1 7)])))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
     (let [sightings '()
           state (state/gen-state {})
-          result (sut/csv-report state 1 sightings)]
+          result (csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n")))
 
   (fact "Should return a record per location."
@@ -172,7 +178,7 @@
                                       :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                       :trap-station-session-id 2}))
           state (state/gen-state {:sighting-independence-minutes-threshold 20})
-          result (sut/csv-report state 1 sightings)]
+          result (csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n"
                      "Smiley Wolf,30,5,X,3,7," (calc-obs-nights 3 7) "\n"
                      "Smiley Wolf,30.5,5.5,X,5,7," (calc-obs-nights 5 7) "\n"))))

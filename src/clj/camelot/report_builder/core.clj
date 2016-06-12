@@ -4,6 +4,10 @@
             [yesql.core :as sql]
             [schema.core :as s]
             [clojure.set :as set]
+            [clj-time.core :as t]
+            [clj-time.format :as tf]
+            [camelot.application :as app]
+            [camelot.util.config :as config]
             [camelot.report-builder.module.core :as module]
             [clojure.data.csv :as csv]
             [ring.util.response :as r]
@@ -130,7 +134,7 @@
 (def add-calculated-columns (module/build-calculated-columns :calculate))
 (def add-post-aggregate-columns (module/build-calculated-columns :post-aggregate))
 
-(defn report
+(defn generate-report
   "Generate a report given a configuration and data."
   [state {:keys [columns pre-transforms pre-filters transforms filters aggregate-on order-by]} data]
   (->> data
@@ -171,7 +175,45 @@
   "Generate a report as a CSV."
   [state params data]
   (->> data
-       (report state params)
+       (generate-report state params)
        (as-rows state params)
        (cons-headings state (:columns params))
        (to-csv-string)))
+
+(defn report
+  [report-key state id data]
+  (let [report (module/get-report report-key)
+        conf ((:configuration report) state id)]
+    (->> data
+         (generate-report state conf)
+         (as-rows state conf))))
+
+(defn csv-report
+  [report-key state id data]
+  (let [report (module/get-report report-key)]
+    (exportable-report
+     state
+     ((:configuration report) state id)
+     data)))
+
+(def time-formatter (tf/formatter "yyyy-MM-dd_hhmm"))
+
+(defn content-disposition
+  [report survey-id]
+  (format "attachment; filename=\"%s_ID_%d_%s.csv\""
+          (get report :file-prefix)
+          survey-id
+          (tf/unparse time-formatter (t/now))))
+
+(defn export
+  "Handler for an export request."
+  [report-key survey-id]
+  (let [report (module/get-report report-key)
+        state (app/gen-state (config/config))
+        sightings (get-by (:by report))
+        data (csv-report report-key state survey-id sightings)]
+    (-> (r/response data)
+        (r/content-type "text/csv; charset=utf-8")
+        (r/header "Content-Length" (count data))
+        (r/header "Content-Disposition"
+                  (content-disposition report survey-id)))))

@@ -1,10 +1,10 @@
 (ns camelot.report-builder.module.core
-  "Column definitions for the report builder."
-  (:require [camelot.import.album :as album]
-            [clj-time.core :as t]
-            [schema.core :as s]))
+  "Column definitions for the report builder.")
 
 (defonce known-columns
+  (atom {}))
+
+(defonce known-reports
   (atom {}))
 
 (defn- calculate-column
@@ -14,7 +14,7 @@
       (f state acc)
       acc)))
 
-(defn add-column
+(defn register-column
   [k conf]
   (swap! known-columns assoc k conf))
 
@@ -23,3 +23,11 @@
   (fn [state columns data]
     (let [cols (filter (set (keys @known-columns)) columns)]
       (reduce (partial calculate-column state t) data cols))))
+
+(defn register-report
+  [k conf]
+  (swap! known-reports assoc k conf))
+
+(defn get-report
+  [report-key]
+  (get @known-reports report-key))

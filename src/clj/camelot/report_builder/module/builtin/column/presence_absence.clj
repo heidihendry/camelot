@@ -1,4 +1,4 @@
-(ns camelot.report-builder.module.builtin.presence-absence
+(ns camelot.report-builder.module.builtin.column.presence-absence
   (:require [camelot.report-builder.module.core :as module]
             [camelot.report-builder.module.column-util :as col-util]))
 
@@ -21,7 +21,7 @@
        (map #(assoc % :presence-absence
                     (presense-flag (:independent-observations %))))))
 
-(module/add-column
+(module/register-column
  :presence-absence
  {:calculate calculate-presence-absence
   :aggregate aggregate-presense-absence})

@@ -19,20 +19,15 @@
              [trap-station-session-camera :as trap-station-session-camera]
              [trap-station-session :as trap-station-session]
              [trap-station :as trap-station]]
-            [camelot.report
-             [raw-data-export :as r.raw-data-export]
-             [maxent :as r.maxent]
-             [summary-statistics :as r.summary-statistics]
-             [trap-station :as r.trap-station]
-             [survey-site :as r.survey-site]
-             [species-statistics :as r.species-statistics]]
             [clojure.java.io :as io]
             [compojure
              [core :refer [defroutes GET POST PUT DELETE routes context]]
              [route :as route]]
             [camelot.util.rest :as rest]
             [camelot.util.config :as conf]
-            [ring.util.response :as r]))
+            [ring.util.response :as r]
+            [camelot.report-builder.core :as report]
+            [clojure.edn :as edn]))
 
 (defn- retrieve-index
   "Return a response for index.html"
@@ -177,12 +172,9 @@
             (POST "/options" [data] (r/response (im.db/options data)))
             (POST "/media" [data] (r/response (import/media data))))
 
+   (context "/report/:report" []
+            (GET "/:id" [report id] (report/export (keyword report) (edn/read-string id))))
+
    misc-routes
    config/routes
-   albums/routes
-   r.raw-data-export/routes
-   r.maxent/routes
-   r.summary-statistics/routes
-   r.species-statistics/routes
-   r.survey-site/routes
-   r.trap-station/routes))
+   albums/routes))

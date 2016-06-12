@@ -1,4 +1,4 @@
-(ns camelot.report-builder.module.builtin.independent-observations-per-night
+(ns camelot.report-builder.module.builtin.column.independent-observations-per-night
   (:require [camelot.report-builder.module.core :as module]))
 
 (defn- get-nights-per-independent-observation
@@ -16,6 +16,6 @@
        (map #(assoc % :independent-observations-per-night
                     (get-nights-per-independent-observation %)))))
 
-(module/add-column
+(module/register-column
  :independent-observations-per-night
  {:post-aggregate calculate-independent-observations-per-night})
