@@ -4,6 +4,7 @@
   (:require [camelot.util.transit :as tutil]
             [camelot.db :as db]
             [camelot.routes :refer [app-routes]]
+            [camelot.report-builder.module.loader :as module.loader]
             [environ.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
@@ -26,5 +27,6 @@
 (defn -main [& [mode directory]]
   (let [port (Integer. (or (env :camelot-port) 8080))]
     (db/migrate)
+    (module.loader/load-user-modules)
     (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
     (run-jetty http-handler {:port port :join? false})))

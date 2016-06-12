@@ -4,7 +4,7 @@
             [camelot.util.config :as config]
             [ring.util.response :as r]
             [clojure.edn :as edn]
-            [camelot.report.core :as report]))
+            [camelot.report-builder.core :as report]))
 
 (defn report-configuration
   [survey-id]
@@ -36,7 +36,7 @@
 (defn export
   [survey-id]
   (let [state (app/gen-state (config/config))
-        sightings (report/get-by state :survey)
+        sightings (report/get-by :survey)
         data (csv-report state survey-id sightings)]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")

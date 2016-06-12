@@ -33,20 +33,35 @@
 (def db-name "Database")
 (def media-directory-name "Media")
 
+(def config-filename "config.clj")
+
+(defn- config-dir
+  "Return the path to the root-level configuration directory."
+  [dir]
+  (format "%s%scamelot" dir SystemUtils/FILE_SEPARATOR))
+
 (defn- config-path
   "Return the full path where the configuration file is stored."
   [dir]
-  (format "%s%scamelot%sconfig.clj" dir SystemUtils/FILE_SEPARATOR
-          SystemUtils/FILE_SEPARATOR))
+  (format "%s%s%s" (config-dir dir) SystemUtils/FILE_SEPARATOR config-filename))
+
+(defn get-config-location
+  [loc-fn]
+  (cond
+    SystemUtils/IS_OS_WINDOWS (loc-fn (env :appdata))
+    SystemUtils/IS_OS_LINUX (loc-fn (str (env :home) "/.config"))
+    SystemUtils/IS_OS_MAC_OSX (loc-fn (str (env :home) "/Library/Preferences"))
+    :else (loc-fn (str (env :pwd) ".camelot"))))
 
 (defn get-config-file
   "Return the OS-specific path to the configuration file."
   []
-  (cond
-    SystemUtils/IS_OS_WINDOWS (config-path (env :appdata))
-    SystemUtils/IS_OS_LINUX (config-path (str (env :home) "/.config"))
-    SystemUtils/IS_OS_MAC_OSX (config-path (str (env :home) "/Library/Preferences"))
-    :else (config-path (str (env :pwd) ".camelot"))))
+  (get-config-location config-path))
+
+(defn get-config-dir
+  "Return the OS-specific path to the configuration directory."
+  []
+  (get-config-location config-dir))
 
 (defn- db-path
   "Return the full path where the database is stored."

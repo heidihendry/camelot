@@ -86,7 +86,7 @@
 (defn- camera-available-for-update?
   [state id data]
   (not (some #(= % (:camera-id data))
-             (get-active state
+             (trap-station-session/get-active state
                          (int (:trap-station-session-id data))
                          id))))
 
@@ -108,7 +108,7 @@
   "Return the available cameras, factoring in whether they're in use elsewhere."
   [state :- State
    id :- s/Int]
-  (let [active (get-active state id)]
+  (let [active (trap-station-session/get-active state id)]
     (->> {:trap-station-session-id id}
          (db/with-db-keys state -get-available)
          (remove #(some #{(:camera-id %)} active)))))
@@ -119,7 +119,7 @@
   [state :- State
    id :- s/Int]
   (let [res (get-specific state id)
-        active (get-active state (:trap-station-session-id res))]
+        active (trap-station-session/get-active state (:trap-station-session-id res))]
     (->> res
          (db/with-db-keys state -get-alternatives)
          (remove #(and (some #{(:camera-id %)} active)

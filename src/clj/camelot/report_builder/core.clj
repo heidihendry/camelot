@@ -1,10 +1,11 @@
-(ns camelot.report.core
+(ns camelot.report-builder.core
+  "Generate a report from a DSL."
   (:require [camelot.db :as db]
             [yesql.core :as sql]
-            [compojure.core :refer [ANY context DELETE GET POST PUT]]
+            [schema.core :as s]
             [clojure.set :as set]
-            [camelot.report.columns :as columns]
-            [camelot.report.util :as util]
+            [camelot.report-builder.module.core :as module]
+            [clojure.data.csv :as csv]
             [ring.util.response :as r]
             [camelot.translation.core :as tr]))
 
@@ -54,11 +55,11 @@
     (every? #(= (test-rec %) (comp-rec %)) (keys test-rec)) false
     :else true))
 
-(defn distinct-in-results
+(defn- distinct-in-results
   [result-set testrec]
   (every? #(distinct-for-known-keys testrec %) result-set))
 
-(defn project
+(defn- project
   [columns data]
   (let [results (set/project data columns)]
     (->> results
@@ -78,7 +79,7 @@
 
 (defn- aggregate-reducer
   [group acc c]
-  (let [f (get-in columns/calculated-columns [c :aggregate])]
+  (let [f (get-in @module/known-columns [c :aggregate])]
     (if f
       (assoc acc c (f c group))
       acc)))
@@ -93,7 +94,7 @@
                                 % col-vals)]
     (map update-vals group)))
 
-(defn aggregate-data
+(defn- aggregate-data
   [columns aggregated-columns data]
   (let [anchors (remove (set aggregated-columns) columns)
         groups (group-by #(select-keys % anchors) data)]
@@ -126,11 +127,12 @@
    (fn [r] (reduce #(%2 %1) r transforms))
    data))
 
-(def add-calculated-columns (columns/build-calculated-columns :calculate))
-(def add-post-aggregate-columns (columns/build-calculated-columns :post-aggregate))
+(def add-calculated-columns (module/build-calculated-columns :calculate))
+(def add-post-aggregate-columns (module/build-calculated-columns :post-aggregate))
 
 (defn report
-  [state {:keys [columns filters pre-filters transforms pre-transforms aggregate-on order-by]} data]
+  "Generate a report given a configuration and data."
+  [state {:keys [columns pre-transforms pre-filters transforms filters aggregate-on order-by]} data]
   (->> data
        (add-calculated-columns state columns)
        (transform-records state pre-transforms)
@@ -142,7 +144,7 @@
        (project columns)
        (sort-result order-by)))
 
-(defn cons-headings
+(defn- cons-headings
   [state columns data]
   (cons (map #(tr/translate (:config state)
                             (keyword (str "report/" (name %)))) columns)
@@ -157,10 +159,18 @@
   (let [cols (:columns params)]
     (map (partial as-row state cols) data)))
 
+(s/defn to-csv-string :- s/Str
+  "Return data as a CSV string."
+  [data]
+  (with-open [io-str (java.io.StringWriter.)]
+    (csv/write-csv io-str data)
+    (.toString io-str)))
+
 (defn exportable-report
+  "Generate a report as a CSV."
   [state params data]
   (->> data
        (report state params)
        (as-rows state params)
        (cons-headings state (:columns params))
-       (util/to-csv-string)))
+       (to-csv-string)))

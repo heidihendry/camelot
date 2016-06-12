@@ -3,7 +3,7 @@
             [camelot.application :as app]
             [camelot.util.config :as config]
             [ring.util.response :as r]
-            [camelot.report.core :as report]
+            [camelot.report-builder.core :as report]
             [clojure.edn :as edn]))
 
 (defn report-configuration

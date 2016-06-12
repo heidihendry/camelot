@@ -4,7 +4,7 @@
             [camelot.util.config :as config]
             [ring.util.response :as r]
             [clojure.edn :as edn]
-            [camelot.report.core :as report]))
+            [camelot.report-builder.core :as report]))
 
 (defn report-configuration
   [trap-station-id]

@@ -56,20 +56,6 @@
          (build-label (:trap-station-session-start-date rec)
                       (:trap-station-session-end-date rec))))
 
-(defn get-active
-  "Return cameras which are active over the time range of the session with the given id."
-  ([state session-id]
-   (let [session (get-specific state session-id)]
-     (when session
-       (map :camera-id (db/with-db-keys state -get-active session)))))
-  ([state session-id session-camera-id]
-   (let [session (get-specific state session-id)]
-     (when session
-       (->> session
-            (db/with-db-keys state -get-active)
-            (remove #(= (:trap-station-session-camera-id %) session-camera-id))
-            (map :camera-id))))))
-
 (s/defn get-all :- [TrapStationSession]
   [state :- State
    id :- s/Int]
@@ -86,6 +72,20 @@
            (first)
            (add-label)
            (trap-station-session)))
+
+(defn get-active
+  "Return cameras which are active over the time range of the session with the given id."
+  ([state session-id]
+   (let [session (get-specific state session-id)]
+     (when session
+       (map :camera-id (db/with-db-keys state -get-active session)))))
+  ([state session-id session-camera-id]
+   (let [session (get-specific state session-id)]
+     (when session
+       (->> session
+            (db/with-db-keys state -get-active)
+            (remove #(= (:trap-station-session-camera-id %) session-camera-id))
+            (map :camera-id))))))
 
 (s/defn get-specific-by-dates :- (s/maybe TrapStationSession)
   [state :- State

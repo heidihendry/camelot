@@ -1,6 +1,6 @@
 (ns camelot.report.summary-statistics
   (:require [compojure.core :refer [ANY context DELETE GET POST PUT]]
-            [camelot.report.core :as report]
+            [camelot.report-builder.core :as report]
             [camelot.application :as app]
             [camelot.util.config :as config]
             [ring.util.response :as r]))

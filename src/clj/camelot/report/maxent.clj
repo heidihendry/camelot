@@ -5,7 +5,7 @@
             [compojure.core :refer [ANY context DELETE GET POST PUT]]
             [ring.util.response :as r]
             [schema.core :as s]
-            [camelot.report.core :as report]
+            [camelot.report-builder.core :as report]
             [clojure.edn :as edn]))
 
 (defn report-configuration
