@@ -118,13 +118,15 @@ Both of these directories should be backed up routinely.
 
 #### Custom Reports
 
-Custom reports and column definitions for reports can be registered by creating a reports module.
+Custom reports and column definitions for reports can be registered by creating a *reports module*.    A reports module can also override existing reports and columns.
 
-Reports modules are clojure files (`.clj` extension) and are stored under the config directory, in the subdirectory `/modules/reports/`.  These files are loaded when Camelot is first started.  Any name you choose can be given to the clojure file.
+Reports modules are clojure files (`.clj` extension) are loaded when Camelot is first started.  Any name you choose can be given to the clojure file.
 
-Modules in this directory are read each time a report is ran.
+Reports modules are stored under the subdirectory `/modules/reports` subdirectory of Camelot's config directory (as described above). If the `/modules/reports` subdirectories don't exist, you will need to create them and place your reports modules in there.
 
-Here's an example module with a simple custom report and custom column.
+Modules are loaded each time a report is ran.
+
+Here's an example module to create and register a custom column, and a custom report using that column.
 
 ```clojure
 (ns custom.camelot.module.custom_column
@@ -166,6 +168,8 @@ Here's an example module with a simple custom report and custom column.
   :by :species
   :for :survey})
 ```
+
+For more advanced reports, check out Camelot's [built-in reports and columns](https://bitbucket.org/cshclm/camelot/src/master/src/clj/camelot/report/module/builtin/?at=master)
 
 ## Experimental Features
 
