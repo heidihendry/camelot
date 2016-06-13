@@ -18,7 +18,8 @@
              [survey-site :as survey-site]
              [trap-station :as trap-station]
              [trap-station-session :as trap-station-session]
-             [trap-station-session-camera :as trap-station-session-camera]]
+             [trap-station-session-camera :as trap-station-session-camera]
+             [library :as library]]
             [camelot.report.core :as report]
             [camelot.util
              [config :as conf]
@@ -173,8 +174,11 @@
             (POST "/options" [data] (r/response (im.db/options data)))
             (POST "/media" [data] (r/response (import/media data))))
 
-   (context "/report/:report" []
-            (GET "/:id" [report id] (report/export (keyword report) (edn/read-string id))))
+   (context "/report/:report" [report]
+            (GET "/:id" [id] (report/export (keyword report) (edn/read-string id))))
+
+   (context "/library" []
+            (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config))))))
 
    misc-routes
    config/routes

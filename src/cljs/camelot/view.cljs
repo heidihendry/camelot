@@ -15,6 +15,7 @@
             [camelot.rest :as rest]
             [camelot.component.error :as cerr]
             [camelot.component.footer :as cfoot]
+            [camelot.component.library :as library]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
 (defn load-resource-children
@@ -290,4 +291,5 @@
 (defroute "/sites" [] (page-content-view :site :create {}))
 (defroute "/cameras" [] (page-content-view :camera :create {}))
 (defroute "/species" [] (page-content-view :species :create {}))
+(defroute "/library" [] (generate-view library/library-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

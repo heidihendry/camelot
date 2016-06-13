@@ -34,6 +34,10 @@
    id :- s/Num]
   (map sighting (db/with-db-keys state -get-all {:media-id id})))
 
+(s/defn get-all*
+  [state :- State]
+  (map sighting (db/with-db-keys state -get-all* {})))
+
 (s/defn get-specific
   [state :- State
    id :- s/Int]

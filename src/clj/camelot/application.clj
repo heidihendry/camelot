@@ -24,6 +24,9 @@ Currently the only application state is the user's configuration."
                  :label (tr/translate (:config state) :application/cameras)}
                 {:url "/species"
                  :label (tr/translate (:config state) :application/species)}
+                {:url "/library"
+                 :label (tr/translate (:config state) :application/library)
+                 :experimental true}
                 {:function "settings"}]})
 
 (def smiths (atom {}))

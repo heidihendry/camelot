@@ -245,6 +245,7 @@
              :species-notes {:label "Notes"
                              :description "Notes about this species or its identification."}}
    :application {:import "Import"
+                 :library "Library"
                  :surveys "Surveys"
                  :analysis "Analysis"
                  :sites "Sites"

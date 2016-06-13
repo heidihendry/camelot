@@ -41,6 +41,7 @@
          (view/navbar)))
   (rest/get-screens
    #(do (om/update! (state/app-state-cursor) :screens (:body %))
+        (om/update! (state/app-state-cursor) :library {:search {}})
         (om/update! (state/app-state-cursor) :view
                     {:settings {:screen {:type :settings
                                          :mode :update}
