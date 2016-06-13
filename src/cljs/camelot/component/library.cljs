@@ -9,9 +9,10 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
+      (dom/div #js {:className "search-bar"}
+               (dom/span #js {:className "fa fa-search"})
                (dom/input #js {:type "text"
-                               :placeholder "Search..."
+                               :placeholder "Filter..."
                                :className "field-input search"
                                :value (get-in data [:search :terms])
                                :onChange #(om/update! (:search data)

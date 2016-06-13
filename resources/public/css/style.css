@@ -567,6 +567,15 @@ pre.field-input {
     background: #fafafa;
     border: 1px solid #ddd;
 }
-#app .library input.search {
+#app .library .search-bar {
     margin-left: 3rem;
+    width: 100%;
+    text-align: left;
+}
+#app .library .fa-search {
+    font-size: 140%;
+}
+#app .library input.search {
+    margin-left: 1rem;
+    display: inline-block;
 }
