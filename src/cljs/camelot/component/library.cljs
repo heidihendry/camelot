@@ -32,7 +32,7 @@
 
 (defn substring?
   [s sub]
-  (if (not= (.indexOf s sub) -1)
+  (if (not= (.indexOf (str/lower-case (or s "")) sub) -1)
     true
     false))
 
@@ -48,13 +48,44 @@
            (:sightings rec)))
     (list rec)))
 
+(defn field-search
+  [search species sightings]
+  (let [[f s] (str/split search #":")]
+    (some #(substring? (get % (keyword f)) s) sightings)))
+
+(defn record-string-search
+  [search species records]
+  (some #(when (= (type %) js/String)
+           (substring? % search))
+        (mapcat vals records)))
+
+(defn record-matches
+  [search species record]
+  (let [rs (flatten (sighting-record species record))]
+    (if (substring? search ":")
+      (field-search search species rs)
+      (record-string-search search species rs))))
+
+(defn conjunctive-terms
+  [search species record]
+  (every? #(record-matches % species record) (str/split search #" ")))
+
+(defn disjunctive-terms
+  [search species record]
+  (some #(conjunctive-terms % species record) (str/split search #"\|")))
+
 (defn matches-search
   [search species record]
   (if (or (nil? search) (= search ""))
     true
-    (some #(when (= (type %) js/String)
-             (substring? % search))
-          (flatten (map vals (flatten (sighting-record species record)))))))
+    (disjunctive-terms search species record)))
+
+(defn only-matching
+  [data]
+  (filter #(matches-search (str/lower-case (or (get-in data [:search :terms]) ""))
+                           (get-in data [:species])
+                           %)
+          (get-in data [:search :results])))
 
 (defn media-collection-component
   "Render a collection of library."
@@ -63,11 +94,7 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (om/build-all media-component
-                             (filter #(matches-search (str/lower-case (get-in data [:search :terms]))
-                                                      (get-in data [:species])
-                                                      %)
-                                     (get-in data [:search :results]))
+               (om/build-all media-component (only-matching data)
                              {:key :media-id})))))
 
 (defn library-view-component
