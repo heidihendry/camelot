@@ -567,3 +567,6 @@ pre.field-input {
     background: #fafafa;
     border: 1px solid #ddd;
 }
+#app .library input.search {
+    margin-left: 3rem;
+}
