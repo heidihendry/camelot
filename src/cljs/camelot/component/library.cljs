@@ -1,7 +1,8 @@
 (ns camelot.component.library
   (:require [om.core :as om]
             [om.dom :as dom]
-            [camelot.rest :as rest]))
+            [camelot.rest :as rest]
+            [clojure.string :as str]))
 
 (defn search-component
   [data owner]
@@ -15,7 +16,7 @@
                                :value (get-in data [:search :terms])
                                :onChange #(om/update! (:search data)
                                                       :terms
-                                                      (.. % -target -value))})))))
+                                                      (str/lower-case (.. % -target -value)))})))))
 
 (defn media-component
   "Render a single library item."

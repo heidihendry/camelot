@@ -47,7 +47,7 @@
           result (sut/build-records (state/gen-state) sightings media)]
       (count result) => 1
       (:sightings (first result)) => []
-      (:media-uri (first result)) => "/media/photo/file.jpg"))
+      (:media-uri (first result)) => "/media/photo/thumb/file.jpg"))
 
   (fact "Constructs media, excluding sightings not matching media ID"
     (let [sightings [(mock-sighting {:media-id 30})]
