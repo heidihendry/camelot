@@ -16,7 +16,7 @@
                                :value (get-in data [:search :terms])
                                :onChange #(om/update! (:search data)
                                                       :terms
-                                                      (str/lower-case (.. % -target -value)))})))))
+                                                      (.. % -target -value))})))))
 
 (defn media-component
   "Render a single library item."
@@ -64,7 +64,7 @@
     (render [_]
       (dom/div nil
                (om/build-all media-component
-                             (filter #(matches-search (get-in data [:search :terms])
+                             (filter #(matches-search (str/lower-case (get-in data [:search :terms]))
                                                       (get-in data [:species])
                                                       %)
                                      (get-in data [:search :results]))
