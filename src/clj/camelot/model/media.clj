@@ -13,6 +13,7 @@
 
 (s/defrecord TMedia
     [media-filename :- s/Str
+     media-format :- s/Str
      media-notes :- (s/maybe s/Str)
      media-cameracheck :- s/Bool
      media-attention-needed :- s/Bool
@@ -24,6 +25,7 @@
      media-created :- org.joda.time.DateTime
      media-updated :- org.joda.time.DateTime
      media-filename :- s/Str
+     media-format :- s/Str
      media-notes :- (s/maybe s/Str)
      media-cameracheck :- s/Bool
      media-attention-needed :- s/Bool
@@ -31,18 +33,20 @@
      trap-station-session-camera-id :- s/Int])
 
 (s/defn tmedia
-  [{:keys [media-filename media-notes media-cameracheck media-attention-needed
-           media-capture-timestamp trap-station-session-camera-id]}]
-  (->TMedia media-filename media-notes media-cameracheck media-attention-needed
-            media-capture-timestamp trap-station-session-camera-id))
+  [{:keys [media-filename media-format media-notes media-cameracheck
+           media-attention-needed media-capture-timestamp
+           trap-station-session-camera-id]}]
+  (->TMedia media-filename media-format media-notes media-cameracheck
+            media-attention-needed media-capture-timestamp
+            trap-station-session-camera-id))
 
 (s/defn media
-  [{:keys [media-id media-created media-updated media-filename media-notes
-           media-cameracheck media-attention-needed media-capture-timestamp
-           trap-station-session-camera-id]}]
-  (->Media media-id media-created media-updated media-filename media-notes
-           media-cameracheck media-attention-needed media-capture-timestamp
-           trap-station-session-camera-id))
+  [{:keys [media-id media-created media-updated media-filename media-format
+           media-notes media-cameracheck media-attention-needed
+           media-capture-timestamp trap-station-session-camera-id]}]
+  (->Media media-id media-created media-updated media-filename media-format
+           media-notes media-cameracheck media-attention-needed
+           media-capture-timestamp trap-station-session-camera-id))
 
 (s/defn get-all :- [Media]
   [state :- State
@@ -54,6 +58,14 @@
    id :- s/Int]
   (some->> {:media-id id}
            (db/with-db-keys state -get-specific)
+           (first)
+           (media)))
+
+(s/defn get-specific-by-filename :- (s/maybe Media)
+  [state :- State
+   filename :- s/Str]
+  (some->> {:media-filename filename}
+           (db/with-db-keys state -get-specific-by-filename)
            (first)
            (media)))
 
@@ -77,11 +89,14 @@
   nil)
 
 (s/defn read-media-file :- java.io.BufferedInputStream
-  [filename :- s/Str]
-  (let [f (io/file (str (config/get-media-path) SystemUtils/FILE_SEPARATOR
-                        filename))]
+  [state :- State
+   filename :- s/Str
+   variant :- (s/enum :thumb :preview :original)]
+  (if-let [media (get-specific-by-filename state filename)]
     (io/input-stream
-     (if (jf/readable? f)
-       f
+     (if (= variant :original)
        (io/file (str (config/get-media-path) SystemUtils/FILE_SEPARATOR
-                     (str/lower-case filename)))))))
+                     filename "."
+                     (:media-format media)))
+       (io/file (str (config/get-media-path) SystemUtils/FILE_SEPARATOR
+                     (name variant) "-" filename ".png"))))))

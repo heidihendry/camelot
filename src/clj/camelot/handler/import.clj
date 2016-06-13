@@ -12,21 +12,49 @@
             [camelot.util.config :as util.config]
             [camelot.util.java-file :as jf]
             [camelot.db :as db]
+            [mikera.image.core :as image]
             [camelot.import.db :as im.db])
   (:import [org.apache.commons.lang3 SystemUtils]))
 
-(defn- get-unique-filename
-  [filename]
-  (str (java.util.UUID/randomUUID)
-       (subs filename (- (count filename) 4))))
-
-(defn- copy-pathname
-  [src dest]
+(defn- save-pathname
+  [f dest]
   (io/make-parents dest)
   (let [d (io/file dest)]
     (if (jf/exists? d)
       (throw (java.io.IOException. (format "copy-pathname: file '%s' already exists", dest)))
-      (io/copy (io/file src) d))))
+      (f dest))))
+
+(def image-variants
+  {"thumb-" 256
+   "preview-" 768
+   "" nil})
+
+(defn- store-original
+  [src dest]
+  (save-pathname #(io/copy (io/file src) (io/file %)) dest))
+
+(defn- store-variant
+  [^java.awt.image.BufferedImage image dest]
+  (save-pathname #(do (prn image)
+                      (image/save image % :quality 0.7 :progressive false)) dest))
+
+(defn- create-variant
+  [path target width]
+  (let [img (image/load-image path)]
+    (store-variant (image/resize img width) target)))
+
+(defn- create-image
+  [path file-basename extension variant width]
+  (let [target (str (util.config/get-media-path) SystemUtils/FILE_SEPARATOR
+                    variant (str/lower-case file-basename))]
+    (if width
+      ;; Always create variants as .png; OpenJDK cannot write .jpg
+      (create-variant path (str target ".png") width)
+      (store-original path (str target "." extension)))))
+
+(defn- create-image-files
+  [path filename extension]
+  (dorun (map (fn [[k v]] (create-image path filename extension k v)) image-variants)))
 
 (defn- get-album
   [state root-path path]
@@ -42,15 +70,14 @@
 (defn- import-media-for-camera
   [state notes full-path trap-camera photos]
   (doseq [photo photos]
-    (let [filename (get-unique-filename (:filename photo))
+    (let [filename (java.util.UUID/randomUUID)
+          fmt (str/lower-case (second (re-find #".*\.(.+?)$" (:filename photo))))
           camset (:settings photo)
           photopath (str full-path SystemUtils/FILE_SEPARATOR (:filename photo))
-          targetname (str (util.config/get-media-path) SystemUtils/FILE_SEPARATOR
-                          (str/lower-case filename))
-          media (im.db/create-media! state photo filename notes trap-camera)]
+          media (im.db/create-media! state photo filename fmt notes trap-camera)]
       (im.db/create-photo! state (:media-id media) camset)
       (create-sightings state (:media-id media) (:sightings photo))
-      (copy-pathname photopath targetname))))
+      (create-image-files photopath filename fmt))))
 
 (defn- path-separator-re
   []

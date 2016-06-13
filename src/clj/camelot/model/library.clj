@@ -48,7 +48,7 @@
 (s/defn build-records :- [LibraryRecord]
   [state sightings media]
   (let [media-sightings (group-by :media-id sightings)
-        media-uri #(format "/media/photo/%s" (:media-filename %))
+        media-uri #(format "/media/photo/thumb/%s" (:media-filename %))
         sightings-for #(get media-sightings (:media-id %))]
     (map #(library-record (assoc %
                                  :sightings (sightings-for %)

@@ -557,3 +557,13 @@ pre.field-input {
 #import-dialog .import-folder {
     padding-bottom: 1rem;
 }
+.library {
+    margin: auto;
+    text-align: center;
+}
+.library .media {
+    padding: 1rem;
+    margin: 1rem;
+    background: #fafafa;
+    border: 1px solid #ddd;
+}

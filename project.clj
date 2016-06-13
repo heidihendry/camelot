@@ -16,6 +16,7 @@
                  [environ "1.0.2"]
                  [incanter/incanter-core "1.5.7"]
                  [midje "1.8.3"]
+                 [net.mikera/imagez "0.10.0"]
                  [org.apache.commons/commons-lang3 "3.4"]
                  [org.apache.derby/derby "10.12.1.1"]
                  [org.clojure/clojure "1.8.0"]

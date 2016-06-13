@@ -11,10 +11,9 @@
     (render [_]
       (prn result)
       (dom/span nil
-                (dom/img #js {:src (get-in result [:media-uri])
-                              :width "100"
-                              :height "100"
-                             :className "library"})))))
+                (dom/img #js {:className "media"
+                              :width "196"
+                              :src (get-in result [:media-uri])})))))
 
 (defn library-collection-component
   "Render a collection of library."

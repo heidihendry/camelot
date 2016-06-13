@@ -146,12 +146,13 @@
                         :species-notes import-note}))))
 
 (defn create-media!
-  [state photo filename notes trap-camera-id]
+  [state photo filename fmt notes trap-camera-id]
   (media/create!
    state
    (media/tmedia
     {:media-capture-timestamp (:datetime photo)
      :media-filename (str/lower-case filename)
+     :media-format (str/lower-case fmt)
      :media-cameracheck (is-cameracheck? photo)
      :media-attention-needed false
      :media-notes notes
