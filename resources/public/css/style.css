@@ -558,24 +558,113 @@ pre.field-input {
     padding-bottom: 1rem;
 }
 .library {
-    margin: auto;
-    text-align: center;
 }
 .library .media {
     padding: 1rem;
-    margin: 1rem;
+    margin: 0.5rem;
     background: #fafafa;
     border: 1px solid #ddd;
+    transition: all 0.2s ease-in-out;
+}
+.library .media.selected {
+    background: #99d344;
+    border: 1px solid #ddd;
+}
+.library .media:hover {
+    opacity: 0.8;
+}
+.library .media-collection {
+    width: 67%;
+    padding-left: 1rem;
+}
+.library .media-control-panel {
+    position: fixed;
+    padding-top: 2rem;
+    border-left: 1px solid #ccc;
+    right: 0;
+    top: 6rem;
+    width: 33vw;
+    height: calc(100vh - 6rem);
+    background: white;
+}
+.library .mcp-container {
+    position: relative;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.library .media-control-panel .preview {
+    position: relative;
+    text-align: center;
+    float: right;
+    border: 1px solid #eee;
+    background: #fafafa;
+    width: 100%;
+}
+.library .media-control-panel img {
+    position: relative;
+    width: 100%;
+    border: 1px solid #999;
+    margin: auto;
+}
+#app .library .none-selected {
+    position: relative;
+    width: 100%;
+    height: calc(0.74 * 33vw);
+}
+#app .library .details {
+    padding-top: 1rem;
+}
+#app .library .details .data {
+    min-height: 1rem;
+}
+#app .library .details label {
+    font-size: 85%;
+    font-weight: normal;
+    color: #666;
+    display: block;
+    margin-bottom: 0;
+    margin-top: 0.4rem;
+}
+#app .library .media-item {
+    position: relative;
+    display: inline-block;
+    max-width: 200px;
+    max-height: 200px;
+}
+#app .library .view-photo {
+    position: absolute;
+    display: inline-block;
+    top: 118px;
+    left: 152px;
+    opacity: 0.5;
+    color: #fff;
+    font-size: 250%;
+    z-index: 100;
+    transition: opacity 0.2s ease-in-out;
+}
+#app .library .view-photo:hover {
+    opacity: 0.8;
+}
+#app .library .details .column {
+    width: 50%;
+    float: left;
+    position: relative;
+}
+#app .library .none-selected h4 {
+    position: relative;
+    top: calc(0.74 * 33vw / 2);
 }
 #app .library .search-bar {
     margin-left: 3rem;
+    font-size: 120%;
     width: 100%;
     text-align: left;
 }
 #app .library .fa-search {
-    font-size: 140%;
+    font-size: 130%;
 }
 #app .library input.search {
-    margin-left: 1rem;
+    margin-left: 0.5rem;
     display: inline-block;
 }

@@ -144,7 +144,52 @@
                  {:sightings [{:species-id 1}]
                   :site-name "MySite"
                   :media-id 2}]
+        data {:search {:terms "species-scientific-name:wolf"
+                       :results results}
+              :species species}]
+    (is (= (sut/only-matching data) expected))))
+
+(deftest allows-field-shorthand-for-species
+  (let [expected [{:sightings [{:species-id 1}]
+                   :site-name "MySite"
+                   :media-id 2}]
+        results [{:sightings []
+                  :site-name "Wolf Den"
+                  :media-id 1}
+                 {:sightings [{:species-id 1}]
+                  :site-name "MySite"
+                  :media-id 2}]
         data {:search {:terms "species:wolf"
+                       :results results}
+              :species species}]
+    (is (= (sut/only-matching data) expected))))
+
+(deftest allows-field-shorthand-for-site
+  (let [expected [{:sightings [{:species-id 1}]
+                   :site-name "MySite"
+                   :media-id 2}]
+        results [{:sightings []
+                  :site-name "Wolf Den"
+                  :media-id 1}
+                 {:sightings [{:species-id 1}]
+                  :site-name "MySite"
+                  :media-id 2}]
+        data {:search {:terms "site:mysite"
+                       :results results}
+              :species species}]
+    (is (= (sut/only-matching data) expected))))
+
+(deftest allows-field-shorthand-for-camera
+  (let [expected [{:sightings []
+                  :camera-name "ABC01"
+                   :media-id 1}]
+        results [{:sightings []
+                  :camera-name "ABC01"
+                  :media-id 1}
+                 {:sightings [{:species-id 1}]
+                  :camera-name "XYZ3"
+                  :media-id 2}]
+        data {:search {:terms "camera:abc"
                        :results results}
               :species species}]
     (is (= (sut/only-matching data) expected))))
@@ -171,7 +216,7 @@
                  {:sightings [{:species-id 1}]
                   :site-name "MySite"
                   :media-id 2}]
-        data {:search {:terms "species:wolf mysite|species:cat mysite"
+        data {:search {:terms "species-scientific-name:wolf mysite|species-scientific-name:cat mysite"
                        :results results}
               :species species}]
     (is (= (sut/only-matching data) expected))))

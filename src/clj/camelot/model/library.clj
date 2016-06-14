@@ -23,6 +23,12 @@
      trap-station-name :- s/Str
      trap-station-longitude :- (s/pred trap-station/valid-longitude?)
      trap-station-latitude :- (s/pred trap-station/valid-latitude?)
+     site-sublocation :- (s/maybe s/Str)
+     site-city :- (s/maybe s/Str)
+     camera-id :- s/Int
+     camera-name :- s/Str
+     camera-make :- (s/maybe s/Str)
+     camera-model :- (s/maybe s/Str)
      survey-site-id :- s/Int
      survey-id :- s/Int
      site-id :- s/Int
@@ -32,23 +38,21 @@
 (s/defn library-record
   [{:keys [media-id media-created media-updated media-filename media-uri media-cameracheck media-attention-needed
            media-capture-timestamp trap-station-session-camera-id trap-station-session-id trap-station-id
-           trap-station-name trap-station-longitude trap-station-latitude
-           survey-site-id survey-id site-id site-name sightings]}]
+           trap-station-name trap-station-longitude trap-station-latitude site-sublocation site-city camera-id
+           camera-name camera-make camera-model survey-site-id survey-id site-id site-name sightings]}]
   (->LibraryRecord media-id media-created media-updated media-filename media-uri media-cameracheck media-attention-needed
                    media-capture-timestamp trap-station-session-camera-id trap-station-session-id trap-station-id
-                   trap-station-name trap-station-longitude trap-station-latitude
-                   survey-site-id survey-id site-id site-name (or sightings [])))
+                   trap-station-name trap-station-longitude trap-station-latitude site-sublocation site-city camera-id
+                   camera-name camera-make camera-model survey-site-id survey-id site-id site-name (or sightings [])))
 
 (defn- all-media
   [state]
   (db/with-db-keys state -all-media {}))
 
-;; TODO make media URI
-
 (s/defn build-records :- [LibraryRecord]
   [state sightings media]
   (let [media-sightings (group-by :media-id sightings)
-        media-uri #(format "/media/photo/thumb/%s" (:media-filename %))
+        media-uri #(format "/media/photo/%s" (:media-filename %))
         sightings-for #(get media-sightings (:media-id %))]
     (map #(library-record (assoc %
                                  :sightings (sightings-for %)

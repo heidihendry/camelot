@@ -38,6 +38,10 @@
   []
   (om/ref-cursor (:nav (:application (om/root-cursor app-state)))))
 
+(defn library-state
+  []
+  (om/ref-cursor (:library (om/root-cursor app-state))))
+
 (defn import-dialog-state
   []
   (when (nil? (:import-dialog (om/root-cursor app-state)))

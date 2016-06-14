@@ -140,10 +140,15 @@
             (POST "/" [data] (rest/create-resource media/create!
                                                    media/tmedia data))
             (DELETE "/:id" [id] (rest/delete-resource media/delete! id))
-            (GET "/photo/:style/:filename" [style filename] {:status 200
-                                                      :headers {"Content-Type" "image/jpeg; charset=utf-8"}
-                                                      :body (media/read-media-file (app/gen-state (conf/config))
-                                                                                   filename (keyword style))}))
+            (GET "/photo/:filename" [filename] (let [style :original]
+                                                       {:status 200
+                                                        :headers {"Content-Type" "image/jpeg; charset=utf-8"}
+                                                        :body (media/read-media-file (app/gen-state (conf/config))
+                                                                                     filename (keyword style))}))
+            (GET "/photo/:filename/:style" [filename style] {:status 200
+                                                             :headers {"Content-Type" "image/jpeg; charset=utf-8"}
+                                                             :body (media/read-media-file (app/gen-state (conf/config))
+                                                                                          filename (keyword style))}))
 
    (context "/photos" []
             (GET "/media/:id" [id] (rest/list-resources photo/get-all :photo id))

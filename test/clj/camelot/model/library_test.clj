@@ -19,6 +19,10 @@
    :trap-station-name "My Trap"
    :trap-station-longitude 105
    :trap-station-latitude 30
+   :site-sublocation "Observatory"
+   :site-city "Atlantis"
+   :camera-id 1
+   :camera-name "ABC01"
    :survey-site-id 99
    :survey-id 6
    :site-id 9
@@ -43,11 +47,11 @@
 (facts "Library"
   (fact "Constructs media without sighting"
     (let [sightings []
-          media [(mock-record {:media-filename "file.jpg"})]
+          media [(mock-record {:media-filename "file"})]
           result (sut/build-records (state/gen-state) sightings media)]
       (count result) => 1
       (:sightings (first result)) => []
-      (:media-uri (first result)) => "/media/photo/thumb/file.jpg"))
+      (:media-uri (first result)) => "/media/photo/file"))
 
   (fact "Constructs media, excluding sightings not matching media ID"
     (let [sightings [(mock-sighting {:media-id 30})]
