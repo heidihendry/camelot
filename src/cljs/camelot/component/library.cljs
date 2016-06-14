@@ -3,6 +3,7 @@
             [om.dom :as dom]
             [camelot.rest :as rest]
             [camelot.state :as state]
+            [cljs.reader :as reader]
             [clojure.string :as str])
   (:import [goog.i18n DateTimeFormat]))
 
@@ -37,7 +38,7 @@
 
 (defn media-selected
   []
-  (filter identity (map :selected (get-in (state/library-state) [:search :matches]))))
+  (filterv :selected (get-in (state/library-state) [:search :matches])))
 
 (defn select-all
   []
@@ -61,10 +62,16 @@
 (defn submit-identification
   []
   (identify-selected-prompt)
-  ;; TODO actually submit the identification
-  (om/update! (:identification (state/library-state)) :quantity 1)
-  (om/update! (:identification (state/library-state)) :species nil)
-  (deselect-all))
+  (rest/put-x "/blah" (merge {:identification
+                              {:quantity (get-in (state/library-state) [:identification :quantity])
+                               :species (cljs.reader/read-string
+                                         (get-in (state/library-state) [:identification :species]))}}
+                             {:media
+                              (map :media-id (media-selected))})
+              (fn [resp]
+                (om/update! (:identification (state/library-state)) :quantity 1)
+                (om/update! (:identification (state/library-state)) :species nil)
+                (deselect-all))))
 
 (defn prev-page
   [page]
@@ -162,6 +169,10 @@
                                                                                    (.. % -target -value))}))
                                    (dom/div #js {:className "field"}
                                             (dom/button #js {:className "btn btn-primary"
+                                                             :disabled (when (not (and (re-find #"^[0-9]+$"
+                                                                                                (get-in data [:identification :quantity]))
+                                                                                       (get-in data [:identification :species])))
+                                                                         "disabled")
                                                              :onClick submit-identification} "Submit")))))))))
 
 (defn media-component
@@ -356,7 +367,7 @@
     (will-mount [_]
       ;; TODO For now we assume there's only 1 survey.
       (om/update! (get-in data [:library :search]) :page 1)
-      (om/update! (get-in data [:library]) :identification {:quantity 1})
+      (om/update! (get-in data [:library]) :identification {:quantity "1"})
       (rest/get-x "/species"
                   (fn [resp] (om/update! (get data :library)
                                          :species

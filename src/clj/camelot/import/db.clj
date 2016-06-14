@@ -106,7 +106,8 @@
 (defn get-or-create-trap-station!
   [state sample survey-site]
   (let [longitude (:gps-longitude (:location sample))
-        latitude (:gps-latitude (:location sample))]
+        latitude (:gps-latitude (:location sample))
+        altitude (:gps-altitude (:location sample))]
     (trap-station/get-or-create!
      state
      (trap-station/ttrap-station
@@ -115,7 +116,7 @@
        :trap-station-longitude longitude
        :trap-station-latitude latitude
        :trap-station-notes import-note
-       :trap-station-altitude nil}))))
+       :trap-station-altitude altitude}))))
 
 (defn get-or-create-trap-session!
   [state album trap-station]

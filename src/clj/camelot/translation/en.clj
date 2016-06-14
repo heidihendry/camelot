@@ -255,7 +255,7 @@
 
    :report {:nights-elapsed "Nights Elapsed"
             :independent-observations "Independent Observations"
-            :independent-observations-per-night "Observations / Night (%%)"
+            :independent-observations-per-night "Abundance Index"
             :presence-absence "Presence"
             :survey-id "Survey ID"
             :survey-name "Survey Name"

@@ -64,6 +64,27 @@
                                                         (:status response)
                                                         (:body response)))))))))
 
+(defn put-x
+  "POST state"
+  ([resource params cb] (put-x resource params cb nil))
+  ([resource params cb failcb]
+   (go
+     (let [response (<! (util/request http/put (util/with-baseurl resource)
+                                      params))
+           success (some #{(:status response)} success-status-codes)]
+       (if success
+         (when cb
+           (cb response))
+         (do
+           (when failcb
+             (failcb))
+           (om/update! (state/app-state-cursor) :error (build-error
+                                                        "PUT"
+                                                        (util/with-baseurl resource)
+                                                        params
+                                                        (:status response)
+                                                        (:body response)))))))))
+
 (def get-application
   "Retrieve global application details"
   (partial get-x "/application"))
