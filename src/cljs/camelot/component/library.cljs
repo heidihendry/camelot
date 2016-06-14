@@ -12,6 +12,10 @@
   []
   (om/transact! (:search (state/library-state)) :show-select-count dec))
 
+(defn identify-selected-prompt
+  []
+  (om/transact! (:search (state/library-state)) :identify-selected not))
+
 (defn show-select-message
   []
   (om/transact! (:search (state/library-state)) :show-select-count inc)
@@ -54,6 +58,14 @@
   (show-select-message)
   (deselect-all))
 
+(defn submit-identification
+  []
+  (identify-selected-prompt)
+  ;; TODO actually submit the identification
+  (om/update! (:identification (state/library-state)) :quantity 1)
+  (om/update! (:identification (state/library-state)) :species nil)
+  (deselect-all))
+
 (defn prev-page
   [page]
   (if (= page 1)
@@ -88,28 +100,69 @@
                                   :onClick #(do (deselect-all)
                                                 (om/transact! data [:search :page] (partial next-page matches)))}))))))
 
+(defn species-option-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (:species-id data)}
+                  (:species-scientific-name data)))))
+
 (defn search-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "search-bar"}
-               (om/build pagination-component data)
-               (dom/span #js {:className "fa fa-search"})
-               (dom/input #js {:type "text"
-                               :placeholder "Filter..."
-                               :className "field-input search"
-                               :value (get-in data [:search :terms])
-                               :onChange #(om/update! (:search data)
-                                                      :terms
-                                                      (.. % -target -value))})
-               (if (= page-size (count (media-selected)))
-                 (dom/button #js {:className "btn btn-primary"
-                                  :onClick deselect-all*}
-                             "Select None")
-                 (dom/button #js {:className "btn btn-primary"
-                                  :onClick select-all*}
-                             "Select All"))))))
+      (let [num-selected (count (media-selected))]
+        (dom/div #js {:className "search-container"}
+                 (dom/div #js {:className "search-bar"}
+                          (om/build pagination-component data)
+                          (dom/span #js {:className "fa fa-search"})
+                          (dom/input #js {:type "text"
+                                          :placeholder "Filter..."
+                                          :className "field-input search"
+                                          :value (get-in data [:search :terms])
+                                          :onChange #(om/update! (:search data)
+                                                                 :terms
+                                                                 (.. % -target -value))})
+                          (if (= page-size num-selected)
+                            (dom/button #js {:className "btn btn-default search-main-op"
+                                             :onClick deselect-all*}
+                                        "Select None")
+                            (dom/button #js {:className "btn btn-default search-main-op"
+                                             :onClick select-all*}
+                                        "Select All"))
+                          (dom/button #js {:className "btn btn-default"
+                                           :onClick identify-selected-prompt
+                                           :disabled (if (zero? num-selected) "disabled" "")}
+                                      "Identify Selected"))
+                 (dom/div #js {:className (str "identify-selected"
+                                               (if (get-in data [:search :identify-selected])
+                                                 " show-prompt"
+                                                 ""
+                                                 ))}
+                          (dom/div nil
+                                   (dom/div #js {:className "field"}
+                                            (dom/label nil "Species")
+                                            (dom/select #js {:className "field-input"
+                                                             :value (get-in data [:identification :species])
+                                                             :onChange #(om/update! (:identification data) :species
+                                                                                    (.. % -target -value))}
+                                                        (om/build-all species-option-component
+                                                                      (conj (vals (:species data))
+                                                                            {:species-id nil
+                                                                             :species-scientific-name "Select..."})
+                                                                      {:key :species-id})))
+                                   (dom/div #js {:className "field"}
+                                            (dom/label nil "Quantity")
+                                            (dom/input #js {:type "number"
+                                                            :className "field-input"
+                                                            :value (get-in data [:identification :quantity])
+                                                            :onChange #(om/update! (:identification data) :quantity
+                                                                                   (.. % -target -value))}))
+                                   (dom/div #js {:className "field"}
+                                            (dom/button #js {:className "btn btn-primary"
+                                                             :onClick submit-identification} "Submit")))))))))
 
 (defn media-component
   "Render a single library item."
@@ -303,6 +356,7 @@
     (will-mount [_]
       ;; TODO For now we assume there's only 1 survey.
       (om/update! (get-in data [:library :search]) :page 1)
+      (om/update! (get-in data [:library]) :identification {:quantity 1})
       (rest/get-x "/species"
                   (fn [resp] (om/update! (get data :library)
                                          :species
