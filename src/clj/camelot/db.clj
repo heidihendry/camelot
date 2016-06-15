@@ -3,9 +3,11 @@
             [clj-time.coerce :as tc]
             [clojure.string :as str]
             [clojure.java.jdbc :as jdbc]
+            [camelot.model.state :refer [State]]
             [ragtime
              [core :as rtc]
-             [jdbc :as ragjdbc]]))
+             [jdbc :as ragjdbc]]
+            [schema.core :as s]))
 
 (def spec
   "JDBC spec for the primary database."
@@ -69,9 +71,11 @@
      (q {} {:connection conn})
      (q))))
 
-(defn with-db-keys
+(s/defn with-db-keys
   "Run a function, translating the parameters and results as needed."
-  [state f data]
+  [state :- State
+   f
+   data]
   (-> data
       (db-keys)
       (with-connection (:connection state) f)

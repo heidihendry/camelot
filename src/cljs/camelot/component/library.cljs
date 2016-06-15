@@ -13,6 +13,57 @@
   []
   (om/transact! (:search (state/library-state)) :show-select-count dec))
 
+(defn deselect-all
+  []
+  (dorun (map #(om/update! % :selected false)
+              (get-in (state/library-state) [:search :matches]))))
+
+(defn media-on-page
+  []
+  (let [data (state/library-state)]
+    (take page-size
+          (drop (* (- (get-in data [:search :page]) 1)
+                   page-size)
+                (get-in data [:search :matches])))))
+
+(defn media-selected
+  []
+  (filterv :selected (get-in (state/library-state) [:search :matches])))
+
+(defn add-sighting
+  []
+  (let [spp (cljs.reader/read-string (get-in (state/library-state) [:identification :species]))
+        qty (get-in (state/library-state) [:identification :quantity])
+        selected (:selected (state/library-state))]
+    (dorun (map #(om/update! % :sightings (conj (:sightings %)
+                                                {:species-id spp
+                                                 :sighting-id -1
+                                                 :sighting-quantity qty}))
+                (media-selected)))
+    (rest/put-x "/library/identify" {:data (merge {:identification
+                                                   {:quantity qty
+                                                    :species spp}}
+                                                  {:media
+                                                   (map :media-id (media-selected))})}
+                (fn [resp]
+                  (om/update! (state/library-state) :selected
+                              (first (filter #(= (:media-id selected) (:media-id %)) (media-on-page))))
+                  (om/update! (:identification (state/library-state)) :quantity 1)
+                  (om/update! (:identification (state/library-state)) :species nil)
+                  (om/update! (:search (state/library-state)) :identify-selected false)
+                  (deselect-all)))))
+
+(defn remove-sighting
+  [sighting-id]
+  (let [selected (:selected (state/library-state))]
+    (om/update! selected :sightings
+                (filterv (fn [s] (not= sighting-id (:sighting-id s)))
+                         (:sightings selected)))
+    (rest/delete-resource (str "/sightings/" sighting-id) {}
+                          #(om/update! (state/library-state) :selected
+                                       (first (filter (fn [y] (= (:media-id selected) (:media-id y)))
+                                                      (media-on-page)))))))
+
 (defn identify-selected-prompt
   []
   (om/transact! (:search (state/library-state)) :identify-selected not))
@@ -28,18 +79,6 @@
   (om/update! data :selected (not (:selected data)))
   (om/update! (state/library-state) :selected data))
 
-(defn media-on-page
-  []
-  (let [data (state/library-state)]
-    (take page-size
-          (drop (* (- (get-in data [:search :page]) 1)
-                   page-size)
-                (get-in data [:search :matches])))))
-
-(defn media-selected
-  []
-  (filterv :selected (get-in (state/library-state) [:search :matches])))
-
 (defn select-all
   []
   (dorun (map #(om/update! % :selected true) (media-on-page))))
@@ -49,11 +88,6 @@
   (show-select-message)
   (select-all))
 
-(defn deselect-all
-  []
-  (dorun (map #(om/update! % :selected false)
-              (get-in (state/library-state) [:search :matches]))))
-
 (defn deselect-all*
   []
   (show-select-message)
@@ -62,16 +96,7 @@
 (defn submit-identification
   []
   (identify-selected-prompt)
-  (rest/put-x "/blah" (merge {:identification
-                              {:quantity (get-in (state/library-state) [:identification :quantity])
-                               :species (cljs.reader/read-string
-                                         (get-in (state/library-state) [:identification :species]))}}
-                             {:media
-                              (map :media-id (media-selected))})
-              (fn [resp]
-                (om/update! (:identification (state/library-state)) :quantity 1)
-                (om/update! (:identification (state/library-state)) :species nil)
-                (deselect-all))))
+  (add-sighting))
 
 (defn prev-page
   [page]
@@ -182,13 +207,13 @@
                                             (dom/input #js {:type "number"
                                                             :className "field-input"
                                                             :value (get-in data [:identification :quantity])
-                                                            :onChange #(om/update! (:identification data) :quantity
-                                                                                   (.. % -target -value))}))
+                                                            :onChange #(when (re-find #"^[0-9]+$"
+                                                                                      (get-in data [:identification :quantity]))
+                                                                         (om/update! (:identification data) :quantity
+                                                                                     (cljs.reader/read-string (.. % -target -value))))}))
                                    (dom/div #js {:className "field"}
                                             (dom/button #js {:className "btn btn-primary"
                                                              :disabled (when (not (and (get-in data [:identification :quantity])
-                                                                                       (re-find #"^[0-9]+$"
-                                                                                                (get-in data [:identification :quantity]))
                                                                                        (get-in data [:identification :species])))
                                                                          "disabled")
                                                              :onClick submit-identification} "Submit")
@@ -322,57 +347,62 @@
   (reify
     om/IRender
     (render [_]
-      (let [spp (:species (state/library-state))]
-        (dom/span nil
-                  (:sighting-quantity sighting) "x "
-                  (:species-scientific-name (get spp (:species-id sighting))))))))
+      (prn "render mcpd-sightings")
+      (prn sighting)
+      (dom/div nil
+               (if (> (:sighting-id sighting) -1)
+                 (dom/div #js {:className "fa fa-trash remove-sighting"
+                               :onClick #(remove-sighting (:sighting-id sighting))}))
+               (:sighting-quantity sighting) "x "
+               (:species-scientific-name (get (:species (state/library-state))
+                                              (:species-id sighting)))))))
 
 (defn mcp-details
-  [selected owner]
+  [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div
-       nil
-       (dom/div #js {:className "fa fa-remove pull-right close-details"
-                     :onClick #(om/transact! (state/library-state) :show-media-details not)})
-       (dom/h4 nil "Details")
-       (if selected
-         (dom/div #js {:className "details"}
-                  (dom/div nil
-                           (dom/label nil "Longitude")
-                           (dom/div #js {:className "data"} (:trap-station-longitude selected)))
-                  (dom/div nil
-                           (dom/label nil "Latitude")
-                           (dom/div #js {:className "data"} (:trap-station-latitude selected)))
-                  (dom/div nil
-                           (dom/label nil "Trap Station")
-                           (dom/div #js {:className "data"} (:trap-station-name selected)))
-                  (dom/div nil
-                           (dom/label nil "Sublocation")
-                           (dom/div #js {:className "data"} (:site-sublocation selected)))
-                  (dom/div nil
-                           (dom/label nil "Site")
-                           (dom/div #js {:className "data"} (:site-name selected)))
-                  (dom/div nil
-                           (dom/label nil "Camera")
-                           (dom/div #js {:className "data"} (:camera-name selected)))
-                  (dom/div nil
-                           (dom/label nil "Timestamp")
-                           (let [df (DateTimeFormat. "hh:mm:ss EEE, dd LLL yyyy")]
-                             (dom/div nil (.format df (:media-capture-timestamp selected)))))
-                  (dom/div nil
-                           (dom/label nil "Sightings")
-                           (om/build-all mcp-details-sightings
-                                         (:sightings selected)
-                                         {:key :sighting-id})))
-         (dom/div nil "Photo not selected"))))))
+      (prn "render mcpd")
+      (dom/div nil
+               (dom/div #js {:className "fa fa-remove pull-right close-details"
+                             :onClick #(om/transact! data :show-media-details not)})
+               (dom/h4 nil "Details")
+               (if (:selected data)
+                 (dom/div #js {:className "details"}
+                          (dom/div nil
+                                   (dom/label nil "Longitude")
+                                   (dom/div #js {:className "data"} (:trap-station-longitude (:selected data))))
+                          (dom/div nil
+                                   (dom/label nil "Latitude")
+                                   (dom/div #js {:className "data"} (:trap-station-latitude (:selected data))))
+                          (dom/div nil
+                                   (dom/label nil "Trap Station")
+                                   (dom/div #js {:className "data"} (:trap-station-name (:selected data))))
+                          (dom/div nil
+                                   (dom/label nil "Sublocation")
+                                   (dom/div #js {:className "data"} (:site-sublocation (:selected data))))
+                          (dom/div nil
+                                   (dom/label nil "Site")
+                                   (dom/div #js {:className "data"} (:site-name (:selected data))))
+                          (dom/div nil
+                                   (dom/label nil "Camera")
+                                   (dom/div #js {:className "data"} (:camera-name (:selected data))))
+                          (dom/div nil
+                                   (dom/label nil "Timestamp")
+                                   (let [df (DateTimeFormat. "hh:mm:ss EEE, dd LLL yyyy")]
+                                     (dom/div nil (.format df (:media-capture-timestamp (:selected data))))))
+                          (dom/div nil
+                                   (dom/label nil "Sightings")
+                                   (om/build-all mcp-details-sightings (:sightings (:selected data))
+                                                 {:key :sighting-id})))
+                 (dom/div nil "Photo not selected"))))))
 
 (defn media-control-panel-component
   [data owner]
   (reify
     om/IRender
     (render [_]
+      (prn "render mcpc")
       (dom/div #js {:className "media-control-panel"}
                (dom/div #js {:className "mcp-container"}
                         (om/build mcp-preview (:selected data)))))))
@@ -382,6 +412,7 @@
   (reify
     om/IRender
     (render [_]
+      (prn "render mdp")
       (dom/div nil
                (dom/div #js {:className (str "media-details-panel"
                                              (if (:show-media-details data)
@@ -397,7 +428,7 @@
                                       :onClick #(om/transact! data :show-media-details not)}
                                  (dom/div #js {:className "rotate"}
                                           "Details"))
-                        (om/build mcp-details (:selected data)))))))
+                        (om/build mcp-details data))))))
 
 (defn library-view-component
   "Render a collection of library."
@@ -407,7 +438,7 @@
     (will-mount [_]
       ;; TODO For now we assume there's only 1 survey.
       (om/update! (get-in data [:library :search]) :page 1)
-      (om/update! (get-in data [:library]) :identification {:quantity "1"})
+      (om/update! (get-in data [:library]) :identification {:quantity 1})
       (rest/get-x "/species"
                   (fn [resp] (om/update! (get data :library)
                                          :species

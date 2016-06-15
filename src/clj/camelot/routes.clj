@@ -184,7 +184,9 @@
             (GET "/:id" [id] (report/export (keyword report) (edn/read-string id))))
 
    (context "/library" []
-            (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config))))))
+            (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config)))))
+            (PUT "/identify" [data] (r/response (library/identify (app/gen-state (conf/config))
+                                                                  data))))
 
    misc-routes
    config/routes

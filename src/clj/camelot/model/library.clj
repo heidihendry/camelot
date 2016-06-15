@@ -55,7 +55,7 @@
         media-uri #(format "/media/photo/%s" (:media-filename %))
         sightings-for #(get media-sightings (:media-id %))]
     (map #(library-record (assoc %
-                                 :sightings (sightings-for %)
+                                 :sightings (vec (sightings-for %))
                                  :media-uri (media-uri %)))
          media)))
 
@@ -63,3 +63,14 @@
   [state]
   (db/with-transaction [s state]
     (build-records s (sighting/get-all* s) (all-media s))))
+
+(defn- identify-media
+  [state {:keys [quantity species]} media-id]
+  (sighting/create! state (sighting/tsighting {:sighting-quantity quantity
+                                               :species-id species
+                                               :media-id media-id})))
+
+(s/defn identify
+  [state {:keys [identification media]}]
+  (db/with-transaction [s state]
+    (dorun (map (partial identify-media s identification) media))))

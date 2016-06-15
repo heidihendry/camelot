@@ -66,6 +66,7 @@ html > body {
   left: 0;
   width: 100%;
   z-index: 500;
+  min-width: 1024px;
 }
 #navigation .navbar-nav {
   float: none;
@@ -631,6 +632,11 @@ pre.field-input {
     padding: 1rem;
     border-left: 1px solid #ccc;
     opacity: 0.6;
+}
+.library .remove-sighting {
+    padding-top: 0.3rem;
+    cursor: pointer;
+    float: right;
 }
 .library .media-details-panel.show-panel {
     right: 0rem;
