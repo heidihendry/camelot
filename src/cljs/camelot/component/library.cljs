@@ -172,9 +172,11 @@
                                                        "disabled" "")
                                           :className "field-input search"
                                           :value (get-in data [:search :terms])
-                                          :onChange #(om/update! (:search data)
-                                                                 :terms
-                                                                 (.. % -target -value))})
+                                          :onChange #(do (om/update! (:search data)
+                                                                     :terms
+                                                                     (.. % -target -value))
+                                                         (om/update! (:search data)
+                                                                     :page 1))})
                           (om/build pagination-component data)
                           (if (= page-size num-selected)
                             (dom/button #js {:className "btn btn-default search-main-op"

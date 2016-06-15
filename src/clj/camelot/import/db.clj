@@ -13,7 +13,8 @@
             [camelot.model.camera-status :as camera-status]
             [clojure.string :as str]
             [camelot.application :as app]
-            [camelot.util.config :as conf]))
+            [camelot.util.config :as conf]
+            [clojure.edn :as edn]))
 
 (def default-survey-name "Initial survey")
 
@@ -116,7 +117,7 @@
        :trap-station-longitude longitude
        :trap-station-latitude latitude
        :trap-station-notes import-note
-       :trap-station-altitude altitude}))))
+       :trap-station-altitude (and altitude (edn/read-string altitude))}))))
 
 (defn get-or-create-trap-session!
   [state album trap-station]
