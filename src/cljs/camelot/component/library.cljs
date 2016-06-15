@@ -272,7 +272,7 @@
                                                          (om/update! (:search data) :matches (map :media-id (only-matching (.. % -target -value) data)))
 )})
                           (om/build pagination-component data)
-                          (if (= page-size num-selected)
+                          (if (> num-selected 0)
                             (dom/button #js {:className "btn btn-default search-main-op"
                                              :onClick deselect-all*
                                              :disabled (if (get-in data
