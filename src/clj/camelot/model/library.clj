@@ -73,4 +73,4 @@
 (s/defn identify
   [state {:keys [identification media]}]
   (db/with-transaction [s state]
-    (dorun (map (partial identify-media s identification) media))))
+    (map :sighting-id (doall (map (partial identify-media s identification) media)))))

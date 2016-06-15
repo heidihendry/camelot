@@ -35,23 +35,33 @@
   (let [spp (cljs.reader/read-string (get-in (state/library-state) [:identification :species]))
         qty (get-in (state/library-state) [:identification :quantity])
         selected (:selected (state/library-state))]
-    (dorun (map #(om/update! % :sightings (conj (:sightings %)
-                                                {:species-id spp
-                                                 :sighting-id -1
-                                                 :sighting-quantity qty}))
-                (media-selected)))
-    (rest/put-x "/library/identify" {:data (merge {:identification
-                                                   {:quantity qty
-                                                    :species spp}}
-                                                  {:media
-                                                   (map :media-id (media-selected))})}
-                (fn [resp]
-                  (om/update! (state/library-state) :selected
-                              (first (filter #(= (:media-id selected) (:media-id %)) (media-on-page))))
-                  (om/update! (:identification (state/library-state)) :quantity 1)
-                  (om/update! (:identification (state/library-state)) :species nil)
-                  (om/update! (:search (state/library-state)) :identify-selected false)
-                  (deselect-all)))))
+    (let [all-selected (media-selected)]
+      (dorun (map #(om/update! %
+                               :sightings
+                               (conj (:sightings %)
+                                     {:species-id spp
+                                      :sighting-id -1
+                                      :sighting-quantity qty}))
+                  all-selected))
+      (rest/put-x "/library/identify" {:data (merge {:identification
+                                                     {:quantity qty
+                                                      :species spp}}
+                                                    {:media
+                                                     (map :media-id (media-selected))})}
+                  (fn [resp]
+                    (dorun (map #(om/update! (second %)
+                                             :sightings
+                                             (conj (:sightings (second %))
+                                                   {:species-id spp
+                                                    :sighting-id (first %)
+                                                    :sighting-quantity qty}))
+                                (zipmap (:body resp) all-selected)))
+                    (om/update! (state/library-state) :selected
+                                (first (filter #(= (:media-id selected) (:media-id %)) (media-on-page))))
+                    (om/update! (:identification (state/library-state)) :quantity 1)
+                    (om/update! (:identification (state/library-state)) :species -1)
+                    (om/update! (:search (state/library-state)) :identify-selected false)
+                    (deselect-all))))))
 
 (defn remove-sighting
   [sighting-id]
@@ -199,7 +209,7 @@
                                                                                     (.. % -target -value))}
                                                         (om/build-all species-option-component
                                                                       (conj (vals (:species data))
-                                                                            {:species-id nil
+                                                                            {:species-id -1
                                                                              :species-scientific-name "Select..."})
                                                                       {:key :species-id})))
                                    (dom/div #js {:className "field"}
@@ -214,7 +224,7 @@
                                    (dom/div #js {:className "field"}
                                             (dom/button #js {:className "btn btn-primary"
                                                              :disabled (when (not (and (get-in data [:identification :quantity])
-                                                                                       (get-in data [:identification :species])))
+                                                                                       (> (get-in data [:identification :species]) -1)))
                                                                          "disabled")
                                                              :onClick submit-identification} "Submit")
                                             (dom/button #js {:className "btn btn-default"
@@ -347,8 +357,7 @@
   (reify
     om/IRender
     (render [_]
-      (prn "render mcpd-sightings")
-      (prn sighting)
+      (prn (:sighting-id sighting))
       (dom/div nil
                (if (> (:sighting-id sighting) -1)
                  (dom/div #js {:className "fa fa-trash remove-sighting"
@@ -362,7 +371,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn "render mcpd")
       (dom/div nil
                (dom/div #js {:className "fa fa-remove pull-right close-details"
                              :onClick #(om/transact! data :show-media-details not)})
@@ -402,7 +410,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn "render mcpc")
       (dom/div #js {:className "media-control-panel"}
                (dom/div #js {:className "mcp-container"}
                         (om/build mcp-preview (:selected data)))))))
@@ -412,7 +419,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn "render mdp")
       (dom/div nil
                (dom/div #js {:className (str "media-details-panel"
                                              (if (:show-media-details data)
