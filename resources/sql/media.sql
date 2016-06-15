@@ -33,7 +33,7 @@ SET media_updated = CURRENT_TIMESTAMP,
     media_format = :media_format,
     media_cameracheck = :media_cameracheck,
     media_attention_needed = :media_attention_needed,
-    trap_station_session_camera_id = :trap_station_session_camera_id
+    trap_station_session_camera_id = :trap_station_session_camera_id,
     media_filename = :media_filename
 WHERE media_id = :media_id
 

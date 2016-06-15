@@ -13,6 +13,7 @@
      media-created :- org.joda.time.DateTime
      media-updated :- org.joda.time.DateTime
      media-filename :- s/Str
+     media-format :- s/Str
      media-uri :- s/Str
      media-cameracheck :- s/Bool
      media-attention-needed :- s/Bool
@@ -36,11 +37,11 @@
      sightings :- [Sighting]])
 
 (s/defn library-record
-  [{:keys [media-id media-created media-updated media-filename media-uri media-cameracheck media-attention-needed
+  [{:keys [media-id media-created media-updated media-filename media-format media-uri media-cameracheck media-attention-needed
            media-capture-timestamp trap-station-session-camera-id trap-station-session-id trap-station-id
            trap-station-name trap-station-longitude trap-station-latitude site-sublocation site-city camera-id
            camera-name camera-make camera-model survey-site-id survey-id site-id site-name sightings]}]
-  (->LibraryRecord media-id media-created media-updated media-filename media-uri media-cameracheck media-attention-needed
+  (->LibraryRecord media-id media-created media-updated media-filename media-format media-uri media-cameracheck media-attention-needed
                    media-capture-timestamp trap-station-session-camera-id trap-station-session-id trap-station-id
                    trap-station-name trap-station-longitude trap-station-latitude site-sublocation site-city camera-id
                    camera-name camera-make camera-model survey-site-id survey-id site-id site-name (or sightings [])))
