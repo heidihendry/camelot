@@ -84,17 +84,22 @@
     (disjunctive-terms search species record)))
 
 (defn only-matching
-  [data]
+  [terms data]
   (filter
-   #(matches-search? (str/lower-case (or (get-in data [:search :terms]) ""))
+   #(matches-search? (str/lower-case (or terms ""))
                      (get-in data [:species])
                      %)
-   (get-in data [:search :results])))
+   (vals (get-in data [:search :results]))))
+
+(defn get-matching
+  [data]
+  (let [search (:search data)]
+    (mapv #(get-in search [:results %]) (:matches search))))
 
 (defn find-with-id
   [media-id]
   (first (filter #(= media-id (:media-id %))
-                 (only-matching (state/library-state)))))
+                 (get-matching (state/library-state)))))
 
 (defn hide-select-message
   []
@@ -102,7 +107,7 @@
 
 (defn all-media-selected
   []
-  (filter :selected (only-matching (state/library-state))))
+  (filter :selected (get-matching (state/library-state))))
 
 (defn deselect-all
   []
@@ -166,12 +171,12 @@
   ([data] (let [data (state/library-state)]
             (vec (take page-size
                        (drop (* (- (get-in data [:search :page]) 1) page-size)
-                             (only-matching data))))))
+                             (get-matching data))))))
   ([]
    (let [data (state/library-state)]
      (vec (take page-size
                 (drop (* (- (get-in data [:search :page]) 1) page-size)
-                      (only-matching data)))))))
+                      (get-matching data)))))))
 
 (defn select-all
   []
@@ -245,6 +250,7 @@
     om/IWillMount
     (will-mount [_]
       (om/update! (:search data) :page 1)
+      (om/update! (:search data) :matches (map :media-id (only-matching nil data)))
       (om/update! (:search data) :terms nil))
     om/IRender
     (render [_]
@@ -262,7 +268,9 @@
                                           :className "field-input search"
                                           :value (get-in data [:search :terms])
                                           :onChange #(do (om/update! (:search data) :terms (.. % -target -value))
-                                                         (om/update! (:search data) :page 1))})
+                                                         (om/update! (:search data) :page 1)
+                                                         (om/update! (:search data) :matches (map :media-id (only-matching (.. % -target -value) data)))
+)})
                           (om/build pagination-component data)
                           (if (= page-size num-selected)
                             (dom/button #js {:className "btn btn-default search-main-op"
@@ -346,7 +354,7 @@
   (reify
     om/IRender
     (render [_]
-      (let [matches (only-matching data)]
+      (let [matches (get-matching data)]
         (om/update! (:search data) :match-count (count matches))
         (dom/div #js {:className "media-collection"}
                  (dom/div #js {:className (str "selected-count"
@@ -477,7 +485,9 @@
                                            (:body resp))))))
       (rest/get-x "/library"
                   (fn [resp]
-                    (om/update! (get-in data [:library :search]) :results (vec (:body resp))))))
+                    (om/update! (get-in data [:library :search]) :results
+                                (reduce-kv (fn [acc k v] (assoc acc k (first v))) {}
+                                           (group-by :media-id (:body resp)))))))
     om/IRender
     (render [_]
       (let [lib (:library data)]
@@ -486,7 +496,8 @@
             (prn "redraw")
             (dom/div #js {:className "library"}
                      (om/build search-component lib)
-                     (om/build media-collection-component lib)
+                     (when (get-in lib [:search :matches])
+                       (om/build media-collection-component lib))
                      (om/build media-details-panel-component lib)
                      (om/build media-control-panel-component lib)))
           (dom/div nil ""))))))
