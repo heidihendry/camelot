@@ -92,6 +92,22 @@
       r
       {:result :pass})))
 
+(defn compare-sources
+  "Compare two source fields, failing if they're not consistent."
+  [state h1 h2]
+  (if (not= (:source h1) (:source h2))
+    (reduced {:result :fail :reason (tr/translate (:config state) :checks/source-consistency
+                                     (:filename h1) (:filename h2))})
+    h1))
+
+(defn check-source-consistency
+  "Check the source of all photos is consistent."
+  [state photos]
+  (let [r (reduce (partial compare-sources state) (first photos) (rest photos))]
+    (if (= (:result r) :fail)
+      r
+      {:result :pass})))
+
 (defn compare-cameras
   "Compare two cameras, failing if they're not consistent."
   [state h1 h2]
@@ -228,6 +244,7 @@
                :time-light-sanity check-ir-threshold
                :camera-checks check-camera-checks
                :headline-consistency check-headline-consistency
+               :source-consistency check-source-consistency
                :camera-consistency check-camera-consistency
                :album-has-data check-album-has-data
                :timeshift-consistency check-timeshift-consistency}]

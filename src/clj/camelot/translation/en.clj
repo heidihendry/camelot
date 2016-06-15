@@ -113,6 +113,7 @@
             :time-light-sanity "The photo exposure values indicate that the timestamp may be wrong on numerous photos"
             :camera-checks "The photos do not have 2 or more photos indicated as being camera check points"
             :headline-consistency "The headline of the photos differs across photos. (Tested '%s' and '%s')"
+            :source-consistency "The phase of the photos differs across photos. (Tested '%s' and '%s')"
             :camera-consistency "The camera used to take the photos differs. (Tested '%s' and '%s')"
             :required-fields "Required fields are missing from '%s': %s"
             :album-has-data "The dataset for a period must not be empty"

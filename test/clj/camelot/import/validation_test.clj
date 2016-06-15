@@ -167,6 +167,34 @@
                  {:datetime (t/date-time 2015 1 5 0 0 0)}]]
       (:result (check-headline-consistency (gen-state-helper config) album)) => :fail)))
 
+(facts "Album source consistency"
+  (fact "All files in an album containing the same source should pass"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :source "phase1"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :source "phase1"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :source "phase1"}]]
+      (:result (check-source-consistency (gen-state-helper config) album)) => :pass))
+
+  (fact "Any one file not containing the same source as the rest should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :source "phase1"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :source "phase1"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)
+                  :source "phase2"}]]
+      (:result (check-source-consistency (gen-state-helper config) album)) => :fail))
+
+  (fact "A missing source should fail"
+    (let [config {}
+          album [{:datetime (t/date-time 2015 1 5 0 0 0)
+                  :source "phase1"}
+                 {:datetime (t/date-time 2015 1 5 0 0 0)}]]
+      (:result (check-source-consistency (gen-state-helper config) album)) => :fail)))
+
 (facts "Album camera consistency"
   (fact "All files in an album containing the same camera should pass"
     (let [config {}
