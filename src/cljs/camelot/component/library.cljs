@@ -79,7 +79,7 @@
 
 (defn matches-search?
   [search species record]
-  (if (or (nil? search) (= search ""))
+  (if (= search "")
     true
     (disjunctive-terms search species record)))
 
@@ -87,7 +87,7 @@
   [terms data]
   (filter
    #(matches-search? (str/lower-case (or terms ""))
-                     (get-in data [:species])
+                     (:species data)
                      %)
    (vals (get-in data [:search :results]))))
 

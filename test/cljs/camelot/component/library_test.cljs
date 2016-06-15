@@ -8,110 +8,111 @@
                  :species-scientific-name "Yellow Spotted Cat"}})
 
 (deftest nil-search-returns-all
-  (let [results [{:sightings []
-                  :media-id 1}]
-        data {:search {:terms nil
-                       :results results}
+  (let [expected [{:sightings []
+                   :media-id 1}]
+        results {1 {:sightings []
+                    :media-id 1}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) results))))
+    (is (= (sut/only-matching nil data) expected))))
 
 (deftest empty-search-returns-all
-  (let [results [{:sightings []
-                  :media-id 1}]
-        data {:search {:terms ""
-                       :results results}
+  (let [expected [{:sightings []
+                   :media-id 1}]
+        results {1 {:sightings []
+                    :media-id 1}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) results))))
+    (is (= (sut/only-matching "" data) expected))))
 
 (deftest species-search-returns-records-with-matching-species
   (let [expected [{:sightings [{:species-id 1}]
                    :media-id 2}]
-        results [{:sightings []
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :media-id 2}]
-        data {:search {:terms "Smiley"
-                       :results results}
+        results {1 {:sightings []
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "Smiley" data) expected))))
 
 (deftest species-search-is-case-insensitive
   (let [expected [{:sightings [{:species-id 1}]
                    :media-id 2}]
-        results [{:sightings []
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :media-id 2}]
-        data {:search {:terms "smiley"
-                       :results results}
+        results {1 {:sightings []
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "smiley" data) expected))))
 
 (deftest species-search-matches-middle-of-string
   (let [expected [{:sightings [{:species-id 1}]
                    :media-id 2}]
-        results [{:sightings []
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :media-id 2}]
-        data {:search {:terms "ley wolf"
-                       :results results}
+        results {1 {:sightings []
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "ley wolf" data) expected))))
 
 (deftest non-matching-species-are-ignored
   (let [expected [{:sightings [{:species-id 1}]
                    :media-id 2}]
-        results [{:sightings [{:species-id 2}]
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :media-id 2}]
-        data {:search {:terms "ley wolf"
-                       :results results}
+        results {1 {:sightings [{:species-id 2}]
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "ley wolf" data) expected))))
 
 (deftest search-by-site
   (let [expected [{:sightings []
                    :site-name "MySite"
                    :media-id 1}]
-        results [{:sightings []
-                  :site-name "MySite"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "someothersite"
-                  :media-id 2}]
-        data {:search {:terms "mysite"
-                       :results results}
+        results {1 {:sightings []
+                    :site-name "MySite"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "someothersite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "mysite" data) expected))))
 
 (deftest matches-any-field
-  (let [results [{:sightings []
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}]
-        data {:search {:terms "wolf"
-                       :results results}
+  (let [expected [{:sightings []
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                  {:sightings [{:species-id 1}]
+                   :site-name "MySite"
+                   :media-id 2}]
+        results {1 {:sightings []
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) results))))
+    (is (= (sut/only-matching "wolf" data) expected))))
 
 (deftest terms-separated-by-space-are-conjunctive
   (let [expected [{:sightings [{:species-id 1}]
                    :site-name "MySite"
                    :media-id 2}]
-        results [{:sightings []
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}]
-        data {:search {:terms "wolf site"
-                       :results results}
+        results {1  {:sightings []
+                     :site-name "Wolf Den"
+                     :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "wolf site" data) expected))))
 
 (deftest terms-separated-by-pipe-are-disjunctive
   (let [expected [{:sightings []
@@ -120,133 +121,126 @@
                  {:sightings [{:species-id 1}]
                   :site-name "MySite"
                   :media-id 2}]
-        results [{:sightings []
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}
-                 {:sightings [{:species-id 2}]
-                  :site-name "Excluded"
-                  :media-id 3}]
-        data {:search {:terms "wolf site|den"
-                       :results results}
+        results {1 {:sightings []
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}
+                 3 {:sightings [{:species-id 2}]
+                    :site-name "Excluded"
+                    :media-id 3}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "wolf site|den" data) expected))))
 
 (deftest allows-field-to-be-specified
   (let [expected [{:sightings [{:species-id 1}]
                    :site-name "MySite"
                    :media-id 2}]
-        results [{:sightings []
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}]
-        data {:search {:terms "species-scientific-name:wolf"
-                       :results results}
+        results {1 {:sightings []
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "species-scientific-name:wolf" data) expected))))
 
 (deftest allows-field-shorthand-for-species
   (let [expected [{:sightings [{:species-id 1}]
                    :site-name "MySite"
                    :media-id 2}]
-        results [{:sightings []
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}]
-        data {:search {:terms "species:wolf"
-                       :results results}
+        results {1 {:sightings []
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "species:wolf" data) expected))))
 
 (deftest allows-field-shorthand-for-site
   (let [expected [{:sightings [{:species-id 1}]
                    :site-name "MySite"
                    :media-id 2}]
-        results [{:sightings []
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}]
-        data {:search {:terms "site:mysite"
-                       :results results}
+        results {1 {:sightings []
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "site:mysite" data) expected))))
 
 (deftest allows-field-shorthand-for-camera
   (let [expected [{:sightings []
                   :camera-name "ABC01"
                    :media-id 1}]
-        results [{:sightings []
-                  :camera-name "ABC01"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :camera-name "XYZ3"
-                  :media-id 2}]
-        data {:search {:terms "camera:abc"
-                       :results results}
+        results {1 {:sightings []
+                    :camera-name "ABC01"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :camera-name "XYZ3"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "camera:abc" data) expected))))
 
 (deftest ignores-nonsense-fields
-  (let [results [{:sightings []
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}]
-        data {:search {:terms "nonexisty:wolf"
-                       :results results}
+  (let [results {1 {:sightings []
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) '()))))
+    (is (= (sut/only-matching "nonexisty:wolf" data) '()))))
 
 (deftest complex-searches-return-expected-results
   (let [expected [{:sightings [{:species-id 1}]
                    :site-name "MySite"
                    :media-id 2}]
-        results [{:sightings [{:species-id 2}]
-                  :site-name "Wolf Den"
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :site-name "MySite"
-                  :media-id 2}]
-        data {:search {:terms "species-scientific-name:wolf mysite|species-scientific-name:cat mysite"
-                       :results results}
+        results {1 {:sightings [{:species-id 2}]
+                    :site-name "Wolf Den"
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :site-name "MySite"
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching
+            "species-scientific-name:wolf mysite|species-scientific-name:cat mysite"
+            data) expected))))
 
 (deftest finds-attention-needed-true-boolean
   (let [expected [{:sightings [{:species-id 1}]
                    :media-attention-needed true
                    :media-id 2}]
-        results [{:sightings [{:species-id 2}]
-                  :media-attention-needed false
-                  :media-id 1}
-                 {:sightings [{:species-id 1}]
-                  :media-attention-needed true
-                  :media-id 2}]
-        data {:search {:terms "attn:true"
-                       :results results}
+        results {1 {:sightings [{:species-id 2}]
+                    :media-attention-needed false
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :media-attention-needed true
+                    :media-id 2}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "attn:true" data) expected))))
 
 (deftest finds-attention-needed-false-boolean
   (let [expected [{:sightings [{:species-id 1}]
                    :media-attention-needed false
                    :media-id 2}]
-        results [{:sightings [{:species-id 1}]
-                  :media-attention-needed false
-                  :media-id 2}
-                 {:sightings [{:species-id 2}]
-                  :media-attention-needed true
-                  :media-id 1}]
-        data {:search {:terms "attn:false"
-                       :results results}
+        results {1 {:sightings [{:species-id 1}]
+                    :media-attention-needed false
+                    :media-id 2}
+                 2 {:sightings [{:species-id 2}]
+                    :media-attention-needed true
+                    :media-id 1}}
+        data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching data) expected))))
+    (is (= (sut/only-matching "attn:false" data) expected))))
