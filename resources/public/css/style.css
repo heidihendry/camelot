@@ -633,7 +633,7 @@ pre.field-input {
     background: #fafafa;
     padding: 1rem;
     border-left: 1px solid #ccc;
-    opacity: 0.6;
+    opacity: 0.8;
 }
 .library .remove-sighting {
     padding-top: 0.3rem;
@@ -665,6 +665,7 @@ pre.field-input {
     border: 1px solid #ccc;
     border-top-left-radius: 0.5rem;
     border-bottom-left-radius: 0.5rem;
+    cursor: pointer;
     width: 3rem;
     height: 7rem;
     padding: 0.2rem;
@@ -673,6 +674,7 @@ pre.field-input {
 .library .media-details-panel-text .details-panel-toggle-text {
     position: absolute;
     left: -3rem;
+    cursor: pointer;
     top: 5rem;
     width: 3rem;
     height: 7rem;
@@ -708,7 +710,6 @@ pre.field-input {
 
     transform: rotate(-90deg);
     transform-origin: right bottom 0;
-    cursor: pointer;
 
     /* Internet Explorer */
     filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
@@ -731,6 +732,7 @@ pre.field-input {
 }
 #app .library .media-item {
     width: 33%;
+    height: calc(33% * 4 / 6);
     margin-top: 0;
     padding: 1%;
     position: relative;
@@ -766,7 +768,7 @@ pre.field-input {
     color: white;
     font-size: 120%;
     padding: 0.3rem 1rem;
-    opacity: 0.90;
+    opacity: 0.95;
     border: 1px solid #fff;
     border-radius: 0.5rem;
     left: 50%;
@@ -871,4 +873,16 @@ pre.field-input {
     padding: 0 2rem;
     text-align: center;
     width: 18rem;
+}
+.library .search-bar .flag {
+    position: relative;
+    color: #999;
+    cursor: pointer;
+    top: 0.5rem;
+    padding: 0 1rem;
+    opacity: 0.4;
+}
+.library .search-bar .flag.red {
+    color: #aa3311;
+    opacity: 1;
 }
