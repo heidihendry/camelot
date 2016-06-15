@@ -90,7 +90,7 @@
                            :trap-station-id 2})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["Smiley Wolf" "X" 3 14 (calc-obs-nights 3 14)])))
+      result => (list ["Smiley Wolf" "X" 3 7 (calc-obs-nights 3 7)])))
 
   (fact "Should respect independence threshold setting"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -145,9 +145,9 @@
                            :trap-station-id 3})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["A. Meerkat" nil nil 45 nil]
-                      ["Smiley Wolf" "X" 3 45 (calc-obs-nights 3 45)]
-                      ["Yellow Spotted Cat" nil nil 45 nil])))
+      result => (list ["A. Meerkat" nil nil 7 nil]
+                      ["Smiley Wolf" "X" 3 7 (calc-obs-nights 3 7)]
+                      ["Yellow Spotted Cat" nil nil 7 nil])))
 
   (fact "Should return a result per species where all are in the same site"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -254,6 +254,6 @@
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n"
-                      "A. Meerkat,-,-,45,-\n"
-                      "Smiley Wolf,X,3,45," (calc-obs-nights 3 45) "\n"
-                      "Yellow Spotted Cat,-,-,45,-\n"))))
+                     "A. Meerkat,-,-,7,-\n"
+                     "Smiley Wolf,X,3,7," (calc-obs-nights 3 7) "\n"
+                     "Yellow Spotted Cat,-,-,7,-\n"))))
