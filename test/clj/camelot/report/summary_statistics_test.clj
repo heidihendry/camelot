@@ -24,7 +24,7 @@
                "Number of Photos"
                "Independent Observations"
                "Nights Elapsed"
-               "Observations / Night (%)"])
+               "Abundance Index"])
 
 (facts "Summary Statistics Report"
   (fact "Report data form empty sightings is empty"
@@ -169,9 +169,9 @@
                            :trap-station-id 3})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["A. Meerkat" 1 1 1 31 (calc-obs-nights 1 31)]
-                      ["Smiley Wolf" 1 1 3 7 (calc-obs-nights 3 7)]
-                      ["Yellow Spotted Cat" 1 1 5 7 (calc-obs-nights 5 7)])))
+      result => (list ["A. Meerkat" 1 1 1 45 (calc-obs-nights 1 45)]
+                      ["Smiley Wolf" 1 1 3 45 (calc-obs-nights 3 45)]
+                      ["Yellow Spotted Cat" 1 1 5 45 (calc-obs-nights 5 45)])))
 
   (fact "Should return a result per species, sightings in same trap station session"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -270,7 +270,7 @@
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
       result => (list ["Smiley Wolf" 2 2 4 14 (calc-obs-nights 4 14)]
-                      ["Yellow Spotted Cat" 1 1 5 7 (calc-obs-nights 5 7)]))))
+                      ["Yellow Spotted Cat" 1 1 5 14 (calc-obs-nights 5 14)]))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
@@ -311,4 +311,4 @@
           result (csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n"
                      "Smiley Wolf,2,2,4,14," (calc-obs-nights 4 14) "\n"
-                     "Yellow Spotted Cat,1,1,5,7," (calc-obs-nights 5 7) "\n"))))
+                     "Yellow Spotted Cat,1,1,5,14," (calc-obs-nights 5 14) "\n"))))

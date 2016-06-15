@@ -12,8 +12,7 @@
                :independent-observations
                :nights-elapsed
                :independent-observations-per-night]
-     :aggregate-on [:independent-observations
-                    :nights-elapsed]
+     :aggregate-on [:independent-observations]
      :filters [#(or (= (:species-id %) species-id)
                     (nil? (:species-id %)))]
      :transforms [#(if (= (:species-id %) species-id)

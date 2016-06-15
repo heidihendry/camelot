@@ -23,7 +23,7 @@
                "Presence"
                "Independent Observations"
                "Nights Elapsed"
-               "Observations / Night (%)"])
+               "Abundance Index"])
 
 (facts "Summary Statistics Report"
   (fact "Report data form empty sightings is empty"
@@ -90,7 +90,7 @@
                            :trap-station-id 2})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["Smiley Wolf" "X" 3 7 (calc-obs-nights 3 7)])))
+      result => (list ["Smiley Wolf" "X" 3 14 (calc-obs-nights 3 14)])))
 
   (fact "Should respect independence threshold setting"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -132,7 +132,7 @@
                            :survey-site-id nil
                            :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
                            :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
-                           :trap-station-session-id nil
+                           :trap-station-session-id 2
                            :trap-station-id nil}
                           {:species-scientific-name "A. Meerkat"
                            :sighting-quantity 1
@@ -145,9 +145,9 @@
                            :trap-station-id 3})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["A. Meerkat" nil nil 31 nil]
-                      ["Smiley Wolf" "X" 3 7 (calc-obs-nights 3 7)]
-                      ["Yellow Spotted Cat" nil nil 7 nil])))
+      result => (list ["A. Meerkat" nil nil 45 nil]
+                      ["Smiley Wolf" "X" 3 45 (calc-obs-nights 3 45)]
+                      ["Yellow Spotted Cat" nil nil 45 nil])))
 
   (fact "Should return a result per species where all are in the same site"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -179,9 +179,9 @@
                            :trap-station-id 3})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["A. Meerkat" "X" 1 7 (calc-obs-nights 1 7)]
-                      ["Smiley Wolf" "X" 3 7 (calc-obs-nights 3 7)]
-                      ["Yellow Spotted Cat" "X" 5 7 (calc-obs-nights 5 7)])))
+      result => (list ["A. Meerkat" "X" 1 21 (calc-obs-nights 1 21)]
+                      ["Smiley Wolf" "X" 3 21 (calc-obs-nights 3 21)]
+                      ["Yellow Spotted Cat" "X" 5 21 (calc-obs-nights 5 21)])))
 
   (fact "Should group multiple sightings from different camera traps"
     (let [sightings (list {:species-scientific-name "Smiley Wolf"
@@ -214,7 +214,7 @@
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
       result => (list ["Smiley Wolf" "X" 4 14 (calc-obs-nights 4 14)]
-                      ["Yellow Spotted Cat" "X" 5 7 (calc-obs-nights 5 7)]))))
+                      ["Yellow Spotted Cat" "X" 5 14 (calc-obs-nights 5 14)]))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
@@ -240,7 +240,7 @@
                            :survey-site-id nil
                            :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
                            :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
-                           :trap-station-session-id nil
+                           :trap-station-session-id 2
                            :trap-station-id nil}
                           {:species-scientific-name "A. Meerkat"
                            :sighting-quantity 1
@@ -254,6 +254,6 @@
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n"
-                      "A. Meerkat,,,31," "\n"
-                      "Smiley Wolf,X,3,7," (calc-obs-nights 3 7) "\n"
-                      "Yellow Spotted Cat,,,7,\n"))))
+                      "A. Meerkat,-,-,45,-\n"
+                      "Smiley Wolf,X,3,45," (calc-obs-nights 3 45) "\n"
+                      "Yellow Spotted Cat,-,-,45,-\n"))))

@@ -2,7 +2,8 @@
   (:require [camelot.db :as sut]
             [midje.sweet :refer :all]
             [clj-time.core :as t]
-            [clj-time.coerce :as tc]))
+            [clj-time.coerce :as tc]
+            [camelot.test-util.state :as state]))
 
 (facts "Converting from database types"
   (fact "Converts columns in a single record"
@@ -38,26 +39,26 @@
 (facts "Converting to database types"
   (fact "Converts columns in a single record"
     (let [data {:column-name "MyData"}
-          state {}]
+          state (state/gen-state)]
       (sut/db-keys data) => {:column_name "MyData"}))
 
   (fact "Returns an empty hash when passed nil"
     (let [data nil
-          state {}]
+          state (state/gen-state)]
       (sut/db-keys data) => {}))
 
   (fact "Converts to SQL Timestamps"
     (let [date (t/date-time 2015 10 10 1 1 5)
           date-long (tc/to-long date)
           data {:column-name date}
-          state {}]
+          state (state/gen-state)]
       (sut/db-keys data) => {:column_name (java.sql.Timestamp. date-long)})))
 
 (facts "Converting between database types"
   (fact "Calls a function with the `db' data, returning a `clj' result."
     (let [fn #(update % :column_name inc)
           data {:column-name 5}
-          state {}]
+          state (state/gen-state)]
       (sut/with-db-keys state fn data) => {:column-name 6}))
 
   (fact "Calls function with a connection should one be provided."
@@ -65,5 +66,6 @@
                ([data opts] (:connection opts))
                ([data] false))
           data {:column-name 5}
-          state {:connection true}]
-      (sut/with-db-keys state fn data) => true)))
+          state (assoc (state/gen-state)
+                       :connection {:v true})]
+      (sut/with-db-keys state fn data) => {:v true})))

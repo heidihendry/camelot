@@ -11,7 +11,6 @@
              :independent-observations-per-night]
    :aggregate-on [:media-count
                   :independent-observations
-                  :nights-elapsed
                   :trap-station-count]
    :filters [#(not (nil? (:species-scientific-name %)))
              #(= (:survey-id %) survey-id)]

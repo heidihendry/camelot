@@ -7,8 +7,7 @@
              :species-scientific-name
              :trap-station-longitude
              :trap-station-latitude]
-   :aggregate-on [:independent-observations
-                  :nights-elapsed]
+   :aggregate-on [:independent-observations]
    :filters [#(:trap-station-longitude %)
              #(:trap-station-latitude %)
              #(:species-scientific-name %)

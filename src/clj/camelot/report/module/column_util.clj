@@ -68,11 +68,17 @@
        (group-by :trap-station-session-id)
        (reduce-kv trap-session-nights-reducer {})))
 
-(defn calculate-nights-elapsed
+(defn calculate-specific-nights-elapsed
   [state data]
   (let [nights (get-nights-for-sessions data)]
     (map #(assoc % :nights-elapsed
                  (get nights (:trap-station-session-id %))) data)))
+
+(defn calculate-nights-elapsed
+  [state data]
+  (let [nights (get-nights-for-sessions data)
+        v (reduce + 0 (vals nights))]
+    (map #(assoc % :nights-elapsed v) data)))
 
 (defn- assoc-count
   [tbl data]

@@ -8,8 +8,7 @@
              :independent-observations
              :nights-elapsed
              :independent-observations-per-night]
-   :aggregate-on [:independent-observations
-                  :nights-elapsed]
+   :aggregate-on [:independent-observations]
    :pre-transforms [#(if (= (:survey-site-id %) survey-site-id)
                        %
                        (select-keys % [:species-scientific-name

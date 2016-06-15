@@ -17,7 +17,7 @@
                "Presence"
                "Independent Observations"
                "Nights Elapsed"
-               "Observations / Night (%)"])
+               "Abundance Index"])
 
 (def report
   (partial sut/report :species-statistics))
@@ -57,7 +57,7 @@
                                         :trap-station-session-id 1}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]))))
+        result => (list ["Smiley Wolf" 30 5 "X" 3 14 (calc-obs-nights 3 14)]))))
 
   (fact "Report for one sighting should contain its summary"
     (let [sightings (list (as-sample {:species-scientific-name "Smiley Wolf"
@@ -86,8 +86,8 @@
                                       :trap-station-session-id 2}))
           state (state/gen-state {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]
-                      ["Smiley Wolf" 30.5 5.5 "X" 5 7 (calc-obs-nights 5 7)])))
+      result => (list ["Smiley Wolf" 30 5 "X" 3 14 (calc-obs-nights 3 14)]
+                      ["Smiley Wolf" 30.5 5.5 "X" 5 14 (calc-obs-nights 5 14)])))
 
   (fact "Should respect independence threshold setting"
     (let [sightings (list (as-sample {:species-scientific-name "Smiley Wolf"
@@ -128,9 +128,9 @@
                                         :trap-station-session-id 3}))
             state (state/gen-state {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
-        result => (list ["Smiley Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]
-                        ["Smiley Wolf" 40 10 nil nil 7 nil]
-                        ["Smiley Wolf" 90 50 nil nil 7 nil]))))
+        result => (list ["Smiley Wolf" 30 5 "X" 3 21 (calc-obs-nights 3 21)]
+                        ["Smiley Wolf" 40 10 nil nil 21 nil]
+                        ["Smiley Wolf" 90 50 nil nil 21 nil]))))
 
   (fact "Should return only the species searched"
     (with-redefs [species/get-specific
@@ -153,7 +153,7 @@
                                         :trap-station-session-id 3}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (report state 3 sightings)]
-        result => (list ["A. Meerkat" 30 5 "X" 1 7 (calc-obs-nights 1 7)])))))
+        result => (list ["A. Meerkat" 30 5 "X" 1 21 (calc-obs-nights 1 21)])))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
@@ -180,5 +180,5 @@
           state (state/gen-state {:sighting-independence-minutes-threshold 20})
           result (csv-report state 1 sightings)]
       result => (str (str/join "," headings) "\n"
-                     "Smiley Wolf,30,5,X,3,7," (calc-obs-nights 3 7) "\n"
-                     "Smiley Wolf,30.5,5.5,X,5,7," (calc-obs-nights 5 7) "\n"))))
+                     "Smiley Wolf,30,5,X,3,14," (calc-obs-nights 3 14) "\n"
+                     "Smiley Wolf,30.5,5.5,X,5,14," (calc-obs-nights 5 14) "\n"))))

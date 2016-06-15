@@ -158,9 +158,18 @@
                                 (keyword (str "report/" (name %))))) columns)
         data))
 
+(defn- as-dashed-row
+  [state cols row]
+  (map #(or (get row %) "-") cols))
+
 (defn- as-row
   [state cols row]
   (map #(get row %) cols))
+
+(defn as-dashed-rows
+  [state params data]
+  (let [cols (:columns params)]
+    (map (partial as-dashed-row state cols) data)))
 
 (defn as-rows
   [state params data]
@@ -179,7 +188,7 @@
   [state params data]
   (->> data
        (generate-report state params)
-       (as-rows state params)
+       (as-dashed-rows state params)
        (cons-headings state (:columns params))
        (to-csv-string)))
 
