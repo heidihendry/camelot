@@ -14,7 +14,6 @@
             [camelot.util :as cam.util]
             [camelot.rest :as rest]
             [camelot.component.error :as cerr]
-            [camelot.component.footer :as cfoot]
             [camelot.component.library :as library]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
@@ -226,11 +225,6 @@
   []
   (om/root nav/nav-component state/app-state
            {:target (js/document.getElementById "navigation")}))
-
-(def footer
-  "Render the footer"
-  (om/root cfoot/footer-component state/app-state
-           {:target (js/document.getElementById "footer")}))
 
 (def error-dialog
   "Render the error dialog"

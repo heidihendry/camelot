@@ -22,8 +22,7 @@
   []
   (set! (.-style (js/document.getElementById "loading")) "display: none")
   (set! (.-style (js/document.getElementById "navigation")) "")
-  (set! (.-style (js/document.getElementById "app")) "")
-  (set! (.-style (js/document.getElementById "footer")) ""))
+  (set! (.-style (js/document.getElementById "app")) ""))
 
 (defn navigate-dwim
   []

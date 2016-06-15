@@ -34,7 +34,7 @@ html > body {
   width: 100%;
   overflow: hidden;
   max-width: 100%;
-  min-height: 500px;
+  min-height: calc(100vh - 6rem);
   min-width: 1024px;
 }
 #app h1,
@@ -128,35 +128,6 @@ html > body {
 }
 a:hover {
   cursor: pointer;
-}
-#footer {
-  text-align: center;
-  width: 100%;
-  padding-top: 1rem;
-  padding-bottom: 2rem;
-  background-image: url("../images/footer-tile.png");
-  background-color: #222;
-}
-#footer .version {
-  font-weight: normal;
-  color: #888;
-  font-size: 90%;
-}
-#footer .title {
-  display: block;
-  margin: auto;
-  padding: 1.5rem;
-  padding-bottom: 2.5rem;
-}
-#footer .developer {
-  display: block;
-  font-weight: normal;
-  color: #888;
-  font-size: 90%;
-}
-#footer .developer a {
-  color: #888;
-  text-decoration: underline;
 }
 #settings {
   position: fixed;
@@ -885,4 +856,9 @@ pre.field-input {
 .library .search-bar .flag.red {
     color: #aa3311;
     opacity: 1;
+}
+#app .version-string {
+    float: right;
+    font-size: 70%;
+    padding-right: 1rem;
 }
