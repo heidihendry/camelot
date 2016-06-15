@@ -31,7 +31,6 @@ html > body {
   position: relative;
   box-shadow: 0px 5px 15px 5px #000;
   margin-top: 6rem;
-  padding-top: 2rem;
   width: 100%;
   overflow: hidden;
   max-width: 100%;
@@ -563,12 +562,11 @@ pre.field-input {
 .library .media {
     padding: 1rem;
     cursor: pointer;
-    margin: 0.5rem;
     background: #fafafa;
     border: 1px solid #ddd;
+    width: 100%;
     transition: all 0.2s ease-in-out;
-    width: 196px;
-    height: 156px;
+    margin-top: 0;
 }
 .library .media.selected {
     background: #99d344;
@@ -578,20 +576,27 @@ pre.field-input {
     opacity: 0.8;
 }
 .library .media-collection {
-    margin-right: 33vw;
+    width: 33%;
+    float: left;
+    overflow: scroll;
     padding-left: 1rem;
+    max-height: calc(100vh - 13.5rem);
 }
 .library .media-collection-container {
     margin: auto;
+    position: relative;
+    float: left;
+    width: 100%;
+    height: calc(100vh - 13.5rem);
 }
 .library .media-control-panel {
-    position: fixed;
-    padding-top: 2rem;
+    position: relative;
+    max-height: calc(100vh - 13.5rem);
+    float: left;
+    width: 66%;
+    padding-top: 0.5rem;
     border-left: 1px solid #ccc;
     right: 0;
-    top: 6rem;
-    width: 32vw;
-    height: calc(100vh - 6rem);
     background: white;
 }
 .library .mcp-container {
@@ -604,23 +609,107 @@ pre.field-input {
     position: relative;
     text-align: center;
     float: right;
-    border: 1px solid #eee;
-    background: #fafafa;
     width: 100%;
 }
 .library .media-control-panel img {
     position: relative;
-    width: 100%;
+    top: -1rem;
+    max-width: 100%;
+    max-height: calc(100vh - 13.3rem);
     border: 1px solid #999;
     margin: auto;
+}
+.library .media-details-panel {
+    position: absolute;
+    transition: all 0.3s ease-in-out;
+    top: 6rem;
+    right: -25rem;
+    width: 25rem;
+    z-index: 400;
+    height: 100vh;
+    background: #fafafa;
+    padding: 1rem;
+    border-left: 1px solid #ccc;
+    opacity: 0.6;
+}
+.library .media-details-panel.show-panel {
+    right: 0rem;
+}
+.library .media-details-panel-text {
+    position: absolute;
+    transition: all 0.3s ease-in-out;
+    top: 6rem;
+    right: -25rem;
+    width: 25rem;
+    z-index: 400;
+    height: 100vh;
+    padding: 1rem;
+    border-left: 1px solid #ccc;
+}
+.library .media-details-panel-text.show-panel {
+    right: 0rem;
+}
+.library .media-details-panel .details-panel-toggle {
+    opacity: 0.6;
+    background: #fafafa;
+    position: absolute;
+    left: -3rem;
+    top: 5rem;
+    border: 1px solid #ccc;
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+    width: 3rem;
+    height: 7rem;
+    padding: 0.2rem;
+    padding-top: 1.2rem;
+}
+.library .media-details-panel-text .details-panel-toggle-text {
+    position: absolute;
+    left: -3rem;
+    top: 5rem;
+    width: 3rem;
+    height: 7rem;
+    padding: 0.2rem;
+    padding-top: 1.2rem;
+    color: #666;
+}
+.library .close-details {
+    color: #666;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+.library .close-details:hover {
+    color: #000;
+}
+.library .media-details-panel-text .details-panel-toggle-text:hover {
+    color: #333;
+}
+.library .media-details-panel-text .rotate {
+    position: relative;
+
+    /* Safari */
+    -webkit-transform: rotate(-90deg);
+
+    /* Firefox */
+    -moz-transform: rotate(-90deg);
+
+    /* IE */
+    -ms-transform: rotate(-90deg);
+
+    /* Opera */
+    -o-transform: rotate(-90deg);
+
+    transform: rotate(-90deg);
+    transform-origin: right bottom 0;
+    cursor: pointer;
+
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 }
 #app .library .none-selected {
     position: relative;
     width: 100%;
     height: calc(0.74 * 32vw);
-}
-#app .library .details {
-    padding-top: 1rem;
 }
 #app .library .details .data {
     min-height: 1rem;
@@ -634,25 +723,28 @@ pre.field-input {
     margin-top: 0.4rem;
 }
 #app .library .media-item {
+    width: 33%;
+    margin-top: 0;
+    padding: 1%;
     position: relative;
     display: inline-block;
 }
 #app .library .view-photo {
     position: absolute;
-    display: inline-block;
-    top: 118px;
-    left: 152px;
-    opacity: 0.5;
+    display: block;
+    top: 10%;
+    left: 10%;
+    opacity: 0.3;
     color: #fff;
     font-size: 250%;
-    z-index: 100;
+    z-index: 3;
     transition: opacity 0.2s ease-in-out;
 }
 #app .library .view-photo:hover {
     opacity: 0.8;
 }
 #app .library .details .column {
-    width: 50%;
+    width: 25%;
     float: left;
     position: relative;
 }
@@ -670,7 +762,7 @@ pre.field-input {
     opacity: 0.90;
     border: 1px solid #fff;
     border-radius: 0.5rem;
-    left: calc(66vw / 2);
+    left: 50%;
     z-index: 400;
     margin: auto;
     top: 12rem;
@@ -680,10 +772,12 @@ pre.field-input {
 }
 #app .library .search-container {
     width: 100%;
+    position: relative;
+    clear: both;
 }
 #app .library .identify-selected {
-    position: relative;
-    z-index: 100;
+    position: absolute;
+    z-index: 600;
     display: block;
     width: calc(100% - 4rem);
     height: 0;
@@ -698,11 +792,14 @@ pre.field-input {
     border-radius: 1rem;
     background: #f5f5f5;
 }
+#app .library .identify-selected button {
+    margin: 0 0.5rem;
+}
 #app .library .identify-selected.show-prompt {
-    top: -2rem;
+    top: 5rem;
     padding-top: 2rem;
     padding-bottom: 4.5rem;
-    z-index: 0;
+    z-index: 5;
 }
 #app .library .identify-selected .field {
     display: inline-block;
@@ -724,17 +821,19 @@ pre.field-input {
     position: relative;
     display: block;
     border: 1px solid #ccc;
-    border-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    border-bottom-left-radius: 1rem;
     padding: 0.5rem;
     padding-top: 0.8rem;
     font-size: 120%;
     text-align: left;
     padding-left: 2rem;
     padding-right: 2rem;
-    height: 5.5rem;
+    height: 6rem;
     z-index: 10;
     margin-bottom: 1rem;
     background: #fafafa;
+    width: 100%;
 }
 #app .library .search-bar button.search-main-op {
     width: 12rem;
@@ -753,8 +852,7 @@ pre.field-input {
 }
 #app .library .pagination-nav {
     position: relative;
-    display: block;
-    float: right;
+    display: inline-block;
 }
 #app .library .pagination-nav .btn {
     font-size: 1.5em;
@@ -762,7 +860,6 @@ pre.field-input {
     padding-bottom: 0.1rem;
 }
 #app .library .pagination-nav .describe-pagination {
-    display: inline-block;
     position: relative;
     padding: 0 2rem;
     text-align: center;

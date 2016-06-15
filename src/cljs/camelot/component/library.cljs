@@ -94,6 +94,9 @@
       (let [matches (get-in data [:search :match-count])]
         (dom/div #js {:className "pagination-nav"}
                  (dom/button #js {:className "fa fa-2x fa-angle-left btn btn-default"
+                                  :disabled (if (get-in data
+                                                        [:search :identify-selected])
+                                              "disabled" "")
                                   :onClick #(do (deselect-all)
                                               (om/transact! data [:search :page] prev-page))})
                  (dom/span #js {:className "describe-pagination"}
@@ -104,6 +107,9 @@
                                 " of "
                                 matches))
                  (dom/button #js {:className "fa fa-2x fa-angle-right btn btn-default"
+                                  :disabled (if (get-in data
+                                                        [:search :identify-selected])
+                                              "disabled" "")
                                   :onClick #(do (deselect-all)
                                                 (om/transact! data [:search :page] (partial next-page matches)))}))))))
 
@@ -123,25 +129,36 @@
       (let [num-selected (count (media-selected))]
         (dom/div #js {:className "search-container"}
                  (dom/div #js {:className "search-bar"}
-                          (om/build pagination-component data)
                           (dom/span #js {:className "fa fa-search"})
                           (dom/input #js {:type "text"
                                           :placeholder "Filter..."
+                                          :disabled (if (get-in data
+                                                                   [:search :identify-selected])
+                                                       "disabled" "")
                                           :className "field-input search"
                                           :value (get-in data [:search :terms])
                                           :onChange #(om/update! (:search data)
                                                                  :terms
                                                                  (.. % -target -value))})
+                          (om/build pagination-component data)
                           (if (= page-size num-selected)
                             (dom/button #js {:className "btn btn-default search-main-op"
-                                             :onClick deselect-all*}
+                                             :onClick deselect-all*
+                                             :disabled (if (get-in data
+                                                                   [:search :identify-selected])
+                                                       "disabled" "")}
                                         "Select None")
                             (dom/button #js {:className "btn btn-default search-main-op"
+                                             :disabled (if (get-in data
+                                                                   [:search :identify-selected])
+                                                       "disabled" "")
                                              :onClick select-all*}
                                         "Select All"))
                           (dom/button #js {:className "btn btn-default"
                                            :onClick identify-selected-prompt
-                                           :disabled (if (zero? num-selected) "disabled" "")}
+                                           :disabled (if (or (zero? num-selected)
+                                                             (get-in data [:search :identify-selected]))
+                                                       "disabled" "")}
                                       "Identify Selected"))
                  (dom/div #js {:className (str "identify-selected"
                                                (if (get-in data [:search :identify-selected])
@@ -169,11 +186,15 @@
                                                                                    (.. % -target -value))}))
                                    (dom/div #js {:className "field"}
                                             (dom/button #js {:className "btn btn-primary"
-                                                             :disabled (when (not (and (re-find #"^[0-9]+$"
+                                                             :disabled (when (not (and (get-in data [:identification :quantity])
+                                                                                       (re-find #"^[0-9]+$"
                                                                                                 (get-in data [:identification :quantity]))
                                                                                        (get-in data [:identification :species])))
                                                                          "disabled")
-                                                             :onClick submit-identification} "Submit")))))))))
+                                                             :onClick submit-identification} "Submit")
+                                            (dom/button #js {:className "btn btn-default"
+                                                             :onClick #(om/update! (:search data) :identify-selected false)}
+                                                        "Cancel")))))))))
 
 (defn media-component
   "Render a single library item."
@@ -182,12 +203,11 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "media-item"}
-               (dom/div #js {:className "view-photo fa fa-eye fa-2x"
-                             :onClick #(om/update! (state/library-state) :selected result)})
                (dom/img #js {:className (str "media" (if (:selected result) " selected" ""))
-                             :width "196"
                              :onMouseDown #(toggle-select-image result)
-                             :src (str (get-in result [:media-uri]) "/thumb")})))))
+                             :src (str (get-in result [:media-uri]) "/thumb")})
+               (dom/div #js {:className "view-photo fa fa-eye fa-2x"
+                             :onClick #(om/update! (state/library-state) :selected result)})))))
 
 
 (def field-keys
@@ -275,7 +295,6 @@
         (when (not= (get-in data [:search :match-count]) (count matches))
           (om/update! (:search data) :match-count (count matches)))
         (dom/div #js {:className "media-collection"}
-                 (om/build search-component data)
                  (dom/div #js {:className (str "selected-count"
                                                (if (> (get-in data [:search :show-select-count]) 0)
                                                  ""
@@ -294,7 +313,7 @@
                (if selected
                  (dom/a #js {:href (str (get selected :media-uri))
                              :target "_blank"}
-                        (dom/img #js {:src (str (get selected :media-uri) "/preview")}))
+                        (dom/img #js {:src (str (get selected :media-uri))}))
                  (dom/div #js {:className "none-selected"}
                           (dom/h4 nil "Photo Not Selected")))))))
 
@@ -313,40 +332,41 @@
   (reify
     om/IRender
     (render [_]
-      (when selected
-        (dom/div #js {:className "details"}
-                 (dom/div #js {:className "column"}
-                          (dom/div nil
-                                   (dom/label nil "Longitude")
-                                   (dom/div #js {:className "data"} (:trap-station-longitude selected)))
-                          (dom/div nil
-                                   (dom/label nil "Latitude")
-                                   (dom/div #js {:className "data"} (:trap-station-latitude selected)))
-                          (dom/div nil
-                                   (dom/label nil "Trap Station")
-                                   (dom/div #js {:className "data"} (:trap-station-name selected)))
-                          (dom/div nil
-                                   (dom/label nil "Sublocation")
-                                   (dom/div #js {:className "data"} (:site-sublocation selected)))
-                          (dom/div nil
-                                   (dom/label nil "City")
-                                   (dom/div #js {:className "data"} (:site-city selected)))
-                          (dom/div nil
-                                   (dom/label nil "Site")
-                                   (dom/div #js {:className "data"} (:site-name selected))))
-                 (dom/div #js {:className "column"}
-                          (dom/div nil
-                                   (dom/label nil "Timestamp")
-                                   (let [df (DateTimeFormat. "hh:mm:ss EEE, dd LLL yyyy")]
-                                     (dom/div nil (.format df (:media-capture-timestamp selected)))))
-                          (dom/div nil
-                                   (dom/label nil "Camera")
-                                   (dom/div #js {:className "data"} (:camera-name selected)))
-                          (dom/div nil
-                                   (dom/label nil "Sightings")
-                                   (om/build-all mcp-details-sightings
-                                                 (:sightings selected)
-                                                 {:key :sighting-id}))))))))
+      (dom/div
+       nil
+       (dom/div #js {:className "fa fa-remove pull-right close-details"
+                     :onClick #(om/transact! (state/library-state) :show-media-details not)})
+       (dom/h4 nil "Details")
+       (if selected
+         (dom/div #js {:className "details"}
+                  (dom/div nil
+                           (dom/label nil "Longitude")
+                           (dom/div #js {:className "data"} (:trap-station-longitude selected)))
+                  (dom/div nil
+                           (dom/label nil "Latitude")
+                           (dom/div #js {:className "data"} (:trap-station-latitude selected)))
+                  (dom/div nil
+                           (dom/label nil "Trap Station")
+                           (dom/div #js {:className "data"} (:trap-station-name selected)))
+                  (dom/div nil
+                           (dom/label nil "Sublocation")
+                           (dom/div #js {:className "data"} (:site-sublocation selected)))
+                  (dom/div nil
+                           (dom/label nil "Site")
+                           (dom/div #js {:className "data"} (:site-name selected)))
+                  (dom/div nil
+                           (dom/label nil "Camera")
+                           (dom/div #js {:className "data"} (:camera-name selected)))
+                  (dom/div nil
+                           (dom/label nil "Timestamp")
+                           (let [df (DateTimeFormat. "hh:mm:ss EEE, dd LLL yyyy")]
+                             (dom/div nil (.format df (:media-capture-timestamp selected)))))
+                  (dom/div nil
+                           (dom/label nil "Sightings")
+                           (om/build-all mcp-details-sightings
+                                         (:sightings selected)
+                                         {:key :sighting-id})))
+         (dom/div nil "Photo not selected"))))))
 
 (defn media-control-panel-component
   [data owner]
@@ -355,8 +375,28 @@
     (render [_]
       (dom/div #js {:className "media-control-panel"}
                (dom/div #js {:className "mcp-container"}
-                        (dom/h4 nil "Details")
-                        (om/build mcp-preview (:selected data))
+                        (om/build mcp-preview (:selected data)))))))
+
+(defn media-details-panel-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil
+               (dom/div #js {:className (str "media-details-panel"
+                                             (if (:show-media-details data)
+                                               " show-panel"
+                                               ""))}
+                        (dom/div #js {:className "details-panel-toggle"
+                                      :onClick #(om/transact! data :show-media-details not)}))
+               (dom/div #js {:className (str "media-details-panel-text"
+                                             (if (:show-media-details data)
+                                               " show-panel"
+                                               ""))}
+                        (dom/div #js {:className "details-panel-toggle-text"
+                                      :onClick #(om/transact! data :show-media-details not)}
+                                 (dom/div #js {:className "rotate"}
+                                          "Details"))
                         (om/build mcp-details (:selected data)))))))
 
 (defn library-view-component
@@ -379,5 +419,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "library"}
-               (om/build media-control-panel-component (:library data))
-               (om/build media-collection-component (:library data))))))
+               (om/build search-component (:library data))
+               (om/build media-collection-component (:library data))
+               (om/build media-details-panel-component (:library data))
+               (om/build media-control-panel-component (:library data))))))
