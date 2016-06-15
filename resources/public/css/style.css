@@ -703,7 +703,7 @@ pre.field-input {
 }
 #app .library .media-item {
     width: 33%;
-    height: calc(33% * 4 / 6);
+    height: calc(11.5vw * (4 / 6) + 1.5rem);
     margin-top: 0;
     padding: 1%;
     position: relative;
@@ -841,9 +841,10 @@ pre.field-input {
 }
 #app .library .pagination-nav .describe-pagination {
     position: relative;
-    padding: 0 2rem;
+    padding: 0 1rem;
+    display: inline-block;
     text-align: center;
-    width: 18rem;
+    min-width: 18rem;
 }
 .library .search-bar .flag {
     position: relative;

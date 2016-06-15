@@ -223,7 +223,7 @@
                                               "disabled" "")
                                   :onClick #(do (deselect-all)
                                               (om/transact! data [:search :page] prev-page))})
-                 (dom/span #js {:className "describe-pagination"}
+                 (dom/div #js {:className "describe-pagination"}
                            (str (+ (- (* page-size (get-in data [:search :page])) page-size) 1)
                                 " - "
                                 (min (* page-size (get-in data [:search :page])) matches)
