@@ -98,7 +98,9 @@
 (s/defn file-raw-metadata-pair
   "Return a pair of the file and its raw metadata."
   [reader file]
-  (vector file (file-metadata reader file)))
+  (try
+    (vector file (file-metadata reader file))
+    (catch java.lang.Exception e nil)))
 
 (s/defn album-dir-raw-metadata :- RawAlbum
   "Return the raw exif data for files in `dir'."
@@ -107,6 +109,7 @@
     (->> dir
          (exif-files-in-dir)
          (map (partial file-raw-metadata-pair reader))
+         (filter identity)
          (into {}))))
 
 (defn- album-dir-list
