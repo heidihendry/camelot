@@ -14,7 +14,7 @@ WHERE species_id = :species_id
 SELECT species_id, species_created, species_updated, species_scientific_name,
        species_common_name, species_notes
 FROM species
-WHERE species_scientific_name = :species_scientific_name
+WHERE LOWER(species_scientific_name) = LOWER(:species_scientific_name)
 
 -- name: -get-all
 SELECT species_id, species_created, species_updated, species_scientific_name,

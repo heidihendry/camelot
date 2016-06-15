@@ -176,7 +176,7 @@
                                                                      :terms
                                                                      (.. % -target -value))
                                                          (om/update! (:search data)
-                                                                     :page 1))})
+                                                                      :page 1))})
                           (om/build pagination-component data)
                           (if (= page-size num-selected)
                             (dom/button #js {:className "btn btn-default search-main-op"
@@ -258,15 +258,22 @@
    "lat" :trap-station-latitude
    "model" :camera-model
    "make" :camera-make
+   "attn" :media-attention-needed
    "city" :site-city})
 
 (defn field-key-lookup
   [f]
   (or (get field-keys f) (keyword f)))
 
+(defn nil->empty
+  [v]
+  (if (nil? v)
+    ""
+    v))
+
 (defn substring?
   [s sub]
-  (if (not= (.indexOf (str/lower-case (or s "")) sub) -1)
+  (if (not= (.indexOf (str/lower-case (.toString (nil->empty s))) sub) -1)
     true
     false))
 
@@ -284,12 +291,13 @@
 (defn field-search
   [search species sightings]
   (let [[f s] (str/split search #":")]
-    (some #(substring? (get % (field-key-lookup f)) s) sightings)))
+    (some #(substring? (nil->empty (get % (field-key-lookup f))) s) sightings)))
 
 (defn record-string-search
   [search species records]
-  (some #(when (= (type %) js/String)
-           (substring? % search))
+  (some #(cond
+           (= (type %) js/String) (substring? (.toString %) search)
+           (= (type %) js/Boolean) (= (.toString %) search))
         (mapcat vals records)))
 
 (defn record-matches

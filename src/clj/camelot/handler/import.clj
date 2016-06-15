@@ -74,7 +74,8 @@
           fmt (str/lower-case (second (re-find #".*\.(.+?)$" (:filename photo))))
           camset (:settings photo)
           photopath (str full-path SystemUtils/FILE_SEPARATOR (:filename photo))
-          media (im.db/create-media! state photo filename fmt notes trap-camera)]
+          attn (some? (some #(re-find #"(?i)unidentified" (:species %)) (:sightings photo)))
+          media (im.db/create-media! state photo filename fmt notes attn trap-camera)]
       (im.db/create-photo! state (:media-id media) camset)
       (create-sightings state (:media-id media) (:sightings photo))
       (create-image-files photopath filename fmt))))
@@ -89,7 +90,7 @@
   "Import media"
   [{:keys [folder session-camera-id notes]}]
   (db/with-transaction [state (app/gen-state (conf/config))]
-    (let [[_ sitename cameraname] (str/split folder (path-separator-re))
+    (let [[_ sitename _phase cameraname] (str/split folder (path-separator-re))
           root-path (:root-path (:config state))
           full-path (str root-path folder)
           album (get-album state root-path full-path)

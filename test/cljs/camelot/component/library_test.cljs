@@ -220,3 +220,33 @@
                        :results results}
               :species species}]
     (is (= (sut/only-matching data) expected))))
+
+(deftest finds-attention-needed-true-boolean
+  (let [expected [{:sightings [{:species-id 1}]
+                   :media-attention-needed true
+                   :media-id 2}]
+        results [{:sightings [{:species-id 2}]
+                  :media-attention-needed false
+                  :media-id 1}
+                 {:sightings [{:species-id 1}]
+                  :media-attention-needed true
+                  :media-id 2}]
+        data {:search {:terms "attn:true"
+                       :results results}
+              :species species}]
+    (is (= (sut/only-matching data) expected))))
+
+(deftest finds-attention-needed-false-boolean
+  (let [expected [{:sightings [{:species-id 1}]
+                   :media-attention-needed false
+                   :media-id 2}]
+        results [{:sightings [{:species-id 1}]
+                  :media-attention-needed false
+                  :media-id 2}
+                 {:sightings [{:species-id 2}]
+                  :media-attention-needed true
+                  :media-id 1}]
+        data {:search {:terms "attn:false"
+                       :results results}
+              :species species}]
+    (is (= (sut/only-matching data) expected))))

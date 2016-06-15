@@ -10,4 +10,4 @@ LEFT JOIN trap_station_session USING (trap_station_session_id)
 LEFT JOIN trap_station USING (trap_station_id)
 LEFT JOIN survey_site USING (survey_site_id)
 LEFT JOIN site USING (site_id)
-ORDER BY site_id, trap_station_id, trap_station_session_id, media_capture_timestamp
+ORDER BY trap_station_session_id, media_capture_timestamp

@@ -140,7 +140,7 @@
 
 (defn get-or-create-species!
   [state sighting]
-  (let [spp (str/lower-case (:species sighting))]
+  (let [spp (:species sighting)]
     (species/get-or-create!
      state
      (species/tspecies {:species-scientific-name spp
@@ -148,7 +148,7 @@
                         :species-notes import-note}))))
 
 (defn create-media!
-  [state photo filename fmt notes trap-camera-id]
+  [state photo filename fmt notes attn trap-camera-id]
   (media/create!
    state
    (media/tmedia
@@ -156,7 +156,7 @@
      :media-filename (str/lower-case filename)
      :media-format (str/lower-case fmt)
      :media-cameracheck (is-cameracheck? photo)
-     :media-attention-needed false
+     :media-attention-needed attn
      :media-notes notes
      :trap-station-session-camera-id trap-camera-id})))
 
