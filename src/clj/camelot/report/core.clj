@@ -139,8 +139,9 @@
 
 (defn generate-report
   "Generate a report given a configuration and data."
-  [state {:keys [columns pre-transforms pre-filters transforms filters aggregate-on order-by]} data]
+  [state {:keys [columns rewrites pre-transforms pre-filters transforms filters aggregate-on order-by]} data]
   (->> data
+       (transform-records state rewrites)
        (add-calculated-columns state columns)
        (transform-records state pre-transforms)
        (filter-records state pre-filters)

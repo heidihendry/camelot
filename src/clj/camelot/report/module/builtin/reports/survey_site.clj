@@ -9,6 +9,9 @@
              :nights-elapsed
              :independent-observations-per-night]
    :aggregate-on [:independent-observations]
+   :rewrites [#(if (= (:survey-site-id %) survey-site-id)
+                 %
+                 (select-keys % [:species-scientific-name]))]
    :pre-transforms [#(if (= (:survey-site-id %) survey-site-id)
                        %
                        (select-keys % [:species-scientific-name

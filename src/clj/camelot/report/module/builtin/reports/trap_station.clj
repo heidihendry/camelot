@@ -8,7 +8,11 @@
              :independent-observations
              :nights-elapsed
              :independent-observations-per-night]
-   :aggregate-on [:independent-observations]
+   :aggregate-on [:independent-observations
+                  :nights-elapsed]
+   :rewrites [#(if (= (:trap-station-id %) trap-station-id)
+                 %
+                 (select-keys % [:species-scientific-name]))]
    :pre-transforms [#(if (= (:trap-station-id %) trap-station-id)
                        %
                        (select-keys % [:species-scientific-name
@@ -24,5 +28,5 @@
  :trap-station-statistics
  {:file-prefix "trap-station-statistics"
   :configuration report-configuration
-  :by :species
+  :by :survey
   :for :trap-station})

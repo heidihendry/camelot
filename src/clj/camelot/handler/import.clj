@@ -35,8 +35,7 @@
 
 (defn- store-variant
   [^java.awt.image.BufferedImage image dest]
-  (save-pathname #(do (prn image)
-                      (image/save image % :quality 0.7 :progressive false)) dest))
+  (save-pathname #(image/save image % :quality 0.7 :progressive false) dest))
 
 (defn- create-variant
   [path target width]
