@@ -291,6 +291,7 @@
             :trap-station-session-id "Trap Station Session ID"
             :trap-station-session-camera-id "Trap Station Session Camera ID"
             :media-id "Media ID"
+            :site-count "Number of Sites"
             :trap-station-session-camera-count "Number of Cameras in Sessions"
             :trap-station-session-count "Number of Trap Station Sessions"
             :trap-station-count "Number of Trap Stations"
