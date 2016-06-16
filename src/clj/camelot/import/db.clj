@@ -157,6 +157,7 @@
      :media-format (str/lower-case fmt)
      :media-cameracheck (is-cameracheck? photo)
      :media-attention-needed attn
+     :media-processed true
      :media-notes notes
      :trap-station-session-camera-id trap-camera-id})))
 

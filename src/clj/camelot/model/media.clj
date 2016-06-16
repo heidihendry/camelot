@@ -17,6 +17,7 @@
      media-notes :- (s/maybe s/Str)
      media-cameracheck :- s/Bool
      media-attention-needed :- s/Bool
+     media-processed :- (s/maybe s/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
      trap-station-session-camera-id :- s/Int])
 
@@ -29,23 +30,24 @@
      media-notes :- (s/maybe s/Str)
      media-cameracheck :- s/Bool
      media-attention-needed :- s/Bool
+     media-processed :- (s/maybe s/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
      trap-station-session-camera-id :- s/Int])
 
 (s/defn tmedia
   [{:keys [media-filename media-format media-notes media-cameracheck
-           media-attention-needed media-capture-timestamp
+           media-attention-needed media-processed media-capture-timestamp
            trap-station-session-camera-id]}]
   (->TMedia media-filename media-format media-notes media-cameracheck
-            media-attention-needed media-capture-timestamp
+            media-attention-needed media-processed media-capture-timestamp
             trap-station-session-camera-id))
 
 (s/defn media
   [{:keys [media-id media-created media-updated media-filename media-format
-           media-notes media-cameracheck media-attention-needed
+           media-notes media-cameracheck media-attention-needed media-processed
            media-capture-timestamp trap-station-session-camera-id]}]
   (->Media media-id media-created media-updated media-filename media-format
-           media-notes media-cameracheck media-attention-needed
+           media-notes media-cameracheck media-attention-needed media-processed
            media-capture-timestamp trap-station-session-camera-id))
 
 (s/defn get-all :- [Media]
@@ -90,10 +92,10 @@
 
 (s/defn update-media-flags
   [state :- State
-   {:keys [media-id media-attention-needed media-processed-flag]}]
+   {:keys [media-id media-attention-needed media-processed]}]
   (db/with-db-keys state -update-media-flags! {:media-id media-id
                                                :media-attention-needed media-attention-needed
-                                               :media-processed-flag media-processed-flag}))
+                                               :media-processed media-processed}))
 
 (s/defn read-media-file :- java.io.BufferedInputStream
   [state :- State

@@ -155,17 +155,25 @@
                     :media-attention-needed
                     :media-processed-flag]))
 
-(defn set-attention-needed
-  [flag-state]
+(defn set-flag-state
+  [flag-key flag-state]
   (let [selected (all-media-selected)]
     (rest/post-resource "/library/media/flags"
                         {:data (mapv #(assoc (get-media-flags %)
-                                             :media-attention-needed flag-state)
+                                             flag-key flag-state)
                                      selected)}
                         (fn []
                           (doall (map
-                                  #(om/update! % :media-attention-needed flag-state)
+                                  #(om/update! % flag-key flag-state)
                                   selected))))))
+
+(defn set-attention-needed
+  [flag-state]
+  (set-flag-state :media-attention-needed flag-state))
+
+(defn set-processed
+  [flag-state]
+  (set-flag-state :media-processed flag-state))
 
 (defn show-select-message
   []
@@ -304,14 +312,23 @@
                                                              (get-in data [:search :identify-selected]))
                                                        "disabled" "")}
                                       "Identify Selected")
-                          (if (seq (all-media-selected))
-                            (let [flag-enabled (every? :media-attention-needed (all-media-selected))]
-                              (dom/span #js {:className (str "fa fa-2x fa-flag flag"
-                                                             (if flag-enabled
-                                                               " red"
-                                                               ""))
-                                             :title "Attention Needed"
-                                             :onClick #(set-attention-needed (not flag-enabled))}))))
+                          (let [selected (all-media-selected)]
+                            (when selected
+                              (dom/span nil
+                                       (let [flag-enabled (every? :media-attention-needed selected)]
+                                         (dom/span #js {:className (str "fa fa-2x fa-flag flag"
+                                                                        (if flag-enabled
+                                                                          " red"
+                                                                          ""))
+                                                        :title "Attention Needed"
+                                                        :onClick #(set-attention-needed (not flag-enabled))}))
+                                       (let [flag-enabled (every? :media-processed selected)]
+                                         (dom/span #js {:className (str "fa fa-2x fa-check processed"
+                                                                        (if flag-enabled
+                                                                          " green"
+                                                                          ""))
+                                                        :title "Processed"
+                                                        :onClick #(set-processed (not flag-enabled))}))))))
                  (dom/div #js {:className (str "identify-selected"
                                                (if (get-in data [:search :identify-selected])
                                                  " show-prompt"

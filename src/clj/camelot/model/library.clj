@@ -19,6 +19,7 @@
      media-uri :- s/Str
      media-cameracheck :- s/Bool
      media-attention-needed :- s/Bool
+     media-processed :- s/Bool
      media-capture-timestamp :- org.joda.time.DateTime
      trap-station-session-camera-id :- s/Int
      trap-station-session-id :- s/Int
@@ -39,14 +40,22 @@
      sightings :- [Sighting]])
 
 (s/defn library-record
-  [{:keys [media-id media-created media-updated media-filename media-format media-uri media-cameracheck media-attention-needed
-           media-capture-timestamp trap-station-session-camera-id trap-station-session-id trap-station-id
-           trap-station-name trap-station-longitude trap-station-latitude site-sublocation site-city camera-id
-           camera-name camera-make camera-model survey-site-id survey-id site-id site-name sightings]}]
-  (->LibraryRecord media-id media-created media-updated media-filename media-format media-uri media-cameracheck media-attention-needed
-                   media-capture-timestamp trap-station-session-camera-id trap-station-session-id trap-station-id
-                   trap-station-name trap-station-longitude trap-station-latitude site-sublocation site-city camera-id
-                   camera-name camera-make camera-model survey-site-id survey-id site-id site-name (or sightings [])))
+  [{:keys [media-id media-created media-updated media-filename media-format
+           media-uri media-cameracheck media-attention-needed media-processed
+           media-capture-timestamp trap-station-session-camera-id
+           trap-station-session-id trap-station-id trap-station-name
+           trap-station-longitude trap-station-latitude site-sublocation
+           site-city camera-id camera-name camera-make camera-model
+           survey-site-id survey-id site-id site-name sightings]}]
+  (->LibraryRecord media-id media-created media-updated media-filename
+                   media-format media-uri media-cameracheck
+                   media-attention-needed media-processed
+                   media-capture-timestamp trap-station-session-camera-id
+                   trap-station-session-id trap-station-id trap-station-name
+                   trap-station-longitude trap-station-latitude
+                   site-sublocation site-city camera-id camera-name
+                   camera-make camera-model survey-site-id survey-id site-id
+                   site-name (or sightings [])))
 
 (defn- all-media
   [state]

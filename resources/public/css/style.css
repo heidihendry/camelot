@@ -860,6 +860,14 @@ pre.field-input {
     opacity: 0.4;
     height: 4rem;
 }
+.library .search-bar .processed {
+    position: relative;
+    color: #999;
+    cursor: pointer;
+    top: 0.5rem;
+    padding: 0 1rem;
+    opacity: 0.4;
+}
 .library .flag.red {
     color: #aa3311;
     opacity: 1;
@@ -867,15 +875,6 @@ pre.field-input {
 .library .processed.green {
     color: #99d344;
     opacity: 1;
-}
-.library .state-icon {
-    padding: 0.2rem;
-    position: absolute;
-    z-index: 2;
-}
-.library .state-icon.processed {
-    left: 80%;
-    display: block;
 }
 #app .version-string {
     float: right;
