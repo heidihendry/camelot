@@ -55,7 +55,10 @@
 (defn field-search
   [search species sightings]
   (let [[f s] (str/split search #":")]
-    (some #(substring? (nil->empty (get % (field-key-lookup f))) s) sightings)))
+    (some #(if (= s "*")
+             (not (nil? (get % (field-key-lookup f))))
+             (substring? (nil->empty (get % (field-key-lookup f))) s))
+          sightings)))
 
 (defn record-string-search
   [search species records]
