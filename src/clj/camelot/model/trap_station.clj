@@ -57,6 +57,15 @@
        (db/with-db-keys state -get-all)
        (map trap-station)))
 
+(s/defn get-all* :- [TrapStation]
+  [state :- State]
+  (map trap-station (db/clj-keys (db/with-connection (:connection state) -get-all*))))
+
+(s/defn get-all-for-survey :- [TrapStation]
+  [state :- State
+   survey-id :- s/Int]
+  (map trap-station (db/with-db-keys state -get-all-for-survey {:survey-id survey-id})))
+
 (s/defn get-specific :- (s/maybe TrapStation)
   [state :- State
    id :- s/Int]

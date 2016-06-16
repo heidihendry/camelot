@@ -50,6 +50,10 @@
    (context "/trap-stations" []
             (GET "/site/:id" [id]
                  (rest/list-resources trap-station/get-all :trap-station id))
+            (GET "/survey/:id" [id]
+                 (rest/list-resources trap-station/get-all-for-survey :trap-station id))
+            (GET "/" []
+                 (rest/list-resources trap-station/get-all* :trap-station))
             (GET "/:id" [id] (rest/specific-resource trap-station/get-specific id))
             (PUT "/:id" [id data] (rest/update-resource trap-station/update! id
                                                         trap-station/ttrap-station data))

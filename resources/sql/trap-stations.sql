@@ -43,3 +43,17 @@ SELECT trap_station_id, survey_site_id, trap_station_created, trap_station_updat
        trap_station_altitude, trap_station_notes
 FROM trap_station
 WHERE survey_site_id = :survey_site_id
+
+-- name: -get-all*
+SELECT trap_station_id, survey_site_id, trap_station_created, trap_station_updated,
+       trap_station_name, trap_station_longitude, trap_station_latitude,
+       trap_station_altitude, trap_station_notes
+FROM trap_station
+
+-- name: -get-all-for-survey
+SELECT trap_station_id, survey_site_id, trap_station_created, trap_station_updated,
+       trap_station_name, trap_station_longitude, trap_station_latitude,
+       trap_station_altitude, trap_station_notes
+FROM trap_station
+LEFT JOIN survey_site USING (survey_site_id)
+WHERE survey_id = :survey_id

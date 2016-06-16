@@ -21,6 +21,7 @@
    "model" :camera-model
    "make" :camera-make
    "attn" :media-attention-needed
+   "trapid" :trap-station-id
    "proc" :media-processed
    "city" :site-city})
 
@@ -101,8 +102,8 @@
       (non-empty-list)
       (append-to-strings (if (:unprocessed-only search-conf) " proc:false" ""))
       (append-to-strings (if (:flagged-only search-conf) " attn:true" ""))
-      (append-to-strings (if (:trap-station-only search-conf)
-                           (str " trapid:" (:trap-station-only search-conf))
+      (append-to-strings (if (> (:trap-station-id search-conf) -1)
+                           (str " trapid:" (:trap-station-id search-conf))
                            ""))
       (#(str/join "|" %))))
 
@@ -152,6 +153,16 @@
    (rest/get-x "/library" load-library-callback))
   ([survey-id]
    (rest/get-x (str "/library/" survey-id) load-library-callback)))
+
+(defn load-trap-stations
+  ([]
+   (rest/get-x "/trap-stations"
+               (fn [resp]
+                 (om/update! (state/library-state) :trap-stations (:body resp)))))
+  ([survey-id]
+   (rest/get-x (str "/trap-stations/survey/" survey-id)
+               (fn [resp]
+                 (om/update! (state/library-state) :trap-stations (:body resp))))))
 
 (defn add-sighting
   []
@@ -299,6 +310,14 @@
                                   :onClick #(do (deselect-all)
                                                 (om/transact! data [:search :page] (partial next-page matches)))}))))))
 
+(defn trap-station-option-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (:trap-station-id data)}
+                  (:trap-station-name data)))))
+
 (defn survey-option-component
   [data owner]
   (reify
@@ -352,8 +371,12 @@
                                            :value (:survey-id data)
                                            :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                                         (if (> sid -1)
-                                                          (load-library sid)
-                                                          (load-library)))}
+                                                          (do
+                                                            (load-library sid)
+                                                            (load-trap-stations sid))
+                                                          (do
+                                                            (load-library)
+                                                            (load-trap-stations))))}
                                       (om/build-all survey-option-component
                                                     (cons {:survey-id -1 :survey-name "All Surveys"}
                                                           (:surveys data))
@@ -462,16 +485,24 @@
                  (dom/div #js {:className "subfilter-bar"}
                           (dom/div #js {:className "subfilter-option"}
                                     (dom/label #js {} "Trap Station")
-                                    (dom/select #js {:className "trap-station-select field-input"}))
+                                    (dom/select #js {:className "trap-station-select field-input"
+                                                     :value (:survey-id data)
+                                                     :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
+                                                                  (om/update! (:search data) :trap-station-id sid)
+                                                                  (om/update! (:search data) :dirty-state true))}
+                                                (om/build-all trap-station-option-component
+                                                    (cons {:trap-station-id -1 :trap-station-name "All Traps"}
+                                                          (:trap-stations data))
+                                                    {:key :trap-station-id})))
                           (dom/div #js {:className "subfilter-option"}
-                                    (dom/label #js {} "Unprocessed only")
-                                    (dom/input #js {:type "checkbox"
-                                                    :value (get-in data [:search :unprocessed-only])
-                                                    :onChange #(do (om/update! (:search (state/library-state)) :unprocessed-only (.. % -target -checked))
-                                                                   (om/update! (:search data) :dirty-state true))
-                                                    :className "field-input"}))
+                                   (dom/label #js {} "Unprocessed")
+                                   (dom/input #js {:type "checkbox"
+                                                   :value (get-in data [:search :unprocessed-only])
+                                                   :onChange #(do (om/update! (:search (state/library-state)) :unprocessed-only (.. % -target -checked))
+                                                                  (om/update! (:search data) :dirty-state true))
+                                                   :className "field-input"}))
                           (dom/div #js {:className "subfilter-option"}
-                                    (dom/label #js {} "Flagged only")
+                                   (dom/label #js {} "Flagged")
                                     (dom/input #js {:type "checkbox"
                                                     :value (get-in data [:search :flagged-only])
                                                     :onChange #(do (om/update! (:search (state/library-state)) :flagged-only (.. % -target -checked))
@@ -604,6 +635,8 @@
       (rest/get-x "/surveys"
                   (fn [resp]
                     (om/update! (get data :library) :surveys (:body resp))))
+
+      (load-trap-stations)
       (load-library))
     om/IRender
     (render [_]

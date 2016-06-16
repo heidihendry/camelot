@@ -901,7 +901,6 @@ pre.field-input {
     float: left;
     padding: 0 1rem;
     text-align: center;
-    min-width: 12rem;
 }
 #app .library .subfilter-bar .subfilter-option:first-child {
     text-align: left;
@@ -917,7 +916,6 @@ pre.field-input {
     display: block;
 }
 #app .library .subfilter-bar input[type=checkbox] {
-    padding: 1rem;
     width: 2rem;
     height: 2rem;
     margin: auto;
