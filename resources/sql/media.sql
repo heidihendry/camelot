@@ -55,3 +55,8 @@ UPDATE media
 SET media_attention_needed = :media_attention_needed,
     media_processed = :media_processed
 WHERE media_id = :media_id
+
+-- name: -update-processed-flag!
+UPDATE media
+SET media_processed = :media_processed
+WHERE media_id = :media_id

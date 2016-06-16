@@ -80,10 +80,12 @@
   [state :- State
    data]
   (db/with-transaction [s state]
-    (doall (map (partial media/update-media-flags s) data))))
+    (doall (map (partial media/update-media-flags! s) data))))
 
 (defn- identify-media
   [state {:keys [quantity species]} media-id]
+  (media/update-processed-flag! state {:media-id media-id
+                                       :media-processed true})
   (sighting/create! state (sighting/tsighting {:sighting-quantity quantity
                                                :species-id species
                                                :media-id media-id})))

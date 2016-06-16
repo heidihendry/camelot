@@ -90,7 +90,13 @@
   (db/with-db-keys state -delete! {:media-id id})
   nil)
 
-(s/defn update-media-flags
+(s/defn update-processed-flag!
+  [state :- State
+   {:keys [media-id media-processed]}]
+  (db/with-db-keys state -update-processed-flag! {:media-id media-id
+                                                  :media-processed media-processed}))
+
+(s/defn update-media-flags!
   [state :- State
    {:keys [media-id media-attention-needed media-processed]}]
   (db/with-db-keys state -update-media-flags! {:media-id media-id

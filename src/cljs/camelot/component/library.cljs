@@ -125,17 +125,17 @@
                                                   {:media
                                                    (map :media-id all-selected)})}
                 (fn [resp]
-                  (dorun (map #(om/update! (second %)
-                                           :sightings
-                                           (conj (:sightings (second %))
-                                                 {:species-id spp
-                                                  :sighting-id (first %)
-                                                  :sighting-quantity qty}))
+                  (dorun (map #(do (om/update! (second %)
+                                               :sightings
+                                               (conj (:sightings (second %))
+                                                     {:species-id spp
+                                                      :sighting-id (first %)
+                                                      :sighting-quantity qty}))
+                                   (om/update! (second %) :media-processed true))
                               (zipmap (:body resp) all-selected)))
                   (om/update! (:identification (state/library-state)) :quantity 1)
                   (om/update! (:identification (state/library-state)) :species -1)
-                  (om/update! (:search (state/library-state)) :identify-selected false)
-                  (deselect-all)))))
+                  (om/update! (:search (state/library-state)) :identify-selected false)))))
 
 (defn remove-sighting
   [sighting-id]
@@ -182,11 +182,13 @@
 
 (defn toggle-select-image
   [data ctrl]
+  (if (and ctrl (:selected data))
+    (om/update! (state/library-state) :selected-media-id nil)
+    (om/update! (state/library-state) :selected-media-id (:media-id data)))
   (when (not ctrl)
     (deselect-all))
   (om/transact! data :selected not)
-  (show-select-message)
-  (om/update! (state/library-state) :selected-media-id (:media-id data)))
+  (show-select-message))
 
 (defn media-on-page
   ([data] (let [data (state/library-state)]
@@ -313,22 +315,21 @@
                                                        "disabled" "")}
                                       "Identify Selected")
                           (let [selected (all-media-selected)]
-                            (when selected
-                              (dom/span nil
-                                       (let [flag-enabled (every? :media-attention-needed selected)]
-                                         (dom/span #js {:className (str "fa fa-2x fa-flag flag"
-                                                                        (if flag-enabled
-                                                                          " red"
-                                                                          ""))
-                                                        :title "Attention Needed"
-                                                        :onClick #(set-attention-needed (not flag-enabled))}))
-                                       (let [flag-enabled (every? :media-processed selected)]
-                                         (dom/span #js {:className (str "fa fa-2x fa-check processed"
-                                                                        (if flag-enabled
-                                                                          " green"
-                                                                          ""))
-                                                        :title "Processed"
-                                                        :onClick #(set-processed (not flag-enabled))}))))))
+                            (dom/span nil
+                                      (let [flag-enabled (and (seq selected) (every? :media-attention-needed selected))]
+                                        (dom/span #js {:className (str "fa fa-2x fa-flag flag"
+                                                                       (if flag-enabled
+                                                                         " red"
+                                                                         ""))
+                                                       :title "Attention Needed"
+                                                       :onClick #(set-attention-needed (not flag-enabled))}))
+                                      (let [flag-enabled (and (seq selected) (every? :media-processed selected))]
+                                        (dom/span #js {:className (str "fa fa-2x fa-check processed"
+                                                                       (if flag-enabled
+                                                                         " green"
+                                                                         ""))
+                                                       :title "Processed"
+                                                       :onClick #(set-processed (not flag-enabled))})))))
                  (dom/div #js {:className (str "identify-selected"
                                                (if (get-in data [:search :identify-selected])
                                                  " show-prompt"
@@ -394,11 +395,12 @@
       (let [matches (get-matching data)]
         (om/update! (:search data) :match-count (count matches))
         (dom/div #js {:className "media-collection"}
-                 (dom/div #js {:className (str "selected-count"
-                                               (if (> (get-in data [:search :show-select-count]) 0)
-                                                 ""
-                                                 " hide-selected"))}
-                          (str (count (all-media-selected)) " selected"))
+                 (when (> (count (all-media-selected)) 1)
+                   (dom/div #js {:className (str "selected-count"
+                                                 (if (> (get-in data [:search :show-select-count]) 0)
+                                                   ""
+                                                   " hide-selected"))}
+                            (str (count (all-media-selected)) " selected")))
                  (dom/div #js {:className "media-collection-container"}
                           (om/build-all media-component (media-on-page) {:key :media-id})))))))
 
