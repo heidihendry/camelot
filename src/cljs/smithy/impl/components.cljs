@@ -41,9 +41,13 @@
   (reify
     om/IRender
     (render [_]
+      (when (not= (:action-menu-id  vs) "")
+        (om/update! vs :action-menu-id ""))
       (let [key :vkey]
-        (apply dom/select #js {:className "actionmenu"
-                               :onChange #(select-action-event-handler vs %)}
+        (dom/select #js {:className "actionmenu"
+                         :value (:action-menu-id vs)
+                         :onChange #(do (select-action-event-handler vs %)
+                                        (om/update! vs :action-menu-id (.. % -target -value)))}
                (om/build-all actionmenu-item-component
                              (actionmenu-builder-list vs key)
                              {:key key}))))))
