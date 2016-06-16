@@ -83,10 +83,34 @@
     true
     (disjunctive-terms search species record)))
 
+(defn append-to-strings
+  [ss append]
+  (map #(str % append) ss))
+
+(defn non-empty-list
+  [s]
+  (if (empty? s)
+    [""]
+    s))
+
+(defn append-subfilters
+  [s search-conf]
+  (-> s
+      (str/split #"\|")
+      (non-empty-list)
+      (append-to-strings (if (:processed-only search-conf) " proc:true" ""))
+      (append-to-strings (if (:flagged-only search-conf) " attn:true" ""))
+      (append-to-strings (if (:trap-station-only search-conf)
+                           (str " trapid:" (:trap-station-only search-conf))
+                           ""))
+      (#(str/join "|" %))))
+
 (defn only-matching
   [terms data]
+  (prn (append-subfilters (str/lower-case (or terms ""))
+                          (:search data)))
   (filter
-   #(matches-search? (str/lower-case (or terms ""))
+   #(matches-search? (append-subfilters (str/lower-case (or terms "")) (:search data))
                      (:species data)
                      %)
    (vals (get-in data [:search :results]))))
@@ -302,6 +326,12 @@
       (om/update! (:search data) :terms nil))
     om/IRender
     (render [_]
+      (prn "Render")
+      (when (-> data :search :dirty-state)
+        (prn "Dty")
+        (om/update! (:search data) :dirty-state false)
+        (om/update! (:search data) :matches
+                    (map :media-id (only-matching (-> data :search :terms) data))))
       (let [num-selected (count (all-media-selected))
             selected (find-with-id (:selected-media-id data))]
         (dom/div #js {:className "search-container"}
@@ -316,8 +346,7 @@
                                           :value (get-in data [:search :terms])
                                           :onChange #(do (om/update! (:search data) :terms (.. % -target -value))
                                                          (om/update! (:search data) :page 1)
-                                                         (om/update! (:search data) :matches
-                                                                     (map :media-id (only-matching (.. % -target -value) data)))
+                                                         (om/update! (:search data) :dirty-state true)
                                                          )})
                           (dom/span nil " in ")
                           (dom/select #js {:className "survey-select field-input"
@@ -431,6 +460,24 @@
       (let [matches (get-matching data)]
         (om/update! (:search data) :match-count (count matches))
         (dom/div #js {:className "media-collection"}
+                 (dom/div #js {:className "subfilter-bar"}
+                          (dom/div #js {:className "subfilter-option"}
+                                    (dom/label #js {} "Trap Station")
+                                    (dom/select #js {:className "trap-station-select field-input"}))
+                          (dom/div #js {:className "subfilter-option"}
+                                    (dom/label #js {} "Processed only")
+                                    (dom/input #js {:type "checkbox"
+                                                    :value (get-in data [:search :processed-only])
+                                                    :onChange #(om/update! (:search (state/library-state)) :processed-only
+                                                                           (= (.. % -target -value) "on"))
+                                                    :className "field-input"}))
+                          (dom/div #js {:className "subfilter-option"}
+                                    (dom/label #js {} "Flagged only")
+                                    (dom/input #js {:type "checkbox"
+                                                    :value (get-in data [:search :flagged-only])
+                                                    :onChange #(do (om/update! (:search (state/library-state)) :flagged-only (.. % -target -checked))
+                                                                   (om/update! (:search data) :dirty-state true))
+                                                    :className "field-input"})))
                  (when (> (count (all-media-selected)) 1)
                    (dom/div #js {:className (str "selected-count"
                                                  (if (> (get-in data [:search :show-select-count]) 0)
