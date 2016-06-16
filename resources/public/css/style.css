@@ -566,7 +566,7 @@ pre.field-input {
     position: relative;
     float: left;
     width: 100%;
-    height: calc(100vh - 13.5rem);
+    height: calc(100vh - 19rem);
 }
 .library .media-control-panel {
     position: relative;

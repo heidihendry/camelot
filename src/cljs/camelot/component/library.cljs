@@ -21,6 +21,7 @@
    "model" :camera-model
    "make" :camera-make
    "attn" :media-attention-needed
+   "proc" :media-processed
    "city" :site-city})
 
 (defn field-key-lookup
@@ -98,7 +99,7 @@
   (-> s
       (str/split #"\|")
       (non-empty-list)
-      (append-to-strings (if (:processed-only search-conf) " proc:true" ""))
+      (append-to-strings (if (:unprocessed-only search-conf) " proc:false" ""))
       (append-to-strings (if (:flagged-only search-conf) " attn:true" ""))
       (append-to-strings (if (:trap-station-only search-conf)
                            (str " trapid:" (:trap-station-only search-conf))
@@ -107,8 +108,6 @@
 
 (defn only-matching
   [terms data]
-  (prn (append-subfilters (str/lower-case (or terms ""))
-                          (:search data)))
   (filter
    #(matches-search? (append-subfilters (str/lower-case (or terms "")) (:search data))
                      (:species data)
@@ -465,11 +464,11 @@
                                     (dom/label #js {} "Trap Station")
                                     (dom/select #js {:className "trap-station-select field-input"}))
                           (dom/div #js {:className "subfilter-option"}
-                                    (dom/label #js {} "Processed only")
+                                    (dom/label #js {} "Unprocessed only")
                                     (dom/input #js {:type "checkbox"
-                                                    :value (get-in data [:search :processed-only])
-                                                    :onChange #(om/update! (:search (state/library-state)) :processed-only
-                                                                           (= (.. % -target -value) "on"))
+                                                    :value (get-in data [:search :unprocessed-only])
+                                                    :onChange #(do (om/update! (:search (state/library-state)) :unprocessed-only (.. % -target -checked))
+                                                                   (om/update! (:search data) :dirty-state true))
                                                     :className "field-input"}))
                           (dom/div #js {:className "subfilter-option"}
                                     (dom/label #js {} "Flagged only")

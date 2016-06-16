@@ -231,7 +231,7 @@
               :species species}]
     (is (= (sut/only-matching "attn:true" data) expected))))
 
-(deftest finds-attention-needed-false-boolean
+(deftest finds-media-attention-needed-false-boolean
   (let [expected [{:sightings [{:species-id 1}]
                    :media-attention-needed false
                    :media-id 2}]
@@ -244,3 +244,31 @@
         data {:search {:results results}
               :species species}]
     (is (= (sut/only-matching "attn:false" data) expected))))
+
+(deftest finds-media-processed-true-boolean
+  (let [expected [{:sightings [{:species-id 1}]
+                   :media-processed true
+                   :media-id 2}]
+        results {1 {:sightings [{:species-id 2}]
+                    :media-processed false
+                    :media-id 1}
+                 2 {:sightings [{:species-id 1}]
+                    :media-processed true
+                    :media-id 2}}
+        data {:search {:results results}
+              :species species}]
+    (is (= (sut/only-matching "proc:true" data) expected))))
+
+(deftest finds-media-processed-false-boolean
+  (let [expected [{:sightings [{:species-id 1}]
+                   :media-processed false
+                   :media-id 2}]
+        results {1 {:sightings [{:species-id 1}]
+                    :media-processed false
+                    :media-id 2}
+                 2 {:sightings [{:species-id 2}]
+                    :media-processed true
+                    :media-id 1}}
+        data {:search {:results results}
+              :species species}]
+    (is (= (sut/only-matching "proc:false" data) expected))))
