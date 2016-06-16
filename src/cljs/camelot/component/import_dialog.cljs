@@ -72,6 +72,11 @@
     (render [_]
       (dom/option #js {:value (:vkey data)} (:desc data)))))
 
+(defn get-root-path
+  []
+  (get-in (state/app-state-cursor)
+          [:view :settings :selected-resource :details :root-path :value]))
+
 (defn simple-import-component
   [data owner]
   (reify
@@ -80,7 +85,7 @@
       (when-not (get-in (state/import-dialog-state) [:selections :folder])
         (om/update! (get (state/import-dialog-state) :selections)
                     :folder (subs (get (state/import-dialog-state) :path)
-                                  (count (get-in (state/resources-state) [:settings :root-path :value])))))
+                                  (count (get-root-path)))))
       (dom/div #js {:className "import-location-selector"}
                (dom/div nil
                         (dom/label nil "Import from")
@@ -101,7 +106,7 @@
       (when-not (get-in (state/import-dialog-state) [:selections :folder])
         (om/update! (get (state/import-dialog-state) :selections)
                     :folder (subs (get (state/import-dialog-state) :path)
-                                  (count (get-in (state/resources-state) [:settings :root-path :value])))))
+                                  (count (get-root-path)))))
       (dom/div #js {:className "import-location-selector"}
                (dom/div nil
                         (dom/label nil "Import from")
