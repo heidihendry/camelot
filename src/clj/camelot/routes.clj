@@ -185,6 +185,8 @@
 
    (context "/library" []
             (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config)))))
+            (GET "/:id" [id] (r/response (library/build-library-for-survey (app/gen-state (conf/config))
+                                                                           (edn/read-string id))))
             (POST "/media/flags" [data] (r/response (library/update-bulk-media-flags
                                                      (app/gen-state (conf/config)) data)))
             (PUT "/identify" [data] (r/response (library/identify (app/gen-state (conf/config))

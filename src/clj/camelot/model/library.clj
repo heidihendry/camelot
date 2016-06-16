@@ -61,6 +61,10 @@
   [state]
   (db/with-db-keys state -all-media {}))
 
+(defn- all-media-for-survey
+  [state survey-id]
+  (db/with-db-keys state -all-media-for-survey {:survey-id survey-id}))
+
 (s/defn build-records :- [LibraryRecord]
   [state sightings media]
   (let [media-sightings (group-by :media-id sightings)
@@ -75,6 +79,12 @@
   [state]
   (db/with-transaction [s state]
     (build-records s (sighting/get-all* s) (all-media s))))
+
+(s/defn build-library-for-survey :- [LibraryRecord]
+  [state :- State
+   id :- s/Int]
+  (db/with-transaction [s state]
+    (build-records s (sighting/get-all* s) (all-media-for-survey s id))))
 
 (s/defn update-bulk-media-flags
   [state :- State

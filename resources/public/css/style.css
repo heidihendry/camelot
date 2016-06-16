@@ -839,6 +839,13 @@ pre.field-input {
     position: relative;
     display: inline-block;
 }
+#app .library .search-bar select.field-input {
+    width: auto;
+    min-width: auto;
+}
+#app .library .search-bar .survey-select {
+    margin-right: 1rem;
+}
 #app .library .pagination-nav .btn {
     font-size: 1.5em;
     padding-top: 0.1rem;

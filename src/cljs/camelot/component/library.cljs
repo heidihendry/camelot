@@ -113,6 +113,23 @@
   []
   (dorun (map #(om/update! % :selected false) (all-media-selected))))
 
+(defn load-library-callback
+  [resp]
+  (om/update! (state/library-state) :selected-media-id nil)
+  (om/update! (get (state/library-state) :search) :results
+              (reduce-kv (fn [acc k v] (assoc acc k (first v))) {}
+                         (group-by :media-id (:body resp))))
+  (om/update! (:search (state/library-state)) :page 1)
+  (om/update! (:search (state/library-state)) :matches
+              (map :media-id (only-matching (get-in (state/library-state) [:search :terms])
+                                            (state/library-state)))))
+
+(defn load-library
+  ([]
+   (rest/get-x "/library" load-library-callback))
+  ([survey-id]
+   (rest/get-x (str "/library/" survey-id) load-library-callback)))
+
 (defn add-sighting
   []
   (let [spp (cljs.reader/read-string (get-in (state/library-state) [:identification :species]))
@@ -259,6 +276,14 @@
                                   :onClick #(do (deselect-all)
                                                 (om/transact! data [:search :page] (partial next-page matches)))}))))))
 
+(defn survey-option-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (:survey-id data)}
+                  (:survey-name data)))))
+
 (defn species-option-component
   [data owner]
   (reify
@@ -293,7 +318,18 @@
                                                          (om/update! (:search data) :page 1)
                                                          (om/update! (:search data) :matches
                                                                      (map :media-id (only-matching (.. % -target -value) data)))
-)})
+                                                         )})
+                          (dom/span nil " in ")
+                          (dom/select #js {:className "survey-select field-input"
+                                           :value (:survey-id data)
+                                           :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
+                                                        (if (> sid -1)
+                                                          (load-library sid)
+                                                          (load-library)))}
+                                      (om/build-all survey-option-component
+                                                    (cons {:survey-id -1 :survey-name "All Surveys"}
+                                                          (:surveys data))
+                                                    {:key :survey-id}))
                           (om/build pagination-component data)
                           (if (> num-selected 0)
                             (dom/button #js {:className "btn btn-default search-main-op"
@@ -519,11 +555,10 @@
                                 (into {}
                                       (map #(hash-map (get % :species-id) %)
                                            (:body resp))))))
-      (rest/get-x "/library"
+      (rest/get-x "/surveys"
                   (fn [resp]
-                    (om/update! (get-in data [:library :search]) :results
-                                (reduce-kv (fn [acc k v] (assoc acc k (first v))) {}
-                                           (group-by :media-id (:body resp)))))))
+                    (om/update! (get data :library) :surveys (:body resp))))
+      (load-library))
     om/IRender
     (render [_]
       (let [lib (:library data)]
