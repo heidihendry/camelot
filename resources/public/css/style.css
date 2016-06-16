@@ -888,7 +888,14 @@ pre.field-input {
     font-size: 70%;
     padding-right: 1rem;
 }
-
+#app .library .btn.search {
+    background: none;
+    border: 1px solid #ccc;
+    opacity: 0.8;
+}
+#app .library .btn.search:hover {
+    opacity: 1;
+}
 #app .library .subfilter-bar {
     width: 100%;
     float: left;
@@ -896,11 +903,14 @@ pre.field-input {
     border-bottom: 1px solid #eee;
     padding-bottom: 0.5rem;
     margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: row;
 }
 #app .library .subfilter-bar .subfilter-option {
     float: left;
     padding: 0 1rem;
     text-align: center;
+    max-width: calc(100% - 15rem);
 }
 #app .library .subfilter-bar .subfilter-option:first-child {
     text-align: left;
@@ -912,7 +922,7 @@ pre.field-input {
 #app .library .subfilter-bar label {
     display: inline;
 }
-#app .library .subfilter-bar select {
+#app .library .subfilter-bar select.field-input {
     display: block;
 }
 #app .library .subfilter-bar input[type=checkbox] {

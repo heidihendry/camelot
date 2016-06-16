@@ -355,7 +355,8 @@
             selected (find-with-id (:selected-media-id data))]
         (dom/div #js {:className "search-container"}
                  (dom/div #js {:className "search-bar"}
-                          (dom/span #js {:className "fa fa-search"})
+                          (dom/button #js {:className "fa fa-search btn search"
+                                           :onClick #(om/update! (:search data) :dirty-state true)})
                           (dom/input #js {:type "text"
                                           :placeholder "Filter..."
                                           :disabled (if (get-in data
