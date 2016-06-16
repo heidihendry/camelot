@@ -13,6 +13,24 @@
                   %1
                   (+ %1 %2)) 0)))
 
+(defn ->percentage
+  [{:keys [n d]}]
+  (format "%.2f" (* 100 (float (/ n d)))))
+
+(defn aggregate-boolean
+  [group-col col data]
+  (->> data
+       (group-by group-col)
+       (vals)
+       (map #(get (first %) col))
+       (flatten)
+       (reduce #(cond
+                  (= %2 "X") (update (update %1 :n inc) :d inc)
+                  (= %2 "") (update %1 :d inc)
+                  (nil? %2) %1)
+               {:n 0 :d 0})
+       (->percentage)))
+
 (defn aggregate-by-trap-station
   [col data]
   (aggregate-numeric :trap-station-session-id col data))
