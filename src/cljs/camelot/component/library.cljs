@@ -356,9 +356,11 @@
         (dom/div #js {:className "search-container"}
                  (dom/div #js {:className "search-bar"}
                           (dom/button #js {:className "fa fa-search btn search"
+                                           :title "Apply the current filters"
                                            :onClick #(om/update! (:search data) :dirty-state true)})
                           (dom/input #js {:type "text"
                                           :placeholder "Filter..."
+                                          :title "Type a keyword you want the media to contain"
                                           :disabled (if (get-in data
                                                                    [:search :identify-selected])
                                                        "disabled" "")
@@ -370,6 +372,7 @@
                                                          )})
                           (dom/span nil " in ")
                           (dom/select #js {:className "survey-select field-input"
+                                           :title "Filter to only items in a certain survey"
                                            :value (:survey-id data)
                                            :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                                         (if (> sid -1)
@@ -387,17 +390,20 @@
                           (if (> num-selected 0)
                             (dom/button #js {:className "btn btn-default search-main-op"
                                              :onClick deselect-all*
+                                             :title "Remove all selections"
                                              :disabled (if (get-in data
                                                                    [:search :identify-selected])
                                                        "disabled" "")}
                                         "Select None")
                             (dom/button #js {:className "btn btn-default search-main-op"
+                                             :title "Select all media on this page"
                                              :disabled (if (get-in data
                                                                    [:search :identify-selected])
                                                        "disabled" "")
                                              :onClick select-all*}
                                         "Select All"))
                           (dom/button #js {:className "btn btn-default"
+                                           :title "Open the identification panel to apply to the selected media"
                                            :onClick identify-selected-prompt
                                            :disabled (if (or (zero? num-selected)
                                                              (get-in data [:search :identify-selected]))
@@ -410,14 +416,14 @@
                                                                        (if flag-enabled
                                                                          " red"
                                                                          ""))
-                                                       :title "Attention Needed"
+                                                       :title "Flag or unflag the selected media as needing attention"
                                                        :onClick #(set-attention-needed (not flag-enabled))}))
                                       (let [flag-enabled (and (seq selected) (every? :media-processed selected))]
                                         (dom/span #js {:className (str "fa fa-2x fa-check processed"
                                                                        (if flag-enabled
                                                                          " green"
                                                                          ""))
-                                                       :title "Processed"
+                                                       :title "Flag or unflag the selected media as processed"
                                                        :onClick #(set-processed (not flag-enabled))})))))
                  (dom/div #js {:className (str "identify-selected"
                                                (if (get-in data [:search :identify-selected])
