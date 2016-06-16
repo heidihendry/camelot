@@ -122,12 +122,11 @@
 (defn get-matching
   [data]
   (let [search (:search data)]
-    (mapv #(get-in search [:results %]) (:matches search))))
+    (map #(get-in search [:results %]) (:matches search))))
 
 (defn find-with-id
   [media-id]
-  (first (filter #(= media-id (:media-id %))
-                 (get-matching (state/library-state)))))
+  (get-in (state/library-state) [:search :results media-id]))
 
 (defn hide-select-message
   []
@@ -348,13 +347,11 @@
       (om/update! (:search data) :terms nil))
     om/IRender
     (render [_]
-      (prn "Render")
       (when (-> data :search :dirty-state)
-        (prn "Dty")
         (om/update! (:search data) :dirty-state false)
         (om/update! (:search data) :matches
                     (map :media-id (only-matching (-> data :search :terms) data))))
-      (let [num-selected (count (all-media-selected))
+      (let [num-selected (count (get-in data [:search :matches]))
             selected (find-with-id (:selected-media-id data))]
         (dom/div #js {:className "search-container"}
                  (dom/div #js {:className "search-bar"}
