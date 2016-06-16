@@ -149,12 +149,23 @@
   []
   (om/transact! (:search (state/library-state)) :identify-selected not))
 
-(defn toggle-attention-needed
+(defn get-media-flags
   [rec]
-  (om/transact! rec :media-attention-needed not)
-  (rest/put-resource (str "/media/" (:media-id rec))
-                     {:data (update (deref rec) :media-attention-needed not)}
-                     identity))
+  (select-keys rec [:media-id
+                    :media-attention-needed
+                    :media-processed-flag]))
+
+(defn set-attention-needed
+  [flag-state]
+  (let [selected (all-media-selected)]
+    (rest/post-resource "/library/media/flags"
+                        {:data (mapv #(assoc (get-media-flags %)
+                                             :media-attention-needed flag-state)
+                                     selected)}
+                        (fn []
+                          (doall (map
+                                  #(om/update! % :media-attention-needed flag-state)
+                                  selected))))))
 
 (defn show-select-message
   []
@@ -162,7 +173,9 @@
   (.setTimeout js/window hide-select-message 1600))
 
 (defn toggle-select-image
-  [data]
+  [data ctrl]
+  (when (not ctrl)
+    (deselect-all))
   (om/transact! data :selected not)
   (show-select-message)
   (om/update! (state/library-state) :selected-media-id (:media-id data)))
@@ -254,7 +267,6 @@
       (om/update! (:search data) :terms nil))
     om/IRender
     (render [_]
-      (prn "redraw search")
       (let [num-selected (count (all-media-selected))
             selected (find-with-id (:selected-media-id data))]
         (dom/div #js {:className "search-container"}
@@ -269,7 +281,8 @@
                                           :value (get-in data [:search :terms])
                                           :onChange #(do (om/update! (:search data) :terms (.. % -target -value))
                                                          (om/update! (:search data) :page 1)
-                                                         (om/update! (:search data) :matches (map :media-id (only-matching (.. % -target -value) data)))
+                                                         (om/update! (:search data) :matches
+                                                                     (map :media-id (only-matching (.. % -target -value) data)))
 )})
                           (om/build pagination-component data)
                           (if (> num-selected 0)
@@ -291,12 +304,14 @@
                                                              (get-in data [:search :identify-selected]))
                                                        "disabled" "")}
                                       "Identify Selected")
-                          (dom/span #js {:className (str "fa fa-2x fa-flag flag"
-                                                                    (if (:media-attention-needed selected)
-                                                                      " red"
-                                                                      ""))
-                                                    :title "Attention Needed"
-                                         :onClick #(toggle-attention-needed selected)}))
+                          (if (seq (all-media-selected))
+                            (let [flag-enabled (every? :media-attention-needed (all-media-selected))]
+                              (dom/span #js {:className (str "fa fa-2x fa-flag flag"
+                                                             (if flag-enabled
+                                                               " red"
+                                                               ""))
+                                             :title "Attention Needed"
+                                             :onClick #(set-attention-needed (not flag-enabled))}))))
                  (dom/div #js {:className (str "identify-selected"
                                                (if (get-in data [:search :identify-selected])
                                                  " show-prompt"
@@ -341,8 +356,13 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "media-item"}
-               (dom/img #js {:className (str "media" (if (:selected result) " selected" ""))
-                             :onMouseDown #(toggle-select-image result)
+               (dom/img #js {:className (str "media"
+                                             (if (:selected result) " selected" "")
+                                             (cond
+                                               (:media-attention-needed result) " attention-needed"
+                                               (:media-processed result) " processed"
+                                               :else ""))
+                             :onMouseDown #(toggle-select-image result (.. % -ctrlKey))
                              :src (str (get-in result [:media-uri]) "/thumb")})
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
                              :onClick #(om/update! (state/library-state) :selected-media-id (:media-id result))})))))
@@ -383,8 +403,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn "redraw mcp-d-s")
-      (prn (:sighting-id sighting))
       (dom/div nil
                (if (> (:sighting-id sighting) -1)
                  (dom/div #js {:className "fa fa-trash remove-sighting"
@@ -440,7 +458,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn "redraw mcpc")
       (dom/div #js {:className "media-control-panel"}
                (dom/div #js {:className "mcp-container"}
                         (om/build mcp-preview (find-with-id (:selected-media-id data))))))))
@@ -492,12 +509,10 @@
     (render [_]
       (let [lib (:library data)]
         (if (get-in lib [:search :results])
-          (do
-            (prn "redraw")
-            (dom/div #js {:className "library"}
-                     (om/build search-component lib)
-                     (when (get-in lib [:search :matches])
-                       (om/build media-collection-component lib))
-                     (om/build media-details-panel-component lib)
-                     (om/build media-control-panel-component lib)))
+          (dom/div #js {:className "library"}
+                   (om/build search-component lib)
+                   (when (get-in lib [:search :matches])
+                     (om/build media-collection-component lib))
+                   (om/build media-details-panel-component lib)
+                   (om/build media-control-panel-component lib))
           (dom/div nil ""))))))

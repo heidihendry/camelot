@@ -48,3 +48,8 @@ SELECT media_id, media_created, media_updated, media_filename,
        media_format
 FROM media
 WHERE media_filename = :media_filename
+
+-- name: -update-media-flags!
+UPDATE media
+SET media_attention_needed = :media_attention_needed
+WHERE media_id = :media_id

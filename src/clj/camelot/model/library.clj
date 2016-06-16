@@ -3,6 +3,8 @@
              [yesql.core :as sql]
              [camelot.db :as db]
              [camelot.model.sighting :as sighting]
+             [camelot.model.media :as media]
+             [camelot.model.state :refer [State]]
              [camelot.model.trap-station :as trap-station])
   (:import [camelot.model.sighting Sighting]))
 
@@ -64,6 +66,12 @@
   [state]
   (db/with-transaction [s state]
     (build-records s (sighting/get-all* s) (all-media s))))
+
+(s/defn update-bulk-media-flags
+  [state :- State
+   data]
+  (db/with-transaction [s state]
+    (doall (map (partial media/update-media-flags s) data))))
 
 (defn- identify-media
   [state {:keys [quantity species]} media-id]

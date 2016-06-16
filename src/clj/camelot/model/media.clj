@@ -88,6 +88,13 @@
   (db/with-db-keys state -delete! {:media-id id})
   nil)
 
+(s/defn update-media-flags
+  [state :- State
+   {:keys [media-id media-attention-needed media-processed-flag]}]
+  (db/with-db-keys state -update-media-flags! {:media-id media-id
+                                               :media-attention-needed media-attention-needed
+                                               :media-processed-flag media-processed-flag}))
+
 (s/defn read-media-file :- java.io.BufferedInputStream
   [state :- State
    filename :- s/Str
