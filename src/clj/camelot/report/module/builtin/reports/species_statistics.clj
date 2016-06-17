@@ -10,7 +10,7 @@
                :trap-station-latitude
                :presence-absence
                :independent-observations
-               :nights-elapsed
+               :total-nights
                :independent-observations-per-night]
      :aggregate-on [:independent-observations
                     :nights-elapsed]
@@ -20,7 +20,7 @@
                      %
                      (select-keys % [:trap-station-longitude
                                      :trap-station-latitude
-                                     :nights-elapsed]))
+                                     :total-nights]))
                   #(if (nil? (:species-id %))
                      (assoc % :species-scientific-name
                             (:species-scientific-name spp))
