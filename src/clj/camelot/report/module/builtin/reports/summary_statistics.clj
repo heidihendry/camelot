@@ -7,18 +7,20 @@
              :trap-station-count
              :media-count
              :independent-observations
-             :nights-elapsed
+             :total-nights
              :independent-observations-per-night]
    :aggregate-on [:media-count
                   :independent-observations
                   :trap-station-count]
-   :filters [#(not (nil? (:species-scientific-name %)))
-             #(= (:survey-id %) survey-id)]
+   :rewrites [#(if (= (:survey-id %) survey-id)
+                 %
+                 (select-keys % [:species-scientific-name]))]
+   :filters [#(not (nil? (:species-scientific-name %)))]
    :order-by [:species-scientific-name ]})
 
 (module/register-report
  :summary-statistics
  {:file-prefix "summary-statistics-report"
   :configuration report-configuration
-  :by :species
+  :by :all
   :for :survey})

@@ -78,6 +78,8 @@
                       :description "The city within which, or nearest city to which, this site resides."}
           :site-sublocation {:label "Sublocation"
                              :description "The name of the location which this site represents."}
+          :site-area {:label "Site Area"
+                       :description "Area of this site in km2."}
           :site-notes {:label "Site Notes"
                        :description "Notes about this site."}}
 
@@ -192,6 +194,7 @@
             :trap-stations "View Trap Stations"
             :sightings "View Sightings"
             :maxent-report "Download MaxEnt Export"
+            :effort-summary-report "Download Effort Summary"
             :summary-statistics-report "Download Summary Statistics"
             :species-statistics-report "Download Species Statistics"
             :raw-data-export "Export Raw Data"
@@ -255,8 +258,11 @@
    :default-config-created "A default configuration has been created in '%s'"
 
    :report {:nights-elapsed "Nights Elapsed"
+            :total-nights "Nights Elapsed"
             :independent-observations "Independent Observations"
             :independent-observations-per-night "Abundance Index"
+            :time-period-start "Period Start"
+            :time-period-end "Period End"
             :percent-nocturnal "Nocturnal (%%)"
             :presence-absence "Presence"
             :survey-id "Survey ID"
@@ -270,6 +276,7 @@
             :site-state-province "Site State Province"
             :site-country "Site Country"
             :site-notes "Site Notes"
+            :site-area "Site Area (km2)"
             :survey-site-id "Survey Site ID"
             :species-scientific-name "Species Scientific Name"
             :species-common-name "Species Common Name"
@@ -296,6 +303,7 @@
             :trap-station-session-count "Number of Trap Station Sessions"
             :trap-station-count "Number of Trap Stations"
             :media-count "Number of Photos"
+            :species-count "Number of Species"
             :media-capture-timestamp "Media Capture Timestamp"
             :media-notes "Media Notes"
             :media-filename "Media Filename"

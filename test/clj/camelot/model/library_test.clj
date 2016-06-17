@@ -13,6 +13,7 @@
    :media-format "jpg"
    :media-cameracheck false
    :media-attention-needed false
+   :media-processed false
    :media-capture-timestamp (t/date-time 2014 9 8 7 6 5)
    :trap-station-session-camera-id 3
    :trap-station-session-id 53

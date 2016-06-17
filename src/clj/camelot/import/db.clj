@@ -72,6 +72,7 @@
                            :site-city (:city loc)
                            :site-state-province (:state-province loc)
                            :site-country (:country loc)
+                           :site-area nil
                            :site-notes import-note})]
     (site/get-or-create! state tsite)))
 

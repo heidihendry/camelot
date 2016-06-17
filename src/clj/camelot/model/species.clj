@@ -9,7 +9,7 @@
 (s/defrecord TSpecies
     [species-scientific-name :- s/Str
      species-common-name :- s/Str
-     species-notes :- s/Str])
+     species-notes :- (s/maybe s/Str)])
 
 (s/defrecord Species
     [species-id :- s/Int

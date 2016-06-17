@@ -6,7 +6,7 @@
   {:columns [:species-scientific-name
              :presence-absence
              :independent-observations
-             :nights-elapsed
+             :total-nights
              :independent-observations-per-night]
    :aggregate-on [:independent-observations]
    :rewrites [#(if (= (:trap-station-id %) trap-station-id)
@@ -15,11 +15,11 @@
    :pre-transforms [#(if (= (:trap-station-id %) trap-station-id)
                        %
                        (select-keys % [:species-scientific-name
-                                       :nights-elapsed]))]
+                                       :total-nights]))]
    :transforms [#(if (= (:trap-station-id %) trap-station-id)
                        %
                        (select-keys % [:species-scientific-name
-                                       :nights-elapsed]))]
+                                       :total-nights]))]
    :filters [#(:species-scientific-name %)]
    :order-by [:species-scientific-name ]})
 
@@ -27,5 +27,5 @@
  :trap-station-statistics
  {:file-prefix "trap-station-statistics"
   :configuration report-configuration
-  :by :survey
+  :by :all
   :for :trap-station})

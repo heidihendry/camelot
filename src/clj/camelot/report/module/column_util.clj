@@ -31,9 +31,27 @@
                {:n 0 :d 0})
        (->percentage)))
 
+(defn aggregate-by-species
+  [col data]
+  (aggregate-numeric :species-id col data))
+
+;; TODO migrate everything off of this
 (defn aggregate-by-trap-station
   [col data]
   (aggregate-numeric :trap-station-session-id col data))
+
+(defn aggregate-by-trap-station-session
+  [col data]
+  (aggregate-numeric :trap-station-session-id col data))
+
+(defn aggregate-with-reducer
+  [pred group-col col data]
+  (->> data
+       (group-by group-col)
+       (vals)
+       (map #(get (first %) col))
+       (flatten)
+       (reduce pred nil)))
 
 (defn- species-sighting-reducer
   [acc v]
@@ -88,9 +106,19 @@
 
 (defn calculate-nights-elapsed
   [state data]
+  (let [nights (get-nights-for-sessions data)]
+    (map #(assoc % :nights-elapsed
+                 (get nights (:trap-station-session-id %))) data)))
+
+(defn column-from-existing
+  [col newcol state data]
+  (map #(assoc % newcol (get % col))) data)
+
+(defn calculate-total-nights
+  [state data]
   (let [nights (get-nights-for-sessions data)
         v (reduce + 0 (vals nights))]
-    (map #(assoc % :nights-elapsed v) data)))
+    (map #(assoc % :total-nights v) data)))
 
 (defn- assoc-count
   [tbl data]

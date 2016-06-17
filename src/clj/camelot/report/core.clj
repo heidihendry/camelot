@@ -34,11 +34,16 @@
   []
   (db/clj-keys (-get-all-by-camera)))
 
+(defn- get-all
+  []
+  (db/clj-keys (-get-all)))
+
 (def ^:private query-fn-map
   {:survey get-all-by-survey
    :species get-all-by-species
    :site get-all-by-site
-   :camera get-all-by-camera})
+   :camera get-all-by-camera
+   :all get-all})
 
 (defn get-by
   [by]

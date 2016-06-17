@@ -64,6 +64,7 @@ Currently the only application state is the user's configuration."
             [:site-city]
             [:site-state-province]
             [:site-country]
+            [:site-area]
             [:site-notes]]
    :schema {:site-name {:type :text
                         :required true}
@@ -71,6 +72,7 @@ Currently the only application state is the user's configuration."
             :site-city {:type :text}
             :site-state-province {:type :text}
             :site-country {:type :text}
+            :site-area {:type :number}
             :site-notes {:type :textarea
                          :rows 4
                          :cols 35}}
@@ -415,6 +417,8 @@ Currently the only application state is the user's configuration."
                         :action :raw-data-export}
                        {:label (tr/translate (:config state) :action/maxent-report)
                         :action :maxent-report}
+                       {:label (tr/translate (:config state) :action/effort-summary-report)
+                        :action :effort-summary-report}
                        ]}
    :layout [[:survey-name]
             [:survey-directory]

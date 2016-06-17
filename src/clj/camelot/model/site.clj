@@ -12,6 +12,7 @@
      site-city :- (s/maybe s/Str)
      site-state-province :- (s/maybe s/Str)
      site-country :- (s/maybe s/Str)
+     site-area :- (s/maybe s/Num)
      site-notes :- (s/maybe s/Str)])
 
 (s/defrecord Site
@@ -23,19 +24,20 @@
      site-city :- (s/maybe s/Str)
      site-state-province :- (s/maybe s/Str)
      site-country :- (s/maybe s/Str)
+     site-area :- (s/maybe s/Num)
      site-notes :- (s/maybe s/Str)])
 
 (s/defn tsite :- TSite
   [{:keys [site-name site-sublocation site-city site-state-province
-           site-country site-notes]}]
+           site-country site-area site-notes]}]
   (->TSite site-name site-sublocation site-city site-state-province
-           site-country site-notes))
+           site-country site-area site-notes))
 
 (s/defn site :- Site
   [{:keys [site-id site-created site-updated site-name site-sublocation
-           site-city site-state-province site-country site-notes]}]
+           site-city site-state-province site-country site-area site-notes]}]
   (->Site site-id site-created site-updated site-name site-sublocation
-           site-city site-state-province site-country site-notes))
+           site-city site-state-province site-country site-area site-notes))
 
 (s/defn get-all :- [Site]
   [state :- State]

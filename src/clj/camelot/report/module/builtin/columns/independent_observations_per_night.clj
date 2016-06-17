@@ -4,7 +4,7 @@
 (defn- get-nights-per-independent-observation
   [record]
   (let [obs (:independent-observations record)
-        nights (:nights-elapsed record)]
+        nights (or (:total-nights record) (:nights-elapsed record))]
     (cond
         (nil? obs) nil
         (or (nil? nights) (zero? nights)) "-"

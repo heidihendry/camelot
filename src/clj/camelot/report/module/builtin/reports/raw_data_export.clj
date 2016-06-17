@@ -19,5 +19,5 @@
  :raw-data-export
  {:file-prefix "raw-data-export"
   :configuration report-configuration
-  :by :survey
+  :by :all
   :for :survey})

@@ -1,0 +1,1 @@
+ALTER TABLE site DROP COLUMN site_area
