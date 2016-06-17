@@ -66,9 +66,9 @@
       (let [val (get-in buf [k :value])]
         (if (nil? val)
           (dom/div nil "Preview not available")
-          (dom/a #js {:href (str (:image-resource-url opts) "/" val "/preview")}
+          (dom/a #js {:href (str (:image-resource-url opts) "/" val)}
                  (dom/img #js {:className "input-field"
-                               :src (str (:image-resource-url opts) "/" val)})))))))
+                               :src (str (:image-resource-url opts) "/" val "/preview")})))))))
 
 (defmethod input-field :select
   [[k v buf opts] owner]
