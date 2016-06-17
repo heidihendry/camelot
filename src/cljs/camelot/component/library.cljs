@@ -207,7 +207,7 @@
   [rec]
   (select-keys rec [:media-id
                     :media-attention-needed
-                    :media-processed-flag]))
+                    :media-processed]))
 
 (defn set-flag-state
   [flag-key flag-state]

@@ -49,7 +49,7 @@
            survey-site-id survey-id site-id site-name sightings]}]
   (->LibraryRecord media-id media-created media-updated media-filename
                    media-format media-uri media-cameracheck
-                   media-attention-needed media-processed
+                   media-attention-needed (or media-processed false)
                    media-capture-timestamp trap-station-session-camera-id
                    trap-station-session-id trap-station-id trap-station-name
                    trap-station-longitude trap-station-latitude
