@@ -194,10 +194,11 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "sidebar"}
-               (dom/button #js {:className "create-record-btn btn btn-primary fa fa-plus fa-2x"
-                                :disabled (= (get-in vs [:screen :mode]) :create)
-                                :onClick #((get-in vs [:events-ref :sidebar-create-click])
-                                           vs)})
+               (when (not (get-in (util/get-screen vs) [:resource :non-creatable]))
+                 (dom/button #js {:className "create-record-btn btn btn-primary fa fa-plus fa-2x"
+                                  :disabled (= (get-in vs [:screen :mode]) :create)
+                                  :onClick #((get-in vs [:events-ref :sidebar-create-click])
+                                             vs)}))
                (build-sidebar-item-components vs)))))
 
 (defn build-update-component
@@ -241,8 +242,9 @@
                     vs
                     (get vs :selected-resource)
                     :details)]
-    (om/build resource-create-component {:view-state vs
-                                         :create create-fn})))
+    (when (not (get-in (util/get-screen vs) [:resource :non-creatable]))
+      (om/build resource-create-component {:view-state vs
+                                           :create create-fn}))))
 
 (defn breadcrumb-item-component
   "A single segment in the breadcrumbs component."

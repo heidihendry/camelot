@@ -264,6 +264,7 @@ Currently the only application state is the user's configuration."
   {:resource {:type :media
               :title (tr/translate (:config state) :media/title)
               :endpoint "/media"
+              :non-creatable true
               :parent-id-key :camera-trap-session-camera-id
               :id :media-id}
    :sidebar {:resource {:endpoint "/media/trap-station-session-camera"
@@ -298,6 +299,7 @@ Currently the only application state is the user's configuration."
   {:resource {:type :photo
               :title (tr/translate (:config state) :photo/title)
               :endpoint "/photos"
+              :non-creatable true
               :parent-id-key :media-id
               :id :photo-id}
    :sidebar {:resource {:endpoint "/photos/media"

@@ -139,8 +139,7 @@
    (context "/media" []
             (GET "/trap-station-session-camera/:id" [id] (rest/list-resources media/get-all :media id))
             (GET "/:id" [id] (rest/specific-resource media/get-specific id))
-            (PUT "/:id" [id data] (rest/update-resource media/update! id
-                                                        media/tmedia (rest/cursorise data)))
+            (PUT "/:id" [id data] (rest/update-resource media/update! id media/tmedia data))
             (POST "/" [data] (rest/create-resource media/create!
                                                    media/tmedia data))
             (DELETE "/:id" [id] (rest/delete-resource media/delete! id))
