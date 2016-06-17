@@ -192,6 +192,7 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "number" :className "field-input"
+                      :step "any"
                       :disabled (:disabled opts)
                       :onChange #(state/set-percentage! % (k buf) :value owner)
                       :value (get-in buf [k :value])}))))
@@ -206,6 +207,7 @@
     om/IRender
     (render [_]
       (dom/input #js {:type "number" :className "field-input"
+                      :step "any"
                       :disabled (:disabled opts)
                       :onChange #(state/set-number! % (k buf) :value owner)
                       :value (get-in buf [k :value])}))))
