@@ -521,7 +521,6 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      ;; TODO For now we assume there's only 1 survey.
       (om/update! (get-in data [:library :search]) :page 1)
       (om/update! (get-in data [:library :search]) :show-select-count 0)
       (om/update! (get-in data [:library]) :identification {:quantity 1})
