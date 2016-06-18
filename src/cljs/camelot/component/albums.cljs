@@ -3,7 +3,7 @@
             [camelot.rest :as rest]
             [camelot.nav :as cnav]
             [camelot.state :as state]
-            [camelot.util :as util]
+            [camelot.util.misc :as misc]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [cljs-time.format :as tf]))
@@ -54,7 +54,7 @@
                     (dom/label nil "Timespan information missing")
                     (dom/span nil
                               (dom/label nil (str ""
-                                                  (util/nights-elapsed start end)
+                                                  (misc/nights-elapsed start end)
                                                   " nights"))
                               (dom/div #js {:className "date-range"}
                                        (str (tf/unparse day-formatter start)

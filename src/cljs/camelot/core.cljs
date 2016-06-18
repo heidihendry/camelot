@@ -5,7 +5,6 @@
             [camelot.view :as view]
             [camelot.state :as state]
             [camelot.rest :as rest]
-            [camelot.util :as util]
             [camelot.component.albums :as albums]
             [cljs.core.async :refer [<!]]
             [secretary.core :as secretary :refer-macros [defroute]])

@@ -1,7 +1,8 @@
 (ns camelot.rest
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [om.core :as om])
-  (:require [camelot.util :as util]
+  (:require [camelot.util.transit :as transit-util]
+            [camelot.util.misc :as misc]
             [cljs-http.client :as http]
             [om.core :as om]
             [camelot.state :as state]
@@ -31,15 +32,15 @@
   "Retrieve settings"
   [x-url cb]
   (go
-    (let [response (<! (util/request
-                        http/get (util/with-baseurl x-url) nil))
+    (let [response (<! (transit-util/request
+                        http/get (misc/with-baseurl x-url) nil))
           success (some #{(:status response)} success-status-codes)]
       (if success
         (when cb
           (cb response))
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "GET"
-                                                     (util/with-baseurl x-url)
+                                                     (misc/with-baseurl x-url)
                                                      (:status response)
                                                      (:body response)))))))
 
@@ -48,8 +49,8 @@
   ([resource params cb] (post-x resource params cb nil))
   ([resource params cb failcb]
    (go
-     (let [response (<! (util/request http/post (util/with-baseurl resource)
-                                      params))
+     (let [response (<! (transit-util/request http/post (misc/with-baseurl resource)
+                                              params))
            success (some #{(:status response)} success-status-codes)]
        (if success
          (when cb
@@ -59,7 +60,7 @@
              (failcb))
            (om/update! (state/app-state-cursor) :error (build-error
                                                         "POST"
-                                                        (util/with-baseurl resource)
+                                                        (misc/with-baseurl resource)
                                                         params
                                                         (:status response)
                                                         (:body response)))))))))
@@ -69,8 +70,8 @@
   ([resource params cb] (put-x resource params cb nil))
   ([resource params cb failcb]
    (go
-     (let [response (<! (util/request http/put (util/with-baseurl resource)
-                                      params))
+     (let [response (<! (transit-util/request http/put (misc/with-baseurl resource)
+                                              params))
            success (some #{(:status response)} success-status-codes)]
        (if success
          (when cb
@@ -80,7 +81,7 @@
              (failcb))
            (om/update! (state/app-state-cursor) :error (build-error
                                                         "PUT"
-                                                        (util/with-baseurl resource)
+                                                        (misc/with-baseurl resource)
                                                         params
                                                         (:status response)
                                                         (:body response)))))))))
@@ -109,15 +110,15 @@
   "GET resource state"
   [resource cb]
   (go
-    (let [response (<! (util/request http/get (util/with-baseurl resource)
-                                     nil))
+    (let [response (<! (transit-util/request http/get (misc/with-baseurl resource)
+                                             nil))
           success (some #{(:status response)} success-status-codes)]
       (if success
         (when cb
           (cb response))
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "GET"
-                                                     (util/with-baseurl resource)
+                                                     (misc/with-baseurl resource)
                                                      (:status response)
                                                      (:body response)))))))
 
@@ -125,15 +126,15 @@
   "PUT resource state"
   [resource params cb]
   (go
-    (let [response (<! (util/request http/put (util/with-baseurl resource)
-                                     params))
+    (let [response (<! (transit-util/request http/put (misc/with-baseurl resource)
+                                             params))
           success (some #{(:status response)} success-status-codes)]
       (if success
         (when cb
           (cb response))
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "PUT"
-                                                     (util/with-baseurl resource)
+                                                     (misc/with-baseurl resource)
                                                      params
                                                      (:status response)
                                                      (:body response)))))))
@@ -142,15 +143,15 @@
   "POST resource state"
   [resource params cb]
   (go
-    (let [response (<! (util/request http/post (util/with-baseurl resource)
-                                     params))
+    (let [response (<! (transit-util/request http/post (misc/with-baseurl resource)
+                                             params))
           success (some #{(:status response)} success-status-codes)]
       (if success
         (when cb
           (cb response))
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "POST"
-                                                     (util/with-baseurl resource)
+                                                     (misc/with-baseurl resource)
                                                      params
                                                      (:status response)
                                                      (:body response)))))))
@@ -159,15 +160,15 @@
   "DELETE resource"
   [resource params cb]
   (go
-    (let [response (<! (util/request http/delete (util/with-baseurl resource)
-                                     params))
+    (let [response (<! (transit-util/request http/delete (misc/with-baseurl resource)
+                                             params))
           success (some #{(:status response)} success-status-codes)]
       (if success
         (when cb
           (cb response))
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "DELETE"
-                                                     (util/with-baseurl resource)
+                                                     (misc/with-baseurl resource)
                                                      params
                                                      (:status response)
                                                      (:body response)))))))
