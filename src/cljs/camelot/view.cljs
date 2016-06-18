@@ -53,8 +53,8 @@
    :survey-sites-available {:vkey :site-id
                             :desc :site-name
                             :baseurl "/survey-sites"}
-   :species-available {:vkey :species-id
-                       :desc :species-scientific-name
+   :taxonomy-available {:vkey :taxonomy-id
+                       :desc :taxonomy-species
                        :baseurl "/sightings"}
    :trap-station-session-cameras-available {:vkey :camera-id
                                             :desc :camera-name
@@ -94,7 +94,8 @@
                             (when cb
                               (cb)))))))
 
-(defn cancel-update [event-key vs resources key]
+(defn cancel-update
+  [event-key vs resources key]
   "Revert the buffer state and return to readonly mode."
   (om/update! vs :buffer (deref (get resources key)))
   (om/update! (get vs :selected-resource) :show-validations false)
@@ -285,6 +286,6 @@
 (defroute "/survey-sites/:id" [id] (page-content-view :survey-site :create {:id id}))
 (defroute "/sites" [] (page-content-view :site :create {}))
 (defroute "/cameras" [] (page-content-view :camera :create {}))
-(defroute "/species" [] (page-content-view :species :create {}))
+(defroute "/taxonomy" [] (page-content-view :taxonomy :create {}))
 (defroute "/library" [] (generate-view library/library-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

@@ -33,7 +33,7 @@
   "Reducing function, adding or updating the sightings based on their dependence."
   [state acc this-sighting]
   (let [datetime (:media-capture-timestamp this-sighting)
-        species (:species-scientific-name this-sighting)
+        species (:taxonomy-id this-sighting)
         previous-sighting (dependent-sighting datetime (get acc species))
         qty (:sighting-quantity this-sighting)
         known-sightings (get acc species)]
@@ -58,7 +58,7 @@
   "Extract the sightings, accounting for the independence threshold, for an album."
   [state sightings]
   (let [indep-reducer (partial independence-reducer state)
-        total-spp (fn [[spp data]] {:species spp
+        total-spp (fn [[spp data]] {:species-id spp
                                     :count (reduce + 0 (map :quantity data))})]
     (->> sightings
          (sort (partial datetime-comparison :media-capture-timestamp))

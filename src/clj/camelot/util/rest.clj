@@ -60,8 +60,8 @@
   "Return the URI for the given resource."
   [resource-key id]
   (format "/%s/%s"
-          (if (= (name resource-key) "species")
-            "species"
+          (if (= (name resource-key) "taxonomy")
+            "taxonomy"
             (if (= (name resource-key) "media")
               "media"
               (str (name resource-key) "s")))

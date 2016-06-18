@@ -22,9 +22,9 @@
   []
   (db/clj-keys (-get-all-by-survey)))
 
-(defn- get-all-by-species
+(defn- get-all-by-taxonomy
   []
-  (db/clj-keys (-get-all-by-species)))
+  (db/clj-keys (-get-all-by-taxonomy)))
 
 (defn- get-all-by-site
   []
@@ -40,7 +40,7 @@
 
 (def ^:private query-fn-map
   {:survey get-all-by-survey
-   :species get-all-by-species
+   :species get-all-by-taxonomy
    :site get-all-by-site
    :camera get-all-by-camera
    :all get-all})

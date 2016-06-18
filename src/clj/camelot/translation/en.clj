@@ -208,8 +208,8 @@
             :delete "Delete"}
    :sighting {:sidebar-title "Sightings"
               :title "Sighting"
-              :species-id {:label "Species"
-                           :description "Species in the media"}
+              :taxonomy-id {:label "Species"
+                            :description "Species in the media"}
               :sighting-quantity {:label "Quantity"
                                   :description "Quantity of this species in the media."}}
    :media {:sidebar-title "Media"
@@ -240,20 +240,29 @@
                                 :description "The height of the photo in pixels."}
            :photo-focal-length {:label "Focal length"
                                 :description "The focal length at the time the photo was taken."}}
-   :species {:sidebar-title "Species"
-             :title "Species"
-             :species-scientific-name {:label "Scientific Name"
-                                       :description "Scientific name by which this species is known."}
-             :species-common-name {:label "Common Name"
-                                   :description "Common name by which this species is known."}
-             :species-notes {:label "Notes"
-                             :description "Notes about this species or its identification."}}
+   :taxonomy {:sidebar-title "Species"
+              :title "Species"
+              :taxonomy-class {:label "Class"
+                               :description "Class name."}
+              :taxonomy-order {:label "Order"
+                               :description "Order name."}
+              :taxonomy-family {:label "Family"
+                                :description "Family name."}
+              :taxonomy-genus {:label "Genus"
+                               :description "Genus name."}
+              :taxonomy-species {:label "Species"
+                                 :description "Species name."}
+              :taxonomy-common-name {:label "Common Name"
+                                     :description "Common name by which this taxonomy is known."}
+              :taxonomy-notes {:label "Notes"
+                               :description "Notes about this species or its identification."}}
    :application {:import "Import"
                  :library "Library"
                  :surveys "Surveys"
                  :analysis "Analysis"
                  :sites "Sites"
                  :species "Species"
+                 :taxonomy "Species"
                  :cameras "Cameras"}
    :default-config-created "A default configuration has been created in '%s'"
 
@@ -278,8 +287,12 @@
             :site-notes "Site Notes"
             :site-area "Site Area (km2)"
             :survey-site-id "Survey Site ID"
-            :species-scientific-name "Species Scientific Name"
-            :species-common-name "Species Common Name"
+            :taxonomy-species "Species"
+            :taxonomy-genus "Genus"
+            :taxonomy-family "Family"
+            :taxonomy-order "Order"
+            :taxonomy-class "Class"
+            :species-common-name "Common Name"
             :species-notes "Species Notes"
             :species-id "Species ID"
             :camera-id "Camera Id"
@@ -303,7 +316,7 @@
             :trap-station-session-count "Number of Trap Station Sessions"
             :trap-station-count "Number of Trap Stations"
             :media-count "Number of Photos"
-            :species-count "Number of Species"
+            :taxonomy-count "Number of Species"
             :media-capture-timestamp "Media Capture Timestamp"
             :media-notes "Media Notes"
             :media-filename "Media Filename"

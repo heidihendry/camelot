@@ -22,8 +22,8 @@ Currently the only application state is the user's configuration."
                  :label (tr/translate (:config state) :application/sites)}
                 {:url "/cameras"
                  :label (tr/translate (:config state) :application/cameras)}
-                {:url "/species"
-                 :label (tr/translate (:config state) :application/species)}
+                {:url "/taxonomy"
+                 :label (tr/translate (:config state) :application/taxonomy)}
                 {:url "/library"
                  :label (tr/translate (:config state) :application/library)}
                 {:function "settings"}]})
@@ -344,17 +344,17 @@ Currently the only application state is the user's configuration."
                         :title (tr/translate (:config state) :sighting/sidebar-title)
                         :type :sighting
                         :id :sighting-id
-                        :label :species-scientific-name}}
+                        :label :taxonomy-label}}
    :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
                 :menu [{:label (tr/translate (:config state) :action/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :action/edit)
                         :action :edit-mode}]}
-   :layout [[:species-id]
+   :layout [[:taxonomy-id]
             [:sighting-quantity]]
-   :schema {:species-id {:type :select
+   :schema {:taxonomy-id {:type :select
                          :required true
-                         :generator :species-available}
+                         :generator :taxonomy-available}
             :sighting-quantity {:type :number
                                 :required true}}
    :states {:create {:submit {:success {:type :event
@@ -362,17 +362,17 @@ Currently the only application state is the user's configuration."
                               :error {:type :event
                                       :event :sighting-error}}}}})
 
-(defsmith species smiths
+(defsmith taxonomy smiths
   [state]
-  {:resource {:type :species
-              :title (tr/translate (:config state) :species/title)
-              :endpoint "/species"
-              :id :species-id}
-   :sidebar {:resource {:endpoint "/species"
-                        :title (tr/translate (:config state) :species/sidebar-title)
-                        :type :species
-                        :id :species-id
-                        :label :species-scientific-name}}
+  {:resource {:type :taxonomy
+              :title (tr/translate (:config state) :taxonomy/title)
+              :endpoint "/taxonomy"
+              :id :taxonomy-id}
+   :sidebar {:resource {:endpoint "/taxonomy"
+                        :title (tr/translate (:config state) :taxonomy/sidebar-title)
+                        :type :taxonomy
+                        :id :taxonomy-id
+                        :label :taxonomy-label}}
    :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
                 :menu [{:label (tr/translate (:config state) :action/delete)
                         :action :delete}
@@ -380,20 +380,29 @@ Currently the only application state is the user's configuration."
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/species-statistics-report)
                         :action :species-statistics-report}]}
-   :layout [[:species-scientific-name]
-            [:species-common-name]
-            [:species-notes]]
-   :schema {:species-scientific-name {:type :text
-                                      :required true}
-            :species-common-name {:type :text
+   :layout [[:taxonomy-class]
+            [:taxonomy-order]
+            [:taxonomy-family]
+            [:taxonomy-genus]
+            [:taxonomy-species]
+            [:taxonomy-common-name]
+            [:taxonomy-notes]]
+   :schema {:taxonomy-class {:type :text}
+            :taxonomy-order {:type :text}
+            :taxonomy-family {:type :text}
+            :taxonomy-genus {:type :text
+                             :required true}
+            :taxonomy-species {:type :text
+                               :required true}
+            :taxonomy-common-name {:type :text
                                   :required true}
-            :species-notes {:type :textarea
+            :taxonomy-notes {:type :textarea
                             :cols 35
                             :rows 4}}
    :states {:create {:submit {:success {:type :event
-                                        :event :species-create}
+                                        :event :taxonomy-create}
                               :error {:type :event
-                                      :event :species-error}}}}})
+                                      :event :taxonomy-error}}}}})
 
 (defsmith survey smiths
   [state]

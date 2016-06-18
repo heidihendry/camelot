@@ -3,7 +3,8 @@
 
 (defn report-configuration
   [state survey-site-id]
-  {:columns [:species-scientific-name
+  {:columns [:taxonomy-genus
+             :taxonomy-species
              :presence-absence
              :independent-observations
              :total-nights
@@ -11,17 +12,20 @@
    :aggregate-on [:independent-observations]
    :rewrites [#(if (= (:survey-site-id %) survey-site-id)
                  %
-                 (select-keys % [:species-scientific-name]))]
+                 (select-keys % [:taxonomy-species
+                                 :taxonomy-genus]))]
    :pre-transforms [#(if (= (:survey-site-id %) survey-site-id)
                        %
-                       (select-keys % [:species-scientific-name
+                       (select-keys % [:taxonomy-species
+                                       :taxonomy-genus
                                        :total-nights]))]
    :transforms [#(if (= (:survey-site-id %) survey-site-id)
                        %
-                       (select-keys % [:species-scientific-name
+                       (select-keys % [:taxonomy-species
+                                       :taxonomy-genus
                                        :total-nights]))]
-   :filters [#(:species-scientific-name %)]
-   :order-by [:species-scientific-name ]})
+   :filters [#(:taxonomy-species %)]
+   :order-by [:taxonomy-genus :taxonomy-species]})
 
 (module/register-report
  :survey-site-statistics

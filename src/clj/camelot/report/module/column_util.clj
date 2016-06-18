@@ -33,7 +33,7 @@
 
 (defn aggregate-by-species
   [col data]
-  (aggregate-numeric :species-id col data))
+  (aggregate-numeric :taxonomy-id col data))
 
 ;; TODO migrate everything off of this
 (defn aggregate-by-trap-station
@@ -55,14 +55,14 @@
 
 (defn- species-sighting-reducer
   [acc v]
-  (let [spp (:species v)
+  (let [spp (:species-id v)
         qty (:count v)]
     (assoc acc spp (+ (or (get acc spp) 0) qty))))
 
 (defn- species-sightings
   [state v]
   (->> v
-       (filter :species-scientific-name)
+       (filter :taxonomy-id)
        (filter :media-capture-timestamp)
        (indep/extract-independent-sightings state)
        (flatten)
@@ -84,7 +84,7 @@
 (defn calculate-independent-observations
   [state data]
   (let [all-spp-obs (get-independent-observations state data)
-        path #(vector (:trap-station-session-id %) (:species-scientific-name %))
+        path #(vector (:trap-station-session-id %) (:taxonomy-id %))
         get-obs #(get-in all-spp-obs (path %))]
     (map #(assoc % :independent-observations (or (get-obs %) 0)) data)))
 

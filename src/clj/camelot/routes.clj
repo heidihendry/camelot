@@ -13,7 +13,7 @@
              [photo :as photo]
              [sighting :as sighting]
              [site :as site]
-             [species :as species]
+             [taxonomy :as taxonomy]
              [survey :as survey]
              [survey-site :as survey-site]
              [trap-station :as trap-station]
@@ -162,14 +162,14 @@
                                                    photo/tphoto data))
             (DELETE "/:id" [id] (rest/delete-resource photo/delete! id)))
 
-   (context "/species" []
-            (GET "/" [] (rest/list-resources species/get-all :species))
-            (GET "/:id" [id] (rest/specific-resource species/get-specific id))
-            (PUT "/:id" [id data] (rest/update-resource species/update! id
-                                                        species/tspecies data))
-            (POST "/" [data] (rest/create-resource species/create!
-                                                   species/tspecies data))
-            (DELETE "/:id" [id] (rest/delete-resource species/delete! id)))
+   (context "/taxonomy" []
+            (GET "/" [] (rest/list-resources taxonomy/get-all :taxonomy))
+            (GET "/:id" [id] (rest/specific-resource taxonomy/get-specific id))
+            (PUT "/:id" [id data] (rest/update-resource taxonomy/update! id
+                                                        taxonomy/ttaxonomy data))
+            (POST "/" [data] (rest/create-resource taxonomy/create!
+                                                   taxonomy/ttaxonomy data))
+            (DELETE "/:id" [id] (rest/delete-resource taxonomy/delete! id)))
 
    (context "/application" []
             (GET "/metadata" [] (r/response (application/get-metadata (app/gen-state (conf/config)))))

@@ -4,15 +4,16 @@
 (defn report-configuration
   [state survey-id]
   {:columns [:media-id
-             :species-scientific-name
+             :taxonomy-genus
+             :taxonomy-species
              :trap-station-longitude
              :trap-station-latitude]
    :aggregate-on [:independent-observations]
    :filters [#(:trap-station-longitude %)
              #(:trap-station-latitude %)
-             #(:species-scientific-name %)
+             #(:taxonomy-species %)
              #(= (:survey-id %) survey-id)]
-   :order-by [:species-scientific-name
+   :order-by [:taxonomy-species
               :trap-station-longitude
               :trap-station-latitude]})
 

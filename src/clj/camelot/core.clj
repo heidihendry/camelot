@@ -2,7 +2,7 @@
   "Camelot - Camera Trap management software for conservation research.
   Core initialisation."
   (:require [camelot.util.transit :as tutil]
-            [camelot.db :as db]
+            [camelot.migrate :refer [migrate]]
             [camelot.routes :refer [app-routes]]
             [environ.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]]
@@ -25,6 +25,6 @@
 
 (defn -main [& [mode directory]]
   (let [port (Integer. (or (env :camelot-port) 8080))]
-    (db/migrate)
+    (migrate)
     (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
     (run-jetty http-handler {:port port :join? false})))

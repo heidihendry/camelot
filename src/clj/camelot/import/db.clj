@@ -7,7 +7,7 @@
             [camelot.model.media :as media]
             [camelot.model.photo :as photo]
             [camelot.model.sighting :as sighting]
-            [camelot.model.species :as species]
+            [camelot.model.taxonomy :as taxonomy]
             [camelot.model.site :as site]
             [camelot.model.camera :as camera]
             [camelot.model.camera-status :as camera-status]
@@ -139,14 +139,21 @@
      :camera-id (:camera-id camera)
      :trap-station-session-camera-import-path folder-path})))
 
-(defn get-or-create-species!
+(defn get-or-create-taxonomy!
   [state sighting]
-  (let [spp (:species sighting)]
-    (species/get-or-create!
+  (let [spp (:species sighting)
+        name-parts (str/split spp #" ")]
+    (taxonomy/get-or-create!
      state
-     (species/tspecies {:species-scientific-name spp
-                        :species-common-name "N/A"
-                        :species-notes import-note}))))
+     (taxonomy/ttaxonomy
+      (if (= (count name-parts) 1)
+        {:taxonomy-species spp
+         :taxonomy-common-name "N/A"
+         :taxonomy-notes import-note}
+        {:taxonomy-genus (first name-parts)
+         :taxonomy-species (str/join " " (rest name-parts))
+         :taxonomy-common-name "N/A"
+         :taxonomy-notes import-note})))))
 
 (defn create-media!
   [state photo filename fmt notes attn trap-camera-id]
@@ -179,10 +186,10 @@
 
 (defn create-sighting!
   [state media-id sighting]
-  (let [species (get-or-create-species! state sighting)]
+  (let [taxonomy (get-or-create-taxonomy! state sighting)]
     (sighting/create!
      state
      (sighting/tsighting
       {:sighting-quantity (:quantity sighting)
-       :species-id (:species-id species)
+       :taxonomy-id (:taxonomy-id taxonomy)
        :media-id media-id}))))

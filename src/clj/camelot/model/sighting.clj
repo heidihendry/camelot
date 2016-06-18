@@ -8,7 +8,7 @@
 
 (s/defrecord TSighting
     [sighting-quantity :- s/Int
-     species-id :- s/Int
+     taxonomy-id :- s/Int
      media-id :- s/Int])
 
 (s/defrecord Sighting
@@ -16,18 +16,19 @@
      sighting-created :- org.joda.time.DateTime
      sighting-updated :- org.joda.time.DateTime
      sighting-quantity :- s/Int
-     species-id :- s/Int
+     taxonomy-id :- (s/maybe s/Int)
      media-id :- s/Int])
 
 (s/defn sighting :- Sighting
   [{:keys [sighting-id sighting-created sighting-updated sighting-quantity
-           species-id media-id]}]
+           taxonomy-id media-id]}]
   (->Sighting sighting-id sighting-created sighting-updated sighting-quantity
-              species-id media-id))
+              taxonomy-id media-id))
 
 (s/defn tsighting :- TSighting
-  [{:keys [sighting-quantity species-id media-id]}]
-  (->TSighting sighting-quantity species-id media-id))
+  [{:keys [sighting-quantity taxonomy-id media-id]}]
+  (->TSighting sighting-quantity taxonomy-id
+               media-id))
 
 (s/defn get-all
   [state :- State

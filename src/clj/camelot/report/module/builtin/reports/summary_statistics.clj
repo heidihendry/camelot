@@ -3,7 +3,8 @@
 
 (defn report-configuration
   [state survey-id]
-  {:columns [:species-scientific-name
+  {:columns [:taxonomy-genus
+             :taxonomy-species
              :trap-station-count
              :media-count
              :independent-observations
@@ -14,9 +15,9 @@
                   :trap-station-count]
    :rewrites [#(if (= (:survey-id %) survey-id)
                  %
-                 (select-keys % [:species-scientific-name]))]
-   :filters [#(not (nil? (:species-scientific-name %)))]
-   :order-by [:species-scientific-name ]})
+                 (select-keys % [:taxonomy-species :taxonomy-genus]))]
+   :filters [#(not (nil? (:taxonomy-species %)))]
+   :order-by [:taxonomy-genus :taxonomy-species]})
 
 (module/register-report
  :summary-statistics

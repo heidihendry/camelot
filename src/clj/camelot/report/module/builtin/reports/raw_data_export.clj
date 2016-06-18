@@ -9,11 +9,12 @@
              :trap-station-name
              :trap-station-longitude
              :trap-station-latitude
-             :species-scientific-name
+             :taxonomy-genus
+             :taxonomy-species
              :independent-observations]
    :aggregate-on [:independent-observations]
    :filters [#(= (:survey-id %) survey-id)]
-   :order-by [:species-scientific-name ]})
+   :order-by [:taxonomy-genus :taxonomy-species]})
 
 (module/register-report
  :raw-data-export

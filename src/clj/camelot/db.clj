@@ -4,9 +4,6 @@
             [clojure.string :as str]
             [clojure.java.jdbc :as jdbc]
             [camelot.model.state :refer [State]]
-            [ragtime
-             [core :as rtc]
-             [jdbc :as ragjdbc]]
             [schema.core :as s]))
 
 (def spec
@@ -15,11 +12,6 @@
    :subprotocol "derby",
    :subname (settings/get-db-path),
    :create true})
-
-(def ragtime-config
-  "Ragtime configuration"
-  {:datastore (ragjdbc/sql-database spec)
-   :migrations (ragjdbc/load-resources "migrations")})
 
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
@@ -80,34 +72,3 @@
       (db-keys)
       (with-connection (:connection state) f)
       (clj-keys)))
-
-(defn migrate
-  "Apply the available database migrations."
-  ([]
-   (rtc/migrate-all (:datastore ragtime-config)
-                    (rtc/into-index (:migrations ragtime-config))
-                    (:migrations ragtime-config)))
-  ([c]
-   (rtc/migrate-all (:datastore c)
-                    (rtc/into-index (:migrations c))
-                    (:migrations c))))
-
-(defn rollback
-  "Rollback the last migration."
-  ([]
-   (rtc/rollback-last (:datastore ragtime-config)
-                      (rtc/into-index (:migrations ragtime-config))))
-  ([c]
-   (rtc/rollback-last (:datastore c)
-                      (rtc/into-index (:migrations c))))
-  ([c n]
-   (rtc/rollback-last (:datastore c)
-                      (rtc/into-index (:migrations c))
-                      n)))
-
-;; Work around for https://github.com/weavejester/ragtime/issues/103
-(let [pattern (re-pattern (str "([^\\/]*)\\/?$"))]
-  (defn- -resource-basename
-    [file]
-    (second (re-find pattern (str file)))))
-(intern 'ragtime.jdbc 'basename #'-resource-basename)

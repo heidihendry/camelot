@@ -10,8 +10,12 @@
 (def page-size 50)
 
 (def field-keys
-  {"species" :species-scientific-name
-   "common" :species-common-name
+  {"species" :taxonomy-label
+   "genus" :taxonomy-genus
+   "family" :taxonomy-family
+   "order" :taxonomy-order
+   "class" :taxonomy-class
+   "common" :taxonomy-common-name
    "site" :site-name
    "camera" :camera-name
    "loc" :site-sublocation
@@ -46,7 +50,7 @@
   (if (seq (:sightings rec))
     (do
       (map (fn [sighting]
-             (let [spp (get species (:species-id sighting))]
+             (let [spp (get species (:taxonomy-id sighting))]
                (merge (dissoc (merge rec sighting) :sightings)
                       spp)))
            (:sightings rec)))
@@ -182,7 +186,7 @@
                   (dorun (map #(do (om/update! (second %)
                                                :sightings
                                                (conj (:sightings (second %))
-                                                     {:species-id spp
+                                                     {:taxonomy-id spp
                                                       :sighting-id (first %)
                                                       :sighting-quantity qty}))
                                    (om/update! (second %) :media-processed true))
@@ -334,8 +338,8 @@
   (reify
     om/IRender
     (render [_]
-      (dom/option #js {:value (:species-id data)}
-                  (:species-scientific-name data)))))
+      (dom/option #js {:value (:taxonomy-id data)}
+                  (:taxonomy-label data)))))
 
 (defn search-component
   [data owner]
@@ -439,9 +443,9 @@
                                                                                     (.. % -target -value))}
                                                         (om/build-all species-option-component
                                                                       (conj (vals (:species data))
-                                                                            {:species-id -1
-                                                                             :species-scientific-name "Select..."})
-                                                                      {:key :species-id})))
+                                                                            {:taxonomy-id -1
+                                                                             :taxonomy-species "Select..."})
+                                                                      {:key :taxonomy-id})))
                                    (dom/div #js {:className "field"}
                                             (dom/label nil "Quantity")
                                             (dom/input #js {:type "number"
@@ -548,8 +552,8 @@
                  (dom/div #js {:className "fa fa-trash remove-sighting"
                                :onClick #(remove-sighting (:sighting-id sighting))}))
                (:sighting-quantity sighting) "x "
-               (:species-scientific-name (get (:species (state/library-state))
-                                              (:species-id sighting)))))))
+               (:taxonomy-label (get (:species (state/library-state))
+                                       (:taxonomy-id sighting)))))))
 
 (defn mcp-details
   [data owner]
@@ -634,11 +638,11 @@
       (om/update! (get-in data [:library :search]) :page 1)
       (om/update! (get-in data [:library :search]) :show-select-count 0)
       (om/update! (get-in data [:library]) :identification {:quantity 1})
-      (rest/get-x "/species"
+      (rest/get-x "/taxonomy"
                   (fn [resp]
                     (om/update! (get data :library) :species
                                 (into {}
-                                      (map #(hash-map (get % :species-id) %)
+                                      (map #(hash-map (get % :taxonomy-id) %)
                                            (:body resp))))))
       (rest/get-x "/surveys"
                   (fn [resp]

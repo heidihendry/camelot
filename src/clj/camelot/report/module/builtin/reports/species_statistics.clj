@@ -1,11 +1,12 @@
 (ns camelot.report.module.builtin.reports.species-statistics
-  (:require [camelot.model.species :as species]
+  (:require [camelot.model.taxonomy :as taxonomy]
             [camelot.report.module.core :as module]))
 
 (defn report-configuration
-  [state species-id]
-  (let [spp (species/get-specific state species-id)]
-    {:columns [:species-scientific-name
+  [state taxonomy-id]
+  (let [spp (taxonomy/get-specific state taxonomy-id)]
+    {:columns [:taxonomy-genus
+               :taxonomy-species
                :trap-station-longitude
                :trap-station-latitude
                :presence-absence
@@ -14,18 +15,20 @@
                :independent-observations-per-night]
      :aggregate-on [:independent-observations
                     :nights-elapsed]
-     :filters [#(or (= (:species-id %) species-id)
-                    (nil? (:species-id %)))]
-     :transforms [#(if (= (:species-id %) species-id)
+     :filters [#(or (= (:taxonomy-id %) taxonomy-id)
+                    (nil? (:taxonomy-id %)))]
+     :transforms [#(if (= (:taxonomy-id %) taxonomy-id)
                      %
                      (select-keys % [:trap-station-longitude
                                      :trap-station-latitude
                                      :total-nights]))
-                  #(if (nil? (:species-id %))
-                     (assoc % :species-scientific-name
-                            (:species-scientific-name spp))
+                  #(if (nil? (:taxonomy-id %))
+                     (assoc % :taxonomy-species
+                            (:taxonomy-species spp)
+                            :taxonomy-genus
+                            (:taxonomy-genus spp))
                      %)]
-     :order-by [:species-scientific-name]}))
+     :order-by [:taxonomy-genus :taxonomy-species]}))
 
 (module/register-report
  :species-statistics

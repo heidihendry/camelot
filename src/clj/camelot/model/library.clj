@@ -97,7 +97,7 @@
   (media/update-processed-flag! state {:media-id media-id
                                        :media-processed true})
   (sighting/create! state (sighting/tsighting {:sighting-quantity quantity
-                                               :species-id species
+                                               :taxonomy-id species
                                                :media-id media-id})))
 
 (s/defn identify

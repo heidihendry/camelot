@@ -21,116 +21,166 @@
 (facts "Sighting Independence"
   (fact "A single sighting is extracted"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}]
           state (gen-state-helper config)]
-      (sut/extract-independent-sightings state sightings) => '({:species "Yellow Spotted Housecat"
-                                                            :count 1})))
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1})))
 
   (fact "Multiple species are extracted if present"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
-                      :species-scientific-name "Smiley Wolf"
+                      :taxonomy-id 2
+                      :taxonomy-genus "Smiley"
+                      :taxonomy-species "Wolf"
                       :sighting-quantity 2}]
           state (gen-state-helper config)]
-      (sut/extract-independent-sightings state sightings) => '({:species "Yellow Spotted Housecat"
-                                                            :count 1}
-                                                           {:species "Smiley Wolf"
-                                                            :count 2})))
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1}
+                                                               {:species-id 2
+                                                                :count 2})))
 
   (fact "Sightings are only considered independent if having sufficient temporal distance"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}]
           state (gen-state-helper config)]
-      (sut/extract-independent-sightings state sightings) => '({:species "Yellow Spotted Housecat"
-                                                            :count 3})))
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 3})))
 
   (fact "A sighting exactly on the threshold is independent"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 20 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 40 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}]
           state (gen-state-helper config)]
-      (sut/extract-independent-sightings state sightings) => '({:species "Yellow Spotted Housecat"
-                                                            :count 4})))
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 4})))
 
   (fact "A sighting may later need to be updated with a higher quantity"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 10 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}]
           state (gen-state-helper config)]
-      (sut/extract-independent-sightings state sightings) => '({:species "Yellow Spotted Housecat"
-                                                            :count 4})))
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 4})))
 
   (fact "A single sighting may contain multiple species"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Smiley Wolf"
+                      :taxonomy-id 2
+                      :taxonomy-genus "Smiley"
+                      :taxonomy-species "Wolf"
                       :sighting-quantity 2}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 00 00)
-                      :species-scientific-name "Smiley Wolf"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Smiley"
+                      :taxonomy-species "Wolf"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 10 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 10 00)
-                      :species-scientific-name "Smiley Wolf"
+                      :taxonomy-id 2
+                      :taxonomy-genus "Smiley"
+                      :taxonomy-species "Wolf"
                       :sighting-quantity 5}]
           state (gen-state-helper config)]
-      (sut/extract-independent-sightings state sightings) => '({:species "Yellow Spotted Housecat"
-                                                        :count 4}
-                                                       {:species "Smiley Wolf"
-                                                        :count 7})))
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 4}
+                                                               {:species-id 2
+                                                                :count 7})))
 
   (fact "Results are correct regardless of ordering of input"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 1}
                      {:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
-                      :species-scientific-name "Smiley Wolf"
+                      :taxonomy-id 2
+                      :taxonomy-genus "Smiley"
+                      :taxonomy-species "Wolf"
                       :sighting-quantity 2}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 10 00)
-                      :species-scientific-name "Yellow Spotted Housecat"
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
                       :sighting-quantity 2}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 10 00)
-                      :species-scientific-name "Smiley Wolf"
+                      :taxonomy-id 2
+                      :taxonomy-genus "Smiley"
+                      :taxonomy-species "Wolf"
                       :sighting-quantity 5}
                      {:media-capture-timestamp (t/date-time 2015 01 01 07 00 00)
-                      :species-scientific-name "Smiley Wolf"
+                      :taxonomy-id 2
+                      :taxonomy-genus "Smiley"
+                      :taxonomy-species "Wolf"
                       :sighting-quantity 1}]
           state (gen-state-helper config)]
-      (sut/extract-independent-sightings state sightings) => '({:species "Yellow Spotted Housecat"
-                                                            :count 4}
-                                                           {:species "Smiley Wolf"
-                                                            :count 7}))))
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 4}
+                                                               {:species-id 2
+                                                                :count 7}))))

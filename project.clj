@@ -29,6 +29,7 @@
                  [prismatic/schema "1.0.5"]
                  ;; Note: ragtime.jdbc/basename has been redefined in camelot.db.
                  [ragtime "0.5.3"]
+                 [resauce "0.1.0"]
                  [ring "1.4.0"]
                  [ring-transit "0.1.4"]
                  [ring.middleware.logger "0.5.0"]

@@ -7,16 +7,17 @@
              :site-area
              :trap-station-count
              :nights-elapsed
-             :species-count
+             :taxonomy-count
              :time-period-start
              :time-period-end]
    :aggregate-on [:trap-station-count
                   :nights-elapsed
-                  :species-count
+                  :taxonomy-count
                   :time-period-start
                   :time-period-end]
    :filters [#(= (:survey-id %) survey-id)]
    :order-by [:site-id]})
+
 
 (module/register-report
  :effort-summary
