@@ -92,7 +92,8 @@
   [sample]
   (let [start (:trap-station-session-start-date sample)
         end (:trap-station-session-end-date sample)]
-    (t/in-days (t/interval start end))))
+    (t/in-days (t/interval (t/floor start t/day)
+                           (t/floor end t/day)))))
 
 (defn- trap-session-nights-reducer
   [acc k v]

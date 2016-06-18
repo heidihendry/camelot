@@ -6,18 +6,18 @@
             [clj-time.core :as t]
             [clj-time.format :as tf]))
 
-(defn- before-reducer
+(defn before-reducer
   [a b]
   (cond (nil? a) b
         (nil? b) a
-        (= (compare a b) 1) b
+        (> (compare a b) 0) b
         :else a))
 
-(defn- after-reducer
+(defn after-reducer
   [a b]
   (cond (nil? a) b
         (nil? b) a
-        (= (compare a b) -1) b
+        (< (compare a b) 0) b
         :else a))
 
 (def month-formatter (tf/formatter "YYYY/MM"))
