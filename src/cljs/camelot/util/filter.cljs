@@ -17,7 +17,7 @@
    "lat" :trap-station-latitude
    "model" :camera-model
    "make" :camera-make
-   "attn" :media-attention-needed
+   "flag" :media-attention-needed
    "trapid" :trap-station-id
    "proc" :media-processed
    "city" :site-city})
@@ -101,7 +101,7 @@
       (str/split #"\|")
       (non-empty-list)
       (append-to-strings (if (:unprocessed-only search-conf) " proc:false" ""))
-      (append-to-strings (if (:flagged-only search-conf) " attn:true" ""))
+      (append-to-strings (if (:flagged-only search-conf) " flag:true" ""))
       (append-to-strings (if (and (:trap-station-id search-conf)
                                   (> (:trap-station-id search-conf) -1))
                            (str " trapid:" (:trap-station-id search-conf))

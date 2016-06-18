@@ -233,7 +233,7 @@
                     :media-id 2}}
         data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching "attn:true" data) expected))))
+    (is (= (sut/only-matching "flag:true" data) expected))))
 
 (deftest finds-media-attention-needed-false-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -247,7 +247,7 @@
                     :media-id 1}}
         data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching "attn:false" data) expected))))
+    (is (= (sut/only-matching "flag:false" data) expected))))
 
 (deftest finds-media-processed-true-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -302,9 +302,9 @@
 (deftest flagged-only-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
     (is (= (sut/append-subfilters search {:flagged-only true})
-           (str "taxonomy-species:wolf mysite attn:true|"
-                "taxonomy-species:cat attn:true|"
-                "wolf attn:true")))))
+           (str "taxonomy-species:wolf mysite flag:true|"
+                "taxonomy-species:cat flag:true|"
+                "wolf flag:true")))))
 
 (deftest trap-id-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
