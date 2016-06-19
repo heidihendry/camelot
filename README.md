@@ -40,19 +40,19 @@ Checks and reporting on whether:
 
 So that trap photos can be processed efficiently, the Library screen has keyboard shortcuts:
 
-**Control + m**: Focus the media collection panel
-**Control + d**: Toggle the details panel
-**Control + i**: Open the identify panel
-**Control + p**: Go to the previous page of media
-**Control + n**: Go to the next page of media
-**Control + a**: Select all media (or select none, if some are selected)
-**Control + g**: Toggle the flag state of the selected media
-**Control + h**: Toggle the processed state of the selected media
+* **Control + m**: Focus the media collection panel
+* **Control + d**: Toggle the details panel
+* **Control + i**: Open the identify panel
+* **Control + p**: Go to the previous page of media
+* **Control + n**: Go to the next page of media
+* **Control + a**: Select all media (or select none, if some are selected)
+* **Control + g**: Toggle the flag state of the selected media
+* **Control + h**: Toggle the processed state of the selected media
 
-With the Media Collection panel focused (Control + m):
+With the Media Collection panel focused (**Control + m**):
 
-* "wasd" and arrow keys can be used to select the next media in that direction.
-* hold shift + wasd or arrow keys to select the next media in that direction, but also keep the existing selection.
+* **"wasd"** and **Arrow keys** can be used to select the next media in that direction.
+* hold **shift** + **"wasd"** OR **arrow keys** to select the next media in that direction, but also keep the existing selection.
 
 ## Configuration
 
