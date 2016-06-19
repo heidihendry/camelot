@@ -106,7 +106,8 @@
     (render [_]
       (dom/div nil
                (dom/div #js {:className (details-panel-class data "media-details-panel")}
-                        (dom/div #js {:className "details-panel-toggle"
+                        (dom/div #js {:id "details-panel-toggle"
+                                      :className "details-panel-toggle"
                                       :onClick #(toggle-details-panel data)}))
                (dom/div #js {:className (details-panel-class data "media-details-panel-text")}
                         (dom/div #js {:className "details-panel-toggle-text"

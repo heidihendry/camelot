@@ -4,6 +4,46 @@
             [camelot.state :as state]
             [om.core :as om]))
 
+(def collection-columns 3)
+
+(defn updated-select-position
+  [media-ids e idx]
+  (if (.-ctrlKey e)
+    nil
+    (if (nil? idx)
+      0
+      (case (.-keyCode e)
+        37 (max (- idx 1) 0)
+        38 (if (< idx 3) idx (- idx 3))
+        39 (min (+ idx 1) (dec (count media-ids)))
+        40 (if (= (.floor js/Math (/ (count media-ids) collection-columns))
+                  (.floor js/Math (/ idx collection-columns)))
+             idx
+             (min (+ idx 3) (dec (count media-ids))))
+        65 (max (- idx 1) 0)
+        87 (if (< idx 3) idx (- idx 3))
+        68 (min (+ idx 1) (dec (count media-ids)))
+        83 (if (= (.floor js/Math (/ (count media-ids) collection-columns))
+                  (.floor js/Math (/ idx collection-columns)))
+             idx
+             (min (+ idx 3) (dec (count media-ids))))
+        nil))))
+
+(defn handle-key-event
+  [data e]
+  (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
+        cur (ffirst (filter #(= (:selected-media-id data) (second %))
+                            media-idxs))]
+    (if (seq media-idxs)
+      (let [id (some->> (updated-select-position media-idxs e cur)
+                        (nth media-idxs))
+            media (util/find-with-id (second id))]
+        (when media
+          (when-not (.-shiftKey e)
+            (util/deselect-all))
+          (om/update! media :selected true)
+          (om/update! data :selected-media-id (second id)))))))
+
 (defn- media-thumb-class
   [data]
   (str "media"
@@ -15,17 +55,57 @@
 
 (defn media-item-component
   "Render a single library item."
-  [result owner]
+  [data owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:className "media-item"}
-               (dom/img #js {:className (media-thumb-class result)
-                             :onMouseDown #(util/toggle-select-image result (.. % -ctrlKey))
-                             :src (str (get-in result [:media-uri]) "/thumb")})
+               (dom/img #js {:className (media-thumb-class data)
+                             :onMouseDown #(util/toggle-select-image data (.. % -ctrlKey))
+                             :src (str (get-in data [:media-uri]) "/thumb")})
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
                              :onClick #(om/update! (state/library-state)
-                                                   :selected-media-id (:media-id result))})))))
+                                                   :selected-media-id (:media-id data))})))))
+
+
+(defn calculate-scroll-update
+  [data node]
+  (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
+        cur (ffirst (filter #(= (:selected-media-id data) (second %)) media-idxs))
+        row (.floor js/Math (/ cur collection-columns))
+        max-row (/ (count media-idxs) collection-columns)
+        doc-height (.-scrollHeight node)
+        top (.-scrollTop node)
+        elt-height (.-clientHeight node)
+        bottom (+ elt-height top)
+        top-per (/ top doc-height)
+        bottom-per (/ bottom doc-height)
+        row-per (/ row max-row)
+        bot-row-per (/ (+ row 1) max-row)]
+    (cond
+      (< row-per top-per) (- (* row-per doc-height) (/ doc-height max-row 2))
+      (> bot-row-per bottom-per) (- (* bot-row-per doc-height) elt-height)
+      :else top)))
+
+(defn media-item-collection-wrapper
+  [data owner]
+  (reify
+    om/IDidMount
+    (did-mount
+      [this]
+      (.focus (om/get-node owner)))
+    om/IDidUpdate
+    (did-update
+      [this prev-props prev-state]
+      (let [node (om/get-node owner)]
+        (set! (.-scrollTop node) (calculate-scroll-update data node))))
+    om/IRender
+    (render [_]
+      (dom/div #js {:id "media-collection-container"
+                    :className "media-collection-container"
+                    :tabIndex 1}
+      (dom/div nil
+               (om/build-all media-item-component (util/media-on-page) {:key :media-id}))))))
 
 (defn prev-page
   [page]
@@ -51,6 +131,7 @@
                                   :disabled (if (get-in data
                                                         [:search :identify-selected])
                                               "disabled" "")
+                                  :id "prev-page"
                                   :onClick #(do (util/deselect-all)
                                                 (om/transact! data [:search :page] prev-page))})
                  (dom/div #js {:className "describe-pagination"}
@@ -63,6 +144,7 @@
                                   :disabled (if (get-in data
                                                         [:search :identify-selected])
                                               "disabled" "")
+                                  :id "next-page"
                                   :onClick #(do (util/deselect-all)
                                                 (om/transact! data [:search :page] (partial next-page matches)))}))))))
 
@@ -75,11 +157,13 @@
         (dom/button #js {:className "btn btn-default search-main-op"
                          :onClick util/deselect-all*
                          :title "Remove all selections"
+                         :id "select-all"
                          :disabled (if (get data :identify-selected)
                                      "disabled" "")}
                     "Select None")
         (dom/button #js {:className "btn btn-default search-main-op"
                          :title "Select all media on this page"
+                         :id "select-all"
                          :disabled (if (get data :identify-selected)
                                      "disabled" "")
                          :onClick util/select-all*}
@@ -97,6 +181,21 @@
                  (om/build select-button-components (:search data)
                            {:state {:has-selected has-selected}}))))))
 
+(defn media-collection-content-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil
+               (om/build subfilter-bar-component data)
+               (when (> (count (util/all-media-selected)) 1)
+                 (dom/div #js {:className (str "selected-count"
+                                               (if (> (get-in data [:search :show-select-count]) 0)
+                                                 ""
+                                                 " hide-selected"))}
+                          (str (count (util/all-media-selected)) " "
+                               (get-in data [:search :show-select-action]))))
+               (om/build media-item-collection-wrapper data)))))
 
 (defn media-collection-component
   "Render a collection of library."
@@ -106,13 +205,6 @@
     (render [_]
       (let [matches (util/get-matching data)]
         (om/update! (:search data) :match-count (count matches))
-        (dom/div #js {:className "media-collection"}
-                 (om/build subfilter-bar-component data)
-                 (when (> (count (util/all-media-selected)) 1)
-                   (dom/div #js {:className (str "selected-count"
-                                                 (if (> (get-in data [:search :show-select-count]) 0)
-                                                   ""
-                                                   " hide-selected"))}
-                            (str (count (util/all-media-selected)) " selected")))
-                 (dom/div #js {:className "media-collection-container"}
-                          (om/build-all media-item-component (util/media-on-page) {:key :media-id})))))))
+        (dom/div #js {:className "media-collection"
+                      :onKeyDown #(handle-key-event data %)}
+                 (om/build media-collection-content-component data))))))

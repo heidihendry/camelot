@@ -11,6 +11,62 @@
             [cljs.reader :as reader]
             [clojure.string :as str]))
 
+(defn print-key
+  [e]
+  (cond
+    ;; crtl+p (frow wasd)
+    (and (= (.-keyCode e) 78) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "next-page"))
+        (.preventDefault e))
+
+    ;; ctrl+right
+    (and (= (.-keyCode e) 39) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "next-page"))
+        (.preventDefault e))
+
+    ;; ctrl+n (frow wasd)
+    (and (= (.-keyCode e) 80) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "prev-page"))
+        (.preventDefault e))
+
+    ;; ctrl+left
+    (and (= (.-keyCode e) 37) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "prev-page"))
+        (.preventDefault e))
+
+    ;; ctrl+f
+    (and (= (.-keyCode e) 70) (.-ctrlKey e))
+    (do (.focus (.getElementById js/document "filter"))
+        (.preventDefault e))
+
+    ;; ctrl+m
+    (and (>= (.-keyCode e) 77) (.-ctrlKey e))
+    (.focus (.getElementById js/document "media-collection-container"))
+
+    ;; ctrl+i
+    (and (= (.-keyCode e) 73) (.-ctrlKey e))
+    (.click (.getElementById js/document "identify-selected"))
+
+    ;; ctrl+d
+    (and (= (.-keyCode e) 68) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "details-panel-toggle"))
+        (.preventDefault e))
+
+    ;; ctrl+g
+    (and (= (.-keyCode e) 71) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "media-flag"))
+        (.preventDefault e))
+
+    ;; ctrl+h
+    (and (= (.-keyCode e) 72) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "media-processed"))
+        (.preventDefault e))
+
+    ;; ctrl+a
+    (and (= (.-keyCode e) 65) (.-ctrlKey e))
+    (do (.click (.getElementById js/document "select-all"))
+        (.preventDefault e))))
+
 (defn library-view-component
   "Render a collection of library."
   [data owner]
@@ -36,7 +92,9 @@
     (render [_]
       (let [lib (:library data)]
         (if (get-in lib [:search :results])
-          (dom/div #js {:className "library"}
+          (dom/div #js {:className "library"
+                        :onKeyDown print-key
+                        :tabIndex 0}
                    (om/build search/search-component lib)
                    (when (get-in lib [:search :matches])
                      (om/build collection/media-collection-component lib))

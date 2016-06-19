@@ -26,12 +26,14 @@
                                                       :sighting-quantity qty}))
                                    (om/update! (second %) :media-processed true))
                               (zipmap (:body resp) all-selected)))
+                  (.focus (.getElementById js/document "media-collection-container"))
                   (om/update! (:identification (state/library-state)) :quantity 1)
                   (om/update! (:identification (state/library-state)) :species -1)
                   (om/update! (:search (state/library-state)) :identify-selected false)))))
 
 (defn identify-selected-prompt
   []
+  (.focus (.getElementById js/document "identify-species-select"))
   (om/transact! (:search (state/library-state)) :identify-selected not))
 
 (defn submit-identification
@@ -64,6 +66,15 @@
                        :title "Apply the current filters"
                        :onClick #(om/update! data :dirty-state true)}))))
 
+(defn select-media-collection-container
+  [e]
+  (if (and (= (.-keyCode e) 85) (.-ctrlKey e))
+    (do (om/update! (:search (state/library-state)) :terms "")
+        (.preventDefault e))
+    (when (= (.-keyCode e) 13)
+      (let [node (.getElementById js/document "media-collection-container")]
+        (.focus node)))))
+
 (defn filter-input-component
   [data owner]
   (reify
@@ -71,15 +82,16 @@
     (render [_]
       (dom/input #js {:type "text"
                       :placeholder "Filter..."
+                      :id "filter"
                       :title "Type a keyword you want the media to contain"
                       :disabled (if (get data :identify-selected)
                                   "disabled" "")
                       :className "field-input search"
-                      :value (get-in data [:search :terms])
+                      :onKeyDown select-media-collection-container
+                      :value (get data :terms)
                       :onChange #(do (om/update! data :terms (.. % -target -value))
                                      (om/update! data :page 1)
-                                     (om/update!  data :dirty-state true)
-                                     )}))))
+                                     (om/update! data :dirty-state true))}))))
 
 (defn filter-survey-component
   [data owner]
@@ -108,6 +120,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/button #js {:className "btn btn-default"
+                       :id "identify-selected"
                        :title "Open the identification panel to apply to the selected media"
                        :onClick identify-selected-prompt
                        :disabled (if (or (not (:has-selected state))
@@ -164,6 +177,7 @@
         (when (seq selected)
           (dom/span #js {:className ((:classFn state) flag-enabled)
                          :title (:title state)
+                         :id (:id state)
                          :onClick #((:fn state) (not flag-enabled))}))))))
 
 (defn media-flag-container-component
@@ -176,12 +190,14 @@
                           {:init-state {:title "Flag or unflag the selected media as needing attention"
                                         :key :media-attention-needed
                                         :fn util/set-attention-needed
+                                        :id "media-flag"
                                         :classFn #(str "fa fa-2x fa-flag flag"
                                                        (if % " red" ""))}})
                 (om/build media-flag-component data
                           {:init-state {:title "Set the selected media as processed or unprocessed"
                                         :key :media-processed
                                         :fn util/set-processed
+                                        :id "media-processed"
                                         :classFn #(str "fa fa-2x fa-check processed"
                                                        (if % " green" ""))}})))))
 
@@ -221,6 +237,7 @@
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Species")
                                  (dom/select #js {:className "field-input"
+                                                  :id "identify-species-select"
                                                   :value (get-in data [:identification :species])
                                                   :onChange #(om/update! (:identification data) :species
                                                                          (.. % -target -value))}
@@ -246,7 +263,8 @@
                                                               "disabled")
                                                   :onClick submit-identification} "Submit")
                                  (dom/button #js {:className "btn btn-default"
-                                                  :onClick #(om/update! (:search data) :identify-selected false)}
+                                                  :onClick #(do (om/update! (:search data) :identify-selected false)
+                                                                (.focus (.getElementById js/document "media-collection-container")))}
                                              "Cancel")))))))
 
 (defn search-component
