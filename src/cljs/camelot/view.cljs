@@ -14,7 +14,7 @@
             [camelot.util.misc :as misc]
             [camelot.rest :as rest]
             [camelot.component.error :as cerr]
-            [camelot.component.library :as library]
+            [camelot.component.library.core :as library]
             [secretary.core :as secretary :refer-macros [defroute]]))
 
 (defn load-resource-children

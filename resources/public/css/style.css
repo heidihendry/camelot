@@ -532,6 +532,8 @@ pre.field-input {
     padding-bottom: 1rem;
 }
 .library {
+    float: left;
+    width: 100%;
 }
 .library .media {
     padding: 1rem;
@@ -555,10 +557,11 @@ pre.field-input {
     opacity: 0.8;
 }
 .library .media-collection {
-    width: 33%;
+    width: 32%;
     float: left;
     padding-left: 1rem;
-    max-height: calc(100vh - 13.5rem);
+    height: calc(100vh - 12rem);
+    overflow: hidden;
 }
 .library .media-collection-container {
     margin: auto;
@@ -566,23 +569,24 @@ pre.field-input {
     position: relative;
     float: left;
     width: 100%;
-    height: calc(100vh - 19rem);
+    height: calc(100vh - 17rem);
 }
 .library .media-control-panel {
     position: relative;
-    max-height: calc(100vh - 13.5rem);
-    float: left;
-    width: 66%;
-    padding-top: 0.5rem;
+    max-height: calc(100vh - 12rem);
+    padding: 0;
+    float: right;
+    width: 67%;
     border-left: 1px solid #ccc;
     right: 0;
+    margin: 0;
     background: white;
 }
 .library .mcp-container {
     position: relative;
     width: 100%;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    margin: 0;
+    padding: 0 1rem;
 }
 .library .media-control-panel .preview {
     position: relative;
@@ -592,16 +596,17 @@ pre.field-input {
 }
 .library .media-control-panel img {
     position: relative;
-    top: -1rem;
-    max-width: 100%;
-    max-height: calc(100vh - 13.3rem);
+    width: 100%;
+    max-height: calc(100vh - 12rem);
     border: 1px solid #999;
+    margin-bottom: 0;
     margin: auto;
 }
 .library .media-details-panel {
     position: absolute;
+    padding: 0;
+    margin: 0;
     transition: all 0.3s ease-in-out;
-    top: 6rem;
     right: -25rem;
     width: 25rem;
     z-index: 400;
@@ -622,7 +627,6 @@ pre.field-input {
 .library .media-details-panel-text {
     position: absolute;
     transition: all 0.3s ease-in-out;
-    top: 6rem;
     right: -25rem;
     width: 25rem;
     z-index: 400;
@@ -693,7 +697,7 @@ pre.field-input {
 #app .library .none-selected {
     position: relative;
     width: 100%;
-    height: calc(0.74 * 32vw);
+    height: calc(100vh - 12rem);
 }
 #app .library .details .data {
     min-height: 1rem;
@@ -708,9 +712,9 @@ pre.field-input {
 }
 #app .library .media-item {
     width: 33%;
-    height: calc(11.5vw * (4 / 6) + 1.5rem);
+    height: calc(10.5vw * (4 / 6) + 1.5rem);
     margin-top: 0;
-    padding: 1%;
+    padding: 0.4%;
     position: relative;
     display: inline-block;
 }
@@ -735,7 +739,7 @@ pre.field-input {
 }
 #app .library .none-selected h4 {
     position: relative;
-    top: calc(0.74 * 33vw / 2);
+    top: calc((100vh - 12rem) / 2.4);
 }
 #app .library .selected-count {
     position: fixed;
@@ -816,7 +820,6 @@ pre.field-input {
     padding-right: 2rem;
     height: 6rem;
     z-index: 10;
-    margin-bottom: 1rem;
     background: #fafafa;
     width: 100%;
 }
