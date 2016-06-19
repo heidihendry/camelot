@@ -39,45 +39,6 @@
   (identify-selected-prompt)
   (add-sighting))
 
-(defn prev-page
-  [page]
-  (if (= page 1)
-    page
-    (do
-      (dec page))))
-
-(defn next-page
-  [matches page]
-  (if (= (.ceil js/Math (/ matches util/page-size)) page)
-    page
-    (inc page)))
-
-(defn pagination-component
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [matches (get-in data [:search :match-count])]
-        (dom/div #js {:className "pagination-nav"}
-                 (dom/button #js {:className "fa fa-2x fa-angle-left btn btn-default"
-                                  :disabled (if (get-in data
-                                                        [:search :identify-selected])
-                                              "disabled" "")
-                                  :onClick #(do (util/deselect-all)
-                                                (om/transact! data [:search :page] prev-page))})
-                 (dom/div #js {:className "describe-pagination"}
-                          (str (+ (- (* util/page-size (get-in data [:search :page])) util/page-size) 1)
-                               " - "
-                               (min (* util/page-size (get-in data [:search :page])) matches)
-                               " of "
-                               matches))
-                 (dom/button #js {:className "fa fa-2x fa-angle-right btn btn-default"
-                                  :disabled (if (get-in data
-                                                        [:search :identify-selected])
-                                              "disabled" "")
-                                  :onClick #(do (util/deselect-all)
-                                                (om/transact! data [:search :page] (partial next-page matches)))}))))))
-
 (defn survey-option-component
   [data owner]
   (reify
@@ -141,25 +102,6 @@
                                       (:surveys data))
                                 {:key :survey-id})))))
 
-(defn select-button-components
-  [data owner]
-  (reify
-    om/IRenderState
-    (render-state [_ state]
-      (if (:has-selected state)
-        (dom/button #js {:className "btn btn-default search-main-op"
-                         :onClick util/deselect-all*
-                         :title "Remove all selections"
-                         :disabled (if (get data :identify-selected)
-                                     "disabled" "")}
-                    "Select None")
-        (dom/button #js {:className "btn btn-default search-main-op"
-                         :title "Select all media on this page"
-                         :disabled (if (get data :identify-selected)
-                                     "disabled" "")
-                         :onClick util/select-all*}
-                    "Select All")))))
-
 (defn identification-panel-button-component
   [data owner]
   (reify
@@ -173,6 +115,45 @@
                                    "disabled" "")}
                   "Identify Selected"))))
 
+(defn trap-station-option-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (:trap-station-id data)}
+                  (:trap-station-name data)))))
+
+(defn trap-station-select-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/span nil
+               (dom/select #js {:className "trap-station-select field-input"
+                                :value (:survey-id data)
+                                :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
+                                             (om/update! (:search data) :trap-station-id sid)
+                                             (om/update! (:search data) :dirty-state true))}
+                           (om/build-all trap-station-option-component
+                                         (cons {:trap-station-id -1 :trap-station-name "All Traps"}
+                                               (:trap-stations data))
+                                         {:key :trap-station-id}))))))
+
+(defn subfilter-checkbox-component
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state
+      [_ state]
+      (dom/div #js {:className "checkbox-container"}
+                (dom/label nil (:label state))
+                (dom/input #js {:type "checkbox"
+                               :value (get-in data [:search (:key state)])
+                               :onChange #(do (om/update! (:search (state/library-state))
+                                                          (:key state) (.. % -target -checked))
+                                              (om/update! (:search data) :dirty-state true))
+                               :className "field-input"})))))
+
 (defn media-flag-component
   [data owner]
   (reify
@@ -180,9 +161,10 @@
     (render-state [_ state]
       (let [selected (util/all-media-selected)
             flag-enabled (and (seq selected) (every? (:key state) selected))]
-        (dom/span #js {:className ((:classFn state) flag-enabled)
-                       :title (:title state)
-                       :onClick #((:fn state) (not flag-enabled))})))))
+        (when (seq selected)
+          (dom/span #js {:className ((:classFn state) flag-enabled)
+                         :title (:title state)
+                         :onClick #((:fn state) (not flag-enabled))}))))))
 
 (defn media-flag-container-component
   [data owner]
@@ -209,18 +191,21 @@
     om/IRender
     (render [_]
       (let [has-selected (first (filter (comp :selected util/find-with-id)
-                                      (get-in data [:search :matches])))]
+                                        (get-in data [:search :matches])))]
         (dom/div #js {:className "search-bar"}
                  (om/build filter-button-component (:search data))
                  (om/build filter-input-component (:search data))
                  (dom/span nil " in ")
                  (om/build filter-survey-component data)
-                 (om/build pagination-component data)
-                 (om/build select-button-components (:search data)
-                           {:state {:has-selected has-selected}})
-                 (om/build identification-panel-button-component (:search data)
-                           {:state {:has-selected has-selected}})
-                 (om/build media-flag-container-component data))))))
+                 (om/build trap-station-select-component data)
+                 (om/build subfilter-checkbox-component data {:init-state {:key :unprocessed-only
+                                                                           :label "Unprocessed"}})
+                 (om/build subfilter-checkbox-component data {:init-state {:key :flagged-only
+                                                                           :label "Flagged"}})
+                 (dom/div #js {:className "pull-right action-container"}
+                          (om/build media-flag-container-component data)
+                          (om/build identification-panel-button-component (:search data)
+                                    {:state {:has-selected has-selected}})))))))
 
 (defn identification-bar-component
   [data owner]

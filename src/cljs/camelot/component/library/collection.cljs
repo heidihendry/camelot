@@ -27,58 +27,76 @@
                              :onClick #(om/update! (state/library-state)
                                                    :selected-media-id (:media-id result))})))))
 
+(defn prev-page
+  [page]
+  (if (= page 1)
+    page
+    (do
+      (dec page))))
 
-(defn trap-station-option-component
+(defn next-page
+  [matches page]
+  (if (= (.ceil js/Math (/ matches util/page-size)) page)
+    page
+    (inc page)))
+
+(defn pagination-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/option #js {:value (:trap-station-id data)}
-                  (:trap-station-name data)))))
+      (let [matches (get-in data [:search :match-count])]
+        (dom/div #js {:className "pagination-nav"}
+                 (dom/button #js {:className "fa fa-2x fa-angle-left btn btn-default"
+                                  :disabled (if (get-in data
+                                                        [:search :identify-selected])
+                                              "disabled" "")
+                                  :onClick #(do (util/deselect-all)
+                                                (om/transact! data [:search :page] prev-page))})
+                 (dom/div #js {:className "describe-pagination"}
+                          (str (+ (- (* util/page-size (get-in data [:search :page])) util/page-size) 1)
+                               " - "
+                               (min (* util/page-size (get-in data [:search :page])) matches)
+                               " of "
+                               matches))
+                 (dom/button #js {:className "fa fa-2x fa-angle-right btn btn-default"
+                                  :disabled (if (get-in data
+                                                        [:search :identify-selected])
+                                              "disabled" "")
+                                  :onClick #(do (util/deselect-all)
+                                                (om/transact! data [:search :page] (partial next-page matches)))}))))))
 
-(defn trap-station-select-component
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:className "subfilter-option"}
-               (dom/label #js {} "Trap Station")
-               (dom/select #js {:className "trap-station-select field-input"
-                                :value (:survey-id data)
-                                :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
-                                             (om/update! (:search data) :trap-station-id sid)
-                                             (om/update! (:search data) :dirty-state true))}
-                           (om/build-all trap-station-option-component
-                                         (cons {:trap-station-id -1 :trap-station-name "All Traps"}
-                                               (:trap-stations data))
-                                         {:key :trap-station-id}))))))
-
-(defn subfilter-checkbox-component
+(defn select-button-components
   [data owner]
   (reify
     om/IRenderState
-    (render-state
-      [_ state]
-      (dom/div #js {:className "subfilter-option"}
-               (dom/label #js {} (:label state))
-               (dom/input #js {:type "checkbox"
-                               :value (get-in data [:search (:key state)])
-                               :onChange #(do (om/update! (:search (state/library-state))
-                                                          (:key state) (.. % -target -checked))
-                                              (om/update! (:search data) :dirty-state true))
-                               :className "field-input"})))))
+    (render-state [_ state]
+      (if (:has-selected state)
+        (dom/button #js {:className "btn btn-default search-main-op"
+                         :onClick util/deselect-all*
+                         :title "Remove all selections"
+                         :disabled (if (get data :identify-selected)
+                                     "disabled" "")}
+                    "Select None")
+        (dom/button #js {:className "btn btn-default search-main-op"
+                         :title "Select all media on this page"
+                         :disabled (if (get data :identify-selected)
+                                     "disabled" "")
+                         :onClick util/select-all*}
+                    "Select All")))))
 
 (defn subfilter-bar-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "subfilter-bar"}
-               (om/build trap-station-select-component data)
-               (om/build subfilter-checkbox-component data {:init-state {:key :unprocessed-only
-                                                                         :label "Unprocessed"}})
-               (om/build subfilter-checkbox-component data {:init-state {:key :flagged-only
-                                                                         :label "Flagged"}})))))
+      (let [has-selected (first (filter (comp :selected util/find-with-id)
+                                        (get-in data [:search :matches])))]
+        (dom/div #js {:className "subfilter-bar"}
+                 (om/build pagination-component data)
+                 (om/build select-button-components (:search data)
+                           {:state {:has-selected has-selected}}))))))
+
 
 (defn media-collection-component
   "Render a collection of library."

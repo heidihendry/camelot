@@ -823,7 +823,7 @@ pre.field-input {
     background: #fafafa;
     width: 100%;
 }
-#app .library .search-bar button.search-main-op {
+#app .library .subfilter-bar button.search-main-op {
     width: 12rem;
 }
 #app .library .fa-search {
@@ -841,6 +841,7 @@ pre.field-input {
 #app .library .pagination-nav {
     position: relative;
     display: inline-block;
+    margin-right: 1rem;
 }
 #app .library .search-bar select.field-input {
     width: auto;
@@ -849,10 +850,12 @@ pre.field-input {
 #app .library .search-bar .survey-select {
     margin-right: 1rem;
 }
-#app .library .pagination-nav .btn {
-    font-size: 1.5em;
+#app .library .subfilter-bar .btn {
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
+}
+#app .library .pagination-nav .btn {
+    font-size: 1.5em;
 }
 #app .library .pagination-nav .describe-pagination {
     position: relative;
@@ -861,12 +864,24 @@ pre.field-input {
     text-align: center;
     min-width: 18rem;
 }
+.library .search-bar label {
+    display: block;
+}
+.library .search-bar .checkbox-container {
+    display: inline-block;
+    top: -1rem;
+    position: relative;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: 0;
+    padding-top: 0;
+}
 .library .search-bar .flag {
     position: relative;
     color: #999;
     cursor: pointer;
     top: 0.5rem;
-    padding: 0 1rem;
+    padding-left: 1rem;
     opacity: 0.4;
     height: 4rem;
 }
@@ -875,16 +890,35 @@ pre.field-input {
     color: #999;
     cursor: pointer;
     top: 0.5rem;
-    padding: 0 1rem;
+    padding-left: 1rem;
     opacity: 0.4;
 }
+.library .search-bar .flag:hover {
+    opacity: 0.6;
+}
+.library .search-bar .processed:hover {
+    opacity: 0.6;
+}
 .library .flag.red {
+    color: #aa3311;
+    opacity: 0.9;
+}
+.library .flag.red:hover {
     color: #aa3311;
     opacity: 1;
 }
 .library .processed.green {
     color: #99d344;
+    opacity: 0.9;
+}
+.library .processed.green:hover {
+    color: #99d344;
     opacity: 1;
+}
+.library .search-bar .action-container button.btn {
+    position: relative;
+    top: 0.4rem;
+    vertical-align: top;
 }
 #app .version-string {
     float: right;
@@ -901,9 +935,9 @@ pre.field-input {
 }
 #app .library .subfilter-bar {
     width: 100%;
-    float: left;
     display: block;
     border-bottom: 1px solid #eee;
+    padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     margin-bottom: 0.5rem;
     display: flex;
@@ -915,8 +949,17 @@ pre.field-input {
     text-align: center;
     max-width: calc(100% - 15rem);
 }
+#app .library .search-bar .field-input {
+    display: inline-block;
+}
+#app .library .search-bar label {
+    display: inline-block;
+}
 #app .library .subfilter-bar .subfilter-option:first-child {
     text-align: left;
+}
+#app .library .search-bar .field-input {
+    display: inline;
 }
 #app .library .subfilter-bar .field-input {
     min-width: auto;
@@ -928,10 +971,11 @@ pre.field-input {
 #app .library .subfilter-bar select.field-input {
     display: block;
 }
-#app .library .subfilter-bar input[type=checkbox] {
+#app .library .search-bar input[type=checkbox] {
+    display: block;
     width: 2rem;
     height: 2rem;
     margin: auto;
-    margin-top: 0.5rem;
+    margin-top: 0.2rem;
     text-align: center;
 }
