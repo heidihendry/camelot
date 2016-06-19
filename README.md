@@ -48,6 +48,8 @@ So that trap photos can be processed efficiently, the Library screen has keyboar
 * **Control + a**: Select all media (or select none, if some are selected)
 * **Control + g**: Toggle the flag state of the selected media
 * **Control + h**: Toggle the processed state of the selected media
+* **Control + f**: Focus the filter text input
+* **Alt + f**: Reapply the current filter
 
 With the Media Collection panel focused (**Control + m**):
 

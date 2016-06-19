@@ -64,6 +64,7 @@
     (render [_]
       (dom/button #js {:className "fa fa-search btn search"
                        :title "Apply the current filters"
+                       :id "apply-filter"
                        :onClick #(om/update! data :dirty-state true)}))))
 
 (defn select-media-collection-container

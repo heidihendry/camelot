@@ -39,6 +39,11 @@
     (do (.focus (.getElementById js/document "filter"))
         (.preventDefault e))
 
+    ;; alt+f
+    (and (= (.-keyCode e) 70) (.-altKey e))
+    (do (.click (.getElementById js/document "apply-filter"))
+        (.preventDefault e))
+
     ;; ctrl+m
     (and (>= (.-keyCode e) 77) (.-ctrlKey e))
     (.focus (.getElementById js/document "media-collection-container"))
