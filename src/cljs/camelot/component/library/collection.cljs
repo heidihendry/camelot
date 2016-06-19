@@ -34,15 +34,24 @@
   (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
         cur (ffirst (filter #(= (:selected-media-id data) (second %))
                             media-idxs))]
-    (if (seq media-idxs)
-      (let [id (some->> (updated-select-position media-idxs e cur)
-                        (nth media-idxs))
-            media (util/find-with-id (second id))]
-        (when media
-          (when-not (.-shiftKey e)
-            (util/deselect-all))
-          (om/update! media :selected true)
-          (om/update! data :selected-media-id (second id)))))))
+    (cond
+      (and (= (.-keyCode e) 71)
+           (not (.-ctrlKey e)))
+      (.click (.getElementById js/document "media-flag"))
+
+      (and (= (.-keyCode e) 72)
+           (not (.-ctrlKey e)))
+      (.click (.getElementById js/document "media-processed"))
+
+      :else (if (seq media-idxs)
+            (let [id (some->> (updated-select-position media-idxs e cur)
+                              (nth media-idxs))
+                  media (util/find-with-id (second id))]
+              (when media
+                (when-not (.-shiftKey e)
+                  (util/deselect-all))
+                (om/update! media :selected true)
+                (om/update! data :selected-media-id (second id))))))))
 
 (defn- media-thumb-class
   [data]
