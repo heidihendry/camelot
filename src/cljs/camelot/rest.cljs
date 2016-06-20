@@ -28,21 +28,50 @@
   ([method url params status response]
    (-build-error method url params status response)))
 
-(defn get-x
-  "Retrieve settings"
-  [x-url cb]
+(defn request-json
+  [url params cb]
   (go
-    (let [response (<! (transit-util/request
-                        http/get (misc/with-baseurl x-url) nil))
+    (let [response (<! (http/get url params))
           success (some #{(:status response)} success-status-codes)]
+      (prn url)
+      (prn response)
       (if success
         (when cb
           (cb response))
         (om/update! (state/app-state-cursor) :error (build-error
                                                      "GET"
-                                                     (misc/with-baseurl x-url)
+                                                     url
                                                      (:status response)
                                                      (:body response)))))))
+
+(defn get-x
+  "Retrieve settings"
+  ([x-url cb]
+   (go
+     (let [response (<! (transit-util/request
+                         http/get (misc/with-baseurl x-url) nil))
+           success (some #{(:status response)} success-status-codes)]
+       (if success
+         (when cb
+           (cb response))
+         (om/update! (state/app-state-cursor) :error (build-error
+                                                      "GET"
+                                                      (misc/with-baseurl x-url)
+                                                      (:status response)
+                                                      (:body response)))))))
+  ([x-url params cb]
+   (go
+     (let [response (<! (transit-util/request
+                         http/get (misc/with-baseurl x-url) params))
+           success (some #{(:status response)} success-status-codes)]
+       (if success
+         (when cb
+           (cb response))
+         (om/update! (state/app-state-cursor) :error (build-error
+                                                      "GET"
+                                                      (misc/with-baseurl x-url)
+                                                      (:status response)
+                                                      (:body response))))))))
 
 (defn post-x
   "POST state"

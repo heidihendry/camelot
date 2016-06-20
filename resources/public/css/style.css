@@ -979,3 +979,42 @@ pre.field-input {
     margin-top: 0.2rem;
     text-align: center;
 }
+#app table {
+    width: 100%;
+}
+#app tr.table-heading {
+    background: #116095;
+    color: white;
+}
+#app .table-heading th {
+    border-right: 1px solid #1175aa;
+    padding: 1rem 2rem;
+}
+#app .table-heading th:first-child {
+    border-right: 1px solid #1175aa;
+    padding: 1rem 2rem;
+    text-align: left;
+}
+#app td {
+    border-bottom: 1px solid #eee;
+    padding: 1rem 2rem;
+}
+#app tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+#app tbody.selectable tr {
+    cursor: pointer;
+}
+#app tbody.selectable tr {
+    opacity: 1;
+}
+#app tbody.selectable tr:hover {
+    color: #116095;
+}
+#app .table-heading td:first-child {
+    border-left: 1px solid #1175aa;
+}
+#app .species-search .field-input {
+    display: inline-block;
+    margin-right: 1rem;
+}

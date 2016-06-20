@@ -5,6 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[bk/ring-gzip "0.1.1"]
+                 [cheshire "5.6.1"]
+                 [clj-http "2.2.0"]
                  [clj-time "0.11.0"]
                  [cljs-http "0.1.39"]
                  [cljsjs/react-with-addons "0.14.3-0"]
@@ -22,7 +24,7 @@
                  [org.apache.derby/derby "10.12.1.1"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228" :scope "provided"]
-                 [org.clojure/core.async "0.2.374"]
+                 [org.clojure/core.async "0.2.385"]
                  [org.clojure/data.csv "0.1.3"]
                  [org.clojure/java.jdbc "0.4.2"]
                  [org.omcljs/om "1.0.0-alpha32" :exclusions [com.cognitect/transit-cljs cljsjs/react]]

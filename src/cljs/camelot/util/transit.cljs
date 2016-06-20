@@ -29,8 +29,9 @@
   "Make a GET or POST request."
   [method href params]
   (method href
-          {:transit-params params
-           :transit-opts {:decoding-opts
-                          {:handlers transit-read-handlers}
-                          :encoding-opts
-                          {:handlers transit-write-handlers}}}))
+          (merge (or (select-keys params [:query-params]) {})
+                 {:transit-params params
+                  :transit-opts {:decoding-opts
+                                 {:handlers transit-read-handlers}
+                                 :encoding-opts
+                                 {:handlers transit-write-handlers}}})))

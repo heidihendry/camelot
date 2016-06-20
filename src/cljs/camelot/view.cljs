@@ -8,6 +8,7 @@
             [camelot.component.surveys :as surveys]
             [camelot.component.nav :as nav]
             [camelot.component.import-dialog :as import]
+            [camelot.component.create-survey :as survey]
             [smithy.core :as smithy]
             [camelot.nav :as cnav]
             [smithy.util :as util]
@@ -288,4 +289,5 @@
 (defroute "/cameras" [] (page-content-view :camera :create {}))
 (defroute "/taxonomy" [] (page-content-view :taxonomy :create {}))
 (defroute "/library" [] (generate-view library/library-view-component))
+(defroute "/survey/create" [] (generate-view survey/create-survey-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))
