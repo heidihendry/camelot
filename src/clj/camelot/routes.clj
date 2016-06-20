@@ -197,7 +197,10 @@
            (GET "/search" {{search :search} :params}
                 (r/response (species-search/query-search
                              (app/gen-state (conf/config))
-                             {:search search}))))
+                             {:search search})))
+           (POST "/create" [data] (r/response (species-search/create-for-ids
+                                               (app/gen-state (conf/config))
+                                               (:ids data)))))
 
   misc-routes
   config/routes

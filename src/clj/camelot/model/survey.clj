@@ -10,7 +10,8 @@
 
 (s/defrecord TSurvey
     [survey-name :- s/Str
-     survey-directory :- s/Str
+     survey-sighting-independence-threshold :- s/Num
+     survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
      survey-notes :- (s/maybe s/Str)])
 
@@ -19,22 +20,26 @@
      survey-created :- org.joda.time.DateTime
      survey-updated :- org.joda.time.DateTime
      survey-name :- s/Str
-     survey-directory :- s/Str
+     survey-sighting-independence-threshold :- s/Num
+     survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
      survey-notes :- (s/maybe s/Str)])
 
 (s/defn survey :- Survey
   [{:keys [survey-id survey-created survey-updated survey-name
+           survey-sighting-independence-threshold
            survey-directory survey-sampling-point-density
            survey-notes]}]
   (->Survey survey-id survey-created survey-updated survey-name
-            survey-directory survey-sampling-point-density survey-notes))
+            survey-sighting-independence-threshold survey-directory
+            survey-sampling-point-density survey-notes))
 
 (s/defn tsurvey :- TSurvey
-  [{:keys [survey-name survey-directory survey-sampling-point-density
+  [{:keys [survey-name survey-sighting-independence-threshold survey-directory
+           survey-sampling-point-density
            survey-notes]}]
-  (->TSurvey survey-name survey-directory
-                     survey-sampling-point-density survey-notes))
+  (->TSurvey survey-name survey-sighting-independence-threshold survey-directory
+             survey-sampling-point-density survey-notes))
 
 (s/defn get-all :- [Survey]
   [state :- State]
@@ -51,7 +56,8 @@
 (s/defn create! :- Survey
   [state :- State
    data :- TSurvey]
-  {:pre [(f/exists? (io/file (:survey-directory data)))]}
+  {:pre [(or (nil? (:survey-directory data))
+             (f/exists? (io/file (:survey-directory data))))]}
   (let [record (db/with-db-keys state -create<! data)]
     (survey (get-specific state (int (:1 record))))))
 

@@ -94,6 +94,7 @@
    state
    (survey/tsurvey {:survey-name default-survey-name
                     :survey-directory directory
+                    :survey-sighting-independence-threshold 20
                     :survey-sampling-point-density nil
                     :survey-notes import-note})))
 

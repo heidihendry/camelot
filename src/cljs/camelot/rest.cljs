@@ -28,22 +28,6 @@
   ([method url params status response]
    (-build-error method url params status response)))
 
-(defn request-json
-  [url params cb]
-  (go
-    (let [response (<! (http/get url params))
-          success (some #{(:status response)} success-status-codes)]
-      (prn url)
-      (prn response)
-      (if success
-        (when cb
-          (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "GET"
-                                                     url
-                                                     (:status response)
-                                                     (:body response)))))))
-
 (defn get-x
   "Retrieve settings"
   ([x-url cb]
@@ -95,7 +79,7 @@
                                                         (:body response)))))))))
 
 (defn put-x
-  "POST state"
+  "PUT state"
   ([resource params cb] (put-x resource params cb nil))
   ([resource params cb failcb]
    (go

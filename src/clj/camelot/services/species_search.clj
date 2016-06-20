@@ -29,3 +29,7 @@
                                     "format" "json"
                                     "response" "full"}})]
     (json/parse-string (:body r))))
+
+(defn create-for-ids
+  [state ids]
+  nil)

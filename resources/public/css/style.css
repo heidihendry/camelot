@@ -173,10 +173,11 @@ a:hover {
   margin-bottom: 0.3rem;
 }
 #app .field-label {
-  color: #666;
-  display: inline-block;
-  clear: both;
-  font-weight: normal;
+    color: #777;
+    font-size: 85%;
+    display: inline-block;
+    clear: both;
+    font-weight: normal;
 }
 #app select.field-input {
   padding: 0.5rem;
@@ -198,6 +199,7 @@ a:hover {
   font-size: 90%;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
+  margin-bottom: 2rem;
 }
 #page-content input.field-input, textarea.field-input, pre.field-input {
   display: block;
@@ -1063,7 +1065,7 @@ pre.field-input {
     flex-direction: column;
     height: calc(100vh - 18rem);
 }
-#app .create-survey input {
+#app .create-survey .field-input {
     width: 100%;
 }
 #app .create-survey .section {

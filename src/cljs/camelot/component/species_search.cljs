@@ -136,7 +136,7 @@
     (render-state [this state]
       (prn (:search-results data))
       (dom/div #js {:className "species-search"}
-               (dom/h5 nil "Search Species")
+               (dom/label #js {:className "field-label"} "Search Species")
                (om/build search-input-component data
                          {:init-state {:result-chan (:result-chan state)}})
                (om/build search-result-list-component data

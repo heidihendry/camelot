@@ -1,9 +1,11 @@
 (ns camelot.component.create-survey
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [om.core :as om]
+            [camelot.rest :as rest]
+            [camelot.nav :as nav]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.component.species-search :as search]
-            [om.dom :as dom]))
+            [om.dom :as dom])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn species-row-component
   [data owner]
@@ -46,11 +48,18 @@
                                                      {:init-state state}))))
         (dom/div #js {:className "no-species-found"}
                  (dom/p nil
-                           "Add species from the search menu"))))))
+                        "Add species from the search menu"))))))
 
 (defn create-survey
-  []
-  nil)
+  [data]
+  (let [ps (select-keys data [:survey-name
+                              :survey-notes
+                              :survey-sighting-independence-threshold])]
+    (rest/post-x "/species/create"
+                 {:data {:ids (map :id (data :species))}}
+                 (fn []
+                   (rest/post-x "/surveys" {:data ps}
+                                #(nav/nav! "/library"))))))
 
 (defn create-survey-details-component
   [data owner]
@@ -58,24 +67,30 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section survey-details-pane"}
-               (dom/h5 nil "Survey Name")
+               (dom/label #js {:className "field-label"} "Survey Name")
                (dom/input #js {:className "field-input"
                                :type "text"
                                :placeholder "Survey Name..."
                                :value (:survey-name data)
                                :onChange #(om/update! data
                                                       :survey-name (.. % -target -value))})
-               (dom/h5 nil "Sighting Independence Threshold (minutes)")
+               (dom/label #js {:className "field-label"} "Survey Description")
+               (dom/textarea #js {:className "field-input"
+                                  :rows "3"
+                                  :value (:survey-notes data)
+                                  :onChange #(om/update! data
+                                                         :survey-notes (.. % -target -value))})
+               (dom/label #js {:className "field-label"} "Sighting Independence Threshold (minutes)")
                (dom/input #js {:className "field-input"
                                :type "number"
-                               :value (:sighting-independence-threshold data)
+                               :value (:survey-sighting-independence-threshold data)
                                :onChange #(om/update! data
-                                                      :sighting-independence-threshold (.. % -target -value))})
-               (dom/h5 nil "Expected Species")
+                                                      :survey-sighting-independence-threshold (int (.. % -target -value)))})
+               (dom/label #js {:className "field-label"} "Expected Species")
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"
-                                         :onClick create-survey}
+                                         :onClick #(create-survey data)}
                                     "Create Survey"
                                     (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
 
