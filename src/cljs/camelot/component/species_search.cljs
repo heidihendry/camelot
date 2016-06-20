@@ -67,7 +67,7 @@
                 (dom/input #js {:type "text"
                                 :name "search"
                                 :placeholder "Scientific Name..."
-                                :className "field-input"
+                                :className "field-input species-search-input"
                                 :onChange #(om/set-state! owner :search (.. % -target -value))
                                 :value (:search state)})
                 (dom/button #js {:type "submit"
@@ -82,7 +82,8 @@
     (render-state [_ state]
       (dom/tr #js {:onClick #(go (>! (:select-chan state) data))}
               (dom/td nil (:genus data))
-              (dom/td nil (:species data))))))
+              (dom/td nil (:species data))
+              (dom/td nil (dom/button #js {:className "btn btn-default"} "Add"))))))
 
 (defn search-result-list-component
   [data owner]
@@ -90,17 +91,22 @@
     om/IRenderState
     (render-state [_ state]
       (if (:busy data)
-        (dom/img #js {:src "images/spinner.gif" :height "32px"})
+        (dom/img #js {:className "spinner"
+                      :src "images/spinner.gif"
+                      :height "32"
+                      :width "32"})
         (if (seq (:search-results data))
-          (dom/table nil
-                     (dom/thead nil
-                                (dom/tr #js {:className "table-heading"}
-                                        (dom/th nil "Genus")
-                                        (dom/th nil "Species")))
-                     (dom/tbody #js {:className "selectable"}
-                                (om/build-all search-result-component
-                                              (:search-results data)
-                                              {:state state})))
+          (dom/div #js {:className "scroll"}
+                   (dom/table nil
+                              (dom/thead nil
+                                         (dom/tr #js {:className "table-heading"}
+                                                 (dom/th nil "Genus")
+                                                 (dom/th nil "Species")
+                                                 (dom/th nil "")))
+                              (dom/tbody #js {:className "selectable"}
+                                         (om/build-all search-result-component
+                                                       (:search-results data)
+                                                       {:state state}))))
           (dom/span nil ))))))
 
 (defn species-search-component
@@ -124,7 +130,7 @@
                     (om/update! data :busy (:busy v)))
                   (when (:results v)
                     (om/update! data :search-results (:results v))))
-                (om/update! data :selection (:results v)))
+                (om/update! data :selection v))
               (recur))))))
     om/IRenderState
     (render-state [this state]

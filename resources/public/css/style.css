@@ -1018,3 +1018,109 @@ pre.field-input {
     display: inline-block;
     margin-right: 1rem;
 }
+
+#app .create-survey {
+}
+#app .create-survey h4 {
+    text-align: center;
+    font-size: 200%;
+    font-weight: 300;
+    font-color: #999;
+}
+#app .create-survey .intro {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    text-align: center;
+}
+#app .create-survey .section-container:first-child {
+    border-right: 1px solid #ccc;
+}
+#app .species-search input.species-search-input {
+    width: calc(100% - 10rem);
+}
+#app .species-search {
+    width: 100%;
+}
+#app .species-search form {
+    width: 100%;
+}
+#app .species-search .spinner {
+    text-align: center;
+    float: center;
+    margin: auto;
+}
+#app .species-search {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+#app .create-survey .section-container {
+    float: left;
+    width: 50%;
+    display: block;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 18rem);
+}
+#app .create-survey input {
+    width: 100%;
+}
+#app .create-survey .section {
+    display: block;
+    width: 70%;
+    margin: auto;
+    flex-grow: 1;
+    height: calc(100vh - 22rem);
+}
+#app .create-survey .section input {
+    flex-shrink: 0;
+}
+#app .create-survey .no-species-found {
+    color: #999;
+    flex-grow: 1;
+    margin: auto;
+    padding-bottom: 4rem;
+    vertical-align: middle;
+}
+#app .create-survey .no-species-found p {
+    margin: auto;
+    padding-top: 4rem;
+    display: inline-block;
+    float: center;
+    vertical-align: middle;
+}
+#app .create-survey .survey-species {
+    flex-grow: 1;
+    overflow: auto;
+    margin-bottom: 2rem;
+}
+#app .create-survey .button-container {
+    text-align: right;
+}
+#app .create-survey th:last-child {
+    text-align: right;
+    width: 12rem;
+}
+#app .create-survey td:last-child {
+    text-align: right;
+    width: 12rem;
+}
+#app .create-survey .survey-details-pane {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 10rem);
+}
+#app .btn-right-icon {
+    padding-left: 1rem;
+    font-weight: 100;
+}
+#app .scroll {
+    height: 100%;
+    overflow: auto;
+    flex-direction: column;
+}
+#app .scroll table {
+    max-height: 100%;
+    overflow: auto;
+}
