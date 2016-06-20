@@ -565,7 +565,7 @@ pre.field-input {
 }
 .library .media-collection-container {
     margin: auto;
-    overflow: scroll;
+    overflow: auto;
     position: relative;
     float: left;
     width: 100%;

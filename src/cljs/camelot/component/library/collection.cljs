@@ -13,13 +13,17 @@
     (if (nil? idx)
       0
       (case (.-keyCode e)
-        37 (max (- idx 1) 0)
-        38 (if (< idx 3) idx (- idx 3))
-        39 (min (+ idx 1) (dec (count media-ids)))
-        40 (if (= (.floor js/Math (/ (count media-ids) collection-columns))
-                  (.floor js/Math (/ idx collection-columns)))
-             idx
-             (min (+ idx 3) (dec (count media-ids))))
+        37 (do (.preventDefault e)
+               (max (- idx 1) 0))
+        38 (do (.preventDefault e)
+               (if (< idx 3) idx (- idx 3)))
+        39 (do (.preventDefault e)
+               (min (+ idx 1) (dec (count media-ids))))
+        40 (do (.preventDefault e)
+               (if (= (.floor js/Math (/ (count media-ids) collection-columns))
+                      (.floor js/Math (/ idx collection-columns)))
+                 idx
+                 (min (+ idx 3) (dec (count media-ids)))))
         65 (max (- idx 1) 0)
         87 (if (< idx 3) idx (- idx 3))
         68 (min (+ idx 1) (dec (count media-ids)))
@@ -44,14 +48,14 @@
       (.click (.getElementById js/document "media-processed"))
 
       :else (if (seq media-idxs)
-            (let [id (some->> (updated-select-position media-idxs e cur)
-                              (nth media-idxs))
-                  media (util/find-with-id (second id))]
-              (when media
-                (when-not (.-shiftKey e)
-                  (util/deselect-all))
-                (om/update! media :selected true)
-                (om/update! data :selected-media-id (second id))))))))
+              (let [id (some->> (updated-select-position media-idxs e cur)
+                                (nth media-idxs))
+                    media (util/find-with-id (second id))]
+                (when media
+                  (when-not (.-shiftKey e)
+                    (util/deselect-all))
+                  (om/update! media :selected true)
+                  (om/update! data :selected-media-id (second id))))))))
 
 (defn- media-thumb-class
   [data]
@@ -113,8 +117,8 @@
       (dom/div #js {:id "media-collection-container"
                     :className "media-collection-container"
                     :tabIndex 1}
-      (dom/div nil
-               (om/build-all media-item-component (util/media-on-page) {:key :media-id}))))))
+               (dom/div nil
+                        (om/build-all media-item-component (util/media-on-page) {:key :media-id}))))))
 
 (defn prev-page
   [page]
