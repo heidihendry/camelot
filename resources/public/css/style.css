@@ -640,29 +640,30 @@ pre.field-input {
     right: 0rem;
 }
 .library .media-details-panel .details-panel-toggle {
-    background: #fafafa;
+    background: #116095;
     position: absolute;
-    left: -3rem;
+    left: -3.5rem;
     top: 5rem;
     border: 1px solid #ccc;
     border-top-left-radius: 0.5rem;
     border-bottom-left-radius: 0.5rem;
     cursor: pointer;
-    width: 3rem;
-    height: 7rem;
+    width: 3.5rem;
+    height: 8rem;
     padding: 0.2rem;
     padding-top: 1.2rem;
 }
 .library .media-details-panel-text .details-panel-toggle-text {
     position: absolute;
-    left: -3rem;
+    left: -3.3rem;
     cursor: pointer;
     top: 5rem;
     width: 3rem;
     height: 7rem;
     padding: 0.2rem;
-    padding-top: 1.2rem;
-    color: #666;
+    font-size: 110%;
+    padding-top: 1.7rem;
+    color: #eee;
 }
 .library .close-details {
     color: #666;
@@ -673,7 +674,7 @@ pre.field-input {
     color: #000;
 }
 .library .media-details-panel-text .details-panel-toggle-text:hover {
-    color: #333;
+    color: #fff;
 }
 .library .media-details-panel-text .rotate {
     position: relative;
