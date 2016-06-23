@@ -14,7 +14,7 @@
 
 (defn default-page [hash]
   (if (= hash "")
-    "/dashboard"
+    "/library"
     (str "/" hash)))
 
 (defn disable-loading-screen
@@ -59,8 +59,7 @@
      (rest/get-configuration
       #(do (om/update! (state/app-state-cursor) :resources {})
            (om/update! (state/resources-state) :settings (:body %))
-           (initialise-state)
-           (albums/reload-albums))))))
+           (initialise-state))))))
 
 (secretary/set-config! :prefix "#")
 

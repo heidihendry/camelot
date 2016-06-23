@@ -115,21 +115,6 @@
                         (dom/label nil (first album))
                         (om/build album-component (second album)))))))
 
-(defn album-view-component
-  "Render an album validation summary."
-  [app owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [albums (sort (comparator compare-album-validity)
-                         (sort-by first (vec (:albums app))))]
-        (dom/div #js {:onClick nav/settings-hide!}
-                 (dom/div #js {:className "validation-heading"}
-                          (dom/span #js {:className "version-string"}
-                                    (str "Version " (get-in app [:application :version])))
-                          (dom/h4 nil "Import"))
-                 (apply dom/div nil (om/build-all albums-component (into [] albums))))))))
-
 (defn reload-albums
   "Reload the available albums"
   []
@@ -142,3 +127,21 @@
                           (js/alert resp))
                         (do
                           (om/update! (state/app-state-cursor) :albums resp))))))
+
+(defn album-view-component
+  "Render an album validation summary."
+  [app owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (reload-albums))
+    om/IRender
+    (render [_]
+      (let [albums (sort (comparator compare-album-validity)
+                         (sort-by first (vec (:albums app))))]
+        (dom/div #js {:onClick nav/settings-hide!}
+                 (dom/div #js {:className "validation-heading"}
+                          (dom/span #js {:className "version-string"}
+                                    (str "Version " (get-in app [:application :version])))
+                          (dom/h4 nil "Import"))
+                 (apply dom/div nil (om/build-all albums-component (into [] albums))))))))
