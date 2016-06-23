@@ -45,10 +45,20 @@
   "Predicate for whether the given file is readable."
   (.canRead ^File file))
 
+(defn writable?
+  [file]
+  "Predicate for whether the given file is readable."
+  (.canWrite ^File file))
+
 (defn mkdir
   [file]
   "Create the directory referred to by the given File."
   (.mkdir ^File file))
+
+(defn mkdirs
+  [file]
+  "Create the directory, and all parent directories, referred to by the given File."
+  (.mkdirs ^File file))
 
 (defn pushback-reader
   [file-reader]

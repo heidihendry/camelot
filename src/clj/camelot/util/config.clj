@@ -114,7 +114,7 @@
   (let [conf (get-config-file)
         confdir (f/get-parent-file (io/file conf))]
     (when-not (f/exists? confdir)
-      (f/mkdir confdir))
+      (f/mkdirs confdir))
     (if (and (not overwrite?) (f/exists? (io/file conf)))
       (throw (RuntimeException. (tr/translate config :problems/default-config-exists conf)))
       (with-open [w (io/writer conf)]

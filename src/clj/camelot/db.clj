@@ -4,13 +4,28 @@
             [clojure.string :as str]
             [clojure.java.jdbc :as jdbc]
             [camelot.model.state :refer [State]]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [camelot.util.java-file :as f]
+            [clojure.java.io :as io])
+  (:import [java.io IOException]))
+
+(defn db-path
+  []
+  (let [path (settings/get-db-path)
+        fpath (io/file path)]
+    (if (f/exists? fpath)
+      (if (and (f/readable? fpath) (f/writable? fpath))
+        fpath
+        (throw (IOException. (str path ": Permission denied"))))
+      (do
+        (f/mkdirs fpath)
+        path))))
 
 (def spec
   "JDBC spec for the primary database."
   {:classname "org.apache.derby.jdbc.EmbeddedDriver",
    :subprotocol "derby",
-   :subname (settings/get-db-path),
+   :subname (db-path),
    :create true})
 
 (defmacro with-transaction
