@@ -79,6 +79,7 @@
     om/IWillMount
     (will-mount [_]
       (om/update! (get-in data [:library :search]) :page 1)
+      (om/update! (:library data) :survey-id (:selected-survey-id (state/app-state-cursor)))
       (om/update! (get-in data [:library :search]) :show-select-count 0)
       (om/update! (get-in data [:library]) :identification {:quantity 1})
       (rest/get-x "/taxonomy"
@@ -91,8 +92,14 @@
                   (fn [resp]
                     (om/update! (get data :library) :surveys (:body resp))))
 
-      (util/load-trap-stations)
-      (util/load-library))
+      (let [sid (:selected-survey-id (state/app-state-cursor))]
+        (if sid
+          (do
+            (util/load-trap-stations sid)
+            (util/load-library sid))
+          (do
+            (util/load-trap-stations)
+            (util/load-library)))))
     om/IRender
     (render [_]
       (let [lib (:library data)]

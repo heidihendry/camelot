@@ -144,12 +144,14 @@
     (render [_]
       (dom/span nil
                (dom/select #js {:className "trap-station-select field-input"
-                                :value (:survey-id data)
+                                :value (:trap-station-id data)
                                 :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                              (om/update! (:search data) :trap-station-id sid)
+                                             (om/update! (:search data) :page 1)
                                              (om/update! (:search data) :dirty-state true))}
                            (om/build-all trap-station-option-component
-                                         (cons {:trap-station-id -1 :trap-station-name "All Traps"}
+                                         (cons {:trap-station-id -1
+                                                :trap-station-name "All Traps"}
                                                (:trap-stations data))
                                          {:key :trap-station-id}))))))
 
@@ -212,8 +214,11 @@
         (dom/div #js {:className "search-bar"}
                  (om/build filter-button-component (:search data))
                  (om/build filter-input-component (:search data))
-                 (dom/span nil " in ")
-                 (om/build filter-survey-component data)
+                 (let [global-survey (:selected-survey-id (state/app-state-cursor))]
+                   (when-not global-survey
+                     (do
+                       (dom/span nil " in ")
+                       (om/build filter-survey-component data))))
                  (om/build trap-station-select-component data)
                  (om/build subfilter-checkbox-component data {:init-state {:key :unprocessed-only
                                                                            :label "Unprocessed"}})

@@ -292,6 +292,21 @@
               :species species}]
     (is (= (sut/only-matching nil data) expected))))
 
+(deftest trap-station-ids-are-matched-exactly
+  (let [expected [{:sightings [{:taxonomy-id 2}]
+                   :trap-station-id 5
+                   :media-id 1}]
+        results {1 {:sightings [{:taxonomy-id 1}]
+                    :trap-station-id 50
+                    :media-id 2
+                    :media-processed true}
+                 2 {:sightings [{:taxonomy-id 2}]
+                    :trap-station-id 5
+                    :media-id 1}}
+        data {:search {:results results}
+              :species species}]
+    (is (= (sut/only-matching "trapid:5" data) expected))))
+
 (deftest unprocessed-only-flag-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
     (is (= (sut/append-subfilters search {:unprocessed-only true})

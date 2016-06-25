@@ -241,7 +241,11 @@
 
 (defn generate-view
   "Render the main page content"
-  [view]
+  [view & [{:keys [survey-id]}]]
+  (om/update! (state/app-state-cursor) :selected-survey-id
+              (if (nil? survey-id)
+                nil
+                (js/parseInt survey-id)))
   (om/root view state/app-state
            {:target (js/document.getElementById "page-content")}))
 
@@ -289,7 +293,8 @@
 (defroute "/cameras" [] (page-content-view :camera :create {}))
 (defroute "/taxonomy" [] (page-content-view :taxonomy :create {}))
 (defroute "/library" [] (generate-view library/library-view-component))
-(defroute "/:survey/library" [survey] (generate-view library/library-view-component))
+(defroute "/:survey/library" [survey] (generate-view library/library-view-component
+                                                     {:survey-id survey}))
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/survey/create" [] (generate-view survey/create-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

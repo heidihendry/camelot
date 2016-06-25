@@ -52,10 +52,13 @@
 (defn field-search
   [search species sightings]
   (let [[f s] (str/split search #":")]
-    (some #(if (= s "*")
-             (not (nil? (get % (field-key-lookup f))))
-             (substring? (nil->empty (get % (field-key-lookup f))) s))
-          sightings)))
+    (if (re-find #"\-id$" (name (field-key-lookup f)))
+      (some? (some #(= (get % (field-key-lookup f)) (js/parseInt s))
+                   sightings))
+      (some #(if (= s "*")
+               (not (nil? (get % (field-key-lookup f))))
+               (substring? (nil->empty (get % (field-key-lookup f))) s))
+            sightings))))
 
 (defn record-string-search
   [search species records]
