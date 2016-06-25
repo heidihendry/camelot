@@ -58,7 +58,7 @@
                  {:data {:species (deref (data :species))}}
                  (fn []
                    (rest/post-x "/surveys" {:data ps}
-                                #(nav/nav! "/library"))))))
+                                #(nav/nav! "/organisation"))))))
 
 (defn survey-details-completed?
   [data]

@@ -12,10 +12,10 @@
 (defn db-path
   []
   (let [path (settings/get-db-path)
-        fpath (io/file path)]
+        fpath (f/get-parent-file (io/file path))]
     (if (f/exists? fpath)
       (if (and (f/readable? fpath) (f/writable? fpath))
-        fpath
+        path
         (throw (IOException. (str path ": Permission denied"))))
       (do
         (f/mkdirs fpath)

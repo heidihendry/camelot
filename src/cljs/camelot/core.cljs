@@ -14,7 +14,7 @@
 
 (defn default-page [hash]
   (if (= hash "")
-    "/library"
+    "/organisation"
     (str "/" hash)))
 
 (defn disable-loading-screen
