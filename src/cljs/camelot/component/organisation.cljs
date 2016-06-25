@@ -4,7 +4,12 @@
             [om.dom :as dom :include-macros true]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.rest :as rest]
-            [camelot.component.survey.core :as survey])
+            [camelot.component.survey.core :as survey]
+            [camelot.component.species.core :as species]
+            [camelot.component.site.core :as site]
+            [camelot.component.camera.core :as camera]
+            [smithy.util :as util]
+            [camelot.component.nav :as nav])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn concept-item-component
@@ -64,11 +69,18 @@
                         (dom/h4 nil "Your Organisation"))
                (dom/div nil
                         (dom/div #js {:className "section-container"}
-                                 (om/build concept-menu-component data))
+                                 (om/build concept-menu-component data)
+                                 (dom/button #js {:className "btn btn-default org-settings"
+                                                  :onClick #(nav/toggle-settings!)}
+                                             (dom/span #js {:className "fa fa-cogs"})
+                                             " Show Settings"))
                         (dom/div #js {:className "section-container"}
                                  (case (:active data)
-                                   :survey (om/build survey/survey-menu-component data)
-                                   (om/build not-implemented data))))))))
+                                   :survey (om/build survey/survey-menu-component (:survey data))
+                                   :species (om/build species/species-menu-component (:species data))
+                                   :site (om/build site/site-menu-component (:site data))
+                                   :camera (om/build camera/camera-menu-component (:camera data))
+                     (om/build not-implemented data))))))))
 
 (defn organisation-view-component
   "Render an album validation summary."
@@ -76,22 +88,24 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (rest/get-resource
-       "/surveys"
-       #(om/update! app :survey {:list (:body %)
-                                 :active :survey
-                                 :menu [{:concept :survey
-                                         :name "Surveys"
-                                         :active true}
-                                        {:concept :species
-                                         :name "Species"}
-                                        {:concept :site
-                                         :name "Sites"}
-                                        {:concept :camera
-                                         :name "Cameras"}]})))
+      (rest/get-resource "/surveys"
+                         #(do (om/update! app :survey {:list (:body %)})
+                              (om/update! app :menu [{:concept :survey
+                                                      :name "Surveys"
+                                                      :active true}
+                                                     {:concept :species
+                                                      :name "Species"}
+                                                     {:concept :site
+                                                      :name "Sites"}
+                                                     {:concept :camera
+                                                      :name "Cameras"}])
+                              (om/update! app :active :survey)
+                              (om/update! app :species {})
+                              (om/update! app :camera {})
+                              (om/update! app :site {}))))
     om/IRender
     (render [_]
       (when (get-in app [:survey :list])
         (if (empty? (get-in app [:survey :list]))
           (om/build create/create-survey-view-component app)
-          (om/build organisation-management-component (:survey app)))))))
+          (om/build organisation-management-component app))))))

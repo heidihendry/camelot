@@ -19,16 +19,7 @@ Currently the only application state is the user's configuration."
                 {:url "/library"
                  :label (tr/translate (:config state) :application/library)}
                 {:url "/dashboard"
-                 :label (tr/translate (:config state) :application/import)}
-                {:url "/surveys"
-                 :label (tr/translate (:config state) :application/surveys)}
-                {:url "/sites"
-                 :label (tr/translate (:config state) :application/sites)}
-                {:url "/cameras"
-                 :label (tr/translate (:config state) :application/cameras)}
-                {:url "/taxonomy"
-                 :label (tr/translate (:config state) :application/taxonomy)}
-                {:function "settings"}]})
+                 :label (tr/translate (:config state) :application/import)}]})
 
 (def smiths (atom {}))
 

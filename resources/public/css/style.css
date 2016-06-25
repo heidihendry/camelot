@@ -75,11 +75,6 @@ html > body {
   min-width: auto;
   margin: 0;
 }
-#navigation .navbar-nav li:last-child {
-  float: right;
-  border-right: none;
-  border-left: 1px solid #1175aa;
-}
 #navigation .nav {
   min-width: auto;
   background: #116095;
@@ -1172,9 +1167,11 @@ pre.field-input {
     border-bottom: none;
     background: #fafafa;
     cursor: pointer;
+    text-align: center;
 }
 #app .simple-menu .menu-item.detailed {
     height: 10rem;
+    text-align: left;
 }
 #app .simple-menu .menu-item:hover {
     background: #fff;
@@ -1197,4 +1194,15 @@ pre.field-input {
 }
 #app .split-menu .section .btn {
     flex-shrink: 0;
+    margin-bottom: 0.5rem;
+}
+#app .split-menu .section .btn:last-child {
+    flex-shrink: 0;
+    margin-bottom: 0rem;
+}
+#app .org-settings {
+    width: 50%;
+    height: 6rem;
+    margin: auto;
+    margin-bottom: 3rem;
 }

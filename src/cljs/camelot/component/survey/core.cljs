@@ -37,6 +37,9 @@
                (dom/button #js {:className "btn btn-primary"
                                 :onClick #(nav/nav! "/survey/create")}
                            (dom/span #js {:className "fa fa-plus"})
-                           " Create Survey")))))
+                           " Create Survey")
+               (dom/button #js {:className "btn btn-default"
+                                :onClick #(nav/nav! "/surveys")}
+                           "Advanced")))))
 
 
