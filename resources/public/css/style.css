@@ -75,6 +75,11 @@ html > body {
   min-width: auto;
   margin: 0;
 }
+#navigation .navbar-nav li:last-child {
+  float: right;
+  border-right: none;
+  border-left: 1px solid #1175aa;
+}
 #navigation .nav {
   min-width: auto;
   background: #116095;
