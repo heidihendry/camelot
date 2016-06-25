@@ -53,6 +53,14 @@
                                           :description "GPS Latitude in decimal format"}
                   :trap-station-altitude {:label "Altitude (meters)"
                                           :description "Altitude in meters relative to sea-level"}
+                  :trap-station-distance-above-ground {:label "Distance above ground (meters)"
+                                                       :description "Distance the camera trap was positioned above ground"}
+                  :trap-station-distance-to-road {:label "Distance to road (meters)"
+                                                       :description "Distance between the camera trap and the nearest road"}
+                  :trap-station-distance-to-river {:label "Distance to river (meters)"
+                                                   :description "Distance between the camera trap and the nearest river"}
+                  :trap-station-distance-to-settlement {:label "Distance to settlement (meters)"
+                                                        :description "Distance between the camera trap and the nearest human settlement"}
                   :trap-station-sublocation {:label "Sublocation"
                                              :description "The name given to the location"}
                   :trap-station-notes {:label "Trap Station Notes"

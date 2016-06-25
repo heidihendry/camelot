@@ -19,7 +19,11 @@
      trap-station-longitude :- (s/pred valid-longitude?)
      trap-station-latitude :- (s/pred valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)])
+     trap-station-notes :- (s/maybe s/Str)
+     trap-station-distance-above-ground :- (s/maybe s/Num)
+     trap-station-distance-to-road :- (s/maybe s/Num)
+     trap-station-distance-to-river :- (s/maybe s/Num)
+     trap-station-distance-to-settlement :- (s/maybe s/Num)])
 
 (s/defrecord TrapStation
     [trap-station-id :- s/Num
@@ -30,25 +34,37 @@
      trap-station-longitude :- (s/pred valid-longitude?)
      trap-station-latitude :- (s/pred valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)])
+     trap-station-notes :- (s/maybe s/Str)
+     trap-station-distance-above-ground :- (s/maybe s/Num)
+     trap-station-distance-to-road :- (s/maybe s/Num)
+     trap-station-distance-to-river :- (s/maybe s/Num)
+     trap-station-distance-to-settlement :- (s/maybe s/Num)])
 
 (s/defn trap-station
   [{:keys [trap-station-id trap-station-created trap-station-updated
            trap-station-name survey-site-id trap-station-longitude
            trap-station-latitude trap-station-altitude
-           trap-station-notes]}]
+           trap-station-notes trap-station-distance-above-ground
+           trap-station-distance-to-road trap-station-distance-to-river
+           trap-station-distance-to-settlement]}]
   (->TrapStation trap-station-id trap-station-created trap-station-updated
                  trap-station-name survey-site-id trap-station-longitude
                  trap-station-latitude trap-station-altitude
-                 trap-station-notes))
+                 trap-station-notes trap-station-distance-above-ground
+                 trap-station-distance-to-road trap-station-distance-to-river
+                 trap-station-distance-to-settlement))
 
 (s/defn ttrap-station
   [{:keys [trap-station-name survey-site-id trap-station-longitude
            trap-station-latitude trap-station-altitude
-           trap-station-notes]}]
+           trap-station-notes trap-station-distance-above-ground
+           trap-station-distance-to-road trap-station-distance-to-river
+           trap-station-distance-to-settlement]}]
   (->TTrapStation trap-station-name survey-site-id trap-station-longitude
                   trap-station-latitude trap-station-altitude
-                  trap-station-notes))
+                  trap-station-notes trap-station-distance-above-ground
+                  trap-station-distance-to-road trap-station-distance-to-river
+                  trap-station-distance-to-settlement))
 
 (s/defn get-all :- [TrapStation]
   [state :- State

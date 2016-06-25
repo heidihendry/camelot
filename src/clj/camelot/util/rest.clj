@@ -19,7 +19,9 @@
 
 (def floating-point-fields
   "Set of keys for floating-point fields."
-  #{:trap-station-longitude :trap-station-latitude})
+  #{:trap-station-longitude :trap-station-latitude :trap-station-distance-above-ground
+    :trap-station-distance-to-road :trap-station-distance-to-river
+    :trap-station-distance-to-settlement})
 
 (defn- as-long
   "Return value as a Long if it can be parsed, otherwise return v."

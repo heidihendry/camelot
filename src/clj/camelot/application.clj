@@ -214,12 +214,20 @@ Currently the only application state is the user's configuration."
             [:trap-station-longitude]
             [:trap-station-latitude]
             [:trap-station-altitude]
+            [:trap-station-distance-above-ground]
+            [:trap-station-distance-to-road]
+            [:trap-station-distance-to-river]
+            [:trap-station-distance-to-settlement]
             [:trap-station-notes]]
    :schema {:trap-station-name {:type :text
                                 :required true}
             :trap-station-longitude {:type :number}
             :trap-station-latitude {:type :number}
             :trap-station-altitude {:type :number}
+            :trap-station-distance-above-ground {:type :number}
+            :trap-station-distance-to-road {:type :number}
+            :trap-station-distance-to-river {:type :number}
+            :trap-station-distance-to-settlement {:type :number}
             :trap-station-notes {:type :textarea
                                  :cols 35
                                  :rows 4}}
