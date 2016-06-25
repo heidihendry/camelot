@@ -48,18 +48,24 @@
                                                      {:init-state state}))))
         (dom/div #js {:className "no-species-found"}
                  (dom/p nil
-                        "Add species from the search menu"))))))
+                        "Search and add species using the menu to the right"))))))
 
 (defn create-survey
   [data]
   (let [ps (select-keys data [:survey-name
-                              :survey-notes
-                              :survey-sighting-independence-threshold])]
+                              :survey-notes])]
     (rest/post-x "/species/create"
-                 {:data {:ids (map :id (data :species))}}
+                 {:data {:species (deref (data :species))}}
                  (fn []
                    (rest/post-x "/surveys" {:data ps}
                                 #(nav/nav! "/library"))))))
+
+(defn survey-details-completed?
+  [data]
+  (and (get data :survey-name)
+       (not= (get data :survey-name) "")
+       (get data :survey-notes)
+       (not= (get data :survey-notes) "")))
 
 (defn create-survey-details-component
   [data owner]
@@ -67,30 +73,29 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section survey-details-pane"}
-               (dom/label #js {:className "field-label"} "Survey Name")
+               (dom/label #js {:className "field-label required"} "Survey Name")
                (dom/input #js {:className "field-input"
                                :type "text"
                                :placeholder "Survey Name..."
                                :value (:survey-name data)
                                :onChange #(om/update! data
                                                       :survey-name (.. % -target -value))})
-               (dom/label #js {:className "field-label"} "Survey Description")
+               (dom/label #js {:className "field-label required"} "Survey Description")
                (dom/textarea #js {:className "field-input"
                                   :rows "3"
                                   :value (:survey-notes data)
                                   :onChange #(om/update! data
                                                          :survey-notes (.. % -target -value))})
-               (dom/label #js {:className "field-label"} "Sighting Independence Threshold (minutes)")
-               (dom/input #js {:className "field-input"
-                               :type "number"
-                               :value (:survey-sighting-independence-threshold data)
-                               :onChange #(om/update! data
-                                                      :survey-sighting-independence-threshold (int (.. % -target -value)))})
                (dom/label #js {:className "field-label"} "Expected Species")
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"
-                                         :onClick #(create-survey data)}
+                                         :onClick #(create-survey data)
+                                         :disabled (if (survey-details-completed? data)
+                                                     "" "disabled")
+                                         :title (if (survey-details-completed? data)
+                                                  "Submit this survey"
+                                                  "Complete all required fields before submitting")}
                                     "Create Survey"
                                     (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
 

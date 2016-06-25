@@ -38,8 +38,8 @@
   [{:keys [survey-name survey-sighting-independence-threshold survey-directory
            survey-sampling-point-density
            survey-notes]}]
-  (->TSurvey survey-name survey-sighting-independence-threshold survey-directory
-             survey-sampling-point-density survey-notes))
+  (->TSurvey survey-name (or survey-sighting-independence-threshold 20)
+             survey-directory survey-sampling-point-density survey-notes))
 
 (s/defn get-all :- [Survey]
   [state :- State]

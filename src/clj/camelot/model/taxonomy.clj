@@ -12,7 +12,7 @@
      taxonomy-family :- (s/maybe s/Str)
      taxonomy-genus :- (s/maybe s/Str)
      taxonomy-species :- s/Str
-     taxonomy-common-name :- s/Str
+     taxonomy-common-name :- (s/maybe s/Str)
      taxonomy-notes :- (s/maybe s/Str)])
 
 (s/defrecord Taxonomy
@@ -24,7 +24,7 @@
      taxonomy-family :- (s/maybe s/Str)
      taxonomy-genus :- (s/maybe s/Str)
      taxonomy-species :- s/Str
-     taxonomy-common-name :- s/Str
+     taxonomy-common-name :- (s/maybe s/Str)
      taxonomy-notes :- (s/maybe s/Str)
      taxonomy-label :- s/Str])
 

@@ -102,8 +102,14 @@ html > body {
     border-right: 1px solid #bb9900;
 }
 #navigation .nav li.experimental:hover {
-    background: #bb3300;
-    background: #bb9900;
+    background: #cc5511;
+}
+#navigation .nav li.deprecated {
+    background: #999999;
+    border-right: 1px solid #888;
+}
+#navigation .nav li.deprecated:hover {
+    background: #aaa;
 }
 #navigation .nav li.icon-only {
   display: inline-block;
@@ -178,6 +184,9 @@ a:hover {
     display: inline-block;
     clear: both;
     font-weight: normal;
+}
+#app .field-label.required:after {
+    content: " *";
 }
 #app select.field-input {
   padding: 0.5rem;
@@ -1032,7 +1041,7 @@ pre.field-input {
 }
 #app .create-survey .intro {
     padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding-bottom: 2rem;
     text-align: center;
 }
 #app .create-survey .section-container:first-child {
@@ -1064,7 +1073,7 @@ pre.field-input {
     margin: auto;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 18rem);
+    height: calc(100vh - 16rem);
 }
 #app .create-survey .field-input {
     width: 100%;

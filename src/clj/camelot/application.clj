@@ -14,7 +14,12 @@ Currently the only application state is the user's configuration."
 (defn nav-menu
   "Main navigation menu structure."
   [state]
-  {:menu-items [{:url "/dashboard"
+  {:menu-items [{:url "/survey/create"
+                 :label (tr/translate (:config state) :application/survey-create)
+                 :experimental true}
+                {:url "/library"
+                 :label (tr/translate (:config state) :application/library)}
+                {:url "/dashboard"
                  :label (tr/translate (:config state) :application/import)}
                 {:url "/surveys"
                  :label (tr/translate (:config state) :application/surveys)}
@@ -24,8 +29,6 @@ Currently the only application state is the user's configuration."
                  :label (tr/translate (:config state) :application/cameras)}
                 {:url "/taxonomy"
                  :label (tr/translate (:config state) :application/taxonomy)}
-                {:url "/library"
-                 :label (tr/translate (:config state) :application/library)}
                 {:function "settings"}]})
 
 (def smiths (atom {}))
@@ -432,7 +435,7 @@ Currently the only application state is the user's configuration."
                         :action :effort-summary-report}
                        ]}
    :layout [[:survey-name]
-            [:survey-directory]
+            [:survey-sighting-independence-threshold]
             [:survey-sampling-point-density]
             [:survey-notes]]
    :schema {:survey-name {:type :text
@@ -440,6 +443,7 @@ Currently the only application state is the user's configuration."
             :survey-directory {:type :text
                                :required true}
             :survey-sampling-point-density {:type :number}
+            :survey-sighting-independence-threshold {:type :number}
             :survey-notes {:type :textarea
                            :rows 4
                            :cols 35}}

@@ -26,6 +26,8 @@
                                :description "The root directory of the survey's data"}
             :survey-sampling-point-density {:label "Sampling Point Density (metres)"
                                             :description "The distance between camera trap stations across the survey."}
+            :survey-sighting-independence-threshold {:label "Sighting Independence Threshold (mins)"
+                                                        :description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"}
             :survey-notes {:label "Survey Notes"
                            :description "Notes about this survey."}}
 
@@ -258,6 +260,7 @@
                                :description "Notes about this species or its identification."}}
    :application {:import "Import"
                  :library "Library"
+                 :survey-create "New Survey"
                  :surveys "Surveys"
                  :analysis "Analysis"
                  :sites "Sites"

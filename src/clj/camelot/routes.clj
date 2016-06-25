@@ -198,9 +198,9 @@
                 (r/response (species-search/query-search
                              (app/gen-state (conf/config))
                              {:search search})))
-           (POST "/create" [data] (r/response (species-search/create-for-ids
+           (POST "/create" [data] (r/response (species-search/ensure-survey-species-known
                                                (app/gen-state (conf/config))
-                                               (:ids data)))))
+                                               (:species data)))))
 
   misc-routes
   config/routes

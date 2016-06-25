@@ -38,7 +38,8 @@
         (dom/li #js {:id "settings-nav" :className "icon-only"
                      :onClick #(toggle-settings!)}
                 (dom/a nil (dom/span #js {:className "fa fa-cogs fa-2x"})))
-        (dom/li #js {:className (if (:experimental data) "experimental" "")
+        (dom/li #js {:className (if (:experimental data) "experimental"
+                                    (if (:deprecated data) "deprecated" ""))
                      :onClick #(nav/nav! (:url data))}
                 (dom/a nil (:label data)))))))
 
