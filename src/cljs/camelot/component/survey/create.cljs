@@ -1,4 +1,4 @@
-(ns camelot.component.create-survey
+(ns camelot.component.survey.create
   (:require [om.core :as om]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
@@ -89,6 +89,9 @@
                (dom/label #js {:className "field-label"} "Expected Species")
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
+                        (dom/button #js {:className "btn btn-default"
+                                         :onClick #(nav/nav! "/organisation")}
+                                    "Cancel")
                         (dom/button #js {:className "btn btn-primary"
                                          :onClick #(create-survey data)
                                          :disabled (if (survey-details-completed? data)
@@ -125,9 +128,7 @@
             (om/transact! data :species
                           #(conj % (deref (get-in data [:species-search :selection]))))
             (om/update! (:species-search data) :selection nil))
-          (prn (om/cursor? data))
-          (prn (:species data))
-          (dom/div #js {:className "create-survey"}
+          (dom/div #js {:className "split-menu"}
                    (dom/div #js {:className "intro"}
                             (dom/h4 nil "Create Survey"))
                    (dom/div nil

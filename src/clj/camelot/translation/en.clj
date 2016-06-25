@@ -268,7 +268,7 @@
                                :description "Notes about this species or its identification."}}
    :application {:import "Import"
                  :library "Library"
-                 :survey-create "New Survey"
+                 :organisation "Organisation"
                  :surveys "Surveys"
                  :analysis "Analysis"
                  :sites "Sites"

@@ -1031,20 +1031,20 @@ pre.field-input {
     margin-right: 1rem;
 }
 
-#app .create-survey {
+#app .split-menu {
 }
-#app .create-survey h4 {
+#app .split-menu h4 {
     text-align: center;
     font-size: 200%;
     font-weight: 300;
     font-color: #999;
 }
-#app .create-survey .intro {
+#app .split-menu .intro {
     padding-top: 3rem;
     padding-bottom: 2rem;
     text-align: center;
 }
-#app .create-survey .section-container:first-child {
+#app .split-menu .section-container:first-child {
     border-right: 1px solid #ccc;
 }
 #app .species-search input.species-search-input {
@@ -1066,7 +1066,7 @@ pre.field-input {
     flex-direction: column;
     height: 100%;
 }
-#app .create-survey .section-container {
+#app .split-menu .section-container {
     float: left;
     width: 50%;
     display: block;
@@ -1075,50 +1075,57 @@ pre.field-input {
     flex-direction: column;
     height: calc(100vh - 16rem);
 }
-#app .create-survey .field-input {
+#app .split-menu .field-input {
     width: 100%;
 }
-#app .create-survey .section {
-    display: block;
+#app .split-menu .section {
+    display: flex;
+    flex-direction: column;
     width: 70%;
     margin: auto;
     flex-grow: 1;
     height: calc(100vh - 22rem);
 }
-#app .create-survey .section input {
+#app .split-menu .section input {
     flex-shrink: 0;
 }
-#app .create-survey .no-species-found {
+#app .split-menu .no-species-found {
     color: #999;
     flex-grow: 1;
     margin: auto;
     padding-bottom: 4rem;
     vertical-align: middle;
 }
-#app .create-survey .no-species-found p {
+#app .split-menu .no-species-found p {
     margin: auto;
     padding-top: 4rem;
     display: inline-block;
     float: center;
     vertical-align: middle;
 }
-#app .create-survey .survey-species {
+#app .split-menu .survey-species {
     flex-grow: 1;
     overflow: auto;
     margin-bottom: 2rem;
 }
-#app .create-survey .button-container {
+#app .split-menu .button-container {
     text-align: right;
 }
-#app .create-survey th:last-child {
+#app .split-menu .button-container button {
+    margin: 0.5rem;
+}
+#app .split-menu .button-container button:last-child {
+    margin-right: 0rem;
+}
+#app .split-menu th:last-child {
     text-align: right;
     width: 12rem;
 }
-#app .create-survey td:last-child {
+#app .split-menu td:last-child {
     text-align: right;
     width: 12rem;
 }
-#app .create-survey .survey-details-pane {
+#app .split-menu .survey-details-pane {
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 10rem);
@@ -1135,4 +1142,59 @@ pre.field-input {
 #app .scroll table {
     max-height: 100%;
     overflow: auto;
+}
+#app .simple-menu {
+    margin: 0;
+    flex-grow: 1;
+    overflow: auto;
+}
+#app .simple-menu .menu-item:first-child {
+    border-top: 1px solid #eee;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+#app .simple-menu .menu-item:last-child {
+    border-bottom: 1px solid #eee;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+}
+#app .simple-menu .menu-item.active {
+    background: #116095;
+    color: #fff;
+}
+#app .simple-menu .menu-item.active:hover {
+    background: #1175aa;
+    color: #fff;
+}
+#app .simple-menu .menu-item {
+    padding: 2rem;
+    border: 1px solid #eee;
+    border-bottom: none;
+    background: #fafafa;
+    cursor: pointer;
+}
+#app .simple-menu .menu-item.detailed {
+    height: 10rem;
+}
+#app .simple-menu .menu-item:hover {
+    background: #fff;
+}
+#app .simple-menu .menu-item-title {
+    display: block;
+    font-size: 110%;
+}
+#app .simple-menu .menu-item-description {
+    font-size: 100%;
+    font-weight: 100;
+}
+#app .split-menu .section .sep {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    flex-shrink: 0;
+}
+#app .split-menu .section .btn {
+    flex-shrink: 0;
 }

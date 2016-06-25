@@ -14,9 +14,8 @@ Currently the only application state is the user's configuration."
 (defn nav-menu
   "Main navigation menu structure."
   [state]
-  {:menu-items [{:url "/survey/create"
-                 :label (tr/translate (:config state) :application/survey-create)
-                 :experimental true}
+  {:menu-items [{:url "/organisation"
+                 :label (tr/translate (:config state) :application/organisation)}
                 {:url "/library"
                  :label (tr/translate (:config state) :application/library)}
                 {:url "/dashboard"
