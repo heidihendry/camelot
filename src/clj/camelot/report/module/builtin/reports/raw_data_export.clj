@@ -11,8 +11,7 @@
              :trap-station-latitude
              :taxonomy-genus
              :taxonomy-species
-             :independent-observations]
-   :aggregate-on [:independent-observations]
+             :sighting-quantity]
    :filters [#(= (:survey-id %) survey-id)]
    :order-by [:taxonomy-genus :taxonomy-species]})
 
