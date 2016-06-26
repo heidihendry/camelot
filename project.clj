@@ -23,7 +23,7 @@
                  [org.apache.commons/commons-lang3 "3.4"]
                  [org.apache.derby/derby "10.12.1.1"]
                  [org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.7.228" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.89"]
                  [org.clojure/core.async "0.2.385"]
                  [org.clojure/data.csv "0.1.3"]
                  [org.clojure/java.jdbc "0.4.2"]
@@ -139,4 +139,6 @@
                            {:source-paths ^:replace ["src/cljs"]
                             :compiler
                             {:optimizations :advanced
+                             :externs ["resources/public/lib/ga.js"]
+                             :closure-warnings {:externs-validation :off}
                              :pretty-print false}}}}}})

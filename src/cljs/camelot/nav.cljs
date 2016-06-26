@@ -19,16 +19,14 @@
 
 (defn analytics-event
   [component action]
-  (let [ga (aget js/window "ga")]
-    (when ga
-      (ga "send" "event" component action))))
+  (when js/window.ga
+    (js/window.ga "send" "event" component action)))
 
 (defn analytics-pageview
   [page]
-  (let [ga (aget js/window "ga")]
-    (when ga
-      (ga "set" "page" page)
-      (ga "send" "pageview"))))
+  (when js/window.ga
+    (js/window.ga "set" "page" page)
+    (js/window.ga "send" "pageview")))
 
 (defn set-token!
   [history token]
