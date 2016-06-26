@@ -1,11 +1,12 @@
 (ns camelot.component.species-search
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [camelot.rest :as rest]
+            [camelot.nav :as nav]
             [clojure.string :as str]
             [cljs.core.async :refer [<! chan >!]]
             [goog.string :as gstr]
             [om.core :as om]
-            [om.dom :as dom]))
+            [om.dom :as dom])
+    (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def db-whitelist
   #{"Systema Dipterorum"
@@ -129,8 +130,11 @@
                   (when-not (nil? (:busy v))
                     (om/update! data :busy (:busy v)))
                   (when (:results v)
-                    (om/update! data :search-results (:results v))))
-                (om/update! data :selection v))
+                    (om/update! data :search-results (:results v))
+                    (nav/analytics-event "species-search" "search")))
+                (do
+                  (om/update! data :selection v)
+                  (nav/analytics-event "species-search" "add-species")))
               (recur))))))
     om/IRenderState
     (render-state [this state]

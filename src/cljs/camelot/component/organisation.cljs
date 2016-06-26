@@ -9,7 +9,8 @@
             [camelot.component.site.core :as site]
             [camelot.component.camera.core :as camera]
             [smithy.util :as util]
-            [camelot.component.nav :as nav])
+            [camelot.component.nav :as cnav]
+            [camelot.nav :as nav])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn concept-item-component
@@ -19,9 +20,10 @@
     (render-state [_ state]
       (dom/div #js {:className (str "menu-item"
                                     (if (:active data) " active" ""))
-                    :onClick #(do (prn "click")
-                                  (prn (:concept data))
-                                  (go (>! (:active-chan state) (:concept data))))}
+                    :onClick #(do
+                                (go (>! (:active-chan state) (:concept data)))
+                                (nav/analytics-event "organisation"
+                                                     (str (name (:concept data)) "-click")))}
                (dom/span #js {:className "menu-item-title"}
                          (:name data))))))
 
@@ -71,7 +73,9 @@
                         (dom/div #js {:className "section-container"}
                                  (om/build concept-menu-component data)
                                  (dom/button #js {:className "btn btn-default org-settings"
-                                                  :onClick #(nav/toggle-settings!)}
+                                                  :onClick #(do (cnav/toggle-settings!)
+                                                                (nav/analytics-event "organisation"
+                                                                                     "toggle-settings-click"))}
                                              (dom/span #js {:className "fa fa-cogs"})
                                              " Show Settings"))
                         (dom/div #js {:className "section-container"}

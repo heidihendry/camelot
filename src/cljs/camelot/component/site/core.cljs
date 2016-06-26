@@ -31,13 +31,16 @@
                                       {:key :site-id}))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"
-                                :onClick #(nav/nav! "/site/create")
+                                :onClick #(do
+                                            (nav/nav! "/site/create")
+                                            (nav/analytics-event "org-site" "create-click"))
                                 :disabled "disabled"
                                 :title "Not implemented"}
                            (dom/span #js {:className "fa fa-plus"})
                            " Add Site")
                (dom/button #js {:className "btn btn-default"
-                                :onClick #(nav/nav! "/sites")}
+                                :onClick #(do (nav/nav! "/sites")
+                                              (nav/analytics-event "org-site" "advanced-click"))}
                            "Advanced")))))
 
 

@@ -10,7 +10,9 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "menu-item detailed"
-                    :onClick #(nav/nav! (str "/" (:survey-id data) "/library"))}
+                    :onClick #(do
+                                (nav/nav! (str "/" (:survey-id data) "/library"))
+                                (nav/analytics-event "org-survey" "survey-click"))}
                (dom/span #js {:className "menu-item-title"}
                          (:survey-name data))
                (dom/span #js {:className "menu-item-description"}
@@ -35,11 +37,15 @@
                                       {:key :survey-id}))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"
-                                :onClick #(nav/nav! "/survey/create")}
+                                :onClick #(do
+                                            (nav/nav! "/survey/create")
+                                            (nav/analytics-event "org-survey" "create-click"))}
                            (dom/span #js {:className "fa fa-plus"})
                            " Create Survey")
                (dom/button #js {:className "btn btn-default"
-                                :onClick #(nav/nav! "/surveys")}
+                                :onClick #(do
+                                            (nav/nav! "/surveys")
+                                            (nav/analytics-event "org-survey" "advanced-click"))}
                            "Advanced")))))
 
 

@@ -67,11 +67,13 @@
                                    :disabled (when (:fail checks) "disabled")
                                    :title (when (:fail checks)
                                             "Unable to import due to validation errors.")
-                                   :onClick #(if (:warn checks)
-                                               (when (js/confirm
-                                                      "This folder may contain data with flaws. Importing it may compromise the accuracy of future analyses. Do you want to continue?")
-                                                 (show-import-dialog path))
-                                               (show-import-dialog path))}
+                                   :onClick #(do
+                                               (cnav/analytics-event "album-import" "show-import-dialog")
+                                               (if (:warn checks)
+                                                 (when (js/confirm
+                                                        "This folder may contain data with flaws. Importing it may compromise the accuracy of future analyses. Do you want to continue?")
+                                                   (show-import-dialog path))
+                                                 (show-import-dialog path)))}
                               "Import"))))))
 
 (defn problem-component

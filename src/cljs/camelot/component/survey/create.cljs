@@ -31,6 +31,7 @@
           (loop []
             (let [r (<! chan)]
               (om/transact! data :species #(into #{} (disj % r)))
+              (nav/analytics-event "org-survey-create" "species-remove-click")
               (recur))))))
     om/IRenderState
     (render-state [_ state]
@@ -90,10 +91,13 @@
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-default"
-                                         :onClick #(nav/nav! "/organisation")}
+                                         :onClick #(do
+                                                     (nav/nav! "/organisation")
+                                                     (nav/analytics-event "org-survey-create" "cancel-click"))}
                                     "Cancel")
                         (dom/button #js {:className "btn btn-primary"
-                                         :onClick #(create-survey data)
+                                         :onClick #(do (create-survey data)
+                                                       (nav/analytics-event "org-survey-create" "submit-click"))
                                          :disabled (if (survey-details-completed? data)
                                                      "" "disabled")
                                          :title (if (survey-details-completed? data)

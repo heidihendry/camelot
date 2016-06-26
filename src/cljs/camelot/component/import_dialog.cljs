@@ -174,12 +174,14 @@
                                              :onClick #(do
                                                          (post-import)
                                                          (om/update! (state/import-dialog-state) :selections {})
-                                                         (om/update! (state/import-dialog-state) :visible false))}
+                                                         (om/update! (state/import-dialog-state) :visible false)
+                                                         (nav/analytics-event "import-dialog" "import"))}
                                         "Import")
                             (dom/button #js {:className "btn btn-default"
                                              :onClick #(do
                                                          (om/update! (state/import-dialog-state) :selections {})
-                                                         (om/update! (state/import-dialog-state) :visible false))}
+                                                         (om/update! (state/import-dialog-state) :visible false)
+                                                         (nav/analytics-event "import-dialog" "cancel"))}
                                         "Cancel"))))
         (dom/span nil "")))))
 

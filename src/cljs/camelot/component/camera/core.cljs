@@ -31,13 +31,17 @@
                                       {:key :camera-id}))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"
-                                :onClick #(nav/nav! "/camera/create")
+                                :onClick #(do
+                                            (nav/nav! "/camera/create")
+                                            (nav/analytics-event "org-camera" "create-click"))
                                 :disabled "disabled"
                                 :title "Not implemented"}
                            (dom/span #js {:className "fa fa-plus"})
                            " Add Camera")
                (dom/button #js {:className "btn btn-default"
-                                :onClick #(nav/nav! "/cameras")}
+                                :onClick #(do
+                                            (nav/nav! "/cameras")
+                                            (nav/analytics-event "org-camera" "advanced-click"))}
                            "Advanced")))))
 
 

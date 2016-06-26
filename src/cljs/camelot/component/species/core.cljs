@@ -39,13 +39,15 @@
                                       {:key :taxonomy-id}))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"
-                                :onClick #(nav/nav! "/species/create")
+                                :onClick #(do (nav/nav! "/species/create")
+                                              (nav/analytics-event "org-species" "create-click"))
                                 :disabled "disabled"
                                 :title "Not implemented"}
                            (dom/span #js {:className "fa fa-plus"})
                            " Add Species")
                (dom/button #js {:className "btn btn-default"
-                                :onClick #(nav/nav! "/taxonomy")}
+                                :onClick #(do (nav/nav! "/taxonomy")
+                                              (nav/analytics-event "org-species" "advanced-click"))}
                            "Advanced")))))
 
 
