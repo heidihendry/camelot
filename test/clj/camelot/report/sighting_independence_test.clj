@@ -18,7 +18,7 @@
    :erroneous-infrared-threshold 0.5
    :sighting-independence-minutes-threshold 20})
 
-(facts "Sighting Independence"
+(facts "Sighting Independence extraction"
   (fact "A single sighting is extracted"
     (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
                       :taxonomy-id 1
@@ -184,3 +184,37 @@
                                                                 :count 4}
                                                                {:species-id 2
                                                                 :count 7}))))
+
+(facts "Sighting independence"
+  (fact "Records without sightings are excluded"
+    (let [record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                  :taxonomy-id nil
+                  :sighting-quantity nil
+                  :media-id 1}
+          state (gen-state-helper config)]
+      (sut/->independent-sightings state record) => []))
+
+  (fact "Records with sightings are included and sorted by date"
+    (let [records (list {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                         :taxonomy-id 1
+                         :sighting-quantity 1
+                         :media-id 1}
+                        {:media-capture-timestamp (t/date-time 2015 1 1 7 15 00)
+                         :taxonomy-id 1
+                         :sighting-quantity 3
+                         :media-id 2}
+                        {:media-capture-timestamp (t/date-time 2015 1 1 7 9 00)
+                         :taxonomy-id 2
+                         :sighting-quantity 2
+                         :media-id 3})
+          state (gen-state-helper config)]
+      (sut/->independent-sightings state records) => [{:media-capture-timestamp (t/date-time 2015 1 1 7 9 00)
+                                                       :sighting-independence-window-end (t/date-time 2015 1 1 7 29 00)
+                                                       :taxonomy-id 2
+                                                       :sighting-quantity 2
+                                                       :media-id 3}
+                                                      {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                                                       :sighting-independence-window-end (t/date-time 2015 1 1 7 30 00)
+                                                       :taxonomy-id 1
+                                                       :sighting-quantity 3
+                                                       :media-id 1}])))

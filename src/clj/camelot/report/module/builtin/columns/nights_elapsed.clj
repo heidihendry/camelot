@@ -6,9 +6,9 @@
 (module/register-column
  :total-nights
  {:calculate col-util/calculate-total-nights
-  :aggregate col-util/aggregate-by-trap-station})
+  :aggregate col-util/aggregate-by-trap-station-session})
 
 (module/register-column
  :nights-elapsed
  {:calculate col-util/calculate-nights-elapsed
-  :aggregate col-util/aggregate-by-trap-station})
+  :aggregate col-util/aggregate-by-trap-station-session})

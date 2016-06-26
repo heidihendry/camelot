@@ -12,7 +12,7 @@
 (defn- aggregate-presense-absence
   [col data]
   (->> data
-       (col-util/aggregate-by-trap-station :independent-observations)
+       (col-util/aggregate-by-trap-station-session :independent-observations)
        (presense-flag)))
 
 (defn- calculate-presence-absence

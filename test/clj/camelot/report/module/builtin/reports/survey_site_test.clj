@@ -1,4 +1,4 @@
-(ns camelot.report.survey-site-test
+(ns camelot.report.module.builtin.reports.survey-site-test
   (:require [camelot.application :as app]
             [camelot.report.core :as sut]
             [clj-time.core :as t]

@@ -1,4 +1,4 @@
-(ns camelot.report.maxent-test
+(ns camelot.report.module.builtin.reports.maxent-test
   (:require [camelot.application :as app]
             [camelot.report.core :as sut]
             [clojure

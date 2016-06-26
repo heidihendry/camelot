@@ -7,4 +7,4 @@
 (module/register-column
  :independent-observations
  {:calculate col-util/calculate-independent-observations
-  :aggregate col-util/aggregate-by-trap-station})
+  :aggregate col-util/aggregate-by-trap-station-session})

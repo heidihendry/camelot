@@ -1,4 +1,4 @@
-(ns camelot.report.trap-station-test
+(ns camelot.report.module.builtin.reports.trap-station-test
   (:require [camelot.application :as app]
             [camelot.report.core :as sut]
             [clj-time.core :as t]

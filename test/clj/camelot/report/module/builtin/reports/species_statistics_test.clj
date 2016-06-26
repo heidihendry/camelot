@@ -1,4 +1,4 @@
-(ns camelot.report.species-statistics-test
+(ns camelot.report.module.builtin.reports.species-statistics-test
   (:require [camelot.application :as app]
             [camelot.report.core :as sut]
             [camelot.test-util.state :as state]

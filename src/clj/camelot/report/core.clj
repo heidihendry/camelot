@@ -90,15 +90,15 @@
   (filter (partial apply-filters filters) data))
 
 (defn- aggregate-reducer
-  [group acc c]
+  [state group acc c]
   (let [f (get-in @module/known-columns [c :aggregate])]
     (if f
-      (assoc acc c (f c group))
+      (assoc acc c (f state c group))
       acc)))
 
 (defn- aggregate-groups
-  [aggregated-columns group]
-  (let [col-vals (reduce (partial aggregate-reducer group) {} aggregated-columns)
+  [state aggregated-columns group]
+  (let [col-vals (reduce (partial aggregate-reducer state group) {} aggregated-columns)
         update-vals #(reduce-kv (fn [acc col v]
                                   (if (nil? (acc col))
                                     acc
@@ -107,12 +107,12 @@
     (map update-vals group)))
 
 (defn- aggregate-data
-  [columns aggregated-columns data]
+  [state columns aggregated-columns data]
   (let [anchors (remove (set aggregated-columns) columns)
         groups (group-by #(select-keys % anchors) data)]
     (->> groups
          (reduce-kv (fn [acc k v]
-                      (assoc acc k (aggregate-groups aggregated-columns v)))
+                      (assoc acc k (aggregate-groups state aggregated-columns v)))
                     {})
          (vals)
          (flatten))))
@@ -150,7 +150,7 @@
        (add-calculated-columns state columns)
        (transform-records state pre-transforms)
        (filter-records state pre-filters)
-       (aggregate-data columns aggregate-on)
+       (aggregate-data state columns aggregate-on)
        (add-post-aggregate-columns state columns)
        (transform-records state transforms)
        (filter-records state filters)

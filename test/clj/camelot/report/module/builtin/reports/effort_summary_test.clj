@@ -6,7 +6,8 @@
 
 (defn- gen-state-helper
   [config]
-  (app/gen-state config))
+  (app/gen-state (merge {:timezone "Asia/Ho_Chi_Minh"}
+                        config)))
 
 (def report
   (partial sut/report :effort-summary))

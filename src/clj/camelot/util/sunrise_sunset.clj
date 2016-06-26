@@ -15,11 +15,11 @@
     cal))
 
 (s/defn get-sunrise-time
-  [lat :- s/Str
+  [tz :- TimeZone
+   lat :- s/Str
    lon :- s/Str
    date :- DateTime]
-  (let [l (Location. lat lon)
-        tz (TimeZone/getDefault)]
+  (let [l (Location. lat lon)]
     (t/plus
      (tc/from-date
       (.getTime (.getOfficialSunriseCalendarForDate (SunriseSunsetCalculator. l tz)
@@ -27,11 +27,11 @@
      (Seconds/seconds (/ (.getOffset tz (tc/to-long date)) 1000)))))
 
 (s/defn get-sunset-time
-  [lat :- s/Str
+  [tz :- TimeZone
+   lat :- s/Str
    lon :- s/Str
    date :- DateTime]
-  (let [l (Location. lat lon)
-        tz (TimeZone/getDefault)]
+  (let [l (Location. lat lon)]
     (t/plus (tc/from-date
              (.getTime (.getOfficialSunsetCalendarForDate (SunriseSunsetCalculator. l tz)
                                                           (calendar-for-date date))))

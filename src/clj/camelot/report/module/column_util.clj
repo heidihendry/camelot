@@ -3,7 +3,7 @@
             [clj-time.core :as t]))
 
 (defn aggregate-numeric
-  [group-col col data]
+  [group-col state col data]
   (->> data
        (group-by group-col)
        (vals)
@@ -15,37 +15,53 @@
 
 (defn ->percentage
   [{:keys [n d]}]
-  (format "%.2f" (* 100 (float (/ n d)))))
+  (if (zero? d)
+    nil
+    (format "%.2f" (* 100 (float (/ n d))))))
 
-(defn aggregate-boolean
-  [group-col col data]
+(defn boolean-reducer
+  [col acc v]
+  (cond
+    (= (get v col) "X") (update (update acc :n inc) :d inc)
+    (= (get v col) "") (update acc :d inc)
+    (nil? (get v col)) acc))
+
+(defn boolean-sighting-reducer
+  [col acc v]
+  (cond
+    (= (get v col) "X") (assoc (assoc acc
+                                        :n (+ (or (:sighting-quantity v) 0) (:n acc)))
+                                :d (+ (or (:sighting-quantity v) 0) (:d acc)))
+    (= (get v col) "") (assoc acc :d (+ (or (:sighting-quantity v) 0) (:d acc)))
+    (nil? (get v col)) acc))
+
+(defn aggregate-boolean*
+  [reducer group-col state col data]
   (->> data
        (group-by group-col)
        (vals)
-       (map #(get (first %) col))
        (flatten)
-       (reduce #(cond
-                  (= %2 "X") (update (update %1 :n inc) :d inc)
-                  (= %2 "") (update %1 :d inc)
-                  (nil? %2) %1)
-               {:n 0 :d 0})
+       (reduce (partial reducer col) {:n 0 :d 0})
        (->percentage)))
 
-(defn aggregate-by-species
-  [col data]
-  (aggregate-numeric :taxonomy-id col data))
+(defn aggregate-boolean
+  [group-col state col data]
+  (aggregate-boolean* boolean-reducer group-col state col data))
 
-;; TODO migrate everything off of this
-(defn aggregate-by-trap-station
-  [col data]
-  (aggregate-numeric :trap-station-session-id col data))
+(defn aggregate-boolean-by-sightings
+  [group-col state col data]
+  (aggregate-boolean* boolean-sighting-reducer group-col state col data))
+
+(defn aggregate-by-species
+  [state col data]
+  (aggregate-numeric :taxonomy-id state col data))
 
 (defn aggregate-by-trap-station-session
-  [col data]
-  (aggregate-numeric :trap-station-session-id col data))
+  [state col data]
+  (aggregate-numeric :trap-station-session-id state col data))
 
 (defn aggregate-with-reducer
-  [pred group-col col data]
+  [pred group-col state col data]
   (->> data
        (group-by group-col)
        (vals)
@@ -92,12 +108,16 @@
   [sample]
   (let [start (:trap-station-session-start-date sample)
         end (:trap-station-session-end-date sample)]
-    (t/in-days (t/interval (t/floor start t/day)
-                           (t/floor end t/day)))))
+    (if (or (nil? start) (nil? end))
+      0
+      (t/in-days (t/interval (t/floor start t/day)
+                             (t/floor end t/day))))))
 
 (defn- trap-session-nights-reducer
   [acc k v]
-  (assoc acc k (get-nights-for-sample (first v))))
+  (assoc acc k (if (seq v)
+                 (get-nights-for-sample (first v))
+                 0)))
 
 (defn- get-nights-for-sessions
   [data]

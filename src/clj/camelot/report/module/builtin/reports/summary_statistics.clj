@@ -8,9 +8,11 @@
              :trap-station-count
              :media-count
              :independent-observations
+             :percent-nocturnal
              :total-nights
              :independent-observations-per-night]
    :aggregate-on [:media-count
+                  :percent-nocturnal
                   :independent-observations
                   :trap-station-count]
    :rewrites [#(if (= (:survey-id %) survey-id)
