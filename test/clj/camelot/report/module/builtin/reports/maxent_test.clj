@@ -1,5 +1,6 @@
 (ns camelot.report.module.builtin.reports.maxent-test
   (:require [camelot.application :as app]
+            [camelot.test-util.state :as state]
             [camelot.report.core :as sut]
             [clojure
              [edn :as edn]
@@ -24,7 +25,7 @@
                       :taxonomy-species "Spotted Cat"
                       :trap-station-longitude 100.0
                       :trap-station-latitude 0.0}]]
-      (csv-report (app/gen-state {:language :en}) 1 sightings) =>
+      (csv-report (state/gen-state {:language :en}) 1 sightings) =>
       (str heading "1,Yellow,Spotted Cat,100.0,0.0\n")))
 
   (fact "Missing sighting information should not produce results"
@@ -33,7 +34,7 @@
                       :taxonomy-species nil
                       :trap-station-longitude 100.0
                       :trap-station-latitude 0.0}]]
-      (csv-report (app/gen-state {:language :en}) 1 sightings) => heading))
+      (csv-report (state/gen-state {:language :en}) 1 sightings) => heading))
 
   (fact "Missing GPS longitude should not produce results"
     (let [sightings [{:media-id 1
@@ -42,7 +43,7 @@
                       :taxonomy-species "Spotted Cat"
                       :trap-station-longitude nil
                       :trap-station-latitude 0.0}]]
-      (csv-report (app/gen-state {:language :en}) 1 sightings) => heading))
+      (csv-report (state/gen-state {:language :en}) 1 sightings) => heading))
 
   (fact "Missing GPS latitude should not produce results"
     (let [sightings [{:media-id 1
@@ -51,7 +52,7 @@
                       :taxonomy-species "Spotted Cat"
                       :trap-station-longitude 100.0
                       :trap-station-latitude nil}]]
-      (csv-report (app/gen-state {:language :en}) 1 sightings) => heading))
+      (csv-report (state/gen-state {:language :en}) 1 sightings) => heading))
 
   (fact "Should exclude results from other surveys"
     (let [sightings [{:media-id 1
@@ -66,7 +67,7 @@
                       :taxonomy-species "Wolf"
                       :trap-station-longitude 50.0
                       :trap-station-latitude 30}]]
-      (csv-report (app/gen-state {:language :en}) 1 sightings) =>
+      (csv-report (state/gen-state {:language :en}) 1 sightings) =>
       (str heading "1,Yellow,Spotted Cat,100.0,0.0\n")))
 
   (fact "Should cope with a large number of results"
@@ -78,7 +79,7 @@
                                            :taxonomy-species "Spotted Cat"
                                            :trap-station-longitude 100.0
                                            :trap-station-latitude 0.0))
-          result (str/split (csv-report (app/gen-state {:language :en}) 1 sightings) #"\n")]
+          result (str/split (csv-report (state/gen-state {:language :en}) 1 sightings) #"\n")]
       (count result) => 1001
       (second result) => "1,Yellow,Spotted Cat,100.0,0.0"
       (last result) => "1000,Yellow,Spotted Cat,100.0,0.0"))
@@ -92,7 +93,7 @@
                                               :taxonomy-species "Spotted Cat"
                                               :trap-station-longitude 100.0
                                               :trap-station-latitude 0.0))
-          runset #(csv-report (app/gen-state {:language :en}) 1 %)
+          runset #(csv-report (state/gen-state {:language :en}) 1 %)
           sightings1000 (repeatedly 500
                                     #(hash-map :media-id (swap! counter inc)
                                                :survey-id 1

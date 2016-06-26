@@ -1,12 +1,12 @@
 (ns camelot.report.module.builtin.reports.effort-summary-test
   (:require [camelot.report.core :as sut]
             [midje.sweet :refer :all]
-            [camelot.application :as app]
+            [camelot.test-util.state :as state]
             [clj-time.core :as t]))
 
 (defn- gen-state-helper
   [config]
-  (app/gen-state (merge {:timezone "Asia/Ho_Chi_Minh"}
+  (state/gen-state (merge {:timezone "Asia/Ho_Chi_Minh"}
                         config)))
 
 (def report

@@ -1,5 +1,5 @@
 (ns camelot.report.module.builtin.reports.trap-station-test
-  (:require [camelot.application :as app]
+  (:require [camelot.test-util.state :as state]
             [camelot.report.core :as sut]
             [clj-time.core :as t]
             [clojure.string :as str]
@@ -7,7 +7,7 @@
 
 (defn- gen-state-helper
   [config]
-  (app/gen-state (assoc config :language :en)))
+  (state/gen-state (assoc config :language :en)))
 
 (defn- calc-obs-nights
   [obs nights]
@@ -53,7 +53,7 @@
                            :trap-station-session-id 1
                            :trap-station-id 1})
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
-          result (report state 1 sightings)]
+          result (report state 1 (vec sightings))]
       result => (list ["Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)])))
 
   (fact "Report with one sighting should contain its summary"

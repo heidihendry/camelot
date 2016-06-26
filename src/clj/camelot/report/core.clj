@@ -3,6 +3,7 @@
   (:require [camelot
              [application :as app]
              [db :as db]]
+            [camelot.model.state :refer [State]]
             [camelot.report.module.loader :as loader]
             [camelot.report.module.core :as module]
             [camelot.translation.core :as tr]
@@ -14,7 +15,8 @@
             [clojure.set :as set]
             [ring.util.response :as r]
             [schema.core :as s]
-            [yesql.core :as sql]))
+            [yesql.core :as sql])
+  (:import [clojure.lang IFn]))
 
 (sql/defqueries "sql/reports.sql" {:connection db/spec})
 
@@ -45,8 +47,9 @@
    :camera get-all-by-camera
    :all get-all})
 
-(defn get-by
-  [by]
+(s/defn get-by :- [{s/Keyword s/Any}]
+  "Retrieve the data for the given report type."
+  [by :- s/Keyword]
   ((get query-fn-map by)))
 
 (defn- fill-keys
@@ -133,18 +136,21 @@
     (apply sorted-set-by (partial compare-records order-by) data)
     data))
 
-(defn- transform-records
-  [state transforms data]
-  (map
-   (fn [r] (reduce #(%2 %1) r transforms))
-   data))
+(s/defn transform-records :- [{s/Keyword s/Any}]
+  "Apply a series of transformation functions to each record."
+  [state :- State
+   transforms :- [IFn]
+   data :- [{s/Keyword s/Any}]]
+  (map (fn [r] (reduce #(%2 %1) r transforms)) data))
 
 (def add-calculated-columns (module/build-calculated-columns :calculate))
 (def add-post-aggregate-columns (module/build-calculated-columns :post-aggregate))
 
-(defn generate-report
+(s/defn generate-report
   "Generate a report given a configuration and data."
-  [state {:keys [columns rewrites pre-transforms pre-filters transforms filters aggregate-on order-by]} data]
+  [state :- State
+   {:keys [columns rewrites pre-transforms pre-filters transforms filters aggregate-on order-by]}
+   data :- [{s/Keyword s/Any}]]
   (->> data
        (transform-records state rewrites)
        (add-calculated-columns state columns)
@@ -172,24 +178,24 @@
   [state cols row]
   (map #(get row %) cols))
 
-(defn as-dashed-rows
+(defn- as-dashed-rows
   [state params data]
   (let [cols (:columns params)]
     (map (partial as-dashed-row state cols) data)))
 
-(defn as-rows
+(defn- as-rows
   [state params data]
   (let [cols (:columns params)]
     (map (partial as-row state cols) data)))
 
-(s/defn to-csv-string :- s/Str
+(defn- to-csv-string
   "Return data as a CSV string."
   [data]
   (with-open [io-str (java.io.StringWriter.)]
     (csv/write-csv io-str data)
     (.toString io-str)))
 
-(defn exportable-report
+(defn- exportable-report
   "Generate a report as a CSV."
   [state params data]
   (->> data
@@ -198,8 +204,12 @@
        (cons-headings state (:columns params))
        (to-csv-string)))
 
-(defn report
-  [report-key state id data]
+(s/defn report :- [s/Any]
+  "Produce a report, with each record represented as a vector."
+  [report-key :- s/Keyword
+   state :- State
+   id :- s/Num
+   data :- [{s/Keyword s/Any}]]
   (loader/load-user-modules)
   (let [report (module/get-report report-key)
         conf ((:configuration report) state id)]
@@ -207,8 +217,12 @@
          (generate-report state conf)
          (as-rows state conf))))
 
-(defn csv-report
-  [report-key state id data]
+(s/defn csv-report
+  "Produce the report as a CSV."
+  [report-key :- s/Keyword
+   state :- State
+   id :- s/Int
+   data :- [{s/Keyword s/Any}]]
   (let [report (module/get-report report-key)]
     (exportable-report
      state
@@ -217,16 +231,17 @@
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
 
-(defn content-disposition
+(defn- content-disposition
   [report survey-id]
   (format "attachment; filename=\"%s_ID_%d_%s.csv\""
           (get report :file-prefix)
           survey-id
           (tf/unparse time-formatter (tl/local-now))))
 
-(defn export
+(s/defn export
   "Handler for an export request."
-  [report-key survey-id]
+  [report-key :- s/Keyword
+   survey-id :- s/Int]
   (loader/load-user-modules)
   (if-let [report (module/get-report report-key)]
     (let [state (app/gen-state (config/config))

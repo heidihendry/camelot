@@ -1,9 +1,17 @@
 (ns camelot.report.module.column-util
+  "Utilities for defining report columns."
   (:require [camelot.report.sighting-independence :as indep]
-            [clj-time.core :as t]))
+            [clj-time.core :as t]
+            [schema.core :as s]
+            [camelot.model.state :refer [State]])
+  (:import [clojure.lang IFn]))
 
-(defn aggregate-numeric
-  [group-col state col data]
+(s/defn aggregate-numeric :- s/Num
+  "Aggregate numeric values of `col' by summation."
+  [group-col :- s/Keyword
+   state :- State
+   col :- s/Keyword
+   data :- [{s/Keyword s/Any}]]
   (->> data
        (group-by group-col)
        (vals)
@@ -13,29 +21,29 @@
                   %1
                   (+ %1 %2)) 0)))
 
-(defn ->percentage
+(defn- ->percentage
   [{:keys [n d]}]
   (if (zero? d)
     nil
     (format "%.2f" (* 100 (float (/ n d))))))
 
-(defn boolean-reducer
+(defn- boolean-reducer
   [col acc v]
   (cond
     (= (get v col) "X") (update (update acc :n inc) :d inc)
     (= (get v col) "") (update acc :d inc)
     (nil? (get v col)) acc))
 
-(defn boolean-sighting-reducer
+(defn- boolean-sighting-reducer
   [col acc v]
   (cond
-    (= (get v col) "X") (assoc (assoc acc
-                                        :n (+ (or (:sighting-quantity v) 0) (:n acc)))
-                                :d (+ (or (:sighting-quantity v) 0) (:d acc)))
+    (= (get v col) "X") (assoc acc
+                               :n (+ (or (:sighting-quantity v) 0) (:n acc))
+                               :d (+ (or (:sighting-quantity v) 0) (:d acc)))
     (= (get v col) "") (assoc acc :d (+ (or (:sighting-quantity v) 0) (:d acc)))
     (nil? (get v col)) acc))
 
-(defn aggregate-boolean*
+(defn- aggregate-boolean*
   [reducer group-col state col data]
   (->> data
        (group-by group-col)
@@ -44,24 +52,42 @@
        (reduce (partial reducer col) {:n 0 :d 0})
        (->percentage)))
 
-(defn aggregate-boolean
-  [group-col state col data]
+(s/defn aggregate-boolean
+  "Aggregate boolean fields as a percentage of records."
+  [group-col :- s/Keyword
+   state :- State
+   col :- s/Keyword
+   data :- [{s/Keyword s/Any}]]
   (aggregate-boolean* boolean-reducer group-col state col data))
 
-(defn aggregate-boolean-by-sightings
-  [group-col state col data]
+(s/defn aggregate-boolean-by-sightings
+  "Aggregate boolean fields as a percentage of sighting quantities."
+  [group-col :- s/Keyword
+   state :- State
+   col :- s/Keyword
+   data :- [{s/Keyword s/Any}]]
   (aggregate-boolean* boolean-sighting-reducer group-col state col data))
 
-(defn aggregate-by-species
-  [state col data]
+(s/defn aggregate-by-species
+  "Numeric aggregation by species."
+  [state :- State
+   col :- s/Keyword
+   data :- [{s/Keyword s/Any}]]
   (aggregate-numeric :taxonomy-id state col data))
 
-(defn aggregate-by-trap-station-session
-  [state col data]
+(s/defn aggregate-by-trap-station-session
+  "Numeric aggregation by trap session."
+  [state :- State
+   col :- s/Keyword
+   data :- [{s/Keyword s/Any}]]
   (aggregate-numeric :trap-station-session-id state col data))
 
-(defn aggregate-with-reducer
-  [pred group-col state col data]
+(s/defn aggregate-with-reducer
+  [pred :- IFn
+   group-col :- s/Keyword
+   state :- State
+   col :- s/Keyword
+   data :- [{s/Keyword s/Any}]]
   (->> data
        (group-by group-col)
        (vals)
@@ -97,8 +123,10 @@
          (group-by :trap-station-session-id)
          (reduce-kv obs-reducer {}))))
 
-(defn calculate-independent-observations
-  [state data]
+(s/defn calculate-independent-observations
+  "Return the number of independent observations for a species"
+  [state :- State
+   data :- [{s/Keyword s/Any}]]
   (let [all-spp-obs (get-independent-observations state data)
         path #(vector (:trap-station-session-id %) (:taxonomy-id %))
         get-obs #(get-in all-spp-obs (path %))]
@@ -125,18 +153,26 @@
        (group-by :trap-station-session-id)
        (reduce-kv trap-session-nights-reducer {})))
 
-(defn calculate-nights-elapsed
-  [state data]
+(s/defn calculate-nights-elapsed
+  [state :- State
+   data :- [{s/Keyword s/Any}]]
   (let [nights (get-nights-for-sessions data)]
     (map #(assoc % :nights-elapsed
                  (get nights (:trap-station-session-id %))) data)))
 
-(defn column-from-existing
-  [col newcol state data]
+(s/defn column-from-existing
+  "Assoc a column `newcol', with the value from `col'.
+Useful for performing different types of aggregations."
+  [col :- s/Keyword
+   newcol :- s/Keyword
+   state :- State
+   data :- [{s/Keyword s/Any}]]
   (map #(assoc % newcol (get % col))) data)
 
-(defn calculate-total-nights
-  [state data]
+(s/defn calculate-total-nights
+  "Assoc the number of nights elapsed for a session."
+  [state :- State
+   data :- [{s/Keyword s/Any}]]
   (let [nights (get-nights-for-sessions data)
         v (reduce + 0 (vals nights))]
     (map #(assoc % :total-nights v) data)))
@@ -150,6 +186,10 @@
              1
              0))))
 
-(defn calculate-count
-  [tbl state data]
+(s/defn calculate-count
+  "Assoc the count of records for a `table'.
+A table corresponds to any `-id' column, minus the '-id' suffix."
+  [tbl :- s/Keyword
+   state :- State
+   data :- [{s/Keyword s/Any}]]
   (map (partial assoc-count tbl) data))

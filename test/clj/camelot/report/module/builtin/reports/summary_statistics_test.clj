@@ -1,5 +1,5 @@
 (ns camelot.report.module.builtin.reports.summary-statistics-test
-  (:require [camelot.application :as app]
+  (:require [camelot.test-util.state :as state]
             [camelot.report.core :as sut]
             [clj-time.core :as t]
             [clojure.string :as str]
@@ -7,7 +7,7 @@
 
 (defn- gen-state-helper
   [config]
-  (app/gen-state (merge {:language :en
+  (state/gen-state (merge {:language :en
                          :timezone "Asia/Ho_Chi_Minh"}
                         config)))
 

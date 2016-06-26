@@ -1,5 +1,5 @@
 (ns camelot.report.module.builtin.reports.survey-site-test
-  (:require [camelot.application :as app]
+  (:require [camelot.test-util.state :as state]
             [camelot.report.core :as sut]
             [clj-time.core :as t]
             [clojure.string :as str]
@@ -7,7 +7,7 @@
 
 (defn- gen-state-helper
   [config]
-  (app/gen-state (assoc config :language :en)))
+  (state/gen-state (assoc config :language :en)))
 
 (defn- calc-obs-nights
   [obs nights]
