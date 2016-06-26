@@ -4,7 +4,9 @@
             [camelot.util.filter :as filter]
             [camelot.component.library.util :as util]
             [camelot.state :as state]
-            [camelot.rest :as rest]))
+            [camelot.rest :as rest]
+            [camelot.nav :as nav]
+            [clojure.string :as str]))
 
 (defn add-sighting
   []
@@ -65,7 +67,8 @@
       (dom/button #js {:className "fa fa-search btn search"
                        :title "Apply the current filters"
                        :id "apply-filter"
-                       :onClick #(om/update! data :dirty-state true)}))))
+                       :onClick #(do (om/update! data :dirty-state true)
+                                     (nav/analytics-event "library-search" "forced-refresh-click"))}))))
 
 (defn select-media-collection-container
   [e]
@@ -109,7 +112,8 @@
                                         (util/load-trap-stations sid))
                                       (do
                                         (util/load-library)
-                                        (util/load-trap-stations))))}
+                                        (util/load-trap-stations)))
+                                    (nav/analytics-event "library-search" "survey-select-change"))}
                   (om/build-all survey-option-component
                                 (cons {:survey-id -1 :survey-name "All Surveys"}
                                       (:surveys data))
@@ -123,7 +127,8 @@
       (dom/button #js {:className "btn btn-default"
                        :id "identify-selected"
                        :title "Open the identification panel to apply to the selected media"
-                       :onClick identify-selected-prompt
+                       :onClick #(do (identify-selected-prompt)
+                                     (nav/analytics-event "library-id" "open-identification-panel"))
                        :disabled (if (or (not (:has-selected state))
                                          (:identify-selected data))
                                    "disabled" "")}
@@ -148,7 +153,8 @@
                                 :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                              (om/update! (:search data) :trap-station-id sid)
                                              (om/update! (:search data) :page 1)
-                                             (om/update! (:search data) :dirty-state true))}
+                                             (om/update! (:search data) :dirty-state true)
+                                             (nav/analytics-event "library-search" "trap-station-select-change"))}
                            (om/build-all trap-station-option-component
                                          (cons {:trap-station-id -1
                                                 :trap-station-name "All Traps"}
@@ -167,7 +173,9 @@
                                :value (get-in data [:search (:key state)])
                                :onChange #(do (om/update! (:search (state/library-state))
                                                           (:key state) (.. % -target -checked))
-                                              (om/update! (:search data) :dirty-state true))
+                                              (om/update! (:search data) :dirty-state true)
+                                              (nav/analytics-event "library-search"
+                                                                   (str (str/lower-case (:label state)) "-checkbox-change")))
                                :className "field-input"})))))
 
 (defn media-flag-component
@@ -181,7 +189,8 @@
           (dom/span #js {:className ((:classFn state) flag-enabled)
                          :title (:title state)
                          :id (:id state)
-                         :onClick #((:fn state) (not flag-enabled))}))))))
+                         :onClick #(do ((:fn state) (not flag-enabled))
+                                       (nav/analytics-event "library-search" (str (:id state) "-toggled")))}))))))
 
 (defn media-flag-container-component
   [data owner]
@@ -245,8 +254,9 @@
                                  (dom/select #js {:className "field-input"
                                                   :id "identify-species-select"
                                                   :value (get-in data [:identification :species])
-                                                  :onChange #(om/update! (:identification data) :species
-                                                                         (.. % -target -value))}
+                                                  :onChange #(do (om/update! (:identification data) :species
+                                                                             (.. % -target -value))
+                                                                 (nav/analytics-event "library-id" "species-change"))}
                                              (om/build-all species-option-component
                                                            (conj (vals (:species data))
                                                                  {:taxonomy-id -1
@@ -260,17 +270,21 @@
                                                  :onChange #(when (re-find #"^[0-9]+$"
                                                                            (get-in data [:identification :quantity]))
                                                               (om/update! (:identification data) :quantity
-                                                                          (cljs.reader/read-string (.. % -target -value))))}))
+                                                                          (cljs.reader/read-string (.. % -target -value)))
+                                                              (nav/analytics-event "library-id" "quantity-change"))}))
                         (dom/div #js {:className "field"}
                                  (dom/button #js {:className "btn btn-primary"
                                                   :disabled (when (not (and (get-in data [:identification :quantity])
                                                                             (get-in data [:identification :species])
                                                                             (> (get-in data [:identification :species]) -1)))
                                                               "disabled")
-                                                  :onClick submit-identification} "Submit")
+                                                  :onClick #(do (submit-identification)
+                                                                (nav/analytics-event "library-id" "submit-identification"))}
+                                             "Submit")
                                  (dom/button #js {:className "btn btn-default"
                                                   :onClick #(do (om/update! (:search data) :identify-selected false)
-                                                                (.focus (.getElementById js/document "media-collection-container")))}
+                                                                (.focus (.getElementById js/document "media-collection-container"))
+                                                                (nav/analytics-event "library-id" "cancel-identification"))}
                                              "Cancel")))))))
 
 (defn search-component

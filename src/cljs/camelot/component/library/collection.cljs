@@ -2,7 +2,8 @@
   (:require [om.dom :as dom]
             [camelot.component.library.util :as util]
             [camelot.state :as state]
-            [om.core :as om]))
+            [om.core :as om]
+            [camelot.nav :as nav]))
 
 (def collection-columns 3)
 
@@ -14,23 +15,35 @@
       0
       (case (.-keyCode e)
         37 (do (.preventDefault e)
+               (nav/analytics-event "library-key" "<left>")
                (max (- idx 1) 0))
         38 (do (.preventDefault e)
+               (nav/analytics-event "library-key" "<up>")
                (if (< idx 3) idx (- idx 3)))
         39 (do (.preventDefault e)
+               (nav/analytics-event "library-key" "<right>")
                (min (+ idx 1) (dec (count media-ids))))
         40 (do (.preventDefault e)
+               (nav/analytics-event "library-key" "<down>")
                (if (= (.floor js/Math (/ (count media-ids) collection-columns))
                       (.floor js/Math (/ idx collection-columns)))
                  idx
                  (min (+ idx 3) (dec (count media-ids)))))
-        65 (max (- idx 1) 0)
-        87 (if (< idx 3) idx (- idx 3))
-        68 (min (+ idx 1) (dec (count media-ids)))
-        83 (if (= (.floor js/Math (/ (count media-ids) collection-columns))
-                  (.floor js/Math (/ idx collection-columns)))
-             idx
-             (min (+ idx 3) (dec (count media-ids))))
+        65 (do
+             (nav/analytics-event "library-key" "a")
+             (max (- idx 1) 0))
+        87 (do
+             (nav/analytics-event "library-key" "w")
+             (if (< idx 3) idx (- idx 3)))
+        68 (do
+             (nav/analytics-event "library-key" "s")
+             (min (+ idx 1) (dec (count media-ids))))
+        83 (do
+             (nav/analytics-event "library-key" "d")
+             (if (= (.floor js/Math (/ (count media-ids) collection-columns))
+                    (.floor js/Math (/ idx collection-columns)))
+               idx
+               (min (+ idx 3) (dec (count media-ids)))))
         nil))))
 
 (defn handle-key-event
@@ -39,13 +52,15 @@
         cur (ffirst (filter #(= (:selected-media-id data) (second %))
                             media-idxs))]
     (cond
-      (and (= (.-keyCode e) 71)
-           (not (.-ctrlKey e)))
-      (.click (.getElementById js/document "media-flag"))
+      (and (= (.-keyCode e) 71) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-flag"))
+        (nav/analytics-event "library-key" "g"))
 
-      (and (= (.-keyCode e) 72)
-           (not (.-ctrlKey e)))
-      (.click (.getElementById js/document "media-processed"))
+      (and (= (.-keyCode e) 72) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-processed"))
+        (nav/analytics-event "library-key" "h"))
 
       :else (if (seq media-idxs)
               (let [id (some->> (updated-select-position media-idxs e cur)
@@ -74,11 +89,15 @@
     (render [_]
       (dom/div #js {:className "media-item"}
                (dom/img #js {:className (media-thumb-class data)
-                             :onMouseDown #(util/toggle-select-image data (.. % -ctrlKey))
+                             :onMouseDown #(do
+                                             (util/toggle-select-image data (.. % -ctrlKey))
+                                             (nav/analytics-event "library-collection" "select-media"))
                              :src (str (get-in data [:media-uri]) "/thumb")})
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
-                             :onClick #(om/update! (state/library-state)
-                                                   :selected-media-id (:media-id data))})))))
+                             :onClick #(do
+                                         (om/update! (state/library-state)
+                                                     :selected-media-id (:media-id data))
+                                         (nav/analytics-event "library-collection" "view-media"))})))))
 
 
 (defn calculate-scroll-update
@@ -146,7 +165,8 @@
                                               "disabled" "")
                                   :id "prev-page"
                                   :onClick #(do (util/deselect-all)
-                                                (om/transact! data [:search :page] prev-page))})
+                                                (om/transact! data [:search :page] prev-page)
+                                                (nav/analytics-event "library-collection" "prev-page-click"))})
                  (dom/div #js {:className "describe-pagination"}
                           (str (+ (- (* util/page-size (get-in data [:search :page])) util/page-size) 1)
                                " - "
@@ -159,7 +179,8 @@
                                               "disabled" "")
                                   :id "next-page"
                                   :onClick #(do (util/deselect-all)
-                                                (om/transact! data [:search :page] (partial next-page matches)))}))))))
+                                                (om/transact! data [:search :page] (partial next-page matches))
+                                                (nav/analytics-event "library-collection" "next-page-click"))}))))))
 
 (defn select-button-components
   [data owner]
@@ -168,7 +189,8 @@
     (render-state [_ state]
       (if (:has-selected state)
         (dom/button #js {:className "btn btn-default search-main-op"
-                         :onClick util/deselect-all*
+                         :onClick #(do (util/deselect-all*)
+                                       (nav/analytics-event "library-collection" "deselect-all-click"))
                          :title "Remove all selections"
                          :id "select-all"
                          :disabled (if (get data :identify-selected)
@@ -179,7 +201,8 @@
                          :id "select-all"
                          :disabled (if (get data :identify-selected)
                                      "disabled" "")
-                         :onClick util/select-all*}
+                         :onClick #(do (util/select-all*)
+                                       (nav/analytics-event "library-collection" "select-all-click"))}
                     "Select All")))))
 
 (defn subfilter-bar-component

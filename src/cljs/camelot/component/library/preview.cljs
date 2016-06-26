@@ -4,7 +4,8 @@
             [camelot.state :as state]
             [om.core :as om]
             [camelot.component.library.util :as util]
-            [camelot.rest :as rest])
+            [camelot.rest :as rest]
+            [camelot.nav :as nav])
   (:import [goog.i18n DateTimeFormat]))
 
 (def photo-not-selected "Photo not selected")
@@ -38,7 +39,9 @@
       (dom/div {:className "data"}
                (if (> (:sighting-id sighting) -1)
                  (dom/div #js {:className "fa fa-trash remove-sighting"
-                               :onClick #(remove-sighting (:sighting-id sighting))}))
+                               :onClick #(do
+                                           (remove-sighting (:sighting-id sighting))
+                                           (nav/analytics-event "library-preview" "delete-sighting"))}))
                (:sighting-quantity sighting) "x "
                (:taxonomy-label (get (:species (state/library-state))
                                        (:taxonomy-id sighting)))))))
@@ -82,7 +85,8 @@
     (render [_]
       (dom/div nil
                (dom/div #js {:className "fa fa-remove pull-right close-details"
-                             :onClick #(om/transact! data :show-media-details not)})
+                             :onClick #(do (om/transact! data :show-media-details not)
+                                           (nav/analytics-event "library-preview" "close-details-click"))})
                (dom/h4 nil "Details")
                (let [selected (util/find-with-id (:selected-media-id data))]
                  (if selected
@@ -108,10 +112,12 @@
                (dom/div #js {:className (details-panel-class data "media-details-panel")}
                         (dom/div #js {:id "details-panel-toggle"
                                       :className "details-panel-toggle"
-                                      :onClick #(toggle-details-panel data)}))
+                                      :onClick #(do (toggle-details-panel data)
+                                                    (nav/analytics-event "library-preview" "details-toggle-click"))}))
                (dom/div #js {:className (details-panel-class data "media-details-panel-text")}
                         (dom/div #js {:className "details-panel-toggle-text"
-                                      :onClick #(toggle-details-panel data)}
+                                      :onClick #(do (toggle-details-panel data)
+                                                    (nav/analytics-event "library-preview" "details-toggle-click"))}
                                  (dom/div #js {:className "rotate"} "Details"))
                         (om/build mcp-details data))))))
 
