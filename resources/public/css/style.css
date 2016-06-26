@@ -724,7 +724,7 @@ pre.field-input {
 }
 #app .library .media-item {
     width: 33%;
-    height: calc(10.5vw * (4 / 6) + 1.5rem);
+    height: calc(12.3vw * (4 / 6));
     margin-top: 0;
     padding: 0.4%;
     position: relative;
