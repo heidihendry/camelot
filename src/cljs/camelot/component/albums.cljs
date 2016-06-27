@@ -56,6 +56,8 @@
                               (dom/label nil (str ""
                                                   (misc/nights-elapsed start end)
                                                   " nights"))
+                              (dom/span nil " and ")
+                              (dom/label nil (str (count (:photos album)) " photos"))
                               (dom/div #js {:className "date-range"}
                                        (str (tf/unparse day-formatter start)
                                             " — "
