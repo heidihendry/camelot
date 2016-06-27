@@ -36,7 +36,7 @@ lein doo phantom test once
 echo "Running camelot and ensuring it responds... "
 java -jar target/camelot.jar &
 PID=$!
-sleep 10
+sleep 20
 # Ensure process is still running
 ps -p $PID
 # Check the compiled JS is served
