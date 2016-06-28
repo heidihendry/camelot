@@ -874,7 +874,8 @@ pre.field-input {
     padding: 0 1rem;
     display: inline-block;
     text-align: center;
-    min-width: 18rem;
+    min-width: 14rem;
+    max-width: 16rem;
 }
 .library .search-bar label {
     display: block;
