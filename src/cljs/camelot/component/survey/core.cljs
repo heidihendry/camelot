@@ -2,6 +2,7 @@
   (:require [om.core :as om]
             [camelot.nav :as nav]
             [camelot.component.survey.create :as create]
+            [camelot.component.survey.manage :as manage]
             [om.dom :as dom]))
 
 (defn survey-list-component
@@ -48,4 +49,19 @@
                                             (nav/analytics-event "org-survey" "advanced-click"))}
                            "Advanced")))))
 
-
+(defn survey-view-component
+  "Render the view component for managing a survey."
+  [app owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! app :survey {:menu [{:action :deployment
+                                         :name "Manage Deployments"
+                                         :active true}
+                                        {:action :upload
+                                         :name "Upload Captures"}]
+                                 :active :deployment}))
+    om/IRender
+    (render [_]
+      (when (:survey app)
+        (om/build manage/survey-management-component (:survey app))))))

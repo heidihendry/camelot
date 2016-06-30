@@ -1206,7 +1206,7 @@ pre.field-input {
     flex-shrink: 0;
     margin-bottom: 0rem;
 }
-#app .org-settings {
+#app .org-settings, #app .view-library {
     width: 50%;
     height: 6rem;
     margin: auto;
