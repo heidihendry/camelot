@@ -223,7 +223,7 @@
         (dom/div #js {:className "search-bar"}
                  (om/build filter-button-component (:search data))
                  (om/build filter-input-component (:search data))
-                 (let [global-survey (:selected-survey-id (state/app-state-cursor))]
+                 (let [global-survey (get-in (state/app-state-cursor) [:selected-survey :id])]
                    (when-not global-survey
                      (do
                        (dom/span nil " in ")

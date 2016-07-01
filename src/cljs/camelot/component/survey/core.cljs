@@ -55,13 +55,13 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! app :survey {:menu [{:action :deployment
-                                         :name "Manage Deployments"
-                                         :active true}
-                                        {:action :upload
-                                         :name "Upload Captures"}]
-                                 :active :deployment}))
+      (om/update! app :page-state {:menu [{:action :deployment
+                                           :name "Manage Deployments"
+                                           :active true}
+                                          {:action :upload
+                                           :name "Upload Captures"}]
+                                   :active :deployment}))
     om/IRender
     (render [_]
-      (when (:survey app)
-        (om/build manage/survey-management-component (:survey app))))))
+      (when (:page-state app)
+        (om/build manage/survey-management-component (:page-state app))))))

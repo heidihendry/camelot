@@ -4,7 +4,8 @@
             [camelot.component.survey.create :as create]
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
-            [camelot.state :as state])
+            [camelot.state :as state]
+            [camelot.rest :as rest])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn action-item-component
@@ -45,6 +46,62 @@
                              {:key :action
                               :init-state state})))))
 
+(defn deployment-list-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "menu-item detailed"}
+               (dom/span #js {:className "menu-item-title"}
+                         (:trap-station-name data))
+               (dom/span #js {:className "menu-item-description"}
+                         (str "Latitude: " (:trap-station-latitude data)
+                              " Longitude: " (:trap-station-longitude data)))))))
+
+(defn deployment-section-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (rest/get-resource "/trap-stations"
+                         #(om/update! data :trap-stations (:body %))))
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "section"}
+               (dom/div #js {:className "simple-menu"}
+                        (om/build-all deployment-list-component
+                                      (sort-by :trap-station-name (:trap-stations data))
+                                      {:key :trap-station-id}))
+               (dom/div #js {:className "sep"})
+               (dom/button #js {:className "btn btn-primary"
+                                :onClick #(do (nav/nav! "/trap-stations/create")
+                                              (nav/analytics-event "survey-deployment" "create-click"))
+                                :disabled "disabled"
+                                :title "Not implemented"}
+                           (dom/span #js {:className "fa fa-plus"})
+                           " Add Deployment")))))
+
+(defn survey-section-containers-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil
+               (dom/div #js {:className "section-container"}
+                        (om/build action-menu-component data)
+                        (dom/button #js {:className "btn btn-default view-library"
+                                         :onClick #(do (nav/analytics-event "survey"
+                                                                            "view-library-click")
+                                                       (nav/nav! (str "/" (get-in (state/app-state-cursor) [:selected-survey :id])
+                                                                      "/library")))}
+                                    (dom/span #js {:className "fa fa-book"})
+                                    " Survey Library"))
+               (dom/div #js {:className "section-container"}
+                        (case (:active data)
+                          :deployment (om/build deployment-section-component data)
+                          :upload nil
+                          ""))))))
+
 (defn survey-management-component
   [data owner]
   (reify
@@ -52,18 +109,5 @@
     (render [_]
       (dom/div #js {:className "split-menu"}
                (dom/div #js {:className "intro"}
-                        (dom/h4 nil "<This Survey>"))
-               (dom/div nil
-                        (dom/div #js {:className "section-container"}
-                                 (om/build action-menu-component data)
-                                 (dom/button #js {:className "btn btn-default view-library"
-                                                  :onClick #(do (nav/analytics-event "survey"
-                                                                                     "view-library-click")
-                                                                (nav/nav! (str "/" (:selected-survey-id (state/app-state-cursor)) "/library")))}
-                                             (dom/span #js {:className "fa fa-book"})
-                                             " Survey Library"))
-                        (dom/div #js {:className "section-container"}
-                                 (case (:active data)
-                                   :deployment nil
-                                   :upload nil
-                                   "")))))))
+                        (dom/h4 nil (get-in (state/app-state-cursor) [:selected-survey :survey-name :value])))
+               (dom/div nil (om/build survey-section-containers-component data))))))

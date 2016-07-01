@@ -243,12 +243,13 @@
 (defn generate-view
   "Render the main page content"
   [view & [{:keys [survey-id]}]]
-  (om/update! (state/app-state-cursor) :selected-survey-id
-              (if (nil? survey-id)
-                nil
-                (js/parseInt survey-id)))
-  (om/root view state/app-state
-           {:target (js/document.getElementById "page-content")}))
+  (if survey-id
+    (rest/get-x (str "/surveys/" survey-id)
+                #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
+                     (om/root view state/app-state
+                              {:target (js/document.getElementById "page-content")})))
+    (om/root view state/app-state
+                              {:target (js/document.getElementById "page-content")})))
 
 (defn settings-menu-view
   "Render the settings panel"
