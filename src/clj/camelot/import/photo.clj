@@ -1,9 +1,7 @@
 (ns camelot.import.photo
-  (:require [clojure.string :as str]
-            [clj-time.core :as t]
+  (:require [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [schema.core :as s]
-            [camelot.import.util :as putil]
             [camelot.model.import :as mi]
             [camelot.import.metadata-utils :as metadata])
   (:import [camelot.model.import ImportPhotoMetadata]))
@@ -15,10 +13,6 @@
     0
     (/ (- (tc/to-long actual)
           (tc/to-long orig)) 1000)))
-
-(defn flatten-sightings
-  [photo]
-  (flatten (mapv #(merge (dissoc photo :sightings) {:sighting %}) (:sightings photo))))
 
 (defn extract-path-value
   "Return the metadata for a given path."

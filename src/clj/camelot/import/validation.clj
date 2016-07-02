@@ -5,8 +5,6 @@
             [clj-time.core :as t]
             [clj-time.coerce :as tc]
             [clojure.string :as str]
-            [camelot.util.java-file :as jf]
-            [incanter.core :as incanter]
             [incanter.stats :as istats]
             [schema.core :as s]))
 

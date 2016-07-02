@@ -3,7 +3,8 @@
             [goog.history.EventType :as EventType]
             [secretary.core :as secretary :refer-macros [defroute]]
             [om.core :as om]
-            [camelot.state :as state])
+            [camelot.state :as state]
+            [clojure.string :as str])
   (:import [goog History]
            [goog.history EventType]))
 
@@ -16,6 +17,13 @@
   (doto (History.)
     (goog.events/listen EventType/NAVIGATE #(secretary/dispatch! (.-token %)))
     (.setEnabled true)))
+
+(defn survey-url
+  [& paths]
+  (str "/"
+       (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
+       "/"
+       (str/join "/" paths)))
 
 (defn analytics-event
   [component action]

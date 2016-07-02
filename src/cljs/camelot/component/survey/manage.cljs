@@ -51,7 +51,11 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed"}
+      (dom/div #js {:className "menu-item detailed"
+                    :onClick #(do
+                                (nav/analytics-event "survey-deployment" "trap-station-click")
+                                (nav/nav! (nav/survey-url "deployments"
+                                                          (:trap-station-id data))))}
                (dom/span #js {:className "menu-item-title"}
                          (:trap-station-name data))
                (dom/span #js {:className "menu-item-description"}
@@ -77,7 +81,7 @@
                                 :onClick #(do (nav/nav! "/trap-stations/create")
                                               (nav/analytics-event "survey-deployment" "create-click"))
                                 :disabled "disabled"
-                                :title "Not implemented"}
+                                :title "Add a new deployment"}
                            (dom/span #js {:className "fa fa-plus"})
                            " Add Deployment")))))
 

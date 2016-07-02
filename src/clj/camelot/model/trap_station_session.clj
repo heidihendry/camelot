@@ -20,7 +20,7 @@
      trap-station-session-updated :- org.joda.time.DateTime
      trap-station-id :- s/Int
      trap-station-session-start-date :- org.joda.time.DateTime
-     trap-station-session-end-date :- org.joda.time.DateTime
+     trap-station-session-end-date :- (s/maybe org.joda.time.DateTime)
      trap-station-session-notes :- (s/maybe s/Str)
      trap-station-session-label :- (s/maybe s/Str)])
 

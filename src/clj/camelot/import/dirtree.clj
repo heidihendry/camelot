@@ -1,13 +1,11 @@
 (ns camelot.import.dirtree
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
-            [clj-time.core :as t]
             [schema.core :as s]
             [camelot.model.import :as mi]
             [camelot.util.java-file :as f])
   (:import [com.drew.imaging ImageMetadataReader]
            [com.drew.metadata Metadata Directory Tag]
-           [camelot.model.import ImportPhotoMetadata]
            [java.io File]))
 
 (def RawAlbum {java.io.File mi/ImportRawMetadata})

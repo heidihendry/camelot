@@ -20,6 +20,7 @@
              [trap-station :as trap-station]
              [trap-station-session :as trap-station-session]
              [trap-station-session-camera :as trap-station-session-camera]
+             [deployment :as deployment]
              [library :as library]]
             [camelot.report.core :as report]
             [camelot.util
@@ -201,6 +202,9 @@
            (POST "/create" [data] (r/response (species-search/ensure-survey-species-known
                                                (app/gen-state (conf/config))
                                                (:species data)))))
+
+  (context "/deployment" []
+           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id)))
 
   misc-routes
   config/routes

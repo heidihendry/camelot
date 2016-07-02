@@ -1,9 +1,6 @@
 (ns camelot.application
   (:require [smithy.core :refer [defsmith] :as smithy]
-            [camelot.translation.core :as tr]
-            [camelot.util
-             [config :as settings]
-             [feature :as feature]]))
+            [camelot.translation.core :as tr]))
 
 (defn gen-state
   "Return the global application state.

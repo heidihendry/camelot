@@ -242,10 +242,11 @@
 
 (defn generate-view
   "Render the main page content"
-  [view & [{:keys [survey-id]}]]
+  [view & [{:keys [survey-id page-id]}]]
   (if survey-id
     (rest/get-x (str "/surveys/" survey-id)
                 #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
+                     (om/update! (state/app-state-cursor) :page-id page-id)
                      (om/root view state/app-state
                               {:target (js/document.getElementById "page-content")})))
     (om/root view state/app-state
@@ -300,5 +301,8 @@
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
+(defroute "/:survey/deployments/:trap-station-id" [survey trap-station-id]
+  (generate-view deployment/deployment-view-component {:survey-id survey
+                                                       :page-id trap-station-id}))
 (defroute "/survey/create" [] (generate-view survey/create-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))
