@@ -204,7 +204,11 @@
                                                (:species data)))))
 
   (context "/deployment" []
-           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id)))
+           (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
+                                                        :trap-station-session id))
+           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id))
+           (POST "/" [data] (rest/create-resource deployment/create-camera-check!
+                                                  deployment/tdeployment data)))
 
   misc-routes
   config/routes

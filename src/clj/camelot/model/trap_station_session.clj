@@ -11,7 +11,7 @@
 (s/defrecord TTrapStationSession
     [trap-station-id :- s/Int
      trap-station-session-start-date :- org.joda.time.DateTime
-     trap-station-session-end-date :- org.joda.time.DateTime
+     trap-station-session-end-date :- (s/maybe org.joda.time.DateTime)
      trap-station-session-notes :- (s/maybe s/Str)])
 
 (s/defrecord TrapStationSession

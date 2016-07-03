@@ -67,7 +67,9 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (rest/get-resource "/trap-stations"
+      (rest/get-resource (str "/deployment/survey/"
+                              (get-in (state/app-state-cursor)
+                                      [:selected-survey :survey-id :value]))
                          #(om/update! data :trap-stations (:body %))))
     om/IRender
     (render [_]

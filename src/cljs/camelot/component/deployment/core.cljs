@@ -154,7 +154,7 @@
                                                        (prn data)
                                                        (nav/analytics-event "deployment"
                                                                             "cameracheck-submit")
-                                                       (rest/post-x "/deployments" (deref data)
+                                                       (rest/post-x "/deployment" {:data (deref data)}
                                                                     (fn [_]
                                                                       (nav/nav! (str "/" (get-in (state/app-state-cursor)
                                                                                                  [:selected-survey :survey-id :value]))))))}
