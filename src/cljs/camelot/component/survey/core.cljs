@@ -12,7 +12,7 @@
     (render [_]
       (dom/div #js {:className "menu-item detailed"
                     :onClick #(do
-                                (nav/nav! (str "/" (:survey-id data) "/library"))
+                                (nav/nav! (str "/" (:survey-id data)))
                                 (nav/analytics-event "org-survey" "survey-click"))}
                (dom/span #js {:className "menu-item-title"}
                          (:survey-name data))
@@ -55,13 +55,13 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! app :page-state {:menu [{:action :deployment
-                                           :name "Manage Deployments"
-                                           :active true}
-                                          {:action :upload
-                                           :name "Upload Captures"}]
-                                   :active :deployment}))
+      (om/update! app :deployment-page-state {:menu [{:action :deployment
+                                                      :name "Manage Deployments"
+                                                      :active true}
+                                                     {:action :upload
+                                                      :name "Upload Captures"}]
+                                              :active :deployment}))
     om/IRender
     (render [_]
-      (when (:page-state app)
-        (om/build manage/survey-management-component (:page-state app))))))
+      (when (:deployment-page-state app)
+        (om/build manage/survey-management-component (:deployment-page-state app))))))

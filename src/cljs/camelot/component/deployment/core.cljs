@@ -48,6 +48,75 @@
                              {:key :action
                               :init-state state})))))
 
+(defn camera-select-option-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (:camera-id data)} (:camera-name data)))))
+
+(defn camera-select-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (rest/get-x (str "/trap-station-session-cameras/available/"
+                       (get-in data [:trap-station-session-id :value]))
+                  #(om/set-state! owner :options (:body %))))
+    om/IRenderState
+    (render-state [_ state]
+      (dom/select #js {:className "field-input"
+                       :onChange #(om/update! (get data (:camera-id-field state))
+                                              :value (.. % -target -value))}
+                  (om/build-all camera-select-option-component
+                                (if (seq (:options state))
+                                  (conj (:options state)
+                                        {:camera-id -1
+                                         :camera-name ""})
+                                  (conj [] {:camera-id -1
+                                            :camera-name "No Cameras Available"}))
+                                {:key :camera-id})))))
+
+(defn camera-status-select-option-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (:camera-status-id data)}
+                  (:camera-status-description data)))))
+
+(defn camera-status-select-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (if (get-in data [(:camera-id-field (om/get-state owner)) :value])
+        (rest/get-x (str "/camera-statuses/alternatives/"
+                         (get-in data [(:camera-id-field (om/get-state owner)) :value]))
+                    #(om/set-state! owner :options (:body %)))))
+    om/IRenderState
+    (render-state [_ state]
+      (when (seq (:options state))
+        (dom/select #js {:className "field-input"
+                         :onChange #(om/update! (get data (:camera-status-field state))
+                                                :value (.. % -target -value))}
+                    (om/build-all camera-status-select-option-component
+                                  (:options state)
+                                  {:key :camera-status-id}))))))
+
+(defn camera-status-component
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ state]
+      (dom/div nil
+               (dom/label #js {:className "field-label"} "Camera Status")
+               (om/build camera-status-select-component data {:init-state state})
+               (when (not= (js/parseInt (get-in data [(:camera-status-field state) :value])) 2)
+                 (dom/div nil
+                          (dom/label #js {:className "field-label"} "Replacement Camera, if any")
+                          (om/build camera-select-component data {:init-state state})))))))
+
 (defn record-camera-check-component
   [data owner]
   (reify
@@ -62,20 +131,35 @@
                  (dom/div nil
                           (dom/label #js {:className "field-label"} "Camera Check Date")
                           (dom/div #js {:className "field-details"}
-                                   (om/build datepicker (or (get data :trap-station-session-end-date)
-                                                            ))))
-                 ;; TODO add components to update cameras and their statuses
-                 (dom/button #js {:className "btn btn-primary"
-                                  :onClick #(do
-                                              (prn data)
-                                              (nav/analytics-event "deployment"
-                                                                   "cameracheck-submit")
-                                              (rest/post-x "/deployments" (deref data)
-                                                           (fn [_]
-                                                             (nav/nav! (str "/" (get-in (state/app-state-cursor)
-                                                                                        [:selected-survey :survey-id :value]))))))}
-                             "Submit Camera Check")
-                 )))))
+                                   (om/build datepicker (or (get data :trap-station-session-end-date)))))
+                 (dom/h5 nil (str "Primary Camera: " ) (get-in data [:primary-camera-name :value]))
+                 (om/build camera-status-component data
+                           {:init-state {:camera-status-field :primary-camera-status-id
+                                         :camera-id-field :primary-camera-id}})
+                 (if (get-in data [:secondary-camera-id :value])
+                   (dom/div nil
+                            (dom/h5 nil (str "Secondary Camera: " ) (get-in data [:secondary-camera-name :value]))
+                            (om/build camera-status-component data
+                                      {:init-state {:camera-status-field :secondary-camera-status-id
+                                                    :camera-id-field :secondary-camera-id}}))
+                   (dom/div nil
+                            (dom/h5 nil (str "Add a Secondary Camera"))
+                            (dom/label #js {:className "field-label"} "Secondary Camera, if any")
+                            (om/build camera-select-component data
+                                      {:init-state {:camera-status-field :secondary-camera-status-id
+                                                    :camera-id-field :secondary-camera-id}})))
+                 (dom/div #js {:className "button-container"}
+                          (dom/button #js {:className "btn btn-primary"
+                                           :onClick #(do
+                                                       (prn data)
+                                                       (nav/analytics-event "deployment"
+                                                                            "cameracheck-submit")
+                                                       (rest/post-x "/deployments" (deref data)
+                                                                    (fn [_]
+                                                                      (nav/nav! (str "/" (get-in (state/app-state-cursor)
+                                                                                                 [:selected-survey :survey-id :value]))))))}
+                                      "Submit "
+                                      (dom/span #js {:className "btn-right-icon fa fa-chevron-right"}))))))))
 
 (defn read-only-field-component
   [data owner]
