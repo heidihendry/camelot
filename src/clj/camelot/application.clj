@@ -13,8 +13,6 @@ Currently the only application state is the user's configuration."
   [state]
   {:menu-items [{:url "/organisation"
                  :label (tr/translate (:config state) :application/organisation)}
-                {:url "/library"
-                 :label (tr/translate (:config state) :application/library)}
                 {:url "/dashboard"
                  :label (tr/translate (:config state) :application/import)}
                 {:function "settings"}]})

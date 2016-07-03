@@ -98,7 +98,7 @@
                         (dom/button #js {:className "btn btn-default view-library"
                                          :onClick #(do (nav/analytics-event "survey"
                                                                             "view-library-click")
-                                                       (nav/nav! (str "/" (get-in (state/app-state-cursor) [:selected-survey :id])
+                                                       (nav/nav! (str "/" (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
                                                                       "/library")))}
                                     (dom/span #js {:className "fa fa-book"})
                                     " Survey Library"))
