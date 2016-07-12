@@ -213,6 +213,14 @@
                           nil)
                         )))))
 
+(defn upload-view-component
+  "Top-lavel view for upload"
+  [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div nil "Deploy!"))))
+
 (defn deployment-view-component
   "Top-level view for deployment components."
   [app owner]

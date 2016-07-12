@@ -49,6 +49,26 @@
      secondary-camera-name :- (s/maybe s/Str)
      secondary-camera-status-id :- (s/maybe s/Int)])
 
+(s/defrecord CameraDeployment
+    [trap-station-session-id :- s/Int
+     trap-station-session-created :- org.joda.time.DateTime
+     trap-station-session-updated :- org.joda.time.DateTime
+     trap-station-id :- s/Int
+     trap-station-name :- s/Str
+     site-id :- s/Int
+     survey-site-id :- s/Int
+     site-name :- s/Str
+     trap-station-longitude :- (s/pred trap-station/valid-longitude?)
+     trap-station-latitude :- (s/pred trap-station/valid-latitude?)
+     trap-station-altitude :- (s/maybe s/Num)
+     trap-station-notes :- (s/maybe s/Str)
+     trap-station-session-start-date :- org.joda.time.DateTime
+     trap-station-session-end-date :- org.joda.time.DateTime
+     trap-station-session-camera-id :- s/Int
+     camera-id :- s/Int
+     camera-name :- s/Str
+     camera-status-id :- s/Int])
+
 (defn validate-camera-check
   [state data]
   (and (not= (:primary-camera-id data) (:secondary-camera-id data))
@@ -74,6 +94,23 @@
                 primary-camera-name primary-camera-status-id
                 secondary-camera-id secondary-camera-name
                 secondary-camera-status-id))
+
+(s/defn camera-deployment
+  [{:keys [trap-station-session-id trap-station-session-created
+           trap-station-session-updated trap-station-id trap-station-name
+           site-id survey-site-id site-name trap-station-longitude
+           trap-station-latitude trap-station-altitude trap-station-notes
+           trap-station-session-start-date trap-station-session-end-date
+           trap-station-session-camera-id
+           camera-id camera-name camera-status-id]}]
+  (->CameraDeployment trap-station-session-id trap-station-session-created
+                      trap-station-session-updated trap-station-session-id
+                      trap-station-name site-id survey-site-id site-name
+                      trap-station-longitude trap-station-latitude
+                      trap-station-altitude trap-station-notes
+                      trap-station-session-start-date trap-station-session-end-date
+                      trap-station-session-camera-id
+                      camera-id camera-name camera-status-id))
 
 (s/defn tdeployment
   [{:keys [trap-station-session-id trap-station-name site-id trap-station-id
@@ -118,6 +155,13 @@
        (db/with-db-keys state -get-all)
        assoc-cameras
        (map deployment)))
+
+(s/defn get-awaiting-upload :- [CameraDeployment]
+  [state :- State
+   id :- s/Int]
+  (->> {:survey-id id}
+       (db/with-db-keys state -get-awaiting-upload)
+       (map camera-deployment)))
 
 (s/defn get-specific :- (s/maybe Deployment)
   [state :- State

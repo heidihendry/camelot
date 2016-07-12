@@ -5,7 +5,8 @@
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.state :as state]
-            [camelot.rest :as rest])
+            [camelot.rest :as rest]
+            [cljs-time.format :as tf])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn action-item-component
@@ -62,6 +63,52 @@
                          (str "Latitude: " (:trap-station-latitude data)
                               " Longitude: " (:trap-station-longitude data)))))))
 
+(def day-formatter (tf/formatter "yyyy-MM-dd"))
+
+(defn incomplete-deployment-list-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "menu-item detailed"
+                    :onClick #(do
+                                (nav/analytics-event "survey-deployment" "upload-click")
+                                (nav/nav! (nav/survey-url "upload" (:trap-station-session-camera-id data))))}
+               (dom/div #js {:className "menu-item-title"}
+                         (:trap-station-name data))
+               (dom/div #js {:className "menu-item-description"}
+                        (dom/label nil "GPS Coordinates:")
+                        " " (:trap-station-latitude data) ", " (:trap-station-longitude data))
+               (dom/div #js {:className "menu-item-description"}
+                        (dom/label nil " Date:")
+                        " "
+                        (tf/unparse day-formatter (:trap-station-session-start-date data))
+                        " -- "
+                        (tf/unparse day-formatter (:trap-station-session-end-date data))
+                        " "
+                        (dom/label nil " Camera Name: ")
+                        " "
+                        (:camera-name data))))))
+
+(defn incomplete-deployment-section-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (rest/get-resource (str "/deployment/survey/"
+                              (get-in (state/app-state-cursor)
+                                      [:selected-survey :survey-id :value])
+                              "/incomplete")
+                         #(om/update! data :incomplete-deployments (:body %))))
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "section"}
+               (dom/div #js {:className "simple-menu"}
+                        (om/build-all incomplete-deployment-list-component
+                                      (sort-by :trap-station-name
+                                               (:incomplete-deployments data))
+                                      {:key :trap-station-id}))))))
+
 (defn deployment-section-component
   [data owner]
   (reify
@@ -105,7 +152,7 @@
                (dom/div #js {:className "section-container"}
                         (case (:active data)
                           :deployment (om/build deployment-section-component data)
-                          :upload nil
+                          :upload (om/build incomplete-deployment-section-component data)
                           ""))))))
 
 (defn survey-management-component
