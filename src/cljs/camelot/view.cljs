@@ -301,9 +301,6 @@
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
-(defroute "/:survey/upload/:session-camera-id" [survey session-camera-id]
-  (generate-view deployment/upload-view-component {:survey-id survey
-                                                   :page-id session-camera-id}))
 (defroute "/:survey/deployments/:trap-station-id" [survey trap-station-id]
   (generate-view deployment/deployment-view-component {:survey-id survey
                                                        :page-id trap-station-id}))

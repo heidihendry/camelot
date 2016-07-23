@@ -203,6 +203,8 @@
                                                (app/gen-state (conf/config))
                                                (:species data)))))
 
+  (context "/capture" []
+           (POST "/upload" [] (r/response "yay")))
   (context "/deployment" []
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
                                                         :trap-station-session id))

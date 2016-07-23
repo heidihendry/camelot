@@ -65,15 +65,48 @@
 
 (def day-formatter (tf/formatter "yyyy-MM-dd"))
 
+(def image-mime #"^image/.*")
+
+(defn upload-file
+  [sesscam-id file chan]
+  (when (re-matches image-mime (.-type file))
+    (rest/post-x-raw "/capture/upload" [["session-camera-id" sesscam-id]
+                                        ["file" file]]
+                     #(go (>! chan true)))))
+
 (defn incomplete-deployment-list-component
   [data owner]
   (reify
+    om/IDidMount
+    (did-mount [_]
+      (let [n (om/get-node owner)]
+        (.addEventListener n "dragenter" #(do (prn "DRAG")
+                                              (.stopPropagation %)
+                                              (.preventDefault %)))
+        (.addEventListener n "dragover" #(do (prn "OVER")
+                                             (.stopPropagation %)
+                                             (.preventDefault %)))
+        (.addEventListener n "drop" #(do
+                                       (.stopPropagation %)
+                                       (.preventDefault %)
+                                       (let [fs (.. % -dataTransfer -files)
+                                             upl-chan (chan)
+                                             complete (atom 0)]
+                                         (go
+                                           (loop []
+                                             (let [r (<! upl-chan)]
+                                               (swap! complete inc)
+                                               (prn @complete)
+                                               (if (= (.-length fs) @complete)
+                                                 (prn "All uploaded")
+                                                 (recur)))))
+                                         (doseq [idx (range (.-length fs))]
+                                           (upload-file (:trap-station-session-camera-id data)
+                                                        (aget fs idx)
+                                                        upl-chan)))))))
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed"
-                    :onClick #(do
-                                (nav/analytics-event "survey-deployment" "upload-click")
-                                (nav/nav! (nav/survey-url "upload" (:trap-station-session-camera-id data))))}
+      (dom/div #js {:className "menu-item extra-detailed"}
                (dom/div #js {:className "menu-item-title"}
                          (:trap-station-name data))
                (dom/div #js {:className "menu-item-description"}

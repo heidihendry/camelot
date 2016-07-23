@@ -78,6 +78,27 @@
                                                         (:status response)
                                                         (:body response)))))))))
 
+(defn post-x-raw
+  "POST state"
+  ([resource params cb] (post-x-raw resource params cb nil))
+  ([resource params cb failcb]
+   (go
+     (let [response (<! (http/post (misc/with-baseurl resource)
+                                   {:multipart-params params}))
+           success (some #{(:status response)} success-status-codes)]
+       (if success
+         (when cb
+           (cb response))
+         (do
+           (when failcb
+             (failcb))
+           (om/update! (state/app-state-cursor) :error (build-error
+                                                        "POST"
+                                                        (misc/with-baseurl resource)
+                                                        params
+                                                        (:status response)
+                                                        (:body response)))))))))
+
 (defn put-x
   "PUT state"
   ([resource params cb] (put-x resource params cb nil))

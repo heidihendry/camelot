@@ -151,7 +151,6 @@
                  (dom/div #js {:className "button-container"}
                           (dom/button #js {:className "btn btn-primary"
                                            :onClick #(do
-                                                       (prn data)
                                                        (nav/analytics-event "deployment"
                                                                             "cameracheck-submit")
                                                        (rest/post-x "/deployment" {:data (deref data)}
@@ -212,14 +211,6 @@
                           :check (om/build record-camera-check-component (:data data))
                           nil)
                         )))))
-
-(defn upload-view-component
-  "Top-lavel view for upload"
-  [app owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div nil "Deploy!"))))
 
 (defn deployment-view-component
   "Top-level view for deployment components."
