@@ -100,7 +100,7 @@
   [data]
   (let [start (:trap-station-session-start-date data)
         end(:trap-station-session-end-date data)]
-    (or (= start end) (t/before? start end))))
+    (or (nil? end) (= start end) (t/before? start end))))
 
 (s/defn create! :- TrapStationSession
   [state :- State

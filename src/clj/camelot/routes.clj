@@ -215,8 +215,12 @@
            (GET "/survey/:id/incomplete" [id] (rest/list-resources deployment/get-awaiting-upload
                                                                    :trap-station-session id))
            (GET "/:id" [id] (rest/specific-resource deployment/get-specific id))
+           (POST "/create/:id" [id data] (rest/create-resource deployment/create!
+                                                               deployment/tdeployment
+                                                               (assoc data :survey-id
+                                                                      {:value (edn/read-string id)})))
            (POST "/" [data] (rest/create-resource deployment/create-camera-check!
-                                                  deployment/tdeployment data)))
+                                                  deployment/tcamera-deployment data)))
 
   misc-routes
   config/routes

@@ -19,9 +19,9 @@
 
 (def floating-point-fields
   "Set of keys for floating-point fields."
-  #{:trap-station-longitude :trap-station-latitude :trap-station-distance-above-ground
-    :trap-station-distance-to-road :trap-station-distance-to-river
-    :trap-station-distance-to-settlement})
+  #{:trap-station-longitude :trap-station-latitude :trap-station-altitude
+    :trap-station-distance-above-ground :trap-station-distance-to-road
+    :trap-station-distance-to-river :trap-station-distance-to-settlement})
 
 (defn- as-long
   "Return value as a Long if it can be parsed, otherwise return v."
@@ -166,14 +166,14 @@
   as its first argument, and a (processed) map of the data for the resource as
   its second argument."
   ([f data]
-   (let [stddata (-> data (decursorise) (parse-ids))]
+   (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))]
      (-> (conf/config)
          (app/gen-state)
          (f stddata)
          (cursorise)
          (r/response))))
   ([f ctor data]
-   (let [stddata (-> data (decursorise) (parse-ids) (ctor))]
+   (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))]
      (-> (conf/config)
          (app/gen-state)
          (f stddata)

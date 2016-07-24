@@ -6,11 +6,22 @@
             [camelot.model.trap-station :as trap-station]
             [clj-time.core :as t]
             [camelot.model.trap-station-session :as trap-station-session]
-            [camelot.model.trap-station-session-camera :as trap-station-session-camera]))
+            [camelot.model.trap-station-session-camera :as trap-station-session-camera]
+            [camelot.model.survey-site :as survey-site]))
 
 (sql/defqueries "sql/deployments.sql" {:connection db/spec})
 
 (s/defrecord TDeployment
+    [survey-id :- s/Int
+     site-id :- s/Int
+     trap-station-longitude :- s/Num
+     trap-station-latitude :- s/Num
+     trap-station-altitude :- (s/maybe s/Num)
+     trap-station-session-start-date :- org.joda.time.DateTime
+     primary-camera-id :- s/Int
+     secondary-camera-id :- (s/maybe s/Int)])
+
+(s/defrecord TCameraDeployment
     [trap-station-session-id :- s/Int
      trap-station-name :- s/Str
      site-id :- s/Int
@@ -77,6 +88,14 @@
        ;; TODO check camera statuses
        ))
 
+(s/defn tdeployment
+  [{:keys [survey-id site-id trap-station-longitude trap-station-latitude
+           trap-station-altitude trap-station-session-start-date
+           primary-camera-id secondary-camera-id]}]
+  (->TDeployment survey-id site-id trap-station-longitude trap-station-latitude
+                 trap-station-altitude trap-station-session-start-date
+                 primary-camera-id secondary-camera-id))
+
 (s/defn deployment
   [{:keys [trap-station-session-id trap-station-session-created
            trap-station-session-updated trap-station-id trap-station-name
@@ -86,7 +105,7 @@
            primary-camera-name primary-camera-status-id secondary-camera-id
            secondary-camera-name secondary-camera-status-id]}]
   (->Deployment trap-station-session-id trap-station-session-created
-                trap-station-session-updated trap-station-session-id
+                trap-station-session-updated trap-station-id
                 trap-station-name site-id survey-site-id site-name
                 trap-station-longitude trap-station-latitude
                 trap-station-altitude trap-station-notes
@@ -104,7 +123,7 @@
            trap-station-session-camera-id
            camera-id camera-name camera-status-id]}]
   (->CameraDeployment trap-station-session-id trap-station-session-created
-                      trap-station-session-updated trap-station-session-id
+                      trap-station-session-updated trap-station-id
                       trap-station-name site-id survey-site-id site-name
                       trap-station-longitude trap-station-latitude
                       trap-station-altitude trap-station-notes
@@ -112,20 +131,20 @@
                       trap-station-session-camera-id
                       camera-id camera-name camera-status-id))
 
-(s/defn tdeployment
+(s/defn tcamera-deployment
   [{:keys [trap-station-session-id trap-station-name site-id trap-station-id
            trap-station-longitude trap-station-latitude trap-station-altitude
            trap-station-notes trap-station-session-start-date
            trap-station-session-end-date primary-camera-id primary-camera-name
            primary-camera-status-id secondary-camera-id secondary-camera-name
            secondary-camera-status-id]}]
-  (->TDeployment trap-station-session-id trap-station-name site-id trap-station-id
-                 trap-station-longitude trap-station-latitude
-                 trap-station-altitude trap-station-notes
-                 trap-station-session-start-date trap-station-session-end-date
-                 primary-camera-id primary-camera-name primary-camera-status-id
-                 secondary-camera-id secondary-camera-name
-                 secondary-camera-status-id))
+  (->TCameraDeployment trap-station-session-id trap-station-name site-id trap-station-id
+                       trap-station-longitude trap-station-latitude
+                       trap-station-altitude trap-station-notes
+                       trap-station-session-start-date trap-station-session-end-date
+                       primary-camera-id primary-camera-name primary-camera-status-id
+                       secondary-camera-id secondary-camera-name
+                       secondary-camera-status-id))
 
 (defn assoc-cameras-for-group
   [[session-id group]]
@@ -195,10 +214,17 @@
       (set-camera-status! state {:camera-status-id (:secondary-camera-status-id data)
                                  :camera-id (:secondary-camera-id orig-data)}))))
 
+(defn- trap-station-name
+  [data]
+  (let [lat (:trap-station-latitude data)
+        lon (:trap-station-longitude data)]
+    (str "Trap at " lat ", " lon)))
+
 (s/defn create-new-session!
   [state :- State
    data]
-  (let [sdata (select-keys data [:trap-station-id :trap-station-session-start-date])
+  (let [sdata {:trap-station-id (:trap-station-id data)
+               :trap-station-session-start-date (:trap-station-session-end-date data)}
         s (trap-station-session/create!
            state (trap-station-session/ttrap-station-session sdata))]
     (when (:primary-camera-id data)
@@ -215,9 +241,24 @@
          :camera-id (:secondary-camera-id data)})))
     s))
 
-(s/defn create-camera-check!
+(s/defn create!
   [state :- State
    data :- TDeployment]
+  (db/with-transaction [s state]
+    (let [tss (survey-site/tsurvey-site
+               (select-keys data [:survey-id :site-id]))
+          ss (survey-site/get-or-create! s tss)
+          ts (trap-station/create! s
+                                   (trap-station/ttrap-station
+                                    (merge data
+                                           (select-keys ss [:survey-site-id])
+                                           {:trap-station-name (trap-station-name data)})))]
+      (create-new-session! s (merge data
+                                    (select-keys ts [:trap-station-id]))))))
+
+(s/defn create-camera-check!
+  [state :- State
+   data :- TCameraDeployment]
   (if (validate-camera-check state data)
     (db/with-transaction [s state]
       (set-session-end-date! s data)

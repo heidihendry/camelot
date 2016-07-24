@@ -56,7 +56,7 @@
                     :onClick #(do
                                 (nav/analytics-event "survey-deployment" "trap-station-click")
                                 (nav/nav! (nav/survey-url "deployments"
-                                                          (:trap-station-id data))))}
+                                                          (:trap-station-session-id data))))}
                (dom/span #js {:className "menu-item-title"}
                          (:trap-station-name data))
                (dom/span #js {:className "menu-item-description"}
@@ -140,7 +140,7 @@
                         (om/build-all incomplete-deployment-list-component
                                       (sort-by :trap-station-name
                                                (:incomplete-deployments data))
-                                      {:key :trap-station-id}))))))
+                                      {:key :trap-station-session-id}))))))
 
 (defn deployment-section-component
   [data owner]
@@ -157,7 +157,7 @@
                (dom/div #js {:className "simple-menu"}
                         (om/build-all deployment-list-component
                                       (sort-by :trap-station-name (:trap-stations data))
-                                      {:key :trap-station-id}))
+                                      {:key :trap-station-session-id}))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"
                                 :onClick #(do (nav/nav! (str "/"

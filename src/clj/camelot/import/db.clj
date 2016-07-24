@@ -115,7 +115,7 @@
      state
      (trap-station/ttrap-station
       {:survey-site-id (:survey-site-id survey-site)
-       :trap-station-name (str "Trap at " longitude ", " latitude)
+       :trap-station-name (str "Trap at " latitude ", " longitude)
        :trap-station-longitude longitude
        :trap-station-latitude latitude
        :trap-station-notes import-note
