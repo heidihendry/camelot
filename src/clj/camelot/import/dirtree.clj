@@ -93,22 +93,26 @@
        (file-seq)
        (filter exif-file?)))
 
+(s/defn file-raw-metadata :- mi/ImportRawMetadata
+  [state file]
+  (let [reader #(ImageMetadataReader/readMetadata ^File %)]
+    (try
+      (file-metadata reader file)
+      (catch java.lang.Exception e {}))))
+
 (s/defn file-raw-metadata-pair
   "Return a pair of the file and its raw metadata."
-  [reader file]
-  (try
-    (vector file (file-metadata reader file))
-    (catch java.lang.Exception e nil)))
+  [state file]
+  (vector file (file-raw-metadata state file)))
 
 (s/defn album-dir-raw-metadata :- RawAlbum
   "Return the raw exif data for files in `dir'."
   [state dir]
-  (let [reader #(ImageMetadataReader/readMetadata ^File %)]
-    (->> dir
-         (exif-files-in-dir)
-         (map (partial file-raw-metadata-pair reader))
-         (filter identity)
-         (into {}))))
+  (->> dir
+       (exif-files-in-dir)
+       (map (partial file-raw-metadata-pair state))
+       (filter identity)
+       (into {})))
 
 (defn- album-dir-list
   "Return a list of valid album directories under `root'."

@@ -7,6 +7,7 @@
             [environ.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
+            [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
@@ -18,6 +19,7 @@
   "Handler for HTTP requests"
   (-> app-routes
       wrap-params
+      wrap-multipart-params
       (wrap-transit-response {:encoding :json, :opts tutil/transit-write-options})
       (wrap-transit-params {:opts tutil/transit-read-options})
       wrap-stacktrace-log

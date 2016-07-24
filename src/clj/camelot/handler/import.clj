@@ -51,7 +51,7 @@
       (create-variant path (str target ".png") width)
       (store-original path (str target "." extension)))))
 
-(defn- create-image-files
+(defn create-image-files
   [path filename extension]
   (dorun (map (fn [[k v]] (create-image path filename extension k v)) image-variants)))
 

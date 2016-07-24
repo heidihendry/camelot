@@ -156,6 +156,20 @@
          :taxonomy-common-name "N/A"
          :taxonomy-notes import-note})))))
 
+(defn create-raw-media!
+  [state photo filename fmt trap-camera-id]
+  (media/create!
+   state
+   (media/tmedia
+    {:media-capture-timestamp (:datetime photo)
+     :media-filename (str/lower-case filename)
+     :media-format (str/lower-case fmt)
+     :media-cameracheck false
+     :media-attention-needed false
+     :media-processed false
+     :media-notes nil
+     :trap-station-session-camera-id trap-camera-id})))
+
 (defn create-media!
   [state photo filename fmt notes attn trap-camera-id]
   (media/create!

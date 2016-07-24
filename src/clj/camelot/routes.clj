@@ -4,6 +4,7 @@
              [albums :as albums]
              [application :as application]
              [config :as config]
+             [capture :as capture]
              [import :as import]]
             [camelot.import.db :as im.db]
             [camelot.services.species-search :as species-search]
@@ -204,7 +205,10 @@
                                                (:species data)))))
 
   (context "/capture" []
-           (POST "/upload" [] (r/response "yay")))
+           (POST "/upload" {params :multipart-params}
+                 (r/response (capture/import-capture! (app/gen-state (conf/config))
+                                                      (edn/read-string (get params "session-camera-id"))
+                                                      (get params "file")))))
   (context "/deployment" []
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
                                                         :trap-station-session id))
