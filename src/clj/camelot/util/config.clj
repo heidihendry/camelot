@@ -1,6 +1,6 @@
 (ns camelot.util.config
   (:require [camelot.translation.core :as tr :refer :all]
-            [camelot.util.java-file :as f]
+            [camelot.util.java-file :as jf]
             [clj-time
              [coerce :as tc]
              [core :as t]]
@@ -8,7 +8,8 @@
              [edn :as edn]
              [pprint :as pp]]
             [clojure.java.io :as io]
-            [environ.core :refer [env]])
+            [environ.core :refer [env]]
+            [camelot.util.java-file :as jf])
   (:import [org.apache.commons.lang3 SystemUtils]
            [java.lang RuntimeException]
            [java.io IOException]))
@@ -63,35 +64,62 @@
   []
   (get-config-location config-dir))
 
+(defn checked-datadir
+  "Check the custom datadir, and return the canonicalised path.
+  throws an IO Exception if unsuitable."
+  [dir]
+  (let [f (io/file dir)]
+    (when (not (jf/exists? f))
+      (throw (IOException. (str "File does not exist: " (jf/get-path f)))))
+    (when (not (jf/directory? f))
+      (throw (IOException. (str "File is not a directory: " (jf/get-path f)))))
+    (when (or (not (jf/readable? f)) (not (jf/writable? f)))
+      (throw (IOException. (str "Permission denied: " (jf/get-path f)))))
+    (jf/get-path f)))
+
 (defn- db-path
   "Return the full path where the database is stored."
   [dir]
   (format "%s%scamelot%s%s" dir SystemUtils/FILE_SEPARATOR
           SystemUtils/FILE_SEPARATOR db-name))
 
-(defn get-db-path
-  "Return the OS-specific path to the configuration file."
+(defn get-std-db-path
+  "Return the OS-specific path to the database directory."
   []
   (cond
-    SystemUtils/IS_OS_WINDOWS (db-path (env :localappdata))
-    SystemUtils/IS_OS_LINUX (db-path (str (env :home) "/.local/share"))
-    SystemUtils/IS_OS_MAC_OSX (db-path (str (env :home) "/Library/Application Support"))
-    :else (db-path ".")))
+      SystemUtils/IS_OS_WINDOWS (db-path (env :localappdata))
+      SystemUtils/IS_OS_LINUX (db-path (str (env :home) "/.local/share"))
+      SystemUtils/IS_OS_MAC_OSX (db-path (str (env :home) "/Library/Application Support"))
+      :else (db-path ".")))
+
+(defn get-db-path
+  "Return the path to the database directory."
+  []
+  (if (env :camelot-datadir)
+    (str (checked-datadir (env :camelot-datadir)) SystemUtils/FILE_SEPARATOR db-name)
+    (get-std-db-path)))
 
 (defn- media-path
-  "Return the full path where the database is stored."
+  "Return the full path where imported media is stored."
   [dir]
   (format "%s%scamelot%s%s" dir SystemUtils/FILE_SEPARATOR
           SystemUtils/FILE_SEPARATOR media-directory-name))
 
-(defn get-media-path
-  "Return the OS-specific path to the configuration file."
+(defn get-std-media-path
+  "Return the OS specific path to the media directory."
   []
   (cond
-    SystemUtils/IS_OS_WINDOWS (media-path (env :localappdata))
-    SystemUtils/IS_OS_LINUX (media-path (str (env :home) "/.local/share"))
-    SystemUtils/IS_OS_MAC_OSX (media-path (str (env :home) "/Library/Application Support"))
-    :else (media-path ".")))
+      SystemUtils/IS_OS_WINDOWS (media-path (env :localappdata))
+      SystemUtils/IS_OS_LINUX (media-path (str (env :home) "/.local/share"))
+      SystemUtils/IS_OS_MAC_OSX (media-path (str (env :home) "/Library/Application Support"))
+      :else (media-path ".")))
+
+(defn get-media-path
+  "Return the path to the media directory."
+  []
+  (if (env :camelot-datadir)
+    (str (checked-datadir (env :camelot-datadir)) SystemUtils/FILE_SEPARATOR media-directory-name)
+    (get-std-media-path)))
 
 (defn- serialise-dates
   "Convert configuration dates to long (e.g., for serialisation)."
@@ -112,10 +140,10 @@
   `overwrite?' flag is set."
   [config overwrite?]
   (let [conf (get-config-file)
-        confdir (f/get-parent-file (io/file conf))]
-    (when-not (f/exists? confdir)
-      (f/mkdirs confdir))
-    (if (and (not overwrite?) (f/exists? (io/file conf)))
+        confdir (jf/get-parent-file (io/file conf))]
+    (when-not (jf/exists? confdir)
+      (jf/mkdirs confdir))
+    (if (and (not overwrite?) (jf/exists? (io/file conf)))
       (throw (RuntimeException. (tr/translate config :problems/default-config-exists conf)))
       (with-open [w (io/writer conf)]
         (pp/write config :stream w)))
@@ -130,8 +158,8 @@
   "Read the configuration file from storage,
 Throws an IOException if the file cannot be read."
   [path]
-  (if (f/exists? (io/file path))
-    (if (f/readable? (io/file path))
+  (if (jf/exists? (io/file path))
+    (if (jf/readable? (io/file path))
       (io/reader path)
       (throw (IOException. (tr/translate default-config :problems/read-permission-denied path))))
     (do
@@ -143,7 +171,7 @@ Throws an IOException if the file cannot be read."
   []
   (->> (get-config-file)
        (config-file-reader)
-       (f/pushback-reader)
+       (jf/pushback-reader)
        (edn/read)
        (parse-dates)))
 

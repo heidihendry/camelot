@@ -126,9 +126,11 @@ Camelot has two directories: one for configuration, and one for data storage.  T
 
 ### Data Directory
 
-The data directory will contain two subdirectories: `Database` and `Media`.  Database is an Apache Derby database.  Imported media is not stored in the database, but in the `Mdia' folder
-.
-Both of these directories should be backed up routinely.
+The data directory will contain two subdirectories: `Database` and `Media`.  Database is an Apache Derby database.  Imported media is not stored in the database, but in the `Media' folder.
+
+A custom data directory can be set using the `CAMELOT_DATADIR` environment variable.  The Database and Media directories will be created (if necessary) and stored within that nominated directory.  If `CAMELOT_DATADIR` is not set, Camelot will fall-back to using the standard locations (as above).
+
+Both of the `Database` and `Media` directories should be backed up routinely.
 
 ### Config Directory
 
