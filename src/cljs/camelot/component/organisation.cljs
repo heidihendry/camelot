@@ -39,8 +39,6 @@
         (go
           (loop []
             (let [r (<! chan)]
-              (prn "Received!")
-              (prn r)
               (om/update! data :active r)
               (doseq [m (:menu data)]
                 (om/update! m :active (= (:concept m) r)))

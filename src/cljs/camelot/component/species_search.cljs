@@ -138,7 +138,6 @@
               (recur))))))
     om/IRenderState
     (render-state [this state]
-      (prn (:search-results data))
       (dom/div #js {:className "species-search"}
                (dom/label #js {:className "field-label"} "Search Species")
                (om/build search-input-component data

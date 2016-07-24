@@ -2,6 +2,7 @@
   (:require [om.core :as om]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
+            [camelot.state :as state]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.component.species-search :as search]
             [om.dom :as dom])
@@ -59,7 +60,9 @@
                  {:data {:species (deref (data :species))}}
                  (fn []
                    (rest/post-x "/surveys" {:data ps}
-                                #(nav/nav! "/organisation"))))))
+                                #(if (seq (get-in (state/app-state-cursor) [:survey :list]))
+                                   (nav/nav! "/organisation")
+                                   (.reload js/location)))))))
 
 (defn survey-details-completed?
   [data]
@@ -90,14 +93,15 @@
                (dom/label #js {:className "field-label"} "Expected Species")
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
-                        (dom/button #js {:className "btn btn-default"
-                                         :onClick #(do
-                                                     (nav/nav! "/organisation")
-                                                     (nav/analytics-event "org-survey-create" "cancel-click"))}
-                                    "Cancel")
+                        (when (seq (get-in (state/app-state-cursor) [:survey :list]))
+                          (dom/button #js {:className "btn btn-default"
+                                           :onClick #(do
+                                                       (nav/nav! "/organisation")
+                                                       (nav/analytics-event "org-survey-create" "cancel-click"))}
+                                      "Cancel"))
                         (dom/button #js {:className "btn btn-primary"
-                                         :onClick #(do (create-survey data)
-                                                       (nav/analytics-event "org-survey-create" "submit-click"))
+                                         :onClick #(do (nav/analytics-event "org-survey-create" "submit-click")
+                                                       (create-survey data))
                                          :disabled (if (survey-details-completed? data)
                                                      "" "disabled")
                                          :title (if (survey-details-completed? data)
@@ -127,7 +131,6 @@
     (render [_]
       (if-let [data (get app :create-survey)]
         (do
-          (prn data)
           (when (get-in data [:species-search :selection])
             (om/transact! data :species
                           #(conj % (deref (get-in data [:species-search :selection]))))
