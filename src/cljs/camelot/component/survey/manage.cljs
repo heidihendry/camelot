@@ -160,9 +160,10 @@
                                       {:key :trap-station-id}))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"
-                                :onClick #(do (nav/nav! "/trap-stations/create")
+                                :onClick #(do (nav/nav! (str "/"
+                                                             (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
+                                                             "/deployments/create"))
                                               (nav/analytics-event "survey-deployment" "create-click"))
-                                :disabled "disabled"
                                 :title "Add a new deployment"}
                            (dom/span #js {:className "fa fa-plus"})
                            " Add Deployment")))))

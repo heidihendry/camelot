@@ -192,6 +192,7 @@ a:hover {
   padding: 0.5rem;
   font-size: 90%;
   min-width: 30rem;
+  margin-bottom: 1rem;
 }
 #app select:disabled {
     background: #ebebe4;
@@ -208,7 +209,7 @@ a:hover {
   font-size: 90%;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 #page-content input.field-input, textarea.field-input, pre.field-input {
   display: block;
@@ -378,6 +379,7 @@ pre.field-input {
 #page-content .section-body {
 
 }
+
 #page-content .edit-btn {
     float: right;
 }
@@ -469,6 +471,9 @@ pre.field-input {
     margin-top: 2rem;
     border-bottom: 1px solid #eee;
     padding-bottom: 0;
+}
+.datepicker {
+    margin-bottom: 1rem;
 }
 .datepicker .label {
     color: black;
@@ -1086,6 +1091,15 @@ pre.field-input {
     margin: auto;
     flex-grow: 1;
     height: calc(100vh - 22rem);
+}
+#app .split-menu .single-section {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    margin: auto;
+    flex-grow: 1;
+    height: calc(100vh - 22rem);
+    max-width: 50rem;
 }
 #app .split-menu .section input {
     flex-shrink: 0;

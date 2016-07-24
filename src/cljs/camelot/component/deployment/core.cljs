@@ -5,7 +5,8 @@
             [camelot.rest :as rest]
             [om-datepicker.components :refer [datepicker]]
             [camelot.nav :as nav]
-            [camelot.state :as state])
+            [camelot.state :as state]
+            [camelot.component.deployment.create :as create])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -211,6 +212,13 @@
                           :check (om/build record-camera-check-component (:data data))
                           nil)
                         )))))
+
+(defn create-view-component
+  [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build create/view-component app))))
 
 (defn deployment-view-component
   "Top-level view for deployment components."
