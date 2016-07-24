@@ -45,7 +45,7 @@
   [chan e]
   (go
     (>! chan {:busy true})
-    (rest/get-x "/species/search" {:query-params {"search" (-> e
+    (rest/get-x-raw "/species/search" {:query-params {"search" (-> e
                                                                .-target
                                                                array-seq
                                                                first

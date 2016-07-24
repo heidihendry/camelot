@@ -28,8 +28,23 @@
   ([method url params status response]
    (-build-error method url params status response)))
 
+(defn get-x-raw
+  "Send an normal (transit-free) GET request."
+  ([x-url params cb]
+   (go
+     (let [response (<! (http/get (misc/with-baseurl x-url) params))
+           success (some #{(:status response)} success-status-codes)]
+       (if success
+         (when cb
+           (cb response))
+         (om/update! (state/app-state-cursor) :error (build-error
+                                                      "GET"
+                                                      (misc/with-baseurl x-url)
+                                                      (:status response)
+                                                      (:body response))))))))
+
 (defn get-x
-  "Retrieve settings"
+  "Make a request via GET."
   ([x-url cb]
    (go
      (let [response (<! (transit-util/request
