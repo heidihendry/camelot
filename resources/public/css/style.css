@@ -1245,3 +1245,30 @@ pre.field-input {
 #app .citation-font {
     font-size: 9pt;
 }
+
+#app .progress-bar-container {
+    width: 100%;
+    margin-top: 1rem;
+}
+.progress-bar-container .progress-bar {
+    position: relative;
+    height: 1rem;
+    background-color: #999;
+    width: 100%;
+    z-index: 5;
+}
+.progress-bar-container .progress-bar-state {
+    position: relative;
+    display: block;
+    height: 1rem;
+    background-color: #116095;
+    z-index: 10;
+}
+.progress-bar-container .error-bar-state {
+    position: relative;
+    display: block;
+    height: 1rem;
+    top: -1rem;
+    background-color: #cc3311;
+    z-index: 11;
+}

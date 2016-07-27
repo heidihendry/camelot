@@ -72,40 +72,52 @@
   (when (re-matches image-mime (.-type file))
     (rest/post-x-raw "/capture/upload" [["session-camera-id" sesscam-id]
                                         ["file" file]]
-                     #(go (>! chan true)))))
+                     #(go (>! chan true))
+                     #(go (>! chan false)))))
+
+(defn uploadable-count
+  [fs]
+  (reduce #(if (re-matches image-mime (.-type (aget fs %2)))
+             (inc %1)
+             %1) 0
+             (range (.-length fs))))
 
 (defn incomplete-deployment-list-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:total 0 :complete 0 :failed 0})
     om/IDidMount
     (did-mount [_]
       (let [n (om/get-node owner)]
-        (.addEventListener n "dragenter" #(do (prn "DRAG")
-                                              (.stopPropagation %)
+        (.addEventListener n "dragenter" #(do (.stopPropagation %)
                                               (.preventDefault %)))
-        (.addEventListener n "dragover" #(do (prn "OVER")
-                                             (.stopPropagation %)
+        (.addEventListener n "dragover" #(do (.stopPropagation %)
                                              (.preventDefault %)))
         (.addEventListener n "drop" #(do
                                        (.stopPropagation %)
                                        (.preventDefault %)
                                        (let [fs (.. % -dataTransfer -files)
+                                             uploadable (uploadable-count fs)
                                              upl-chan (chan)
                                              complete (atom 0)]
                                          (go
+                                           (om/set-state! owner :total uploadable)
+                                           (om/set-state! owner :complete 0)
+                                           (om/set-state! owner :failed 0)
                                            (loop []
                                              (let [r (<! upl-chan)]
-                                               (swap! complete inc)
-                                               (prn @complete)
-                                               (if (= (.-length fs) @complete)
-                                                 (prn "All uploaded")
-                                                 (recur)))))
+                                               (if r
+                                                 (om/update-state! owner :complete inc)
+                                                 (om/update-state! owner :failed inc))
+                                               (recur))))
                                          (doseq [idx (range (.-length fs))]
                                            (upload-file (:trap-station-session-camera-id data)
                                                         (aget fs idx)
                                                         upl-chan)))))))
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/div #js {:className "menu-item extra-detailed"}
                (dom/div #js {:className "menu-item-title"}
                          (:trap-station-name data))
@@ -121,7 +133,20 @@
                         " "
                         (dom/label nil " Camera Name: ")
                         " "
-                        (:camera-name data))))))
+                        (:camera-name data))
+               (when-not (or (zero? (get state :total)) (nil? (get state :total)))
+                 (dom/div #js {:className "progress-bar-container"
+                               :title (str (get state :complete) " complete and "
+                                           (get state :failed) " failed")}
+                          (dom/div #js {:className "progress-bar"})
+                          (dom/div #js {:className "progress-bar-state"
+                                        :style #js {:width (str (* 100 (/ (get state :complete)
+                                                                          (get state :total))) "%")}})
+                          (dom/div #js {:className "error-bar-state"
+                                        :style #js {:left (str (* 100 (/ (get state :complete)
+                                                                          (get state :total))) "%")
+                                                    :width (str (* 100 (/ (get state :failed)
+                                                                          (get state :total))) "%")}})))))))
 
 (defn incomplete-deployment-section-component
   [data owner]
