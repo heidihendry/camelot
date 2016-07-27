@@ -44,7 +44,7 @@ LEFT JOIN survey_site USING (survey_site_id)
 LEFT JOIN camera USING (camera_id)
 LEFT JOIN site USING (site_id)
 LEFT JOIN camera_status USING (camera_status_id)
-LEFT OUTER JOIN media USING (trap_station_session_camera_id)
+LEFT JOIN media USING (trap_station_session_camera_id)
 WHERE survey_id = :survey_id AND media_id IS NULL
       AND trap_station_session_end_date IS NOT NULL
 

@@ -165,7 +165,7 @@
                         (om/build-all incomplete-deployment-list-component
                                       (sort-by :trap-station-name
                                                (:incomplete-deployments data))
-                                      {:key :trap-station-session-id}))))))
+                                      {:key :trap-station-session-camera-id}))))))
 
 (defn deployment-section-component
   [data owner]

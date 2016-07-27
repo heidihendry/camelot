@@ -263,4 +263,5 @@
     (db/with-transaction [s state]
       (set-session-end-date! s data)
       (set-statuses-for-cameras! s data)
-      (create-new-session! s data))))
+      (create-new-session! s data))
+    (throw (RuntimeException. "Invalid camera check"))))
