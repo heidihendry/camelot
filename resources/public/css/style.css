@@ -1129,16 +1129,19 @@ pre.field-input {
 #app .split-menu .button-container button {
     margin: 0.5rem;
 }
+#page-content td .button-container button {
+    width: auto;
+}
 #app .split-menu .button-container button:last-child {
     margin-right: 0rem;
 }
 #app .split-menu th:last-child {
     text-align: right;
-    width: 12rem;
+    width: 22rem;
 }
 #app .split-menu td:last-child {
     text-align: right;
-    width: 12rem;
+    width: 22rem;
 }
 #app .split-menu .survey-details-pane {
     display: flex;
@@ -1218,11 +1221,27 @@ pre.field-input {
 }
 #app .split-menu .section .btn:last-child {
     flex-shrink: 0;
-    margin-bottom: 0rem;
 }
 #app .org-settings, #app .view-library {
     width: 50%;
     height: 6rem;
     margin: auto;
     margin-bottom: 3rem;
+}
+#app .citation-modal {
+    position: absolute;
+    left: calc(50% - 25rem);
+    z-index: 500;
+    width: 50rem;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0px 0px 15px 1px #666;
+}
+#app .hide-citation {
+    float: right;
+}
+#app .citation-font {
+    font-size: 9pt;
 }

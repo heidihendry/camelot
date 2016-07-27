@@ -60,6 +60,7 @@
                          :taxonomy-family (classification-for clsn "Family")
                          :taxonomy-genus (get result "genus")
                          :taxonomy-species (get result "species")
+                         :citation (get result "bibliographic_citation")
                          :taxonomy-common-name (common-name state names)})))
 
 (defn get-taxonomy-for-id

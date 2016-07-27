@@ -5,8 +5,9 @@
             [cljs.core.async :refer [<! chan >!]]
             [goog.string :as gstr]
             [om.core :as om]
-            [om.dom :as dom])
-    (:require-macros [cljs.core.async.macros :refer [go]]))
+            [om.dom :as dom]
+            [camelot.state :as state])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def db-whitelist
   #{"Systema Dipterorum"
@@ -17,15 +18,17 @@
 
 (defn get-classification
   [rank classifications]
-  (gstr/unescapeEntities (or (get (first (filter #(= (get % "rank") rank) classifications))
-                                  "name")
-                             "")))
+  (gstr/unescapeEntities
+   (or (get (first (filter #(= (get % "rank") rank) classifications))
+            "name")
+       "")))
 
 (defn process-result
   [res]
   (let [[genus species] (str/split (gstr/unescapeEntities (or (get res "name") ""))
                                    #" ")]
     {:id (get res "id")
+     :citation (get res (gstr/unescapeEntities "bibliographic_citation"))
      :species species
      :genus genus}))
 
@@ -76,15 +79,30 @@
                                  :className "btn btn-default"}
                             "Search")))))
 
+(defn truncate
+  [s nc]
+  (if (> (count s) nc)
+    (str (subs s 0 nc) "...")
+    s))
+
 (defn search-result-component
   [data owner]
   (reify
     om/IRenderState
     (render-state [_ state]
+      (prn data)
       (dom/tr #js {:onClick #(go (>! (:select-chan state) data))}
               (dom/td nil (:genus data))
               (dom/td nil (:species data))
-              (dom/td nil (dom/button #js {:className "btn btn-default"} "Add"))))))
+              (dom/td #js {:colSpan "2"}
+                      (dom/p #js {:className "button-container"}
+                             (dom/button #js {:className "btn btn-default"
+                                              :onClick #(do
+                                                          (.preventDefault %)
+                                                          (.stopPropagation %)
+                                                          (go (>! (:select-chan state) {:citation (:citation data)})))}
+                                         "Citation")
+                             (dom/button #js {:className "btn btn-default"} "Add")))))))
 
 (defn search-result-list-component
   [data owner]
@@ -110,6 +128,19 @@
                                                        {:state state}))))
           (dom/span nil ))))))
 
+(defn citation-modal
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (when (:citation data)
+        (dom/div #js {:className "citation-modal"}
+                 (dom/h3 nil "Citation")
+                 (dom/p #js {:className "citation-font"} (:citation data))
+                 (dom/button #js {:onClick #(om/update! data :citation nil)
+                                  :className "btn btn-primary hide-citation"}
+                             "Hide"))))))
+
 (defn species-search-component
   [data owner]
   (reify
@@ -133,12 +164,18 @@
                     (om/update! data :search-results (:results v))
                     (nav/analytics-event "species-search" "search")))
                 (do
-                  (om/update! data :selection v)
-                  (nav/analytics-event "species-search" "add-species")))
+                  (if (:citation v)
+                    (do
+                      (om/update! data :citation (:citation v))
+                      (nav/analytics-event "species-search" "view-citation"))
+                    (do
+                      (om/update! data :selection v)
+                      (nav/analytics-event "species-search" "add-species")))))
               (recur))))))
     om/IRenderState
     (render-state [this state]
       (dom/div #js {:className "species-search"}
+               (om/build citation-modal data)
                (dom/label #js {:className "field-label"} "Search Species")
                (om/build search-input-component data
                          {:init-state {:result-chan (:result-chan state)}})
