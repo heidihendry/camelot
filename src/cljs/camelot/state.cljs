@@ -17,6 +17,10 @@
   []
   (om/ref-cursor (:metadata (om/root-cursor app-state))))
 
+(defn display-state
+  []
+  (om/ref-cursor (:display (om/root-cursor app-state))))
+
 (defn view-state
   [area]
   {:pre [(or (= area :settings) (= area :content))]}

@@ -37,11 +37,11 @@
        (if success
          (when cb
            (cb response))
-         (om/update! (state/app-state-cursor) :error (build-error
-                                                      "GET"
-                                                      (misc/with-baseurl x-url)
-                                                      (:status response)
-                                                      (:body response))))))))
+         (om/update! (state/display-state) :error (build-error
+                                                   "GET"
+                                                   (misc/with-baseurl x-url)
+                                                   (:status response)
+                                                   (:body response))))))))
 
 (defn get-x
   "Make a request via GET."
@@ -53,11 +53,11 @@
        (if success
          (when cb
            (cb response))
-         (om/update! (state/app-state-cursor) :error (build-error
-                                                      "GET"
-                                                      (misc/with-baseurl x-url)
-                                                      (:status response)
-                                                      (:body response)))))))
+         (om/update! (state/display-state) :error (build-error
+                                                   "GET"
+                                                   (misc/with-baseurl x-url)
+                                                   (:status response)
+                                                   (:body response)))))))
   ([x-url params cb]
    (go
      (let [response (<! (transit-util/request
@@ -66,11 +66,11 @@
        (if success
          (when cb
            (cb response))
-         (om/update! (state/app-state-cursor) :error (build-error
-                                                      "GET"
-                                                      (misc/with-baseurl x-url)
-                                                      (:status response)
-                                                      (:body response))))))))
+         (om/update! (state/display-state) :error (build-error
+                                                   "GET"
+                                                   (misc/with-baseurl x-url)
+                                                   (:status response)
+                                                   (:body response))))))))
 
 (defn post-x
   "POST state"
@@ -84,14 +84,14 @@
          (when cb
            (cb response))
          (do
-           (when failcb
-             (failcb))
-           (om/update! (state/app-state-cursor) :error (build-error
-                                                        "POST"
-                                                        (misc/with-baseurl resource)
-                                                        params
-                                                        (:status response)
-                                                        (:body response)))))))))
+           (if failcb
+             (failcb)
+             (om/update! (state/display-state) :error (build-error
+                                                       "POST"
+                                                       (misc/with-baseurl resource)
+                                                       params
+                                                       (:status response)
+                                                       (:body response))))))))))
 
 (defn post-x-raw
   "POST state"
@@ -105,14 +105,14 @@
          (when cb
            (cb response))
          (do
-           (when failcb
-             (failcb))
-           (om/update! (state/app-state-cursor) :error (build-error
-                                                        "POST"
-                                                        (misc/with-baseurl resource)
-                                                        params
-                                                        (:status response)
-                                                        (:body response)))))))))
+           (if failcb
+             (failcb)
+             (om/update! (state/display-state) :error (build-error
+                                                       "POST"
+                                                       (misc/with-baseurl resource)
+                                                       params
+                                                       (:status response)
+                                                       (:body response))))))))))
 
 (defn put-x
   "PUT state"
@@ -128,12 +128,12 @@
          (do
            (when failcb
              (failcb))
-           (om/update! (state/app-state-cursor) :error (build-error
-                                                        "PUT"
-                                                        (misc/with-baseurl resource)
-                                                        params
-                                                        (:status response)
-                                                        (:body response)))))))))
+           (om/update! (state/display-state) :error (build-error
+                                                     "PUT"
+                                                     (misc/with-baseurl resource)
+                                                     params
+                                                     (:status response)
+                                                     (:body response)))))))))
 
 (def get-application
   "Retrieve global application details"
@@ -165,11 +165,11 @@
       (if success
         (when cb
           (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "GET"
-                                                     (misc/with-baseurl resource)
-                                                     (:status response)
-                                                     (:body response)))))))
+        (om/update! (state/display-state) :error (build-error
+                                                  "GET"
+                                                  (misc/with-baseurl resource)
+                                                  (:status response)
+                                                  (:body response)))))))
 
 (defn put-resource
   "PUT resource state"
@@ -181,12 +181,12 @@
       (if success
         (when cb
           (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "PUT"
-                                                     (misc/with-baseurl resource)
-                                                     params
-                                                     (:status response)
-                                                     (:body response)))))))
+        (om/update! (state/display-state) :error (build-error
+                                                  "PUT"
+                                                  (misc/with-baseurl resource)
+                                                  params
+                                                  (:status response)
+                                                  (:body response)))))))
 
 (defn post-resource
   "POST resource state"
@@ -198,12 +198,12 @@
       (if success
         (when cb
           (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "POST"
-                                                     (misc/with-baseurl resource)
-                                                     params
-                                                     (:status response)
-                                                     (:body response)))))))
+        (om/update! (state/display-state) :error (build-error
+                                                  "POST"
+                                                  (misc/with-baseurl resource)
+                                                  params
+                                                  (:status response)
+                                                  (:body response)))))))
 
 (defn delete-resource
   "DELETE resource"
@@ -215,9 +215,9 @@
       (if success
         (when cb
           (cb response))
-        (om/update! (state/app-state-cursor) :error (build-error
-                                                     "DELETE"
-                                                     (misc/with-baseurl resource)
-                                                     params
-                                                     (:status response)
-                                                     (:body response)))))))
+        (om/update! (state/display-state) :error (build-error
+                                                  "DELETE"
+                                                  (misc/with-baseurl resource)
+                                                  params
+                                                  (:status response)
+                                                  (:body response)))))))

@@ -206,9 +206,11 @@
 
   (context "/capture" []
            (POST "/upload" {params :multipart-params}
-                 (r/response (capture/import-capture! (app/gen-state (conf/config))
-                                                      (edn/read-string (get params "session-camera-id"))
-                                                      (get params "file")))))
+                 (if (= (rand-int 10) 0)
+                   (throw (RuntimeException. "Random error"))
+                   (r/response (capture/import-capture! (app/gen-state (conf/config))
+                                                        (edn/read-string (get params "session-camera-id"))
+                                                        (get params "file"))))))
   (context "/deployment" []
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
                                                         :trap-station-session id))
