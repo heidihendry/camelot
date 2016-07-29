@@ -1280,3 +1280,10 @@ pre.field-input {
     background-color: #cc3311;
     z-index: 11;
 }
+#app .help-text {
+    padding: 1rem;
+    border: 1px dashed #ccc;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}

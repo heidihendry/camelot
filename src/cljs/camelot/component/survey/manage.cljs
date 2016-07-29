@@ -191,6 +191,8 @@
     (render [_]
       (dom/div #js {:className "section"}
                (dom/div #js {:className "simple-menu"}
+                        (dom/div #js {:className "help-text"}
+                                 "You can drag and drop capture files on a Camera Check to upload them.")
                         (om/build-all incomplete-deployment-list-component
                                       (sort-by :trap-station-name
                                                (:incomplete-deployments data))
