@@ -61,14 +61,17 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! data :camera-is-new {:value false})
       (rest/get-x (str "/trap-station-session-cameras/available/"
                        (get-in data [:trap-station-session-id :value]))
                   #(om/set-state! owner :options (:body %))))
     om/IRenderState
     (render-state [_ state]
       (dom/select #js {:className "field-input"
-                       :onChange #(om/update! (get data (:camera-id-field state))
-                                              :value (.. % -target -value))}
+                       :onChange #(do
+                                    (om/update! (:camera-is-new data) :value (:camera-is-new state))
+                                    (om/update! (get data (:camera-id-field state))
+                                                :value (.. % -target -value)))}
                   (om/build-all camera-select-option-component
                                 (if (seq (:options state))
                                   (conj (:options state)
@@ -91,16 +94,17 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (if (get-in data [(:camera-id-field (om/get-state owner)) :value])
-        (rest/get-x (str "/camera-statuses/alternatives/"
-                         (get-in data [(:camera-id-field (om/get-state owner)) :value]))
-                    #(om/set-state! owner :options (:body %)))))
+      (let [v (get-in data [(:camera-id-field (om/get-state owner)) :value])]
+        (when v
+          (rest/get-x (str "/camera-statuses/alternatives/" v)
+                      #(om/set-state! owner :options (:body %))))))
     om/IRenderState
     (render-state [_ state]
       (when (seq (:options state))
         (dom/select #js {:className "field-input"
+                         :value (get-in data [(:camera-status-field state) :value])
                          :onChange #(om/update! (get data (:camera-status-field state))
-                                                :value (.. % -target -value))}
+                                                 :value (.. % -target -value))}
                     (om/build-all camera-status-select-option-component
                                   (:options state)
                                   {:key :camera-status-id}))))))
@@ -137,7 +141,8 @@
                  (om/build camera-status-component data
                            {:init-state {:camera-status-field :primary-camera-status-id
                                          :camera-id-field :primary-camera-id}})
-                 (if (get-in data [:secondary-camera-id :value])
+                 (if (and (get-in data [:secondary-camera-id :value])
+                          (not (get-in data [:camera-is-new :value])))
                    (dom/div nil
                             (dom/h5 nil (str "Secondary Camera: " ) (get-in data [:secondary-camera-name :value]))
                             (om/build camera-status-component data
@@ -148,7 +153,8 @@
                             (dom/label #js {:className "field-label"} "Secondary Camera, if any")
                             (om/build camera-select-component data
                                       {:init-state {:camera-status-field :secondary-camera-status-id
-                                                    :camera-id-field :secondary-camera-id}})))
+                                                    :camera-id-field :secondary-camera-id
+                                                    :camera-is-new true}})))
                  (dom/div #js {:className "button-container"}
                           (dom/button #js {:className "btn btn-primary"
                                            :onClick #(do

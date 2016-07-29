@@ -44,3 +44,11 @@
        (db/clj-keys)
        (translate-statuses state)
        (map camera-status)))
+
+(s/defn get-specific-with-description :- (s/maybe CameraStatus)
+  "Return a camera status with the given description, should one exist."
+  [state :- State
+   desc :- s/Str]
+  (->> (get-all state)
+       (filter #(= desc (:camera-status-description %)))
+       (first)))

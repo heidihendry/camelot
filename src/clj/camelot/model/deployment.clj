@@ -7,7 +7,8 @@
             [clj-time.core :as t]
             [camelot.model.trap-station-session :as trap-station-session]
             [camelot.model.trap-station-session-camera :as trap-station-session-camera]
-            [camelot.model.survey-site :as survey-site]))
+            [camelot.model.survey-site :as survey-site]
+            [camelot.model.camera-status :as camera-status]))
 
 (sql/defqueries "sql/deployments.sql" {:connection db/spec})
 
@@ -204,15 +205,24 @@
 (s/defn set-statuses-for-cameras!
   [state :- State
    data]
-  (let [orig-data (get-specific state (:trap-station-session-id data))]
-    (when (not= (:primary-camera-status-id data)
-                (:primary-camera-status-id orig-data))
+  (let [orig-data (get-specific state (:trap-station-session-id data))
+        active-id (:camera-status-id (camera-status/get-specific-with-description state "Active"))]
+    (when (and (not= (:primary-camera-status-id data)
+                     (:primary-camera-status-id orig-data))
+               (:primary-camera-id orig-data))
       (set-camera-status! state {:camera-status-id (:primary-camera-status-id data)
                                  :camera-id (:primary-camera-id orig-data)}))
-    (when (not= (:secondary-camera-status-id data)
-                (:secondary-camera-status-id orig-data))
+    (when (and (not= (:secondary-camera-status-id data)
+                     (:secondary-camera-status-id orig-data))
+               (:secondary-camera-id orig-data))
       (set-camera-status! state {:camera-status-id (:secondary-camera-status-id data)
-                                 :camera-id (:secondary-camera-id orig-data)}))))
+                                 :camera-id (:secondary-camera-id orig-data)}))
+    (when (not= (:primary-camera-id data) (:primary-camera-id orig-data))
+      (set-camera-status! state {:camera-status-id active-id
+                                 :camera-id (:primary-camera-id data)}))
+    (when (not= (:secondary-camera-id data) (:secondary-camera-id orig-data))
+      (set-camera-status! state {:camera-status-id active-id
+                                 :camera-id (:secondary-camera-id data)}))))
 
 (defn- trap-station-name
   [data]
@@ -223,23 +233,39 @@
 (s/defn create-new-session!
   [state :- State
    data]
-  (let [sdata {:trap-station-id (:trap-station-id data)
-               :trap-station-session-start-date (:trap-station-session-end-date data)}
-        s (trap-station-session/create!
-           state (trap-station-session/ttrap-station-session sdata))]
-    (when (:primary-camera-id data)
-      (trap-station-session-camera/create!
-       state
-       (trap-station-session-camera/ttrap-station-session-camera
-        {:trap-station-session-id (:trap-station-session-id s)
-         :camera-id (:primary-camera-id data)})))
-    (when (:secondary-camera-id data)
-      (trap-station-session-camera/create!
-       state
-       (trap-station-session-camera/ttrap-station-session-camera
-        {:trap-station-session-id (:trap-station-session-id s)
-         :camera-id (:secondary-camera-id data)})))
-    s))
+  (let [orig-data (when (:trap-station-session-id data)
+                    (get-specific state (:trap-station-session-id data)))
+        sdata {:trap-station-id (:trap-station-id data)
+               :trap-station-session-start-date (or (:trap-station-session-end-date data)
+                                                    (:trap-station-session-start-date data))}
+        active-id (:camera-status-id (camera-status/get-specific-with-description state "Active"))]
+    ;; We need at least one camera to create a new session if a session was already ongoing.
+    (when (or (nil? orig-data)
+              (and (:primary-camera-id data)
+                   (or (= (:primary-camera-status-id data) active-id)
+                       (not= (:primary-camera-id data) (:primary-camera-id orig-data)))
+                   (:secondary-camera-id data)
+                   (or (= (:secondary-camera-status-id data) active-id)
+                       (not= (:secondary-camera-id data) (:secondary-camera-id orig-data)))))
+      (let [s (trap-station-session/create!
+               state (trap-station-session/ttrap-station-session sdata))]
+        (when (and (:primary-camera-id data)
+                   (or (= (:primary-camera-status-id data) active-id)
+                       (not= (:primary-camera-id data) (:primary-camera-id orig-data))))
+          (trap-station-session-camera/create!
+           state
+           (trap-station-session-camera/ttrap-station-session-camera
+            {:trap-station-session-id (:trap-station-session-id s)
+             :camera-id (:primary-camera-id data)})))
+        (when (and (:secondary-camera-id data)
+                   (or (= (:secondary-camera-status-id data) active-id)
+                       (not= (:secondary-camera-id data) (:secondary-camera-id orig-data))))
+          (trap-station-session-camera/create!
+           state
+           (trap-station-session-camera/ttrap-station-session-camera
+            {:trap-station-session-id (:trap-station-session-id s)
+             :camera-id (:secondary-camera-id data)})))
+        s))))
 
 (s/defn create!
   [state :- State
