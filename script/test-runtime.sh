@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 echo "Running camelot and ensuring it responds... "
 echo "Using datadir: ${CAMELOT_DATADIR}"
 java -jar target/camelot.jar &
