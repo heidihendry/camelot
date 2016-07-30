@@ -21,5 +21,6 @@ build:
     - CAMELOT_DATADIR="camelot-testdata" script/test-runtime.sh
     - script/prepare-snapshot.sh
   artifacts:
+    name: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
     paths:
       - target/camelot-*.jar
