@@ -6,6 +6,8 @@ echo "Running camelot and ensuring it responds... "
 
 if [ -n "$CAMELOT_DATADIR" ]; then
     echo "Using custom datadir: ${CAMELOT_DATADIR}"
+else
+    echo "Using default datadir"
 fi
 
 java -jar target/camelot.jar &
