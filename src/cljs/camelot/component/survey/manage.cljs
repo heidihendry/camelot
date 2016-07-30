@@ -68,7 +68,8 @@
 (def image-mime #"^image/.*")
 
 (defn add-upload-problem
-  [owner desc]
+  [owner event-details desc]
+  (apply (partial nav/analytics-event "capture-upload") event-details)
   (if (nil? (om/get-state owner :errors))
       (om/set-state! owner :errors desc)
       (om/update-state! owner :errors #(str % desc))))
@@ -80,7 +81,7 @@
                                         ["file" file]]
                      #(go (>! chan {:file file :success true}))
                      #(go (>! chan {:file file :success false})))
-    (add-upload-problem owner
+    (add-upload-problem owner ["skipped" (.-type file)]
                         (str "'" (.-name file) "' is not in a supported format.\n"))))
 
 (defn uploadable-count
@@ -93,7 +94,7 @@
 (defn display-upload-failure
   [owner f]
   (let [desc (str "'" (.-name f) "' failed to upload\n")]
-    (add-upload-problem owner desc)))
+    (add-upload-problem owner ["failed" (.-type f)] desc)))
 
 (defn handle-upload-failure
   [owner f]
@@ -126,11 +127,14 @@
                                          (om/set-state! owner :failed 0)
                                          (om/set-state! owner :errors nil)
                                          (om/set-state! owner :ignored (- (.-length fs) uploadable))
+                                         (nav/analytics-event "capture-upload" "upload-init")
                                          (go
                                            (loop []
                                              (let [r (<! upl-chan)]
                                                (if (:success r)
-                                                 (om/update-state! owner :complete inc)
+                                                 (do
+                                                   (om/update-state! owner :complete inc)
+                                                   (nav/analytics-event "capture-upload" "success" (.-type (:file r))))
                                                  (handle-upload-failure owner (:file r)))
                                                (recur))))
                                          (doseq [idx (range (.-length fs))]

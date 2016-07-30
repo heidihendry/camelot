@@ -26,9 +26,12 @@
        (str/join "/" paths)))
 
 (defn analytics-event
-  [component action]
-  (when js/window.ga
-    (js/window.ga "send" "event" component action)))
+  ([component action]
+   (when js/window.ga
+     (js/window.ga "send" "event" component action)))
+  ([component action label]
+   (when js/window.ga
+     (js/window.ga "send" "event" component action label))))
 
 (defn analytics-pageview
   [page]
