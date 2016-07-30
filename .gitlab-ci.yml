@@ -7,8 +7,6 @@ stages:
 
 before_script:
   - export LEIN_ROOT=1
-  - mkdir data
-  - export CAMELOT_DATADIR=data
 
 build:standard:
   stage: build
