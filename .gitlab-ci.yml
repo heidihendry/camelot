@@ -1,44 +1,21 @@
-image: clojure
-
-stages:
-  - build
-  - test
-  - deploy
-
 before_script:
   - export LEIN_ROOT=1
+  - apt-get update -y
+  - apt-get install nodejs nodejs-legacy npm curl -y
+  - npm install -g phantomjs-prebuilt
+  - mkdir ~/.ssh
+  - chmod 700 ~/.ssh
+  - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
 
-build:standard:
-  stage: build
-  script: script/clean-build.sh
-  artifacts:
-    paths:
-      - target/camelot.jar
-
-test:standard:
-  stage: test
+build:
+  image: clojure
   script:
-    - apt-get update -y
-    - apt-get install nodejs nodejs-legacy npm curl -y
-    - npm install -g phantomjs-prebuilt
-    - mkdir ~/.ssh
-    - chmod 700 ~/.ssh
-    - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
+    - script/clean-build.sh
     - lein with-profiles +test midje
     - lein doo phantom test once
     - script/setup-testdata.sh
     - CAMELOT_DATADIR="camelot-testdata" script/test-runtime.sh
-  artifacts:
-    paths:
-      - target/camelot.jar
-
-deploy:snapshot:
-  stage: deploy
-  environment: snapshots
-  script:
     - script/prepare-snapshot.sh
   artifacts:
     paths:
-      - target/camelot*SNAPSHOT.jar
-  except:
-    - tags
+      - target/camelot-*.jar
