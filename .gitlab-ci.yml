@@ -16,6 +16,9 @@ test:standard:
   stage: test
   script:
     - script/unit-test.sh
+    - apt-get update -y
+    - apt-get install build-essential nodejs -y
+    - npm install -g phantomjs-prebuilt
     - script/test-runtime.sh
 
 deploy:snapshot:
