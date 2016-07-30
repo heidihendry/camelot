@@ -118,7 +118,8 @@
                              [org.apache.derby/derbytools "10.12.1.1"]]
               :env {:camelot-dev-mode "true"}
               :plugins [[lein-figwheel "0.5.4" :exclusions [org.clojure/clojure]]
-                        [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]]
+                        [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]
+                        [lein-midje "3.2"]]
 
               :cljsbuild {:builds
                           {:test
