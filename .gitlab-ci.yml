@@ -27,7 +27,7 @@ test:standard:
     - lein with-profiles +test midje
     - lein doo phantom test once
     - script/setup-testdata.sh
-    - CAMELOT_DATADIR="camelot-testdata" script/test-migration.sh
+    - CAMELOT_DATADIR="camelot-testdata" script/test-runtime.sh
   artifacts:
     paths:
       - target/camelot.jar
