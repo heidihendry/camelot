@@ -41,10 +41,15 @@
 
 (facts "Species Statistics Report"
   (fact "Report data form empty sightings is empty"
-    (let [sightings '()
-          state (state/gen-state {})
-          result (report state 1 sightings)]
-      result => '()))
+    (with-redefs [taxonomy/get-specific
+                  (fn [state id]
+                    {:taxonomy-genus "Smiley"
+                     :taxonomy-species "Wolf"
+                     :taxonomy-id 1})]
+      (let [sightings '()
+            state (state/gen-state {})
+            result (report state 1 sightings)]
+        result => '())))
 
   (fact "Media without sightings should be excluded"
     (with-redefs [taxonomy/get-specific

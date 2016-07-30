@@ -13,9 +13,6 @@ before_script:
 build:standard:
   stage: build
   script: script/clean-build.sh
-  artifacts:
-    paths:
-    - target/camelot.jar
 
 test:standard:
   stage: test
@@ -31,3 +28,5 @@ deploy:snapshot:
   artifacts:
     paths:
       - target/camelot*SNAPSHOT.jar
+  except:
+    - tags
