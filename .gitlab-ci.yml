@@ -24,7 +24,7 @@ test:standard:
     - lein with-profiles +test midje
     - lein doo phantom test once
     - script/test-runtime.sh
-    - ssh-keygen -R gitlab.com
+    - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
     - script/test-migration.sh
   artifacts:
     paths:
