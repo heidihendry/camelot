@@ -3,7 +3,11 @@
 set -e
 
 echo "Running camelot and ensuring it responds... "
-echo "Using datadir: ${CAMELOT_DATADIR}"
+
+if [ -n "$CAMELOT_DATADIR" ]; then
+    echo "Using custom datadir: ${CAMELOT_DATADIR}"
+fi
+
 java -jar target/camelot.jar &
 PID=$!
 sleep 45
