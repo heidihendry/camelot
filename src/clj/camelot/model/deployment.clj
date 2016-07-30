@@ -15,6 +15,7 @@
 (s/defrecord TDeployment
     [survey-id :- s/Int
      site-id :- s/Int
+     trap-station-name :- s/Str
      trap-station-longitude :- s/Num
      trap-station-latitude :- s/Num
      trap-station-altitude :- (s/maybe s/Num)
@@ -90,12 +91,12 @@
        ))
 
 (s/defn tdeployment
-  [{:keys [survey-id site-id trap-station-longitude trap-station-latitude
+  [{:keys [survey-id site-id trap-station-name trap-station-longitude trap-station-latitude
            trap-station-altitude trap-station-session-start-date
            primary-camera-id secondary-camera-id]}]
-  (->TDeployment survey-id site-id trap-station-longitude trap-station-latitude
-                 trap-station-altitude trap-station-session-start-date
-                 primary-camera-id secondary-camera-id))
+  (->TDeployment survey-id site-id trap-station-name trap-station-longitude
+                 trap-station-latitude trap-station-altitude
+                 trap-station-session-start-date primary-camera-id secondary-camera-id))
 
 (s/defn deployment
   [{:keys [trap-station-session-id trap-station-session-created
@@ -224,12 +225,6 @@
       (set-camera-status! state {:camera-status-id active-id
                                  :camera-id (:secondary-camera-id data)}))))
 
-(defn- trap-station-name
-  [data]
-  (let [lat (:trap-station-latitude data)
-        lon (:trap-station-longitude data)]
-    (str "Trap at " lat ", " lon)))
-
 (s/defn create-new-session!
   [state :- State
    data]
@@ -277,8 +272,7 @@
           ts (trap-station/create! s
                                    (trap-station/ttrap-station
                                     (merge data
-                                           (select-keys ss [:survey-site-id])
-                                           {:trap-station-name (trap-station-name data)})))]
+                                           (select-keys ss [:survey-site-id]))))]
       (create-new-session! s (merge data
                                     (select-keys ts [:trap-station-id]))))))
 

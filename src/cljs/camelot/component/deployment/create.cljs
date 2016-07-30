@@ -64,6 +64,12 @@
                                  (om/build datepicker (get-in data [:data :trap-station-session-start-date]))))
                (dom/label #js {:className "field-label required"} "Site")
                (om/build site-select-component data)
+               (dom/label #js {:className "field-label required"} "Trap Station Identifier")
+               (dom/input #js {:className "field-input"
+                               :type "text"
+                               :value (get-in data [:data :trap-station-name :value])
+                               :onChange #(om/update! (get-in data [:data :trap-station-name])
+                                                      :value (.. % -target -value))})
                (dom/label #js {:className "field-label required"} "Latitude")
                (dom/input #js {:className "field-input"
                                :type "number"
@@ -126,6 +132,7 @@
                                            :trap-station-latitude {:value nil}
                                            :trap-station-longitude {:value nil}
                                            :trap-station-altitude {:value nil}
+                                           :trap-station-name {:value nil}
                                            :site-id {:value nil}}})
       (go
         (let [c (chan)]
