@@ -16,7 +16,7 @@ test:standard:
   stage: test
   script:
     - apt-get update -y
-    - apt-get install nodejs npm -y
+    - apt-get install nodejs nodejs-legacy npm -y
     - npm install -g phantomjs-prebuilt
     - lein with-profiles +test midje
     - lein doo phantom test once
