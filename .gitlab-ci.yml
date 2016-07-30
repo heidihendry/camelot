@@ -19,13 +19,13 @@ test:standard:
   stage: test
   script:
     - apt-get update -y
-    - apt-get install nodejs nodejs-legacy npm -y
+    - apt-get install nodejs nodejs-legacy npm curl -y
     - npm install -g phantomjs-prebuilt
+    - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
     - lein with-profiles +test midje
     - lein doo phantom test once
-    - script/test-runtime.sh
-    - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
-    - script/test-migration.sh
+    - script/setup-testdata.sh
+    - CAMELOT_DATADIR="camelot-testdata" script/test-migration.sh
   artifacts:
     paths:
       - target/camelot.jar
