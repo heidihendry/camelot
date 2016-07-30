@@ -11,6 +11,9 @@ before_script:
 build:standard:
   stage: build
   script: script/clean-build.sh
+  artifacts:
+    paths:
+      - target/camelot.jar
 
 test:standard:
   stage: test
@@ -21,6 +24,9 @@ test:standard:
     - lein with-profiles +test midje
     - lein doo phantom test once
     - script/test-runtime.sh
+  artifacts:
+    paths:
+      - target/camelot.jar
 
 deploy:snapshot:
   stage: deploy
