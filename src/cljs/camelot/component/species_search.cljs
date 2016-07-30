@@ -91,7 +91,8 @@
     om/IRenderState
     (render-state [_ state]
       (prn data)
-      (dom/tr #js {:onClick #(go (>! (:select-chan state) data))}
+      (dom/tr #js {:onClick #(go (>! (:select-chan state) {:type :selection
+                                                           :data data}))}
               (dom/td nil (:genus data))
               (dom/td nil (:species data))
               (dom/td #js {:colSpan "2"}
@@ -100,7 +101,8 @@
                                               :onClick #(do
                                                           (.preventDefault %)
                                                           (.stopPropagation %)
-                                                          (go (>! (:select-chan state) {:citation (:citation data)})))}
+                                                          (go (>! (:select-chan state) {:type :citation
+                                                                                        :data (:citation data)})))}
                                          "Citation")
                              (dom/button #js {:className "btn btn-default"} "Add")))))))
 
@@ -164,12 +166,12 @@
                     (om/update! data :search-results (:results v))
                     (nav/analytics-event "species-search" "search")))
                 (do
-                  (if (:citation v)
+                  (if (= (:type v) :citation)
                     (do
-                      (om/update! data :citation (:citation v))
+                      (om/update! data :citation (:data v))
                       (nav/analytics-event "species-search" "view-citation"))
                     (do
-                      (om/update! data :selection v)
+                      (om/update! data :selection (:data v))
                       (nav/analytics-event "species-search" "add-species")))))
               (recur))))))
     om/IRenderState
