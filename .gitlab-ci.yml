@@ -15,10 +15,10 @@ build:standard:
 test:standard:
   stage: test
   script:
-    - lein with-profiles +test midje
     - apt-get update -y
-    - apt-get install build-essential nodejs -y
+    - apt-get install nodejs npm -y
     - npm install -g phantomjs-prebuilt
+    - lein with-profiles +test midje
     - lein doo phantom test once
     - script/test-runtime.sh
 
