@@ -22,7 +22,7 @@ test:standard:
     - apt-get install nodejs nodejs-legacy npm curl -y
     - npm install -g phantomjs-prebuilt
     - mkdir ~/.ssh
-    - chmod 600 ~/.ssh
+    - chmod 700 ~/.ssh
     - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
     - lein with-profiles +test midje
     - lein doo phantom test once
