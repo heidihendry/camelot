@@ -108,22 +108,17 @@
   "Return the available cameras, factoring in whether they're in use elsewhere."
   [state :- State
    id :- s/Int]
-  (let [active (trap-station-session/get-active state id)]
-    (->> {:trap-station-session-id id}
-         (db/with-db-keys state -get-available)
-         (remove #(some #{(:camera-id %)} active)))))
+  (db/clj-keys (-get-available)))
 
 (s/defn get-alternatives
   "Return the current and alternative cameras, factoring in whether they're in
   use elsewhere."
   [state :- State
    id :- s/Int]
-  (let [res (get-specific state id)
-        active (trap-station-session/get-active state (:trap-station-session-id res))]
+  (let [res (get-specific state id)]
     (->> res
-         (db/with-db-keys state -get-alternatives)
-         (remove #(and (some #{(:camera-id %)} active)
-                       (not= (:camera-id res) (:camera-id %)))))))
+         (db/with-db-keys state -get-alternatives))))
+
 (s/defn get-or-create! :- TrapStationSessionCamera
   [state :- State
    data :- TTrapStationSessionCamera]

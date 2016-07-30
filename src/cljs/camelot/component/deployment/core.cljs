@@ -166,6 +166,11 @@
                                         {:init-state {:camera-status-field :secondary-camera-status-id
                                                       :camera-id-field :secondary-camera-id
                                                       :camera-is-new true}})))
+                   (when (= (get-in data [:primary-camera-id :value])
+                            (get-in data [:secondary-camera-id :value]))
+                     (om/update! (:validation-problem data) :value true)
+                     (dom/label #js {:className "validation-warning"}
+                                "The same camera cannot be used twice."))
                    (dom/div #js {:className "button-container"}
                             (dom/button #js {:className "btn btn-primary"
                                              :disabled (if (get-in data [:validation-problem :value]) "disabled" "")

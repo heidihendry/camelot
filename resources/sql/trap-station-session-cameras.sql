@@ -35,14 +35,11 @@ WHERE trap_station_session_id = :trap_station_session_id
 -- name: -get-available
 SELECT camera_id, camera_name
 FROM camera
-WHERE camera_id NOT IN (SELECT camera_id
-                        FROM trap_station_session_camera
-                        WHERE trap_station_session_id = :trap_station_session_id)
+LEFT JOIN camera_status USING (camera_status_id)
+WHERE camera_status_description = 'camera-status/available'
 
 -- name: -get-alternatives
 SELECT camera_id, camera_name
 FROM camera
-WHERE camera_id NOT IN (SELECT camera_id
-                      FROM trap_station_session_camera
-                      WHERE trap_station_session_id = :trap_station_session_id)
-  OR camera_id = :camera_id
+LEFT JOIN camera_status USING (camera_status_id)
+WHERE camera_status_description = 'camera-status/available' OR camera_id = :camera_id
