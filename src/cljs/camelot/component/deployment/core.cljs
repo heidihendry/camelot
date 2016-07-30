@@ -127,45 +127,57 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! data :validation-problem {:value false})
       (when (nil? (get-in data [:trap-station-session-end-date]))
         (om/update! data :trap-station-session-end-date {:value (UtcDateTime.)})))
     om/IRender
     (render [_]
-      (when (get-in data [:trap-station-session-end-date :value])
-        (dom/div #js {:className "section"}
-                 (dom/div nil
-                          (dom/label #js {:className "field-label"} "Camera Check Date")
-                          (dom/div #js {:className "field-details"}
-                                   (om/build datepicker (or (get data :trap-station-session-end-date)))))
-                 (dom/h5 nil (str "Primary Camera: " ) (get-in data [:primary-camera-name :value]))
-                 (om/build camera-status-component data
-                           {:init-state {:camera-status-field :primary-camera-status-id
-                                         :camera-id-field :primary-camera-id}})
-                 (if (and (get-in data [:secondary-camera-id :value])
-                          (not (get-in data [:camera-is-new :value])))
+      (when-not (nil? (get-in data [:validation-problem :value]))
+        (om/update! data :validation-problem {:value false})
+        (if-let [sess-end (get-in data [:trap-station-session-end-date :value])]
+          (dom/div #js {:className "section"}
                    (dom/div nil
-                            (dom/h5 nil (str "Secondary Camera: " ) (get-in data [:secondary-camera-name :value]))
-                            (om/build camera-status-component data
-                                      {:init-state {:camera-status-field :secondary-camera-status-id
-                                                    :camera-id-field :secondary-camera-id}}))
-                   (dom/div nil
-                            (dom/h5 nil (str "Add a Secondary Camera"))
-                            (dom/label #js {:className "field-label"} "Secondary Camera, if any")
-                            (om/build camera-select-component data
-                                      {:init-state {:camera-status-field :secondary-camera-status-id
-                                                    :camera-id-field :secondary-camera-id
-                                                    :camera-is-new true}})))
-                 (dom/div #js {:className "button-container"}
-                          (dom/button #js {:className "btn btn-primary"
-                                           :onClick #(do
-                                                       (nav/analytics-event "deployment"
-                                                                            "cameracheck-submit")
-                                                       (rest/post-x "/deployment" {:data (deref data)}
-                                                                    (fn [_]
-                                                                      (nav/nav! (str "/" (get-in (state/app-state-cursor)
-                                                                                                 [:selected-survey :survey-id :value]))))))}
-                                      "Submit "
-                                      (dom/span #js {:className "btn-right-icon fa fa-chevron-right"}))))))))
+                            (dom/label #js {:className "field-label"} "Camera Check Date")
+                            (dom/div #js {:className "field-details"}
+                                     (om/build datepicker (or (get data :trap-station-session-end-date)))))
+                   (when (< (.getTime sess-end) (.getTime (get-in data [:trap-station-session-start-date :value])))
+                     (om/update! (:validation-problem data) :value true)
+                     (dom/label #js {:className "validation-warning"}
+                                "Date cannot be before the start date of the current session."))
+                   (when (> (.getTime sess-end) (.getTime (UtcDateTime.)))
+                     (om/update! (:validation-problem data) :value true)
+                     (dom/label #js {:className "validation-warning"}
+                                "Date cannot be in the future."))
+                   (dom/h5 nil (str "Primary Camera: " ) (get-in data [:primary-camera-name :value]))
+                   (om/build camera-status-component data
+                             {:init-state {:camera-status-field :primary-camera-status-id
+                                           :camera-id-field :primary-camera-id}})
+                   (if (and (get-in data [:secondary-camera-id :value])
+                            (not (get-in data [:camera-is-new :value])))
+                     (dom/div nil
+                              (dom/h5 nil (str "Secondary Camera: " ) (get-in data [:secondary-camera-name :value]))
+                              (om/build camera-status-component data
+                                        {:init-state {:camera-status-field :secondary-camera-status-id
+                                                      :camera-id-field :secondary-camera-id}}))
+                     (dom/div nil
+                              (dom/h5 nil (str "Add a Secondary Camera"))
+                              (dom/label #js {:className "field-label"} "Secondary Camera, if any")
+                              (om/build camera-select-component data
+                                        {:init-state {:camera-status-field :secondary-camera-status-id
+                                                      :camera-id-field :secondary-camera-id
+                                                      :camera-is-new true}})))
+                   (dom/div #js {:className "button-container"}
+                            (dom/button #js {:className "btn btn-primary"
+                                             :disabled (if (get-in data [:validation-problem :value]) "disabled" "")
+                                             :onClick #(do
+                                                         (nav/analytics-event "deployment"
+                                                                              "cameracheck-submit")
+                                                         (rest/post-x "/deployment" {:data (deref data)}
+                                                                      (fn [_]
+                                                                        (nav/nav! (str "/" (get-in (state/app-state-cursor)
+                                                                                                   [:selected-survey :survey-id :value]))))))}
+                                        "Submit "
+                                        (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))))
 
 (defn read-only-field-component
   [data owner]

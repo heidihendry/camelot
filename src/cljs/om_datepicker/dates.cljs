@@ -12,6 +12,13 @@
          second (.getSeconds date)]
      (js/Date. (.UTC js/Date year month day hour minute second)))))
 
+(defn truncate-time
+  [date]
+  (let [year (.getFullYear date)
+         month (.getMonth date)
+         day (.getDate date)]
+    (js/Date. (.UTC js/Date year month day))))
+
 (defn leap-year?
   [year]
   (or (and (= 0 (mod year 4))
@@ -28,11 +35,11 @@
 
 (defn today
   []
-  (date-instance (truncate-tz)))
+  (date-instance (js/Date.)))
 
 (defn first-of-month
   [date]
-  (js/Date. (.getFullYear date) (.getMonth date) 1))
+  (truncate-tz (js/Date. (.getFullYear date) (.getMonth date) 1)))
 
 (defn last-of-month
   [date]
