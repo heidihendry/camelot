@@ -1,8 +1,33 @@
 image: clojure
 
+stages:
+  - build
+  - test
+  - deploy
+
 before_script:
   - export LEIN_ROOT=1
+  - mkdir data
+  - export CAMELOT_DATADIR=data
 
-test:
+build:standard:
+  stage: build
+  script: script/clean-build.sh
+  artifacts:
+    paths:
+    - target/camelot.jar
+
+test:standard:
+  stage: test
   script:
-    - script/test-full.sh
+    - script/unit-test.sh
+    - script/test-runtime.sh
+
+deploy:snapshot:
+  stage: deploy
+  environment: snapshots
+  script:
+    - script/prepare-snapshot.sh
+  artifacts:
+    paths:
+      - target/camelot*SNAPSHOT.jar
