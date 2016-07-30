@@ -1,5 +1,7 @@
-# camelot
+# Camelot
+
 [![build status](https://gitlab.com/cshclm/camelot/badges/master/build.svg)](https://gitlab.com/cshclm/camelot/commits/master)
+
 Camelot is software for Camera Trap data management and analysis.
 
 Currently Camelot reports validation problems for survey data read from image metadata.
