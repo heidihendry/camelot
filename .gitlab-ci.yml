@@ -1,6 +1,7 @@
 before_script:
+  - add-apt-repository ppa:webupd8team/java
   - apt-get update -y
-  - apt-get install default-jre -y
+  - apt-get install oracle-java8-installer -y
   - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
   - chmod a+x lein
   - export LEIN_ROOT=1
