@@ -2,22 +2,16 @@
   (:require [schema.core :as s]
             [yesql.core :as sql]
             [camelot.model.state :refer [State]]
+            [camelot.util.trap-station :as util.ts]
             [camelot.db :as db]))
 
 (sql/defqueries "sql/trap-stations.sql" {:connection db/spec})
 
-(defn valid-range?
-  [rs re l]
-  (or (nil? l) (and (>= l rs) (<= l re))))
-
-(def valid-longitude? (partial valid-range? -180.0 180.0))
-(def valid-latitude? (partial valid-range? -90.0 90.0))
-
 (s/defrecord TTrapStation
     [trap-station-name :- s/Str
      survey-site-id :- s/Num
-     trap-station-longitude :- (s/pred valid-longitude?)
-     trap-station-latitude :- (s/pred valid-latitude?)
+     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
+     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-distance-above-ground :- (s/maybe s/Num)
@@ -31,8 +25,8 @@
      trap-station-updated :- org.joda.time.DateTime
      trap-station-name :- s/Str
      survey-site-id :- s/Num
-     trap-station-longitude :- (s/pred valid-longitude?)
-     trap-station-latitude :- (s/pred valid-latitude?)
+     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
+     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-distance-above-ground :- (s/maybe s/Num)

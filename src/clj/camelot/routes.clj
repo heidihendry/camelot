@@ -95,6 +95,7 @@
 
   (context "/cameras" []
            (GET "/" [] (rest/list-resources camera/get-all :camera))
+           (GET "/available" [] (rest/list-resources camera/get-available :camera))
            (GET "/:id" [id] (rest/specific-resource camera/get-specific id))
            (PUT "/:id" [id data] (rest/update-resource camera/update! id
                                                        camera/tcamera data))

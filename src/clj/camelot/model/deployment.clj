@@ -4,11 +4,13 @@
             [camelot.model.state :refer [State]]
             [camelot.db :as db]
             [camelot.model.trap-station :as trap-station]
+            [camelot.util.trap-station :as util.ts]
             [clj-time.core :as t]
             [camelot.model.trap-station-session :as trap-station-session]
             [camelot.model.trap-station-session-camera :as trap-station-session-camera]
             [camelot.model.survey-site :as survey-site]
-            [camelot.model.camera-status :as camera-status]))
+            [camelot.model.camera-status :as camera-status]
+            [camelot.util.trap-station :as util.ts]))
 
 (sql/defqueries "sql/deployments.sql" {:connection db/spec})
 
@@ -50,8 +52,8 @@
      site-id :- s/Int
      survey-site-id :- s/Int
      site-name :- s/Str
-     trap-station-longitude :- (s/pred trap-station/valid-longitude?)
-     trap-station-latitude :- (s/pred trap-station/valid-latitude?)
+     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
+     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
@@ -71,8 +73,8 @@
      site-id :- s/Int
      survey-site-id :- s/Int
      site-name :- s/Str
-     trap-station-longitude :- (s/pred trap-station/valid-longitude?)
-     trap-station-latitude :- (s/pred trap-station/valid-latitude?)
+     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
+     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
@@ -206,7 +208,7 @@
 (s/defn set-statuses-for-cameras!
   [state :- State
    data]
-  (let [orig-data (get-specific state (:trap-station-session-id data))
+  (let [orig-data (and (:trap-station-session-id data) (get-specific state (:trap-station-session-id data)))
         active-id (:camera-status-id (camera-status/get-specific-with-description state "Active"))]
     (when (and (not= (:primary-camera-status-id data)
                      (:primary-camera-status-id orig-data))
@@ -273,6 +275,7 @@
                                    (trap-station/ttrap-station
                                     (merge data
                                            (select-keys ss [:survey-site-id]))))]
+      (set-statuses-for-cameras! s data)
       (create-new-session! s (merge data
                                     (select-keys ts [:trap-station-id]))))))
 

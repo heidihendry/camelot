@@ -39,6 +39,10 @@
   [state :- State]
   (map camera (db/clj-keys (db/with-connection (:connection state) -get-all))))
 
+(s/defn get-available :- [Camera]
+  [state :- State]
+  (map camera (db/clj-keys (db/with-connection (:connection state) -get-available))))
+
 (s/defn get-specific :- (s/maybe Camera)
   [state :- State
    id :- s/Num]

@@ -5,7 +5,7 @@
              [camelot.model.sighting :as sighting]
              [camelot.model.media :as media]
              [camelot.model.state :refer [State]]
-             [camelot.model.trap-station :as trap-station])
+             [camelot.util.trap-station :as util.ts])
   (:import [camelot.model.sighting Sighting]))
 
 (sql/defqueries "sql/library.sql" {:connection db/spec})
@@ -25,8 +25,8 @@
      trap-station-session-id :- s/Int
      trap-station-id :- s/Int
      trap-station-name :- s/Str
-     trap-station-longitude :- (s/pred trap-station/valid-longitude?)
-     trap-station-latitude :- (s/pred trap-station/valid-latitude?)
+     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
+     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      site-sublocation :- (s/maybe s/Str)
      site-city :- (s/maybe s/Str)
      camera-id :- s/Int

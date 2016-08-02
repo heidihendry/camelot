@@ -170,7 +170,7 @@
                             (get-in data [:secondary-camera-id :value]))
                      (om/update! (:validation-problem data) :value true)
                      (dom/label #js {:className "validation-warning"}
-                                "The same camera cannot be used twice."))
+                                "Secondary camera must not be the same as the primary camera."))
                    (dom/div #js {:className "button-container"}
                             (dom/button #js {:className "btn btn-primary"
                                              :disabled (if (get-in data [:validation-problem :value]) "disabled" "")

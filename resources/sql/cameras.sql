@@ -34,3 +34,10 @@ WHERE camera_id = :camera_id
 SELECT camera_id, camera_created, camera_updated, camera_name, camera_status_id,
        camera_make, camera_model, camera_notes
 FROM camera
+
+-- name: -get-available
+SELECT camera_id, camera_created, camera_updated, camera_name, camera_status_id,
+       camera_make, camera_model, camera_notes
+FROM camera
+LEFT JOIN camera_status USING (camera_status_id)
+WHERE camera_status_description = 'camera-status/available'

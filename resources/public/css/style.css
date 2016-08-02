@@ -1098,7 +1098,7 @@ pre.field-input {
     width: 70%;
     margin: auto;
     flex-grow: 1;
-    height: calc(100vh - 22rem);
+    height: calc(100vh - 16rem);
     max-width: 50rem;
 }
 #app .split-menu .section input {

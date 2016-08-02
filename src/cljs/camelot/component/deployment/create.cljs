@@ -5,6 +5,7 @@
             [om.dom :as dom]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
+            [camelot.util.trap-station :as util.ts]
             [camelot.state :as state])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat])
@@ -28,7 +29,7 @@
                   (om/build-all camera-select-option-component
                                 (cons {:camera-id -1
                                        :camera-name ""}
-                                      (into '() (:cameras data)))
+                                      (sort-by :camera-name (into '() (:cameras data))))
                                 {:key :camera-id})))))
 
 (defn site-select-option-component
@@ -51,6 +52,18 @@
                                        :site-name ""}
                                       (into '() (:sites data)))
                                 {:key :site-id})))))
+
+(defn validate-form
+  [data]
+  (and (get-in data [:trap-station-session-start-date :value])
+       (and (get-in data [:trap-station-name :value])
+            (not (empty? (get-in data [:trap-station-name :value]))))
+       (util.ts/valid-latitude? (get-in data [:trap-station-latitude :value]))
+       (util.ts/valid-longitude? (get-in data [:trap-station-longitude :value]))
+       (util.ts/valid-altitude? (get-in data [:trap-station-altitude :value]))
+       (get-in data [:primary-camera-id :value])
+       (not= (get-in data [:secondary-camera-id :value])
+             (get-in data [:primary-camera-id :value]))))
 
 (defn deployment-form
   [data owner]
@@ -77,6 +90,9 @@
                                :onChange #(om/update! (get-in data [:data :trap-station-latitude])
                                                       :value
                                                       (.. % -target -value))})
+               (let [v (get-in data [:data :trap-station-latitude :value])]
+                 (when (and v (not (util.ts/valid-latitude? v)))
+                   (dom/label #js {:className "validation-warning"} "Latitude must be in the range [-90, 90].")))
                (dom/label #js {:className "field-label required"} "Longitude")
                (dom/input #js {:className "field-input"
                                :type "number"
@@ -84,7 +100,11 @@
                                :onChange #(om/update! (get-in data [:data :trap-station-longitude])
                                                       :value
                                                       (.. % -target -value))})
-               (dom/label #js {:className "field-label required"} "Altitude")
+               (let [v (get-in data [:data :trap-station-longitude :value])]
+                 (prn v)
+                 (when (and v (not (util.ts/valid-longitude? v)))
+                   (dom/label #js {:className "validation-warning"} "Longitude must be in the range [-180, 180].")))
+               (dom/label #js {:className "field-label"} "Altitude")
                (dom/input #js {:className "field-input"
                                :type "number"
                                :value (get-in data [:data :trap-station-altitude :value])
@@ -97,8 +117,14 @@
                (dom/label #js {:className "field-label"} "Secondary Camera")
                (om/build camera-select-component data
                          {:init-state {:camera-id-field :secondary-camera-id}})
+               (let [v (get-in data [:data :secondary-camera-id :value])]
+                 (when (and v (= (get-in data [:data :primary-camera-id :value]) v))
+                   (dom/label #js {:className "validation-warning"} "Secondary camera must not be the same as the primary camera.")))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"
+                                         :disabled (if (validate-form (:data data)) "" "disabled")
+                                         :title (if (validate-form (:data data)) ""
+                                                    "Please complete all required fields and address any errors.")
                                          :onClick #(do
                                                      (nav/analytics-event "deployment"
                                                                           "cameracheck-submit")
@@ -137,7 +163,7 @@
       (go
         (let [c (chan)]
           (rest/get-x "/sites" #(go (>! c {:sites (:body %)})))
-          (rest/get-x "/cameras" #(go (>! c {:cameras (:body %)})))
+          (rest/get-x "/cameras/available" #(go (>! c {:cameras (:body %)})))
           (loop []
             (let [v (<! c)]
               (om/transact! data #(if (:page-state %)

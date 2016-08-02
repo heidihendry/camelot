@@ -44,9 +44,9 @@
 
   :min-lein-version "2.6.1"
 
-  :source-paths ["src/clj" "src/cljs" "dev"]
+  :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]
 
-  :test-paths ["test/clj"]
+  :test-paths ["test/cljc" "test/clj"]
 
   :clean-targets ^{:protect false} [:target-path :compile-path "resources/public/js"]
 
@@ -61,7 +61,7 @@
 
   :cljsbuild {:builds
               {:app
-               {:source-paths ["src/cljs"]
+               {:source-paths ["src/cljc" "src/cljs"]
 
                 :figwheel true
                 ;; Alternatively, you can configure a function to run every time figwheel reloads.
@@ -123,7 +123,7 @@
 
               :cljsbuild {:builds
                           {:test
-                           {:source-paths ["src/cljs" "test/cljs"]
+                           {:source-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]
                             :compiler
                             {:output-to "resources/public/js/compiled/testable.js"
                              :main camelot.test-runner
@@ -137,7 +137,7 @@
               :aot :all
               :cljsbuild {:builds
                           {:app
-                           {:source-paths ^:replace ["src/cljs"]
+                           {:source-paths ^:replace ["src/cljc" "src/cljs"]
                             :compiler
                             {:optimizations :advanced
                              :externs ["resources/public/lib/ga.js"]
