@@ -1196,6 +1196,9 @@ pre.field-input {
     height: 10rem;
     text-align: left;
 }
+#app .simple-menu .menu-item.detailed.dynamic {
+    height: auto;
+}
 #app .simple-menu .menu-item:hover {
     background: #fff;
 }
