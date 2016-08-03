@@ -55,3 +55,11 @@ WHERE (trap_station_session_start_date >= :trap_station_session_start_date AND
        OR
       (trap_station_session_start_date <= :trap_station_session_start_date AND
        trap_station_session_end_date >= :trap_station_session_end_date)
+
+-- name: -get-specific-by-trap-station-session-camera-id
+SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
+       trap_station_session_updated, trap_station_session_start_date,
+       trap_station_session_end_date, trap_station_session_notes
+FROM trap_station_session
+LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
+WHERE trap_station_session_camera_id = :trap_station_session_camera_id

@@ -1,6 +1,7 @@
 (ns camelot.component.survey.manage
   (:require [om.core :as om]
             [camelot.nav :as nav]
+            [camelot.util.capture :as capture]
             [camelot.component.survey.create :as create]
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
@@ -65,8 +66,6 @@
 
 (def day-formatter (tf/formatter "yyyy-MM-dd"))
 
-(def image-mime #"^image/.*")
-
 (defn add-upload-problem
   [owner event-details desc]
   (apply (partial nav/analytics-event "capture-upload") event-details)
@@ -74,31 +73,41 @@
       (om/set-state! owner :errors desc)
       (om/update-state! owner :errors #(str % desc))))
 
+(defn is-uploadable?
+  [file]
+  (some #(= (.-type file) %) (keys capture/image-mimes)))
+
 (defn upload-file
   [sesscam-id owner file chan]
-  (if (re-matches image-mime (.-type file))
+  (if (is-uploadable? file)
     (rest/post-x-raw "/capture/upload" [["session-camera-id" sesscam-id]
                                         ["file" file]]
-                     #(go (>! chan {:file file :success true}))
+                     #(go (let [err (:error (:body %))]
+                            (if err
+                              (>! chan {:file file :success false :error err})
+                              (>! chan {:file file :success true}))))
                      #(go (>! chan {:file file :success false})))
     (add-upload-problem owner ["skipped" (.-type file)]
                         (str "'" (.-name file) "' is not in a supported format.\n"))))
 
 (defn uploadable-count
   [fs]
-  (reduce #(if (re-matches image-mime (.-type (aget fs %2)))
+  (reduce #(if (is-uploadable? (aget fs %2))
              (inc %1)
              %1) 0
              (range (.-length fs))))
 
 (defn display-upload-failure
-  [owner f]
-  (let [desc (str "'" (.-name f) "' failed to upload\n")]
+  [owner f err]
+  (let [reason (if err
+                 (str " " err "\n")
+                 "' error during upload\n")
+        desc (str "'" (.-name f) reason)]
     (add-upload-problem owner ["failed" (.-type f)] desc)))
 
 (defn handle-upload-failure
-  [owner f]
-  (display-upload-failure owner f)
+  [owner f err]
+  (display-upload-failure owner f err)
   (om/update-state! owner :failed inc))
 
 (defn incomplete-deployment-list-component
@@ -135,7 +144,7 @@
                                                  (do
                                                    (om/update-state! owner :complete inc)
                                                    (nav/analytics-event "capture-upload" "success" (.-type (:file r))))
-                                                 (handle-upload-failure owner (:file r)))
+                                                 (handle-upload-failure owner (:file r) (:error r)))
                                                (recur))))
                                          (doseq [idx (range (.-length fs))]
                                            (upload-file (:trap-station-session-camera-id data)

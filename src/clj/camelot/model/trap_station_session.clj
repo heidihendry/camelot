@@ -96,6 +96,14 @@
            (add-label)
            (trap-station-session)))
 
+(s/defn get-specific-by-trap-station-session-camera-id :- (s/maybe TrapStationSession)
+  [state :- State
+   id :- s/Int]
+  (some->> {:trap-station-session-camera-id id}
+           (db/with-db-keys state -get-specific-by-trap-station-session-camera-id)
+           (first)
+           (trap-station-session)))
+
 (defn- start-date-before-end-date?
   [data]
   (let [start (:trap-station-session-start-date data)
