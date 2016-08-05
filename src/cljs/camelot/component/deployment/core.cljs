@@ -315,6 +315,6 @@
                                                              (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
                                                              "/deployments/create"))
                                               (nav/analytics-event "survey-deployment" "create-click"))
-                                :title "Add a new deployment"}
+                                :title "Add a new camera trap deployment"}
                            (dom/span #js {:className "fa fa-plus"})
-                           " Add Camera Deployment")))))
+                           " Add Camera Trap")))))

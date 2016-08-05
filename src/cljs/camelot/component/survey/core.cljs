@@ -56,7 +56,7 @@
     om/IWillMount
     (will-mount [_]
       (om/update! app :deployment-page-state {:menu [{:action :deployment
-                                                      :name "Manage Camera Deployments"
+                                                      :name "Manage Camera Traps"
                                                       :active true}
                                                      {:action :upload
                                                       :name "Upload Captures"}]
