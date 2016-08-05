@@ -45,10 +45,17 @@
        (translate-statuses state)
        (map camera-status)))
 
+(s/defn get-all-raw :- [CameraStatus]
+  "Retrieve, translate and return all available camera statuses without translating."
+  [state :- State]
+  (->> (db/with-connection (:connection state) -get-all)
+       db/clj-keys
+       (map camera-status)))
+
 (s/defn get-specific-with-description :- (s/maybe CameraStatus)
   "Return a camera status with the given description, should one exist."
   [state :- State
    desc :- s/Str]
-  (->> (get-all state)
+  (->> (get-all-raw state)
        (filter #(= desc (:camera-status-description %)))
        (first)))

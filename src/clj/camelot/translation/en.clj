@@ -109,8 +109,8 @@
             :camera-notes {:label "Notes"
                            :description "Notes about this camera"}}
 
-   :camera-status {:active "Active"
-                   :available "Available"
+   :camera-status {:active "Active in field"
+                   :available "Available for use"
                    :lost "Lost"
                    :stolen "Stolen"
                    :retired "Retired"}

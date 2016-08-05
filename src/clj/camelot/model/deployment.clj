@@ -217,7 +217,7 @@
 
 (s/defn active-status-id
   [state]
-  (->> "Active"
+  (->> "camera-status/active"
        (camera-status/get-specific-with-description state)
        :camera-status-id))
 
