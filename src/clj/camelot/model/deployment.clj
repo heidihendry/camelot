@@ -84,13 +84,20 @@
      camera-name :- s/Str
      camera-status-id :- s/Int])
 
+(s/defn camera-id-key
+  [cam-type]
+  (keyword (str (name cam-type) "-id")))
+
+(s/defn camera-status-id-key
+  [cam-type]
+  (keyword (str (name cam-type) "-status-id")))
+
 (defn validate-camera-check
   [state data]
-  (and (not= (:primary-camera-id data) (:secondary-camera-id data))
+  (and (not= (get data (camera-id-key :primary-camera))
+             (get data (camera-id-key :secondary-camera)))
        (not (t/after? (:trap-station-session-start-date data)
-                      (:trap-station-session-end-date data)))
-       ;; TODO check camera statuses
-       ))
+                      (:trap-station-session-end-date data)))))
 
 (s/defn tdeployment
   [{:keys [survey-id site-id trap-station-name trap-station-longitude trap-station-latitude
@@ -202,67 +209,119 @@
 
 (s/defn set-camera-status!
   [state :- State
-   data]
-  (db/with-db-keys state -set-camera-status! data))
+   cam-id
+   cam-status]
+  (db/with-db-keys state -set-camera-status!
+    {:camera-status-id cam-status
+     :camera-id cam-id}))
 
-(s/defn set-statuses-for-cameras!
+(s/defn active-status-id
+  [state]
+  (->> "Active"
+       (camera-status/get-specific-with-description state)
+       :camera-status-id))
+
+(s/defn camera-changed?
+  [orig-data
+   data
+   cam-type]
+  (not= (get data (camera-id-key cam-type)) (get orig-data (camera-id-key cam-type))))
+
+(s/defn activate-cameras!
   [state :- State
    data]
-  (let [orig-data (and (:trap-station-session-id data) (get-specific state (:trap-station-session-id data)))
-        active-id (:camera-status-id (camera-status/get-specific-with-description state "Active"))]
-    (when (and (not= (:primary-camera-status-id data)
-                     (:primary-camera-status-id orig-data))
-               (:primary-camera-id orig-data))
-      (set-camera-status! state {:camera-status-id (:primary-camera-status-id data)
-                                 :camera-id (:primary-camera-id orig-data)}))
-    (when (and (not= (:secondary-camera-status-id data)
-                     (:secondary-camera-status-id orig-data))
-               (:secondary-camera-id orig-data))
-      (set-camera-status! state {:camera-status-id (:secondary-camera-status-id data)
-                                 :camera-id (:secondary-camera-id orig-data)}))
-    (when (not= (:primary-camera-id data) (:primary-camera-id orig-data))
-      (set-camera-status! state {:camera-status-id active-id
-                                 :camera-id (:primary-camera-id data)}))
-    (when (not= (:secondary-camera-id data) (:secondary-camera-id orig-data))
-      (set-camera-status! state {:camera-status-id active-id
-                                 :camera-id (:secondary-camera-id data)}))))
+  (let [active-id (active-status-id state)
+        orig-data (and (:trap-station-session-id data)
+                       (get-specific state (:trap-station-session-id data)))]
+    (if (camera-changed? orig-data data :primary-camera)
+      (set-camera-status! state (get data (camera-id-key :primary-camera)) active-id)
+      (set-camera-status! state (get data (camera-id-key :primary-camera))
+                          (get data (camera-status-id-key :primary-camera))))
+    (if (camera-changed? orig-data data :secondary-camera)
+      (set-camera-status! state (get data (camera-id-key :secondary-camera)) active-id)
+      (set-camera-status! state (get data (camera-id-key :secondary-camera))
+                          (get data (camera-status-id-key :secondary-camera))))))
+
+(s/defn update-used-camera!
+  [state :- State
+   orig-data
+   data
+   cam-type]
+  (when (and (camera-status-changed? orig-data data cam-type)
+             (get orig-data (camera-id-key cam-type)))
+    (set-camera-status! state
+                        (get orig-data (camera-id-key cam-type))
+                        (get data (camera-status-id-key cam-type)))))
+
+(s/defn update-used-cameras!
+  [state :- State
+   data]
+  (let [orig-data (and (:trap-station-session-id data)
+                       (get-specific state (:trap-station-session-id data)))
+        active-id (active-status-id state)]
+    (update-used-camera! state orig-data data :primary-camera)
+    (update-used-camera! state orig-data data :secondary-camera)))
+
+(s/defn update-cameras!
+  [state
+   data]
+  (when (:trap-station-session-id data)
+    (update-used-cameras! state data))
+  (activate-cameras! state data))
+
+(s/defn camera-active-or-added-fn
+  [state orig-data data]
+  (let [active-id (active-status-id state)]
+    (fn [cam-type]
+      (let [idk (camera-id-key cam-type)
+            statk (camera-status-id-key cam-type)]
+        (and (get data idk)
+             (or (= (get data statk) active-id)
+                 (not= (get data idk) (get orig-data idk))))))))
+
+(s/defn create-session-camera!
+  [state data session cam-type]
+  (trap-station-session-camera/create!
+   state
+   (trap-station-session-camera/ttrap-station-session-camera
+    {:trap-station-session-id (:trap-station-session-id session)
+     :camera-id (get data (camera-id-key cam-type))})))
 
 (s/defn create-new-session!
+  [state data]
+  (let [new-start (or (:trap-station-session-end-date data)
+                      (:trap-station-session-start-date data))
+        sdata {:trap-station-id (:trap-station-id data)
+               :trap-station-session-start-date new-start}]
+    (->> sdata
+         trap-station-session/ttrap-station-session
+         (trap-station-session/create! state))))
+
+(s/defn create-new-session-and-cameras!
   [state :- State
    data]
   (let [orig-data (when (:trap-station-session-id data)
                     (get-specific state (:trap-station-session-id data)))
-        sdata {:trap-station-id (:trap-station-id data)
-               :trap-station-session-start-date (or (:trap-station-session-end-date data)
-                                                    (:trap-station-session-start-date data))}
-        active-id (:camera-status-id (camera-status/get-specific-with-description state "Active"))]
-    ;; We need at least one camera to create a new session if a session was already ongoing.
+        camera-active? (camera-active-or-added-fn state orig-data data)]
     (when (or (nil? orig-data)
-              (and (:primary-camera-id data)
-                   (or (= (:primary-camera-status-id data) active-id)
-                       (not= (:primary-camera-id data) (:primary-camera-id orig-data)))
-                   (:secondary-camera-id data)
-                   (or (= (:secondary-camera-status-id data) active-id)
-                       (not= (:secondary-camera-id data) (:secondary-camera-id orig-data)))))
-      (let [s (trap-station-session/create!
-               state (trap-station-session/ttrap-station-session sdata))]
-        (when (and (:primary-camera-id data)
-                   (or (= (:primary-camera-status-id data) active-id)
-                       (not= (:primary-camera-id data) (:primary-camera-id orig-data))))
-          (trap-station-session-camera/create!
-           state
-           (trap-station-session-camera/ttrap-station-session-camera
-            {:trap-station-session-id (:trap-station-session-id s)
-             :camera-id (:primary-camera-id data)})))
-        (when (and (:secondary-camera-id data)
-                   (or (= (:secondary-camera-status-id data) active-id)
-                       (not= (:secondary-camera-id data) (:secondary-camera-id orig-data))))
-          (trap-station-session-camera/create!
-           state
-           (trap-station-session-camera/ttrap-station-session-camera
-            {:trap-station-session-id (:trap-station-session-id s)
-             :camera-id (:secondary-camera-id data)})))
+              (camera-active? :primary-camera)
+              (camera-active? :secondary-camera))
+      (let [s (create-new-session! state data)]
+        (when (camera-active? :primary-camera)
+          (create-session-camera! state data s :primary-camera))
+        (when (camera-active? :secondary-camera)
+          (create-session-camera! state data s :secondary-camera))
         s))))
+
+(s/defn create-camera-check!
+  [state :- State
+   data :- TCameraDeployment]
+  (if (validate-camera-check state data)
+    (db/with-transaction [s state]
+      (set-session-end-date! s data)
+      (update-cameras! s data)
+      (create-new-session-and-cameras! s data))
+    (throw (RuntimeException. "Invalid camera check"))))
 
 (s/defn create!
   [state :- State
@@ -275,16 +334,6 @@
                                    (trap-station/ttrap-station
                                     (merge data
                                            (select-keys ss [:survey-site-id]))))]
-      (set-statuses-for-cameras! s data)
-      (create-new-session! s (merge data
-                                    (select-keys ts [:trap-station-id]))))))
-
-(s/defn create-camera-check!
-  [state :- State
-   data :- TCameraDeployment]
-  (if (validate-camera-check state data)
-    (db/with-transaction [s state]
-      (set-session-end-date! s data)
-      (set-statuses-for-cameras! s data)
-      (create-new-session! s data))
-    (throw (RuntimeException. "Invalid camera check"))))
+      (activate-cameras! s data)
+      (create-new-session-and-cameras! s (merge data
+                                                (select-keys ts [:trap-station-id]))))))
