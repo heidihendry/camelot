@@ -89,7 +89,7 @@
                                               (nav/analytics-event "survey-deployment" "create-click"))
                                 :title "Add a new deployment"}
                            (dom/span #js {:className "fa fa-plus"})
-                           " Add Deployment")))))
+                           " Add Camera Deployment")))))
 
 (defn survey-section-containers-component
   [data owner]

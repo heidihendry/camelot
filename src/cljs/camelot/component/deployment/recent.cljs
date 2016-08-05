@@ -12,7 +12,7 @@
 
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 (def ^:private help-text
-  "You can drag and drop capture files on a Camera Check to upload them.")
+  "Drag and drop capture files on to a Camera Check to add them.")
 
 (defn- add-upload-problem
   [owner event-details desc]

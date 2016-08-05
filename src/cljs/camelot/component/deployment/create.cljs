@@ -175,5 +175,5 @@
       (when (:page-state data)
         (dom/div #js {:className "split-menu"}
                  (dom/div #js {:className "intro"}
-                          (dom/h4 nil "New Deployment"))
+                          (dom/h4 nil "New Camera Deployment"))
                  (dom/div nil (om/build section-containers-component (:page-state data))))))))
