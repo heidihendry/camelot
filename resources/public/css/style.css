@@ -1210,6 +1210,9 @@ pre.field-input {
     font-size: 100%;
     font-weight: 100;
 }
+#app .menu-item label {
+    margin: 0;
+}
 #app .split-menu .section .sep {
     padding-bottom: 2rem;
     margin-bottom: 2rem;

@@ -8,7 +8,8 @@
             [cljs.core.async :refer [<! chan >!]]
             [camelot.state :as state]
             [camelot.rest :as rest]
-            [cljs-time.format :as tf])
+            [cljs-time.format :as tf]
+            [camelot.component.deployment.core :as deployment])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn action-item-component
@@ -49,48 +50,6 @@
                              {:key :action
                               :init-state state})))))
 
-(defn deployment-list-component
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:className "menu-item detailed"
-                    :onClick #(do
-                                (nav/analytics-event "survey-deployment" "trap-station-click")
-                                (nav/nav! (nav/survey-url "deployments"
-                                                          (:trap-station-session-id data))))}
-               (dom/span #js {:className "menu-item-title"}
-                         (:trap-station-name data))
-               (dom/span #js {:className "menu-item-description"}
-                         (str "Latitude: " (:trap-station-latitude data)
-                              " Longitude: " (:trap-station-longitude data)))))))
-
-(defn deployment-section-component
-  [data owner]
-  (reify
-    om/IWillMount
-    (will-mount [_]
-      (rest/get-resource (str "/deployment/survey/"
-                              (get-in (state/app-state-cursor)
-                                      [:selected-survey :survey-id :value]))
-                         #(om/update! data :trap-stations (:body %))))
-    om/IRender
-    (render [_]
-      (dom/div #js {:className "section"}
-               (dom/div #js {:className "simple-menu"}
-                        (om/build-all deployment-list-component
-                                      (sort-by :trap-station-name (:trap-stations data))
-                                      {:key :trap-station-session-id}))
-               (dom/div #js {:className "sep"})
-               (dom/button #js {:className "btn btn-primary"
-                                :onClick #(do (nav/nav! (str "/"
-                                                             (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
-                                                             "/deployments/create"))
-                                              (nav/analytics-event "survey-deployment" "create-click"))
-                                :title "Add a new deployment"}
-                           (dom/span #js {:className "fa fa-plus"})
-                           " Add Camera Deployment")))))
-
 (defn survey-section-containers-component
   [data owner]
   (reify
@@ -108,7 +67,7 @@
                                     " Survey Library"))
                (dom/div #js {:className "section-container"}
                         (case (:active data)
-                          :deployment (om/build deployment-section-component data)
+                          :deployment (om/build deployment/deployment-list-section-component data)
                           :upload (om/build recent/recent-deployment-section-component data)
                           ""))))))
 
