@@ -247,7 +247,7 @@
    orig-data
    data
    cam-type]
-  (when (and (camera-status-changed? orig-data data cam-type)
+  (when (and (camera-changed? orig-data data cam-type)
              (get orig-data (camera-id-key cam-type)))
     (set-camera-status! state
                         (get orig-data (camera-id-key cam-type))
