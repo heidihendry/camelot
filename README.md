@@ -81,7 +81,7 @@ A list of strings with the names of the species in the survey.  Should any file'
 
 ### Language
 
-Language used by Camelot. Currently only `English` is supported.  Support for `Vietnamese` is planned in the future.
+Language used by Camelot. Currently only `English` is supported. 
 
 ### Night Start Hour
 
