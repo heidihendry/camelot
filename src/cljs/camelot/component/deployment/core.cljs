@@ -64,7 +64,6 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! data :camera-is-new {:value false})
       (rest/get-x (str "/trap-station-session-cameras/available/"
                        (get-in data [:trap-station-session-id :value]))
                   #(om/set-state! owner :options (:body %))))
@@ -72,7 +71,8 @@
     (render-state [_ state]
       (dom/select #js {:className "field-input"
                        :onChange #(do
-                                    (om/update! (:camera-is-new data) :value (:camera-is-new state))
+                                    (when-not (nil? (:camera-is-new state))
+                                      (om/update! data [:camera-is-new :value] (:camera-is-new state)))
                                     (om/update! (get data (:camera-id-field state))
                                                 :value (.. % -target -value)))}
                   (om/build-all camera-select-option-component
