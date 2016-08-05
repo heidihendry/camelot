@@ -99,7 +99,7 @@
       (dom/div nil
                (dom/div #js {:className "section-container"}
                         (om/build action-menu-component data)
-                        (dom/button #js {:className "btn btn-default view-library"
+                        (dom/button #js {:className "btn btn-primary view-library"
                                          :onClick #(do (nav/analytics-event "survey"
                                                                             "view-library-click")
                                                        (nav/nav! (str "/" (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])

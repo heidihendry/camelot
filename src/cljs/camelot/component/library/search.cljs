@@ -224,10 +224,9 @@
                  (om/build filter-button-component (:search data))
                  (om/build filter-input-component (:search data))
                  (let [global-survey (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])]
-                   (when-not global-survey
-                     (do
-                       (dom/span nil " in ")
-                       (om/build filter-survey-component data))))
+                   (do
+                     (dom/span nil " in ")
+                     (om/build filter-survey-component data)))
                  (om/build trap-station-select-component data)
                  (om/build subfilter-checkbox-component data {:init-state {:key :unprocessed-only
                                                                            :label "Unprocessed"}})
