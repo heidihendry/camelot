@@ -1,7 +1,5 @@
 # Camelot
 
-[![build status](https://gitlab.com/cshclm/camelot/badges/master/build.svg)](https://gitlab.com/cshclm/camelot/commits/master)
-
 Camelot is software for Camera Trap data management and analysis.
 
 ## Getting Started
@@ -19,25 +17,12 @@ This starts a web server which is available on TCP 8080 (by default).  If you wi
 You should connect to this port with your web browser.  Upon connecting, you'll be notified that Camelot is not configured.  Open the settings menu from the top right-hand corner, set the settings you wish to use, and press `Save' from the button left corner of the screen.
 
 ## Limitations
-This is a beta release, and thus comes with numerous limitations and rough edges.  If you find these limitations impact upon you, please let us know by reporting an issue.
 
-## Validations
-
-Checks and reporting on whether:
-
-* the timestamp on a photo is significantly earlier or later than the norm
-* the timestamp on some photos lies outside of the project start and stop times
-* the camera exposure settings coincide with the time configuration
-* the photos do have a camera check at the beginning and end
-* the headline differs across photos in a folder
-* one or more required fields are missing from one or more photos
-* a sighting is incomplete (i.e., species without quantity or quantity without species)
-* a species was identified which is not known to the survey
-* a timeshift applied to photos is applied consistently throughout a camera trap operation period's dataset
+This is a beta-quality release, and thus comes with numerous limitations and rough edges. If you find these limitations impact upon you, please let us know by reporting an issue.
 
 ## Keyboard shortcuts
 
-So that trap photos can be processed efficiently, the Library screen has keyboard shortcuts:
+So that trap photos can be processed efficiently, the Library has several keyboard shortcuts:
 
 * **Control + m**: Focus the media collection panel
 * **Control + d**: Toggle the details panel
@@ -54,54 +39,6 @@ With the Media Collection panel focused (**Control + m**):
 
 * **"wasd"** and **Arrow keys** can be used to select the next media in that direction.
 * hold **shift** + **"wasd"** OR **arrow keys** to select the next media in that direction, but also keep the existing selection.
-
-## Configuration
-
-### Required Fields
-
-A list of properties which must be present in the metadata of a file.  Should any one of these properties not be present, a problem will be flagged in the dataset.
-
-### Project Start
-
-A timestamp indicating the beginning of the project. Should the timestamp of any file in the dataset fall occur before this, a problem will be flagged.  The start time is _inclusive_.
-
-### Project End
-
-Like 'project-start', but for the project end date.  The end time is _exclusive_.
-
-### Surveyed Species
-
-A list of strings with the names of the species in the survey.  Should any file's metadata include a species not present in this list, a problem will be flagged.
-
-`HUMAN-CAMERACHECK` is considered by Camelot as a special species used to verify the start and end of a phase.  Should a collection not contain a at least 2 files with this species, with unique dates, it will be flagged as a problem in the dataset.
-
-### Language
-
-Language used by Camelot. Currently only `English` is supported. 
-
-### Night Start Hour
-
-One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night is guaranteed to have fallen.  This should be set to the hour after there is no sign of daylight.
-
-### Night End Hour
-
-One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night may have ended.  This should be set to the earliest time at which there's sign of daylight.
-
-### Infrared ISO Value Threshold
-
-One of four properties used to (naively) identify camera time configuration issues.  The ISO value of the cameras which is used to suggest a photo was taken at night.
-
-File ISO values greater than this threshold are considered `night` photos and thus are expected to lie within 'Night Start Hour' and 'Night End Hour'
-
-### Erroneous Infrared Threshold
-
-One of four properties used to (naively) identify camera time configuration issues. This is the maximum allowable proportion of photos which are `night` photos, but do not fall within the block of time denoted by `Night Start Hour` and `Night End Hour`.
-
-### Sighting Independence Minutes Threshold
-
-The number of minutes after a species is sighted before further photographs of that species at that location should be considered independent (and thus included in analysis).
-
-**Important:** Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
 
 ## Administration and Advanced Configuration
 
@@ -195,6 +132,54 @@ Currently reports are available by directly accessing the URL:
 In the future they will be made available through the UI.
 
 For more module examples, check out Camelot's [built-in reports and columns](https://bitbucket.org/cshclm/camelot/src/master/src/clj/camelot/report/module/builtin/?at=master)
+
+## Configuration
+
+### Required Fields (deprecated)
+
+A list of properties which must be present in the metadata of a file.  Should any one of these properties not be present, a problem will be flagged in the dataset.
+
+### Project Start (deprecated)
+
+A timestamp indicating the beginning of the project. Should the timestamp of any file in the dataset fall occur before this, a problem will be flagged.  The start time is _inclusive_.
+
+### Project End (deprecated)
+
+Like 'project-start', but for the project end date.  The end time is _exclusive_.
+
+### Surveyed Species (deprecated)
+
+A list of strings with the names of the species in the survey.  Should any file's metadata include a species not present in this list, a problem will be flagged.
+
+`HUMAN-CAMERACHECK` is considered by Camelot as a special species used to verify the start and end of a phase.  Should a collection not contain a at least 2 files with this species, with unique dates, it will be flagged as a problem in the dataset.
+
+### Language
+
+Language used by Camelot. Currently only `English` is supported. 
+
+### Night Start Hour
+
+One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night is guaranteed to have fallen.  This should be set to the hour after there is no sign of daylight.
+
+### Night End Hour
+
+One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night may have ended.  This should be set to the earliest time at which there's sign of daylight.
+
+### Infrared ISO Value Threshold
+
+One of four properties used to (naively) identify camera time configuration issues.  The ISO value of the cameras which is used to suggest a photo was taken at night.
+
+File ISO values greater than this threshold are considered `night` photos and thus are expected to lie within 'Night Start Hour' and 'Night End Hour'
+
+### Erroneous Infrared Threshold
+
+One of four properties used to (naively) identify camera time configuration issues. This is the maximum allowable proportion of photos which are `night` photos, but do not fall within the block of time denoted by `Night Start Hour` and `Night End Hour`.
+
+### Sighting Independence Minutes Threshold
+
+The number of minutes after a species is sighted before further photographs of that species at that location should be considered independent (and thus included in analysis).
+
+**Important:** Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
 
 ## Experimental Features
 
