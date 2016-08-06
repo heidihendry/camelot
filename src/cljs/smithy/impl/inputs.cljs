@@ -3,7 +3,8 @@
             [om.dom :as dom :include-macros true]
             [smithy.impl.state :as state]
             [clojure.string :as string]
-            [om-datepicker.components :refer [datepicker]])
+            [om-datepicker.components :refer [datepicker]]
+            [camelot.rest :as rest])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat]))
 
@@ -77,19 +78,32 @@
     (will-mount [_]
       (when (nil? (get buf k))
         (om/update! buf k {:value nil}))
-      (let [generator (get-in v [:schema :generator])
-            gen-template (get-in opts [:generators generator])
-            generator-fn (:generator-fn opts)]
-        (when (and generator generator-fn)
-          (om/update! (get opts :generator-data) generator {})
-          (generator-fn gen-template (get opts :generator-data) generator
-                        (get opts :generator-args)))))
+      (if (get-in v [:schema :get-options])
+        ;; TODO fix dependency on camelot
+        (rest/get-x (get-in v [:schema :get-options :url])
+                    #(let [r (:body %)]
+                       (om/update! (:generator-data opts)
+                                   :default
+                                   (vec (cons [-1 ""]
+                                              (map (fn [x]
+                                                     (vector (get x (get-in v [:schema :get-options :value]))
+                                                             (get x (get-in v [:schema :get-options :label]))))
+                                                   r))))))
+        (do
+          (let [generator (get-in v [:schema :generator])
+                gen-template (get-in opts [:generators generator])
+                generator-fn (:generator-fn opts)]
+            (when (and generator generator-fn)
+              (om/update! (get opts :generator-data) generator {})
+              (generator-fn gen-template (get opts :generator-data) generator
+                            (get opts :generator-args)))))))
     om/IWillUpdate
     (will-update [this next-props next-state]
       (let [generator (get-in v [:schema :generator])
             gen-template (get-in opts [:generators generator])
             generator-fn (:generator-fn opts)]
-        (when (and generator generator-fn)
+        (when (and generator generator-fn
+                   (nil? (get-in v [:schema :get-options])))
           (om/update! (get opts :generator-data) generator {})
           (generator-fn gen-template (get opts :generator-data) generator
                         (get opts :generator-args)))))
@@ -110,7 +124,8 @@
                                     (get-in opts [:generator-data generator])
                                     (map #(hash-map :vkey (list-react-key (first %))
                                                     :desc (second %))
-                                         (get-in v [:schema :options])))
+                                         (or (get-in opts [:generator-data :default])
+                                             (get-in v [:schema :options]))))
                                   {:key :vkey}))))))
 
 (defmethod input-field :list

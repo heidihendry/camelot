@@ -1,21 +1,10 @@
 (ns camelot.util.rest
   (:require [camelot.util.config :as conf]
             [clojure.edn :as edn]
+            [camelot.util.cursorise :refer [cursorise decursorise]]
             [camelot.application :as app]
             [clojure.tools.logging :as log]
             [ring.util.response :as r]))
-
-(defn decursorise
-  "Remove :value keys used for Om cursors to leaves from the configuration data."
-  [conf]
-  (if (some :value (vals conf))
-    (into {} (map (fn [[k v]] {k (:value v)}) conf))
-    conf))
-
-(defn cursorise
-  "Add :value keys used for Om cursors to leaves from the configuration data."
-  [conf]
-  (into {} (map (fn [[k v]] {k {:value v}}) conf)))
 
 (def floating-point-fields
   "Set of keys for floating-point fields."

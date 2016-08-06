@@ -3,7 +3,9 @@
   (:require [om.core :as om]
             [om.dom :as dom]
             [camelot.nav :as nav]
-            [camelot.rest :as rest]))
+            [camelot.rest :as rest]
+            [smithy.core :as smithy]
+            [camelot.state :as state]))
 
 (defn item-component
   "A menu item for a single report."
@@ -19,11 +21,26 @@
                          (desc-key data))))))
 
 (defn configure-report-view
-  [data owner]
+  [data owner {:keys [report-key]}]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (rest/get-x (str "/report/" report-key)
+                  #(om/update! (get (state/app-state-cursor) :view) :content
+                               {:screen {:type :report :mode :create :id :report
+                                         :resource-id :report
+                                         :nav-to true}
+                                :screens-ref-override true
+                                :buffer {}
+                                :screens-ref {:report (assoc (:form (:body %))
+                                                             :resource {:type :report
+                                                                        :endpoint (str "/report/" report-key "/download")})}
+                                :selected-resource {}
+                                :generator-data {}})))
     om/IRender
     (render [_]
-      (dom/div nil "Report Configured Here"))))
+      (when (:content (get (state/app-state-cursor) :view))
+        (om/build (smithy/build-view-component :content) data)))))
 
 (defn menu-component
   "List all reports."

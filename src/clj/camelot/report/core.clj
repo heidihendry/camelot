@@ -254,13 +254,24 @@
                     (content-disposition report survey-id))))
     (format "Report '%s' is not known" (name report-key))))
 
+(defn ->report-descriptor
+  [r rk]
+  (assoc (select-keys r [:title :form :description])
+         :report-key (name rk)))
+
 (defn- report-configuration-reducer
   [acc k v]
-  (conj acc (assoc (select-keys v [:title :form :description])
-                   :report-key (name k))))
+  (conj acc (->report-descriptor v k)))
 
 (s/defn available-reports
   "Map of all available reports."
   []
   (loader/load-user-modules)
   (reduce-kv report-configuration-reducer [] (module/all-reports)))
+
+(s/defn get-configuration
+  "Configuration of the given report."
+  [report-key]
+  (loader/load-user-modules)
+  (let [r (get (module/all-reports) report-key)]
+    (->report-descriptor r report-key)))

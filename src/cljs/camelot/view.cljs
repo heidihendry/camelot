@@ -10,6 +10,7 @@
             [camelot.component.organisation :as organisation]
             [camelot.component.nav :as nav]
             [camelot.component.import-dialog :as import]
+            [camelot.util.cursorise :as cursorise]
             [smithy.core :as smithy]
             [camelot.nav :as cnav]
             [smithy.util :as util]
@@ -41,6 +42,8 @@
         reqd (filter (fn [[k v]] (get-in v [:schema :required])) entries)
         invalid (filter #(let [data (get-in vs [:buffer (first %) :value])]
                            (or (nil? data) (= data "")
+                               (and (re-matches #".*-id$" (name (first %)))
+                                    (= "-1" data))
                                (and (coll? data) (empty? data)))) reqd)]
     (if (zero? (count invalid))
       (do (om/update! (get vs :selected-resource) :show-validations false)
@@ -80,6 +83,18 @@
                              (om/update! (get vs :selected-resource) :details (:body %))
                              (om/update! vs :buffer (:body %))
                              (get-in vs [:events-ref success-key]))))))
+
+(defn map-to-params
+  [m]
+  (clojure.string/join "&" (reduce-kv #(conj %1 (str (name %2) "=" %3)) [] m)))
+
+(defn create-nav [success-key error-key vs resources key]
+  "Create the item in the buffer and view it in readonly mode."
+  (let [basedata (deref (get vs :buffer))]
+    (when (validate vs)
+      (cnav/analytics-event "create-nav" (util/get-resource-type-name vs))
+      (.open js/window (misc/with-baseurl (str (util/get-endpoint vs) "?"
+                                               (map-to-params (cursorise/decursorise basedata))))))))
 
 (defn submit-update
   [success-key error-key vs resources key]
@@ -222,6 +237,7 @@
    :nav-history #(get (state/app-state-cursor) :nav-history)
    :cancel-update cancel-update
    :create create
+   :create-nav create-nav
    :update submit-update
    :delete delete})
 
@@ -243,7 +259,7 @@
 
 (defn generate-view
   "Render the main page content"
-  [view & [{:keys [survey-id page-id]}]]
+  [view & [{:keys [survey-id page-id report-key]}]]
   (if survey-id
     (rest/get-x (str "/surveys/" survey-id)
                 #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
@@ -251,7 +267,8 @@
                      (om/root view state/app-state
                               {:target (js/document.getElementById "page-content")})))
     (om/root view state/app-state
-                              {:target (js/document.getElementById "page-content")})))
+             {:target (js/document.getElementById "page-content")
+              :opts {:report-key report-key}})))
 
 (defn settings-menu-view
   "Render the settings panel"

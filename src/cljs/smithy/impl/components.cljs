@@ -90,6 +90,7 @@
                   :generator-args {:id (if (= (get-in vs [:screen :mode]) :create)
                                          (util/get-parent-resource-id vs)
                                          (util/get-resource-id vs))}
+                  
                   :image-resource-url "/media/photo"
                   :metadata (let [md-schema (get-in vs [:events-ref :metadata-schema])]
                               (and md-schema (md-schema)))}]
@@ -236,13 +237,15 @@
   "Builder for a Create-Mode component"
   [vs]
   (let [screen (util/get-screen vs)
-        create-fn #((get-in vs [:events-ref :create])
+        create-fn #((if (get-in vs [:screen :nav-to])
+                      (get-in vs [:events-ref :create-nav])
+                      (get-in vs [:events-ref :create]))
                     (get-in screen [:states :create :submit :success :event])
                     (get-in screen [:states :create :submit :error :event])
                     vs
                     (get vs :selected-resource)
                     :details)]
-    (when (not (get-in (util/get-screen vs) [:resource :non-creatable]))
+    (when-not (get-in (util/get-screen vs) [:resource :non-creatable])
       (om/build resource-create-component {:view-state vs
                                            :create create-fn}))))
 
@@ -293,7 +296,8 @@
       om/IWillMount
       (will-mount [_]
         (let [vs (get-in app [:view type])]
-          (om/update! vs :screens-ref (get app :screens))
+          (when-not (:screens-ref-override vs)
+            (om/update! vs :screens-ref (get app :screens)))
           (om/update! vs :events-ref (get app :events))
           (om/update! vs :actions-ref (get app :actions))
           (om/update! vs :generators-ref (get app :generators))))

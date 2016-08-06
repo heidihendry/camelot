@@ -1,9 +1,9 @@
 (ns camelot.handler.config
   (:require [compojure.core :refer [ANY context DELETE GET POST PUT]]
+            [camelot.util.cursorise :as cursorise]
             [ring.util.response :as r]
             [camelot.util
-             [config :as conf]
-             [rest :as rest-util]]))
+             [config :as conf]]))
 
 (defn config-save
   "Save a configuration."
@@ -12,5 +12,5 @@
 
 (def routes
   (context "/settings" []
-           (GET "/" [] (r/response (rest-util/cursorise (conf/config))))
-           (PUT "/" [data] (r/response (config-save (rest-util/decursorise data))))))
+           (GET "/" [] (r/response (cursorise/cursorise (conf/config))))
+           (PUT "/" [data] (r/response (config-save (cursorise/decursorise data))))))

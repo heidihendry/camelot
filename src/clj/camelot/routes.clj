@@ -187,6 +187,7 @@
 
   (context "/report" []
            (GET "/:report/:id" [report id] (report/export (keyword report) (edn/read-string id)))
+           (GET "/:report" [report] (r/response (report/get-configuration (keyword report))))
            (GET "/" [] (r/response (report/available-reports))))
 
   (context "/library" []

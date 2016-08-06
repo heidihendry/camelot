@@ -28,12 +28,16 @@
    :order-by [:taxonomy-genus :taxonomy-species]})
 
 (def form-smith
-  {:layout [[:trap-station-id]]
-   :schema {:trap-station-id {:type :select
-                              :required true
-                              :options {:url "/trap-stations"
-                                        :label :trap-station-name
-                                        :value :trap-station-id}}}})
+  {:resource {}
+   :layout [[:trap-station-id]]
+   :schema {:trap-station-id
+            {:label "Test"
+             :description "This is a test field"
+             :schema {:type :select
+                      :required true
+                      :get-options {:url "/trap-stations"
+                                    :label :trap-station-name
+                                    :value :trap-station-id}}}}})
 
 (module/register-report
  :trap-station-statistics
