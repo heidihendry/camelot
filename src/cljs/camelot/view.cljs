@@ -17,7 +17,8 @@
             [camelot.rest :as rest]
             [camelot.component.error :as cerr]
             [camelot.component.library.core :as library]
-            [secretary.core :as secretary :refer-macros [defroute]]))
+            [secretary.core :as secretary :refer-macros [defroute]]
+            [camelot.component.report.core :as report]))
 
 (defn load-resource-children
   "Update the state of the children defined for the selected resource type."
@@ -301,6 +302,8 @@
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
+(defroute "/report/:report-key" [report-key]
+  (generate-view report/configure-report-view {:report-key report-key}))
 (defroute "/:survey/deployments/create" [survey]
   (generate-view deployment/create-view-component {:survey-id survey}))
 (defroute "/:survey/deployments/:trap-station-id" [survey trap-station-id]

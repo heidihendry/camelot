@@ -256,10 +256,11 @@
 
 (defn- report-configuration-reducer
   [acc k v]
-  (assoc acc k (select-keys v [:title :form])))
+  (conj acc (assoc (select-keys v [:title :form :description])
+                   :report-key (name k))))
 
 (s/defn available-reports
   "Map of all available reports."
   []
   (loader/load-user-modules)
-  (reduce-kv report-configuration-reducer {} (module/all-reports)))
+  (reduce-kv report-configuration-reducer [] (module/all-reports)))

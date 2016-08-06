@@ -8,6 +8,7 @@
             [camelot.component.species.core :as species]
             [camelot.component.site.core :as site]
             [camelot.component.camera.core :as camera]
+            [camelot.component.report.core :as report]
             [smithy.util :as util]
             [camelot.component.nav :as cnav]
             [camelot.nav :as nav])
@@ -82,6 +83,7 @@
                                    :species (om/build species/species-menu-component (:species data))
                                    :site (om/build site/site-menu-component (:site data))
                                    :camera (om/build camera/camera-menu-component (:camera data))
+                                   :report (om/build report/menu-component (:report data))
                      (om/build not-implemented data))))))))
 
 (defn organisation-view-component
@@ -100,11 +102,14 @@
                                                      {:concept :site
                                                       :name "Sites"}
                                                      {:concept :camera
-                                                      :name "Cameras"}])
+                                                      :name "Cameras"}
+                                                     {:concept :report
+                                                      :name "Reports"}])
                               (om/update! app :active :survey)
                               (om/update! app :species {})
                               (om/update! app :camera {})
-                              (om/update! app :site {}))))
+                              (om/update! app :site {})
+                              (om/update! app :report {}))))
     om/IRender
     (render [_]
       (when (get-in app [:survey :list])

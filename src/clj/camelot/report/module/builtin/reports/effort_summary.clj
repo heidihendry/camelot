@@ -23,5 +23,6 @@
  :effort-summary
  {:file-prefix "effort-summary-report"
   :output report-output
+  :title "Effort Summary Report"
   :by :all
   :for :survey})
