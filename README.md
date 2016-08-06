@@ -4,11 +4,9 @@
 
 Camelot is software for Camera Trap data management and analysis.
 
-Currently Camelot reports validation problems for survey data read from image metadata.
-
 ## Getting Started
 
-Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.4.5.jar).
+Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.5.0.jar).
 
 Run camelot with:
 
@@ -21,11 +19,7 @@ This starts a web server which is available on TCP 8080 (by default).  If you wi
 You should connect to this port with your web browser.  Upon connecting, you'll be notified that Camelot is not configured.  Open the settings menu from the top right-hand corner, set the settings you wish to use, and press `Save' from the button left corner of the screen.
 
 ## Limitations
-This is a 'pre-alpha' release, and thus comes with numerous limitations.
-
-* Only the latest versions of Firefox and Chrome are supported
-* Does not support video files
-* English is the only supported language
+This is a beta release, and thus comes with numerous limitations and rough edges.  If you find these limitations impact upon you, please let us know by reporting an issue.
 
 ## Validations
 
