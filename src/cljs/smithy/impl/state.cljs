@@ -39,6 +39,9 @@
 (defn set-unvalidated-text! [e data edit-key owner]
   (om/transact! data edit-key (fn [_] (.. e -target -value))))
 
+(defn set-flag! [e data edit-key owner]
+  (om/transact! data edit-key not))
+
 (defn set-number! [e data edit-key owner]
   (if (re-matches #"^-?[\.0-9]*$" (.. e -target -value))
     (om/transact! data edit-key (fn [_] (reader/read-string (.. e -target -value))))

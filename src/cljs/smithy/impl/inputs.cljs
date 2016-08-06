@@ -244,6 +244,21 @@
                              :onChange #(state/set-unvalidated-text! % (k buf) :value owner)
                              :value (get-in buf [k :value])}))))))
 
+(defmethod input-field :boolean
+  [[k v buf opts :as d] owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get buf k))
+        (om/update! buf k {:value nil})))
+    om/IRender
+    (render [_]
+      (prn (get-in buf [k :value]))
+      (dom/input #js {:type "checkbox" :className "field-input-checkbox"
+                      :disabled (:disabled opts)
+                      :onChange #(state/set-flag! % (k buf) :value owner)
+                      :checked (get-in buf [k :value])}))))
+
 (defmethod input-field :default
   [[k v buf opts :as d] owner]
   (reify

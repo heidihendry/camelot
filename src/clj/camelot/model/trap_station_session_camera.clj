@@ -13,12 +13,14 @@
      trap-station-session-camera-updated :- org.joda.time.DateTime
      camera-id :- s/Int
      trap-station-session-id :- s/Int
+     trap-station-session-camera-media-unrecoverable :- s/Bool
      trap-station-session-camera-import-path :- (s/maybe s/Str)
      camera-name :- (s/maybe s/Str)])
 
 (s/defrecord TTrapStationSessionCamera
     [camera-id :- s/Int
      trap-station-session-id :- s/Int
+     trap-station-session-camera-media-unrecoverable :- s/Bool
      trap-station-session-camera-import-path :- (s/maybe s/Str)])
 
 (s/defn trap-station-session-camera :- TrapStationSessionCamera
@@ -27,6 +29,7 @@
            trap-station-session-camera-updated
            camera-id
            trap-station-session-id
+           trap-station-session-camera-media-unrecoverable
            trap-station-session-camera-import-path
            camera-name]}]
   (->TrapStationSessionCamera trap-station-session-camera-id
@@ -34,15 +37,18 @@
                               trap-station-session-camera-updated
                               camera-id
                               trap-station-session-id
+                              trap-station-session-camera-media-unrecoverable
                               trap-station-session-camera-import-path
                               camera-name))
 
 (s/defn ttrap-station-session-camera :- TTrapStationSessionCamera
   [{:keys [camera-id
            trap-station-session-id
+           trap-station-session-camera-media-unrecoverable
            trap-station-session-camera-import-path]}]
   (->TTrapStationSessionCamera camera-id
                                trap-station-session-id
+                               trap-station-session-camera-media-unrecoverable
                                trap-station-session-camera-import-path))
 
 
@@ -56,11 +62,22 @@
 
 (s/defn get-specific :- (s/maybe TrapStationSessionCamera)
   [state :- State
-   id :- s/Num]
+   id :- s/Int]
   (some->> {:trap-station-session-camera-id id}
            (db/with-db-keys state -get-specific )
-           (first)
-           (trap-station-session-camera)))
+           first
+           trap-station-session-camera))
+
+(s/defn get-specific-with-camera-and-session :- (s/maybe TrapStationSessionCamera)
+  "Return a session camera given a camera and session ID."
+  [state :- State
+   camera-id :- s/Int
+   session-id :- s/Int]
+  (some->> {:trap-station-session-id session-id
+            :camera-id camera-id}
+           (db/with-db-keys state -get-specific-with-camera-and-session)
+           first
+           trap-station-session-camera))
 
 (s/defn get-specific-by-import-path :- (s/maybe TrapStationSessionCamera)
   [state :- State
@@ -125,3 +142,18 @@
   (or (get-specific-by-import-path
        state (:trap-station-session-camera-import-path data))
       (create! state data)))
+
+(s/defn update-media-unrecoverable! :- TrapStationSessionCamera
+  "Set the media recoverable flag for a given camera and session.  Returns the
+  updated session camera."
+  [state :- State
+   camera-id :- s/Int
+   trap-station-session-id :- s/Int
+   media-unrecoverable :- s/Bool]
+  (db/with-db-keys state -update-media-unrecoverable!
+    {:camera-id camera-id
+     :trap-station-session-id trap-station-session-id
+     :trap-station-session-camera-media-unrecoverable media-unrecoverable})
+  (trap-station-session-camera
+   (get-specific-with-camera-and-session state camera-id
+                                         trap-station-session-id)))

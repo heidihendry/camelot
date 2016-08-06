@@ -8,9 +8,11 @@
             [clj-time.core :as t]
             [camelot.model.trap-station-session :as trap-station-session]
             [camelot.model.trap-station-session-camera :as trap-station-session-camera]
+            [camelot.util.deployment :refer [camera-id-key camera-status-id-key camera-media-unrecoverable-key]]
             [camelot.model.survey-site :as survey-site]
             [camelot.model.camera-status :as camera-status]
-            [camelot.util.trap-station :as util.ts]))
+            [camelot.util.trap-station :as util.ts])
+  (:import [camelot.model.trap_station_session_camera TrapStationSessionCamera]))
 
 (sql/defqueries "sql/deployments.sql" {:connection db/spec})
 
@@ -39,9 +41,11 @@
      primary-camera-id :- s/Int
      primary-camera-name :- s/Str
      primary-camera-status-id :- s/Int
+     primary-camera-media-unrecoverable :- s/Bool
      secondary-camera-id :- (s/maybe s/Int)
      secondary-camera-name :- (s/maybe s/Str)
-     secondary-camera-status-id :- (s/maybe s/Int)])
+     secondary-camera-status-id :- (s/maybe s/Int)
+     secondary-camera-media-unrecoverable :- s/Bool])
 
 (s/defrecord Deployment
     [trap-station-session-id :- s/Int
@@ -80,22 +84,15 @@
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- org.joda.time.DateTime
      trap-station-session-camera-id :- s/Int
+     trap-station-session-camera-media-unrecoverable :- s/Bool
      camera-id :- s/Int
      camera-name :- s/Str
      camera-status-id :- s/Int])
 
-(s/defn camera-id-key
-  [cam-type]
-  (keyword (str (name cam-type) "-id")))
-
-(s/defn camera-status-id-key
-  [cam-type]
-  (keyword (str (name cam-type) "-status-id")))
-
 (defn validate-camera-check
   [state data]
-  (and (not= (get data (camera-id-key :primary-camera))
-             (get data (camera-id-key :secondary-camera)))
+  (and (not= (get data (camera-id-key :primary))
+             (get data (camera-id-key :secondary)))
        (not (t/after? (:trap-station-session-start-date data)
                       (:trap-station-session-end-date data)))))
 
@@ -132,6 +129,7 @@
            trap-station-latitude trap-station-altitude trap-station-notes
            trap-station-session-start-date trap-station-session-end-date
            trap-station-session-camera-id
+           trap-station-session-camera-media-unrecoverable
            camera-id camera-name camera-status-id]}]
   (->CameraDeployment trap-station-session-id trap-station-session-created
                       trap-station-session-updated trap-station-id
@@ -140,6 +138,7 @@
                       trap-station-altitude trap-station-notes
                       trap-station-session-start-date trap-station-session-end-date
                       trap-station-session-camera-id
+                      trap-station-session-camera-media-unrecoverable
                       camera-id camera-name camera-status-id))
 
 (s/defn tcamera-deployment
@@ -147,15 +146,18 @@
            trap-station-longitude trap-station-latitude trap-station-altitude
            trap-station-notes trap-station-session-start-date
            trap-station-session-end-date primary-camera-id primary-camera-name
-           primary-camera-status-id secondary-camera-id secondary-camera-name
-           secondary-camera-status-id]}]
+           primary-camera-status-id primary-camera-media-unrecoverable
+           secondary-camera-id secondary-camera-name
+           secondary-camera-status-id secondary-camera-media-unrecoverable]}]
   (->TCameraDeployment trap-station-session-id trap-station-name site-id trap-station-id
                        trap-station-longitude trap-station-latitude
                        trap-station-altitude trap-station-notes
                        trap-station-session-start-date trap-station-session-end-date
                        primary-camera-id primary-camera-name primary-camera-status-id
+                       primary-camera-media-unrecoverable
                        secondary-camera-id secondary-camera-name
-                       secondary-camera-status-id))
+                       secondary-camera-status-id
+                       secondary-camera-media-unrecoverable))
 
 (defn assoc-cameras-for-group
   [[session-id group]]
@@ -166,11 +168,13 @@
        (assoc g1
               :secondary-camera-id (:camera-id g2)
               :secondary-camera-name (:camera-name g2)
-              :secondary-camera-status-id (:camera-status-id g2))
+              :secondary-camera-status-id (:camera-status-id g2)
+              :secondary-camera-media-unrecoverable (:camera-media-unrecoverable g2))
        g1)
      :primary-camera-id (:camera-id g1)
      :primary-camera-name (:camera-name g1)
-     :primary-camera-status-id (:camera-status-id g1))))
+     :primary-camera-status-id (:camera-status-id g1)
+     :primary-camera-media-unrecoverable (:camera-media-unrecoverable g1))))
 
 (defn assoc-cameras
   [data]
@@ -233,25 +237,37 @@
   (let [active-id (active-status-id state)
         orig-data (and (:trap-station-session-id data)
                        (get-specific state (:trap-station-session-id data)))]
-    (if (camera-changed? orig-data data :primary-camera)
-      (set-camera-status! state (get data (camera-id-key :primary-camera)) active-id)
-      (set-camera-status! state (get data (camera-id-key :primary-camera))
-                          (get data (camera-status-id-key :primary-camera))))
-    (if (camera-changed? orig-data data :secondary-camera)
-      (set-camera-status! state (get data (camera-id-key :secondary-camera)) active-id)
-      (set-camera-status! state (get data (camera-id-key :secondary-camera))
-                          (get data (camera-status-id-key :secondary-camera))))))
+    (if (camera-changed? orig-data data :primary)
+      (set-camera-status! state (get data (camera-id-key :primary)) active-id)
+      (set-camera-status! state (get data (camera-id-key :primary))
+                          (get data (camera-status-id-key :primary))))
+    (if (camera-changed? orig-data data :secondary)
+      (set-camera-status! state (get data (camera-id-key :secondary)) active-id)
+      (set-camera-status! state (get data (camera-id-key :secondary))
+                          (get data (camera-status-id-key :secondary))))))
+
+(s/defn update-session-camera! :- TrapStationSessionCamera
+  [state :- State
+   camera-id :- s/Int
+   sess-id :- s/Int
+   media-unrecoverable :- s/Bool]
+  (trap-station-session-camera/update-media-unrecoverable!
+   state camera-id sess-id media-unrecoverable))
 
 (s/defn update-used-camera!
   [state :- State
    orig-data
    data
    cam-type]
-  (when (and (camera-changed? orig-data data cam-type)
-             (get orig-data (camera-id-key cam-type)))
-    (set-camera-status! state
-                        (get orig-data (camera-id-key cam-type))
-                        (get data (camera-status-id-key cam-type)))))
+  (when (get orig-data (camera-id-key cam-type))
+    (when (camera-changed? orig-data data cam-type)
+      (set-camera-status! state
+                          (get orig-data (camera-id-key cam-type))
+                          (get data (camera-status-id-key cam-type))))
+    (update-session-camera! state
+                            (get data (camera-id-key cam-type))
+                            (:trap-station-session-id data)
+                            (get data (camera-media-unrecoverable-key cam-type)))))
 
 (s/defn update-used-cameras!
   [state :- State
@@ -259,8 +275,8 @@
   (let [orig-data (and (:trap-station-session-id data)
                        (get-specific state (:trap-station-session-id data)))
         active-id (active-status-id state)]
-    (update-used-camera! state orig-data data :primary-camera)
-    (update-used-camera! state orig-data data :secondary-camera)))
+    (update-used-camera! state orig-data data :primary)
+    (update-used-camera! state orig-data data :secondary)))
 
 (s/defn update-cameras!
   [state
@@ -285,6 +301,7 @@
    state
    (trap-station-session-camera/ttrap-station-session-camera
     {:trap-station-session-id (:trap-station-session-id session)
+     :trap-station-session-camera-media-unrecoverable false
      :camera-id (get data (camera-id-key cam-type))})))
 
 (s/defn create-new-session!
@@ -304,13 +321,13 @@
                     (get-specific state (:trap-station-session-id data)))
         camera-active? (camera-active-or-added-fn state orig-data data)]
     (when (or (nil? orig-data)
-              (camera-active? :primary-camera)
-              (camera-active? :secondary-camera))
+              (camera-active? :primary)
+              (camera-active? :secondary))
       (let [s (create-new-session! state data)]
-        (when (camera-active? :primary-camera)
-          (create-session-camera! state data s :primary-camera))
-        (when (camera-active? :secondary-camera)
-          (create-session-camera! state data s :secondary-camera))
+        (when (camera-active? :primary)
+          (create-session-camera! state data s :primary))
+        (when (camera-active? :secondary)
+          (create-session-camera! state data s :secondary))
         s))))
 
 (s/defn create-camera-check!

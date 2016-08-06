@@ -1,0 +1,1 @@
+ALTER TABLE trap_station_session_camera ADD COLUMN trap_station_session_camera_media_unrecoverable BOOLEAN DEFAULT false

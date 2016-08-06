@@ -166,12 +166,15 @@ Currently the only application state is the user's configuration."
                        {:label (tr/translate (:config state) :action/media)
                         :action :media}]}
    :layout [[:camera-id]
-            [:trap-station-session-camera-import-path]]
+            [:trap-station-session-camera-import-path]
+            [:trap-station-session-camera-media-unrecoverable]]
    :schema {:camera-id {:type :select
                         :required true
                         :generator :trap-station-session-cameras-available}
             :trap-station-session-camera-import-path {:type :text
-                                                      :required false}}
+                                                      :required false}
+            :trap-station-session-camera-media-unrecoverable {:type :boolean
+                                                              :required true}}
    :states {:create {:submit {:success {:type :event
                                         :event :trap-station-session-camera-create}
                               :error {:type :event

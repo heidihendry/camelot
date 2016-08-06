@@ -4,7 +4,7 @@ SELECT trap_station_session_id, trap_station_session_created,
        survey_site_id, trap_station_name, trap_station_longitude, trap_station_latitude,
        trap_station_altitude, trap_station_notes, survey_site_id, site_name,
        trap_station_session_start_date, trap_station_session_end_date, camera_id,
-       camera_name, camera_status_id
+       camera_name, camera_status_id, trap_station_session_camera_media_unrecoverable
 FROM trap_station_session
 LEFT JOIN trap_station USING (trap_station_id)
 LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
@@ -20,7 +20,7 @@ SELECT trap_station_session_id, trap_station_session_created,
        survey_site_id, trap_station_name, trap_station_longitude, trap_station_latitude,
        trap_station_altitude, trap_station_notes, survey_site_id, site_name,
        trap_station_session_start_date, trap_station_session_end_date, camera_id,
-       camera_name, camera_status_id
+       camera_name, camera_status_id, trap_station_session_camera_media_unrecoverable
 FROM trap_station_session
 LEFT JOIN trap_station USING (trap_station_id)
 LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
@@ -36,7 +36,8 @@ SELECT trap_station_session_id, trap_station_session_created,
        survey_site_id, trap_station_name, trap_station_longitude, trap_station_latitude,
        trap_station_altitude, trap_station_notes, survey_site_id, site_name,
        trap_station_session_start_date, trap_station_session_end_date,
-       trap_station_session_camera_id, camera_id, camera_name, camera_status_id
+       trap_station_session_camera_id, camera_id, camera_name, camera_status_id,
+       trap_station_session_camera_media_unrecoverable
 FROM trap_station_session
 LEFT JOIN trap_station USING (trap_station_id)
 LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
@@ -47,6 +48,7 @@ LEFT JOIN camera_status USING (camera_status_id)
 LEFT JOIN media USING (trap_station_session_camera_id)
 WHERE survey_id = :survey_id AND media_id IS NULL
       AND trap_station_session_end_date IS NOT NULL
+      AND trap_station_session_camera_media_unrecoverable = FALSE
 
 -- name: -set-session-end-date!
 UPDATE trap_station_session

@@ -4,6 +4,7 @@
             [cljs.core.async :refer [<! chan >!]]
             [camelot.rest :as rest]
             [om-datepicker.components :refer [datepicker]]
+            [camelot.util.deployment :refer [camera-id-key camera-status-id-key camera-media-unrecoverable-key]]
             [camelot.nav :as nav]
             [camelot.state :as state]
             [camelot.component.deployment.create :as create]
@@ -60,7 +61,7 @@
       (dom/option #js {:value (:camera-id data)} (:camera-name data)))))
 
 (defn camera-select-component
-  [data owner]
+  [data owner {:keys [blank-description]}]
   (reify
     om/IWillMount
     (will-mount [_]
@@ -79,7 +80,7 @@
                                 (if (seq (:options state))
                                   (conj (:options state)
                                         {:camera-id -1
-                                         :camera-name ""})
+                                         :camera-name (or blank-description "")})
                                   (conj [] {:camera-id -1
                                             :camera-name "No Cameras Available"}))
                                 {:key :camera-id})))))
@@ -118,12 +119,33 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div nil
-               (dom/label #js {:className "field-label"} "Camera Status")
+               (dom/label #js {:className "field-label"} "What is the new status of this camera?")
                (om/build camera-status-select-component data {:init-state state})
                (when (not= (js/parseInt (get-in data [(:camera-status-field state) :value])) 2)
                  (dom/div nil
-                          (dom/label #js {:className "field-label"} "Replacement Camera, if any")
-                          (om/build camera-select-component data {:init-state state})))))))
+                          (dom/label #js {:className "field-label"} "Which camera replaced it in the field, if any?")
+                          (om/build camera-select-component data {:init-state state
+                                                                  :opts {:blank-description "No replacement camera"}})))))))
+
+(defn camera-media-unrecoverable-component
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ state]
+      (let [unrec (get data (camera-media-unrecoverable-key (:camera-type state)))]
+        (if (nil? unrec)
+          (do
+            (om/update! data (camera-media-unrecoverable-key (:camera-type state)) {:value false})
+            (dom/span nil))
+          (dom/div nil
+                   (dom/label #js {:className "field-label"} "Media retrieved?")
+                   (dom/select #js {:className "field-input"
+                                    :value (get data [(camera-media-unrecoverable-key (:camera-type state)) :value])
+                                    :onChange #(do (prn "Changing to " (.. % -target -value))
+                                                   (om/update! data [(camera-media-unrecoverable-key (:camera-type state)) :value]
+                                                               (= (.. % -target -value) "true")))}
+                               (dom/option #js {:value "false"} "Media was recovered")
+                               (dom/option #js {:value "true"} "Media could not be recovered"))))))))
 
 (defn record-camera-check-component
   [data owner]
@@ -152,6 +174,7 @@
                      (dom/label #js {:className "validation-warning"}
                                 "Date cannot be in the future."))
                    (dom/h5 nil (str "Primary Camera: " ) (get-in data [:primary-camera-name :value]))
+                   (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :primary}})
                    (om/build camera-status-component data
                              {:init-state {:camera-status-field :primary-camera-status-id
                                            :camera-id-field :primary-camera-id}})
@@ -159,6 +182,7 @@
                             (not (get-in data [:camera-is-new :value])))
                      (dom/div nil
                               (dom/h5 nil (str "Secondary Camera: " ) (get-in data [:secondary-camera-name :value]))
+                              (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :secondary}})
                               (om/build camera-status-component data
                                         {:init-state {:camera-status-field :secondary-camera-status-id
                                                       :camera-id-field :secondary-camera-id}}))

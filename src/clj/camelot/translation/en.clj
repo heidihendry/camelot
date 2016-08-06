@@ -40,6 +40,8 @@
                                  :sidebar-title "Session Cameras"
                                  :trap-station-session-camera-import-path {:label "Import Path"
                                                                            :description "The path to the files originally imported to this camera"}
+                                 :trap-station-session-camera-media-unrecoverable {:label "Media Unrecoverable"
+                                                                                   :description "The media associated with this camera session could not be recovered."}
                                  :camera-id {:label "Camera"
                                              :description "The camera to add to the Trap Station Session"}}
 
