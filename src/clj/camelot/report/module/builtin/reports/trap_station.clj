@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.reports.trap-station
   (:require [camelot.report.module.core :as module]))
 
-(defn report-configuration
+(defn report-output
   [state trap-station-id]
   {:columns [:taxonomy-genus
              :taxonomy-species
@@ -27,9 +27,19 @@
    :filters [#(:taxonomy-species %)]
    :order-by [:taxonomy-genus :taxonomy-species]})
 
+(def form-smith
+  {:layout [[:trap-station-id]]
+   :schema {:trap-station-id {:type :select
+                              :required true
+                              :options {:url "/trap-stations"
+                                        :label :trap-station-name
+                                        :value :trap-station-id}}}})
+
 (module/register-report
  :trap-station-statistics
  {:file-prefix "trap-station-statistics"
-  :configuration report-configuration
+  :title "Trap Station Statistics"
+  :output report-output
+  :form form-smith
   :by :all
   :for :trap-station})

@@ -101,7 +101,7 @@ Here's an example module to create and register a custom column, and a custom re
  {:calculate custom-column
   :heading "Custom Column"})
 
-(defn report-configuration
+(defn report-output
   [state survey-id]
   {:columns [:species-scientific-name
              :trap-station-longitude
@@ -119,8 +119,9 @@ Here's an example module to create and register a custom column, and a custom re
 
 (module/register-report
  :custom-report
- {:file-prefix "my custom report"
-  :configuration report-configuration
+ {:file-prefix "my-custom-report"
+  :title "My Custom Report"
+  :output report-output
   :by :species
   :for :survey})
 ```

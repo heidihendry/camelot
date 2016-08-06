@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.reports.raw-data-export
   (:require [camelot.report.module.core :as module]))
 
-(defn report-configuration
+(defn report-output
   [state survey-id]
   {:columns [:media-filename
              :site-name
@@ -18,6 +18,7 @@
 (module/register-report
  :raw-data-export
  {:file-prefix "raw-data-export"
-  :configuration report-configuration
+  :title "Raw Data Export"
+  :output report-output
   :by :all
   :for :survey})

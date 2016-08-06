@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.reports.summary-statistics
   (:require [camelot.report.module.core :as module]))
 
-(defn report-configuration
+(defn report-output
   [state survey-id]
   {:columns [:taxonomy-genus
              :taxonomy-species
@@ -24,6 +24,7 @@
 (module/register-report
  :summary-statistics
  {:file-prefix "summary-statistics-report"
-  :configuration report-configuration
+  :title "Summary Statistics Report"
+  :output report-output
   :by :all
   :for :survey})

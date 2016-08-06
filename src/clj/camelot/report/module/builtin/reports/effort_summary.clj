@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.reports.effort-summary
   (:require [camelot.report.module.core :as module]))
 
-(defn report-configuration
+(defn report-output
   [state survey-id]
   {:columns [:site-id
              :site-area
@@ -22,6 +22,6 @@
 (module/register-report
  :effort-summary
  {:file-prefix "effort-summary-report"
-  :configuration report-configuration
+  :output report-output
   :by :all
   :for :survey})

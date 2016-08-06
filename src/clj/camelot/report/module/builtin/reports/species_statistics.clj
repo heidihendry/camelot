@@ -2,7 +2,7 @@
   (:require [camelot.model.taxonomy :as taxonomy]
             [camelot.report.module.core :as module]))
 
-(defn report-configuration
+(defn report-output
   [state taxonomy-id]
   (let [spp (taxonomy/get-specific state taxonomy-id)]
     {:columns [:taxonomy-genus
@@ -33,6 +33,7 @@
 (module/register-report
  :species-statistics
  {:file-prefix "species-statistics"
-  :configuration report-configuration
+  :title "Species Statistics"
+  :output report-output
   :by :all
   :for :species})

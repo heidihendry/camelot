@@ -31,3 +31,7 @@
 (defn get-report
   [report-key]
   (get @known-reports report-key))
+
+(defn all-reports
+  []
+  (deref known-reports))

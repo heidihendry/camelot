@@ -185,8 +185,9 @@
            (POST "/options" [data] (r/response (im.db/options data)))
            (POST "/media" [data] (r/response (import/media data))))
 
-  (context "/report/:report" [report]
-           (GET "/:id" [id] (report/export (keyword report) (edn/read-string id))))
+  (context "/report" []
+           (GET "/:report/:id" [report id] (report/export (keyword report) (edn/read-string id)))
+           (GET "/" [] (r/response (report/available-reports))))
 
   (context "/library" []
            (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config)))))

@@ -147,7 +147,7 @@
 (def add-post-aggregate-columns (module/build-calculated-columns :post-aggregate))
 
 (s/defn generate-report
-  "Generate a report given a configuration and data."
+  "Generate a report given an output configuration and data."
   [state :- State
    {:keys [columns rewrites pre-transforms pre-filters transforms filters aggregate-on order-by]}
    data :- [{s/Keyword s/Any}]]
@@ -212,7 +212,7 @@
    data :- [{s/Keyword s/Any}]]
   (loader/load-user-modules)
   (let [report (module/get-report report-key)
-        conf ((:configuration report) state id)]
+        conf ((:output report) state id)]
     (->> data
          (generate-report state conf)
          (as-rows state conf))))
@@ -226,7 +226,7 @@
   (let [report (module/get-report report-key)]
     (exportable-report
      state
-     ((:configuration report) state id)
+     ((:output report) state id)
      data)))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
@@ -253,3 +253,13 @@
           (r/header "Content-Disposition"
                     (content-disposition report survey-id))))
     (format "Report '%s' is not known" (name report-key))))
+
+(defn- report-configuration-reducer
+  [acc k v]
+  (assoc acc k (select-keys v [:title :form])))
+
+(s/defn available-reports
+  "Map of all available reports."
+  []
+  (loader/load-user-modules)
+  (reduce-kv report-configuration-reducer {} (module/all-reports)))
