@@ -1303,3 +1303,6 @@ pre.field-input {
 #app .validation-warning {
     color: #cc3311;
 }
+#app button.btn-sml {
+    padding: 0.3rem 1rem;
+}

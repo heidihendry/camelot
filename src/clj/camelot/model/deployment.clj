@@ -45,7 +45,7 @@
      secondary-camera-id :- (s/maybe s/Int)
      secondary-camera-name :- (s/maybe s/Str)
      secondary-camera-status-id :- (s/maybe s/Int)
-     secondary-camera-media-unrecoverable :- s/Bool])
+     secondary-camera-media-unrecoverable :- (s/maybe s/Bool)])
 
 (s/defrecord Deployment
     [trap-station-session-id :- s/Int

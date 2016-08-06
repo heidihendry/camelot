@@ -2,6 +2,7 @@
   (:require [om.core :as om]
             [camelot.nav :as nav]
             [camelot.util.capture :as capture]
+            [camelot.component.deployment.shared :as shared]
             [camelot.component.survey.create :as create]
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
@@ -159,6 +160,8 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (or (:deployment-sort-order data)
+          (om/update! data :deployment-sort-order :trap-station-name))
       (rest/get-resource (str "/deployment/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value])
@@ -167,10 +170,11 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section"}
+               (om/build shared/deployment-sort-menu data)
                (dom/div #js {:className "simple-menu"}
                         (dom/div #js {:className "help-text"}
                                  help-text)
                         (om/build-all recent-deployment-list-component
-                                      (sort-by :trap-station-name
-                                               (:recent-deployments data))
+                                      (sort (shared/deployment-sorters (get data :deployment-sort-order))
+                                            (:recent-deployments data))
                                       {:key :trap-station-session-camera-id}))))))

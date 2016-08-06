@@ -8,7 +8,8 @@
             [camelot.nav :as nav]
             [camelot.state :as state]
             [camelot.component.deployment.create :as create]
-            [cljs-time.format :as tf])
+            [cljs-time.format :as tf]
+            [camelot.component.deployment.shared :as shared])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -328,17 +329,23 @@
                          #(om/update! data :trap-stations (:body %))))
     om/IRender
     (render [_]
-      (dom/div #js {:className "section"}
-               (dom/div #js {:className "simple-menu"}
-                        (om/build-all deployment-list-component
-                                      (sort-by :trap-station-name (:trap-stations data))
-                                      {:key :trap-station-session-id}))
-               (dom/div #js {:className "sep"})
-               (dom/button #js {:className "btn btn-primary"
-                                :onClick #(do (nav/nav! (str "/"
-                                                             (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
-                                                             "/deployments/create"))
-                                              (nav/analytics-event "survey-deployment" "create-click"))
-                                :title "Add a new camera trap deployment"}
-                           (dom/span #js {:className "fa fa-plus"})
-                           " Add Camera Trap")))))
+      (if (:deployment-sort-order data)
+        (dom/div #js {:className "section"}
+                 (om/build shared/deployment-sort-menu data)
+                 (dom/div #js {:className "simple-menu"}
+                          (om/build-all deployment-list-component
+                                        (sort (shared/deployment-sorters (get data :deployment-sort-order))
+                                              (:trap-stations data))
+                                        {:key :trap-station-session-id}))
+                 (dom/div #js {:className "sep"})
+                 (dom/button #js {:className "btn btn-primary"
+                                  :onClick #(do (nav/nav! (str "/"
+                                                               (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
+                                                               "/deployments/create"))
+                                                (nav/analytics-event "survey-deployment" "create-click"))
+                                  :title "Add a new camera trap deployment"}
+                             (dom/span #js {:className "fa fa-plus"})
+                             " Add Camera Trap"))
+        (do
+          (om/update! data :deployment-sort-order :trap-station-session-start-date)
+          (dom/div nil))))))
