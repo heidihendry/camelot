@@ -4,7 +4,7 @@ set -e
 
 PROJECT_NAME="camelot"
 PROJECT_FILE="project.clj"
-DOWNLOADS_URL="https://api.bitbucket.org/2.0/repositories/cshclm/camelot/downloads/"
+README_FILE="README.md"
 
 echo "Checking binaries in \$PATH... "
 which gdrive &> /dev/null
@@ -59,6 +59,7 @@ fi
 echo "Bumping release version... "
 sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"$/${PROJECT_NAME} \"\1\"/" ${PROJECT_FILE}
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
+sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).jar/${PROJECT_NAME}-${released_version}.jar/" ${README_FILE}
 git commit -a -m "Version bump: $released_version"
 git tag -sa "v$released_version" -m "Release: $released_version"
 
@@ -66,10 +67,8 @@ echo "Running release build... "
 lein with-profiles -dev,-user,+uberjar uberjar
 
 echo "Uploading release... "
-released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
-echo "To Bitbucket... "
 mv "target/${PROJECT_NAME}.jar" "target/$PROJECT_NAME-${released_version}.jar"
-curl -u ${BITBUCKET_CREDENTIALS} -X POST ${DOWNLOADS_URL} -F "files=@target/$PROJECT_NAME-${released_version}.jar"
+scp "target/$PROJECT_NAME-${released_version}.jar" "${CAMELOT_UPLOAD_TARGET}/release/"
 
 echo "Bumping version to *-SNAPSHOT... "
 patch_version=$(echo $released_version | cut -d\. -f3)

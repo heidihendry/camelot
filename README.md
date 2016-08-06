@@ -8,6 +8,8 @@ Currently Camelot reports validation problems for survey data read from image me
 
 ## Getting Started
 
+Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.4.5.jar).
+
 Run camelot with:
 
 ```sh
