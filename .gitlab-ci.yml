@@ -10,6 +10,9 @@ before_script:
   - chmod 700 ~/.ssh
   - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
 
+variables:
+  BUILD_NAME: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
+
 build:
   image: clojure
   script:
@@ -20,9 +23,9 @@ build:
     - script/test-runtime.sh
     - CAMELOT_DATADIR="camelot-testdata" script/test-runtime.sh
     - script/prepare-snapshot.sh
-    - mkdir "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
-    - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.command "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
+    - mkdir "${BUILD_NAME}"
+    - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.command "${BUILD_NAME}"
   artifacts:
-    name: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
+    name: "${BUILD_NAME}"
     paths:
-      - "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
+      - "${BUILD_NAME}/"
