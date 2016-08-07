@@ -13,7 +13,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item"
+      (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(nav/nav! (str "/report/" (get data id-key)))}
                (dom/span #js {:className "menu-item-title"}
                          (title-key data))
@@ -53,8 +53,18 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section"}
+               (dom/div nil
+                (dom/input #js {:className "field-input"
+                                :value (:filter data)
+                                :placeholder "Filter reports..."
+                                :onChange #(om/update! data :filter (.. % -target -value))}))
                (dom/div #js {:className "simple-menu"}
-                        (om/build-all item-component (sort-by :title (:list data))
+                        (om/build-all item-component
+                                      (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
+                                                 true
+                                                 (re-matches (re-pattern (str "(?i).*" (:filter data) ".*"))
+                                                             (str (:title %) " " (:description %))))
+                                              (sort-by :title (:list data)))
                                       {:opts {:title-key :title
                                               :id-key :report-key
                                               :desc-key :description}
