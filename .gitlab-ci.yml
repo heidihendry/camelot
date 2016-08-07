@@ -20,10 +20,9 @@ build:
     - script/test-runtime.sh
     - CAMELOT_DATADIR="camelot-testdata" script/test-runtime.sh
     - script/prepare-snapshot.sh
-    - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.command .
+    - mkdir "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
+    - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.command "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
   artifacts:
     name: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
     paths:
-      - camelot-*.jar
-      - camelot-desktop.command
-      - camelot-desktop.sh
+      - "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
