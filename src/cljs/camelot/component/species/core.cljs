@@ -2,7 +2,8 @@
   (:require [om.core :as om]
             [camelot.nav :as nav]
             [om.dom :as dom]
-            [camelot.rest :as rest]))
+            [camelot.rest :as rest]
+            [camelot.component.util :as util]))
 
 (defn species-list-component
   [data owner]
@@ -32,22 +33,26 @@
                          #(om/update! data :list (:body %))))
     om/IRender
     (render [_]
-      (dom/div #js {:className "section"}
-               (dom/div #js {:className "simple-menu"}
-                        (om/build-all species-list-component
-                                      (sort-by :taxonomy-label (:list data))
-                                      {:key :taxonomy-id}))
-               (dom/div #js {:className "sep"})
-               (dom/button #js {:className "btn btn-primary"
-                                :onClick #(do (nav/nav! "/species/create")
-                                              (nav/analytics-event "org-species" "create-click"))
-                                :disabled "disabled"
-                                :title "Not implemented"}
-                           (dom/span #js {:className "fa fa-plus"})
-                           " Add Species")
-               (dom/button #js {:className "btn btn-default"
-                                :onClick #(do (nav/nav! "/taxonomy")
-                                              (nav/analytics-event "org-species" "advanced-click"))}
-                           "Advanced")))))
+      (when (:list data)
+        (dom/div #js {:className "section"}
+                 (dom/div #js {:className "simple-menu"}
+                          (if (empty? (:list data))
+                            (om/build util/blank-slate-beta-component {}
+                                      {:opts {:item-name "species"}})
+                            (om/build-all species-list-component
+                                          (sort-by :taxonomy-label (:list data))
+                                          {:key :taxonomy-id})))
+                 (dom/div #js {:className "sep"})
+                 (dom/button #js {:className "btn btn-primary"
+                                  :onClick #(do (nav/nav! "/species/create")
+                                                (nav/analytics-event "org-species" "create-click"))
+                                  :disabled "disabled"
+                                  :title "Not implemented"}
+                             (dom/span #js {:className "fa fa-plus"})
+                             " Add Species")
+                 (dom/button #js {:className "btn btn-default"
+                                  :onClick #(do (nav/nav! "/taxonomy")
+                                                (nav/analytics-event "org-species" "advanced-click"))}
+                             "Advanced"))))))
 
 

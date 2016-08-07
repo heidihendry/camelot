@@ -1317,3 +1317,15 @@ pre.field-input {
 #app button.btn-sml {
     padding: 0.3rem 1rem;
 }
+#app .blank-slate {
+    padding-top: 6rem;
+    line-height: 5rem;
+    color: #999;
+    text-align: center;
+}
+#app .blank-slate .large {
+    font-size: 180%;
+}
+#app .blank-slate .advice {
+    font-size: 120%;
+}

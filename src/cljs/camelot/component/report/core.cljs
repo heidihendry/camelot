@@ -5,7 +5,8 @@
             [camelot.nav :as nav]
             [camelot.rest :as rest]
             [smithy.core :as smithy]
-            [camelot.state :as state]))
+            [camelot.state :as state]
+            [camelot.component.util :as util]))
 
 (defn item-component
   "A menu item for a single report."
@@ -55,21 +56,28 @@
                          #(om/update! data :list (:body %))))
     om/IRender
     (render [_]
-      (dom/div #js {:className "section"}
-               (dom/div nil
-                (dom/input #js {:className "field-input"
-                                :value (:filter data)
-                                :placeholder "Filter reports..."
-                                :onChange #(om/update! data :filter (.. % -target -value))}))
-               (dom/div #js {:className "simple-menu"}
-                        (om/build-all item-component
-                                      (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
-                                                 true
-                                                 (re-matches (re-pattern (str "(?i).*" (:filter data) ".*"))
-                                                             (str (:title %) " " (:description %))))
-                                              (sort-by :title (:list data)))
-                                      {:opts {:title-key :title
-                                              :id-key :report-key
-                                              :desc-key :description}
-                                       :key :report-key}))))))
+      (when (:list data)
+        (dom/div #js {:className "section"}
+                 (dom/div nil
+                          (dom/input #js {:className "field-input"
+                                          :value (:filter data)
+                                          :placeholder "Filter reports..."
+                                          :onChange #(om/update! data :filter (.. % -target -value))}))
+                 (dom/div #js {:className "simple-menu"}
+                          (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
+                                                    true
+                                                    (re-matches (re-pattern (str "(?i).*" (:filter data) ".*"))
+                                                                (str (:title %) " " (:description %))))
+                                                 (sort-by :title (:list data)))]
+                            (if (empty? filtered)
+                              (om/build util/blank-slate-component {}
+                                        {:opts {:item-name "reports"
+                                                :notice "No reports matched"
+                                                :advice "There weren't any results for this search"}})
+                              (om/build-all item-component filtered
+                                            
+                                            {:opts {:title-key :title
+                                                    :id-key :report-key
+                                                    :desc-key :description}
+                                             :key :report-key})))))))))
 

@@ -8,7 +8,8 @@
             [cljs.core.async :refer [<! chan >!]]
             [camelot.state :as state]
             [camelot.rest :as rest]
-            [cljs-time.format :as tf])
+            [cljs-time.format :as tf]
+            [camelot.component.util :as util])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
@@ -170,11 +171,15 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section"}
-               (om/build shared/deployment-sort-menu data)
                (dom/div #js {:className "simple-menu"}
-                        (dom/div #js {:className "help-text"}
-                                 help-text)
-                        (om/build-all recent-deployment-list-component
-                                      (sort (shared/deployment-sorters (get data :deployment-sort-order))
-                                            (:recent-deployments data))
-                                      {:key :trap-station-session-camera-id}))))))
+                        (if (empty? (:recent-deployments data))
+                          (om/build util/blank-slate-component {}
+                                    {:opts {:item-name "camera checks"
+                                            :advice "These will appear when you add checks to your camera traps"}})
+                          (dom/div nil
+                                   (dom/div #js {:className "help-text"} help-text)
+                                   (om/build shared/deployment-sort-menu data)
+                                   (om/build-all recent-deployment-list-component
+                                                 (sort (shared/deployment-sorters (get data :deployment-sort-order))
+                                                       (:recent-deployments data))
+                                                 {:key :trap-station-session-camera-id}))))))))

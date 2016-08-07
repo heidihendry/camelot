@@ -71,10 +71,6 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "single-section"}
-               (dom/div nil
-                        (dom/label #js {:className "field-label required"} "Start Date")
-                        (dom/div #js {:className "field-details"}
-                                 (om/build datepicker (get-in data [:data :trap-station-session-start-date]))))
                (dom/label #js {:className "field-label required"} "Site")
                (om/build site-select-component data)
                (dom/label #js {:className "field-label required"} "Trap Station Identifier")
@@ -83,6 +79,10 @@
                                :value (get-in data [:data :trap-station-name :value])
                                :onChange #(om/update! (get-in data [:data :trap-station-name])
                                                       :value (.. % -target -value))})
+               (dom/div nil
+                        (dom/label #js {:className "field-label required"} "Start Date")
+                        (dom/div #js {:className "field-details"}
+                                 (om/build datepicker (get-in data [:data :trap-station-session-start-date]))))
                (dom/label #js {:className "field-label required"} "Latitude")
                (dom/input #js {:className "field-input"
                                :type "number"
@@ -175,5 +175,5 @@
       (when (:page-state data)
         (dom/div #js {:className "split-menu"}
                  (dom/div #js {:className "intro"}
-                          (dom/h4 nil "New Camera Deployment"))
+                          (dom/h4 nil "Add Camera Trap"))
                  (dom/div nil (om/build section-containers-component (:page-state data))))))))

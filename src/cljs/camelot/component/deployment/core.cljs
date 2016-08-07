@@ -9,7 +9,8 @@
             [camelot.state :as state]
             [camelot.component.deployment.create :as create]
             [cljs-time.format :as tf]
-            [camelot.component.deployment.shared :as shared])
+            [camelot.component.deployment.shared :as shared]
+            [camelot.component.util :as util])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -331,12 +332,16 @@
     (render [_]
       (if (:deployment-sort-order data)
         (dom/div #js {:className "section"}
-                 (om/build shared/deployment-sort-menu data)
                  (dom/div #js {:className "simple-menu"}
-                          (om/build-all deployment-list-component
-                                        (sort (shared/deployment-sorters (get data :deployment-sort-order))
-                                              (:trap-stations data))
-                                        {:key :trap-station-session-id}))
+                          (if (empty? (:trap-stations data))
+                            (om/build util/blank-slate-component {}
+                                      {:opts {:item-name "camera traps"}})
+                            (dom/div nil
+                                     (om/build shared/deployment-sort-menu data)
+                                     (om/build-all deployment-list-component
+                                                   (sort (shared/deployment-sorters (get data :deployment-sort-order))
+                                                         (:trap-stations data))
+                                                   {:key :trap-station-session-id}))))
                  (dom/div #js {:className "sep"})
                  (dom/button #js {:className "btn btn-primary"
                                   :onClick #(do (nav/nav! (str "/"
