@@ -68,9 +68,9 @@ echo "Running release build... "
 lein with-profiles -dev,-user,+uberjar uberjar
 
 echo "Packaging release"
-mkdir "${PROJECT_NAME}-${released_version}"
-mv "target/${PROJECT_NAME}.jar" "${PROJECT_NAME}-${released_version}"
-cp "script/bin/"* "${PROJECT_NAME}-${released_version}"
+mkdir "${PROJECT_NAME}-${released_version}/"
+mv "target/${PROJECT_NAME}.jar" "${PROJECT_NAME}-${released_version}/"
+cp "script/bin/"* "${PROJECT_NAME}-${released_version}/"
 zip -r "${PROJECT_NAME}-${released_version}.zip" "${PROJECT_NAME}-${released_version}"
 
 echo "Uploading release... "
@@ -84,5 +84,8 @@ sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"$/${PROJECT_NAME} \"
 git commit -a -m "Version bump: ${new_version}-SNAPSHOT"
 
 echo "Cleaning up"
-rm "${PROJECT_NAME}-${released_version}" "${PROJECT_NAME}-${released_version}.zip"
+mkdir -p ../releases
+rm -rf "${PROJECT_NAME}-${released_version}/"
+mv "${PROJECT_NAME}-${released_version}.zip" ../releases
+
 echo "RELEASE COMPLETE"
