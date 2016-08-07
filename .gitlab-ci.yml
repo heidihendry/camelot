@@ -10,11 +10,10 @@ before_script:
   - chmod 700 ~/.ssh
   - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
 
-variables:
-  BUILD_NAME: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
-
 build:
   image: clojure
+  variables:
+    BUILD_NAME: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
   script:
     - script/clean-build.sh
     - lein with-profiles +test midje
