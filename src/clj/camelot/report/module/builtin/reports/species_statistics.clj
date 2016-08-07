@@ -47,7 +47,7 @@
  :species-statistics
  {:file-prefix "species-statistics"
   :title "Species Statistics"
-  :description "Describe me"
+  :description "Sightings breakdown for a single species across all surveys."
   :output report-output
   :form form-smith
   :by :all

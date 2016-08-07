@@ -43,7 +43,7 @@
  :trap-station-statistics
  {:file-prefix "trap-station-statistics"
   :title "Trap Station Statistics"
-  :description "Describe the observations at a given trap station and the time elapsed gathering those observations."
+  :description "Observations at a given trap station and the time elapsed gathering those observations."
   :output report-output
   :form form-smith
   :by :all

@@ -31,7 +31,7 @@
  :raw-data-export
  {:file-prefix "raw-data-export"
   :title "Raw Data Export"
-  :description "Describe me"
+  :description "Details about each uploaded capture."
   :output report-output
   :form form-smith
   :by :all

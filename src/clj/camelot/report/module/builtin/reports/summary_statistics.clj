@@ -36,8 +36,8 @@
 (module/register-report
  :summary-statistics
  {:file-prefix "summary-statistics-report"
-  :title "Summary Statistics Report"
-  :description "Describe me"
+  :title "Summary Statistics"
+  :description "Summary report for the observations of each species in a survey."
   :output report-output
   :form form-smith
   :by :all

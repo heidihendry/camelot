@@ -34,8 +34,8 @@
  :effort-summary
  {:file-prefix "effort-summary-report"
   :output report-output
-  :title "Effort Summary Report"
-  :description "Describe me"
+  :title "Effort Summary"
+  :description "A breakdown of sites in a survey and their trap stations."
   :form form-smith
   :by :all
   :for :survey})

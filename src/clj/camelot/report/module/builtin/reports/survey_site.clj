@@ -43,7 +43,7 @@
  :survey-site-statistics
  {:file-prefix "survey-site-statistics"
   :title "Survey Site Statistics"
-  :description "Describe me"
+  :description "The observations of each species in a Survey Site."
   :output report-output
   :form form-smith
   :by :all
