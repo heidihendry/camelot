@@ -12,8 +12,21 @@
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
             [ring.middleware.gzip :refer [wrap-gzip]]
-            [ring.middleware.logger :refer [wrap-with-logger]])
+            [ring.middleware.logger :refer [wrap-with-logger]]
+            [clojure.java.shell :refer [sh]])
+  (:import [java.net URI]
+           [java.awt Desktop])
   (:gen-class))
+
+(defn- start-browser
+  [port]
+  (let [addr (str "http://localhost:" port "/")
+        uri (new URI addr)]
+    (try
+      (if (Desktop/isDesktopSupported)
+        (.browse (Desktop/getDesktop) uri))
+      (catch java.lang.UnsupportedOperationException e
+        (sh "bash" "-c" (str "xdg-open " addr " &> /dev/null &"))))))
 
 (def http-handler
   "Handler for HTTP requests"
@@ -27,8 +40,10 @@
       wrap-with-logger
       wrap-gzip))
 
-(defn -main [& [mode directory]]
+(defn -main [& args]
   (let [port (Integer. (or (env :camelot-port) 8080))]
     (migrate)
     (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
+    (when (some #(= "--browser" %) args)
+      (start-browser port))
     (run-jetty http-handler {:port port :join? false})))
