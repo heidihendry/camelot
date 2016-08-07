@@ -2,7 +2,7 @@
   (:require [camelot.report.module.core :as module]))
 
 (defn report-output
-  [state trap-station-id]
+  [state {:keys [trap-station-id]}]
   {:columns [:taxonomy-genus
              :taxonomy-species
              :presence-absence
@@ -31,8 +31,8 @@
   {:resource {}
    :layout [[:trap-station-id]]
    :schema {:trap-station-id
-            {:label "Test"
-             :description "This is a test field"
+            {:label "Trap Station"
+             :description "The trap station to report on"
              :schema {:type :select
                       :required true
                       :get-options {:url "/trap-stations"

@@ -134,9 +134,7 @@ Currently the only application state is the user's configuration."
                 :menu [{:label (tr/translate (:config state) :action/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :action/trap-stations)
-                        :action :trap-stations}
-                       {:label (tr/translate (:config state) :action/survey-site-report)
-                        :action :survey-site-report}]}
+                        :action :trap-stations}]}
    :layout [[:site-id]]
    :schema {:site-id {:type :select
                       :required true
@@ -198,9 +196,7 @@ Currently the only application state is the user's configuration."
                        {:label (tr/translate (:config state) :action/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/sessions)
-                        :action :trap-station-sessions}
-                       {:label (tr/translate (:config state) :action/trap-station-report)
-                        :action :trap-station-report}]}
+                        :action :trap-station-sessions}]}
    :layout [[:trap-station-name]
             [:trap-station-longitude]
             [:trap-station-latitude]
@@ -379,9 +375,7 @@ Currently the only application state is the user's configuration."
                 :menu [{:label (tr/translate (:config state) :action/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :action/edit)
-                        :action :edit-mode}
-                       {:label (tr/translate (:config state) :action/species-statistics-report)
-                        :action :species-statistics-report}]}
+                        :action :edit-mode}]}
    :layout [[:taxonomy-class]
             [:taxonomy-order]
             [:taxonomy-family]
@@ -423,16 +417,7 @@ Currently the only application state is the user's configuration."
                        {:label (tr/translate (:config state) :action/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/survey-sites)
-                        :action :survey-sites}
-                       {:label (tr/translate (:config state) :action/summary-statistics-report)
-                        :action :summary-statistics-report}
-                       {:label (tr/translate (:config state) :action/raw-data-export)
-                        :action :raw-data-export}
-                       {:label (tr/translate (:config state) :action/maxent-report)
-                        :action :maxent-report}
-                       {:label (tr/translate (:config state) :action/effort-summary-report)
-                        :action :effort-summary-report}
-                       ]}
+                        :action :survey-sites}]}
    :layout [[:survey-name]
             [:survey-sighting-independence-threshold]
             [:survey-sampling-point-density]

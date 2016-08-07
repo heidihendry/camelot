@@ -32,6 +32,11 @@ FROM survey_site
 LEFT JOIN site using (site_id)
 WHERE survey_id = :survey_id
 
+-- name: -get-all*
+SELECT survey_site_id, survey_site_created, survey_site_updated, site_id, survey_id, site_name
+FROM survey_site
+LEFT JOIN site using (site_id)
+
 -- name: -get-available
 SELECT site_id, site_name
 FROM site

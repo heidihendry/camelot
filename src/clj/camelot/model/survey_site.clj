@@ -34,6 +34,10 @@
    id :- s/Int]
   (map survey-site (db/with-db-keys state -get-all {:survey-id id})))
 
+(s/defn get-all* :- [SurveySite]
+  [state :- State]
+  (map survey-site (db/clj-keys (db/with-connection (:connection state) -get-all*))))
+
 (s/defn get-specific :- (s/maybe SurveySite)
   [state :- State
    id :- s/Int]

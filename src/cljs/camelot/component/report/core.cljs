@@ -13,7 +13,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed"
+      (dom/div #js {:className "menu-item"
                     :onClick #(nav/nav! (str "/report/" (get data id-key)))}
                (dom/span #js {:className "menu-item-title"}
                          (title-key data))

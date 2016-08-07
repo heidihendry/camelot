@@ -305,6 +305,7 @@
             :taxonomy-family "Family"
             :taxonomy-order "Order"
             :taxonomy-class "Class"
+            :taxonomy-label "Species"
             :species-common-name "Common Name"
             :species-notes "Species Notes"
             :species-id "Species ID"

@@ -113,6 +113,7 @@
            (DELETE "/:id" [id] (rest/delete-resource survey/delete! id)))
 
   (context "/survey-sites" []
+           (GET "/" [] (rest/list-resources survey-site/get-all* :survey-site))
            (GET "/survey/:id" [id] (rest/list-resources survey-site/get-all :survey-site id))
            (GET "/:id" [id] (rest/specific-resource survey-site/get-specific id))
            (GET "/available/:id" [id] (rest/list-available survey-site/get-available id))
@@ -186,7 +187,8 @@
            (POST "/media" [data] (r/response (import/media data))))
 
   (context "/report" []
-           (GET "/:report/:id" [report id] (report/export (keyword report) (edn/read-string id)))
+           (GET "/:report/download" {params :params}
+                (report/export (keyword (:report params)) (rest/parse-ids params)))
            (GET "/:report" [report] (r/response (report/get-configuration (keyword report))))
            (GET "/" [] (r/response (report/available-reports))))
 

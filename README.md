@@ -101,9 +101,10 @@ Here's an example module to create and register a custom column, and a custom re
  {:calculate custom-column
   :heading "Custom Column"})
 
-(defn report-output
-  [state survey-id]
-  {:columns [:species-scientific-name
+(defn report-configuration
+  [state {:keys [survey-id]}]
+  {:columns [:media-id
+             :taxonomy-label
              :trap-station-longitude
              :trap-station-latitude
              :custom-column]
@@ -117,11 +118,26 @@ Here's an example module to create and register a custom column, and a custom re
               :trap-station-longitude
               :trap-station-latitude]})
 
+;; The design of the configuration page for the report.
+(def form-smith
+  {:resource {}
+   :layout [[:survey-id]]
+   :schema {:survey-id
+            {:label "Survey"
+             :description "The survey to report on"
+             :schema {:type :select
+                      :required true
+                      :get-options {:url "/surveys"
+                                    :label :survey-name
+                                    :value :survey-id}}}}})
+
 (module/register-report
  :custom-report
- {:file-prefix "my-custom-report"
-  :title "My Custom Report"
-  :output report-output
+ {:file-prefix "cool custom report"
+  :output report-configuration
+  :title "Cool Custom Report"
+  :description "A very cool report"
+  :form form-smith
   :by :species
   :for :survey})
 ```

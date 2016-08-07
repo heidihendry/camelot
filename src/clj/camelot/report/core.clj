@@ -208,11 +208,11 @@
   "Produce a report, with each record represented as a vector."
   [report-key :- s/Keyword
    state :- State
-   id :- s/Num
+   configuration
    data :- [{s/Keyword s/Any}]]
   (loader/load-user-modules)
   (let [report (module/get-report report-key)
-        conf ((:output report) state id)]
+        conf ((:output report) state configuration)]
     (->> data
          (generate-report state conf)
          (as-rows state conf))))
@@ -221,37 +221,36 @@
   "Produce the report as a CSV."
   [report-key :- s/Keyword
    state :- State
-   id :- s/Int
+   configuration
    data :- [{s/Keyword s/Any}]]
   (let [report (module/get-report report-key)]
     (exportable-report
      state
-     ((:output report) state id)
+     ((:output report) state configuration)
      data)))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
 
 (defn- content-disposition
-  [report survey-id]
-  (format "attachment; filename=\"%s_ID_%d_%s.csv\""
+  [report]
+  (format "attachment; filename=\"%s_%s.csv\""
           (get report :file-prefix)
-          survey-id
           (tf/unparse time-formatter (tl/local-now))))
 
 (s/defn export
   "Handler for an export request."
   [report-key :- s/Keyword
-   survey-id :- s/Int]
+   configuration]
   (loader/load-user-modules)
   (if-let [report (module/get-report report-key)]
     (let [state (app/gen-state (config/config))
           sightings (get-by (:by report))
-          data (csv-report report-key state survey-id sightings)]
+          data (csv-report report-key state configuration sightings)]
       (-> (r/response data)
           (r/content-type "text/csv; charset=utf-8")
           (r/header "Content-Length" (count data))
           (r/header "Content-Disposition"
-                    (content-disposition report survey-id))))
+                    (content-disposition report))))
     (format "Report '%s' is not known" (name report-key))))
 
 (defn ->report-descriptor

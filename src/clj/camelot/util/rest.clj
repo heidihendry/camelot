@@ -31,7 +31,7 @@
     (assoc acc k (as-long v))
     (assoc acc k v)))
 
-(defn- parse-ids
+(defn parse-ids
   "Return data with any strings in ID fields parsed."
   [data]
   (reduce-kv normalise-field-types {} data))
