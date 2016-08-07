@@ -146,7 +146,9 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/h4 nil (str "Create " (util/get-screen-title view-state)))
+               (if (get view-state :title-override)
+                 (dom/h4 nil (get view-state :title-override))
+                 (dom/h4 nil (str "Create " (util/get-screen-title view-state))))
                (dom/div nil (om/build body-component view-state))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"

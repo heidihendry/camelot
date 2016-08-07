@@ -1102,11 +1102,22 @@ pre.field-input {
 #app .split-menu .single-section {
     display: flex;
     flex-direction: column;
-    width: 70%;
     margin: auto;
     flex-grow: 1;
     height: calc(100vh - 16rem);
     max-width: 50rem;
+}
+#app .split-menu .main-content-container {
+    margin: auto;
+    margin-top: 2rem;
+}
+#app .split-menu .main-content-container .main-content {
+    margin: auto;
+    float: none;
+    padding-right: 0;
+}
+#app .split-menu .main-content-container .main-content .button-container {
+    text-align: left;
 }
 #app .split-menu .section input {
     flex-shrink: 0;

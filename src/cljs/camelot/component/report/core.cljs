@@ -30,6 +30,7 @@
                                {:screen {:type :report :mode :create :id :report
                                          :resource-id :report
                                          :nav-to true}
+                                :title-override (:title (:body %))
                                 :screens-ref-override true
                                 :buffer {}
                                 :screens-ref {:report (assoc (:form (:body %))
@@ -40,7 +41,9 @@
     om/IRender
     (render [_]
       (when (:content (get (state/app-state-cursor) :view))
-        (om/build (smithy/build-view-component :content) data)))))
+        (dom/div #js {:className "split-menu"}
+                 (dom/div #js {:className "single-section"}
+                        (om/build (smithy/build-view-component :content) data)))))))
 
 (defn menu-component
   "List all reports."
