@@ -1,5 +1,6 @@
 (ns camelot.application
   (:require [smithy.core :refer [defsmith] :as smithy]
+            [environ.core :refer [env]]
             [camelot.translation.core :as tr]))
 
 (defn gen-state
@@ -11,11 +12,19 @@ Currently the only application state is the user's configuration."
 (defn nav-menu
   "Main navigation menu structure."
   [state]
-  {:menu-items [{:url "/organisation"
-                 :label (tr/translate (:config state) :application/organisation)}
-                {:url "/library"
-                 :label (tr/translate (:config state) :application/library)}
-                {:function "settings"}]})
+  (if (env :camelot_legacy_features)
+    {:menu-items [{:url "/organisation"
+                   :label (tr/translate (:config state) :application/organisation)}
+                  {:url "/library"
+                   :label (tr/translate (:config state) :application/library)}
+                  {:url "/dashboard"
+                   :label (tr/translate (:config state) :application/import)}
+                  {:function "settings"}]}
+    {:menu-items [{:url "/organisation"
+                   :label (tr/translate (:config state) :application/organisation)}
+                  {:url "/library"
+                   :label (tr/translate (:config state) :application/library)}
+                  {}]}))
 
 (def smiths (atom {}))
 
@@ -440,71 +449,72 @@ Currently the only application state is the user's configuration."
                               :error {:type :event
                                       :event :survey-update-error}}}}})
 
-(defsmith settings smiths
-  [state]
-  {:resource {:type :settings
-              :title (tr/translate (:config state) :settings/title)
-              :endpoint "/settings"}
-   :layout [[:label (tr/translate (:config state) :settings/preferences)]
-            [:language]
-            [:label (tr/translate (:config state) :settings/survey-settings)]
-            [:root-path]
-            [:project-start]
-            [:project-end]
-            [:required-fields]
-            [:surveyed-species]
-            [:night-start-hour]
-            [:night-end-hour]
-            [:sighting-independence-minutes-threshold]
-            [:infrared-iso-value-threshold]
-            [:erroneous-infrared-threshold]]
-   :schema {:erroneous-infrared-threshold {:type :percentage
-                                           :required true}
-            :infrared-iso-value-threshold {:type :number
-                                           :required true}
-            :sighting-independence-minutes-threshold {:type :number
-                                                      :required true}
-            :language {:type :select
-                       :required true
-                       :options {:en (tr/translate (:config state) :language/en)
-                                 :vn (tr/translate (:config state) :language/vn)}}
-            :night-start-hour {:type :select
+(when (env :camelot_legacy_features)
+  (defsmith settings smiths
+    [state]
+    {:resource {:type :settings
+                :title (tr/translate (:config state) :settings/title)
+                :endpoint "/settings"}
+     :layout [[:label (tr/translate (:config state) :settings/preferences)]
+              [:language]
+              [:label (tr/translate (:config state) :settings/survey-settings)]
+              [:root-path]
+              [:project-start]
+              [:project-end]
+              [:required-fields]
+              [:surveyed-species]
+              [:night-start-hour]
+              [:night-end-hour]
+              [:sighting-independence-minutes-threshold]
+              [:infrared-iso-value-threshold]
+              [:erroneous-infrared-threshold]]
+     :schema {:erroneous-infrared-threshold {:type :percentage
+                                             :required true}
+              :infrared-iso-value-threshold {:type :number
+                                             :required true}
+              :sighting-independence-minutes-threshold {:type :number
+                                                        :required true}
+              :language {:type :select
+                         :required true
+                         :options {:en (tr/translate (:config state) :language/en)
+                                   :vn (tr/translate (:config state) :language/vn)}}
+              :night-start-hour {:type :select
+                                 :required true
+                                 :options {17 "17:00"
+                                           18 "18:00"
+                                           19 "19:00"
+                                           20 "20:00"
+                                           21 "21:00"
+                                           22 "22:00"
+                                           23 "23:00"}}
+              :night-end-hour {:type :select
                                :required true
-                               :options {17 "17:00"
-                                         18 "18:00"
-                                         19 "19:00"
-                                         20 "20:00"
-                                         21 "21:00"
-                                         22 "22:00"
-                                         23 "23:00"}}
-            :night-end-hour {:type :select
-                             :required true
-                             :options {0 "0:00"
-                                       1 "1:00"
-                                       2 "2:00"
-                                       3 "3:00"
-                                       4 "4:00"
-                                       5 "5:00"
-                                       6 "6:00"
-                                       7 "7:00"
-                                       8 "8:00"}}
-            :project-start {:type :datetime
+                               :options {0 "0:00"
+                                         1 "1:00"
+                                         2 "2:00"
+                                         3 "3:00"
+                                         4 "4:00"
+                                         5 "5:00"
+                                         6 "6:00"
+                                         7 "7:00"
+                                         8 "8:00"}}
+              :project-start {:type :datetime
+                              :required true}
+              :project-end {:type :datetime
                             :required true}
-            :project-end {:type :datetime
+              :root-path {:type :string
                           :required true}
-            :root-path {:type :string
-                        :required true}
-            :surveyed-species {:type :list
-                               :list-of :string}
-            :required-fields {:type :list
-                              :list-of :paths
-                              :complete-with :metadata}}
-   :states {:update {:submit {:success {:type :event
-                                        :event :settings-save}
-                              :error {:type :event
-                                      :event :settings-error}}
-                     :cancel {:type :event
-                              :event :settings-cancel}}}})
+              :surveyed-species {:type :list
+                                 :list-of :string}
+              :required-fields {:type :list
+                                :list-of :paths
+                                :complete-with :metadata}}
+     :states {:update {:submit {:success {:type :event
+                                          :event :settings-save}
+                                :error {:type :event
+                                        :event :settings-error}}
+                       :cancel {:type :event
+                                :event :settings-cancel}}}}))
 
 (def metadata-structure
   "Layout of all photo metadata fields."

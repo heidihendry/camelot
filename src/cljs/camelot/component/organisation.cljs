@@ -70,13 +70,7 @@
                         (dom/h4 nil "Your Organisation"))
                (dom/div nil
                         (dom/div #js {:className "section-container"}
-                                 (om/build concept-menu-component data)
-                                 (dom/button #js {:className "btn btn-default org-settings"
-                                                  :onClick #(do (cnav/toggle-settings!)
-                                                                (nav/analytics-event "organisation"
-                                                                                     "toggle-settings-click"))}
-                                             (dom/span #js {:className "fa fa-cogs"})
-                                             " Show Settings"))
+                                 (om/build concept-menu-component data))
                         (dom/div #js {:className "section-container"}
                                  (case (:active data)
                                    :survey (om/build survey/survey-menu-component (:survey data))

@@ -9,7 +9,7 @@
 
 (def defined-screens
   #{:camera :survey :survey-site :site :trap-station :trap-station-session
-    :trap-station-session-camera :settings :taxonomy :photo :media :sighting})
+    :trap-station-session-camera :taxonomy :photo :media :sighting})
 
 (facts "Screen smith"
   (fact "Should contain keys for all known screens"
@@ -26,14 +26,6 @@
   (fact "Schemas should have field schema types"
     (let [path [:site :schema :site-sublocation :schema :type]]
       (get-in (sut/all-screens (gen-state-helper {})) path) => :text))
-
-  (fact "Schemas should have layouts"
-    (let [path [:settings :layout]]
-      (type (get-in (sut/all-screens (gen-state-helper {})) path)) => clojure.lang.PersistentVector))
-
-  (fact "Settings schema should have a `:settings' resource type"
-    (let [path [:settings :resource :type]]
-      (get-in (sut/all-screens (gen-state-helper {})) path) => :settings))
 
   (fact "Camera schema should have a `:camera' resource type"
     (let [path [:camera :resource :type]]
