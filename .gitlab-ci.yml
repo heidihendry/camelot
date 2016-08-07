@@ -12,8 +12,6 @@ before_script:
 
 build:
   image: clojure
-  variables:
-    BUILD_NAME: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
   script:
     - script/clean-build.sh
     - lein with-profiles +test midje
@@ -22,9 +20,9 @@ build:
     - script/test-runtime.sh
     - CAMELOT_DATADIR="camelot-testdata" script/test-runtime.sh
     - script/prepare-snapshot.sh
-    - mkdir "${BUILD_NAME}"
-    - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.command "${BUILD_NAME}"
+    - mkdir -p "camelot-${CI_BUILD_REF_NAME}/"
+    - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.command "camelot-${CI_BUILD_REF_NAME}/"
   artifacts:
-    name: "${BUILD_NAME}"
+    name: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"
     paths:
-      - "${BUILD_NAME}/"
+      - "camelot-${CI_BUILD_REF_NAME}/"
