@@ -18,7 +18,7 @@ lein with-profiles -dev,-user,+uberjar uberjar
 
 echo "Packaging release"
 mkdir "${PROJECT_NAME}-${released_version}/"
-mv "target/${PROJECT_NAME}.jar" "${PROJECT_NAME}-${released_version}/"
+mv "target/${PROJECT_NAME}.jar" "${PROJECT_NAME}-${released_version}/${PROJECT_NAME}-${released_version}.jar"
 cp "script/bin/"* "${PROJECT_NAME}-${released_version}/"
 zip -r "${PROJECT_NAME}-${released_version}.zip" "${PROJECT_NAME}-${released_version}"
 
