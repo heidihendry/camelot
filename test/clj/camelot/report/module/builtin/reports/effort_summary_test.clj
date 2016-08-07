@@ -9,11 +9,13 @@
   (state/gen-state (merge {:timezone "Asia/Ho_Chi_Minh"}
                         config)))
 
-(def report
-  (partial sut/report :effort-summary))
+(defn report
+  [state id data]
+  (sut/report :effort-summary state {:survey-id id} data))
 
-(def csv-report
-  (partial sut/csv-report :effort-summary))
+(defn csv-report
+  [state id data]
+  (sut/csv-report :effort-summary state {:survey-id id} data))
 
 (def headings ["Site ID"
                "Site Area"

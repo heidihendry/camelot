@@ -20,11 +20,13 @@
                "Nights Elapsed"
                "Abundance Index"])
 
-(def report
-  (partial sut/report :species-statistics))
+(defn report
+  [state id data]
+  (sut/report :species-statistics state {:taxonomy-id id} data))
 
-(def csv-report
-  (partial sut/csv-report :species-statistics))
+(defn csv-report
+  [state id data]
+  (sut/csv-report :species-statistics state {:taxonomy-id id} data))
 
 (def default-sample
   {:media-capture-timestamp (t/date-time 2015 1 3 10 10 15)

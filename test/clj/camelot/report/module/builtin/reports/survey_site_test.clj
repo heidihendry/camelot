@@ -13,11 +13,13 @@
   [obs nights]
   (format "%.3f" (* 100 (double (/ obs nights)))))
 
-(def report
-  (partial sut/report :survey-site-statistics))
+(defn report
+  [state id data]
+  (sut/report :survey-site-statistics state {:survey-site-id id} data))
 
-(def csv-report
-  (partial sut/csv-report :survey-site-statistics))
+(defn csv-report
+  [state id data]
+  (sut/csv-report :survey-site-statistics state {:survey-site-id id} data))
 
 (def headings ["Genus"
                "Species"
