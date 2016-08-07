@@ -12,7 +12,7 @@ Currently the only application state is the user's configuration."
 (defn nav-menu
   "Main navigation menu structure."
   [state]
-  (if (env :camelot_legacy_features)
+  (if (env :camelot-legacy-features)
     {:menu-items [{:url "/organisation"
                    :label (tr/translate (:config state) :application/organisation)}
                   {:url "/library"
@@ -449,7 +449,7 @@ Currently the only application state is the user's configuration."
                               :error {:type :event
                                       :event :survey-update-error}}}}})
 
-(when (env :camelot_legacy_features)
+(when (env :camelot-legacy-features)
   (defsmith settings smiths
     [state]
     {:resource {:type :settings
