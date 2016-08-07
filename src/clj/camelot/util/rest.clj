@@ -4,7 +4,8 @@
             [camelot.util.cursorise :refer [cursorise decursorise]]
             [camelot.application :as app]
             [clojure.tools.logging :as log]
-            [ring.util.response :as r]))
+            [ring.util.response :as r]
+            [clj-time.coerce :as c]))
 
 (def floating-point-fields
   "Set of keys for floating-point fields."
@@ -24,6 +25,10 @@
              v)))
     v))
 
+(defn- as-date
+  [v]
+  (c/from-long ^java.lang.Long (Long/parseLong v)))
+
 (defn- normalise-field-types
   "Reducer to parse strings for ID fields."
   [acc k v]
@@ -35,6 +40,30 @@
   "Return data with any strings in ID fields parsed."
   [data]
   (reduce-kv normalise-field-types {} data))
+
+(defn coerce-string-fields
+  "Reducer to parse strings for various field types."
+  [data]
+  (reduce-kv
+   (fn [acc k v]
+     (cond
+       (re-find #"-id$" (name k))
+       (assoc acc k (as-long v))
+
+       (re-find #"-date$" (name k))
+       (assoc acc k (as-date v))
+
+       (re-find #"-num$" (name k))
+       (assoc acc k (edn/read-string v))
+
+       (re-find #"-long$" (name k))
+       (assoc acc k (Long/parseLong v))
+
+       (re-find #"-float$" (name k))
+       (assoc acc k (Float/parseFloat v))
+
+       :else (assoc acc k v)))
+   {} data))
 
 (defn- parse-float-reducer
   "Reducer to parse strings for floating-point fields."

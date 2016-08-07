@@ -76,7 +76,7 @@ Both of the `Database` and `Media` directories should be backed up routinely.
 
 #### Custom Reports
 
-Custom reports and column definitions for reports can be registered by creating a *reports module*.     A reports module can also override existing reports and columns.
+Custom reports and column definitions for reports can be registered by creating a *reports module*. A reports module can also override existing reports and columns.
 
 Reports modules are Clojure files (`.clj` extension) and are stored under the subdirectory `/modules/reports` of Camelot's config directory (described above). If the `/modules/reports` subdirectories don't exist, you will need to create them.
 
@@ -142,11 +142,12 @@ Here's an example module to create and register a custom column, and a custom re
   :for :survey})
 ```
 
-Currently reports are available by directly accessing the URL:
+Camelot will treat your field differently when it comes to generating the report, depending on how it the field is named.
 
-`/report/<my-report-name>/<for-id>`  (e.g., for the above example it would be `/report/custom-report/3`, where `3` is the survey ID.)
-
-In the future they will be made available through the UI.
+* Fields ending in "-id" are converted to Java Longs.
+* Fields ending in "-date" are converted to Joda Dates.
+* Fields ending in "-float" are converted to Java Floats.
+* Fields ending in "-num" are converted to a suitable type. Check the `edn/read-string` documentation for details.
 
 For more module examples, check out Camelot's [built-in reports and columns](https://bitbucket.org/cshclm/camelot/src/master/src/clj/camelot/report/module/builtin/?at=master)
 

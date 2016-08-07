@@ -86,7 +86,10 @@
 
 (defn map-to-params
   [m]
-  (clojure.string/join "&" (reduce-kv #(conj %1 (str (name %2) "=" %3)) [] m)))
+  (clojure.string/join "&" (reduce-kv #(do (conj %1 (str (name %2) "="
+                                                         (if (aget %3 "getTime")
+                                                           (.getTime %3)
+                                                           %3)))) [] m)))
 
 (defn create-nav [success-key error-key vs resources key]
   "Create the item in the buffer and view it in readonly mode."

@@ -188,7 +188,7 @@
 
   (context "/report" []
            (GET "/:report/download" {params :params}
-                (report/export (keyword (:report params)) (rest/parse-ids params)))
+                (report/export (keyword (:report params)) (rest/coerce-string-fields params)))
            (GET "/:report" [report] (r/response (report/get-configuration (keyword report))))
            (GET "/" [] (r/response (report/available-reports))))
 
