@@ -258,9 +258,9 @@
                                                                              (.. % -target -value))
                                                                  (nav/analytics-event "library-id" "species-change"))}
                                              (om/build-all species-option-component
-                                                           (conj (vals (:species data))
+                                                           (conj (sort-by :taxonomy-label (vals (:species data)))
                                                                  {:taxonomy-id -1
-                                                                  :taxonomy-species "Select..."})
+                                                                  :taxonomy-label "Select..."})
                                                            {:key :taxonomy-id})))
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Quantity")
