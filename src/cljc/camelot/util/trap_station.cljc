@@ -7,6 +7,3 @@
 
 (def valid-longitude? (partial valid-range? -180.0 180.0))
 (def valid-latitude? (partial valid-range? -90.0 90.0))
-(defn valid-altitude?
-  [d]
-  (or (nil? d) (number? d)))

@@ -269,11 +269,11 @@
 (defn settings-menu-view
   "Render the settings panel"
   []
+  (om/update! (state/app-state-cursor) :events events)
+  (om/update! (state/app-state-cursor) :actions actions)
+  (om/update! (state/app-state-cursor) :generators generators)
   (when (:settings (:screens (state/app-state-cursor)))
     (let [f (smithy/build-view-component :settings)]
-      (om/update! (state/app-state-cursor) :events events)
-      (om/update! (state/app-state-cursor) :actions actions)
-      (om/update! (state/app-state-cursor) :generators generators)
       (om/root f state/app-state
                {:target (js/document.getElementById "settings")}))))
 

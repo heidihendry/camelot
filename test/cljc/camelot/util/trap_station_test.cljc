@@ -46,19 +46,3 @@
     (testing "beyond maximum longitude should return false"
       (is (= (sut/valid-longitude? 180.1) false)))))
 
-(deftest test-altitude
-  (testing "Altitude"
-    (testing "of zero should return true"
-      (is (= (sut/valid-altitude? 0) true)))
-
-    (testing "with small positive value should return true"
-      (is (= (sut/valid-altitude? 50) true)))
-
-    (testing "with large positive value should return true"
-      (is (= (sut/valid-altitude? 1000) true)))
-
-    (testing "with negative value should return true"
-      (is (= (sut/valid-altitude? -100) true)))
-
-    (testing "with large negative value should return true"
-      (is (= (sut/valid-altitude? -1000) true)))))

@@ -60,7 +60,6 @@
             (not (empty? (get-in data [:trap-station-name :value]))))
        (util.ts/valid-latitude? (get-in data [:trap-station-latitude :value]))
        (util.ts/valid-longitude? (get-in data [:trap-station-longitude :value]))
-       (util.ts/valid-altitude? (get-in data [:trap-station-altitude :value]))
        (get-in data [:primary-camera-id :value])
        (not= (get-in data [:secondary-camera-id :value])
              (get-in data [:primary-camera-id :value]))))
