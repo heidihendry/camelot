@@ -5,11 +5,13 @@ set -e
 PROJECT_NAME="camelot"
 PROJECT_FILE="project.clj"
 README_FILE="README.md"
+BATCH_FILE="script/bin/camelot-desktop.bat"
 
 echo "Bumping release version... "
 sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"$/${PROJECT_NAME} \"\1\"/" ${PROJECT_FILE}
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${README_FILE}
+sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).jar/${PROJECT_NAME}-${released_version}.jar/" ${BATCH_FILE}
 git commit -a -m "Version bump: $released_version"
 git tag -sa "v$released_version" -m "Release: $released_version"
 
