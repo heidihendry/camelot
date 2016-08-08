@@ -297,12 +297,14 @@
 
 (s/defn create-session-camera!
   [state data session cam-type]
-  (trap-station-session-camera/create!
-   state
-   (trap-station-session-camera/ttrap-station-session-camera
-    {:trap-station-session-id (:trap-station-session-id session)
-     :trap-station-session-camera-media-unrecoverable false
-     :camera-id (get data (camera-id-key cam-type))})))
+  (let [cam-id (get data (camera-id-key cam-type))]
+    (when (>= cam-id 0)
+      (trap-station-session-camera/create!
+       state
+       (trap-station-session-camera/ttrap-station-session-camera
+        {:trap-station-session-id (:trap-station-session-id session)
+         :trap-station-session-camera-media-unrecoverable false
+         :camera-id (get data (camera-id-key cam-type))})))))
 
 (s/defn create-new-session!
   [state data]
