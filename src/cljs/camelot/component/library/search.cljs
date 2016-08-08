@@ -106,6 +106,7 @@
                        :title "Filter to only items in a certain survey"
                        :value (:survey-id data)
                        :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
+                                    (om/update! data :survey-id (.. % -target -value))
                                     (if (> sid -1)
                                       (do
                                         (util/load-library sid)
