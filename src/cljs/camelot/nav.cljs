@@ -70,3 +70,11 @@
   (om/update! (state/app-state-cursor) :nav-history [])
   (set-token! history token))
 
+(defn nav-up-url
+  [token levels]
+  {:pre [(and (string? token) (number? levels))]}
+  (reduce #(str/replace % #"(https?://.*)/.+?$" "$1") token (range levels)))
+
+(defn nav-up!
+  ([] (nav-up! 1))
+  ([levels] (nav! (nav-up-url (get-token) levels))))

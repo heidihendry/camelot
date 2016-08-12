@@ -126,7 +126,8 @@
       (om/update! app :create-survey {:species-search {}
                                       :species #{}
                                       :sighting-independence-threshold 20
-                                      :survey-name nil}))
+                                      :survey-name nil
+                                      :survey-notes nil}))
     om/IRender
     (render [_]
       (if-let [data (get app :create-survey)]

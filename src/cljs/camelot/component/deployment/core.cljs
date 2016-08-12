@@ -15,6 +15,8 @@
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
+
+(def help-text "Record a camera check each time you visit a camera trap in the field.")
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 
 (defn action-item-component
@@ -163,6 +165,7 @@
         (om/update! data :validation-problem {:value false})
         (if-let [sess-end (get-in data [:trap-station-session-end-date :value])]
           (dom/div #js {:className "section"}
+                   (dom/div #js {:className "help-text"} help-text)
                    (dom/div nil
                             (dom/label #js {:className "field-label"} "Camera Check Date")
                             (dom/div #js {:className "field-details"}
@@ -262,8 +265,7 @@
                         (case (:active data)
                           :details (om/build deployment-selected-details-component data)
                           :check (om/build record-camera-check-component (:data data))
-                          nil)
-                        )))))
+                          nil))))))
 
 (defn create-view-component
   [app owner]
@@ -279,17 +281,24 @@
     om/IWillMount
     (will-mount [_]
       (rest/get-x (str "/deployment/" (:page-id app))
-                  #(om/update! app :page-state {:data (:body %)
-                                                :menu [{:action :details
-                                                        :name "Details"
+                  #(om/update! app :page-state {:data (merge (:body %)
+                                                             {:validation-problem {:value false}
+                                                              :trap-station-session-end-date {:value (UtcDateTime.)}})
+                                                :menu [{:action :check
+                                                        :name "Record Camera Check"
                                                         :active true}
-                                                       {:action :check
-                                                        :name "Record Camera Check"}]
-                                                :active :details})))
+                                                       {:action :details
+                                                        :name "Details"}]
+                                                :active :check})))
     om/IRender
     (render [_]
       (when (:page-state app)
         (dom/div #js {:className "split-menu"}
+                 (dom/div #js {:className "back-button-container"}
+                          (dom/button #js {:className "btn btn-default back"
+                                           :onClick #(nav/nav-up! 2)}
+                                      (dom/span #js {:className "fa fa-mail-reply"})
+                                      " Back"))
                  (dom/div #js {:className "intro"}
                           (dom/h4 nil (get-in app [:page-state :data :trap-station-name :value])))
                  (dom/div nil
@@ -335,7 +344,11 @@
                  (dom/div #js {:className "simple-menu"}
                           (if (empty? (:trap-stations data))
                             (om/build util/blank-slate-component {}
-                                      {:opts {:item-name "camera traps"}})
+                                      {:opts {:item-name "camera traps"
+                                              :advice
+                                              (dom/div nil
+                                                       (dom/p nil "These are locations where cameras are deployed in the field.")
+                                                       (dom/p nil "You can set some up using the button below."))}})
                             (dom/div nil
                                      (om/build shared/deployment-sort-menu data)
                                      (om/build-all deployment-list-component

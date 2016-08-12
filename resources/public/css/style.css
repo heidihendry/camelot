@@ -1319,7 +1319,6 @@ pre.field-input {
 }
 #app .blank-slate {
     padding-top: 6rem;
-    line-height: 5rem;
     color: #999;
     text-align: center;
 }
@@ -1327,5 +1326,11 @@ pre.field-input {
     font-size: 180%;
 }
 #app .blank-slate .advice {
+    padding-top: 2rem;
     font-size: 120%;
+}
+#app .back-button-container button {
+    margin-top: 2rem;
+    margin-left: 2rem;
+    float: left;
 }
