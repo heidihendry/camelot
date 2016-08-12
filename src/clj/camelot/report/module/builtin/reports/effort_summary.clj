@@ -4,6 +4,7 @@
 (defn report-output
   [state {:keys [survey-id]}]
   {:columns [:site-id
+             :site-name
              :site-area
              :trap-station-count
              :nights-elapsed
