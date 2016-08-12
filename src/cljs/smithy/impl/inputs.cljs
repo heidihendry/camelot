@@ -120,12 +120,13 @@
                            (name val)
                            val)}
                     (om/build-all select-option-component
-                                  (if generator
-                                    (get-in opts [:generator-data generator])
-                                    (map #(hash-map :vkey (list-react-key (first %))
-                                                    :desc (second %))
-                                         (or (get-in opts [:generator-data :default])
-                                             (get-in v [:schema :options]))))
+                                  (sort-by :desc
+                                           (if generator
+                                             (get-in opts [:generator-data generator])
+                                             (map #(hash-map :vkey (list-react-key (first %))
+                                                             :desc (second %))
+                                                  (or (get-in opts [:generator-data :default])
+                                                      (get-in v [:schema :options])))))
                                   {:key :vkey}))))))
 
 (defmethod input-field :list
