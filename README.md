@@ -4,7 +4,7 @@ Camelot is software for Camera Trap data management and analysis.
 
 ## Getting Started
 
-Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.5.4.zip).
+Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.5.5.zip).
 
 Run camelot with:
 
