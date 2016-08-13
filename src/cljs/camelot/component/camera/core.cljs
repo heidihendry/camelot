@@ -63,6 +63,7 @@
     om/IWillMount
     (will-mount [_]
       (om/update! data :data nil)
+      (om/update! data :list nil)
       (rest/get-x (str "/cameras/" camera-id)
                   #(do (om/update! data :data (:body %))
                        (rest/get-x "/cameras/"
@@ -72,7 +73,7 @@
                                        (om/update! data :list others)))))))
     om/IRender
     (render [_]
-      (when (:data data)
+      (when-not (nil? (:list data))
         (om/build manage/manage-component data)))))
 
 (defn camera-menu-component
@@ -86,14 +87,23 @@
     (render [_]
       (when (:list data)
         (dom/div #js {:className "section"}
+                 (dom/div nil
+                          (dom/input #js {:className "field-input"
+                                          :value (:filter data)
+                                          :placeholder "Filter cameras..."
+                                          :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu"}
-                          (if (empty? (:list data))
-                            (om/build util/blank-slate-component {}
-                                      {:opts {:item-name "cameras"
-                                              :advice "You can add cameras using the input field below"}})
-                            (om/build-all camera-list-component
-                                          (sort-by :camera-name (:list data))
-                                          {:key :camera-id})))
+                          (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
+                                                    true
+                                                    (re-matches (re-pattern (str "(?i).*" (:filter data) ".*"))
+                                                                (:camera-name %)))
+                                                 (sort-by :camera-name (:list data)))]
+                            (if (empty? filtered)
+                              (om/build util/blank-slate-component {}
+                                        {:opts {:item-name "cameras"
+                                                :advice "You can add cameras using the input field below"}})
+                              (om/build-all camera-list-component filtered
+                                            {:key :camera-id}))))
                  (dom/div #js {:className "sep"})
                  (om/build add-camera-component data)
                  (dom/button #js {:className "btn btn-default"
