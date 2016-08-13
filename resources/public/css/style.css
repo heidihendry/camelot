@@ -1045,6 +1045,7 @@ pre.field-input {
 }
 
 #app .split-menu {
+    overflow: auto;
 }
 #app .split-menu h4 {
     text-align: center;
