@@ -29,11 +29,6 @@
      camera-status-is-terminated :- s/Bool
      camera-status-description :- s/Str])
 
-(s/defn default-camera-status :- (s/maybe CameraStatus)
-  []
-  (get-specific-with-description (app/gen-state (config/config))
-                                 camera-available))
-
 (s/defn camera-status :- CameraStatus
   [{:keys [camera-status-id camera-status-is-deployed
            camera-status-is-terminated camera-status-description]}]
@@ -68,3 +63,9 @@
   (->> (get-all-raw state)
        (filter #(= desc (:camera-status-description %)))
        (first)))
+
+(s/defn default-camera-status :- (s/maybe CameraStatus)
+  "Return the camera status which should be assigned to new cameras."
+  []
+  (get-specific-with-description (app/gen-state (config/config))
+                                 camera-available))

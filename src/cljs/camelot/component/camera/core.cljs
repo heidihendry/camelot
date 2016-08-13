@@ -47,7 +47,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed"}
+      (dom/div #js {:className "menu-item detailed dynamic"}
                (dom/span #js {:className "menu-item-title"}
                          (:camera-name data))
                (dom/span #js {:className "menu-item-description"}

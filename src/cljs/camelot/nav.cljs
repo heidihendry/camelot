@@ -73,8 +73,9 @@
 (defn nav-up-url
   [token levels]
   {:pre [(and (string? token) (number? levels))]}
-  (reduce #(str/replace % #"(https?://.*)/.+?$" "$1") token (range levels)))
+  (reduce #(str/replace % #"(.*)/.+?$" "$1") token (range levels)))
 
 (defn nav-up!
+  "Navigate up 1 or more levels."
   ([] (nav-up! 1))
   ([levels] (nav! (nav-up-url (get-token) levels))))
