@@ -1,4 +1,4 @@
-(ns camelot.component.camera.manage
+(ns camelot.component.site.manage
   (:require [om.core :as om]
             [camelot.rest :as rest]
             [om.dom :as dom]
@@ -36,14 +36,17 @@
 
 (defn form-layout
   [data]
-  [["Camera name" :camera-name :text-input {:required true
-                                            :validator (fn [] (let [v (get-in data [:data :camera-name :value])]
+  [["Site name" :site-name :text-input {:required true
+                                            :validator (fn [] (let [v (get-in data [:data :site-name :value])]
                                                                 (not (or (nil? v) (= "" v)
-                                                                         (some #(= v %) (map :camera-name (:list data)))))))
-                                            :warning "Must not be blank or have the same name as another camera."}]
-   ["Camera make" :camera-make :text-input {}]
-   ["Camera model" :camera-model :text-input {}]
-   ["Camera notes" :camera-notes :textarea {}]])
+                                                                         (some #(= v %) (map :site-name (:list data)))))))
+                                        :warning "Must not be blank or have the same name as another site."}]
+   ["Sublocation" :site-sublocation :text-input {}]
+   ["Nearest city" :site-city :text-input {}]
+   ["State/Province" :site-state-province :text-input {}]
+   ["Country" :site-country :text-input {}]
+   ["Area covered (km^2)" :site-area :text-input {}]
+   ["Additional notes" :site-notes :textarea {}]])
 
 (defn update-success-handler
   [data]
@@ -51,11 +54,11 @@
 
 (defn update-handler
   [data]
-  (nav/analytics-event "camera-update" "submit")
-  (rest/put-x (str "/cameras/" (get-in data [:camera-id :value])),
-              {:data (select-keys (deref data) [:camera-name :camera-make
-                                                :camera-model :camera-notes
-                                                :camera-status-id])}
+  (nav/analytics-event "site-update" "submit")
+  (rest/put-x (str "/sites/" (get-in data [:site-id :value])),
+              {:data (select-keys (deref data) [:site-name :site-sublocation :site-city
+                                                :site-state-province :site-country
+                                                :site-area :site-notes])}
               update-success-handler))
 
 (defn submit-button
@@ -94,9 +97,9 @@
     (render [_]
       (dom/div #js {:className "split-menu"}
                (dom/div #js {:className "intro"}
-                        (dom/h4 nil (let [v (get-in data [:data :camera-name :value])]
+                        (dom/h4 nil (let [v (get-in data [:data :site-name :value])]
                                       (if (or (nil? v) (= v ""))
-                                        "Update Camera"
+                                        "Update Site"
                                         v))))
                (dom/div #js {:className "single-section"}
                         (om/build form-component data))))))

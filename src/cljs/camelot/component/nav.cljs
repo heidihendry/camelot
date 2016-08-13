@@ -8,9 +8,11 @@
   []
   (let [elt (js/document.getElementById "settings")
         navelt (js/document.getElementById "settings-nav")]
-    (set! (.-className elt) "")
-    (set! (.-className navelt) (clojure.string/replace-first
-                                (.-className navelt) #"active" ""))))
+    (when elt
+      (set! (.-className elt) ""))
+    (when navelt
+      (set! (.-className navelt) (clojure.string/replace-first
+                                  (.-className navelt) #"active" "")))))
 
 (defn settings-show!
   "Show the settings panel"

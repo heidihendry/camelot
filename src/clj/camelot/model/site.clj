@@ -37,7 +37,7 @@
   [{:keys [site-id site-created site-updated site-name site-sublocation
            site-city site-state-province site-country site-area site-notes]}]
   (->Site site-id site-created site-updated site-name site-sublocation
-           site-city site-state-province site-country site-area site-notes))
+          site-city site-state-province site-country site-area site-notes))
 
 (s/defn get-all :- [Site]
   [state :- State]

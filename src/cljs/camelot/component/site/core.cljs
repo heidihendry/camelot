@@ -3,18 +3,78 @@
             [camelot.nav :as nav]
             [camelot.component.util :as util]
             [om.dom :as dom]
-            [camelot.rest :as rest]))
+            [camelot.rest :as rest]
+            [camelot.component.site.manage :as manage]
+            [camelot.util.cursorise :as cursorise]))
+
+(defn add-success-handler
+  [data resp]
+  (prn resp)
+  (om/transact! data :list #(conj % (cursorise/decursorise (:body resp))))
+  (om/update! data :new-site-name nil))
+
+(defn add-site-handler
+  [data]
+  (rest/post-x "/sites"
+               {:data {:site-name (:new-site-name data)}}
+               (partial add-success-handler data))
+  (nav/analytics-event "org-site" "create-click"))
+
+(defn validate-proposed-site
+  [data]
+  (not (some #(= (:new-site-name data) %)
+             (map :site-name (:list data)))))
+
+(defn add-site-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [is-valid (validate-proposed-site data)]
+        (dom/form #js {:className "field-input-form"}
+                  (dom/input #js {:type "submit"
+                                  :disabled (if is-valid "" "disabled")
+                                  :title (when-not is-valid
+                                           "A site with this name already exists")
+                                  :className "btn btn-primary input-field-submit"
+                                  :onClick #(add-site-handler data)
+                                  :value "Add"})
+                  (dom/input #js {:className "field-input"
+                                  :placeholder "New site name..."
+                                  :value (get-in data [:new-site-name])
+                                  :onChange #(om/update! data :new-site-name
+                                                         (.. % -target -value))}))))))
 
 (defn site-list-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed"}
+      (dom/div #js {:className "menu-item detailed dynamic"
+                    :onClick #(nav/nav! (str "/site/" (:site-id data)))}
                (dom/span #js {:className "menu-item-title"}
                          (:site-name data))
                (dom/span #js {:className "menu-item-description"}
                          (:site-notes data))))))
+
+(defn manage-view
+  [data owner {:keys [site-id]}]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data :data nil)
+      (om/update! data :list nil)
+      (rest/get-x (str "/sites/" site-id)
+                  #(do (om/update! data :data (:body %))
+                       (rest/get-x "/sites/"
+                                   (fn [x]
+                                     (let [others (filter (fn [v] (not= (get-in (:body %) [:site-name :value])
+                                                                        (:site-name v))) (:body x))]
+                                       (om/update! data :list others)))))))
+    om/IRender
+    (render [_]
+      (when-not (nil? (:list data))
+        (om/build manage/manage-component data)))))
 
 (defn site-menu-component
   [data owner]
@@ -27,22 +87,30 @@
     (render [_]
       (when (:list data)
         (dom/div #js {:className "section"}
+                 (dom/div nil
+                          (dom/input #js {:className "field-input"
+                                          :value (:filter data)
+                                          :placeholder "Filter sites..."
+                                          :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu"}
-                          (if (empty? (:list data))
-                            (om/build util/blank-slate-beta-component {}
-                                      {:opts {:item-name "sites"}})
-                            (om/build-all site-list-component
-                                          (sort-by :site-id (:list data))
-                                          {:key :site-id})))
+                          (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
+                                                    true
+                                                    (re-matches (re-pattern (str "(?i).*" (:filter data) ".*"))
+                                                                (str (:site-name %) " "
+                                                                     (:site-city %) " "
+                                                                     (:site-sublocation %) " "
+                                                                     (:site-state-province %) " "
+                                                                     (:site-country %) " "
+                                                                     (:site-notes %))))
+                                                 (sort-by :site-name (:list data)))]
+                            (if (empty? filtered)
+                              (om/build util/blank-slate-component {}
+                                        {:opts {:item-name "sites"
+                                                :advice "You can add sites using the input field below"}})
+                              (om/build-all site-list-component filtered
+                                            {:key :site-id}))))
                  (dom/div #js {:className "sep"})
-                 (dom/button #js {:className "btn btn-primary"
-                                  :onClick #(do
-                                              (nav/nav! "/site/create")
-                                              (nav/analytics-event "org-site" "create-click"))
-                                  :disabled "disabled"
-                                  :title "Not implemented"}
-                             (dom/span #js {:className "fa fa-plus"})
-                             " Add Site")
+                 (om/build add-site-component data)
                  (dom/button #js {:className "btn btn-default"
                                   :onClick #(do (nav/nav! "/sites")
                                                 (nav/analytics-event "org-site" "advanced-click"))}
