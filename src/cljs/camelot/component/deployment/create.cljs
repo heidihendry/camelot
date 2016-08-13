@@ -193,6 +193,8 @@
             (not (empty? (get-in data [:trap-station-name :value]))))
        (util.ts/valid-latitude? (get-in data [:trap-station-latitude :value]))
        (util.ts/valid-longitude? (get-in data [:trap-station-longitude :value]))
+       (<= (.getTime (or (get-in data [:trap-station-session-start-date :value]) (UtcDateTime.)))
+           (.getTime (UtcDateTime.)))
        (get-in data [:primary-camera-id :value])
        (not= (get-in data [:secondary-camera-id :value])
              (get-in data [:primary-camera-id :value]))))
@@ -215,6 +217,9 @@
                         (dom/label #js {:className "field-label required"} "Start Date")
                         (dom/div #js {:className "field-details"}
                                  (om/build datepicker (get-in data [:data :trap-station-session-start-date]))))
+               (when (> (.getTime (or (get-in data [:data :trap-station-session-start-date :value]) (UtcDateTime.)))
+                        (.getTime (UtcDateTime.)))
+                 (dom/label #js {:className "validation-warning"} "Date cannot be in the future."))
                (dom/label #js {:className "field-label required"} "Latitude")
                (dom/input #js {:className "field-input"
                                :type "number"
