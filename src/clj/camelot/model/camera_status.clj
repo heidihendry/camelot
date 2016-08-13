@@ -11,11 +11,19 @@
 
 (def camera-available "camera-status/available")
 
+(defn translate-status
+  "Translate a camera status to something readable."
+  ([status]
+   (tr/translate (app/gen-state (config/config))
+                 (keyword status)))
+  ([state status]
+   (tr/translate (:config state) (keyword status))))
+
 (defn- translate-statuses
   "Translate the description of camera statuses."
   [state statuses]
-  (map #(assoc % :camera-status-description
-               (tr/translate (:config state) (keyword (:camera-status-description %))))
+  (map #(update % :camera-status-description
+                (partial translate-status state))
        statuses))
 
 (s/defrecord TCameraStatus

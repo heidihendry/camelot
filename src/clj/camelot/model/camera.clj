@@ -24,13 +24,16 @@
      camera-make :- (s/maybe s/Str)
      camera-model :- (s/maybe s/Str)
      camera-notes :- (s/maybe s/Str)
-     camera-status-id :- s/Num])
+     camera-status-id :- s/Num
+     camera-status-description :- s/Str])
 
 (s/defn camera :- Camera
   [{:keys [camera-id camera-created camera-updated camera-name
-           camera-make camera-model camera-notes camera-status-id]}]
+           camera-make camera-model camera-notes camera-status-id
+           camera-status-description]}]
   (->Camera camera-id camera-created camera-updated camera-name
-            camera-make camera-model camera-notes camera-status-id))
+            camera-make camera-model camera-notes camera-status-id
+            (camera-status/translate-status camera-status-description)))
 
 (s/defn tcamera :- TCamera
   [{:keys [camera-name camera-make camera-model camera-notes

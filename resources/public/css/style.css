@@ -1231,6 +1231,10 @@ pre.field-input {
 #app .menu-item label {
     margin: 0;
 }
+#app .menu-item .status {
+    color: #666;
+    font-size: 90%;
+}
 #app .split-menu .section .sep {
     padding-bottom: 2rem;
     margin-bottom: 2rem;

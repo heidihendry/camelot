@@ -52,6 +52,8 @@
     (render [_]
       (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(nav/nav! (str "/camera/" (:camera-id data)))}
+               (dom/span #js {:className "status pull-right"}
+                         (:camera-status-description data))
                (dom/span #js {:className "menu-item-title"}
                          (:camera-name data))
                (dom/span #js {:className "menu-item-description"}
