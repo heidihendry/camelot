@@ -1193,6 +1193,9 @@ pre.field-input {
     flex-shrink: 0;
     overflow: auto;
 }
+#app .simple-menu.scroll {
+    height: calc(100% - 20rem);
+}
 #app .simple-menu .menu-item:first-child {
     border-top: 1px solid #eee;
     border-top-left-radius: 1rem;

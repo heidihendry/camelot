@@ -104,7 +104,7 @@
                                           :value (:filter data)
                                           :placeholder "Filter sites..."
                                           :onChange #(om/update! data :filter (.. % -target -value))}))
-                 (dom/div #js {:className "simple-menu"}
+                 (dom/div #js {:className "simple-menu scroll"}
                           (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
                                                     true
                                                     (re-matches (re-pattern (str "(?i).*" (:filter data) ".*"))

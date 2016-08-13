@@ -35,7 +35,7 @@
     (render [_]
       (when (:list data)
         (dom/div #js {:className "section"}
-                 (dom/div #js {:className "simple-menu"}
+                 (dom/div #js {:className "simple-menu scroll"}
                           (if (empty? (:list data))
                             (om/build util/blank-slate-beta-component {}
                                       {:opts {:item-name "species"}})
