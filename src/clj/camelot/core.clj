@@ -14,9 +14,32 @@
             [ring.middleware.gzip :refer [wrap-gzip]]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [clojure.java.shell :refer [sh]])
-  (:import [java.net URI]
-           [java.awt Desktop])
+  (:import [java.net URI NetworkInterface InetAddress]
+           [java.awt Desktop]
+           [java.util Enumeration])
   (:gen-class))
+
+(defn meaningful-address
+  [n]
+  (let [as (.getInetAddresses ^NetworkInterface n)
+        check (atom nil)]
+    (while (and (nil? @check) (.hasMoreElements ^Enumeration as))
+      (let [a (.nextElement ^Enumeration as)]
+        (when (and (not (.isLinkLocalAddress ^InetAddress a))
+                   (= (type a) java.net.Inet4Address))
+          (reset! check a))))
+    @check))
+
+(defn get-network-addresses
+  []
+  (let [ns (NetworkInterface/getNetworkInterfaces)
+        check (atom [])]
+    (while (.hasMoreElements ^Enumeration ns)
+      (let [e (.nextElement ^Enumeration ns)
+            r (meaningful-address e)]
+        (when r
+          (swap! check #(conj % r)))))
+    (map #(.getHostAddress ^InetAddress %) @check)))
 
 (defn- start-browser
   [port]
@@ -43,7 +66,13 @@
 (defn -main [& args]
   (let [port (Integer. (or (env :camelot-port) 8080))]
     (migrate)
-    (println (format "Server started.  Please open http://localhost:%d/ in a browser" port))
+    (println (format "Camelot started on port %d.\n" port))
+    (println "You might be able to connect to it from the following addresses:")
+    (->> (get-network-addresses)
+         (mapcat #(InetAddress/getAllByName %))
+         (map #(.getCanonicalHostName ^InetAddress %))
+         (map #(println (format "  - http://%s:%d/" % port)))
+         (doall))
     (when (some #(= "--browser" %) args)
       (start-browser port))
     (run-jetty http-handler {:port port :join? false})))
