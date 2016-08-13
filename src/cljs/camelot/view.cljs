@@ -19,7 +19,8 @@
             [camelot.component.error :as cerr]
             [camelot.component.library.core :as library]
             [secretary.core :as secretary :refer-macros [defroute]]
-            [camelot.component.report.core :as report]))
+            [camelot.component.report.core :as report]
+            [camelot.component.camera.core :as camera]))
 
 (defn load-resource-children
   "Update the state of the children defined for the selected resource type."
@@ -255,7 +256,7 @@
 
 (defn generate-view
   "Render the main page content"
-  [view & [{:keys [survey-id page-id report-key]}]]
+  [view & [{:keys [survey-id page-id report-key camera-id]}]]
   (if survey-id
     (rest/get-x (str "/surveys/" survey-id)
                 #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
@@ -264,7 +265,8 @@
                               {:target (js/document.getElementById "page-content")})))
     (om/root view state/app-state
              {:target (js/document.getElementById "page-content")
-              :opts {:report-key report-key}})))
+              :opts {:report-key report-key
+                     :camera-id camera-id}})))
 
 (defn settings-menu-view
   "Render the settings panel"
@@ -316,6 +318,8 @@
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
+(defroute "/camera/:camera-id" [camera-id]
+  (generate-view camera/manage-view {:camera-id camera-id}))
 (defroute "/report/:report-key" [report-key]
   (generate-view report/configure-report-view {:report-key report-key}))
 (defroute "/:survey/deployments/create" [survey]

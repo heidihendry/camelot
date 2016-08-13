@@ -88,21 +88,26 @@
     (will-mount [_]
       (rest/get-resource "/surveys"
                          #(do (om/update! app :survey {:list (:body %)})
-                              (om/update! app :menu [{:concept :survey
-                                                      :name "Surveys"
-                                                      :active true}
-                                                     {:concept :species
-                                                      :name "Species"}
-                                                     {:concept :site
-                                                      :name "Sites"}
-                                                     {:concept :camera
-                                                      :name "Cameras"}
-                                                     {:concept :report
-                                                      :name "Reports"}])
-                              (om/update! app :active :survey)
-                              (om/update! app :species {})
-                              (om/update! app :camera {})
-                              (om/update! app :site {})
+                              (when-not (:menu app)
+                                (om/update! app :menu [{:concept :survey
+                                                        :name "Surveys"
+                                                        :active true}
+                                                       {:concept :species
+                                                        :name "Species"}
+                                                       {:concept :site
+                                                        :name "Sites"}
+                                                       {:concept :camera
+                                                        :name "Cameras"}
+                                                       {:concept :report
+                                                        :name "Reports"}]))
+                              (when-not (:active app)
+                                (om/update! app :active :survey))
+                              (when-not (:species app)
+                                (om/update! app :species {}))
+                              (when-not (:camera app)
+                                (om/update! app :camera {}))
+                              (when-not (:site app)
+                                (om/update! app :site {}))
                               (om/update! app :report {}))))
     om/IRender
     (render [_]

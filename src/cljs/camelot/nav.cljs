@@ -73,7 +73,10 @@
 (defn nav-up-url
   [token levels]
   {:pre [(and (string? token) (number? levels))]}
-  (reduce #(str/replace % #"(.*)/.+?$" "$1") token (range levels)))
+  (let [url (reduce #(str/replace % #"(.*)/.+?$" "$1") token (range levels))]
+    (if (or (= url "/#") (= url ""))
+      "/#/organisation"
+      url)))
 
 (defn nav-up!
   "Navigate up 1 or more levels."

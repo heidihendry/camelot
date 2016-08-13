@@ -3,11 +3,14 @@
             [camelot.nav :as nav]
             [om.dom :as dom]
             [camelot.rest :as rest]
-            [camelot.component.util :as util]))
+            [camelot.component.util :as util]
+            [camelot.component.camera.manage :as manage]
+            [camelot.util.cursorise :as cursorise]))
 
 (defn add-success-handler
-  [data]
-  (om/transact! data :list #(conj % {:camera-name (:new-camera-name data)}))
+  [data resp]
+  (prn resp)
+  (om/transact! data :list #(conj % (cursorise/decursorise (:body resp))))
   (om/update! data :new-camera-name nil))
 
 (defn add-camera-handler
@@ -47,11 +50,25 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed dynamic"}
+      (dom/div #js {:className "menu-item detailed dynamic"
+                    :onClick #(nav/nav! (str "/camera/" (:camera-id data)))}
                (dom/span #js {:className "menu-item-title"}
                          (:camera-name data))
                (dom/span #js {:className "menu-item-description"}
                          (:camera-notes data))))))
+
+(defn manage-view
+  [data owner {:keys [camera-id]}]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data :data nil)
+      (rest/get-x (str "/cameras/" camera-id)
+                #(om/update! data :data (:body %))))
+    om/IRender
+    (render [_]
+      (when (:data data)
+        (om/build manage/manage-component (:data data))))))
 
 (defn camera-menu-component
   [data owner]
@@ -66,8 +83,9 @@
         (dom/div #js {:className "section"}
                  (dom/div #js {:className "simple-menu"}
                           (if (empty? (:list data))
-                            (om/build util/blank-slate-beta-component {}
-                                      {:opts {:item-name "cameras"}})
+                            (om/build util/blank-slate-component {}
+                                      {:opts {:item-name "cameras"
+                                              :advice "You can add cameras using the input field below"}})
                             (om/build-all camera-list-component
                                           (sort-by :camera-name (:list data))
                                           {:key :camera-id})))
