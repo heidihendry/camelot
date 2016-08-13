@@ -52,9 +52,6 @@
 (defn update-handler
   [data]
   (nav/analytics-event "camera-update" "submit")
-  (prn (select-keys data [:camera-id :camera-name :camera-make
-                          :camera-model :camera-notes
-                          :camera-status-id]))
   (rest/put-x (str "/cameras/" (get-in data [:camera-id :value])),
               {:data (select-keys (deref data) [:camera-name :camera-make
                                                 :camera-model :camera-notes
@@ -66,7 +63,6 @@
   (reify
     om/IRender
     (render [_]
-      (prn data)
       (dom/button #js {:className "btn btn-primary"
                        :disabled (if (:validation-failure data)
                                    "disabled" "")
