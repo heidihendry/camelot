@@ -189,10 +189,14 @@ a:hover {
     content: " *";
 }
 #app select.field-input {
-  padding: 0.5rem;
-  font-size: 90%;
-  min-width: 30rem;
-  margin-bottom: 1rem;
+    min-height: 3rem;
+    padding-left: 0.5rem;
+    font-size: 90%;
+    min-width: 30rem;
+    margin-bottom: 1rem;
+}
+#app select.field-input option {
+    padding-left: 1rem;
 }
 #app select:disabled {
     background: #ebebe4;
@@ -203,6 +207,7 @@ a:hover {
 }
 #app input.field-input, textarea.field-input, pre.field-input {
   width: 30rem;
+  min-height: 3rem;
   padding: 0.5rem;
   margin: 0;
   color: #666;
@@ -1098,6 +1103,7 @@ pre.field-input {
     width: 70%;
     margin: auto;
     flex-grow: 1;
+    flex-shrink: 0;
     height: calc(100vh - 22rem);
 }
 #app .split-menu .single-section {
@@ -1105,6 +1111,7 @@ pre.field-input {
     flex-direction: column;
     margin: auto;
     flex-grow: 1;
+    flex-shrink: 0;
     height: calc(100vh - 16rem);
     max-width: 50rem;
 }
@@ -1183,6 +1190,7 @@ pre.field-input {
 #app .simple-menu {
     margin: 0;
     flex-grow: 1;
+    flex-shrink: 0;
     overflow: auto;
 }
 #app .simple-menu .menu-item:first-child {

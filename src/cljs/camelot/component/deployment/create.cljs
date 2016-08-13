@@ -6,7 +6,8 @@
             [camelot.rest :as rest]
             [camelot.nav :as nav]
             [camelot.util.trap-station :as util.ts]
-            [camelot.state :as state])
+            [camelot.state :as state]
+            [camelot.util.cursorise :as cursorise])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -39,19 +40,82 @@
     (render [_]
       (dom/option #js {:value (:site-id data)} (:site-name data)))))
 
+(defn site-change-handler
+  [data event]
+  (let [v (.. event -target -value)]
+    (if (= v "create")
+      (om/update! data :site-create-mode true)
+      (om/update! (get-in data [:data :site-id])
+                  :value (.. event -target -value)))))
+
+(defn add-success-handler
+  [data resp]
+  (let [site (cursorise/decursorise (:body resp))]
+    (om/transact! data :sites #(conj % site))
+    (om/update! data :new-site-name nil)
+    (prn "site id data")
+    (prn (get-in data [:data :site-id]))
+    (prn "assigning to")
+    (prn (:site-id site))
+    (om/update! (get-in data [:data :site-id]) :value (:site-id site))
+    (om/update! data :site-create-mode false)))
+
+(defn add-site-handler
+  [data]
+  (rest/post-x "/sites"
+               {:data {:site-name (:new-site-name data)}}
+               (partial add-success-handler data))
+  (nav/analytics-event "org-site" "create-click"))
+
+(defn validate-proposed-site
+  [data]
+  (not (some #(= (:new-site-name data) %)
+             (map :site-name (:sites data)))))
+
+(defn add-site-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [is-valid (validate-proposed-site data)]
+        (dom/form #js {:className "field-input-form"}
+                  (if (empty? (:new-site-name data))
+                    (dom/input #js {:type "submit"
+                                    :className "btn btn-default input-field-submit"
+                                    :onClick #(om/update! data :site-create-mode false)
+                                    :value "Cancel"})
+                    (dom/input #js {:type "submit"
+                                    :disabled (if is-valid "" "disabled")
+                                    :title (when-not is-valid
+                                             "A site with this name already exists")
+                                    :className "btn btn-primary input-field-submit"
+                                    :onClick #(add-site-handler data)
+                                    :value "Add"}))
+                  (dom/input #js {:className "field-input"
+                                  :placeholder "New site name..."
+                                  :value (get-in data [:new-site-name])
+                                  :onChange #(om/update! data :new-site-name
+                                                         (.. % -target -value))}))))))
+
 (defn site-select-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/select #js {:className "field-input"
-                       :onChange #(om/update! (get-in data [:data :site-id])
-                                              :value (.. % -target -value))}
-                  (om/build-all site-select-option-component
-                                (cons {:site-id -1
-                                       :site-name ""}
-                                      (into '() (:sites data)))
-                                {:key :site-id})))))
+      (if (or (empty? (:sites data)) (:site-create-mode data))
+        (om/build add-site-component data)
+        (dom/select #js {:className "field-input"
+                         :value (get-in data [:data :site-id :value])
+                         :onChange (partial site-change-handler data)}
+                    (om/build-all site-select-option-component
+                                  (cons {:site-id -1
+                                         :site-name ""}
+                                        (reverse (conj (into '()
+                                                             (sort-by :site-name
+                                                                      (:sites data)))
+                                                       {:site-id "create"
+                                                        :site-name "Create a new site..."})))
+                                  {:key :site-id}))))))
 
 (defn validate-form
   [data]
