@@ -3,9 +3,13 @@
             [camelot.model.state :refer [State]]
             [schema.core :as s]
             [camelot.db :as db]
-            [camelot.translation.core :as tr]))
+            [camelot.translation.core :as tr]
+            [camelot.application :as app]
+            [camelot.util.config :as config]))
 
 (sql/defqueries "sql/camera-status.sql" {:connection db/spec})
+
+(def camera-available "camera-status/available")
 
 (defn- translate-statuses
   "Translate the description of camera statuses."
@@ -24,6 +28,11 @@
      camera-status-is-deployed :- s/Bool
      camera-status-is-terminated :- s/Bool
      camera-status-description :- s/Str])
+
+(s/defn default-camera-status :- (s/maybe CameraStatus)
+  []
+  (get-specific-with-description (app/gen-state (config/config))
+                                 camera-available))
 
 (s/defn camera-status :- CameraStatus
   [{:keys [camera-status-id camera-status-is-deployed

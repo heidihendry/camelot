@@ -2,7 +2,10 @@
   (:require [schema.core :as s]
             [camelot.db :as db]
             [camelot.model.state :refer [State]]
-            [yesql.core :as sql]))
+            [yesql.core :as sql]
+            [camelot.model.camera-status :as camera-status]
+            [camelot.application :as app]
+            [camelot.util.config :as config]))
 
 (sql/defqueries "sql/cameras.sql" {:connection db/spec})
 
@@ -33,7 +36,8 @@
   [{:keys [camera-name camera-make camera-model camera-notes
            camera-status-id]}]
   (->TCamera camera-name camera-make camera-model camera-notes
-                  camera-status-id))
+             (or camera-status-id (:camera-status-id
+                                   (camera-status/default-camera-status)))))
 
 (s/defn get-all :- [Camera]
   [state :- State]

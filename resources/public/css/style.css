@@ -1334,3 +1334,19 @@ pre.field-input {
     margin-left: 2rem;
     float: left;
 }
+#app .field-input-form .field-input {
+    display: inline-block;
+    width: calc(100% - 8rem);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0;
+}
+#app .field-input-form input[type=submit] {
+    display: inline-block;
+    float: right;
+    width: 8rem;
+    padding: 0.4rem;
+    border: 1px solid #ccc;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

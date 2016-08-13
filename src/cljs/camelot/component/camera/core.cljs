@@ -5,6 +5,43 @@
             [camelot.rest :as rest]
             [camelot.component.util :as util]))
 
+(defn add-success-handler
+  [data]
+  (om/transact! data :list #(conj % {:camera-name (:new-camera-name data)}))
+  (om/update! data :new-camera-name nil))
+
+(defn add-camera-handler
+  [data]
+  (rest/post-x "/cameras"
+               {:data {:camera-name (:new-camera-name data)}}
+               (partial add-success-handler data))
+  (nav/analytics-event "org-camera" "create-click"))
+
+(defn validate-proposed-camera
+  [data]
+  (not (some #(= (:new-camera-name data) %)
+             (map :camera-name (:list data)))))
+
+(defn add-camera-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [is-valid (validate-proposed-camera data)]
+        (dom/form #js {:className "field-input-form"}
+                  (dom/input #js {:type "submit"
+                                  :disabled (if is-valid "" "disabled")
+                                  :title (when-not is-valid
+                                           "A camera with this name already exists")
+                                  :className "btn btn-primary input-field-submit"
+                                  :onClick #(add-camera-handler data)
+                                  :value "Add"})
+                  (dom/input #js {:className "field-input"
+                                  :placeholder "New camera name..."
+                                  :value (get-in data [:new-camera-name])
+                                  :onChange #(om/update! data :new-camera-name
+                                                         (.. % -target -value))}))))))
+
 (defn camera-list-component
   [data owner]
   (reify
@@ -32,17 +69,10 @@
                             (om/build util/blank-slate-beta-component {}
                                       {:opts {:item-name "cameras"}})
                             (om/build-all camera-list-component
-                                          (sort-by :camera-id (:list data))
+                                          (sort-by :camera-name (:list data))
                                           {:key :camera-id})))
                  (dom/div #js {:className "sep"})
-                 (dom/button #js {:className "btn btn-primary"
-                                  :onClick #(do
-                                              (nav/nav! "/camera/create")
-                                              (nav/analytics-event "org-camera" "create-click"))
-                                  :disabled "disabled"
-                                  :title "Not implemented"}
-                             (dom/span #js {:className "fa fa-plus"})
-                             " Add Camera")
+                 (om/build add-camera-component data)
                  (dom/button #js {:className "btn btn-default"
                                   :onClick #(do
                                               (nav/nav! "/cameras")
