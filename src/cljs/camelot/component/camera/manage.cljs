@@ -18,22 +18,32 @@
                                   :value (get-in data [value-key :value])})))))
 
 (defn form-input
-  [data owner {:keys [label value-key]}]
+  [data owner {:keys [label value-key required validator warning]}]
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
-               (dom/label #js {:className "field-label"} label)
-               (dom/input #js {:className "field-input"
-                               :placeholder (str label "...")
-                               :onChange #(om/update! data [value-key :value] (.. % -target -value))
-                               :value (get-in data [value-key :value])})))))
+      (let [vr (if validator (validator) true)]
+        (when validator
+          (om/update! data :validation-failure (not vr)))
+        (dom/div nil
+                 (dom/label #js {:className (str "field-label" (when required " required"))} label)
+                 (dom/input #js {:className "field-input"
+                                 :placeholder (str label "...")
+                                 :onChange #(om/update! data [value-key :value] (.. % -target -value))
+                                 :value (get-in data [value-key :value])})
+                 (when-not vr
+                   (dom/div #js {:className "validation-warning"} warning)))))))
 
-(def form-layout
-  [["Camera name" :camera-name :text-input]
-   ["Camera make" :camera-make :text-input]
-   ["Camera model" :camera-model :text-input]
-   ["Camera notes" :camera-notes :textarea]])
+(defn form-layout
+  [data]
+  [["Camera name" :camera-name :text-input {:required true
+                                            :validator (fn [] (let [v (get-in data [:data :camera-name :value])]
+                                                                (not (or (nil? v) (= "" v)
+                                                                         (some #(= v %) (map :camera-name (:list data)))))))
+                                            :warning "Must not be blank or have the same name as another camera."}]
+   ["Camera make" :camera-make :text-input {}]
+   ["Camera model" :camera-model :text-input {}]
+   ["Camera notes" :camera-notes :textarea {}]])
 
 (defn update-success-handler
   [data]
@@ -56,7 +66,12 @@
   (reify
     om/IRender
     (render [_]
+      (prn data)
       (dom/button #js {:className "btn btn-primary"
+                       :disabled (if (:validation-failure data)
+                                   "disabled" "")
+                       :title (when (:validation-failure data)
+                                "Fix the errors above before submitting.")
                        :onClick (partial update-handler data)}
                   "Update"))))
 
@@ -69,10 +84,12 @@
                (map #(om/build (if (= (nth % 2) :textarea)
                                  form-textarea
                                  form-input)
-                               data {:opts {:label (first %)
-                                            :value-key (second %)}})
-                    form-layout)
-               (om/build submit-button data)))))
+                               (:data data)
+                               {:opts (merge (nth % 3)
+                                             {:label (first %)
+                                              :value-key (second %)})})
+                    (form-layout data))
+               (om/build submit-button (:data data))))))
 
 (defn manage-component
   [data owner]
@@ -80,6 +97,10 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "split-menu"}
+               (dom/div #js {:className "intro"}
+                        (dom/h4 nil (let [v (get-in data [:data :camera-name :value])]
+                                      (if (or (nil? v) (= v ""))
+                                        "Update Camera"
+                                        v))))
                (dom/div #js {:className "single-section"}
-                        (dom/h4 nil (get-in data [:camera-name :value]))
                         (om/build form-component data))))))

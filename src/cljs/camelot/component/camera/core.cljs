@@ -64,11 +64,16 @@
     (will-mount [_]
       (om/update! data :data nil)
       (rest/get-x (str "/cameras/" camera-id)
-                #(om/update! data :data (:body %))))
+                  #(do (om/update! data :data (:body %))
+                       (rest/get-x "/cameras/"
+                                   (fn [x]
+                                     (let [others (filter (fn [v] (not= (get-in (:body %) [:camera-name :value])
+                                                                        (:camera-name v))) (:body x))]
+                                       (om/update! data :list others)))))))
     om/IRender
     (render [_]
       (when (:data data)
-        (om/build manage/manage-component (:data data))))))
+        (om/build manage/manage-component data)))))
 
 (defn camera-menu-component
   [data owner]
