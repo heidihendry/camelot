@@ -98,7 +98,9 @@
                           (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
                                                     true
                                                     (re-matches (re-pattern (str "(?i).*" (:filter data) ".*"))
-                                                                (:camera-name %)))
+                                                                (str (:camera-name %)
+                                                                     (:camera-status-description %)
+                                                                     (:camera-notes %))))
                                                  (sort-by :camera-name (:list data)))]
                             (if (empty? filtered)
                               (om/build util/blank-slate-component {}

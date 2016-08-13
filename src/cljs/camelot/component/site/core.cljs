@@ -52,9 +52,20 @@
     (render [_]
       (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(nav/nav! (str "/site/" (:site-id data)))}
+               (dom/span #js {:className "status pull-right"}
+                         (:site-city data))
                (dom/span #js {:className "menu-item-title"}
                          (:site-name data))
                (dom/span #js {:className "menu-item-description"}
+                         (when-not (empty? (:site-sublocation data))
+                           (dom/span nil
+                                     (dom/label nil "Sublocation:") " "
+                                     (:site-sublocation data) ", "))
+                         (when-not (empty? (:site-city data))
+                           (dom/span nil
+                                     (dom/label nil "State/Province:") " "
+                                     (:site-state-province data))))
+               (dom/div #js {:className "menu-item-description"}
                          (:site-notes data))))))
 
 (defn manage-view
