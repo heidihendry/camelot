@@ -12,6 +12,26 @@
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
+(defn add-camera-success-handler
+  [data field resp]
+  (let [camera (cursorise/decursorise (:body resp))]
+    (om/transact! data :cameras #(conj % camera))
+    (om/update! (:new-camera-name data) field nil)
+    (om/update! (get-in data [:data field]) :value (:camera-id camera))
+    (om/update! (:camera-create-mode data) field false)))
+
+(defn add-camera-handler
+  [data field]
+  (rest/post-x "/cameras"
+               {:data {:camera-name (get-in data [:new-camera-name field])}}
+               (partial add-camera-success-handler data field))
+  (nav/analytics-event "deployment" "camera-create"))
+
+(defn validate-proposed-camera
+  [data field]
+  (not (some #(= (get-in data [:new-camera-name field]) %)
+             (map :camera-name (:all-cameras data)))))
+
 (defn camera-select-option-component
   [data owner]
   (reify
@@ -19,19 +39,68 @@
     (render [_]
       (dom/option #js {:value (:camera-id data)} (:camera-name data)))))
 
-(defn camera-select-component
+(defn add-camera-component
   [data owner]
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/select #js {:className "field-input"
-                       :onChange #(om/update! (get (:data data) (:camera-id-field state))
-                                              :value (.. % -target -value))}
-                  (om/build-all camera-select-option-component
-                                (cons {:camera-id -1
-                                       :camera-name ""}
-                                      (sort-by :camera-name (into '() (:cameras data))))
-                                {:key :camera-id})))))
+      (let [is-valid (validate-proposed-camera data (:camera-id-field state))]
+        (dom/form #js {:className "field-input-form"
+                       :onSubmit #(.preventDefault %)}
+                  (dom/input #js {:className "field-input"
+                                  :autoFocus "autofocus"
+                                  :placeholder "New camera name..."
+                                  :value (get-in data [:new-camera-name (:camera-id-field state)])
+                                  :onChange #(om/update! (:new-camera-name data)
+                                                         (:camera-id-field state)
+                                                         (.. % -target -value))})
+                  (if (empty? (get-in data [:new-camera-name (:camera-id-field state)]))
+                    (dom/input #js {:type "submit"
+                                    :className "btn btn-default input-field-submit"
+                                    :onClick #(om/update! (:camera-create-mode data)
+                                                          (:camera-id-field state) false)
+                                    :value "Cancel"})
+                    (dom/input #js {:type "submit"
+                                    :disabled (if is-valid "" "disabled")
+                                    :title (when-not is-valid
+                                             "A camera with this name already exists")
+                                    :className "btn btn-primary input-field-submit"
+                                    :onClick #(add-camera-handler data (:camera-id-field state))
+                                    :value "Add"})))))))
+
+(defn camera-change-handler
+  [data field event]
+  (let [v (.. event -target -value)]
+    (if (= v "create")
+      (om/update! (:camera-create-mode data) field true)
+      (om/update! (get-in data [:data field])
+                  :value (.. event -target -value)))))
+
+(defn camera-select-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data :camera-create-mode {})
+      (om/update! data :new-camera-name {}))
+    om/IRenderState
+    (render-state [_ state]
+      (when (:camera-create-mode data)
+        (if (or (empty? (:cameras data))
+                (get-in data [:camera-create-mode (:camera-id-field state)]))
+          (om/build add-camera-component data {:init-state state})
+          (dom/select #js {:className "field-input"
+                           :value (get-in data [:data (:camera-id-field state) :value])
+                           :onChange (partial camera-change-handler data (:camera-id-field state))}
+                      (om/build-all camera-select-option-component
+                                    (cons {:camera-id -1
+                                           :camera-name ""}
+                                          (reverse (conj (into '()
+                                                               (sort-by :camera-name
+                                                                        (:cameras data)))
+                                                         {:camera-id "create"
+                                                          :camera-name "Create a new camera..."})))
+                                    {:key :camera-id})))))))
 
 (defn site-select-option-component
   [data owner]
@@ -41,22 +110,20 @@
       (dom/option #js {:value (:site-id data)} (:site-name data)))))
 
 (defn site-change-handler
-  [data event]
+  [data owner event]
   (let [v (.. event -target -value)]
     (if (= v "create")
-      (om/update! data :site-create-mode true)
+      (do
+        (om/update! data :site-create-mode true)
+        (.focus (om/get-node owner)))
       (om/update! (get-in data [:data :site-id])
                   :value (.. event -target -value)))))
 
-(defn add-success-handler
+(defn add-site-success-handler
   [data resp]
   (let [site (cursorise/decursorise (:body resp))]
     (om/transact! data :sites #(conj % site))
     (om/update! data :new-site-name nil)
-    (prn "site id data")
-    (prn (get-in data [:data :site-id]))
-    (prn "assigning to")
-    (prn (:site-id site))
     (om/update! (get-in data [:data :site-id]) :value (:site-id site))
     (om/update! data :site-create-mode false)))
 
@@ -64,8 +131,8 @@
   [data]
   (rest/post-x "/sites"
                {:data {:site-name (:new-site-name data)}}
-               (partial add-success-handler data))
-  (nav/analytics-event "org-site" "create-click"))
+               (partial add-site-success-handler data))
+  (nav/analytics-event "deployment" "site-create"))
 
 (defn validate-proposed-site
   [data]
@@ -78,7 +145,14 @@
     om/IRender
     (render [_]
       (let [is-valid (validate-proposed-site data)]
-        (dom/form #js {:className "field-input-form"}
+        (dom/form #js {:className "field-input-form"
+                       :onSubmit #(.preventDefault %)}
+                  (dom/input #js {:className "field-input"
+                                  :autoFocus "autofocus"
+                                  :placeholder "New site name..."
+                                  :value (get-in data [:new-site-name])
+                                  :onChange #(om/update! data :new-site-name
+                                                         (.. % -target -value))})
                   (if (empty? (:new-site-name data))
                     (dom/input #js {:type "submit"
                                     :className "btn btn-default input-field-submit"
@@ -90,12 +164,7 @@
                                              "A site with this name already exists")
                                     :className "btn btn-primary input-field-submit"
                                     :onClick #(add-site-handler data)
-                                    :value "Add"}))
-                  (dom/input #js {:className "field-input"
-                                  :placeholder "New site name..."
-                                  :value (get-in data [:new-site-name])
-                                  :onChange #(om/update! data :new-site-name
-                                                         (.. % -target -value))}))))))
+                                    :value "Add"})))))))
 
 (defn site-select-component
   [data owner]
@@ -106,7 +175,7 @@
         (om/build add-site-component data)
         (dom/select #js {:className "field-input"
                          :value (get-in data [:data :site-id :value])
-                         :onChange (partial site-change-handler data)}
+                         :onChange (partial site-change-handler data owner)}
                     (om/build-all site-select-option-component
                                   (cons {:site-id -1
                                          :site-name ""}
@@ -164,7 +233,6 @@
                                                       :value
                                                       (.. % -target -value))})
                (let [v (get-in data [:data :trap-station-longitude :value])]
-                 (prn v)
                  (when (and v (not (util.ts/valid-longitude? v)))
                    (dom/label #js {:className "validation-warning"} "Longitude must be in the range [-180, 180].")))
                (dom/label #js {:className "field-label"} "Altitude")

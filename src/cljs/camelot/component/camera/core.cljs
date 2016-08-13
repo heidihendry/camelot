@@ -31,19 +31,20 @@
     om/IRender
     (render [_]
       (let [is-valid (validate-proposed-camera data)]
-        (dom/form #js {:className "field-input-form"}
+        (dom/form #js {:className "field-input-form"
+                       :onSubmit #(.preventDefault %)}
+                  (dom/input #js {:className "field-input"
+                                  :placeholder "New camera name..."
+                                  :value (get-in data [:new-camera-name])
+                                  :onChange #(om/update! data :new-camera-name
+                                                         (.. % -target -value))})
                   (dom/input #js {:type "submit"
                                   :disabled (if is-valid "" "disabled")
                                   :title (when-not is-valid
                                            "A camera with this name already exists")
                                   :className "btn btn-primary input-field-submit"
                                   :onClick #(add-camera-handler data)
-                                  :value "Add"})
-                  (dom/input #js {:className "field-input"
-                                  :placeholder "New camera name..."
-                                  :value (get-in data [:new-camera-name])
-                                  :onChange #(om/update! data :new-camera-name
-                                                         (.. % -target -value))}))))))
+                                  :value "Add"}))))))
 
 (defn camera-list-component
   [data owner]

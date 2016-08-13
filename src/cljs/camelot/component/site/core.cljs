@@ -31,19 +31,20 @@
     om/IRender
     (render [_]
       (let [is-valid (validate-proposed-site data)]
-        (dom/form #js {:className "field-input-form"}
+        (dom/form #js {:className "field-input-form"
+                       :onSubmit #(.preventDefault %)}
+                  (dom/input #js {:className "field-input"
+                                  :placeholder "New site name..."
+                                  :value (get-in data [:new-site-name])
+                                  :onChange #(om/update! data :new-site-name
+                                                         (.. % -target -value))})
                   (dom/input #js {:type "submit"
                                   :disabled (if is-valid "" "disabled")
                                   :title (when-not is-valid
                                            "A site with this name already exists")
                                   :className "btn btn-primary input-field-submit"
                                   :onClick #(add-site-handler data)
-                                  :value "Add"})
-                  (dom/input #js {:className "field-input"
-                                  :placeholder "New site name..."
-                                  :value (get-in data [:new-site-name])
-                                  :onChange #(om/update! data :new-site-name
-                                                         (.. % -target -value))}))))))
+                                  :value "Add"}))))))
 
 (defn site-list-component
   [data owner]
