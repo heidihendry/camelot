@@ -1,9 +1,13 @@
 (ns camelot.report.module.builtin.reports.raw-data-export
-  (:require [camelot.report.module.core :as module]))
+  (:require [camelot.report.module.core :as module]
+            [clj-time.format :as tf]))
+
+(def timestamp-formatter (tf/formatter "yyyy-MM-dd hh:mm:ss"))
 
 (defn report-output
   [state {:keys [survey-id]}]
   {:columns [:media-filename
+             :media-capture-timestamp
              :site-name
              :site-sublocation
              :trap-station-name
@@ -12,7 +16,10 @@
              :taxonomy-genus
              :taxonomy-species
              :sighting-quantity]
-   :filters [#(= (:survey-id %) survey-id)]
+   :filters [#(= (:survey-id %) survey-id)
+             #(not (nil? (:media-id %)))]
+   :transforms [#(update % :media-capture-timestamp
+                         (partial tf/unparse timestamp-formatter))]
    :order-by [:taxonomy-genus :taxonomy-species]})
 
 (def form-smith
