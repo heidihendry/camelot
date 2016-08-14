@@ -13,8 +13,8 @@
 
 (def headings ["Genus"
                "Species"
-               "Trap Station Longitude"
                "Trap Station Latitude"
+               "Trap Station Longitude"
                "Presence"
                "Independent Observations"
                "Nights Elapsed"
@@ -68,7 +68,7 @@
                                         :trap-station-session-id 1}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 30 5 "X" 3 14 (calc-obs-nights 3 14)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14)]))))
 
   (fact "Report for one sighting should contain its summary"
     (with-redefs [taxonomy/get-specific
@@ -84,7 +84,7 @@
                                         :trap-station-session-id 1}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 30 5 "X" 3 7 (calc-obs-nights 3 7)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 3 7 (calc-obs-nights 3 7)]))))
 
   (fact "Should return a record per location."
     (with-redefs [taxonomy/get-specific
@@ -110,8 +110,8 @@
                                         :trap-station-session-id 2}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 30 5 "X" 3 14 (calc-obs-nights 3 14)]
-                        ["Smiley" "Wolf" 30.5 5.5 "X" 5 14 (calc-obs-nights 5 14)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14)]
+                        ["Smiley" "Wolf" 5.5 30.5 "X" 5 14 (calc-obs-nights 5 14)]))))
 
   (fact "Should respect independence threshold setting"
     (with-redefs [taxonomy/get-specific
@@ -135,7 +135,7 @@
                                         :trap-station-session-id 1}))
             state (state/gen-state {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 30 5 "X" 8 7 (calc-obs-nights 8 7)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 8 7 (calc-obs-nights 8 7)]))))
 
   (fact "Should include entries for locations the species was not found in"
     (with-redefs [taxonomy/get-specific
@@ -162,9 +162,9 @@
                                         :trap-station-session-id 3}))
             state (state/gen-state {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 30 5 "X" 3 21 (calc-obs-nights 3 21)]
-                        ["Smiley" "Wolf" 40 10 nil nil 21 nil]
-                        ["Smiley" "Wolf" 90 50 nil nil 21 nil]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 3 21 (calc-obs-nights 3 21)]
+                        ["Smiley" "Wolf" 10 40 nil nil 21 nil]
+                        ["Smiley" "Wolf" 50 90 nil nil 21 nil]))))
 
   (fact "Should return only the species searched"
     (with-redefs [taxonomy/get-specific
@@ -192,7 +192,7 @@
                                         :trap-station-session-id 3}))
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (report state 3 sightings)]
-        result => (list ["A" "Meerkat" 30 5 "X" 1 21 (calc-obs-nights 1 21)])))))
+        result => (list ["A" "Meerkat" 5 30 "X" 1 21 (calc-obs-nights 1 21)])))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
@@ -231,5 +231,5 @@
             state (state/gen-state {:sighting-independence-minutes-threshold 20})
             result (csv-report state 1 sightings)]
         result => (str (str/join "," headings) "\n"
-                       "Smiley,Wolf,30,5,X,3,14," (calc-obs-nights 3 14) "\n"
-                       "Smiley,Wolf,30.5,5.5,X,5,14," (calc-obs-nights 5 14) "\n")))))
+                       "Smiley,Wolf,5,30,X,3,14," (calc-obs-nights 3 14) "\n"
+                       "Smiley,Wolf,5.5,30.5,X,5,14," (calc-obs-nights 5 14) "\n")))))

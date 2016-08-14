@@ -8,8 +8,8 @@
   (let [spp (taxonomy/get-specific state taxonomy-id)]
     {:columns [:taxonomy-genus
                :taxonomy-species
-               :trap-station-longitude
                :trap-station-latitude
+               :trap-station-longitude
                :presence-absence
                :independent-observations
                :total-nights
