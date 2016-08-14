@@ -11,8 +11,8 @@
              :site-name
              :site-sublocation
              :trap-station-name
-             :trap-station-longitude
              :trap-station-latitude
+             :trap-station-longitude
              :taxonomy-genus
              :taxonomy-species
              :sighting-quantity]

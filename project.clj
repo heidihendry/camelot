@@ -53,7 +53,7 @@
   :uberjar-name "camelot.jar"
 
   :main camelot.core
-  
+
   ;; nREPL by default starts in the :main namespace, we want to start in `user`
   ;; because that's where our development helper functions like (run) and
   ;; (browser-repl) live.
