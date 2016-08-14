@@ -10,23 +10,22 @@
 
 (def day-formatter (tf/formatter "yyyy-MM-dd"))
 
+(def ^:private problem-ratings {:pass 0
+                                :warn 1
+                                :fail 2})
+
 (defn compare-validity
-  "Predicate for comparing the severity of two problems."
+  "True if val-a is ordered before val-b, by problem.  False otherwise."
   [val-a val-b]
-  (let [ratings {:pass 0
-                 :warn 1
-                 :fail 2}]
-    (< (get ratings (:result val-a)) (get ratings (:result val-b)))))
+  (let [vfn #(get problem-ratings (:result %))]
+    (< (or (vfn val-a) 3) (or (vfn val-b) 3))))
 
 (defn compare-album-validity
-  "Predicate for sort ordering on problem results."
+  "True if alb-a is ordered before alb-b, by problem.  False otherwise."
   [[path-a alb-a] [path-b alb-b]]
   (let [sevs #(keys (group-by :result (:problems %)))
-        ratings {:pass 0
-                 :warn 1
-                 :fail 2}]
-    (< (reduce #(+ (get ratings %2) %1) 0 (sevs alb-a))
-       (reduce #(+ (get ratings %2) %1) 0 (sevs alb-b)))))
+        vfn (fn [v] (reduce #(+ (or (get problem-ratings %2) 3) %1) 0 (sevs v)))]
+    (< (vfn alb-a) (vfn alb-b))))
 
 (defn show-import-dialog
   [path]

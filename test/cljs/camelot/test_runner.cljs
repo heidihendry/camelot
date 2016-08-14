@@ -2,6 +2,7 @@
   (:require
    [doo.runner :refer-macros [doo-tests]]
    [camelot.nav-test]
+   [camelot.component.albums-test]
    [camelot.util.filter-test]
    [om-datepicker.test-components]
    [camelot.util.trap-station-test]))
@@ -10,5 +11,6 @@
 
 (doo-tests 'om-datepicker.test-components
            'camelot.nav-test
+           'camelot.component.albums-test
            'camelot.util.filter-test
            'camelot.util.trap-station-test)
