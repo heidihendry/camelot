@@ -2,12 +2,20 @@
 
 (defn decursorise
   "Remove :value keys used for Om cursors to leaves from the configuration data."
-  [conf]
-  (if (some :value (vals conf))
-    (into {} (map (fn [[k v]] {k (:value v)}) conf))
-    conf))
+  [node]
+  (if (map? node)
+    (into {} (map (fn [[k v]] {k (if (and (map? v) (contains? v :value))
+                                   (decursorise (:value v))
+                                   (decursorise v))})
+                  node))
+    node))
 
 (defn cursorise
   "Add :value keys used for Om cursors to leaves from the configuration data."
-  [conf]
-  (into {} (map (fn [[k v]] {k {:value v}}) conf)))
+  [node]
+  (if (map? node)
+    (into {} (map (fn [[k v]] (if (= k :value)
+                                {k v}
+                                {k (cursorise v)}))
+                  node))
+    {:value node}))

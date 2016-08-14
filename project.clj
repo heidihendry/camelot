@@ -120,7 +120,6 @@
               :plugins [[lein-figwheel "0.5.4" :exclusions [org.clojure/clojure]]
                         [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]
                         [lein-midje "3.2"]]
-
               :cljsbuild {:builds
                           {:test
                            {:source-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]

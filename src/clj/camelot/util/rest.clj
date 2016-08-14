@@ -11,8 +11,8 @@
   "Set of keys for floating-point fields."
   #{:trap-station-longitude :trap-station-latitude :trap-station-altitude
     :trap-station-distance-above-ground :trap-station-distance-to-road
-    :site-area
-    :trap-station-distance-to-river :trap-station-distance-to-settlement})
+    :site-area :trap-station-distance-to-river
+    :trap-station-distance-to-settlement})
 
 (defn- as-long
   "Return value as a Long if it can be parsed, otherwise return v."
@@ -27,6 +27,7 @@
     v))
 
 (defn- as-date
+  "Return value as a Joda date, given an epoch string."
   [v]
   (c/from-long ^java.lang.Long (Long/parseLong v)))
 
