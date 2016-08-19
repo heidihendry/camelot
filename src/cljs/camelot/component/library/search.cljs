@@ -85,8 +85,9 @@
   (reify
     om/IRender
     (render [_]
-      (om/build typeahead/typeahead (typeahead/phrase-index ["species:" "trap:" "genus:" "trap-station:"
-                                                             "trap-station-session:"])
+      (om/build typeahead/typeahead (typeahead/phrase-index
+                                     (map #(str % ":") (apply conj (keys filter/field-keys)
+                                                              filter/model-fields)))
                 {:opts {:input-config {:placeholder "Filter..."
                                        :className "field-input search"
                                        :title "Type a keyword you want the media to contain"

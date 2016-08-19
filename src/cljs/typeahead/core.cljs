@@ -12,12 +12,12 @@
     (if (empty? idx)
       nil
       (assoc idx "" nil))
-    (let [next (into-index (get idx (first cs)) (rest cs))]
-      (assoc idx (first cs)
-             (if (and (contains? idx (first cs))
-                      (nil? (get idx (first cs))))
-               (merge {"" nil} next)
-               next)))))
+    (let [c (first cs)
+          next (into-index (get idx c) (rest cs))]
+      (assoc idx c (if (and (contains? idx c)
+                            (nil? (get idx c)))
+                     (merge {"" nil} next)
+                     next)))))
 
 (defn index-single
   "Given an existing index, add a new word."
@@ -54,7 +54,7 @@
                                                               {:select x}))} x))
                       data))))))
 
-(defn match-builder
+(defn- match-builder
   [data]
   (if (nil? data)
     [""]
@@ -62,19 +62,20 @@
          keys
          (mapcat #(map (fn [x] (str % x)) (match-builder (get data %)))))))
 
-(defn search-reducer
+(defn- search-reducer
   [acc s]
   (let [r (get acc s)]
     (if (nil? r)
       (reduced {})
       r)))
 
-(defn matches
-  [data search]
-  (->> (seq search)
+(defn complete
+  "Return all possible completions given the index data and a prefix."
+  [data prefix]
+  (->> (seq prefix)
        (reduce search-reducer data)
        match-builder
-       (map #(str search %))
+       (map #(str prefix %))
        (sort)
        (sort-by count)))
 
@@ -112,6 +113,6 @@
                                                             (when tv
                                                               (go (>! (::chan state) tv)))))})))
                  (when-not (empty? v)
-                   (om/build completion-list-component (matches data v)
+                   (om/build completion-list-component (complete data v)
                              {:init-state {::chan (::chan state)}
                               :opts {:show-create (not (nil? create-fn))}})))))))
