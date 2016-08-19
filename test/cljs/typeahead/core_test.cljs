@@ -56,3 +56,39 @@
   (testing "Should index phrases"
     (is (= (sut/phrase-index ["hello: world"])
            {"h" {"e" {"l" {"l" {"o" {":" {" " {"w" {"o" {"r" {"l" {"d" nil}}}}}}}}}}}}))))
+
+(deftest matches-test
+  (testing "Should find a single match in a one-term trie."
+    (is (= (sut/matches {"h" {"e" {"l" {"l" {"o" nil}}}}} "hel")
+           ["hello"])))
+
+  (testing "Should support multiple matches in a simple trie."
+    (is (= (sut/matches {"h" {"e" {"l" {"l" {"" nil
+                                             "o" nil}}}}} "hel")
+           ["hell" "hello"])))
+
+  (testing "Should support multiple matches in a simple trie."
+    (is (= (sut/matches {"h" {"e" {"l" {"l" {"" nil
+                                             "o" nil}}}}} "hel")
+           ["hell" "hello"])))
+
+  (testing "Results are sorted by length, then alphabetically."
+    (is (= (sut/matches {"x" {"y" {"z" nil}}
+                         "a" {"b" {"c" {"e" nil
+                                        "d" nil}}}} "")
+           ["xyz" "abcd" "abce"])))
+
+  (testing "Should be able to numerous matches in a more complex trie."
+    (is (= (sut/matches {"h" {"e" {"n" nil}}
+                         "t" {"h" {"e" {"" nil
+                                        "n" nil}
+                                   "i" {"n" nil}
+                                   "a" {"n" nil
+                                        "t" nil}}}} "")
+           ["hen" "the" "than" "that" "then" "thin"])))
+
+  (testing "Should match phrases"
+    (is (= (sut/matches
+            {"h" {"e" {"l" {"l" {"o" {":" {" " {"w" {"o" {"r" {"l" {"d" nil}}}}}}}}}}}}
+            "hello")
+           ["hello: world"]))))

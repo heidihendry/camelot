@@ -6,6 +6,7 @@
             [camelot.state :as state]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
+            [typeahead.core :as typeahead]
             [clojure.string :as str]))
 
 (defn add-sighting
@@ -84,18 +85,20 @@
   (reify
     om/IRender
     (render [_]
-      (dom/input #js {:type "text"
-                      :placeholder "Filter..."
-                      :id "filter"
-                      :title "Type a keyword you want the media to contain"
-                      :disabled (if (get data :identify-selected)
-                                  "disabled" "")
-                      :className "field-input search"
-                      :onKeyDown select-media-collection-container
-                      :value (get data :terms)
-                      :onChange #(do (om/update! data :terms (.. % -target -value))
-                                     (om/update! data :page 1)
-                                     (om/update! data :dirty-state true))}))))
+      (om/build typeahead/typeahead (typeahead/phrase-index ["species:" "trap:" "genus:" "trap-station:"
+                                                             "trap-station-session:"])
+                {:opts {:input-config {:placeholder "Filter..."
+                                       :className "field-input search"
+                                       :title "Type a keyword you want the media to contain"
+                                       :id "filter"
+                                       :onChange #(do
+                                                    (om/update! data :terms (.. % -target -value))
+                                                    (om/update! data :page 1)
+                                                    (om/update! data :dirty-state true))
+                                       :value (get data :terms)
+                                       :onKeyDown select-media-collection-container
+                                       :disabled (if (get data :identify-selected)
+                                                   "disabled" "")}}}))))
 
 (defn filter-survey-component
   [data owner]

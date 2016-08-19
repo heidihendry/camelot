@@ -46,17 +46,45 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "typeahead-menu"}
-               ""))))
+      (when (seq data)
+        (dom/div #js {:className "typeahead-menu"}
+                 (map (fn [x] (dom/div #js {
+                                            :className "menu-item"
+                                            :onClick #(go (>! (::chan state)
+                                                              {:select x}))} x))
+                      data))))))
+
+(defn match-builder
+  [data]
+  (if (nil? data)
+    [""]
+    (->> data
+         keys
+         (mapcat #(map (fn [x] (str % x)) (match-builder (get data %)))))))
+
+(defn search-reducer
+  [acc s]
+  (let [r (get acc s)]
+    (if (nil? r)
+      (reduced {})
+      r)))
+
+(defn matches
+  [data search]
+  (->> (seq search)
+       (reduce search-reducer data)
+       match-builder
+       (map #(str search %))
+       (sort)
+       (sort-by count)))
 
 (defn typeahead
   "Input component with typeahead-style completion."
-  [data owner {:keys [placeholder create-text create-fn result-limit]}]
+  [data owner {:keys [create-text create-fn input-config]}]
   (reify
     om/IInitState
     (init-state [_]
       {::value ""
-       ::placeholder (or placeholder "")
        ::chan (chan)})
     om/IWillMount
     (will-mount [_]
@@ -64,14 +92,26 @@
         (go
           (loop []
             (let [r (<! c)]
+              (if (:select r)
+                (do
+                  (om/set-state! owner ::value (:select r))
+                  (.focus (om/get-node owner "searchInput")))
+                (om/set-state! owner ::value r))
               (recur))))))
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "typeahead"}
-               (dom/input #js {:placeholder (::placeholder state)
-                               :value (::value state)
-                               :onChange #(>! (::chan state) (.. % -target -value))})
-               (om/build completion-list-component completions
-                         {:init-state {:chan (select-keys state [::chan])}
-                          :opts {:show-create (not (nil? create-fn))
-                                 :result-limit result-limit}})))))
+      (let [v (::value state)]
+        (dom/div #js {:className "typeahead"}
+                 (dom/input (clj->js (merge input-config
+                                            {:value v
+                                             :ref "searchInput"
+                                             :onChange #(do
+                                                          (when (:onChange input-config)
+                                                            ((:onChange input-config) %))
+                                                          (let [tv (.. % -target -value)]
+                                                            (when tv
+                                                              (go (>! (::chan state) tv)))))})))
+                 (when-not (empty? v)
+                   (om/build completion-list-component (matches data v)
+                             {:init-state {::chan (::chan state)}
+                              :opts {:show-create (not (nil? create-fn))}})))))))
