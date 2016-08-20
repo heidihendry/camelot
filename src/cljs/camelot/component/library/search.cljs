@@ -99,7 +99,8 @@
                                        :value (get data :terms)
                                        :onKeyDown select-media-collection-container
                                        :disabled (if (get data :identify-selected)
-                                                   "disabled" "")}}}))))
+                                                   "disabled" "")}
+                        :multi-term true}}))))
 
 (defn filter-survey-component
   [data owner]
