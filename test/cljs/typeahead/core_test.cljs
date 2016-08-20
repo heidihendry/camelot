@@ -100,37 +100,37 @@
 
 (deftest complete-test
   (testing "Should find a single match in a one-term trie."
-    (is (= (sut/complete {"h" {"e" {"l" {"l" {"o" nil}}}}} "hel")
+    (is (= (sut/complete {"h" {"e" {"l" {"l" {"o" {:props {}}}}}}} "hel")
            ["hello"])))
 
   (testing "Should support multiple completions in a simple trie."
-    (is (= (sut/complete {"h" {"e" {"l" {"l" {"" nil
-                                             "o" nil}}}}} "hel")
+    (is (= (sut/complete {"h" {"e" {"l" {"l" {"" {:props {}}
+                                             "o" {:props {}}}}}}} "hel")
            ["hell" "hello"])))
 
   (testing "Should support multiple completions in a simple trie."
-    (is (= (sut/complete {"h" {"e" {"l" {"l" {"" nil
-                                             "o" nil}}}}} "hel")
+    (is (= (sut/complete {"h" {"e" {"l" {"l" {"" {:props {}}
+                                             "o" {:props {}}}}}}} "hel")
            ["hell" "hello"])))
 
   (testing "Results are sorted by length, then alphabetically."
-    (is (= (sut/complete {"x" {"y" {"z" nil}}
-                         "a" {"b" {"c" {"e" nil
-                                        "d" nil}}}} "")
+    (is (= (sut/complete {"x" {"y" {"z" {:props {}}}}
+                         "a" {"b" {"c" {"e" {:props {}}
+                                        "d" {:props {}}}}}} "")
            ["xyz" "abcd" "abce"])))
 
   (testing "Should be able to numerous completions in a more complex trie."
-    (is (= (sut/complete {"h" {"e" {"n" nil}}
-                         "t" {"h" {"e" {"" nil
-                                        "n" nil}
-                                   "i" {"n" nil}
-                                   "a" {"n" nil
-                                        "t" nil}}}} "")
+    (is (= (sut/complete {"h" {"e" {"n" {:props {}}}}
+                         "t" {"h" {"e" {"" {:props {}}
+                                        "n" {:props {}}}
+                                   "i" {"n" {:props {}}}
+                                   "a" {"n" {:props {}}
+                                        "t" {:props {}}}}}} "")
            ["hen" "the" "than" "that" "then" "thin"])))
 
   (testing "Should complete phrases"
     (is (= (sut/complete
-            {"h" {"e" {"l" {"l" {"o" {":" {" " {"w" {"o" {"r" {"l" {"d" nil}}}}}}}}}}}}
+            {"h" {"e" {"l" {"l" {"o" {":" {" " {"w" {"o" {"r" {"l" {"d" {:props {}}}}}}}}}}}}}}
             "hello")
            ["hello: world"]))))
 
