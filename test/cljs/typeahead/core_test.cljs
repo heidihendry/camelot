@@ -3,60 +3,100 @@
             [cljs.test :refer-macros [deftest is testing]]
             [clojure.set :as set]))
 
+(defn ->no-context
+  [term]
+  {:term term})
+
+(defn ->some-context
+  [term]
+  {:term term
+   :props {:context "abc"}})
+
 (deftest word-index-test
-  (testing "Should index a single word"
-    (is (= (sut/word-index ["hello"])
-           {"h" {"e" {"l" {"l" {"o" nil}}}}})))
+  (testing "Basic indexing"
+    (testing "should index a single word"
+      (is (= (sut/word-index (map ->no-context ["hello"]))
+             {"h" {"e" {"l" {"l" {"o" {:props {}}}}}}})))
 
-  (testing "Should index two overlapping words"
-    (is (= (sut/word-index ["hello" "help"])
-           {"h" {"e" {"l" {"l" {"o" nil}
-                           "p" nil}}}})))
+    (testing "should index two overlapping words"
+      (is (= (sut/word-index (map ->no-context ["hello" "help"]))
+             {"h" {"e" {"l" {"l" {"o" {:props {}}}
+                             "p" {:props {}}}}}})))
 
-  (testing "Should index identically regardless of insertion order."
-    (is (= (sut/word-index ["help" "hello"])
-           {"h" {"e" {"l" {"l" {"o" nil}
-                           "p" nil}}}})))
+    (testing "should index identically regardless of insertion order."
+      (is (= (sut/word-index (map ->no-context ["help" "hello"]))
+             {"h" {"e" {"l" {"l" {"o" {:props {}}}
+                             "p" {:props {}}}}}})))
 
-  (testing "Should index two words without overlap."
-    (is (= (sut/word-index ["wildlife" "hello"])
-           {"w" {"i" {"l" {"d" {"l" {"i" {"f" {"e" nil}}}}}}}
-            "h" {"e" {"l" {"l" {"o" nil}}}}})))
+    (testing "should index two words without overlap."
+      (is (= (sut/word-index (map ->no-context ["wildlife" "hello"]))
+             {"w" {"i" {"l" {"d" {"l" {"i" {"f" {"e" {:props {}}}}}}}}}
+              "h" {"e" {"l" {"l" {"o" {:props {}}}}}}})))
 
-  (testing "Should do blank string insertion should a longer string be defined."
-    (is (= (sut/word-index ["hello" "hell"])
-           {"h" {"e" {"l" {"l" {"o" nil
-                                "" nil}}}}})))
+    (testing "should do blank string insertion should a longer string be defined."
+      (is (= (sut/word-index (map ->no-context ["hello" "hell"]))
+             {"h" {"e" {"l" {"l" {"o" {:props {}}
+                                  "" {:props {}}}}}}})))
 
-  (testing "Should maintain the definition of a shorter string when defining a longer one."
-    (is (= (sut/word-index ["hell" "hello"])
-           {"h" {"e" {"l" {"l" {"o" nil
-                                "" nil}}}}})))
+    (testing "should maintain the definition of a shorter string when defining a longer one."
+      (is (= (sut/word-index (map ->no-context ["hell" "hello"]))
+             {"h" {"e" {"l" {"l" {"o" {:props {}}
+                                  "" {:props {}}}}}}})))
 
-  (testing "Should index a phrase as words, using word breaks as separators."
-    (is (= (sut/word-index ["spp:big bird"])
-           {"s" {"p" {"p" nil}}
-            "b" {"i" {"g" nil
-                      "r" {"d" nil}}}})))
+    (testing "should index a phrase as words, using word breaks as separators."
+      (is (= (sut/word-index (map ->no-context ["spp:big bird"]))
+             {"s" {"p" {"p" {:props {}}}}
+              "b" {"i" {"g" {:props {}}
+                        "r" {"d" {:props {}}}}}})))
 
-  (testing "Should accept alphanumeric characters."
-    (is (= (sut/word-index ["TRAP:10"])
-           {"T" {"R" {"A" {"P" nil}}}
-            "1" {"0" nil}})))
+    (testing "should accept alphanumeric characters."
+      (is (= (sut/word-index (map ->no-context ["TRAP:10"]))
+             {"T" {"R" {"A" {"P" {:props {}}}}}
+              "1" {"0" {:props {}}}})))
 
-  (testing "Should produce the expected result for a series of similar words."
-    (is (= (sut/word-index ["the" "that" "then" "than" "hen" "thin"])
-           {"h" {"e" {"n" nil}}
-            "t" {"h" {"e" {"" nil
-                           "n" nil}
-                      "i" {"n" nil}
-                      "a" {"n" nil
-                           "t" nil}}}}))))
+    (testing "should produce the expected result for a series of similar words."
+      (is (= (sut/word-index (map ->no-context ["the" "that" "then" "than" "hen" "thin"]))
+             {"h" {"e" {"n" {:props {}}}}
+              "t" {"h" {"e" {"" {:props {}}
+                             "n" {:props {}}}
+                        "i" {"n" {:props {}}}
+                        "a" {"n" {:props {}}
+                             "t" {:props {}}}}}}))))
+
+  (testing "Context-aware indexing"
+    (testing "should assign correct contexts where there are similar terms."
+      (is (= (sut/word-index [(->no-context "help")
+                              (->some-context "hello")])
+             {"h" {"e" {"l" {"l" {"o" {:props {:context "abc"}}}
+                             "p" {:props {}}}}}})))
+
+    (testing "should assign correct contexts where there are existing substrings"
+      (is (= (sut/word-index [(->no-context "hell")
+                              (->some-context "hello")])
+             {"h" {"e" {"l" {"l" {"o" {:props {:context "abc"}}
+                                  "" {:props {}}}}}}})))
+
+    (testing "should assign correct contexts when a substring exists"
+      (is (= (sut/word-index [(->no-context "hello")
+                              (->some-context "hell")])
+             {"h" {"e" {"l" {"l" {"" {:props {:context "abc"}}
+                                  "o" {:props {}}}}}}})))
+
+    (testing "should produce the expected result for a series of similar words."
+      (is (= (sut/word-index (apply conj
+                                    (map ->no-context ["the" "that" "then"])
+                                    (map ->some-context ["than" "hen" "thin"])))
+             {"h" {"e" {"n" {:props {:context "abc"}}}}
+              "t" {"h" {"e" {"" {:props {}}
+                             "n" {:props {}}}
+                        "i" {"n" {:props {:context "abc"}}}
+                        "a" {"n" {:props {:context "abc"}}
+                             "t" {:props {}}}}}})))))
 
 (deftest phrase-index-test
   (testing "Should index phrases"
-    (is (= (sut/phrase-index ["hello: world"])
-           {"h" {"e" {"l" {"l" {"o" {":" {" " {"w" {"o" {"r" {"l" {"d" nil}}}}}}}}}}}}))))
+    (is (= (sut/phrase-index (map ->no-context ["hello: world"]))
+           {"h" {"e" {"l" {"l" {"o" {":" {" " {"w" {"o" {"r" {"l" {"d" {:props {}}}}}}}}}}}}}}))))
 
 (deftest complete-test
   (testing "Should find a single match in a one-term trie."
@@ -160,3 +200,23 @@
   (testing "Should be clever about replacing fields"
     (is (= (sut/replace-term "test:yes hello:" 10 "world:" true)
            "test:yes world:"))))
+
+(deftest ifind-test
+  (testing "Find"
+    (testing "should return properties for an exact match"
+      (is (= (sut/ifind {"h" {"e" {"l" {"l" {"o" {:props {:context "xyz"}}
+                                            "" {:props {:context "abc"}}}}}}}
+                       "hello")
+             {:context "xyz"})))
+
+    (testing "should return property corresponding to the search string"
+      (is (= (sut/ifind {"h" {"e" {"l" {"l" {"o" {:props {:context "xyz"}}
+                                            "" {:props {:context "abc"}}}}}}}
+                       "hell")
+             {:context "abc"})))
+
+    (testing "should return nil if match is not found"
+      (is (= (sut/ifind {"h" {"e" {"l" {"l" {"o" {:props {:context "xyz"}}
+                                            "" {:props {:context "abc"}}}}}}}
+                       "world")
+             nil)))))

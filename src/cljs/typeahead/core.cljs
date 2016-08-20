@@ -1,5 +1,5 @@
 (ns typeahead.core
-  "Input field with flexible typeahead."
+  "Input field with powerful typeahead."
   (:require [om.core :as om]
             [cljs.core.async :refer [<! chan >!]]
             [om.dom :as dom]
@@ -10,22 +10,22 @@
 
 (defn- into-index
   "Add a list of characters to an index, implemented as a trie."
-  [idx cs]
+  [idx cs props]
   (if (empty? cs)
     (if (empty? idx)
-      nil
-      (assoc idx "" nil))
+      props
+      (assoc idx "" props))
     (let [c (first cs)
-          next (into-index (get idx c) (rest cs))]
-      (assoc idx c (if (and (contains? idx c)
-                            (nil? (get idx c)))
-                     (merge {"" nil} next)
-                     next)))))
+          next (into-index (get idx c) (rest cs) props)]
+      (dissoc (assoc idx c (if (contains? (get idx c) :props)
+                             (merge {"" (get idx c)} next)
+                             next))
+              :props))))
 
 (defn index-single
   "Given an existing index, add a new word."
-  [idx word]
-  (into-index idx (seq word)))
+  [idx {:keys [term props]}]
+  (into-index idx (seq term) {:props props}))
 
 (defn- transforming-index
   [transformer phrases]
@@ -37,12 +37,14 @@
 (defn word-index
   "Index the words of a list of phrases, returning the result as a trie."
   [phrases]
-  (transforming-index #(str/split % term-separator-re) phrases))
+  (transforming-index #(map (fn [x] {:term x :props (or (:props %) {})})
+                            (str/split (:term %) term-separator-re))
+                      phrases))
 
 (defn phrase-index
   "Index a list of phrases, returning the result as a trie."
   [phrases]
-  (transforming-index list phrases))
+  (transforming-index #(list (assoc % :props (or (:props %) {}))) phrases))
 
 (defn completion-option-component
   [data owner]
@@ -69,7 +71,7 @@
 
 (defn- match-builder
   [data]
-  (if (nil? data)
+  (if (contains? data :props)
     [""]
     (->> data
          keys
@@ -91,6 +93,18 @@
        (map #(str prefix %))
        (sort)
        (sort-by count)))
+
+(defn- props-for-subtree
+  [st]
+  (or (:props st)
+      (get-in st ["" :props])))
+
+(defn ifind
+  "Return the props for search, or nil if search is not in the index."
+  [index search]
+  (->> (seq search)
+       (reduce search-reducer index)
+       props-for-subtree))
 
 (defn- term-separators
   [search]
@@ -159,11 +173,16 @@
             (let [r (<! c)]
               (if (::select r)
                 (do
-                  (let [si (om/get-node owner "search-input")]
-                    (om/set-state! owner ::value (replace-term (om/get-state owner ::value)
-                                                               (.-selectionStart si)
-                                                               (::select r)
-                                                               multi-term)))
+                  (let [si (om/get-node owner "search-input")
+                        props (ifind data (::select r))]
+                    (om/set-state! owner ::value
+                                   (replace-term (om/get-state owner ::value)
+                                                 (.-selectionStart si)
+                                                 (str (::select r)
+                                                      (if (:field props)
+                                                        ":"
+                                                        " "))
+                                                 multi-term)))
                   (.focus (om/get-node owner "search-input"))))
               (recur))))))
     om/IRenderState

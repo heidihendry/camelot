@@ -37,7 +37,6 @@
    "media-processed"
    "media-updated"
    "media-uri"
-   "sightings"
    "sighting-id"
    "sighting-created"
    "sighting-quantity"
