@@ -1092,7 +1092,7 @@ pre.field-input {
     margin: auto;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 16rem);
+    max-height: calc(100vh - 16rem);
 }
 #app .split-menu .field-input {
     width: 100%;
@@ -1104,7 +1104,7 @@ pre.field-input {
     margin: auto;
     flex-grow: 1;
     flex-shrink: 0;
-    height: calc(100vh - 22rem);
+    height: calc(100vh - 16rem);
 }
 #app .split-menu .single-section {
     display: flex;
@@ -1190,7 +1190,7 @@ pre.field-input {
 #app .simple-menu {
     margin: 0;
     flex-grow: 1;
-    flex-shrink: 0;
+    flex-shrink: 1;
     overflow: auto;
 }
 #app .simple-menu.scroll {
