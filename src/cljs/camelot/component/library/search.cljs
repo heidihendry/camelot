@@ -7,7 +7,9 @@
             [camelot.rest :as rest]
             [camelot.nav :as nav]
             [typeahead.core :as typeahead]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [cljs.core.async :refer [<! chan >!]])
+    (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn add-sighting
   []
@@ -80,6 +82,37 @@
       (let [node (.getElementById js/document "media-collection-container")]
         (.focus node)))))
 
+(defn completion-field
+  [ctx]
+  (let [field (get filter/field-keys ctx)]
+    (if field
+      (name field)
+      (some (set filter/model-fields) (list ctx)))))
+
+(def prefix-endpoints
+  {"survey" "/surveys"
+   "site" "/sites"
+   "trap-station" "/trap-stations"
+   "trap-station-session" "/trap-station-sessions"
+   "trap-station-session-camera" "/trap-station-session-cameras"
+   "camera" "/cameras"
+   "sighting" "/sightings"
+   "media" "/media"
+   "taxonomy" "/taxonomy"
+   "photo" "/photos"})
+
+(defn completions
+  [ctx ch]
+  (let [cf (completion-field ctx)
+        ep (get prefix-endpoints (first (str/split cf #"-")))]
+    (if (or (nil? cf) (nil? ep))
+      []
+      (rest/get-x (str ep)
+                  #(go (>! ch (->> (:body %)
+                                   (mapv (keyword cf))
+                                   (mapv typeahead/->basic-entry)
+                                   typeahead/word-index)))))))
+
 (defn filter-input-component
   [data owner]
   (reify
@@ -88,7 +121,7 @@
       (om/build typeahead/typeahead (typeahead/phrase-index
                                      (map #(hash-map :term %
                                                      :props {:field true
-                                                             :completions (typeahead/word-index [{:term "test"}])})
+                                                             :completion-fn completions})
                                           (apply conj (keys filter/field-keys)
                                                  filter/model-fields)))
                 {:opts {:input-config {:placeholder "Filter..."

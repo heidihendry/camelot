@@ -220,3 +220,33 @@
                                             "" {:props {:context "abc"}}}}}}}
                        "world")
              nil)))))
+
+(deftest field-context-test
+  (testing "Field context"
+    (testing "should return field context at point"
+      (is (= (sut/field-context "field:hel" 9)
+             "field")))
+
+    (testing "should set context immediately following the field"
+      (is (= (sut/field-context "field:" 6)
+             "field")))
+
+    (testing "should not set field context when within a field"
+      (is (= (sut/field-context "field:" 5)
+             nil)))
+
+    (testing "should lose context once a space is inserted"
+      (is (= (sut/field-context "field:hel " 10)
+             nil)))
+
+    (testing "should lose context once a pipe is inserted"
+      (is (= (sut/field-context "field:hel|" 10)
+             nil)))
+
+    (testing "should be fine with an empty expression"
+      (is (= (sut/field-context "" 0)
+             nil)))
+
+    (testing "should be fine with a single character expression"
+      (is (= (sut/field-context "a" 1)
+             nil)))))

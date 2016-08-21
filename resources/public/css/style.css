@@ -1377,6 +1377,8 @@ pre.field-input {
     border: 1px solid #ccc;
     margin-left: 0.5rem;
     margin-top: -1rem;
+    max-height: calc(100vh - 16rem);
+    overflow: auto;
 }
 #app .typeahead-menu .menu-item {
     padding: 0.4rem 0.5rem;

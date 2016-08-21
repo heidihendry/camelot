@@ -1,12 +1,17 @@
 (ns typeahead.core
   "Input field with powerful typeahead."
   (:require [om.core :as om]
-            [cljs.core.async :refer [<! chan >!]]
+            [cljs.core.async :refer [<! chan >! alts!]]
             [om.dom :as dom]
             [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def term-separator-re #"[|+ :]")
+
+(defn ->basic-entry
+  [term]
+  {:term term
+   :props {}})
 
 (defn- into-index
   "Add a list of characters to an index, implemented as a trie."
@@ -17,10 +22,10 @@
       (assoc idx "" props))
     (let [c (first cs)
           next (into-index (get idx c) (rest cs) props)]
-      (dissoc (assoc idx c (if (contains? (get idx c) :props)
-                             (merge {"" (get idx c)} next)
-                             next))
-              :props))))
+      (assoc (dissoc idx :props) c
+             (if (contains? (get idx c) :props)
+               (merge {"" (get idx c)} next)
+               next)))))
 
 (defn index-single
   "Given an existing index, add a new word."
@@ -91,8 +96,7 @@
        (reduce search-reducer data)
        match-builder
        (map #(str prefix %))
-       (sort)
-       (sort-by count)))
+       (sort #(compare (str/lower-case %1) (str/lower-case %2)))))
 
 (defn- props-for-subtree
   [st]
@@ -102,9 +106,11 @@
 (defn ifind
   "Return the props for search, or nil if search is not in the index."
   [index search]
-  (->> (seq search)
-       (reduce search-reducer index)
-       props-for-subtree))
+  (if (nil? search)
+    nil
+    (->> (seq search)
+         (reduce search-reducer index)
+         props-for-subtree)))
 
 (defn- term-separators
   [search]
@@ -148,6 +154,23 @@
       (apply str (splice (seq search) (seq insertion) (- end (count term)) end)))
     insertion))
 
+(defn field-context
+  "Return the field responsible for setting context at point, if any."
+  [search point]
+  (if (zero? point)
+    nil
+    (reduce #(let [c (nth search %2)]
+               (cond
+                 (or (= c "|") (= c " "))
+                 (reduced nil)
+
+                 (= c ":")
+                 (reduced (term-at-point search %2))
+
+                 :else nil))
+            nil
+            (range (dec point) 0 -1))))
+
 (defn typeahead
   "Input component with typeahead-style completion."
   [data owner {:keys [create-text create-fn input-config multi-term]}]
@@ -155,10 +178,18 @@
     om/IInitState
     (init-state [_]
       {::value ""
-       ::chan (chan)})
+       ::int-chan (chan)
+       ::completion-chan (chan)})
     om/IWillUpdate
     (will-update [_ props state]
-      (let [si (om/get-node owner "search-input")]
+      (let [si (om/get-node owner "search-input")
+            ctx (field-context (::value state)
+                               (.-selectionStart si))]
+        (when-not (= (::context state) ctx)
+          (om/set-state! owner ::context ctx)
+          (om/set-state! owner ::completions nil)
+          (let [cfn (:completion-fn (ifind data ctx))]
+            (and cfn (cfn ctx (::completion-chan state)))))
         (om/set-state! owner
                        ::term
                        ((if multi-term
@@ -167,27 +198,32 @@
                           (.-selectionStart si)))))
     om/IWillMount
     (will-mount [_]
-      (let [c (om/get-state owner ::chan)]
+      (let [ic (om/get-state owner ::int-chan)
+            cc (om/get-state owner ::completion-chan)]
         (go
           (loop []
-            (let [r (<! c)]
-              (if (::select r)
-                (do
-                  (let [si (om/get-node owner "search-input")
-                        props (ifind data (::select r))]
-                    (om/set-state! owner ::value
-                                   (replace-term (om/get-state owner ::value)
-                                                 (.-selectionStart si)
-                                                 (str (::select r)
-                                                      (if (:field props)
-                                                        ":"
-                                                        " "))
-                                                 multi-term)))
-                  (.focus (om/get-node owner "search-input"))))
+            (let [[r port] (alts! [ic cc])]
+              (if (= port ic)
+                (if (::select r)
+                  (do
+                    (let [si (om/get-node owner "search-input")
+                          props (ifind data (::select r))]
+                      (om/set-state! owner ::value
+                                     (replace-term (om/get-state owner ::value)
+                                                   (.-selectionStart si)
+                                                   (str (::select r)
+                                                        (if (:field props)
+                                                          ":"
+                                                          " "))
+                                                   multi-term)))
+                    (.focus (om/get-node owner "search-input"))))
+                (do (prn "Setting completions!")
+                    (om/set-state! owner ::completions r)))
               (recur))))))
     om/IRenderState
     (render-state [_ state]
-      (let [v (::term state)]
+      (let [v (::term state)
+            ctx (::completions state)]
         (dom/div #js {:className "typeahead"}
                  (dom/input (clj->js (merge input-config
                                             {:value (::value state)
@@ -198,10 +234,10 @@
                                                           (let [tv (.. % -target -value)]
                                                             (om/set-state! owner ::value tv)
                                                             (when tv
-                                                              (go (>! (::chan state) tv)))))})))
-                 (when-not (empty? v)
+                                                              (go (>! (::int-chan state) tv)))))})))
+                 (when-not (and (empty? v) (empty? ctx))
                    (om/build completion-list-component
                              (map #(hash-map :completion %
-                                             :context nil) (complete data v))
-                             {:init-state {::chan (::chan state)}
+                                             :context nil) (complete (or ctx data) v))
+                             {:init-state {::chan (::int-chan state)}
                               :opts {:show-create (not (nil? create-fn))}})))))))
