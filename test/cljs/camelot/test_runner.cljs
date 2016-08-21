@@ -5,13 +5,13 @@
    [camelot.component.albums-test]
    [camelot.util.filter-test]
    [om-datepicker.test-components]
-   [typeahead.core]
+   [typeahead.core-test]
    [camelot.util.trap-station-test]))
 
 (enable-console-print!)
 
 (doo-tests 'om-datepicker.test-components
-           'typeahead.core
+           'typeahead.core-test
            'camelot.nav-test
            'camelot.component.albums-test
            'camelot.util.filter-test

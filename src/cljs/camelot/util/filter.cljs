@@ -22,6 +22,49 @@
    "proc" :media-processed
    "city" :site-city})
 
+(def model-fields
+  ["camera-id"
+   "camera-make"
+   "camera-model"
+   "camera-name"
+   "media-attention-needed"
+   "media-cameracheck"
+   "media-capture-timestamp"
+   "media-created"
+   "media-filename"
+   "media-format"
+   "media-id"
+   "media-processed"
+   "media-updated"
+   "media-uri"
+   "sighting-id"
+   "sighting-created"
+   "sighting-quantity"
+   "sighting-updated"
+   "site-city"
+   "site-id"
+   "site-name"
+   "site-sublocation"
+   "survey-id"
+   "survey-site-id"
+   "taxonomy-class"
+   "taxonomy-created"
+   "taxonomy-common-name"
+   "taxonomy-family"
+   "taxonomy-genus"
+   "taxonomy-id"
+   "taxonomy-label"
+   "taxonomy-notes"
+   "taxonomy-order"
+   "taxonomy-species"
+   "taxonomy-updated"
+   "trap-station-id"
+   "trap-station-latitude"
+   "trap-station-longitude"
+   "trap-station-name"
+   "trap-station-session-camera-id"
+   "trap-station-session-id"])
+
 (defn field-key-lookup
   [f]
   (or (get field-keys f) (keyword f)))
