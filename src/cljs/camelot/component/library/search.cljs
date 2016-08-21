@@ -8,8 +8,9 @@
             [camelot.nav :as nav]
             [typeahead.core :as typeahead]
             [clojure.string :as str]
-            [cljs.core.async :refer [<! chan >!]])
-    (:require-macros [cljs.core.async.macros :refer [go]]))
+            [cljs.core.async :refer [<! chan >!]]
+            [camelot.util.cursorise :as cursorise])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn add-sighting
   []
@@ -38,7 +39,8 @@
 
 (defn identify-selected-prompt
   []
-  (.focus (.getElementById js/document "identify-species-select"))
+  (if-let [el (.getElementById js/document "identify-species-select")]
+    (.focus el))
   (om/transact! (:search (state/library-state)) :identify-selected not))
 
 (defn submit-identification
@@ -287,6 +289,82 @@
                           (om/build identification-panel-button-component (:search data)
                                     {:state {:has-selected has-selected}})))))))
 
+(defn validate-proposed-species
+  [data]
+  (and (not (nil? (:new-species-name data)))
+       (= (count (str/split (:new-species-name data) #" ")) 2)))
+
+(defn add-taxonomy-success-handler
+  [data resp]
+  (let [species (cursorise/decursorise (:body resp))]
+    (om/transact! data :species #(conj % (hash-map (:taxonomy-id species) species)))
+    (om/update! data :new-species-name nil)
+    (om/update! (get-in data [:identification]) :species (str (:taxonomy-id species)))
+    (om/update! data :taxonomy-create-mode false)))
+
+(defn add-taxonomy-handler
+  [data]
+  (let [segments (str/split (:new-species-name data) #" ")]
+    (rest/post-x "/taxonomy"
+                 {:data {:taxonomy-genus (first segments)
+                         :taxonomy-species (second segments)
+                         :taxonomy-common-name "N/A"}}
+                 (partial add-taxonomy-success-handler data)))
+  (nav/analytics-event "library-id" "taxonomy-create"))
+
+(defn add-taxonomy-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [is-valid (validate-proposed-species data)]
+        (dom/form #js {:className "field-input-form inline"
+                       :onSubmit #(.preventDefault %)}
+                  (dom/input #js {:className "field-input inline long-input"
+                                  :autoFocus "autofocus"
+                                  :placeholder "New species name..."
+                                  :value (get-in data [:new-species-name])
+                                  :onChange #(om/update! data :new-species-name
+                                                         (.. % -target -value))})
+                  (if (empty? (:new-species-name data))
+                    (dom/input #js {:type "submit"
+                                    :className "btn btn-default input-field-submit"
+                                    :onClick #(om/update! data :taxonomy-create-mode false)
+                                    :value "Cancel"})
+                    (dom/input #js {:type "submit"
+                                    :disabled (if is-valid "" "disabled")
+                                    :title (when-not is-valid
+                                             "A species with this name already exists")
+                                    :className "btn btn-primary input-field-submit"
+                                    :onClick #(add-taxonomy-handler data)
+                                    :value "Add"})))))))
+
+(defn taxonomy-select-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (if (or (empty? (:species data)) (:taxonomy-create-mode data))
+        (om/build add-taxonomy-component data)
+        (dom/select #js {:className "field-input"
+                         :id "identify-species-select"
+                         :value (get-in data [:identification :species])
+                         :onChange #(let [v (.. % -target -value)]
+                                      (if (= v "create")
+                                        (do
+                                          (om/update! data :taxonomy-create-mode true)
+                                          (.focus (om/get-node owner)))
+                                        (om/update! (:identification data) :species v)))}
+                    (om/build-all species-option-component
+                                  (cons {:taxonomy-id -1
+                                         :taxonomy-label "Select..."}
+                                        (reverse (conj (into '()
+                                                             (sort-by :taxonomy-label
+                                                                      (vals (:species data))))
+                                                       {:taxonomy-id "create"
+                                                        :taxonomy-label "Add a new species..."})))
+                                  {:key :taxonomy-id}))))))
+
 (defn identification-bar-component
   [data owner]
   (reify
@@ -300,21 +378,11 @@
                (dom/div nil
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Species")
-                                 (dom/select #js {:className "field-input"
-                                                  :id "identify-species-select"
-                                                  :value (get-in data [:identification :species])
-                                                  :onChange #(do (om/update! (:identification data) :species
-                                                                             (.. % -target -value))
-                                                                 (nav/analytics-event "library-id" "species-change"))}
-                                             (om/build-all species-option-component
-                                                           (conj (sort-by :taxonomy-label (vals (:species data)))
-                                                                 {:taxonomy-id -1
-                                                                  :taxonomy-label "Select..."})
-                                                           {:key :taxonomy-id})))
+                                 (om/build taxonomy-select-component data))
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Quantity")
                                  (dom/input #js {:type "number"
-                                                 :className "field-input"
+                                                 :className "field-input short-input"
                                                  :value (get-in data [:identification :quantity])
                                                  :onChange #(when (re-find #"^[0-9]+$"
                                                                            (get-in data [:identification :quantity]))
@@ -323,9 +391,10 @@
                                                               (nav/analytics-event "library-id" "quantity-change"))}))
                         (dom/div #js {:className "field"}
                                  (dom/button #js {:className "btn btn-primary"
-                                                  :disabled (when (not (and (get-in data [:identification :quantity])
-                                                                            (get-in data [:identification :species])
-                                                                            (> (get-in data [:identification :species]) -1)))
+                                                  :disabled (when (or (not (and (get-in data [:identification :quantity])
+                                                                                (get-in data [:identification :species])
+                                                                                (> (get-in data [:identification :species]) -1)))
+                                                                      (:taxonomy-create-mode data))
                                                               "disabled")
                                                   :onClick #(do (submit-identification)
                                                                 (nav/analytics-event "library-id" "submit-identification"))}
