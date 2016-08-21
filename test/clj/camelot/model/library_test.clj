@@ -27,6 +27,7 @@
    :camera-name "ABC01"
    :survey-site-id 99
    :survey-id 6
+   :survey-name "My Survey"
    :site-id 9
    :site-name "My Site"})
 
