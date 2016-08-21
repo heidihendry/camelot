@@ -92,14 +92,9 @@
 (def prefix-endpoints
   {"survey" "/surveys"
    "site" "/sites"
-   "trap-station" "/trap-stations"
-   "trap-station-session" "/trap-station-sessions"
-   "trap-station-session-camera" "/trap-station-session-cameras"
+   "trap" "/trap-stations"
    "camera" "/cameras"
-   "sighting" "/sightings"
-   "media" "/media"
-   "taxonomy" "/taxonomy"
-   "photo" "/photos"})
+   "taxonomy" "/taxonomy"})
 
 (defn completions
   [ctx ch]
