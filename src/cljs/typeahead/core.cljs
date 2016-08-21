@@ -56,11 +56,13 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {
-                    :className "menu-item"
+      (dom/div #js {:className (str "menu-item" (if (= (:index data)
+                                                       (::selection-index state))
+                                                  " active"
+                                                  ""))
                     :onClick #(go (>! (::chan state)
-                                      {::select (:completion data)}))}
-               (:completion data)))))
+                                      {::select (get-in data [:entry :completion])}))}
+               (get-in data [:entry :completion])))))
 
 (defn completion-list-component
   [data owner {:keys [show-create result-limit]}]
@@ -70,9 +72,13 @@
       (when (seq data)
         (dom/div #js {:className "typeahead-menu"}
                  (om/build-all completion-option-component
-                               data
-                               {:init-state state
-                                :key :completion}))))))
+                               (vec (map-indexed #(hash-map :entry %2
+                                                            :index %1)
+                                                 data))
+                               {:init-state {::chan (::chan state)}
+                                :state {::selection-index (mod (::selection-index state)
+                                                               (count data))}
+                                :key :index}))))))
 
 (defn- match-builder
   [data]
@@ -191,7 +197,8 @@
     (init-state [_]
       {::value ""
        ::int-chan (chan)
-       ::completion-chan (chan)})
+       ::completion-chan (chan)
+       ::selection-index 0})
     om/IWillUpdate
     (will-update [_ props state]
       (let [si (om/get-node owner "search-input")
@@ -233,6 +240,7 @@
                         ((:onChange input-config) v)))
                     (.focus (om/get-node owner "search-input"))))
                 (om/set-state! owner ::completions r))
+              (om/set-state! owner ::selection-index 0)
               (recur))))))
     om/IRenderState
     (render-state [_ state]
@@ -242,6 +250,31 @@
                  (dom/input (clj->js (merge input-config
                                             {:value (::value state)
                                              :ref "search-input"
+                                             :onKeyDown (fn [e]
+                                                          (cond
+                                                             (= (.-keyCode e) 38)
+                                                             (do (om/update-state! owner ::selection-index dec)
+                                                                 (.preventDefault e)
+                                                                 (.stopPropagation e)
+                                                                 (om/refresh! owner))
+
+                                                             (= (.-keyCode e) 40)
+                                                             (do (om/update-state! owner ::selection-index inc)
+                                                                 (.preventDefault e)
+                                                                 (.stopPropagation e)
+                                                                 (om/refresh! owner))
+
+                                                             (= (.-keyCode e) 13)
+                                                             (do (.preventDefault e)
+                                                                 (.stopPropagation e)
+                                                                 (if (not (and (empty? v) (empty? ctx)))
+                                                                   (let [comps (complete (or (and (::context state) ctx)
+                                                                                             data) v)]
+                                                                     (go (>! (::int-chan state)
+                                                                             {::select (nth comps
+                                                                                            (mod (::selection-index state)
+                                                                                                 (count comps)))}))))
+                                                                 (om/refresh! owner))))
                                              :onChange #(do
                                                           (let [tv (.. % -target -value)]
                                                             (when (:onChange input-config)
@@ -257,4 +290,5 @@
                                  (map #(hash-map :completion %
                                                  :context nil) completions)
                                  {:init-state {::chan (::int-chan state)}
+                                  :state {::selection-index (::selection-index state)}
                                   :opts {:show-create (not (nil? create-fn))}})))))))))

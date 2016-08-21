@@ -1387,6 +1387,9 @@ pre.field-input {
 #app .typeahead-menu .menu-item:hover {
     background: #eee;
 }
+#app .typeahead-menu .menu-item.active {
+    background: #eee;
+}
 #app .typeahead-menu .menu-item:last-child {
     border-bottom: none;
 }
