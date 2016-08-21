@@ -110,6 +110,7 @@
       (rest/get-x (str ep)
                   #(go (>! ch (->> (:body %)
                                    (mapv (keyword cf))
+                                   (filter (complement nil?))
                                    (mapv typeahead/->basic-entry)
                                    typeahead/word-index)))))))
 
@@ -129,7 +130,7 @@
                                        :title "Type a keyword you want the media to contain"
                                        :id "filter"
                                        :onChange #(do
-                                                    (om/update! data :terms (.. % -target -value))
+                                                    (om/update! data :terms %)
                                                     (om/update! data :page 1)
                                                     (om/update! data :dirty-state true))
                                        :value (get data :terms)

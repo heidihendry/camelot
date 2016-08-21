@@ -152,11 +152,13 @@
              tail))))
 
 (defn replace-term
-  [search point insertion multi-term]
+  [search point selection-end insertion multi-term]
   (if multi-term
-    (let [term (term-at-point search point)
-          end (next-separator search point)]
-      (apply str (splice (seq search) (seq insertion) (- end (count term)) end)))
+    (if (= point selection-end)
+      (let [term (term-at-point search point)
+            end (next-separator search point)]
+        (apply str (splice (seq search) (seq insertion) (- end (count term)) end)))
+      (apply str (splice (seq search) (seq insertion) point selection-end)))
     insertion))
 
 (defn field-context
@@ -217,15 +219,18 @@
                 (if (::select r)
                   (do
                     (let [si (om/get-node owner "search-input")
-                          props (ifind data (::select r))]
-                      (om/set-state! owner ::value
-                                     (replace-term (om/get-state owner ::value)
-                                                   (.-selectionStart si)
-                                                   (str (::select r)
-                                                        (if (:field props)
-                                                          ":"
-                                                          " "))
-                                                   multi-term)))
+                          props (ifind data (::select r))
+                          v (replace-term (om/get-state owner ::value)
+                                          (.-selectionStart si)
+                                          (.-selectionEnd si)
+                                          (str (::select r)
+                                               (if (:field props)
+                                                 ":"
+                                                 " "))
+                                                   multi-term)]
+                      (om/set-state! owner ::value v)
+                      (when (:onChange input-config)
+                        ((:onChange input-config) v)))
                     (.focus (om/get-node owner "search-input"))))
                 (om/set-state! owner ::completions r))
               (recur))))))
@@ -238,14 +243,15 @@
                                             {:value (::value state)
                                              :ref "search-input"
                                              :onChange #(do
-                                                          (when (:onChange input-config)
-                                                            ((:onChange input-config) %))
                                                           (let [tv (.. % -target -value)]
+                                                            (when (:onChange input-config)
+                                                              ((:onChange input-config) tv))
                                                             (om/set-state! owner ::value tv)
                                                             (when tv
                                                               (go (>! (::int-chan state) tv)))))})))
                  (when-not (and (empty? v) (empty? ctx))
-                   (let [completions (complete (or ctx data) v)]
+                   (let [completions (complete (or (and (::context state) ctx)
+                                                   data) v)]
                      (when-not (already-complete? completions v)
                        (om/build completion-list-component
                                  (map #(hash-map :completion %
