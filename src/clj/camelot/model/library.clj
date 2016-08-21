@@ -29,12 +29,15 @@
      trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      site-sublocation :- (s/maybe s/Str)
      site-city :- (s/maybe s/Str)
+     site-state-province :- (s/maybe s/Str)
+     site-country :- (s/maybe s/Str)
      camera-id :- s/Int
      camera-name :- s/Str
      camera-make :- (s/maybe s/Str)
      camera-model :- (s/maybe s/Str)
      survey-site-id :- s/Int
      survey-id :- s/Int
+     survey-name :- s/Str
      site-id :- s/Int
      site-name :- s/Str
      sightings :- [Sighting]])
@@ -45,17 +48,18 @@
            media-capture-timestamp trap-station-session-camera-id
            trap-station-session-id trap-station-id trap-station-name
            trap-station-longitude trap-station-latitude site-sublocation
-           site-city camera-id camera-name camera-make camera-model
-           survey-site-id survey-id site-id site-name sightings]}]
+           site-city site-state-province site-country camera-id camera-name
+           camera-make camera-model survey-site-id survey-id survey-name
+           site-id site-name sightings]}]
   (->LibraryRecord media-id media-created media-updated media-filename
                    media-format media-uri media-cameracheck
                    media-attention-needed (or media-processed false)
                    media-capture-timestamp trap-station-session-camera-id
                    trap-station-session-id trap-station-id trap-station-name
                    trap-station-longitude trap-station-latitude
-                   site-sublocation site-city camera-id camera-name
-                   camera-make camera-model survey-site-id survey-id site-id
-                   site-name (or sightings [])))
+                   site-sublocation site-city site-state-province site-country camera-id
+                   camera-name camera-make camera-model survey-site-id survey-id
+                   survey-name site-id site-name (or sightings [])))
 
 (defn- all-media
   [state]
