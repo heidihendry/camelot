@@ -30,7 +30,7 @@
 (defn index-single
   "Given an existing index, add a new word."
   [idx {:keys [term props]}]
-  (into-index idx (seq term) {:props props}))
+  (into-index idx (seq (str/lower-case term)) {:props props}))
 
 (defn- transforming-index
   [transformer phrases]
@@ -92,7 +92,9 @@
 (defn complete
   "Return all possible completions given the index data and a prefix."
   [data prefix]
-  (->> (seq prefix)
+  (->> prefix
+       str/lower-case
+       seq
        (reduce search-reducer data)
        match-builder
        (map #(str prefix %))
@@ -108,13 +110,16 @@
   [index search]
   (if (nil? search)
     nil
-    (->> (seq search)
+    (->> search
+         str/lower-case
+         seq
          (reduce search-reducer index)
          props-for-subtree)))
 
 (defn- term-separators
   [search]
   (->> search
+       str/lower-case
        seq
        (map-indexed #(vector %1 %2))
        (filter #(re-matches term-separator-re (second %)))
@@ -171,6 +176,11 @@
             nil
             (range (dec point) 0 -1))))
 
+(defn already-complete?
+  [cs v]
+  (and (= (count cs) 1)
+       (= (first cs) v)))
+
 (defn typeahead
   "Input component with typeahead-style completion."
   [data owner {:keys [create-text create-fn input-config multi-term]}]
@@ -189,7 +199,7 @@
           (om/set-state! owner ::context ctx)
           (om/set-state! owner ::completions nil)
           (let [cfn (:completion-fn (ifind data ctx))]
-            (and cfn (cfn ctx (::completion-chan state)))))
+            (and cfn (cfn (str/lower-case ctx) (::completion-chan state)))))
         (om/set-state! owner
                        ::term
                        ((if multi-term
@@ -217,8 +227,7 @@
                                                           " "))
                                                    multi-term)))
                     (.focus (om/get-node owner "search-input"))))
-                (do (prn "Setting completions!")
-                    (om/set-state! owner ::completions r)))
+                (om/set-state! owner ::completions r))
               (recur))))))
     om/IRenderState
     (render-state [_ state]
@@ -236,8 +245,10 @@
                                                             (when tv
                                                               (go (>! (::int-chan state) tv)))))})))
                  (when-not (and (empty? v) (empty? ctx))
-                   (om/build completion-list-component
-                             (map #(hash-map :completion %
-                                             :context nil) (complete (or ctx data) v))
-                             {:init-state {::chan (::int-chan state)}
-                              :opts {:show-create (not (nil? create-fn))}})))))))
+                   (let [completions (complete (or ctx data) v)]
+                     (when-not (already-complete? completions v)
+                       (om/build completion-list-component
+                                 (map #(hash-map :completion %
+                                                 :context nil) completions)
+                                 {:init-state {::chan (::int-chan state)}
+                                  :opts {:show-create (not (nil? create-fn))}})))))))))
