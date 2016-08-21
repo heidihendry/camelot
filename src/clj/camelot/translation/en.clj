@@ -266,6 +266,8 @@
                                  :description "Species name."}
               :taxonomy-common-name {:label "Common Name"
                                      :description "Common name by which this taxonomy is known."}
+              :species-mass-id {:label "Species mass"
+                                :description "The approximate mass for an average adult."}
               :taxonomy-notes {:label "Notes"
                                :description "Notes about this species or its identification."}}
    :application {:import "Import"

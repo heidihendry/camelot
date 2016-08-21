@@ -16,6 +16,7 @@
              [sighting :as sighting]
              [site :as site]
              [taxonomy :as taxonomy]
+             [species-mass :as species-mass]
              [survey :as survey]
              [survey-site :as survey-site]
              [trap-station :as trap-station]
@@ -173,6 +174,11 @@
            (POST "/" [data] (rest/create-resource taxonomy/create!
                                                   taxonomy/ttaxonomy data))
            (DELETE "/:id" [id] (rest/delete-resource taxonomy/delete! id)))
+
+  (context "/species-mass" []
+           (GET "/" [] (rest/list-resources species-mass/get-all :species-mass))
+           (GET "/available/" [id] (rest/list-resources species-mass/get-all :species-mass))
+           (GET "/alternatives/:id" [id] (rest/list-resources species-mass/get-all :species-mass)))
 
   (context "/application" []
            (GET "/metadata" [] (r/response (application/get-metadata (app/gen-state (conf/config)))))

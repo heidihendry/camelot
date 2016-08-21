@@ -63,7 +63,10 @@
                             :baseurl "/survey-sites"}
    :taxonomy-available {:vkey :taxonomy-id
                        :desc :taxonomy-species
-                       :baseurl "/sightings"}
+                        :baseurl "/sightings"}
+   :species-mass {:vkey :species-mass-id
+                  :desc :species-mass-label
+                  :baseurl "/species-mass"}
    :trap-station-session-cameras-available {:vkey :camera-id
                                             :desc :camera-name
                                             :baseurl "/trap-station-session-cameras"}})

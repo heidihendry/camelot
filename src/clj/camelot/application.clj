@@ -389,6 +389,7 @@ Currently the only application state is the user's configuration."
             [:taxonomy-genus]
             [:taxonomy-species]
             [:taxonomy-common-name]
+            [:species-mass-id]
             [:taxonomy-notes]]
    :schema {:taxonomy-class {:type :text}
             :taxonomy-order {:type :text}
@@ -398,7 +399,9 @@ Currently the only application state is the user's configuration."
             :taxonomy-species {:type :text
                                :required true}
             :taxonomy-common-name {:type :text
-                                  :required true}
+                                   :required true}
+            :species-mass-id {:type :select
+                              :generator :species-mass}
             :taxonomy-notes {:type :textarea
                             :cols 35
                             :rows 4}}

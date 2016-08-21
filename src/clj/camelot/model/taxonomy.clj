@@ -13,6 +13,7 @@
      taxonomy-genus :- (s/maybe s/Str)
      taxonomy-species :- s/Str
      taxonomy-common-name :- (s/maybe s/Str)
+     species-mass-id :- (s/maybe s/Int)
      taxonomy-notes :- (s/maybe s/Str)])
 
 (s/defrecord Taxonomy
@@ -25,22 +26,23 @@
      taxonomy-genus :- (s/maybe s/Str)
      taxonomy-species :- s/Str
      taxonomy-common-name :- (s/maybe s/Str)
+     species-mass-id :- (s/maybe s/Int)
      taxonomy-notes :- (s/maybe s/Str)
      taxonomy-label :- s/Str])
 
 (s/defn ttaxonomy :- TTaxonomy
   [{:keys [taxonomy-class taxonomy-order taxonomy-family taxonomy-genus
-           taxonomy-species taxonomy-common-name taxonomy-notes]}]
+           taxonomy-species taxonomy-common-name species-mass-id taxonomy-notes]}]
   (->TTaxonomy taxonomy-class taxonomy-order taxonomy-family taxonomy-genus
-               taxonomy-species taxonomy-common-name taxonomy-notes))
+               taxonomy-species taxonomy-common-name species-mass-id taxonomy-notes))
 
 (s/defn taxonomy :- Taxonomy
   [{:keys [taxonomy-id taxonomy-created taxonomy-updated taxonomy-class
            taxonomy-order taxonomy-family taxonomy-genus taxonomy-species
-           taxonomy-common-name taxonomy-notes taxonomy-label]}]
+           taxonomy-common-name species-mass-id taxonomy-notes taxonomy-label]}]
   (->Taxonomy taxonomy-id taxonomy-created taxonomy-updated taxonomy-class
                taxonomy-order taxonomy-family taxonomy-genus taxonomy-species
-               taxonomy-common-name taxonomy-notes taxonomy-label))
+               taxonomy-common-name species-mass-id taxonomy-notes taxonomy-label))
 
 (defn- add-label
   "Assoc a key for the label, which is a computed value."
