@@ -117,14 +117,26 @@
 (defn filter-input-component
   [data owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (let [rf #(filter (complement nil?) (mapv %1 %2))]
+        (rest/get-x "/taxonomy"
+                    #(om/update! data :taxonomy-completions
+                                 {:species (rf :taxonomy-label (:body %))
+                                  :common-names (rf :taxonomy-common-name (:body %))}))))
     om/IRender
     (render [_]
       (om/build typeahead/typeahead (typeahead/phrase-index
-                                     (map #(hash-map :term %
-                                                     :props {:field true
-                                                             :completion-fn completions})
-                                          (apply conj (keys filter/field-keys)
-                                                 filter/model-fields)))
+                                     (apply conj (map #(hash-map :term %
+                                                                 :props {:field true
+                                                                         :completion-fn completions})
+                                                      (apply conj (keys filter/field-keys)
+                                                             filter/model-fields))
+                                            (if (get-in data [:taxonomy-completions :species])
+                                              (mapv typeahead/->basic-entry
+                                                    (apply conj (get-in data [:taxonomy-completions :species])
+                                                           (get-in data [:taxonomy-completions :common-names])))
+                                              [])))
                 {:opts {:input-config {:placeholder "Filter..."
                                        :className "field-input search"
                                        :title "Type a keyword you want the media to contain"
