@@ -50,9 +50,13 @@
                         "r" {"d" {:props {}}}}}})))
 
     (testing "should accept alphanumeric characters."
-      (is (= (sut/word-index (map ->no-context ["TRAP:10"]))
-             {"T" {"R" {"A" {"P" {:props {}}}}}
+      (is (= (sut/word-index (map ->no-context ["trap:10"]))
+             {"t" {"r" {"a" {"p" {:props {}}}}}
               "1" {"0" {:props {}}}})))
+
+    (testing "should be case insensitive."
+      (is (= (sut/word-index (map ->no-context ["TRAP"]))
+             {"t" {"r" {"a" {"p" {:props {}}}}}})))
 
     (testing "should produce the expected result for a series of similar words."
       (is (= (sut/word-index (map ->no-context ["the" "that" "then" "than" "hen" "thin"]))
@@ -113,11 +117,11 @@
                                              "o" {:props {}}}}}}} "hel")
            ["hell" "hello"])))
 
-  (testing "Results are sorted by length, then alphabetically."
+  (testing "Results are sorted alphabetically."
     (is (= (sut/complete {"x" {"y" {"z" {:props {}}}}
                          "a" {"b" {"c" {"e" {:props {}}
                                         "d" {:props {}}}}}} "")
-           ["xyz" "abcd" "abce"])))
+           ["abcd" "abce" "xyz"])))
 
   (testing "Should be able to numerous completions in a more complex trie."
     (is (= (sut/complete {"h" {"e" {"n" {:props {}}}}
@@ -126,7 +130,7 @@
                                    "i" {"n" {:props {}}}
                                    "a" {"n" {:props {}}
                                         "t" {:props {}}}}}} "")
-           ["hen" "the" "than" "that" "then" "thin"])))
+           ["hen" "than" "that" "the" "then" "thin"])))
 
   (testing "Should complete phrases"
     (is (= (sut/complete
@@ -182,24 +186,28 @@
 
 (deftest replace-term-test
   (testing "Should replace the entire search if not multi-term"
-    (is (= (sut/replace-term "hello world" 5 "replacement" false)
+    (is (= (sut/replace-term "hello world" 5 5 "replacement" false)
            "replacement")))
 
   (testing "Should perform basic replacement if multi-term"
-    (is (= (sut/replace-term "hel" 3 "hello" true)
+    (is (= (sut/replace-term "hel" 3 3 "hello" true)
            "hello")))
 
   (testing "Should replace term at point if multi-term"
-    (is (= (sut/replace-term "hello world" 5 "replacement" true)
+    (is (= (sut/replace-term "hello world" 5 5 "replacement" true)
            "replacement world")))
 
   (testing "Should append replacement text if starting a new term"
-    (is (= (sut/replace-term "hello " 6 "replacement" true)
+    (is (= (sut/replace-term "hello " 6 6 "replacement" true)
            "hello replacement")))
 
   (testing "Should be clever about replacing fields"
-    (is (= (sut/replace-term "test:yes hello:" 10 "world:" true)
-           "test:yes world:"))))
+    (is (= (sut/replace-term "test:yes hello:" 10 10 "world:" true)
+           "test:yes world:")))
+
+  (testing "Should allow arbitrary replacements"
+    (is (= (sut/replace-term "test:yes hello:" 5 15 "yay" true)
+           "test:yay"))))
 
 (deftest ifind-test
   (testing "Find"
