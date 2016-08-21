@@ -6,7 +6,10 @@
             [camelot.state :as state]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
-            [clojure.string :as str]))
+            [typeahead.core :as typeahead]
+            [clojure.string :as str]
+            [cljs.core.async :refer [<! chan >!]])
+    (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn add-sighting
   []
@@ -79,23 +82,69 @@
       (let [node (.getElementById js/document "media-collection-container")]
         (.focus node)))))
 
+(defn completion-field
+  [ctx]
+  (let [field (get filter/field-keys ctx)]
+    (if field
+      (name field)
+      (some (set filter/model-fields) (list ctx)))))
+
+(def prefix-endpoints
+  {"survey" "/surveys"
+   "site" "/sites"
+   "trap" "/trap-stations"
+   "camera" "/cameras"
+   "taxonomy" "/taxonomy"})
+
+(defn completions
+  [ctx ch]
+  (let [cf (completion-field ctx)
+        ep (get prefix-endpoints (first (str/split cf #"-")))]
+    (if (or (nil? cf) (nil? ep))
+      []
+      (rest/get-x (str ep)
+                  #(go (>! ch (->> (:body %)
+                                   (mapv (keyword cf))
+                                   (filter (complement nil?))
+                                   (mapv typeahead/->basic-entry)
+                                   typeahead/word-index)))))))
+
 (defn filter-input-component
   [data owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (let [rf #(filter (complement nil?) (mapv %1 %2))]
+        (rest/get-x "/taxonomy"
+                    #(om/update! data :taxonomy-completions
+                                 {:species (rf :taxonomy-label (:body %))
+                                  :common-names (rf :taxonomy-common-name (:body %))}))))
     om/IRender
     (render [_]
-      (dom/input #js {:type "text"
-                      :placeholder "Filter..."
-                      :id "filter"
-                      :title "Type a keyword you want the media to contain"
-                      :disabled (if (get data :identify-selected)
-                                  "disabled" "")
-                      :className "field-input search"
-                      :onKeyDown select-media-collection-container
-                      :value (get data :terms)
-                      :onChange #(do (om/update! data :terms (.. % -target -value))
-                                     (om/update! data :page 1)
-                                     (om/update! data :dirty-state true))}))))
+      (om/build typeahead/typeahead (typeahead/phrase-index
+                                     (apply conj (map #(hash-map :term %
+                                                                 :props {:field true
+                                                                         :completion-fn completions})
+                                                      (apply conj (keys filter/field-keys)
+                                                             filter/model-fields))
+                                            (if (get-in data [:taxonomy-completions :species])
+                                              (mapv typeahead/->basic-entry
+                                                    (apply conj (get-in data [:taxonomy-completions :species])
+                                                           (get-in data [:taxonomy-completions :common-names])))
+                                              [])))
+                {:opts {:input-config {:placeholder "Filter..."
+                                       :className "field-input search"
+                                       :title "Type a keyword you want the media to contain"
+                                       :id "filter"
+                                       :onChange #(do
+                                                    (om/update! data :terms %)
+                                                    (om/update! data :page 1)
+                                                    (om/update! data :dirty-state true))
+                                       :value (get data :terms)
+                                       :onKeyDown select-media-collection-container
+                                       :disabled (if (get data :identify-selected)
+                                                   "disabled" "")}
+                        :multi-term true}}))))
 
 (defn filter-survey-component
   [data owner]

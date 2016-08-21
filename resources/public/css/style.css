@@ -1366,3 +1366,30 @@ pre.field-input {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
+#app .typeahead {
+    display: inline-block;
+}
+#app .typeahead-menu {
+    background: white;
+    position: absolute;
+    z-index: 10;
+    width: 20rem;
+    border: 1px solid #ccc;
+    margin-left: 0.5rem;
+    margin-top: -1rem;
+    max-height: calc(100vh - 16rem);
+    overflow: auto;
+}
+#app .typeahead-menu .menu-item {
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+#app .typeahead-menu .menu-item:hover {
+    background: #eee;
+}
+#app .typeahead-menu .menu-item.active {
+    background: #eee;
+}
+#app .typeahead-menu .menu-item:last-child {
+    border-bottom: none;
+}
