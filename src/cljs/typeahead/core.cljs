@@ -157,14 +157,23 @@
              (drop 1 tail)
              tail))))
 
+(defn insertion-chars
+  [insertion]
+  (let [qd (if (re-matches #".*[\ \|].*" insertion)
+             (str "\"" insertion "\"")
+             insertion)]
+    (seq (if (= (last insertion) ":")
+           qd
+           (str qd " ")))))
+
 (defn replace-term
   [search point selection-end insertion multi-term]
   (if multi-term
     (if (= point selection-end)
       (let [term (term-at-point search point)
             end (next-separator search point)]
-        (apply str (splice (seq search) (seq insertion) (- end (count term)) end)))
-      (apply str (splice (seq search) (seq insertion) point selection-end)))
+        (apply str (splice (seq search) (insertion-chars insertion) (- end (count term)) end)))
+      (apply str (splice (seq search) (insertion-chars insertion) point selection-end)))
     insertion))
 
 (defn field-context
@@ -231,10 +240,8 @@
                                           (.-selectionStart si)
                                           (.-selectionEnd si)
                                           (str (::select r)
-                                               (if (:field props)
-                                                 ":"
-                                                 " "))
-                                                   multi-term)]
+                                               (if (:field props) ":" ""))
+                                          multi-term)]
                       (om/set-state! owner ::value v)
                       (when (:onChange input-config)
                         ((:onChange input-config) v)))

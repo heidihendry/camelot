@@ -118,7 +118,7 @@
                                    (mapv (keyword cf))
                                    (filter (complement nil?))
                                    (mapv typeahead/->basic-entry)
-                                   typeahead/word-index)))))))
+                                   typeahead/phrase-index)))))))
 
 (defn filter-input-component
   [data owner]

@@ -191,15 +191,15 @@
 
   (testing "Should perform basic replacement if multi-term"
     (is (= (sut/replace-term "hel" 3 3 "hello" true)
-           "hello")))
+           "hello ")))
 
   (testing "Should replace term at point if multi-term"
     (is (= (sut/replace-term "hello world" 5 5 "replacement" true)
-           "replacement world")))
+           "replacement  world")))
 
   (testing "Should append replacement text if starting a new term"
     (is (= (sut/replace-term "hello " 6 6 "replacement" true)
-           "hello replacement")))
+           "hello replacement ")))
 
   (testing "Should be clever about replacing fields"
     (is (= (sut/replace-term "test:yes hello:" 10 10 "world:" true)
@@ -207,7 +207,7 @@
 
   (testing "Should allow arbitrary replacements"
     (is (= (sut/replace-term "test:yes hello:" 5 15 "yay" true)
-           "test:yay"))))
+           "test:yay "))))
 
 (deftest ifind-test
   (testing "Find"

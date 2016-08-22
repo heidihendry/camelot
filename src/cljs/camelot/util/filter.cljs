@@ -123,7 +123,7 @@
 
 (defn conjunctive-terms
   [search species record]
-  (every? #(record-matches % species record) (str/split search #" ")))
+  (every? #(record-matches % species record) (str/split search #"\+\+\+")))
 
 (defn disjunctive-terms
   [search species record]
@@ -159,10 +159,29 @@
                            ""))
       (#(str/join "|" %))))
 
+(defn format-reducer
+  [acc c]
+  (cond
+    (and (= c " ") (not (:quoted acc)))
+    (update acc :result #(conj % "+++"))
+
+    (= c "\"")
+    (update acc :quoted not)
+
+    :else
+    (update acc :result #(conj % c))))
+
+(defn format-terms
+  [terms]
+  (str/lower-case (apply str (:result (reduce format-reducer {:result []
+                                                              :quoted false}
+                                              (seq terms))))))
+
 (defn only-matching
   [terms data]
-  (filter
-   #(matches-search? (append-subfilters (str/lower-case (or terms "")) (:search data))
-                     (:species data)
-                     %)
-   (vals (get-in data [:search :results]))))
+  (let [t (format-terms terms)]
+    (filter
+     #(matches-search? (format-terms (append-subfilters (or t "") (:search data)))
+                       (:species data)
+                       %)
+     (vals (get-in data [:search :results])))))

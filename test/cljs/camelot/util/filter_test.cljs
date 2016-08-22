@@ -233,7 +233,7 @@
                     :media-id 2}}
         data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching "flag:true" data) expected))))
+    (is (= (sut/only-matching "flagged:true" data) expected))))
 
 (deftest finds-media-attention-needed-false-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -247,7 +247,7 @@
                     :media-id 1}}
         data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching "flag:false" data) expected))))
+    (is (= (sut/only-matching "flagged:false" data) expected))))
 
 (deftest finds-media-processed-true-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -261,7 +261,7 @@
                     :media-id 2}}
         data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching "proc:true" data) expected))))
+    (is (= (sut/only-matching "processed:true" data) expected))))
 
 (deftest finds-media-processed-false-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -275,7 +275,7 @@
                     :media-id 1}}
         data {:search {:results results}
               :species species}]
-    (is (= (sut/only-matching "proc:false" data) expected))))
+    (is (= (sut/only-matching "processed:false" data) expected))))
 
 (deftest supports-unprocessed-only-flag
   (let [expected [{:sightings [{:taxonomy-id 2}]
@@ -310,16 +310,16 @@
 (deftest unprocessed-only-flag-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
     (is (= (sut/append-subfilters search {:unprocessed-only true})
-           (str "taxonomy-species:wolf mysite proc:false|"
-                "taxonomy-species:cat proc:false|"
-                "wolf proc:false")))))
+           (str "taxonomy-species:wolf mysite processed:false|"
+                "taxonomy-species:cat processed:false|"
+                "wolf processed:false")))))
 
 (deftest flagged-only-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
     (is (= (sut/append-subfilters search {:flagged-only true})
-           (str "taxonomy-species:wolf mysite flag:true|"
-                "taxonomy-species:cat flag:true|"
-                "wolf flag:true")))))
+           (str "taxonomy-species:wolf mysite flagged:true|"
+                "taxonomy-species:cat flagged:true|"
+                "wolf flagged:true")))))
 
 (deftest trap-id-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
@@ -332,6 +332,16 @@
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
     (is (= (sut/append-subfilters search {:unprocessed-only true
                                           :trap-station-id 5})
-           (str "taxonomy-species:wolf mysite proc:false trapid:5|"
-                "taxonomy-species:cat proc:false trapid:5|"
-                "wolf proc:false trapid:5")))))
+           (str "taxonomy-species:wolf mysite processed:false trapid:5|"
+                "taxonomy-species:cat processed:false trapid:5|"
+                "wolf processed:false trapid:5")))))
+
+(deftest term-formatter-replaces-spaces
+  (let [search "this is a test"]
+    (is (= (sut/format-terms search)
+           "this+++is+++a+++test"))))
+
+(deftest term-formatter-leaves-spaces-in-quotes-alone
+  (let [search "this is \"a test\""]
+    (is (= (sut/format-terms search)
+           "this+++is+++\"a test\""))))
