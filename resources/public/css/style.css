@@ -1029,10 +1029,10 @@ pre.field-input {
 }
 #app .library .search-bar input[type=checkbox] {
     display: block;
-    width: 2rem;
-    height: 2rem;
+    width: 1.6rem;
+    height: 1.6rem;
     margin: auto;
-    margin-top: 0.2rem;
+    margin-top: -0.4rem;
     text-align: center;
 }
 #app table {

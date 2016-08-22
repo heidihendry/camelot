@@ -17,9 +17,10 @@
    "lat" :trap-station-latitude
    "model" :camera-model
    "make" :camera-make
-   "flag" :media-attention-needed
    "trapid" :trap-station-id
-   "proc" :media-processed
+   "flagged" :media-attention-needed
+   "processed" :media-processed
+   "reference-quality" :media-reference-quality
    "city" :site-city})
 
 (def model-fields
@@ -149,8 +150,9 @@
   (-> s
       (str/split #"\|")
       (non-empty-list)
-      (append-to-strings (if (:unprocessed-only search-conf) " proc:false" ""))
-      (append-to-strings (if (:flagged-only search-conf) " flag:true" ""))
+      (append-to-strings (if (:unprocessed-only search-conf) " processed:false" ""))
+      (append-to-strings (if (:flagged-only search-conf) " flagged:true" ""))
+      (append-to-strings (if (:reference-only search-conf) " reference-quality:true" ""))
       (append-to-strings (if (and (:trap-station-id search-conf)
                                   (> (:trap-station-id search-conf) -1))
                            (str " trapid:" (:trap-station-id search-conf))

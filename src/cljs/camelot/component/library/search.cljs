@@ -102,8 +102,17 @@
   [ctx ch]
   (let [cf (completion-field ctx)
         ep (get prefix-endpoints (first (str/split cf #"-")))]
-    (if (or (nil? cf) (nil? ep))
-      []
+    (cond
+      (some #(= ctx %) '("flagged" "processed" "reference-quality"))
+      (go
+        (->> ["true" "false"]
+             (mapv typeahead/->basic-entry)
+             typeahead/word-index
+             (>! ch)))
+
+      (or (nil? cf) (nil? ep)) nil
+
+      :else
       (rest/get-x (str ep)
                   #(go (>! ch (->> (:body %)
                                    (mapv (keyword cf))
@@ -291,6 +300,8 @@
                                                                            :label "Unprocessed"}})
                  (om/build subfilter-checkbox-component data {:init-state {:key :flagged-only
                                                                            :label "Flagged"}})
+                 (om/build subfilter-checkbox-component data {:init-state {:key :reference-only
+                                                                           :label "Reference"}})
                  (dom/div #js {:className "pull-right action-container"}
                           (om/build media-flag-container-component data)
                           (om/build identification-panel-button-component (:search data)
