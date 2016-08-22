@@ -56,14 +56,14 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className (str "typeahead-elem menu-item" (if (= (:index data)
-                                                                      (::selection-index state))
-                                                                 " active"
-                                                                 ""))
+      (dom/div #js {:className (str "menu-item" (if (= (:index data)
+                                                       (::selection-index state))
+                                                  " active"
+                                                  ""))
                     :onClick #(do
                                 (om/set-state! owner ::async-pending true)
                                 (go (>! (::chan state)
-                                          {::select (get-in data [:entry :completion])})))}
+                                        {::select (get-in data [:entry :completion])})))}
                (get-in data [:entry :completion])))))
 
 (defn completion-list-component
@@ -72,7 +72,7 @@
     om/IRenderState
     (render-state [_ state]
       (when (seq data)
-        (dom/div #js {:className "typeahead-elem typeahead-menu"}
+        (dom/div #js {:className "typeahead-menu"}
                  (om/build-all completion-option-component
                                (vec (map-indexed #(hash-map :entry %2
                                                             :index %1)
