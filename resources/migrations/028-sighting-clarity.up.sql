@@ -1,0 +1,1 @@
+ALTER TABLE media ADD COLUMN media_reference_quality BOOLEAN NOT NULL DEFAULT FALSE

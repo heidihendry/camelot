@@ -263,7 +263,14 @@
                                         :fn util/set-processed
                                         :id "media-processed"
                                         :classFn #(str "fa fa-2x fa-check processed"
-                                                       (if % " green" ""))}})))))
+                                                       (if % " green" ""))}})
+                (om/build media-flag-component data
+                          {:init-state {:title "Indicates the selected media are high quality and should be used as a reference"
+                                        :key :media-reference-quality
+                                        :fn util/set-reference-quality
+                                        :id "media-reference-quality"
+                                        :classFn #(str "fa fa-2x fa-trophy reference-quality"
+                                                       (if % " yellow " ""))}})))))
 
 (defn search-bar-component
   [data owner]

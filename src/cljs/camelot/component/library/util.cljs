@@ -63,6 +63,13 @@
   (show-select-message)
   (set-flag-state :media-attention-needed flag-state))
 
+(defn set-reference-quality
+  [flag-state]
+  (om/update! (:search (state/library-state))
+              :show-select-action (if flag-state "reference" "ordinary"))
+  (show-select-message)
+  (set-flag-state :media-reference-quality flag-state))
+
 (defn set-processed
   [flag-state]
   (om/update! (:search (state/library-state)) :show-select-action (if flag-state

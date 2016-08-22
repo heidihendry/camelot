@@ -1,7 +1,7 @@
 -- name: -create<!
 INSERT INTO media (media_created, media_updated, media_filename,
        media_notes, media_cameracheck, media_attention_needed,
-       media_processed, media_capture_timestamp,
+       media_processed, media_capture_timestamp, media_reference_quality,
        trap_station_session_camera_id, media_format)
 VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :media_filename,
        :media_notes, :media_cameracheck, :media_attention_needed,
@@ -11,7 +11,7 @@ VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :media_filename,
 -- name: -get-specific
 SELECT media_id, media_created, media_updated, media_filename,
        media_notes, media_cameracheck, media_attention_needed,
-       media_processed, media_capture_timestamp,
+       media_processed, media_capture_timestamp, media_reference_quality,
        trap_station_session_camera_id, media_format
 FROM media
 WHERE media_id = :media_id
@@ -19,7 +19,7 @@ WHERE media_id = :media_id
 -- name: -get-all
 SELECT media_id, media_created, media_updated, media_filename,
        media_notes, media_cameracheck, media_attention_needed,
-       media_processed, media_capture_timestamp,
+       media_processed, media_capture_timestamp, media_reference_quality,
        trap_station_session_camera_id, media_format
 FROM media
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
@@ -35,6 +35,7 @@ SET media_updated = CURRENT_TIMESTAMP,
     media_attention_needed = :media_attention_needed,
     media_processed = :media_processed,
     trap_station_session_camera_id = :trap_station_session_camera_id,
+    media_reference_quality = :media_reference_quality,
     media_filename = :media_filename
 WHERE media_id = :media_id
 
@@ -45,7 +46,7 @@ WHERE media_id = :media_id
 -- name: -get-specific-by-filename
 SELECT media_id, media_created, media_updated, media_filename,
        media_notes, media_cameracheck, media_attention_needed,
-       media_processed, media_capture_timestamp,
+       media_processed, media_capture_timestamp, media_reference_quality,
        trap_station_session_camera_id, media_format
 FROM media
 WHERE media_filename = :media_filename
@@ -53,10 +54,16 @@ WHERE media_filename = :media_filename
 -- name: -update-media-flags!
 UPDATE media
 SET media_attention_needed = :media_attention_needed,
-    media_processed = :media_processed
+    media_processed = :media_processed,
+    media_reference_quality = :media_reference_quality
 WHERE media_id = :media_id
 
 -- name: -update-processed-flag!
 UPDATE media
 SET media_processed = :media_processed
+WHERE media_id = :media_id
+
+-- name: -update-reference-quality-flag!
+UPDATE media
+SET media_processed = :media_reference_quality
 WHERE media_id = :media_id

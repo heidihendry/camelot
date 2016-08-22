@@ -19,6 +19,7 @@
      media-attention-needed :- s/Bool
      media-processed :- (s/maybe s/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
+     media-reference-quality :- (s/maybe s/Bool)
      trap-station-session-camera-id :- s/Int])
 
 (s/defrecord Media
@@ -32,23 +33,24 @@
      media-attention-needed :- s/Bool
      media-processed :- (s/maybe s/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
+     media-reference-quality :- s/Bool
      trap-station-session-camera-id :- s/Int])
 
 (s/defn tmedia
   [{:keys [media-filename media-format media-notes media-cameracheck
            media-attention-needed media-processed media-capture-timestamp
-           trap-station-session-camera-id]}]
+           media-reference-quality trap-station-session-camera-id]}]
   (->TMedia media-filename media-format media-notes media-cameracheck
             media-attention-needed media-processed media-capture-timestamp
-            trap-station-session-camera-id))
+            (or media-reference-quality false) trap-station-session-camera-id))
 
 (s/defn media
   [{:keys [media-id media-created media-updated media-filename media-format
            media-notes media-cameracheck media-attention-needed media-processed
-           media-capture-timestamp trap-station-session-camera-id]}]
+           media-reference-quality media-capture-timestamp trap-station-session-camera-id]}]
   (->Media media-id media-created media-updated media-filename media-format
            media-notes media-cameracheck media-attention-needed media-processed
-           media-capture-timestamp trap-station-session-camera-id))
+           media-capture-timestamp media-reference-quality trap-station-session-camera-id))
 
 (s/defn get-all :- [Media]
   [state :- State
@@ -60,16 +62,16 @@
    id :- s/Int]
   (some->> {:media-id id}
            (db/with-db-keys state -get-specific)
-           (first)
-           (media)))
+           first
+           media))
 
 (s/defn get-specific-by-filename :- (s/maybe Media)
   [state :- State
    filename :- s/Str]
   (some->> {:media-filename filename}
            (db/with-db-keys state -get-specific-by-filename)
-           (first)
-           (media)))
+           first
+           media))
 
 (s/defn create! :- Media
   [state :- State
@@ -96,10 +98,18 @@
   (db/with-db-keys state -update-processed-flag! {:media-id media-id
                                                   :media-processed media-processed}))
 
+(s/defn update-reference-quality-flag!
+  [state :- State
+   {:keys [media-id media-reference-quality]}]
+  (db/with-db-keys state -update-reference-quality-flag!
+    {:media-id media-id
+     :media-reference-quality media-reference-quality}))
+
 (s/defn update-media-flags!
   [state :- State
-   {:keys [media-id media-attention-needed media-processed]}]
+   {:keys [media-id media-attention-needed media-processed media-reference-quality]}]
   (db/with-db-keys state -update-media-flags! {:media-id media-id
+                                               :media-reference-quality (or media-reference-quality false)
                                                :media-attention-needed media-attention-needed
                                                :media-processed media-processed}))
 
