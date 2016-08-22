@@ -1,7 +1,7 @@
 (ns typeahead.core
   "Input field with powerful typeahead."
   (:require [om.core :as om]
-            [cljs.core.async :refer [<! chan >! alts!]]
+            [cljs.core.async :refer [<! chan >! alts! timeout]]
             [om.dom :as dom]
             [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -56,12 +56,14 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className (str "menu-item" (if (= (:index data)
-                                                       (::selection-index state))
-                                                  " active"
-                                                  ""))
-                    :onClick #(go (>! (::chan state)
-                                      {::select (get-in data [:entry :completion])}))}
+      (dom/div #js {:className (str "typeahead-elem menu-item" (if (= (:index data)
+                                                                      (::selection-index state))
+                                                                 " active"
+                                                                 ""))
+                    :onClick #(do
+                                (om/set-state! owner ::async-pending true)
+                                (go (>! (::chan state)
+                                          {::select (get-in data [:entry :completion])})))}
                (get-in data [:entry :completion])))))
 
 (defn completion-list-component
@@ -70,7 +72,7 @@
     om/IRenderState
     (render-state [_ state]
       (when (seq data)
-        (dom/div #js {:className "typeahead-menu"}
+        (dom/div #js {:className "typeahead-elem typeahead-menu"}
                  (om/build-all completion-option-component
                                (vec (map-indexed #(hash-map :entry %2
                                                             :index %1)
@@ -223,7 +225,14 @@
                        ((if multi-term
                           term-at-point
                           identity) (::value state)
-                          (.-selectionStart si)))))
+                          (.-selectionStart si)))
+        (if (= (.-activeElement js/document) si)
+          (om/set-state! owner ::is-focused true)
+          ;; Slightly delay hiding, otherwise we lose the menu as soon as we
+          ;; go to click on something.
+          (go
+            (<! (timeout 100))
+            (om/set-state! owner ::is-focused false)))))
     om/IWillMount
     (will-mount [_]
       (let [ic (om/get-state owner ::int-chan)
@@ -243,6 +252,7 @@
                                                (if (:field props) ":" ""))
                                           multi-term)]
                       (om/set-state! owner ::value v)
+                      (om/set-state! owner ::async-pending false)
                       (when (:onChange input-config)
                         ((:onChange input-config) v)))
                     (.focus (om/get-node owner "search-input"))))
@@ -292,7 +302,8 @@
                  (when-not (and (empty? v) (empty? ctx))
                    (let [completions (complete (or (and (::context state) ctx)
                                                    data) v)]
-                     (when-not (already-complete? completions v)
+                     (when (and (not (already-complete? completions v))
+                                (::is-focused state))
                        (om/build completion-list-component
                                  (map #(hash-map :completion %
                                                  :context nil) completions)
