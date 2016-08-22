@@ -344,4 +344,4 @@
 (deftest term-formatter-leaves-spaces-in-quotes-alone
   (let [search "this is \"a test\""]
     (is (= (sut/format-terms search)
-           "this+++is+++\"a test\""))))
+           "this+++is+++a test"))))
