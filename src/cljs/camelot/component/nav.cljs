@@ -58,4 +58,6 @@
                             (:loading data)))
                (apply dom/ul #js {:className "nav navbar-nav"}
                       (om/build-all nav-item-component
-                                    (remove nil? (:menu-items (:nav (:application data))))))))))
+                                    (if (:restricted-mode data)
+                                      [nil]
+                                      (remove nil? (:menu-items (:nav (:application data)))))))))))

@@ -260,7 +260,7 @@
 
 (defn generate-view
   "Render the main page content"
-  [view & [{:keys [survey-id page-id report-key camera-id site-id]}]]
+  [view & [{:keys [survey-id page-id report-key camera-id site-id restricted-mode]}]]
   (if survey-id
     (rest/get-x (str "/surveys/" survey-id)
                 #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
@@ -271,6 +271,7 @@
              {:target (js/document.getElementById "page-content")
               :opts {:report-key report-key
                      :camera-id camera-id
+                     :restricted-mode restricted-mode
                      :site-id site-id}})))
 
 (defn settings-menu-view
@@ -318,6 +319,7 @@
 (defroute "/cameras" [] (page-content-view :camera :create {}))
 (defroute "/taxonomy" [] (page-content-view :taxonomy :create {}))
 (defroute "/library" [] (generate-view library/library-view-component))
+(defroute "/library/restricted" [] (generate-view library/library-view-component {:restricted-mode true}))
 (defroute "/:survey/library" [survey] (generate-view library/library-view-component
                                                      {:survey-id survey}))
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))

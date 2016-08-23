@@ -87,10 +87,12 @@
 
 (defn library-view-component
   "Render a collection of library."
-  [data owner]
+  [data owner {:keys [restricted-mode]}]
   (reify
     om/IWillMount
     (will-mount [_]
+      (when restricted-mode
+        (om/update! (state/app-state-cursor) :restricted-mode true))
       (om/update! (get-in data [:library :search]) :page 1)
       (om/update! (:library data) :survey-id (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! (get-in data [:library :search]) :show-select-count 0)
@@ -120,7 +122,8 @@
           (dom/div #js {:className "library"
                         :onKeyDown print-key
                         :tabIndex 0}
-                   (om/build search/search-component lib)
+                   (when-not restricted-mode
+                     (om/build search/search-component lib))
                    (when (get-in lib [:search :matches])
                      (om/build collection/media-collection-component lib))
                    (om/build preview/media-control-panel-component lib))
