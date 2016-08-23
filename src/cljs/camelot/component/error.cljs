@@ -22,7 +22,8 @@
                (dom/p #js {:className "error-paragraph"}
                       "If you think this is a bug, please "
                       (dom/a #js {:href new-issue-url
-                                  :target "_blank"}
+                                  :target "_blank"
+                                  :rel "noopener noreferrer"}
                              "Report an Issue"))
                (dom/button #js {:className "error-ack btn btn-danger"
                                 :onClick #(do (om/update! data :error nil)

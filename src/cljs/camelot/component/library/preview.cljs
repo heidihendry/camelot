@@ -26,7 +26,8 @@
       (dom/div #js {:className "preview"}
                (if selected
                  (dom/a #js {:href (str (get selected :media-uri))
-                             :target "_blank"}
+                             :target "_blank"
+                             :rel "noopener noreferrer"}
                         (dom/img #js {:src (str (get selected :media-uri))}))
                  (dom/div #js {:className "none-selected"}
                           (dom/h4 nil photo-not-selected)))))))
