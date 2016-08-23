@@ -85,6 +85,13 @@
         (nav/analytics-event "library-key" "C-a")
         (.preventDefault e))))
 
+(defn tincan-listener
+  [data search]
+  (util/load-library)
+  (search/update-terms (get data :search) search)
+  (om/update! (:search data) :matches
+              (map :media-id (filter/only-matching search data))))
+
 (defn library-view-component
   "Render a collection of library."
   [data owner {:keys [restricted-mode]}]
@@ -122,7 +129,8 @@
           (dom/div #js {:className "library"
                         :onKeyDown print-key
                         :tabIndex 0}
-                   (when-not restricted-mode
+                   (if restricted-mode
+                     (set! (.-tincan js/window) (partial tincan-listener lib))
                      (om/build search/search-component lib))
                    (when (get-in lib [:search :matches])
                      (om/build collection/media-collection-component lib))

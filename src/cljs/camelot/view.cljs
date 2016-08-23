@@ -298,43 +298,43 @@
       (om/root f state/app-state
                {:target (js/document.getElementById "page-content")}))))
 
-(defroute "/dashboard" [] (generate-view calb/album-view-component) {})
-(defroute "/surveys" [] (page-content-view :survey :create {}))
-(defroute "/surveys/:mode/:rid" [mode rid] (page-content-view :survey (keyword mode)
+(defroute "/#/dashboard" [] (generate-view calb/album-view-component) {})
+(defroute "/#/surveys" [] (page-content-view :survey :create {}))
+(defroute "/#/surveys/:mode/:rid" [mode rid] (page-content-view :survey (keyword mode)
                                                               {:resource-id rid}))
-(defroute "/trap-station-session-cameras/:id" [id] (page-content-view :trap-station-session-camera :create
+(defroute "/#/trap-station-session-cameras/:id" [id] (page-content-view :trap-station-session-camera :create
                                                                         {:id id}))
-(defroute "/trap-station-session-cameras/:id/:mode/:resource-id" [id mode resource-id]
+(defroute "/#/trap-station-session-cameras/:id/:mode/:resource-id" [id mode resource-id]
   (page-content-view :trap-station-session-camera (keyword mode) {:resource-id resource-id
                                                                   :id id}))
-(defroute "/trap-station-sessions/:id" [id] (page-content-view :trap-station-session :create
+(defroute "/#/trap-station-sessions/:id" [id] (page-content-view :trap-station-session :create
                                                                  {:id id}))
-(defroute "/media/:id" [id] (page-content-view :media :create
+(defroute "/#/media/:id" [id] (page-content-view :media :create
                                                  {:id id}))
-(defroute "/photos/:id" [id] (page-content-view :photo :create {:id id}))
-(defroute "/sightings/:id" [id] (page-content-view :sighting :create {:id id}))
-(defroute "/trap-stations/:id" [id] (page-content-view :trap-station :create {:id id}))
-(defroute "/survey-sites/:id" [id] (page-content-view :survey-site :create {:id id}))
-(defroute "/sites" [] (page-content-view :site :create {}))
-(defroute "/cameras" [] (page-content-view :camera :create {}))
-(defroute "/taxonomy" [] (page-content-view :taxonomy :create {}))
-(defroute "/library" [] (generate-view library/library-view-component))
-(defroute "/library/restricted" [] (generate-view library/library-view-component {:restricted-mode true}))
-(defroute "/:survey/library" [survey] (generate-view library/library-view-component
+(defroute "/#/photos/:id" [id] (page-content-view :photo :create {:id id}))
+(defroute "/#/sightings/:id" [id] (page-content-view :sighting :create {:id id}))
+(defroute "/#/trap-stations/:id" [id] (page-content-view :trap-station :create {:id id}))
+(defroute "/#/survey-sites/:id" [id] (page-content-view :survey-site :create {:id id}))
+(defroute "/#/sites" [] (page-content-view :site :create {}))
+(defroute "/#/cameras" [] (page-content-view :camera :create {}))
+(defroute "/#/taxonomy" [] (page-content-view :taxonomy :create {}))
+(defroute "/#/library/restricted" [] (generate-view library/library-view-component {:restricted-mode true}))
+(defroute "/#/library" [] (generate-view library/library-view-component))
+(defroute "/#/:survey/library" [survey] (generate-view library/library-view-component
                                                      {:survey-id survey}))
-(defroute "/organisation" [] (generate-view organisation/organisation-view-component))
-(defroute "/:survey" [survey] (generate-view survey/survey-view-component
+(defroute "/#/organisation" [] (generate-view organisation/organisation-view-component))
+(defroute "/#/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
-(defroute "/camera/:camera-id" [camera-id]
+(defroute "/#/camera/:camera-id" [camera-id]
   (generate-view camera/manage-view {:camera-id camera-id}))
-(defroute "/site/:site-id" [site-id]
+(defroute "/#/site/:site-id" [site-id]
   (generate-view site/manage-view {:site-id site-id}))
-(defroute "/report/:report-key" [report-key]
+(defroute "/#/report/:report-key" [report-key]
   (generate-view report/configure-report-view {:report-key report-key}))
-(defroute "/:survey/deployments/create" [survey]
+(defroute "/#/:survey/deployments/create" [survey]
   (generate-view deployment/create-view-component {:survey-id survey}))
-(defroute "/:survey/deployments/:trap-station-id" [survey trap-station-id]
+(defroute "/#/:survey/deployments/:trap-station-id" [survey trap-station-id]
   (generate-view deployment/deployment-view-component {:survey-id survey
                                                        :page-id trap-station-id}))
-(defroute "/survey/create" [] (generate-view survey/create-view-component))
+(defroute "/#/survey/create" [] (generate-view survey/create-view-component))
 (defroute "*" [] (generate-view cerr/not-found-page-component))

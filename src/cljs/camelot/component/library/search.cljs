@@ -8,7 +8,7 @@
             [camelot.nav :as nav]
             [typeahead.core :as typeahead]
             [clojure.string :as str]
-            [cljs.core.async :refer [<! chan >!]]
+            [cljs.core.async :refer [<! chan >! timeout]]
             [camelot.util.cursorise :as cursorise])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
@@ -120,6 +120,12 @@
                                    (mapv typeahead/->basic-entry)
                                    typeahead/phrase-index)))))))
 
+(defn update-terms
+  [data terms]
+  (om/update! data :terms terms)
+  (om/update! data :page 1)
+  (om/update! data :dirty-state true))
+
 (defn filter-input-component
   [data owner]
   (reify
@@ -147,10 +153,7 @@
                                        :className "field-input search"
                                        :title "Type a keyword you want the media to contain"
                                        :id "filter"
-                                       :onChange #(do
-                                                    (om/update! data :terms %)
-                                                    (om/update! data :page 1)
-                                                    (om/update! data :dirty-state true))
+                                       :onChange (partial update-terms data)
                                        :value (get data :terms)
                                        :onKeyDown select-media-collection-container
                                        :disabled (if (get data :identify-selected)
@@ -383,6 +386,34 @@
                                                         :taxonomy-label "Add a new species..."})))
                                   {:key :taxonomy-id}))))))
 
+(defn reference-photos-filter
+  [data]
+  (str (:taxonomy-label
+        (get (:species data)
+             (cljs.reader/read-string (get-in data [:identification :species]))))
+       " reference-quality:true"))
+
+(defn tincan-sender-wait
+  [window arg]
+  (go
+    (loop []
+      (if (.-tincan window)
+        (.tincan window arg)
+        (do
+          (<! (timeout 100))
+          (recur))))))
+
+(defn tincan-sender
+  [data]
+  (let [features "menubar=no,location=no,resizable=no,scrollbars=yes,dependent=yes"]
+    (if (and (:secondary-window data) (not (.-closed (:secondary-window data))))
+      (do (.focus (:secondary-window data))
+          (.tincan (:secondary-window data) (reference-photos-filter data)))
+      (let [w (.open js/window (str (nav/get-token) "/restricted")
+                     "Camelot | Reference photos" features)]
+        (om/update! data :secondary-window w)
+        (tincan-sender-wait w (reference-photos-filter data))))))
+
 (defn identification-bar-component
   [data owner]
   (reify
@@ -397,6 +428,9 @@
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Species")
                                  (om/build taxonomy-select-component data))
+                        (dom/button #js {:className "btn btn-default"
+                                         :onClick (partial tincan-sender data)}
+                                    "Reference photos")
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Quantity")
                                  (dom/input #js {:type "number"
