@@ -872,19 +872,22 @@ pre.field-input {
     width: 20rem;
 }
 #app .library .search-bar button {
-    margin: 0 0.5rem;
+    margin-right: 0.5rem;
 }
 #app .library .pagination-nav {
     position: relative;
     display: inline-block;
     margin-right: 1rem;
 }
+#app .library .search-bar .field-input {
+    margin-left: 0;
+}
 #app .library .search-bar select.field-input {
     width: auto;
     min-width: auto;
 }
 #app .library .search-bar .survey-select {
-    margin-right: 1rem;
+    margin-right: 0.5rem;
 }
 #app .library .subfilter-bar .btn {
     padding-top: 0.1rem;
@@ -908,8 +911,8 @@ pre.field-input {
     display: inline-block;
     top: -1rem;
     position: relative;
-    margin-left: 1rem;
-    margin-right: 1rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
     margin-top: 0;
     padding-top: 0;
 }
@@ -939,6 +942,7 @@ pre.field-input {
     cursor: pointer;
     top: 0.5rem;
     padding-left: 1rem;
+    margin-right: 0.5rem;
     opacity: 0.4;
 }
 .library .search-bar .reference-quality:hover {

@@ -86,11 +86,14 @@
         (.preventDefault e))))
 
 (defn tincan-listener
-  [data search]
-  (util/load-library)
-  (search/update-terms (get data :search) search)
-  (om/update! (:search data) :matches
-              (map :media-id (filter/only-matching search data))))
+  [data opts]
+  (let [search (aget opts "search")
+        reload (aget opts "reload")]
+    (when reload
+      (util/load-library))
+    (search/update-terms (get data :search) search)
+    (om/update! (:search data) :matches
+                (map :media-id (filter/only-matching search data)))))
 
 (defn library-view-component
   "Render a collection of library."

@@ -183,6 +183,40 @@
                                       (:surveys data))
                                 {:key :survey-id})))))
 
+(defn reference-photos-filter
+  [data spp]
+  (str (if (string? spp)
+         (:taxonomy-label
+          (get (:species data)
+               (cljs.reader/read-string spp)))
+         "")
+       " reference-quality:true"))
+
+(defn tincan-sender-wait
+  [window opts]
+  (go
+    (loop []
+      (if (.-tincan window)
+        (.tincan window opts)
+        (do
+          (<! (timeout 100))
+          (recur))))))
+
+(defn tincan-sender
+  [data spp reload {:keys [prevent-open]}]
+  (let [features "menubar=no,location=no,resizable=no,scrollbars=yes,dependent=yes"]
+    (if (and (:secondary-window data) (not (.-closed (:secondary-window data))))
+      (do
+        (.tincan (:secondary-window data)
+                 #js {:search (reference-photos-filter data spp)
+                      :reload reload}))
+      (when-not prevent-open
+        (let [w (.open js/window (str (nav/get-token) "/restricted")
+                       "Camelot | Reference photos" features)]
+          (om/update! data :secondary-window w)
+          (tincan-sender-wait w #js {:search (reference-photos-filter data spp)
+                                     :reload reload}))))))
+
 (defn identification-panel-button-component
   [data owner]
   (reify
@@ -194,7 +228,7 @@
                        :onClick #(do (identify-selected-prompt)
                                      (nav/analytics-event "library-id" "open-identification-panel"))
                        :disabled (if (or (not (:has-selected state))
-                                         (:identify-selected data))
+                                         (:identify-selected (:search data)))
                                    "disabled" "")}
                   "Identify Selected"))))
 
@@ -303,11 +337,17 @@
                                                                            :label "Unprocessed"}})
                  (om/build subfilter-checkbox-component data {:init-state {:key :flagged-only
                                                                            :label "Flagged"}})
-                 (om/build subfilter-checkbox-component data {:init-state {:key :reference-only
-                                                                           :label "Reference"}})
                  (dom/div #js {:className "pull-right action-container"}
                           (om/build media-flag-container-component data)
-                          (om/build identification-panel-button-component (:search data)
+                          (dom/button #js {:className "btn btn-default"
+                                           :onClick #(do
+                                                       (let [sw (:secondary-window data)]
+                                                         (when (and sw (not (.-closed sw)))
+                                                           (.focus sw)))
+                                                       (tincan-sender data "-1" true {}))
+                                           :title "Additional window which displays reference-quality photos of the currently selected species for identification."}
+                                      "Reference window")
+                          (om/build identification-panel-button-component data
                                     {:state {:has-selected has-selected}})))))))
 
 (defn validate-proposed-species
@@ -375,7 +415,9 @@
                                         (do
                                           (om/update! data :taxonomy-create-mode true)
                                           (.focus (om/get-node owner)))
-                                        (om/update! (:identification data) :species v)))}
+                                        (do
+                                          (om/update! (:identification data) :species v)
+                                          (tincan-sender data v false {:prevent-open true}))))}
                     (om/build-all species-option-component
                                   (cons {:taxonomy-id -1
                                          :taxonomy-label "Select..."}
@@ -385,34 +427,6 @@
                                                        {:taxonomy-id "create"
                                                         :taxonomy-label "Add a new species..."})))
                                   {:key :taxonomy-id}))))))
-
-(defn reference-photos-filter
-  [data]
-  (str (:taxonomy-label
-        (get (:species data)
-             (cljs.reader/read-string (get-in data [:identification :species]))))
-       " reference-quality:true"))
-
-(defn tincan-sender-wait
-  [window arg]
-  (go
-    (loop []
-      (if (.-tincan window)
-        (.tincan window arg)
-        (do
-          (<! (timeout 100))
-          (recur))))))
-
-(defn tincan-sender
-  [data]
-  (let [features "menubar=no,location=no,resizable=no,scrollbars=yes,dependent=yes"]
-    (if (and (:secondary-window data) (not (.-closed (:secondary-window data))))
-      (do (.focus (:secondary-window data))
-          (.tincan (:secondary-window data) (reference-photos-filter data)))
-      (let [w (.open js/window (str (nav/get-token) "/restricted")
-                     "Camelot | Reference photos" features)]
-        (om/update! data :secondary-window w)
-        (tincan-sender-wait w (reference-photos-filter data))))))
 
 (defn identification-bar-component
   [data owner]
@@ -428,9 +442,6 @@
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Species")
                                  (om/build taxonomy-select-component data))
-                        (dom/button #js {:className "btn btn-default"
-                                         :onClick (partial tincan-sender data)}
-                                    "Reference photos")
                         (dom/div #js {:className "field"}
                                  (dom/label nil "Quantity")
                                  (dom/input #js {:type "number"
