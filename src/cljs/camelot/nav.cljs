@@ -27,17 +27,20 @@
 
 (defn analytics-event
   ([component action]
-   (when js/window.ga
-     (js/window.ga "send" "event" component action)))
+   (if-let [ga (aget js/window "cljs_ga")]
+     (ga "send" "event" component action)
+     (.warn js/console "Analytics library not found")))
   ([component action label]
-   (when js/window.ga
-     (js/window.ga "send" "event" component action label))))
+   (if-let [ga (aget js/window "cljs_ga")]
+     (ga "send" "event" component action label)
+     (.warn js/console "Analytics library not found"))))
 
 (defn analytics-pageview
   [page]
-  (when js/window.ga
-    (js/window.ga "set" "page" page)
-    (js/window.ga "send" "pageview")))
+  (if-let [ga (aget js/window "cljs_ga")]
+    (do
+      (ga "set" "page" page)
+      (ga "send" "pageview"))))
 
 (defn set-token!
   [history token]
