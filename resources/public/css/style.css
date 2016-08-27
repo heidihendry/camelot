@@ -652,6 +652,12 @@ pre.field-input {
     cursor: pointer;
     float: right;
 }
+.library .sighting-extra-details {
+    margin-left: 2rem;
+    color: #333;
+    font-style: italic;
+    font-size: 90%;
+}
 .library .media-details-panel.show-panel {
     right: 0rem;
 }
@@ -829,12 +835,18 @@ pre.field-input {
 #app .library .field-input.short-input {
     display: inline-block;
     width: 8rem;
+    min-width: auto;
+}
+#app .library .field-input.auto-input {
+    display: inline-block;
+    width: auto;
+    min-width: auto;
 }
 #app .library .field-input.long-input {
     display: inline-block;
     width: 22rem;
 }
-#app .library .identify-selected .field select.field-input {
+#app .library .field select.field-input.taxonomy-select {
     width: 15rem;
 }
 #app .library .identify-selected .field label {

@@ -33,7 +33,7 @@
                                                (conj (:sightings (second %))
                                                      {:taxonomy-id spp
                                                       :sighting-lifestage lifestage
-                                                      :sighting-sex :sex
+                                                      :sighting-sex sex
                                                       :sighting-id (first %)
                                                       :sighting-quantity qty}))
                                    (om/update! (second %) :media-processed true))
@@ -413,7 +413,7 @@
     (render [_]
       (if (or (empty? (:species data)) (:taxonomy-create-mode data))
         (om/build add-taxonomy-component data)
-        (dom/select #js {:className "field-input"
+        (dom/select #js {:className "field-input auto-input"
                          :id "identify-species-select"
                          :value (get-in data [:identification :species])
                          :onChange #(let [v (.. % -target -value)]
@@ -446,7 +446,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/select #js {:className "field-input"
+      (dom/select #js {:className "field-input auto-input"
                        :value (get-in data [:identification :lifestage])
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :lifestage v))}
@@ -464,7 +464,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/select #js {:className "field-input"
+      (dom/select #js {:className "field-input auto-input"
                        :value (get-in data [:identification :sex])
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :sex v))}

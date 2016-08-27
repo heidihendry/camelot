@@ -5,7 +5,8 @@
             [om.core :as om]
             [camelot.component.library.util :as util]
             [camelot.rest :as rest]
-            [camelot.nav :as nav])
+            [camelot.nav :as nav]
+            [clojure.string :as str])
   (:import [goog.i18n DateTimeFormat]))
 
 (def photo-not-selected "Photo not selected")
@@ -32,6 +33,10 @@
                  (dom/div #js {:className "none-selected"}
                           (dom/h4 nil photo-not-selected)))))))
 
+(defn unidentified?
+  [v]
+  (or (nil? v) (= v "unidentified")))
+
 (defn mcp-details-sightings
   [sighting owner]
   (reify
@@ -45,7 +50,18 @@
                                            (nav/analytics-event "library-preview" "delete-sighting"))}))
                (:sighting-quantity sighting) "x "
                (:taxonomy-label (get (:species (state/library-state))
-                                       (:taxonomy-id sighting)))))))
+                                     (:taxonomy-id sighting)))
+               (let [ls (:sighting-lifestage sighting)
+                     sex (:sighting-sex sighting)]
+                 (when (or (unidentified? "unidentified")
+                           (unidentified? "unidentified"))
+                   (dom/p #js {:className "sighting-extra-details"}
+                          (str/join ", "
+                                    (filter (complement nil?)
+                                            [(when-not (unidentified? sex)
+                                               (str "Sex: " sex))
+                                             (when-not (unidentified? ls)
+                                               (str "LS: " ls))])))))))))
 
 (defn mcp-detail
   [data owner]
@@ -54,7 +70,7 @@
     (render-state [_ state]
       (dom/div nil
                (dom/label nil (:label state))
-               (dom/div #js {:className "data"} (get data (:key state)))))))
+               (dom/div #js {:className "data"} (or (get data (:key state)) "-"))))))
 
 (defn mcp-details-breakdown
   [data owner]
