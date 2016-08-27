@@ -336,6 +336,24 @@
                 "taxonomy-species:cat processed:false trapid:5|"
                 "wolf processed:false trapid:5")))))
 
+(deftest exact-matches-are-respected
+  (let [search "sighting-sex:f"
+        expected [{:sightings [{:taxonomy-id 1 :sighting-sex "F"}]
+                   :media-id 2
+                   :media-processed true}]
+        results {1 {:sightings [{:taxonomy-id 1 :sighting-sex "F"}]
+                    :media-id 2
+                    :media-processed true}
+                 2 {:sightings [{:taxonomy-id 2 :sighting-sex "unidentified"}]
+                    :media-id 1
+                    :media-processed false}
+                 3 {:sightings [{:taxonomy-id 3 :sighting-sex nil}]
+                    :media-id 3
+                    :media-processed false}}
+        data {:search {:results results}
+              :species species}]
+    (is (= (sut/only-matching search data) expected))))
+
 (deftest term-formatter-replaces-spaces
   (let [search "this is a test"]
     (is (= (sut/format-terms search)

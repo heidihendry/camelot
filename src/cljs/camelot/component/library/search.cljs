@@ -116,6 +116,20 @@
              typeahead/word-index
              (>! ch)))
 
+      (= ctx "sighting-sex")
+      (go
+        (->> ["M" "F" "unidentified"]
+             (mapv typeahead/->basic-entry)
+             typeahead/word-index
+             (>! ch)))
+
+      (= ctx "sighting-lifestage")
+      (go
+        (->> ["adult" "juvenile" "unidentified"]
+             (mapv typeahead/->basic-entry)
+             typeahead/word-index
+             (>! ch)))
+
       (or (nil? cf) (nil? ep)) nil
 
       :else

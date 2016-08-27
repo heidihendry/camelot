@@ -41,6 +41,8 @@
    "sighting-id"
    "sighting-created"
    "sighting-quantity"
+   "sighting-lifestage"
+   "sighting-sex"
    "sighting-updated"
    "site-city"
    "site-id"
@@ -69,6 +71,9 @@
    "trap-station-session-camera-id"
    "trap-station-session-id"])
 
+(def exact-matches-needed
+  #{:sighting-sex :sighting-lifestage})
+
 (defn field-key-lookup
   [f]
   (or (get field-keys f) (keyword f)))
@@ -96,6 +101,10 @@
            (:sightings rec)))
     (list rec)))
 
+(defn needs-exact-match?
+  [f]
+  (some #(= % (field-key-lookup f)) exact-matches-needed))
+
 (defn field-search
   [search species sightings]
   (let [[f s] (str/split search #":")]
@@ -104,7 +113,10 @@
                    sightings))
       (some #(if (= s "*")
                (not (nil? (get % (field-key-lookup f))))
-               (substring? (nil->empty (get % (field-key-lookup f))) s))
+               (if (needs-exact-match? f)
+                 (= (str/lower-case (nil->empty (get % (field-key-lookup f))))
+                    (str/lower-case (nil->empty s)))
+                 (substring? (nil->empty (get % (field-key-lookup f))) s)))
             sightings))))
 
 (defn record-string-search
