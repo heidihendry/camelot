@@ -104,6 +104,12 @@
    "camera" "/cameras"
    "taxonomy" "/taxonomy"})
 
+(defn basic-word-index
+  [xs]
+  (->> xs
+       (mapv typeahead/->basic-entry)
+       typeahead/word-index))
+
 (defn completions
   [ctx ch]
   (let [cf (completion-field ctx)
@@ -112,22 +118,19 @@
       (some #(= ctx %) '("flagged" "processed" "reference-quality"))
       (go
         (->> ["true" "false"]
-             (mapv typeahead/->basic-entry)
-             typeahead/word-index
+             basic-word-index
              (>! ch)))
 
       (= ctx "sighting-sex")
       (go
         (->> ["M" "F" "unidentified"]
-             (mapv typeahead/->basic-entry)
-             typeahead/word-index
+             basic-word-index
              (>! ch)))
 
       (= ctx "sighting-lifestage")
       (go
         (->> ["adult" "juvenile" "unidentified"]
-             (mapv typeahead/->basic-entry)
-             typeahead/word-index
+             basic-word-index
              (>! ch)))
 
       (or (nil? cf) (nil? ep)) nil
@@ -203,14 +206,24 @@
                                       (:surveys data))
                                 {:key :survey-id})))))
 
-(defn reference-photos-filter
+(defn species-reference-filter
   [data spp]
-  (str (if (string? spp)
+  (if (string? spp)
+    (str "species:"
          (:taxonomy-label
           (get (:species data)
-               (cljs.reader/read-string spp)))
-         "")
-       " reference-quality:true"))
+               (cljs.reader/read-string spp))))
+    ""))
+
+(defn unidentified?
+  [x]
+  (or (nil? x) (= "unidentified" x)))
+
+(defn maybe-unidentified-reference-filter
+  [f x]
+  (if (unidentified? x)
+    ""
+    (str f ":" x)))
 
 (defn tincan-sender-wait
   [window opts]
@@ -222,19 +235,30 @@
           (<! (timeout 100))
           (recur))))))
 
+(defn build-reference-filter-string
+  [data]
+  (str (species-reference-filter data (get-in data [:identification :species]))
+       " "
+       (maybe-unidentified-reference-filter "sighting-sex"
+                                            (get-in data [:identification :sex]))
+       " "
+       (maybe-unidentified-reference-filter "sighting-lifestage"
+                                            (get-in data [:identification :lifestage]))
+       " reference-quality:true"))
+
 (defn tincan-sender
-  [data spp reload {:keys [prevent-open]}]
+  [data reload {:keys [prevent-open]}]
   (let [features "menubar=no,location=no,resizable=no,scrollbars=yes,dependent=yes"]
     (if (and (:secondary-window data) (not (.-closed (:secondary-window data))))
       (do
         (.tincan (:secondary-window data)
-                 #js {:search (reference-photos-filter data spp)
+                 #js {:search (build-reference-filter-string data)
                       :reload reload}))
       (when-not prevent-open
         (let [w (.open js/window (str (nav/get-token) "/restricted")
                        "Camelot | Reference photos" features)]
           (om/update! data :secondary-window w)
-          (tincan-sender-wait w #js {:search (reference-photos-filter data spp)
+          (tincan-sender-wait w #js {:search (build-reference-filter-string data)
                                      :reload reload}))))))
 
 (defn identification-panel-button-component
@@ -364,7 +388,7 @@
                                                        (let [sw (:secondary-window data)]
                                                          (when (and sw (not (.-closed sw)))
                                                            (.focus sw)))
-                                                       (tincan-sender data "-1" true {}))
+                                                       (tincan-sender data true {}))
                                            :title "Additional window which displays reference-quality photos of the currently selected species for identification."}
                                       "Reference window")
                           (om/build identification-panel-button-component data
@@ -437,7 +461,7 @@
                                           (.focus (om/get-node owner)))
                                         (do
                                           (om/update! (:identification data) :species v)
-                                          (tincan-sender data v false {:prevent-open true}))))}
+                                          (om/update! (:identification data) :dirty-state true))))}
                     (om/build-all species-option-component
                                   (cons {:taxonomy-id -1
                                          :taxonomy-label "Select..."}
@@ -463,7 +487,8 @@
       (dom/select #js {:className "field-input auto-input"
                        :value (get-in data [:identification :lifestage])
                        :onChange #(let [v (.. % -target -value)]
-                                    (om/update! (:identification data) :lifestage v))}
+                                    (om/update! (:identification data) :lifestage v)
+                                    (om/update! (:identification data) :dirty-state true))}
                   (om/build-all sighting-option-component
                                 (list {:key "unidentified"
                                        :label "Unidentified"}
@@ -481,7 +506,8 @@
       (dom/select #js {:className "field-input auto-input"
                        :value (get-in data [:identification :sex])
                        :onChange #(let [v (.. % -target -value)]
-                                    (om/update! (:identification data) :sex v))}
+                                    (om/update! (:identification data) :sex v)
+                                    (om/update! (:identification data) :dirty-state true))}
                   (om/build-all sighting-option-component
                                 (list {:key "unidentified"
                                        :label "Unidentified"}
@@ -551,6 +577,9 @@
         (om/update! (:search data) :dirty-state false)
         (om/update! (:search data) :matches
                     (map :media-id (filter/only-matching (-> data :search :terms) data))))
+      (when (-> data :identification :dirty-state)
+        (om/update! (:identification data) :dirty-state false)
+        (tincan-sender data false {:prevent-open true}))
       (dom/div #js {:className "search-container"}
                (om/build search-bar-component data)
                (om/build identification-bar-component data)))))
