@@ -16,10 +16,14 @@
   []
   (let [spp (cljs.reader/read-string (get-in (state/library-state) [:identification :species]))
         qty (get-in (state/library-state) [:identification :quantity])
+        lifestage (get-in (state/library-state) [:identification :lifestage])
+        sex (get-in (state/library-state) [:identification :sex])
         selected (:selected-media-id (state/library-state))
         all-selected (util/all-media-selected)]
     (rest/put-x "/library/identify" {:data (merge {:identification
                                                    {:quantity qty
+                                                    :lifestage lifestage
+                                                    :sex sex
                                                     :species spp}}
                                                   {:media
                                                    (map :media-id all-selected)})}
@@ -28,6 +32,8 @@
                                                :sightings
                                                (conj (:sightings (second %))
                                                      {:taxonomy-id spp
+                                                      :sighting-lifestage lifestage
+                                                      :sighting-sex :sex
                                                       :sighting-id (first %)
                                                       :sighting-quantity qty}))
                                    (om/update! (second %) :media-processed true))
@@ -428,6 +434,49 @@
                                                         :taxonomy-label "Add a new species..."})))
                                   {:key :taxonomy-id}))))))
 
+(defn sighting-option-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (:key data)} (:label data)))))
+
+(defn sighting-lifestage-select-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/select #js {:className "field-input"
+                       :value (get-in data [:identification :lifestage])
+                       :onChange #(let [v (.. % -target -value)]
+                                    (om/update! (:identification data) :lifestage v))}
+                  (om/build-all sighting-option-component
+                                (list {:key "unidentified"
+                                       :label "Unidentified"}
+                                      {:key "adult"
+                                       :label "Adult"}
+                                      {:key "juvenile"
+                                       :label "Juvenile"})
+                                {:key :key})))))
+
+(defn sighting-sex-select-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/select #js {:className "field-input"
+                       :value (get-in data [:identification :sex])
+                       :onChange #(let [v (.. % -target -value)]
+                                    (om/update! (:identification data) :sex v))}
+                  (om/build-all sighting-option-component
+                                (list {:key "unidentified"
+                                       :label "Unidentified"}
+                                      {:key "M"
+                                       :label "Male"}
+                                      {:key "F"
+                                       :label "Female"})
+                                {:key :key})))))
+
 (defn identification-bar-component
   [data owner]
   (reify
@@ -452,6 +501,12 @@
                                                               (om/update! (:identification data) :quantity
                                                                           (cljs.reader/read-string (.. % -target -value)))
                                                               (nav/analytics-event "library-id" "quantity-change"))}))
+                        (dom/div #js {:className "field"}
+                                 (dom/label nil "Sex")
+                                 (om/build sighting-sex-select-component data))
+                        (dom/div #js {:className "field"}
+                                 (dom/label nil "Life stage")
+                                 (om/build sighting-lifestage-select-component data))
                         (dom/div #js {:className "field"}
                                  (dom/button #js {:className "btn btn-primary"
                                                   :disabled (when (or (not (and (get-in data [:identification :quantity])

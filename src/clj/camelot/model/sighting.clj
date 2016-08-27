@@ -6,8 +6,16 @@
 
 (sql/defqueries "sql/sightings.sql" {:connection db/spec})
 
+(def sighting-default-option "unidentified")
+
+(defn known-or-nil
+  [v]
+  (if (= v sighting-default-option) nil v))
+
 (s/defrecord TSighting
     [sighting-quantity :- s/Int
+     sighting-lifestage :- (s/maybe s/Str)
+     sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- s/Int
      media-id :- s/Int])
 
@@ -16,19 +24,23 @@
      sighting-created :- org.joda.time.DateTime
      sighting-updated :- org.joda.time.DateTime
      sighting-quantity :- s/Int
+     sighting-lifestage :- (s/maybe s/Str)
+     sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- (s/maybe s/Int)
      media-id :- s/Int])
 
 (s/defn sighting :- Sighting
   [{:keys [sighting-id sighting-created sighting-updated sighting-quantity
-           taxonomy-id media-id]}]
+           sighting-lifestage sighting-sex taxonomy-id media-id]}]
   (->Sighting sighting-id sighting-created sighting-updated sighting-quantity
+              (or sighting-lifestage sighting-default-option)
+              (or sighting-sex sighting-default-option)
               taxonomy-id media-id))
 
 (s/defn tsighting :- TSighting
-  [{:keys [sighting-quantity taxonomy-id media-id]}]
-  (->TSighting sighting-quantity taxonomy-id
-               media-id))
+  [{:keys [sighting-quantity sighting-lifestage sighting-sex taxonomy-id media-id]}]
+  (->TSighting sighting-quantity (known-or-nil sighting-lifestage)
+               (known-or-nil sighting-sex) taxonomy-id media-id))
 
 (s/defn get-all
   [state :- State

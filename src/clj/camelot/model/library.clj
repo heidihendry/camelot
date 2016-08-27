@@ -98,10 +98,12 @@
     (doall (map (partial media/update-media-flags! s) data))))
 
 (defn- identify-media
-  [state {:keys [quantity species]} media-id]
+  [state {:keys [quantity species lifestage sex]} media-id]
   (media/update-processed-flag! state {:media-id media-id
                                        :media-processed true})
   (sighting/create! state (sighting/tsighting {:sighting-quantity quantity
+                                               :sighting-lifestage lifestage
+                                               :sighting-sex sex
                                                :taxonomy-id species
                                                :media-id media-id})))
 
