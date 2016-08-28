@@ -3,6 +3,7 @@
             [camelot.nav :as nav]
             [om.dom :as dom]
             [camelot.rest :as rest]
+            [camelot.state :as state]
             [camelot.component.util :as util]))
 
 (defn species-list-component
@@ -29,7 +30,9 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (rest/get-resource "/taxonomy"
+      (rest/get-resource (str "/taxonomy/survey/"
+                              (get-in (state/app-state-cursor)
+                                      [:selected-survey :survey-id :value]))
                          #(om/update! data :list (:body %))))
     om/IRender
     (render [_]

@@ -5,7 +5,6 @@
             [cljs.core.async :refer [<! chan >!]]
             [camelot.rest :as rest]
             [camelot.component.survey.core :as survey]
-            [camelot.component.species.core :as species]
             [camelot.component.site.core :as site]
             [camelot.component.camera.core :as camera]
             [camelot.component.report.core :as report]
@@ -74,11 +73,10 @@
                         (dom/div #js {:className "section-container"}
                                  (case (:active data)
                                    :survey (om/build survey/survey-menu-component (:survey data))
-                                   :species (om/build species/species-menu-component (:species data))
                                    :site (om/build site/site-menu-component (:site data))
                                    :camera (om/build camera/camera-menu-component (:camera data))
                                    :report (om/build report/menu-component (:report data))
-                     (om/build not-implemented data))))))))
+                                   (om/build not-implemented data))))))))
 
 (defn organisation-view-component
   "Render an album validation summary."
@@ -92,8 +90,6 @@
                                 (om/update! app :menu [{:concept :survey
                                                         :name "Surveys"
                                                         :active true}
-                                                       {:concept :species
-                                                        :name "Species"}
                                                        {:concept :site
                                                         :name "Sites"}
                                                        {:concept :camera
@@ -102,8 +98,6 @@
                                                         :name "Reports"}]))
                               (when-not (:active app)
                                 (om/update! app :active :survey))
-                              (when-not (:species app)
-                                (om/update! app :species {}))
                               (when-not (:camera app)
                                 (om/update! app :camera {}))
                               (when-not (:site app)

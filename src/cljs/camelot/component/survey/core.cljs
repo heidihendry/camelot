@@ -59,8 +59,11 @@
                                                       :name "Manage Camera Traps"
                                                       :active true}
                                                      {:action :upload
-                                                      :name "Upload Captures"}]
-                                              :active :deployment}))
+                                                      :name "Upload Captures"}
+                                                     {:action :species
+                                                      :name "Manage Species"}]
+                                              :active :deployment
+                                              :species {}}))
     om/IRender
     (render [_]
       (when (:deployment-page-state app)

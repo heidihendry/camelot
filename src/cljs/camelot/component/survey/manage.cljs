@@ -2,6 +2,7 @@
   (:require [om.core :as om]
             [camelot.nav :as nav]
             [camelot.util.capture :as capture]
+            [camelot.component.species.core :as species]
             [camelot.component.deployment.recent :as recent]
             [camelot.component.survey.create :as create]
             [om.dom :as dom]
@@ -62,6 +63,7 @@
                         (case (:active data)
                           :deployment (om/build deployment/deployment-list-section-component data)
                           :upload (om/build recent/recent-deployment-section-component data)
+                          :species (om/build species/species-menu-component (:species data))
                           ""))))))
 
 (defn survey-management-component
