@@ -56,13 +56,15 @@
   [data]
   (let [ps (select-keys data [:survey-name
                               :survey-notes])]
-    (rest/post-x "/species/create"
-                 {:data {:species (deref (data :species))}}
-                 (fn []
-                   (rest/post-x "/surveys" {:data ps}
-                                #(if (seq (get-in (state/app-state-cursor) [:survey :list]))
-                                   (nav/nav! "/organisation")
-                                   (.reload js/location)))))))
+    (rest/post-x "/surveys" {:data ps}
+                 #(do
+                    (rest/post-x "/species/create"
+                                 {:data {:species (deref (data :species))
+                                         :survey-id (:value (:survey-id (:body %)))}}
+                                 (fn []
+                                   (if (seq (get-in (state/app-state-cursor) [:survey :list]))
+                                     (nav/nav! "/organisation")
+                                     (.reload js/location))))))))
 
 (defn survey-details-completed?
   [data]

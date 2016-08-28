@@ -216,7 +216,8 @@
                              {:search search})))
            (POST "/create" [data] (r/response (species-search/ensure-survey-species-known
                                                (app/gen-state (conf/config))
-                                               (:species data)))))
+                                               (:species data)
+                                               (:survey-id data)))))
 
   (context "/capture" []
            (POST "/upload" {params :multipart-params}

@@ -1091,6 +1091,19 @@ pre.field-input {
     margin-right: 1rem;
 }
 
+#app .species-search .action-column {
+    padding-left: 0;
+    min-width: 16rem;
+}
+
+#app .species-search .species-search-table {
+    width: 100%;
+}
+
+#app .species-search button {
+    padding: 0.5rem 1rem;
+}
+
 #app .split-menu {
     overflow: auto;
 }

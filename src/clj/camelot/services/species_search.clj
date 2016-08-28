@@ -2,7 +2,8 @@
   (:require [clj-http.client :as http]
             [clojure.core.async :refer [go <!]]
             [cheshire.core :as json]
-            [camelot.model.taxonomy :as taxonomy]))
+            [camelot.model.taxonomy :as taxonomy]
+            [camelot.handler.associated-taxonomy :as ataxonomy]))
 
 (def service-url "http://www.catalogueoflife.org/col/webservice")
 
@@ -49,19 +50,21 @@
        (first)
        (#(get % "name"))))
 
-(defn result->ttaxonomy
-  [state result]
+(defn result->tassociated-taxonomy
+  [state survey-id result]
   (let [clsn (or (get-in result ["classification"])
                  (get-in result ["accepted_name" "classification"]))
         names (or (get-in result ["common_names"])
                   (get-in result ["accepted_name" "common_names"]))]
-    (taxonomy/ttaxonomy {:taxonomy-class (classification-for clsn "Class")
-                         :taxonomy-order (classification-for clsn "Order")
-                         :taxonomy-family (classification-for clsn "Family")
-                         :taxonomy-genus (get result "genus")
-                         :taxonomy-species (get result "species")
-                         :citation (get result "bibliographic_citation")
-                         :taxonomy-common-name (common-name state names)})))
+    (ataxonomy/tassociated-taxonomy
+     {:taxonomy-class (classification-for clsn "Class")
+      :taxonomy-order (classification-for clsn "Order")
+      :taxonomy-family (classification-for clsn "Family")
+      :taxonomy-genus (get result "genus")
+      :taxonomy-species (get result "species")
+      :citation (get result "bibliographic_citation")
+      :taxonomy-common-name (common-name state names)
+      :survey-id survey-id})))
 
 (defn get-taxonomy-for-id
   [state id]
@@ -73,19 +76,21 @@
       (first rs))))
 
 (defn create-taxonomy-with-id
-  [state id]
+  [state survey-id id]
   (->> id
        (get-taxonomy-for-id state)
-       (result->ttaxonomy state)
-       (taxonomy/create! state)))
+       (result->tassociated-taxonomy state survey-id)
+       (ataxonomy/create! state)))
 
 (defn get-or-create-species
-  [state details]
+  [state survey-id details]
   (let [ttax (taxonomy/ttaxonomy {:taxonomy-species (:species details)
                                   :taxonomy-genus (:genus details)})]
-    (or (taxonomy/get-specific-by-taxonomy state ttax)
-        (create-taxonomy-with-id state (:id details)))))
+    (let [ts (taxonomy/get-specific-by-taxonomy state ttax)]
+      (if ts
+        (ataxonomy/ensure-associated state survey-id (:taxonomy-id ts))
+        (create-taxonomy-with-id state survey-id (:id details))))))
 
 (defn ensure-survey-species-known
-  [state species]
-  (map (partial get-or-create-species state) species))
+  [state species survey-id]
+  (map (partial get-or-create-species state survey-id) species))

@@ -90,12 +90,12 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (prn data)
       (dom/tr #js {:onClick #(go (>! (:select-chan state) {:type :selection
                                                            :data data}))}
               (dom/td nil (:genus data))
               (dom/td nil (:species data))
-              (dom/td #js {:colSpan "2"}
+              (dom/td #js {:colSpan "2"
+                           :className "action-column"}
                       (dom/p #js {:className "button-container"}
                              (dom/button #js {:className "btn btn-default"
                                               :onClick #(do
@@ -104,7 +104,7 @@
                                                           (go (>! (:select-chan state) {:type :citation
                                                                                         :data (:citation data)})))}
                                          "Citation")
-                             (dom/button #js {:className "btn btn-default"} "Add")))))))
+                             (dom/button #js {:className "btn btn-primary"} "Add")))))))
 
 (defn search-result-list-component
   [data owner]
@@ -118,7 +118,7 @@
                       :width "32"})
         (if (seq (:search-results data))
           (dom/div #js {:className "scroll"}
-                   (dom/table nil
+                   (dom/table #js {:className "species-search-table"}
                               (dom/thead nil
                                          (dom/tr #js {:className "table-heading"}
                                                  (dom/th nil "Genus")
