@@ -60,7 +60,7 @@
   [state :- State
    survey-id :- s/Int]
   (some->> {:survey-id survey-id}
-           (db/with-db-keys state -get-specific-by-survey)
+           (db/with-db-keys state -get-all-for-survey)
            (map add-label)
            (map taxonomy)))
 
