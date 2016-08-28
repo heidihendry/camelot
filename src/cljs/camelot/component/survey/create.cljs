@@ -90,8 +90,7 @@
                (dom/textarea #js {:className "field-input"
                                   :rows "3"
                                   :value (:survey-notes data)
-                                  :onChange #(om/update! data
-                                                         :survey-notes (.. % -target -value))})
+                                  :onChange #(om/update! data :survey-notes (.. % -target -value))})
                (dom/label #js {:className "field-label"} "Expected Species")
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
@@ -129,7 +128,7 @@
                                       :species #{}
                                       :sighting-independence-threshold 20
                                       :survey-name nil
-                                      :survey-notes nil}))
+                                      :survey-notes ""}))
     om/IRender
     (render [_]
       (if-let [data (get app :create-survey)]
