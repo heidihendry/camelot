@@ -411,9 +411,12 @@
   [data]
   (let [segments (str/split (:new-species-name data) #" ")]
     (rest/post-x "/taxonomy"
-                 {:data {:taxonomy-genus (first segments)
-                         :taxonomy-species (second segments)
-                         :taxonomy-common-name "N/A"}}
+                 {:data (merge {:taxonomy-genus (first segments)
+                                :taxonomy-species (second segments)
+                                :taxonomy-common-name "N/A"}
+                               (if (and (:survey-id data) (not= (:survey-id data) -1))
+                                 {:survey-id (:survey-id data)}
+                                 {}))}
                  (partial add-taxonomy-success-handler data)))
   (nav/analytics-event "library-id" "taxonomy-create"))
 

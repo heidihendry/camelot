@@ -38,7 +38,7 @@
        (map survey-taxonomy)))
 
 (s/defn get-all-for-survey :- [SurveyTaxonomy]
-  "Retrieve all entries for a given survey"
+  "Retrieve all entries for a given survey."
   [state :- State
    survey-id :- s/Int]
   (->> {:survey-id survey-id}
@@ -70,7 +70,8 @@
   (->> {:survey-id survey-id
         :taxonomy-id taxonomy-id}
        (db/with-db-keys state -get-specific-by-relations)
-       (map survey-taxonomy)))
+       (map survey-taxonomy)
+       first))
 
 (s/defn create! :- SurveyTaxonomy
   [state :- State

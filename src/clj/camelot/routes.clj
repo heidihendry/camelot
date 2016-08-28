@@ -3,6 +3,7 @@
             [camelot.handler
              [albums :as albums]
              [application :as application]
+             [associated-taxonomy :as ataxonomy]
              [config :as config]
              [capture :as capture]
              [import :as import]]
@@ -171,8 +172,8 @@
            (GET "/:id" [id] (rest/specific-resource taxonomy/get-specific id))
            (PUT "/:id" [id data] (rest/update-resource taxonomy/update! id
                                                        taxonomy/ttaxonomy data))
-           (POST "/" [data] (rest/create-resource taxonomy/create!
-                                                  taxonomy/ttaxonomy data))
+           (POST "/" [data] (rest/create-resource ataxonomy/create!
+                                                  ataxonomy/tassociated-taxonomy data))
            (DELETE "/:id" [id] (rest/delete-resource taxonomy/delete! id)))
 
   (context "/species-mass" []
