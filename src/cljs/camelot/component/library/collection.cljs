@@ -1,6 +1,7 @@
 (ns camelot.component.library.collection
   (:require [om.dom :as dom]
             [camelot.component.library.util :as util]
+            [camelot.component.util :as cutil]
             [camelot.state :as state]
             [om.core :as om]
             [camelot.nav :as nav]))
@@ -119,6 +120,24 @@
       (> bot-row-per bottom-per) (- (* bot-row-per doc-height) elt-height)
       :else top)))
 
+(defn media-tips-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build cutil/blank-slate-component data
+                {:opts {:item-name "captures"
+                        :advice "Upload captures using 'Upload Captures' in your survey."}}))))
+
+(defn filter-blank-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build cutil/blank-slate-component data
+                {:opts {:notice "No matching captures found"
+                        :advice "That's a shame. Maybe try another search?"}}))))
+
 (defn media-item-collection-wrapper
   [data owner]
   (reify
@@ -133,11 +152,20 @@
         (set! (.-scrollTop node) (calculate-scroll-update data node))))
     om/IRender
     (render [_]
-      (dom/div #js {:id "media-collection-container"
-                    :className "media-collection-container"
-                    :tabIndex 1}
-               (dom/div nil
-                        (om/build-all media-item-component (util/media-on-page) {:key :media-id}))))))
+      (let [ms (util/media-on-page)]
+        (dom/div #js {:id "media-collection-container"
+                      :className "media-collection-container"
+                      :tabIndex 1}
+                 (cond
+                   (empty? (get-in (state/library-state) [:search :results]))
+                   (om/build media-tips-component data)
+
+                   (empty? ms)
+                   (om/build filter-blank-component data)
+
+                   :else (dom/div nil
+                                  (om/build-all media-item-component ms
+                                                {:key :media-id}))))))))
 
 (defn prev-page
   [page]
