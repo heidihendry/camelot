@@ -21,6 +21,7 @@
             [secretary.core :as secretary :refer-macros [defroute]]
             [camelot.component.report.core :as report]
             [camelot.component.camera.core :as camera]
+            [camelot.component.species.core :as species]
             [camelot.component.site.core :as site]))
 
 (defn load-resource-children
@@ -260,7 +261,8 @@
 
 (defn generate-view
   "Render the main page content"
-  [view & [{:keys [survey-id page-id report-key camera-id site-id restricted-mode]}]]
+  [view & [{:keys [survey-id page-id report-key camera-id site-id taxonomy-id
+                   restricted-mode]}]]
   (if survey-id
     (rest/get-x (str "/surveys/" survey-id)
                 #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
@@ -271,6 +273,7 @@
              {:target (js/document.getElementById "page-content")
               :opts {:report-key report-key
                      :camera-id camera-id
+                     :taxonomy-id taxonomy-id
                      :restricted-mode restricted-mode
                      :site-id site-id}})))
 
@@ -325,6 +328,8 @@
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
+(defroute "/taxonomy/:taxonomy-id" [taxonomy-id]
+  (generate-view species/manage-view {:taxonomy-id taxonomy-id}))
 (defroute "/camera/:camera-id" [camera-id]
   (generate-view camera/manage-view {:camera-id camera-id}))
 (defroute "/site/:site-id" [site-id]

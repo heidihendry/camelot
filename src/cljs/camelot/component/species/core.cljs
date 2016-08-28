@@ -4,6 +4,7 @@
             [om.dom :as dom]
             [camelot.rest :as rest]
             [camelot.state :as state]
+            [camelot.component.species.manage :as manage]
             [camelot.component.util :as util]))
 
 (defn species-list-component
@@ -11,7 +12,8 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed"}
+      (dom/div #js {:className "menu-item detailed"
+                    :onClick #(nav/nav! (str "/taxonomy/" (:taxonomy-id data)))}
                (dom/span #js {:className "menu-item-title"}
                          (:taxonomy-label data))
                (dom/span #js {:className "menu-item-description"}
@@ -24,6 +26,19 @@
                            (str "Order: " (:taxonomy-order data) "; "))
                          (when (:taxonomy-family data)
                            (str "Family: " (:taxonomy-family data))))))))
+
+(defn manage-view
+  [data owner {:keys [taxonomy-id]}]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data :data nil)
+      (rest/get-x (str "/taxonomy/" taxonomy-id)
+                  #(om/update! data :data (:body %))))
+    om/IRender
+    (render [_]
+      (when-not (nil? (:data data))
+        (om/build manage/manage-component data)))))
 
 (defn species-menu-component
   [data owner]
@@ -57,5 +72,3 @@
                                   :onClick #(do (nav/nav! "/taxonomy")
                                                 (nav/analytics-event "org-species" "advanced-click"))}
                              "Advanced"))))))
-
-
