@@ -76,6 +76,10 @@
                                 :value (:search state)})
                 (dom/button #js {:type "submit"
                                  :name "submit"
+                                 :disabled (if (or (nil? (:search state))
+                                                   (< (count (.trim (:search state))) 5))
+                                             "disabled"
+                                             "")
                                  :className "btn btn-default"}
                             "Search")))))
 
