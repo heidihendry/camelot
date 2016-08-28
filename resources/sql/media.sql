@@ -5,7 +5,7 @@ INSERT INTO media (media_created, media_updated, media_filename,
        trap_station_session_camera_id, media_format)
 VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :media_filename,
        :media_notes, :media_cameracheck, :media_attention_needed,
-       :media_processed, :media_capture_timestamp,
+       :media_processed, :media_capture_timestamp, :media_reference_quality,
        :trap_station_session_camera_id, :media_format)
 
 -- name: -get-specific

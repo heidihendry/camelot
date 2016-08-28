@@ -107,12 +107,6 @@
       (om/update! (:library data) :survey-id (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! (get-in data [:library :search]) :show-select-count 0)
       (om/update! (get-in data [:library]) :identification {:quantity 1})
-      (rest/get-x "/taxonomy"
-                  (fn [resp]
-                    (om/update! (get data :library) :species
-                                (into {}
-                                      (map #(hash-map (get % :taxonomy-id) %)
-                                           (:body resp))))))
       (rest/get-x "/surveys"
                   (fn [resp]
                     (om/update! (get data :library) :surveys (:body resp))))
@@ -120,9 +114,11 @@
       (let [sid (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])]
         (if sid
           (do
+            (util/load-taxonomies sid)
             (util/load-trap-stations sid)
             (util/load-library sid))
           (do
+            (util/load-taxonomies)
             (util/load-trap-stations)
             (util/load-library)))))
     om/IRender

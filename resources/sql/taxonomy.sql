@@ -35,6 +35,14 @@ SELECT taxonomy_id, taxonomy_created, taxonomy_updated, taxonomy_class, taxonomy
        species_mass_id, taxonomy_notes
 FROM taxonomy
 
+-- name: -get-all-for-survey
+SELECT taxonomy_id, taxonomy_created, taxonomy_updated, taxonomy_class, taxonomy_order,
+       taxonomy_family, taxonomy_genus, taxonomy_species, taxonomy_common_name,
+       species_mass_id, taxonomy_notes
+FROM taxonomy
+LEFT JOIN survey_taxonomy USING (taxonomy_id)
+WHERE survey_id = :survey_id
+
 -- name: -update!
 UPDATE taxonomy
 SET taxonomy_updated = CURRENT_TIMESTAMP,

@@ -172,6 +172,8 @@
            (GET "/:id" [id] (rest/specific-resource taxonomy/get-specific id))
            (PUT "/:id" [id data] (rest/update-resource taxonomy/update! id
                                                        taxonomy/ttaxonomy data))
+           (GET "/survey/:id" [id] (rest/list-resources taxonomy/get-all-for-survey
+                                                        :taxonomy id))
            (POST "/" [data] (rest/create-resource ataxonomy/create!
                                                   ataxonomy/tassociated-taxonomy data))
            (DELETE "/:id" [id] (rest/delete-resource taxonomy/delete! id)))

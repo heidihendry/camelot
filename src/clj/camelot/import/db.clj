@@ -167,6 +167,7 @@
      :media-cameracheck false
      :media-attention-needed false
      :media-processed false
+     :media-reference-quality false
      :media-notes nil
      :trap-station-session-camera-id trap-camera-id})))
 
@@ -181,6 +182,7 @@
      :media-cameracheck (is-cameracheck? photo)
      :media-attention-needed attn
      :media-processed true
+     :media-reference-quality false
      :media-notes notes
      :trap-station-session-camera-id trap-camera-id})))
 

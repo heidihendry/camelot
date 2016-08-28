@@ -56,6 +56,14 @@
        (db/clj-keys (db/with-connection (:connection state)
                       -get-all))))
 
+(s/defn get-all-for-survey :- [Taxonomy]
+  [state :- State
+   survey-id :- s/Int]
+  (some->> {:survey-id survey-id}
+           (db/with-db-keys state -get-specific-by-survey)
+           (map add-label)
+           (map taxonomy)))
+
 (s/defn get-specific :- (s/maybe Taxonomy)
   [state :- State
    id :- s/Int]

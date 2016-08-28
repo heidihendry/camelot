@@ -84,6 +84,22 @@
   ([survey-id]
    (rest/get-x (str "/library/" survey-id) load-library-callback)))
 
+(defn load-taxonomies
+  ([]
+   (rest/get-x "/taxonomy"
+               (fn [resp]
+                 (om/update! (state/library-state) :species
+                             (into {}
+                                   (map #(hash-map (get % :taxonomy-id) %)
+                                        (:body resp)))))))
+  ([survey-id]
+   (rest/get-x (str "/taxonomy/survey/" survey-id)
+               (fn [resp]
+                 (om/update! (state/library-state) :species
+                             (into {}
+                                   (map #(hash-map (get % :taxonomy-id) %)
+                                        (:body resp))))))))
+
 (defn load-trap-stations
   ([]
    (rest/get-x "/trap-stations"

@@ -195,9 +195,11 @@
                                     (om/update! data :survey-id (.. % -target -value))
                                     (if (> sid -1)
                                       (do
+                                        (util/load-taxonomies sid)
                                         (util/load-library sid)
                                         (util/load-trap-stations sid))
                                       (do
+                                        (util/load-taxonomies)
                                         (util/load-library)
                                         (util/load-trap-stations)))
                                     (nav/analytics-event "library-search" "survey-select-change"))}
