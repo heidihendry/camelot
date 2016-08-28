@@ -47,6 +47,7 @@
   "Miscellaneous application routes."
   (GET "/" _ (retrieve-index))
   (POST "/quit" [] (System/exit 0))
+  (GET "/quit" [] (System/exit 0))
   (route/resources "/"))
 
 (defroutes app-routes
