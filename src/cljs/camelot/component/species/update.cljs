@@ -110,6 +110,7 @@
                (om/build text-input-component data {:opts {:field :taxonomy-species}})
                (dom/label #js {:className "field-label"} "Species mass")
                (om/build species-mass-select-component data)
+               (dom/label #js {:className "field-label"} "Notes")
                (om/build text-area-component data {:opts {:field :taxonomy-notes}})
                (om/build submit-button (:data data))))))
 
