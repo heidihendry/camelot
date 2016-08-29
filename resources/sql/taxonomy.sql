@@ -59,3 +59,7 @@ WHERE taxonomy_id = :taxonomy_id
 -- name: -delete!
 DELETE FROM taxonomy
 WHERE taxonomy_id = :taxonomy_id
+
+-- name: -delete-from-survey!
+DELETE FROM survey_taxonomy
+WHERE taxonomy_id = :taxonomy_id AND survey_id = :survey_id

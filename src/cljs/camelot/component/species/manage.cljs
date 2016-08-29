@@ -1,132 +1,114 @@
 (ns camelot.component.species.manage
   (:require [om.core :as om]
             [camelot.rest :as rest]
-            [om.dom :as dom]
             [camelot.nav :as nav]
-            [camelot.state :as state]))
+            [camelot.state :as state]
+            [cljs.core.async :refer [<! chan >!]]
+            [camelot.component.species-search :as search]
+            [om.dom :as dom])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
-(defn update-success-handler
-  [data]
-  (nav/nav! (str "/" (get-in (state/app-state-cursor)
-                             [:selected-survey :survey-id :value]))))
+(defn remove-species
+  [taxonomy-id cb]
+  (let [sid (get-in (state/app-state-cursor)
+                    [:selected-survey :survey-id :value])]
+    (rest/delete-x (str "/taxonomy/" taxonomy-id "/survey/" sid) cb)))
 
-(defn update-handler
-  [data]
-  (nav/analytics-event "taxonomy-update" "submit")
-  (rest/put-x (str "/taxonomy/" (get-in data [:taxonomy-id :value])),
-              {:data (select-keys (deref data)
-                                  [:taxonomy-species :taxonomy-genus :taxonomy-family
-                                   :taxonomy-order :taxonomy-class :taxonomy-common-name
-                                   :species-mass-id :taxonomy-notes])}
-              update-success-handler))
+(defn species-row-component
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ state]
+      (dom/tr #js {:onClick #(go (>! (:rm-chan state) data))}
+              (dom/td nil (:taxonomy-genus data))
+              (dom/td nil (:taxonomy-species data))
+              (dom/td nil (dom/button #js {:className "btn btn-default"}
+                                      "Remove"))))))
 
-(defn blank?
-  [d]
-  (or (nil? d) (= (.trim d) "")))
+(defn survey-species-list
+  [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:rm-chan (chan)})
+    om/IWillUpdate
+    (will-update [_ _ _]
+      (let [chan (om/get-state owner :rm-chan)]
+        (go
+          (loop []
+            (let [r (<! chan)]
+              (remove-species (:taxonomy-id r)
+                              (fn [x]
+                                (do
+                                  (om/transact! data :species #(into #{} (disj % r)))
+                                  (nav/analytics-event "species-manage" "species-remove-click"))))
+              (recur))))))
+    om/IRenderState
+    (render-state [_ state]
+      (if (seq (:species data))
+        (dom/div #js {:className "survey-species"}
+                 (dom/table nil
+                            (dom/thead nil
+                                       (dom/tr #js {:className "table-heading"}
+                                               (dom/th nil "Genus")
+                                               (dom/th nil "Species")
+                                               (dom/th nil "")))
+                            (dom/tbody #js {:className "selectable"}
+                                       (om/build-all species-row-component
+                                                     (sort-by :taxonomy-genus (sort-by :taxonomy-species
+                                                                                       (:species data)))
+                                                     {:init-state state}))))
+        (dom/div #js {:className "no-species-found"}
+                 (dom/p nil
+                        "Search and add species using the options to the right"))))))
 
-(defn validate-form
-  [data]
-  (or
-   (blank? (get-in data [:taxonomy-species :value]))
-   (blank? (get-in data [:taxonomy-genus :value]))
-   (blank? (get-in data [:taxonomy-common-name :value]))))
-
-(defn submit-button
+(defn expected-species-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (let [verror (validate-form data)]
-        (dom/button #js {:className "btn btn-primary"
-                         :disabled (if verror
-                                     "disabled" "")
-                         :title (when verror
-                                  "Complete all required fields before submitting.")
-                         :onClick (partial update-handler data)}
-                    "Update")))))
+      (dom/div #js {:className "section survey-details-pane"}
+               (dom/label #js {:className "field-label"} "Expected Species")
+               (om/build survey-species-list data)
+               (dom/div #js {:className "button-container"}
+                        (dom/button #js {:className "btn btn-primary"
+                                         :onClick #(do (nav/analytics-event "species-manage" "done-click")
+                                                       (nav/nav-up!))}
+                                    "Done"))))))
 
-(defn species-mass-option-component
+(defn species-search-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/option #js {:value (:species-mass-id data)}
-                  (:species-mass-label data)))))
-
-(defn species-mass-select-component
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/select #js {:className "field-input"
-                       :onChange #(om/update! data [:data :species-mass-id :value]
-                                              (.. % -target -value))
-                       :value (get-in data [:data :species-mass-id :value])}
-                  (om/build-all species-mass-option-component
-                                (conj (into '() (reverse (:species-mass-options data)))
-                                      {:species-mass-id "-1"
-                                       :species-mass-label ""})
-                                {:key :species-mass-id})))))
-
-(defn text-input-component
-  [data owner {:keys [field]}]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/input #js {:className "field-input"
-                      :onChange #(om/update! data [:data field :value]
-                                             (.. % -target -value))
-                      :value (get-in data [:data field :value])}))))
-
-(defn text-area-component
-  [data owner {:keys [field]}]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/textarea #js {:className "field-input"
-                         :rows 3
-                         :cols 48
-                         :onChange #(om/update! data [:data field :value]
-                                                (.. % -target -value))
-                         :value (get-in data [:data field :value])}))))
-
-(defn form-component
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div nil
-               (dom/label #js {:className "field-label required"} "Common name")
-               (om/build text-input-component data {:opts {:field :taxonomy-common-name}})
-               (dom/label #js {:className "field-label"} "Class")
-               (om/build text-input-component data {:opts {:field :taxonomy-class}})
-               (dom/label #js {:className "field-label"} "Order")
-               (om/build text-input-component data {:opts {:field :taxonomy-order}})
-               (dom/label #js {:className "field-label"} "Family")
-               (om/build text-input-component data {:opts {:field :taxonomy-family}})
-               (dom/label #js {:className "field-label required"} "Genus")
-               (om/build text-input-component data {:opts {:field :taxonomy-genus}})
-               (dom/label #js {:className "field-label required"} "Species")
-               (om/build text-input-component data {:opts {:field :taxonomy-species}})
-               (dom/label #js {:className "field-label"} "Species mass")
-               (om/build species-mass-select-component data)
-               (om/build text-area-component data {:opts {:field :taxonomy-notes}})
-               (om/build submit-button (:data data))))))
+      (when (:species-search data)
+        (dom/div #js {:className "section"}
+                 (om/build search/species-search-component (:species-search data)))))))
 
 (defn manage-component
-  [data owner]
+  [app owner]
   (reify
-    om/IWillMount
-    (will-mount [_]
-      (rest/get-x "/species-mass"
-                  #(om/update! data :species-mass-options (:body %))))
     om/IRender
     (render [_]
-      (dom/div #js {:className "split-menu"}
-               (dom/div #js {:className "intro"}
-                        (dom/h4 nil (let [v (get-in data [:data :taxonomy-name :value])]
-                                      (if (or (nil? v) (= v ""))
-                                        "Update Species"
-                                        v))))
-               (dom/div #js {:className "single-section"}
-                        (om/build form-component data))))))
+      (when (get app :data)
+        (if-let [sel (get-in app [:data :species-search :selection])]
+          (do
+            (rest/post-x "/species/create"
+                         {:data {:survey-id (get-in (state/app-state-cursor)
+                                                    [:selected-survey :survey-id :value])
+                                 :species [(select-keys sel [:species :genus :id])]}}
+                         (fn [x]
+                           (do
+                             (prn (first (:body x)))
+                             (om/transact! (:data app) :species #(conj % {:taxonomy-id (:taxonomy-id (first (:body x)))
+                                                                   :taxonomy-species (:species sel)
+                                                                   :taxonomy-genus (:genus sel)}))
+                             (om/update! (:species-search (:data app)) :selection nil))))))
+        (dom/div #js {:className "split-menu"}
+                 (dom/div #js {:className "intro"}
+                          (dom/h4 nil "Manage Species"))
+                 (dom/div nil
+                          (dom/div #js {:className "section-container"}
+                                   (om/build expected-species-component (:data app)))
+                          (dom/div #js {:className "section-container"}
+                                   (om/build species-search-component (:data app)))))))))

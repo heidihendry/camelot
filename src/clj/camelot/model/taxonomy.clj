@@ -107,6 +107,13 @@
   (db/with-db-keys state -delete! {:taxonomy-id id})
   nil)
 
+(s/defn delete-from-survey!
+  [state :- State
+   {:keys [survey-id taxonomy-id]}]
+  (db/with-db-keys state -delete-from-survey!
+    {:survey-id survey-id :taxonomy-id taxonomy-id})
+  nil)
+
 (s/defn get-or-create! :- Taxonomy
   [state :- State
    data :- TTaxonomy]

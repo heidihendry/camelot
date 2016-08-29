@@ -4,6 +4,7 @@
             [om.dom :as dom]
             [camelot.rest :as rest]
             [camelot.state :as state]
+            [camelot.component.species.update :as update]
             [camelot.component.species.manage :as manage]
             [camelot.component.util :as util]))
 
@@ -27,7 +28,7 @@
                          (when (:taxonomy-family data)
                            (str "Family: " (:taxonomy-family data))))))))
 
-(defn manage-view
+(defn update-view
   [data owner {:keys [taxonomy-id]}]
   (reify
     om/IWillMount
@@ -35,6 +36,22 @@
       (om/update! data :data nil)
       (rest/get-x (str "/taxonomy/" taxonomy-id)
                   #(om/update! data :data (:body %))))
+    om/IRender
+    (render [_]
+      (when-not (nil? (:data data))
+        (om/build update/update-component data)))))
+
+(defn manage-view
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data :data nil)
+      (let [survey-id (get-in (state/app-state-cursor)
+                              [:selected-survey :survey-id :value])]
+        (rest/get-x (str "/taxonomy/survey/" survey-id)
+                    #(om/update! data :data {:species (into #{} (:body %))
+                                             :species-search {}}))))
     om/IRender
     (render [_]
       (when-not (nil? (:data data))
@@ -62,13 +79,15 @@
                                           {:key :taxonomy-id})))
                  (dom/div #js {:className "sep"})
                  (dom/button #js {:className "btn btn-primary"
-                                  :onClick #(do (nav/nav! "/species/create")
-                                                (nav/analytics-event "org-species" "create-click"))
-                                  :disabled "disabled"
-                                  :title "Not implemented"}
-                             (dom/span #js {:className "fa fa-plus"})
-                             " Add Species")
+                                  :onClick #(do (nav/nav!
+                                                 (str "/"
+                                                      (get-in (state/app-state-cursor)
+                                                              [:selected-survey :survey-id :value])
+                                                      "/taxonomy"))
+                                                (nav/analytics-event "survey-species" "create-click"))}
+                             (dom/span nil)
+                             " Manage Species")
                  (dom/button #js {:className "btn btn-default"
                                   :onClick #(do (nav/nav! "/taxonomy")
-                                                (nav/analytics-event "org-species" "advanced-click"))}
+                                                (nav/analytics-event "survey-species" "advanced-click"))}
                              "Advanced"))))))

@@ -329,13 +329,15 @@
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
 (defroute "/taxonomy/:taxonomy-id" [taxonomy-id]
-  (generate-view species/manage-view {:taxonomy-id taxonomy-id}))
+  (generate-view species/update-view {:taxonomy-id taxonomy-id}))
 (defroute "/camera/:camera-id" [camera-id]
   (generate-view camera/manage-view {:camera-id camera-id}))
 (defroute "/site/:site-id" [site-id]
   (generate-view site/manage-view {:site-id site-id}))
 (defroute "/report/:report-key" [report-key]
   (generate-view report/configure-report-view {:report-key report-key}))
+(defroute "/:survey/taxonomy" [survey]
+  (generate-view species/manage-view {:survey-id survey}))
 (defroute "/:survey/deployments/create" [survey]
   (generate-view deployment/create-view-component {:survey-id survey}))
 (defroute "/:survey/deployments/:trap-station-id" [survey trap-station-id]

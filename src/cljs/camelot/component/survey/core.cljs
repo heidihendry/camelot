@@ -61,7 +61,7 @@
                                                      {:action :upload
                                                       :name "Upload Captures"}
                                                      {:action :species
-                                                      :name "Manage Species"}]
+                                                      :name "Species"}]
                                               :active :deployment
                                               :species {}}))
     om/IRender

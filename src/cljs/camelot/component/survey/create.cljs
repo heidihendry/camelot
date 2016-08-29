@@ -59,7 +59,7 @@
     (rest/post-x "/surveys" {:data ps}
                  #(do
                     (rest/post-x "/species/create"
-                                 {:data {:species (deref (data :species))
+                                 {:data {:species (deref (:species data))
                                          :survey-id (:value (:survey-id (:body %)))}}
                                  (fn []
                                    (if (seq (get-in (state/app-state-cursor) [:survey :list]))

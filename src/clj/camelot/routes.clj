@@ -175,6 +175,10 @@
                                                        taxonomy/ttaxonomy data))
            (GET "/survey/:id" [id] (rest/list-resources taxonomy/get-all-for-survey
                                                         :taxonomy id))
+           (DELETE "/:taxonomy-id/survey/:survey-id" [taxonomy-id survey-id]
+                   (rest/delete-resource taxonomy/delete-from-survey!
+                                         {:survey-id survey-id
+                                          :taxonomy-id taxonomy-id}))
            (POST "/" [data] (rest/create-resource ataxonomy/create!
                                                   ataxonomy/tassociated-taxonomy data))
            (DELETE "/:id" [id] (rest/delete-resource taxonomy/delete! id)))
