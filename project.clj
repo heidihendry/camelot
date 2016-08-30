@@ -53,7 +53,7 @@
   :uberjar-name "camelot.jar"
 
   :mirrors {"central" {:name "central"
-                       :url "http://mirrors.ibiblio.org/pub/mirrors/maven2"}}
+                       :url "http://uk.maven.org/maven2"}}
 
   :main camelot.core
 
