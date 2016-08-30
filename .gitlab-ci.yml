@@ -13,6 +13,7 @@ before_script:
 build:
   image: clojure
   script:
+    - sh -c "lein deps || lein deps || exit 0"
     - script/clean-build.sh
     - lein with-profiles +test midje
     - lein doo phantom test once
