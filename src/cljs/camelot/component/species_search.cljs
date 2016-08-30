@@ -67,21 +67,22 @@
     (render-state [_ state]
       (dom/form #js {:onSubmit #(do (.preventDefault %)
                                     (when-not (:busy data)
-                                      (lookup-species (:result-chan state) %)))}
+                                      (lookup-species (:result-chan state) %)))
+                     :className "field-input-form"}
                 (dom/input #js {:type "text"
                                 :name "search"
                                 :placeholder "Scientific Name..."
-                                :className "field-input species-search-input"
+                                :className "field-input inline long-input"
                                 :onChange #(om/set-state! owner :search (.. % -target -value))
                                 :value (:search state)})
-                (dom/button #js {:type "submit"
-                                 :name "submit"
-                                 :disabled (if (or (nil? (:search state))
-                                                   (< (count (.trim (:search state))) 5))
-                                             "disabled"
-                                             "")
-                                 :className "btn btn-default"}
-                            "Search")))))
+                (dom/input #js {:type "submit"
+                                :name "submit"
+                                :disabled (if (or (nil? (:search state))
+                                                  (< (count (.trim (:search state))) 5))
+                                            "disabled"
+                                            "")
+                                :className "btn btn-default input-field-submit"
+                                :value "Search"})))))
 
 (defn truncate
   [s nc]
@@ -148,7 +149,7 @@
                              "Hide"))))))
 
 (defn species-search-component
-  [data owner]
+  [data owner {:keys [extch]}]
   (reify
     om/IInitState
     (init-state [_]
@@ -175,7 +176,9 @@
                       (om/update! data :citation (:data v))
                       (nav/analytics-event "species-search" "view-citation"))
                     (do
-                      (om/update! data :selection (:data v))
+                      (if extch
+                        (>! extch {:type :search :taxonomy (:data v)})
+                        (om/update! data :selection (:data v)))
                       (nav/analytics-event "species-search" "add-species")))))
               (recur))))))
     om/IRenderState

@@ -1086,11 +1086,6 @@ pre.field-input {
 #app .table-heading td:first-child {
     border-left: 1px solid #1175aa;
 }
-#app .species-search .field-input {
-    display: inline-block;
-    margin-right: 1rem;
-}
-
 #app .species-search .action-column {
     padding-left: 0;
     min-width: 16rem;
@@ -1399,6 +1394,19 @@ pre.field-input {
 #app .blank-slate .advice {
     padding-top: 2rem;
     font-size: 120%;
+}
+#app .guide {
+    font-size: 120%;
+    color: #999;
+}
+#app .guide .decorator {
+    opacity: 0.8;
+}
+#app .concept-separator {
+    padding-bottom: 0rem;
+    padding-top: 1rem;
+    width: 100%;
+    text-align: center;
 }
 #app .back-button-container button {
     margin-top: 2rem;

@@ -46,15 +46,20 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! data :data nil)
-      (let [survey-id (get-in (state/app-state-cursor)
-                              [:selected-survey :survey-id :value])]
-        (rest/get-x (str "/taxonomy/survey/" survey-id)
-                    #(om/update! data :data {:species (into #{} (:body %))
-                                             :species-search {}}))))
+      (rest/get-x (str "/taxonomy/survey/" (state/get-survey-id))
+                  (fn [resp]
+                    (om/update! data :species (into #{} (:body resp)))
+                    (om/update! data :species-search {})))
+      (rest/get-x "/taxonomy"
+                  (fn [resp]
+                    (om/update! data :known-species
+                                (into {}
+                                      (map (fn [x]
+                                             (hash-map (get x :taxonomy-id) x))
+                                           (:body resp)))))))
     om/IRender
     (render [_]
-      (when-not (nil? (:data data))
+      (when (and (get data :species-search) (get data :known-species))
         (om/build manage/manage-component data)))))
 
 (defn species-menu-component

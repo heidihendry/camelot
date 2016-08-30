@@ -9,6 +9,10 @@
   []
   (om/ref-cursor (om/root-cursor app-state)))
 
+(defn get-survey-id
+  []
+  (get-in (app-state-cursor) [:selected-survey :survey-id :value]))
+
 (defn screen-config-state
   [screen]
   (om/ref-cursor (:schema (get (:screens (om/root-cursor app-state)) screen))))
