@@ -9,7 +9,6 @@ before_script:
   - mkdir ~/.ssh
   - chmod 700 ~/.ssh
   - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
-  - script/maven-mirrors.sh
 
 build:
   image: clojure

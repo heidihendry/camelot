@@ -52,6 +52,9 @@
 
   :uberjar-name "camelot.jar"
 
+  :mirrors {"central" {:name "central"
+                       :url "http://mirrors.ibiblio.org/pub/mirrors/maven2"}}
+
   :main camelot.core
 
   ;; nREPL by default starts in the :main namespace, we want to start in `user`
