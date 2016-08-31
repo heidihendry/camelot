@@ -185,6 +185,386 @@
                                                                {:species-id 2
                                                                 :count 7}))))
 
+(facts "Sighting species sex"
+  (fact "Sightings of a different sex are considered independent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings of the same sex are considered dependent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1})))
+
+  (fact "Sightings of unidentified and a single sex are considered dependent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "unidentified"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1})))
+
+  (fact "Sightings of sightings with an unidentified sex are considered dependent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "unidentified"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "unidentified"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1})))
+
+  (fact "Sightings of sightings with an unidentified sex are considered dependent for both male and female sightings"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "unidentified"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings without a sex are treated the same as an undefined sex"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex nil
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings without a sex are treated the same as an undefined sex"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex nil
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sex of a sighting can be inferred from later sightings"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "unidentified"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2}))))
+
+(facts "Sighting species lifestage"
+  (fact "Sightings of a different lifestage are considered independent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings of the same lifestage are considered dependent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1})))
+
+  (fact "Sightings of unidentified and a single lifestage are considered dependent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "unidentified"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1})))
+
+  (fact "Sightings of sightings with an unidentified lifestage are considered dependent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "unidentified"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "unidentified"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1})))
+
+  (fact "Sightings of sightings with an unidentified lifestage are considered dependent for both adult and juvenile sightings"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "unidentified"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings without a lifestage are treated the same as an undefined lifestage"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage nil
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings without a lifestage are treated the same as an undefined lifestage"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage nil
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Lifestage of a sighting can be inferred from later sightings"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "unidentified"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 10 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2}))))
+
+(facts "Sightings with mixed lifestage and sex"
+  (fact "Sightings with a distinct lifestage but the same sex are considered independent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Adult"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings with a distinct sex but the same lifestage are considered independent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-sex "M"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 2})))
+
+  (fact "Sightings with a the same sex and lifestage are considered dependent"
+    (let [sightings [{:media-capture-timestamp (t/date-time 2015 01 01 06 00 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}
+                     {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                      :taxonomy-id 1
+                      :taxonomy-genus "Yellow"
+                      :taxonomy-species "Spotted Housecat"
+                      :sighting-lifestage "Juvenile"
+                      :sighting-sex "F"
+                      :sighting-quantity 1}]
+          state (gen-state-helper config)]
+      (sut/extract-independent-sightings state sightings) => '({:species-id 1
+                                                                :count 1}))))
+
 (facts "Sighting independence"
   (fact "Records without sightings are excluded"
     (let [record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
@@ -198,23 +578,33 @@
     (let [records (list {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
                          :taxonomy-id 1
                          :sighting-quantity 1
+                         :sighting-sex nil
+                         :sighting-lifestage nil
                          :media-id 1}
                         {:media-capture-timestamp (t/date-time 2015 1 1 7 15 00)
                          :taxonomy-id 1
                          :sighting-quantity 3
+                         :sighting-sex nil
+                         :sighting-lifestage nil
                          :media-id 2}
                         {:media-capture-timestamp (t/date-time 2015 1 1 7 9 00)
                          :taxonomy-id 2
                          :sighting-quantity 2
+                         :sighting-sex nil
+                         :sighting-lifestage nil
                          :media-id 3})
           state (gen-state-helper config)]
       (sut/->independent-sightings state records) => [{:media-capture-timestamp (t/date-time 2015 1 1 7 9 00)
                                                        :sighting-independence-window-end (t/date-time 2015 1 1 7 29 00)
                                                        :taxonomy-id 2
                                                        :sighting-quantity 2
+                                                       :sighting-sex nil
+                                                       :sighting-lifestage nil
                                                        :media-id 3}
                                                       {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
                                                        :sighting-independence-window-end (t/date-time 2015 1 1 7 30 00)
                                                        :taxonomy-id 1
                                                        :sighting-quantity 3
+                                                       :sighting-sex nil
+                                                       :sighting-lifestage nil
                                                        :media-id 1}])))
