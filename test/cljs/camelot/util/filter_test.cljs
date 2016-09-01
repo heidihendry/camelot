@@ -314,13 +314,6 @@
                 "taxonomy-species:cat processed:false|"
                 "wolf processed:false")))))
 
-(deftest flagged-only-supports-disjunction
-  (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
-    (is (= (sut/append-subfilters search {:flagged-only true})
-           (str "taxonomy-species:wolf mysite flagged:true|"
-                "taxonomy-species:cat flagged:true|"
-                "wolf flagged:true")))))
-
 (deftest trap-id-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
     (is (= (sut/append-subfilters search {:trap-station-id 5})
