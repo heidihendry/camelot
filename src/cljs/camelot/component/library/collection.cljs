@@ -188,8 +188,8 @@
       (let [matches (get-in data [:search :match-count])]
         (dom/div #js {:className "pagination-nav"}
                  (dom/button #js {:className "fa fa-2x fa-angle-left btn btn-default"
-                                  :disabled (if (get-in data
-                                                        [:search :identify-selected])
+                                  :disabled (if (or (get-in data [:search :identify-selected])
+                                                    (= (- (* util/page-size (get-in data [:search :page])) util/page-size) 0))
                                               "disabled" "")
                                   :id "prev-page"
                                   :onClick #(do (util/deselect-all)
@@ -202,8 +202,8 @@
                                " of "
                                matches))
                  (dom/button #js {:className "fa fa-2x fa-angle-right btn btn-default"
-                                  :disabled (if (get-in data
-                                                        [:search :identify-selected])
+                                  :disabled (if (or (get-in data [:search :identify-selected])
+                                                    (>= (* util/page-size (get-in data [:search :page])) matches))
                                               "disabled" "")
                                   :id "next-page"
                                   :onClick #(do (util/deselect-all)

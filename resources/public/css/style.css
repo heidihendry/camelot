@@ -25,7 +25,6 @@ html > body {
   background-color: #fff;
   color: #333;
   width: 100%;
-  overflow-x: hidden;
 }
 #app {
   position: relative;
@@ -35,7 +34,7 @@ html > body {
   overflow: hidden;
   max-width: 100%;
   min-height: calc(100vh - 6rem);
-  min-width: 1024px;
+  min-width: 1200px;
 }
 #app h1,
 #app h2,
@@ -897,7 +896,9 @@ pre.field-input {
 #app .library .search-bar select.field-input {
     width: auto;
     min-width: auto;
+    max-width: 16rem;
 }
+
 #app .library .search-bar .survey-select {
     margin-right: 0.5rem;
 }

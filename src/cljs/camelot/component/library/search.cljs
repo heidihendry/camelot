@@ -381,8 +381,6 @@
                  (om/build trap-station-select-component data)
                  (om/build subfilter-checkbox-component data {:init-state {:key :unprocessed-only
                                                                            :label "Unprocessed"}})
-                 (om/build subfilter-checkbox-component data {:init-state {:key :flagged-only
-                                                                           :label "Flagged"}})
                  (dom/div #js {:className "pull-right action-container"}
                           (om/build media-flag-container-component data)
                           (dom/button #js {:className "btn btn-default"

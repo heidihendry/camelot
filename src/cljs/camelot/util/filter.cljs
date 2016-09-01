@@ -163,8 +163,6 @@
       (str/split #"\|")
       (non-empty-list)
       (append-to-strings (if (:unprocessed-only search-conf) " processed:false" ""))
-      (append-to-strings (if (:flagged-only search-conf) " flagged:true" ""))
-      (append-to-strings (if (:reference-only search-conf) " reference-quality:true" ""))
       (append-to-strings (if (and (:trap-station-id search-conf)
                                   (> (:trap-station-id search-conf) -1))
                            (str " trapid:" (:trap-station-id search-conf))
