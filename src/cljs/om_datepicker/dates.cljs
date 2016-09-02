@@ -68,9 +68,17 @@
   [date]
   (add-months date 1))
 
+(defn next-year
+  [date]
+  (add-months date 12))
+
 (defn previous-month
   [date]
   (add-months date -1))
+
+(defn previous-year
+  [date]
+  (add-months date -12))
 
 (defn coerse-date
   [date]

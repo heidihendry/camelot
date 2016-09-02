@@ -239,13 +239,19 @@
                                   (before? next max-date)
                                   (d/same-month? next max-date))]
           (dom/div #js {:className "month-panel navigation"}
+                   (dom/div #js {:className (str "control vleft" (when-not can-go-back? " disabled"))
+                                 :onClick   (when can-go-back?
+                                              #(monthpicker-change-month cursor owner d/previous-year result-ch))} "")
                    (dom/div #js {:className (str "control left" (when-not can-go-back? " disabled"))
                                  :onClick   (when can-go-back?
                                               #(monthpicker-change-month cursor owner d/previous-month result-ch))} "")
                    (dom/div #js {:className "label"} (to-month-format value))
                    (dom/div #js {:className (str "control right" (when-not can-go-forward? " disabled"))
                                  :onClick   (when can-go-forward?
-                                              #(monthpicker-change-month cursor owner d/next-month result-ch))} "")))))))
+                                              #(monthpicker-change-month cursor owner d/next-month result-ch))} "")
+                   (dom/div #js {:className (str "control vright" (when-not can-go-forward? " disabled"))
+                                 :onClick   (when can-go-forward?
+                                              #(monthpicker-change-month cursor owner d/next-year result-ch))} "")))))))
 
 (defn datepicker-panel
   "Creates a date-picker panel component.
