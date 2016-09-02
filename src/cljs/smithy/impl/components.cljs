@@ -185,7 +185,8 @@
                                          :id (get res :id)
                                          :resource-id (get % (get res :id))
                                          :uri (get % :uri))
-                              (get-in vs [:selected-resource :children]))))))
+                              (sort-by #(get % (:label res))
+                                       (get-in vs [:selected-resource :children])))))))
 
 (defn sidebar-component
   "Component for the navigation sidebar."
