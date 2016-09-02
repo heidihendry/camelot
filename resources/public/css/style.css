@@ -936,8 +936,7 @@ pre.field-input {
 }
 .library .search-bar .checkbox-container {
     display: inline-block;
-    top: -1rem;
-    position: relative;
+    position: absolute;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
     margin-top: 0;
