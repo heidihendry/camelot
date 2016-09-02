@@ -310,8 +310,23 @@ pre.field-input {
     background: url("../images/logo-inv.png");
     background-repeat: no-repeat;
     position: fixed;
-    top: calc(40vh);
+    top: calc(30vh);
     left: calc(50vw - 60px);
+}
+.supported-by {
+    font-size: 120%;
+    position: fixed;
+    bottom: 10vh;
+    left: calc(50vw - 125px);
+    text-align: center;
+    font-style:italic;
+}
+.supported-by .supported-by-text {
+    position: relative;
+    top: 25px;
+    right: 55px;
+    font-weight: light;
+    color: #1c6b24;
 }
 .album-validation-summary {
     font-size: 140%;
@@ -321,7 +336,6 @@ pre.field-input {
     background: #fff;
     border: 1px solid #ccc;
     box-shadow: 0px 3px 10px 1px #333;
-    font-size: 130%;
     top: 5rem;
     z-index: 1000;
     left: calc(50vw - 15rem);
