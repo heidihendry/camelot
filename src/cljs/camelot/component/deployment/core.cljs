@@ -16,7 +16,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 
-(def help-text "Record a camera check each time you visit a camera trap in the field.")
+(def help-text "Record a camera check each time you visit a camera trap in the field. A camera trap deployment will be finished automatically once there are no 'Active' cameras assigned to it.")
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 
 (defn action-item-component
