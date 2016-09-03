@@ -6,7 +6,8 @@
             [camelot.state :as state]
             [camelot.component.species.update :as update]
             [camelot.component.species.manage :as manage]
-            [camelot.component.util :as util]))
+            [camelot.component.util :as util]
+            [camelot.translation.core :as tr]))
 
 (defn species-list-component
   [data owner]
@@ -20,13 +21,17 @@
                (dom/span #js {:className "menu-item-description"}
                          (when (:taxonomy-common-name data)
                            (dom/div nil
-                                  (str "Common Name: " (:taxonomy-common-name data))))
+                                    (tr/translate :concepts/common-name) ": "
+                                    (:taxonomy-common-name data)))
                          (when (:taxonomy-class data)
-                           (str "Class: " (:taxonomy-class data) "; "))
+                           (str (tr/translate :concepts/class)
+                                ": " (:taxonomy-class data) "; "))
                          (when (:taxonomy-order data)
-                           (str "Order: " (:taxonomy-order data) "; "))
+                           (str (tr/translate :concepts/order) ": "
+                                (:taxonomy-order data) "; "))
                          (when (:taxonomy-family data)
-                           (str "Family: " (:taxonomy-family data))))))))
+                           (str (tr/translate :concepts/family) ": "
+                                (:taxonomy-family data))))))))
 
 (defn update-view
   [data owner {:keys [taxonomy-id]}]
@@ -78,7 +83,7 @@
                  (dom/div #js {:className "simple-menu scroll"}
                           (if (empty? (:list data))
                             (om/build util/blank-slate-beta-component {}
-                                      {:opts {:item-name "species"}})
+                                      {:opts {:item-name (tr/translate ::item-name)}})
                             (om/build-all species-list-component
                                           (sort-by :taxonomy-label (:list data))
                                           {:key :taxonomy-id})))
@@ -91,8 +96,8 @@
                                                       "/taxonomy"))
                                                 (nav/analytics-event "survey-species" "create-click"))}
                              (dom/span nil)
-                             " Manage Species")
+                             " " (tr/translate ::manage-species))
                  (dom/button #js {:className "btn btn-default"
                                   :onClick #(do (nav/nav! "/taxonomy")
                                                 (nav/analytics-event "survey-species" "advanced-click"))}
-                             "Advanced"))))))
+                             (tr/translate :words/advanced)))))))

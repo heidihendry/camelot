@@ -2,7 +2,8 @@
   (:require [om.core :as om]
             [camelot.rest :as rest]
             [om.dom :as dom]
-            [camelot.nav :as nav]))
+            [camelot.nav :as nav]
+            [camelot.translation.core :as tr]))
 
 (defn form-textarea
   [data owner {:keys [label value-key]}]
@@ -36,14 +37,15 @@
 
 (defn form-layout
   [data]
-  [["Camera name" :camera-name :text-input {:required true
-                                            :validator (fn [] (let [v (get-in data [:data :camera-name :value])]
-                                                                (not (or (nil? v) (= "" v)
-                                                                         (some #(= v %) (map :camera-name (:list data)))))))
-                                            :warning "Must not be blank or have the same name as another camera."}]
-   ["Camera make" :camera-make :text-input {}]
-   ["Camera model" :camera-model :text-input {}]
-   ["Camera notes" :camera-notes :textarea {}]])
+  [[(tr/translate :concepts/camera-name)
+    :camera-name :text-input {:required true
+                              :validator (fn [] (let [v (get-in data [:data :camera-name :value])]
+                                                  (not (or (nil? v) (= "" v)
+                                                           (some #(= v %) (map :camera-name (:list data)))))))
+                              :warning "Must not be blank or have the same name as another camera."}]
+   [(tr/translate :concepts/camera-make) :camera-make :text-input {}]
+   [(tr/translate :concepts/camera-model) :camera-model :text-input {}]
+   [(tr/translate :concepts/camera-notes) :camera-notes :textarea {}]])
 
 (defn update-success-handler
   [data]
@@ -67,9 +69,9 @@
                        :disabled (if (:validation-failure data)
                                    "disabled" "")
                        :title (when (:validation-failure data)
-                                "Fix the errors above before submitting.")
+                                (tr/translate ::validation-failure-title))
                        :onClick (partial update-handler data)}
-                  "Update"))))
+                  (tr/translate :words/update)))))
 
 (defn form-component
   [data owner]
@@ -96,7 +98,7 @@
                (dom/div #js {:className "intro"}
                         (dom/h4 nil (let [v (get-in data [:data :camera-name :value])]
                                       (if (or (nil? v) (= v ""))
-                                        "Update Camera"
+                                        (tr/translate ::update-camera)
                                         v))))
                (dom/div #js {:className "single-section"}
                         (om/build form-component data))))))

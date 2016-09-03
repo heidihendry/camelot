@@ -7,7 +7,8 @@
             [camelot.nav :as nav]
             [camelot.util.trap-station :as util.ts]
             [camelot.state :as state]
-            [camelot.util.cursorise :as cursorise])
+            [camelot.util.cursorise :as cursorise]
+            [camelot.translation.core :as tr])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -49,7 +50,7 @@
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input"
                                   :autoFocus "autofocus"
-                                  :placeholder "New camera name..."
+                                  :placeholder (tr/translate ::new-camera-name-placeholder)
                                   :value (get-in data [:new-camera-name (:camera-id-field state)])
                                   :onChange #(om/update! (:new-camera-name data)
                                                          (:camera-id-field state)
@@ -59,14 +60,14 @@
                                     :className "btn btn-default input-field-submit"
                                     :onClick #(om/update! (:camera-create-mode data)
                                                           (:camera-id-field state) false)
-                                    :value "Cancel"})
+                                    :value (tr/translate :words/cancel)})
                     (dom/input #js {:type "submit"
                                     :disabled (if is-valid "" "disabled")
                                     :title (when-not is-valid
-                                             "A camera with this name already exists")
+                                             (tr/translate ::camera-invalid-title))
                                     :className "btn btn-primary input-field-submit"
                                     :onClick #(add-camera-handler data (:camera-id-field state))
-                                    :value "Add"})))))))
+                                    :value (tr/translate :words/add)})))))))
 
 (defn camera-change-handler
   [data field event]
@@ -99,7 +100,7 @@
                                                                (sort-by :camera-name
                                                                         (:cameras data)))
                                                          {:camera-id "create"
-                                                          :camera-name "Create a new camera..."})))
+                                                          :camera-name (tr/translate ::create-new-camera)})))
                                     {:key :camera-id})))))))
 
 (defn site-select-option-component
@@ -149,7 +150,7 @@
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input"
                                   :autoFocus "autofocus"
-                                  :placeholder "New site name..."
+                                  :placeholder (tr/translate ::new-site-name)
                                   :value (get-in data [:new-site-name])
                                   :onChange #(om/update! data :new-site-name
                                                          (.. % -target -value))})
@@ -157,14 +158,14 @@
                     (dom/input #js {:type "submit"
                                     :className "btn btn-default input-field-submit"
                                     :onClick #(om/update! data :site-create-mode false)
-                                    :value "Cancel"})
+                                    :value (tr/translate :words/cancel)})
                     (dom/input #js {:type "submit"
                                     :disabled (if is-valid "" "disabled")
                                     :title (when-not is-valid
-                                             "A site with this name already exists")
+                                             (tr/translate ::site-invalid-title))
                                     :className "btn btn-primary input-field-submit"
                                     :onClick #(add-site-handler data)
-                                    :value "Add"})))))))
+                                    :value (tr/translate :words/add)})))))))
 
 (defn site-select-component
   [data owner]
@@ -183,7 +184,7 @@
                                                              (sort-by :site-name
                                                                       (:sites data)))
                                                        {:site-id "create"
-                                                        :site-name "Create a new site..."})))
+                                                        :site-name (tr/translate ::create-new-site)})))
                                   {:key :site-id}))))))
 
 (defn validate-form
@@ -205,22 +206,25 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "single-section"}
-               (dom/label #js {:className "field-label required"} "Site")
+               (dom/label #js {:className "field-label required"} (tr/translate :concepts/site))
                (om/build site-select-component data)
-               (dom/label #js {:className "field-label required"} "Trap Station Identifier")
+               (dom/label #js {:className "field-label required"} (tr/translate :concepts/trap-station))
                (dom/input #js {:className "field-input"
                                :type "text"
                                :value (get-in data [:data :trap-station-name :value])
                                :onChange #(om/update! (get-in data [:data :trap-station-name])
                                                       :value (.. % -target -value))})
                (dom/div nil
-                        (dom/label #js {:className "field-label required"} "Start Date")
+                        (dom/label #js {:className "field-label required"}
+                                   (tr/translate ::start-date))
                         (dom/div #js {:className "field-details"}
                                  (om/build datepicker (get-in data [:data :trap-station-session-start-date]))))
                (when (> (.getTime (or (get-in data [:data :trap-station-session-start-date :value]) (UtcDateTime.)))
                         (.getTime (UtcDateTime.)))
-                 (dom/label #js {:className "validation-warning"} "Date cannot be in the future."))
-               (dom/label #js {:className "field-label required"} "Latitude")
+                 (dom/label #js {:className "validation-warning"}
+                            (tr/translate ::valdiation-future-date)))
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate :words/latitude))
                (dom/input #js {:className "field-input"
                                :type "number"
                                :value (get-in data [:data :trap-station-latitude :value])
@@ -229,8 +233,10 @@
                                                       (.. % -target -value))})
                (let [v (get-in data [:data :trap-station-latitude :value])]
                  (when (and v (not (util.ts/valid-latitude? v)))
-                   (dom/label #js {:className "validation-warning"} "Latitude must be in the range [-90, 90].")))
-               (dom/label #js {:className "field-label required"} "Longitude")
+                   (dom/label #js {:className "validation-warning"}
+                              (tr/translate ::invalid-latitude))))
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate :words/longitude))
                (dom/input #js {:className "field-input"
                                :type "number"
                                :value (get-in data [:data :trap-station-longitude :value])
@@ -239,28 +245,33 @@
                                                       (.. % -target -value))})
                (let [v (get-in data [:data :trap-station-longitude :value])]
                  (when (and v (not (util.ts/valid-longitude? v)))
-                   (dom/label #js {:className "validation-warning"} "Longitude must be in the range [-180, 180].")))
-               (dom/label #js {:className "field-label"} "Altitude")
+                   (dom/label #js {:className "validation-warning"}
+                              (tr/translate ::invalid-longitude))))
+               (dom/label #js {:className "field-label"}
+                          (tr/translate :words/altitude))
                (dom/input #js {:className "field-input"
                                :type "number"
                                :value (get-in data [:data :trap-station-altitude :value])
                                :onChange #(om/update! (get-in data [:data :trap-station-altitude])
                                                       :value
                                                       (.. % -target -value))})
-               (dom/label #js {:className "field-label required"} "Primary Camera")
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate ::primary-camera))
                (om/build camera-select-component data
                          {:init-state {:camera-id-field :primary-camera-id}})
-               (dom/label #js {:className "field-label"} "Secondary Camera")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate ::secondary-camera))
                (om/build camera-select-component data
                          {:init-state {:camera-id-field :secondary-camera-id}})
                (let [v (get-in data [:data :secondary-camera-id :value])]
                  (when (and v (= (get-in data [:data :primary-camera-id :value]) v))
-                   (dom/label #js {:className "validation-warning"} "Secondary camera must not be the same as the primary camera.")))
+                   (dom/label #js {:className "validation-warning"}
+                              (tr/translate ::validation-same-camera))))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary"
                                          :disabled (if (validate-form (:data data)) "" "disabled")
                                          :title (if (validate-form (:data data)) ""
-                                                    "Please complete all required fields and address any errors.")
+                                                    (tr/translate ::validation-failure))
                                          :onClick #(do
                                                      (nav/analytics-event "deployment"
                                                                           "cameracheck-submit")
@@ -271,7 +282,7 @@
                                                                   (fn [_]
                                                                     (nav/nav! (str "/" (get-in (state/app-state-cursor)
                                                                                                [:selected-survey :survey-id :value]))))))}
-                                    "Create "
+                                    (tr/translate :words/create) " "
                                     (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
 
 (defn section-containers-component
@@ -311,5 +322,5 @@
       (when (:page-state data)
         (dom/div #js {:className "split-menu"}
                  (dom/div #js {:className "intro"}
-                          (dom/h4 nil "Add Camera Trap"))
+                          (dom/h4 nil (tr/translate ::add-camera-trap)))
                  (dom/div nil (om/build section-containers-component (:page-state data))))))))

@@ -40,6 +40,7 @@
   (rest/get-screens
    #(do (om/update! (state/app-state-cursor) :screens (:body %))
         (om/update! (state/app-state-cursor) :library {:search {}})
+        (om/update! (state/app-state-cursor) :language :en)
         (om/update! (state/app-state-cursor) :display {:error nil})
         (om/update! (state/app-state-cursor) :view
                     {:settings {:screen {:type :settings

@@ -3,7 +3,8 @@
             [camelot.rest :as rest]
             [om.dom :as dom]
             [camelot.nav :as nav]
-            [camelot.state :as state]))
+            [camelot.state :as state]
+            [camelot.translation.core :as tr]))
 
 (defn update-success-handler
   [data]
@@ -41,9 +42,9 @@
                          :disabled (if verror
                                      "disabled" "")
                          :title (when verror
-                                  "Complete all required fields before submitting.")
+                                  (tr/translate ::validation-error-title))
                          :onClick (partial update-handler data)}
-                    "Update")))))
+                    (tr/translate :words/update))))))
 
 (defn species-mass-option-component
   [data owner]
@@ -96,21 +97,29 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/label #js {:className "field-label required"} "Common name")
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate :concepts/common-name))
                (om/build text-input-component data {:opts {:field :taxonomy-common-name}})
-               (dom/label #js {:className "field-label"} "Class")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate :concepts/class))
                (om/build text-input-component data {:opts {:field :taxonomy-class}})
-               (dom/label #js {:className "field-label"} "Order")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate :concepts/order))
                (om/build text-input-component data {:opts {:field :taxonomy-order}})
-               (dom/label #js {:className "field-label"} "Family")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate :concepts/family))
                (om/build text-input-component data {:opts {:field :taxonomy-family}})
-               (dom/label #js {:className "field-label required"} "Genus")
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate :concepts/genus))
                (om/build text-input-component data {:opts {:field :taxonomy-genus}})
-               (dom/label #js {:className "field-label required"} "Species")
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate :concepts/species))
                (om/build text-input-component data {:opts {:field :taxonomy-species}})
-               (dom/label #js {:className "field-label"} "Species mass")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate :concepts/species-mass))
                (om/build species-mass-select-component data)
-               (dom/label #js {:className "field-label"} "Notes")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate :words/notes))
                (om/build text-area-component data {:opts {:field :taxonomy-notes}})
                (om/build submit-button (:data data))))))
 
@@ -127,7 +136,7 @@
                (dom/div #js {:className "intro"}
                         (dom/h4 nil (let [v (get-in data [:data :taxonomy-name :value])]
                                       (if (or (nil? v) (= v ""))
-                                        "Update Species"
+                                        (tr/translate ::update-species)
                                         v))))
                (dom/div #js {:className "single-section"}
                         (om/build form-component data))))))

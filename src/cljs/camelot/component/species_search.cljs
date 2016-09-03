@@ -6,7 +6,8 @@
             [goog.string :as gstr]
             [om.core :as om]
             [om.dom :as dom]
-            [camelot.state :as state])
+            [camelot.state :as state]
+            [camelot.translation.core :as tr])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def db-whitelist
@@ -71,7 +72,7 @@
                      :className "field-input-form"}
                 (dom/input #js {:type "text"
                                 :name "search"
-                                :placeholder "Scientific Name..."
+                                :placeholder (tr/translate ::scientific-name)
                                 :className "field-input inline long-input"
                                 :onChange #(om/set-state! owner :search (.. % -target -value))
                                 :value (:search state)})
@@ -82,7 +83,7 @@
                                             "disabled"
                                             "")
                                 :className "btn btn-default input-field-submit"
-                                :value "Search"})))))
+                                :value (tr/translate :words/search)})))))
 
 (defn truncate
   [s nc]
@@ -108,8 +109,9 @@
                                                           (.stopPropagation %)
                                                           (go (>! (:select-chan state) {:type :citation
                                                                                         :data (:citation data)})))}
-                                         "Citation")
-                             (dom/button #js {:className "btn btn-primary"} "Add")))))))
+                                         (tr/translate :words/citation))
+                             (dom/button #js {:className "btn btn-primary"}
+                                         (tr/translate :words/add))))))))
 
 (defn search-result-list-component
   [data owner]
@@ -126,8 +128,8 @@
                    (dom/table #js {:className "species-search-table"}
                               (dom/thead nil
                                          (dom/tr #js {:className "table-heading"}
-                                                 (dom/th nil "Genus")
-                                                 (dom/th nil "Species")
+                                                 (dom/th nil (tr/translate :words/genus))
+                                                 (dom/th nil (tr/translate :words/species))
                                                  (dom/th nil "")))
                               (dom/tbody #js {:className "selectable"}
                                          (om/build-all search-result-component
@@ -142,11 +144,11 @@
     (render [_]
       (when (:citation data)
         (dom/div #js {:className "citation-modal"}
-                 (dom/h3 nil "Citation")
+                 (dom/h3 nil (tr/translate :words/citation))
                  (dom/p #js {:className "citation-font"} (:citation data))
                  (dom/button #js {:onClick #(om/update! data :citation nil)
                                   :className "btn btn-primary hide-citation"}
-                             "Hide"))))))
+                             (tr/translate :words/hide)))))))
 
 (defn species-search-component
   [data owner {:keys [extch]}]
@@ -185,7 +187,8 @@
     (render-state [this state]
       (dom/div #js {:className "species-search"}
                (om/build citation-modal data)
-               (dom/label #js {:className "field-label"} "Search Species")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate ::search-species))
                (om/build search-input-component data
                          {:init-state {:result-chan (:result-chan state)}})
                (om/build search-result-list-component data

@@ -6,7 +6,8 @@
             [camelot.util.misc :as misc]
             [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [cljs-time.format :as tf]))
+            [cljs-time.format :as tf]
+            [camelot.translation.core :as tr]))
 
 (def day-formatter (tf/formatter "yyyy-MM-dd"))
 
@@ -50,13 +51,13 @@
                     (:warn checks) (dom/span #js {:className "fa fa-2x fa-exclamation-triangle album-result warning-result"})
                     :else (dom/span #js {:className "fa fa-2x fa-check album-result success-result"}))
                   (if (or (nil? start) (nil? end))
-                    (dom/label nil "Timespan information missing")
+                    (dom/label nil (tr/translate ::timestamp-information-missing))
                     (dom/span nil
-                              (dom/label nil (str ""
-                                                  (misc/nights-elapsed start end)
-                                                  " nights"))
-                              (dom/span nil " and ")
-                              (dom/label nil (str (count (:photos album)) " photos"))
+                              (dom/label nil (tr/translate ::num-nights
+                                                           (misc/nights-elapsed start end)))
+                              (dom/span nil (str " " (tr/translate :words/and-lc) " "))
+                              (dom/label nil (tr/translate ::num-photos
+                                                           (count (:photos album))))
                               (dom/div #js {:className "date-range"}
                                        (str (tf/unparse day-formatter start)
                                             " — "
@@ -67,12 +68,12 @@
                                                 :else "btn btn-primary import")
                                    :disabled (when (:fail checks) "disabled")
                                    :title (when (:fail checks)
-                                            "Unable to import due to validation errors.")
+                                            (tr/translate ::import-validation-error-title))
                                    :onClick #(do
                                                (cnav/analytics-event "album-import" "show-import-dialog")
                                                (if (:warn checks)
                                                  (when (js/confirm
-                                                        "This folder may contain data with flaws. Importing it may compromise the accuracy of future analyses. Do you want to continue?")
+                                                        (tr/translate ::import-warning-confirm))
                                                    (show-import-dialog path))
                                                  (show-import-dialog path)))}
                               "Import"))))))
@@ -100,7 +101,7 @@
                (if (empty? (:problems data))
                  (dom/label #js {:className "album-problem"}
                            (dom/span #js {:className "fa fa-check album-result success-result"})
-                           "No problems found. Time to analyse!")
+                           (tr/translate ::no-problems))
                  (apply dom/span nil
                         (om/build-all problem-component (sort compare-validity
                                                               (:problems data)))))))))
@@ -121,7 +122,7 @@
 (defn reload-albums
   "Reload the available albums"
   []
-  (om/update! (state/app-state-cursor) :loading "Loading Data")
+  (om/update! (state/app-state-cursor) :loading (tr/translate ::loading))
   (rest/get-albums #(let [resp (:body %)]
                       (om/update! (state/app-state-cursor) :loading nil)
                       (if (= (type resp) js/String)
@@ -145,6 +146,7 @@
         (dom/div #js {:onClick nav/settings-hide!}
                  (dom/div #js {:className "validation-heading"}
                           (dom/span #js {:className "version-string"}
-                                    (str "Version " (get-in app [:application :version])))
-                          (dom/h4 nil "Import"))
+                                    (str (tr/translate :words/version)
+                                         " " (get-in app [:application :version])))
+                          (dom/h4 nil (tr/translate :words/import)))
                  (apply dom/div nil (om/build-all albums-component (into [] albums))))))))

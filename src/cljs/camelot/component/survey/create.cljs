@@ -5,7 +5,8 @@
             [camelot.state :as state]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.component.species-search :as search]
-            [om.dom :as dom])
+            [om.dom :as dom]
+            [camelot.translation.core :as tr])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn species-row-component
@@ -17,7 +18,7 @@
               (dom/td nil (:genus data))
               (dom/td nil (:species data))
               (dom/td nil (dom/button #js {:className "btn btn-default"}
-                                      "Remove"))))))
+                                      (tr/translate :words/remove)))))))
 
 (defn survey-species-list
   [data owner]
@@ -41,8 +42,8 @@
                  (dom/table nil
                             (dom/thead nil
                                        (dom/tr #js {:className "table-heading"}
-                                               (dom/th nil "Genus")
-                                               (dom/th nil "Species")
+                                               (dom/th nil (tr/translate :concepts/genus))
+                                               (dom/th nil (tr/translate :concepts/species))
                                                (dom/th nil "")))
                             (dom/tbody #js {:className "selectable"}
                                        (om/build-all species-row-component
@@ -50,7 +51,7 @@
                                                      {:init-state state}))))
         (dom/div #js {:className "no-species-found"}
                  (dom/p nil
-                        "Search and add species using the menu to the right"))))))
+                        (tr/translate ::search-instructions)))))))
 
 (defn create-survey
   [data]
@@ -79,19 +80,22 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section survey-details-pane"}
-               (dom/label #js {:className "field-label required"} "Survey Name")
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate ::survey-name))
                (dom/input #js {:className "field-input"
                                :type "text"
-                               :placeholder "Survey Name..."
+                               :placeholder (tr/translate ::survey-name-placeholder)
                                :value (:survey-name data)
                                :onChange #(om/update! data
                                                       :survey-name (.. % -target -value))})
-               (dom/label #js {:className "field-label required"} "Survey Description")
+               (dom/label #js {:className "field-label required"}
+                          (tr/translate ::survey-description))
                (dom/textarea #js {:className "field-input"
                                   :rows "3"
                                   :value (:survey-notes data)
                                   :onChange #(om/update! data :survey-notes (.. % -target -value))})
-               (dom/label #js {:className "field-label"} "Expected Species")
+               (dom/label #js {:className "field-label"}
+                          (tr/translate ::expected-species))
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
                         (when (seq (get-in (state/app-state-cursor) [:survey :list]))
@@ -99,16 +103,16 @@
                                            :onClick #(do
                                                        (nav/nav! "/organisation")
                                                        (nav/analytics-event "org-survey-create" "cancel-click"))}
-                                      "Cancel"))
+                                      (tr/translate :words/cancel)))
                         (dom/button #js {:className "btn btn-primary"
                                          :onClick #(do (nav/analytics-event "org-survey-create" "submit-click")
                                                        (create-survey data))
                                          :disabled (if (survey-details-completed? data)
                                                      "" "disabled")
                                          :title (if (survey-details-completed? data)
-                                                  "Submit this survey"
-                                                  "Complete all required fields before submitting")}
-                                    "Create Survey"
+                                                  (tr/translate ::submit-title)
+                                                  (tr/translate ::validation-error-title))}
+                                    (tr/translate ::create-survey)
                                     (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
 
 (defn species-listing-component
@@ -139,7 +143,7 @@
             (om/update! (:species-search data) :selection nil))
           (dom/div #js {:className "split-menu"}
                    (dom/div #js {:className "intro"}
-                            (dom/h4 nil "Create Survey"))
+                            (dom/h4 nil (tr/translate ::intro)))
                    (dom/div nil
                             (dom/div #js {:className "section-container"}
                                      (om/build create-survey-details-component data))

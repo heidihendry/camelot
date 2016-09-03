@@ -27,7 +27,7 @@
             :survey-sampling-point-density {:label "Sampling Point Density (metres)"
                                             :description "The distance between camera trap stations across the survey."}
             :survey-sighting-independence-threshold {:label "Sighting Independence Threshold (mins)"
-                                                        :description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"}
+                                                     :description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"}
             :survey-notes {:label "Survey Notes"
                            :description "Notes about this survey."}}
 
@@ -58,7 +58,7 @@
                   :trap-station-distance-above-ground {:label "Distance above ground (meters)"
                                                        :description "Distance the camera trap was positioned above ground"}
                   :trap-station-distance-to-road {:label "Distance to road (meters)"
-                                                       :description "Distance between the camera trap and the nearest road"}
+                                                  :description "Distance between the camera trap and the nearest road"}
                   :trap-station-distance-to-river {:label "Distance to river (meters)"
                                                    :description "Distance between the camera trap and the nearest river"}
                   :trap-station-distance-to-settlement {:label "Distance to settlement (meters)"
@@ -91,7 +91,7 @@
           :site-sublocation {:label "Sublocation"
                              :description "The name of the location which this site represents."}
           :site-area {:label "Site Area"
-                       :description "Area of this site in km2."}
+                      :description "Area of this site in km2."}
           :site-notes {:label "Site Notes"
                        :description "Notes about this site."}}
 
@@ -344,4 +344,310 @@
             :photo-orientation "Photo Orientation"
             :photo-resolution-x "Photo X Resolution (pixels)"
             :photo-resolution-y "Photo Y Resolution (pixels)"}
+
+   :words {:in "in"
+           :done "Done"
+           :or "Or"
+           :na "N/A"
+           :acknowledge "Acknowledge"
+           :uploading "Uploading"
+           :search "Search"
+           :citation "Citation"
+           :genus "Genus"
+           :back "Back"
+           :cancel "Cancel"
+           :add "Add"
+           :create "Create"
+           :adult "Adult"
+           :juvenile "Juvenile"
+           :unidentified "Unidentified"
+           :male "Male"
+           :female "Female"
+           :hide "Hide"
+           :species "Species"
+           :quantity "Quantity"
+           :sex "Sex"
+           :submit "Submit"
+           :latitude "Latitude"
+           :longitude "Longitude"
+           :altitude "Altitude"
+           :captures-lc "captures"
+           :camera "Camera"
+           :timestamp "Timestamp"
+           :sightings "Sightings"
+           :details "Details"
+           :flagged-lc "flagged"
+           :unflagged-lc "unflagged"
+           :processed-lc "processed"
+           :unprocessed-lc "unprocessed"
+           :selected-lc "selected"
+           :and-lc "and"
+           :import "Import"
+           :version "Version"
+           :cameras-ls "cameras"
+           :advanced "Advanced"
+           :remove "Remove"
+           :name "Name"
+           :date "Date"
+           :notes "Notes"
+           :update "Update"
+           :surveys "Surveys"
+           :sites "Sites"
+           :cameras "Cameras"
+           :reports "Reports"}
+
+   :common {:select "Select..."}
+
+   :concepts {:lifestage "Life stage"
+              :reference-quality-lc "reference quality"
+              :ordinary-quality-lc "ordinary quality"
+              :test-fires-lc "test-fires"
+              :not-test-fires-lc "no longer test-fires"
+              :trap-station "Trap Station"
+              :sublocation "Sublocation"
+              :state-province "State/Province"
+              :site "Site"
+              :site-name "Site name"
+              :nearest-city "Nearest city"
+              :country "Country"
+              :area-covered "Area covered (km2)"
+              :lifestage-abbrev "LS"
+              :common-name "Common name"
+              :class "Class"
+              :order "Order"
+              :family "Family"
+              :genus "Genus"
+              :species "Species"
+              :species-mass "Species mass"
+              :camera-name "Camera name"
+              :camera-make "Camera make"
+              :camera-model "Camera model"
+              :camera-notes "Camera notes"
+              }
+
+   :camelot.component.camera.core
+   {:new-camera-name-placeholder "New camera name..."
+    :invalid-title "A camera with this name already exists."
+    :filter-cameras "Filter cameras..."
+    :blank-filter-advice "You can add cameras using the input field below"
+    }
+
+   :camelot.component.camera.manage
+   {:validation-failure-title "Fix the errors above before submitting."
+    :update-camera "Update Camera"
+    }
+
+   :camelot.component.library.collection
+   {:upload-advice "Upload captures using 'Upload Captures' in your survey."
+    :filter-notice "No matching captures found"
+    :filter-advice "That's a shame. Maybe try another search?"
+    :select-none-button-title "Remove all selections"
+    :select-none-button "Select None"
+    :select-all-button-title "Select all media on this page"
+    :select-all-button "Select All"
+    }
+
+   :camelot.component.library.preview
+   {
+    :photo-not-selected "Photo not selected"
+    }
+
+   :camelot.component.library.search
+   {:reference-window-button-text "Reference Window"
+    :reference-window-button-title "Additional window which displays reference-quality photos of the currently selected species for identification."
+    :filter-button-title "Apply the current filters"
+    :filter-placeholder "Filter..."
+    :filter-title "Type a keyword you want the media to contain"
+    :filter-survey-title "Filter to only items in a certain survey"
+    :filter-survey-all-surveys "All Surveys"
+    :reference-window-partial-title "Reference photos"
+    :identification-panel-button-title "Open the identification panel to apply to the selected media"
+    :identification-panel-button-text "Identify Selected"
+    :filter-trap-station-all-traps "All Traps"
+    :flag-media-title "Flag or unflag the selected media as needing attention."
+    :media-cameracheck-title "Mark the selected media as a human-caused test fire."
+    :media-processed-title "Set the selected media as processed or unprocessed."
+    :media-reference-quality-title "Indicates the selected media are high quality and should be used as a reference."
+    :filter-unprocessed-label "Unprocessed"
+    :taxonomy-add-placeholder "New species name..."
+    :add-duplicate-species-error "A species with this name already exists"
+    :add-new-species-label "Add a new species..."
+    }
+
+   :camelot.component.albums
+   {
+    :num-nights "%d nights"
+    :num-photos "%d photos"
+    :timestamp-information-missing "Timespan information missing"
+    :import-validation-error-title "Unable to import due to validation errors."
+    :import-warning-confirm "This folder may contain data with flaws. Importing it may compromise the accuracy of future analyses. Do you want to continue?"
+    :no-problems "No problems found. Time to analyse!"
+    :loading "Loading Data"
+    }
+
+   :camelot.component.deployment.core
+   {
+    :help-text "Record a camera check each time you visit a camera trap in the field. A camera trap deployment will be finished automatically once there are no 'Active' cameras assigned to it."
+    :no-cameras "No Cameras Available"
+    :status-question "What is the new status of this camera?"
+    :replacer-question "Which camera replaced it in the field, if any?"
+    :media-retrieved "Media retrieved?"
+    :media-recovered "Media was recovered"
+    :media-not-recovered "Media could not be recovered"
+    :camera-check-date "Camera-check date"
+    :date-validation-past "Date cannot be before the start date of the current session."
+    :date-validation-future "Date cannot be in the future."
+    :primary-camera "Primary camera"
+    :secondary-camera "Secondary camera"
+    :add-secondary-camera "Add a secondary camera"
+    :secondary-camera-label "Secondary camera, if any"
+    :validation-same-camera "Secondary camera must not be the same as the primary camera."
+    :primary-camera-name "Camera name (primary)"
+    :secondary-camera-name "Camera name (secondary)"
+    :record-camera-check "Record camera check"
+    :start-date "State date"
+    :blank-item-name-lc "camera traps"
+    :advice-context "These are locations where cameras are deployed in the field."
+    :advice-direction "You can set some up using the button below."
+    :create-title "Add a new camera trap deployment."
+    :create-button "Add camera trap"
+    }
+
+   :camelot.component.deployment.create
+   {
+    :new-camera-name-placeholder "New camera name..."
+    :camera-invalid-title "A camera with this name already exists."
+    :create-new-camera "Create a new camera..."
+    :new-site-name-placeholder "New site name..."
+    :site-invalid-title "A site with this name already exists."
+    :create-new-site "Create a new site..."
+    :start-date "Start date"
+    :validation-future-date "Date cannot be in the future."
+    :invalid-latitude "Latitude must be in the range [-90, 90]."
+    :invalid-longitude "Longitude must be in the range [-180, 180]."
+    :primary-camera "Primary camera"
+    :secondary-camera "Secondary camera"
+    :validation-same-camera "Secondary camera must not be the same as the primary camera."
+    :validation-failure "Please complete all required fields and address any errors."
+    :add-camera-trap "Add Camera Trap"
+    }
+
+   :camelot.component.deployment.recent
+   {
+    :help-text "Drag and drop capture files on to a Camera Check to add them."
+    :format-not-supported "'%s' is not in a supported format."
+    :upload-error "error during upload"
+    :gps-coordinates "GPS coordinates"
+    :progress-bar-title "%d complete, %d failed and %d ignored."
+    :show-details "Show details"
+    :blank-item-name "camera checks"
+    :blank-advice "These will appear when you add checks to your camera traps."
+    }
+
+   :camelot.component.deployment.shared
+   {
+    :sort-by "Sort by"
+    }
+
+   :camelot.component.error
+   {
+    :problems "There were some problems..."
+    :page-not-found "A page with that name has not been sighted."
+    :maybe-bug "If you think this is a bug, "
+    :report-issue "Report an Issue"
+    }
+
+   :camelot.component.import-dialog
+   {
+    :import-from "Import from"
+    :import-media "Import media"
+    }
+
+   :camelot.component.organisation
+   {
+    :not-implemented "Sorry, but this hasn't been developed yet."
+    :organisation "Your Organisation"
+    }
+
+   :camelot.component.species-search
+   {
+    :scientific-name "Scientific name..."
+    :search-species "Search species"
+    }
+
+   :camelot.component.util
+   {
+    :blank-notice-template "There aren't any %s yet"
+    :use-button-below "You can set some up using the button below."
+    :use-advanced-menu "You can set some up using the 'Advanced' menu below."
+    }
+
+   :camelot.component.report.core
+   {
+    :filter-reports-placeholder "Filter reports..."
+    :item-name "reports"
+    :notice "No reports matched"
+    :advice "There weren't any results for this search."
+    }
+
+   :camelot.component.site.core
+   {
+    :new-site-name "New site name..."
+    :validation-duplicate-site "A site with this name already exists."
+    :item-name "sites"
+    :advice "You can add sites using the input field below."
+    :filter-sites "Filter sites..."
+    }
+
+   :camelot.component.site.manage
+   {
+    :validation-site-name "Must not be blank or have the same name as another site."
+    :validation-failure "Fix the errors above before submitting."
+    :default-intro "Update Site"
+    }
+
+   :camelot.component.species.core
+   {
+    :item-name "species"
+    :manage-species "Manage species"
+    }
+
+   :camelot.component.species.manage
+   {
+    :search-instructions "Search and add species using the options to the right."
+    :new-species-name-placeholder "New species name..."
+    :validation-duplicate-species "A species with this name already exists."
+    :new-or-existing "New or existing species"
+    :new-species "Add a new species..."
+    :expected-species "Expected species"
+    :intro "Manage Species"
+    }
+
+   :camelot.component.species.update
+   {
+    :validation-error-title "Complete all required fields before submitting."
+    :update-species "Update species"
+    }
+
+   :camelot.component.survey.core
+   {
+    :create-survey "Create survey"
+    :manage-traps "Manage camera traps"
+    :upload-captures "Upload captures"
+    :species "Species"
+    }
+
+   :camelot.component.survey.create
+   {
+    :search-instructions "Search and add species using the options to the right."
+    :survey-name "Survey name"
+    :survey-name-placeholder "Survey name..."
+    :survey-description "Survey description"
+    :expected-species "Expected species"
+    :create-survey "Create survey"
+    :intro "Create Survey"
+    :submit-title "Submit this survey."
+    :validation-error-title "Complete all required fields before submitting."
+    }
+
    :missing  "|Missing translation: [%1$s %2$s %3$s]|"})

@@ -10,13 +10,14 @@
             [camelot.component.deployment.create :as create]
             [cljs-time.format :as tf]
             [camelot.component.deployment.shared :as shared]
-            [camelot.component.util :as util])
+            [camelot.component.util :as util]
+            [camelot.translation.core :as tr])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 
-(def help-text "Record a camera check each time you visit a camera trap in the field. A camera trap deployment will be finished automatically once there are no 'Active' cameras assigned to it.")
+(def help-text (tr/translate ::help-text))
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 
 (defn action-item-component
@@ -86,7 +87,7 @@
                                         {:camera-id -1
                                          :camera-name (or blank-description "")})
                                   (conj [] {:camera-id -1
-                                            :camera-name "No Cameras Available"}))
+                                            :camera-name (tr/translate ::no-cameras)}))
                                 {:key :camera-id})))))
 
 (defn camera-status-select-option-component
@@ -123,11 +124,11 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div nil
-               (dom/label #js {:className "field-label"} "What is the new status of this camera?")
+               (dom/label #js {:className "field-label"} (tr/translate ::status-question))
                (om/build camera-status-select-component data {:init-state state})
                (when (not= (js/parseInt (get-in data [(:camera-status-field state) :value])) 2)
                  (dom/div nil
-                          (dom/label #js {:className "field-label"} "Which camera replaced it in the field, if any?")
+                          (dom/label #js {:className "field-label"} (tr/translate ::replacer-question))
                           (om/build camera-select-component data {:init-state state
                                                                   :opts {:blank-description "No replacement camera"}})))))))
 
@@ -142,14 +143,13 @@
             (om/update! data (camera-media-unrecoverable-key (:camera-type state)) {:value false})
             (dom/span nil))
           (dom/div nil
-                   (dom/label #js {:className "field-label"} "Media retrieved?")
+                   (dom/label #js {:className "field-label"} (tr/translate ::media-retrieved))
                    (dom/select #js {:className "field-input"
                                     :value (get data [(camera-media-unrecoverable-key (:camera-type state)) :value])
-                                    :onChange #(do (prn "Changing to " (.. % -target -value))
-                                                   (om/update! data [(camera-media-unrecoverable-key (:camera-type state)) :value]
+                                    :onChange #(do (om/update! data [(camera-media-unrecoverable-key (:camera-type state)) :value]
                                                                (= (.. % -target -value) "true")))}
-                               (dom/option #js {:value "false"} "Media was recovered")
-                               (dom/option #js {:value "true"} "Media could not be recovered"))))))))
+                               (dom/option #js {:value "false"} (tr/translate ::media-recovered))
+                               (dom/option #js {:value "true"} (tr/translate ::media-not-recovered)))))))))
 
 (defn record-camera-check-component
   [data owner]
@@ -167,18 +167,21 @@
           (dom/div #js {:className "section"}
                    (dom/div #js {:className "help-text"} help-text)
                    (dom/div nil
-                            (dom/label #js {:className "field-label"} "Camera Check Date")
+                            (dom/label #js {:className "field-label"} (tr/translate ::camera-check-date))
                             (dom/div #js {:className "field-details"}
                                      (om/build datepicker (or (get data :trap-station-session-end-date)))))
                    (when (< (.getTime sess-end) (.getTime (get-in data [:trap-station-session-start-date :value])))
                      (om/update! (:validation-problem data) :value true)
                      (dom/label #js {:className "validation-warning"}
-                                "Date cannot be before the start date of the current session."))
+                                (tr/translate ::date-validation-past)))
                    (when (> (.getTime sess-end) (.getTime (UtcDateTime.)))
                      (om/update! (:validation-problem data) :value true)
                      (dom/label #js {:className "validation-warning"}
-                                "Date cannot be in the future."))
-                   (dom/h5 nil (str "Primary Camera: " ) (get-in data [:primary-camera-name :value]))
+                                (tr/translate ::date-validation-future)))
+                   (dom/h5 nil
+                           (tr/translate ::primary-camera)
+                           ": "
+                           (get-in data [:primary-camera-name :value]))
                    (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :primary}})
                    (om/build camera-status-component data
                              {:init-state {:camera-status-field :primary-camera-status-id
@@ -186,14 +189,16 @@
                    (if (and (get-in data [:secondary-camera-id :value])
                             (not (get-in data [:camera-is-new :value])))
                      (dom/div nil
-                              (dom/h5 nil (str "Secondary Camera: " ) (get-in data [:secondary-camera-name :value]))
+                              (dom/h5 nil ": "
+                                      (get-in data [:secondary-camera-name :value]))
                               (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :secondary}})
                               (om/build camera-status-component data
                                         {:init-state {:camera-status-field :secondary-camera-status-id
                                                       :camera-id-field :secondary-camera-id}}))
                      (dom/div nil
-                              (dom/h5 nil (str "Add a Secondary Camera"))
-                              (dom/label #js {:className "field-label"} "Secondary Camera, if any")
+                              (dom/h5 nil (tr/translate ::add-secondary-camera))
+                              (dom/label #js {:className "field-label"}
+                                         (tr/translate ::secondary-camera-label))
                               (om/build camera-select-component data
                                         {:init-state {:camera-status-field :secondary-camera-status-id
                                                       :camera-id-field :secondary-camera-id
@@ -202,7 +207,7 @@
                             (get-in data [:secondary-camera-id :value]))
                      (om/update! (:validation-problem data) :value true)
                      (dom/label #js {:className "validation-warning"}
-                                "Secondary camera must not be the same as the primary camera."))
+                                (tr/translate ::validation-same-camera)))
                    (dom/div #js {:className "button-container"}
                             (dom/button #js {:className "btn btn-primary"
                                              :disabled (if (get-in data [:validation-problem :value]) "disabled" "")
@@ -235,23 +240,23 @@
       (dom/div #js {:className "section"}
                (om/build read-only-field-component data
                          {:init-state {:field :site-name
-                                       :label "Site Name"}})
+                                       :label (tr/translate :concepts/site)}})
                (om/build read-only-field-component data
                          {:init-state {:field :trap-station-latitude
-                                       :label "Latitude"}})
+                                       :label (tr/translate :words/latitude)}})
                (om/build read-only-field-component data
                          {:init-state {:field :trap-station-longitude
-                                       :label "Longitude"}})
+                                       :label (tr/translate :words/longitude)}})
                (om/build read-only-field-component data
                          {:init-state {:field :trap-station-altitude
-                                       :label "Altitude"}})
+                                       :label (tr/translate :words/altitude)}})
                (om/build read-only-field-component data
                          {:init-state {:field :primary-camera-name
-                                       :label "Camera Name (Primary)"}})
+                                       :label (tr/translate ::primary-camera-name)}})
                (when (:camera-name-secondary data)
                  (om/build read-only-field-component
                            {:init-state {:field :secondary-camera-name
-                                         :label "Camera Name (Secondary)"}}))))))
+                                         :label (tr/translate ::secondary-camera-name)}}))))))
 
 (defn deployment-section-containers-component
   [data owner]
@@ -285,10 +290,10 @@
                                                              {:validation-problem {:value false}
                                                               :trap-station-session-end-date {:value (UtcDateTime.)}})
                                                 :menu [{:action :check
-                                                        :name "Record Camera Check"
+                                                        :name (tr/translate ::record-camera-check)
                                                         :active true}
                                                        {:action :details
-                                                        :name "Details"}]
+                                                        :name (tr/translate :words/details)}]
                                                 :active :check})))
     om/IRender
     (render [_]
@@ -298,7 +303,7 @@
                           (dom/button #js {:className "btn btn-default back"
                                            :onClick #(nav/nav-up! 2)}
                                       (dom/span #js {:className "fa fa-mail-reply"})
-                                      " Back"))
+                                      " " (tr/translate :words/back)))
                  (dom/div #js {:className "intro"}
                           (dom/h4 nil (get-in app [:page-state :data :trap-station-name :value])))
                  (dom/div nil
@@ -319,13 +324,13 @@
                (dom/span #js {:className "menu-item-title"}
                          (:trap-station-name data))
                (dom/span #js {:className "menu-item-description"}
-                         (dom/label nil "Latitude:")
+                         (dom/label nil (tr/translate :words/latitude) ":")
                          " " (:trap-station-latitude data)
                          ", "
-                         (dom/label nil "Longitude:")
+                         (dom/label nil (tr/translate :words/longitude) ":")
                          " " (:trap-station-longitude data))
                (dom/div #js {:className "menu-item-description"}
-                         (dom/label nil "State Date:")
+                         (dom/label nil (tr/translate ::start-date) ":")
                          " " (tf/unparse day-formatter (:trap-station-session-start-date data)))))))
 
 (defn deployment-list-section-component
@@ -344,11 +349,11 @@
                  (dom/div #js {:className "simple-menu"}
                           (if (empty? (:trap-stations data))
                             (om/build util/blank-slate-component {}
-                                      {:opts {:item-name "camera traps"
+                                      {:opts {:item-name (tr/translate ::blank-item-name-lc)
                                               :advice
                                               (dom/div nil
-                                                       (dom/p nil "These are locations where cameras are deployed in the field.")
-                                                       (dom/p nil "You can set some up using the button below."))}})
+                                                       (dom/p nil (tr/translate ::advice-context))
+                                                       (dom/p nil (tr/translate ::advice-direction)))}})
                             (dom/div nil
                                      (om/build shared/deployment-sort-menu data)
                                      (om/build-all deployment-list-component
@@ -361,9 +366,9 @@
                                                                (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
                                                                "/deployments/create"))
                                                 (nav/analytics-event "survey-deployment" "create-click"))
-                                  :title "Add a new camera trap deployment"}
+                                  :title (tr/translate ::create-title)}
                              (dom/span #js {:className "fa fa-plus"})
-                             " Add Camera Trap"))
+                             " " (tr/translate ::create-button)))
         (do
           (om/update! data :deployment-sort-order :trap-station-session-start-date)
           (dom/div nil))))))

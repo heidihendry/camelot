@@ -2,7 +2,8 @@
   (:require [camelot.state :as state]
             [om.core :as om]
             [camelot.rest :as rest]
-            [camelot.util.filter :as filter]))
+            [camelot.util.filter :as filter]
+            [camelot.translation.core :as tr]))
 
 (defn get-matching
   [data]
@@ -59,8 +60,8 @@
   [flag-state]
   (om/update! (:search (state/library-state)) :show-select-action
               (if flag-state
-                "flagged"
-                "unflagged"))
+                (tr/translate :words/flagged-lc)
+                (tr/translate :words/unflagged-lc)))
   (show-select-message)
   (set-flag-state :media-attention-needed flag-state)
   (when flag-state
@@ -70,25 +71,26 @@
   [flag-state]
   (om/update! (:search (state/library-state))
               :show-select-action (if flag-state
-                                    "reference quality"
-                                    "ordinary quality"))
+                                    (tr/translate :concepts/reference-quality-lc)
+                                    (tr/translate :concepts/ordinary-quality-lc)))
   (show-select-message)
   (set-flag-state :media-reference-quality flag-state))
 
 (defn set-processed
   [flag-state]
-  (om/update! (:search (state/library-state)) :show-select-action (if flag-state
-                                                                    "processed"
-                                                                    "unprocessed"))
+  (om/update! (:search (state/library-state)) :show-select-action
+              (if flag-state
+                (tr/translate :words/processed-lc)
+                (tr/translate :words/unprocessed-lc)))
   (show-select-message)
   (set-flag-state :media-processed flag-state))
 
 (defn set-cameracheck
   [flag-state]
-  (om/update! (:search (state/library-state))
-              :show-select-action (if flag-state
-                                    "test-fires"
-                                    "not test-fires"))
+  (om/update! (:search (state/library-state)) :show-select-action
+              (if flag-state
+                (tr/translate :concepts/test-fires-lc)
+                (tr/translate :concepts/not-test-fires-lc)))
   (show-select-message)
   (set-flag-state :media-cameracheck flag-state)
   (when flag-state
@@ -150,13 +152,15 @@
 
 (defn select-all*
   []
-  (om/update! (:search (state/library-state)) :show-select-action "selected")
+  (om/update! (:search (state/library-state)) :show-select-action
+              (tr/translate :words/selected-lc))
   (show-select-message)
   (select-all))
 
 (defn deselect-all*
   []
-  (om/update! (:search (state/library-state)) :show-select-action "selected")
+  (om/update! (:search (state/library-state)) :show-select-action
+              (tr/translate :words/selected-lc))
   (show-select-message)
   (deselect-all))
 
@@ -168,6 +172,6 @@
   (when (not ctrl)
     (deselect-all))
   (om/transact! data :selected not)
-  (om/update! (:search (state/library-state)) :show-select-action "selected")
+  (om/update! (:search (state/library-state)) :show-select-action
+              (tr/translate :words/selected-lc))
   (show-select-message))
-

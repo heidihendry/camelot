@@ -9,12 +9,12 @@
             [camelot.state :as state]
             [camelot.rest :as rest]
             [cljs-time.format :as tf]
-            [camelot.component.util :as util])
+            [camelot.component.util :as util]
+            [camelot.translation.core :as tr])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
-(def ^:private help-text
-  "Drag and drop capture files on to a Camera Check to add them.")
+(def ^:private help-text (tr/translate ::help-text))
 
 (defn- add-upload-problem
   [owner event-details desc]
@@ -29,7 +29,7 @@
 
 (defn- unsupported-str
   [file]
-  (str "'" (.-name file) "' is not in a supported format.\n"))
+  (str (tr/translate ::format-not-supported (.-name file)) "\n"))
 
 (defn- upload-file
   [sesscam-id owner file chan]
@@ -53,7 +53,7 @@
 
 (defn- display-upload-failure
   [owner f err]
-  (let [reason (str "' " (or err "error during upload") "\n")
+  (let [reason (str "' " (or err (tr/translate ::upload-error)) "\n")
         desc (str "'" (.-name f) reason)]
     (add-upload-problem owner ["failed" (.-type f)] desc)))
 
@@ -129,21 +129,22 @@
                (dom/div #js {:className "menu-item-title"}
                         (:trap-station-name data))
                (dom/div #js {:className "menu-item-description"}
-                        (dom/label nil "GPS Coordinates:")
-                        " " (:trap-station-latitude data) ", " (:trap-station-longitude data))
+                        (dom/label nil (tr/translate ::gps-coordinates) ": ")
+                        (:trap-station-latitude data) ", " (:trap-station-longitude data))
                (dom/div #js {:className "menu-item-description"}
-                        (dom/label nil " Date:")
-                        " "
+                        (dom/label nil " " (tr/translate :words/date) ": ")
                         (tf/unparse day-formatter (:trap-station-session-start-date data))
                         " -- "
                         (tf/unparse day-formatter (:trap-station-session-end-date data)))
                (dom/div #js {:className "menu-item-description"}
-                        (dom/label nil " Camera Name: ") " " (:camera-name data))
+                        (dom/label nil " " (tr/translate :concepts/camera-name)
+                                   ":") " " (:camera-name data))
                (when-not (or (zero? (get state :total)) (nil? (get state :total)))
                  (dom/div #js {:className "progress-bar-container"
-                               :title (str (get state :complete) " complete, "
-                                           (get state :failed) " failed and "
-                                           (get state :ignored) " ignored")}
+                               :title (tr/translate ::progress-bar-title
+                                                    (get state :complete)
+                                                    (get state :failed)
+                                                    (get state :ignored))}
                           (dom/div #js {:className "progress-bar"})
                           (dom/div #js {:className "progress-bar-state"
                                         :style #js {:width (str (complete-percent state) "%")}})
@@ -154,7 +155,7 @@
                                         :style #js {:left (str (- 100 (failed-percent state)) "%")
                                                     :width (str (failed-percent state) "%")}})))
                (when-not (zero? (+ (get state :ignored) (get state :failed)))
-                 (dom/div nil "Show details"))))))
+                 (dom/div nil (tr/translate ::show-details)))))))
 
 (defn recent-deployment-section-component
   [data owner]
@@ -174,8 +175,8 @@
                (dom/div #js {:className "simple-menu"}
                         (if (empty? (:recent-deployments data))
                           (om/build util/blank-slate-component {}
-                                    {:opts {:item-name "camera checks"
-                                            :advice "These will appear when you add checks to your camera traps"}})
+                                    {:opts {:item-name (tr/translate ::blank-item-name)
+                                            :advice (tr/translate ::blank-advice)}})
                           (dom/div nil
                                    (dom/div #js {:className "help-text"} help-text)
                                    (om/build shared/deployment-sort-menu data)

@@ -5,7 +5,8 @@
             [om.dom :as dom]
             [camelot.rest :as rest]
             [camelot.component.site.manage :as manage]
-            [camelot.util.cursorise :as cursorise]))
+            [camelot.util.cursorise :as cursorise]
+            [camelot.translation.core :as tr]))
 
 (defn add-success-handler
   [data resp]
@@ -34,17 +35,17 @@
         (dom/form #js {:className "field-input-form"
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input"
-                                  :placeholder "New site name..."
+                                  :placeholder (tr/translate ::new-site-name)
                                   :value (get-in data [:new-site-name])
                                   :onChange #(om/update! data :new-site-name
                                                          (.. % -target -value))})
                   (dom/input #js {:type "submit"
                                   :disabled (if is-valid "" "disabled")
                                   :title (when-not is-valid
-                                           "A site with this name already exists")
+                                           (tr/translate ::validation-duplicate-site))
                                   :className "btn btn-primary input-field-submit"
                                   :onClick #(add-site-handler data)
-                                  :value "Add"}))))))
+                                  :value (tr/translate :words/add)}))))))
 
 (defn site-list-component
   [data owner]
@@ -60,11 +61,14 @@
                (dom/span #js {:className "menu-item-description"}
                          (when-not (empty? (:site-sublocation data))
                            (dom/span nil
-                                     (dom/label nil "Sublocation:") " "
+                                     (dom/label nil (tr/translate :concepts/sublocation) ":")
+                                     " "
                                      (:site-sublocation data) ", "))
                          (when-not (empty? (:site-city data))
                            (dom/span nil
-                                     (dom/label nil "State/Province:") " "
+                                     (dom/label nil
+                                                (tr/translate :concepts/state-province) ":")
+                                     " "
                                      (:site-state-province data))))
                (dom/div #js {:className "menu-item-description"}
                          (:site-notes data))))))
@@ -102,7 +106,7 @@
                  (dom/div nil
                           (dom/input #js {:className "field-input"
                                           :value (:filter data)
-                                          :placeholder "Filter sites..."
+                                          :placeholder (tr/translate ::filter-sites)
                                           :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu scroll"}
                           (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
@@ -117,8 +121,8 @@
                                                  (sort-by :site-name (:list data)))]
                             (if (empty? filtered)
                               (om/build util/blank-slate-component {}
-                                        {:opts {:item-name "sites"
-                                                :advice "You can add sites using the input field below"}})
+                                        {:opts {:item-name (tr/translate ::item-name)
+                                                :advice (tr/translate ::advice)}})
                               (om/build-all site-list-component filtered
                                             {:key :site-id}))))
                  (dom/div #js {:className "sep"})
@@ -126,6 +130,6 @@
                  (dom/button #js {:className "btn btn-default"
                                   :onClick #(do (nav/nav! "/sites")
                                                 (nav/analytics-event "org-site" "advanced-click"))}
-                             "Advanced"))))))
+                             (tr/translate :words/advanced)))))))
 
 

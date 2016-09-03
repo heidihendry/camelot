@@ -2,7 +2,8 @@
   (:require [om.core :as om]
             [camelot.rest :as rest]
             [om.dom :as dom]
-            [camelot.nav :as nav]))
+            [camelot.nav :as nav]
+            [camelot.translation.core :as tr]))
 
 (defn form-textarea
   [data owner {:keys [label value-key]}]
@@ -36,17 +37,18 @@
 
 (defn form-layout
   [data]
-  [["Site name" :site-name :text-input {:required true
-                                            :validator (fn [] (let [v (get-in data [:data :site-name :value])]
-                                                                (not (or (nil? v) (= "" v)
-                                                                         (some #(= v %) (map :site-name (:list data)))))))
-                                        :warning "Must not be blank or have the same name as another site."}]
-   ["Sublocation" :site-sublocation :text-input {}]
-   ["Nearest city" :site-city :text-input {}]
-   ["State/Province" :site-state-province :text-input {}]
-   ["Country" :site-country :text-input {}]
-   ["Area covered (km^2)" :site-area :text-input {}]
-   ["Additional notes" :site-notes :textarea {}]])
+  [[(tr/translate :concepts/site-name)
+    :site-name :text-input {:required true
+                            :validator (fn [] (let [v (get-in data [:data :site-name :value])]
+                                                (not (or (nil? v) (= "" v)
+                                                         (some #(= v %) (map :site-name (:list data)))))))
+                            :warning (tr/translate ::validation-site-name)}]
+   [(tr/translate :concepts/sublocation) :site-sublocation :text-input {}]
+   [(tr/translate :concepts/nearest-city) :site-city :text-input {}]
+   [(tr/translate :concepts/state-province) :site-state-province :text-input {}]
+   [(tr/translate :concepts/country) :site-country :text-input {}]
+   [(tr/translate :concepts/area-covered) :site-area :text-input {}]
+   [(tr/translate :words/notes) :site-notes :textarea {}]])
 
 (defn update-success-handler
   [data]
@@ -70,9 +72,9 @@
                        :disabled (if (:validation-failure data)
                                    "disabled" "")
                        :title (when (:validation-failure data)
-                                "Fix the errors above before submitting.")
+                                (tr/translate ::validation-failure))
                        :onClick (partial update-handler data)}
-                  "Update"))))
+                  (tr/translate :words/update)))))
 
 (defn form-component
   [data owner]
@@ -99,7 +101,7 @@
                (dom/div #js {:className "intro"}
                         (dom/h4 nil (let [v (get-in data [:data :site-name :value])]
                                       (if (or (nil? v) (= v ""))
-                                        "Update Site"
+                                        (tr/translate ::default-intro)
                                         v))))
                (dom/div #js {:className "single-section"}
                         (om/build form-component data))))))

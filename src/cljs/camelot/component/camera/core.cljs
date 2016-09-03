@@ -5,7 +5,9 @@
             [camelot.rest :as rest]
             [camelot.component.util :as util]
             [camelot.component.camera.manage :as manage]
-            [camelot.util.cursorise :as cursorise]))
+            [camelot.util.cursorise :as cursorise]
+            [camelot.translation.core :as tr]
+            [camelot.util.filter :as filter]))
 
 (defn add-success-handler
   [data resp]
@@ -34,17 +36,17 @@
         (dom/form #js {:className "field-input-form"
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input"
-                                  :placeholder "New camera name..."
+                                  :placeholder (tr/translate ::new-camera-name-placeholder)
                                   :value (get-in data [:new-camera-name])
                                   :onChange #(om/update! data :new-camera-name
                                                          (.. % -target -value))})
                   (dom/input #js {:type "submit"
                                   :disabled (if is-valid "" "disabled")
                                   :title (when-not is-valid
-                                           "A camera with this name already exists")
+                                           (tr/translate ::invalid-title))
                                   :className "btn btn-primary input-field-submit"
                                   :onClick #(add-camera-handler data)
-                                  :value "Add"}))))))
+                                  :value (tr/translate :words/add)}))))))
 
 (defn camera-list-component
   [data owner]
@@ -93,7 +95,7 @@
                  (dom/div nil
                           (dom/input #js {:className "field-input"
                                           :value (:filter data)
-                                          :placeholder "Filter cameras..."
+                                          :placeholder (tr/translate ::filter-cameras)
                                           :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu scroll"}
                           (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
@@ -105,8 +107,8 @@
                                                  (sort-by :camera-name (:list data)))]
                             (if (empty? filtered)
                               (om/build util/blank-slate-component {}
-                                        {:opts {:item-name "cameras"
-                                                :advice "You can add cameras using the input field below"}})
+                                        {:opts {:item-name (tr/translate :words/cameras-lc)
+                                                :advice (tr/translate ::blank-filter-advice)}})
                               (om/build-all camera-list-component filtered
                                             {:key :camera-id}))))
                  (dom/div #js {:className "sep"})
@@ -115,6 +117,4 @@
                                   :onClick #(do
                                               (nav/nav! "/cameras")
                                               (nav/analytics-event "org-camera" "advanced-click"))}
-                             "Advanced"))))))
-
-
+                             (tr/translate :words/advanced)))))))

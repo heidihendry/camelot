@@ -73,5 +73,6 @@
     (render [_]
       (dom/div #js {:className "split-menu"}
                (dom/div #js {:className "intro"}
-                        (dom/h4 nil (get-in (state/app-state-cursor) [:selected-survey :survey-name :value])))
+                        (dom/h4 nil (get-in (state/app-state-cursor)
+                                            [:selected-survey :survey-name :value])))
                (dom/div nil (om/build survey-section-containers-component data))))))

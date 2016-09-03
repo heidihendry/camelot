@@ -697,7 +697,7 @@ pre.field-input {
     border-bottom-left-radius: 0.5rem;
     cursor: pointer;
     width: 3.5rem;
-    height: 8rem;
+    height: 10rem;
     padding: 0.2rem;
     padding-top: 1.2rem;
 }
@@ -705,9 +705,9 @@ pre.field-input {
     position: absolute;
     left: -3.3rem;
     cursor: pointer;
-    top: 5rem;
+    top: 6rem;
     width: 3rem;
-    height: 7rem;
+    height: 10rem;
     padding: 0.2rem;
     font-size: 110%;
     padding-top: 1.7rem;

@@ -3,7 +3,8 @@
             [camelot.nav :as nav]
             [camelot.component.survey.create :as create]
             [camelot.component.survey.manage :as manage]
-            [om.dom :as dom]))
+            [om.dom :as dom]
+            [camelot.translation.core :as tr]))
 
 (defn survey-list-component
   [data owner]
@@ -42,12 +43,12 @@
                                             (nav/nav! "/survey/create")
                                             (nav/analytics-event "org-survey" "create-click"))}
                            (dom/span #js {:className "fa fa-plus"})
-                           " Create Survey")
+                           " " (tr/translate ::create-survey))
                (dom/button #js {:className "btn btn-default"
                                 :onClick #(do
                                             (nav/nav! "/surveys")
                                             (nav/analytics-event "org-survey" "advanced-click"))}
-                           "Advanced")))))
+                           (tr/translate :words/advanced))))))
 
 (defn survey-view-component
   "Render the view component for managing a survey."
@@ -56,12 +57,12 @@
     om/IWillMount
     (will-mount [_]
       (om/update! app :deployment-page-state {:menu [{:action :deployment
-                                                      :name "Manage Camera Traps"
+                                                      :name (tr/translate ::manage-traps)
                                                       :active true}
                                                      {:action :upload
-                                                      :name "Upload Captures"}
+                                                      :name (tr/translate ::upload-captures)}
                                                      {:action :species
-                                                      :name "Species"}]
+                                                      :name (tr/translate ::species)}]
                                               :active :deployment
                                               :species {}}))
     om/IRender

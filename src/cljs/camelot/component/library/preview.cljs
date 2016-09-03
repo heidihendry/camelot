@@ -6,10 +6,11 @@
             [camelot.component.library.util :as util]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [camelot.translation.core :as tr])
   (:import [goog.i18n DateTimeFormat]))
 
-(def photo-not-selected "Photo not selected")
+(def photo-not-selected (tr/translate ::photo-not-selected))
 
 (defn remove-sighting
   [sighting-id]
@@ -59,9 +60,10 @@
                           (str/join ", "
                                     (filter (complement nil?)
                                             [(when-not (unidentified? sex)
-                                               (str "Sex: " sex))
+                                               (str (tr/translate :words/sex) ":" sex))
                                              (when-not (unidentified? ls)
-                                               (str "LS: " ls))])))))))))
+                                               (str (tr/translate :concepts/lifestage-abbrev)
+                                                    ":" ls))])))))))))
 
 (defn mcp-detail
   [data owner]
@@ -79,19 +81,19 @@
     (render [_]
       (dom/div #js {:className "details"}
                (map #(om/build mcp-detail data {:init-state %})
-                    [{:key :trap-station-latitude :label "Latitude"}
-                     {:key :trap-station-longitude :label "Longitude"}
-                     {:key :trap-station-name :label "Trap Station"}
-                     {:key :site-sublocation :label "Sublocation"}
-                     {:key :site-name :label "Site"}
-                     {:key :camera-name :label "Camera"}])
+                    [{:key :trap-station-latitude :label (tr/translate :words/latitude)}
+                     {:key :trap-station-longitude :label (tr/translate :words/longitude)}
+                     {:key :trap-station-name :label (tr/translate :concepts/trap-station)}
+                     {:key :site-sublocation :label (tr/translate :concepts/sublocation)}
+                     {:key :site-name :label (tr/translate :concepts/site)}
+                     {:key :camera-name :label (tr/translate :words/camera)}])
                (dom/div nil
-                        (dom/label nil "Timestamp")
+                        (dom/label nil (tr/translate :words/timestamp))
                         (let [df (DateTimeFormat. "hh:mm:ss EEE, dd LLL yyyy")]
                           (dom/div {:className "data"}
                                    (.format df (:media-capture-timestamp data)))))
                (dom/div nil
-                        (dom/label nil "Sightings")
+                        (dom/label nil (tr/translate :words/sightings))
                         (om/build-all mcp-details-sightings (:sightings data)
                                       {:key :sighting-id}))))))
 
@@ -104,7 +106,7 @@
                (dom/div #js {:className "fa fa-remove pull-right close-details"
                              :onClick #(do (om/transact! data :show-media-details not)
                                            (nav/analytics-event "library-preview" "close-details-click"))})
-               (dom/h4 nil "Details")
+               (dom/h4 nil (tr/translate :words/details))
                (let [selected (util/find-with-id (:selected-media-id data))]
                  (if selected
                    (om/build mcp-details-breakdown selected)
@@ -135,7 +137,7 @@
                         (dom/div #js {:className "details-panel-toggle-text"
                                       :onClick #(do (toggle-details-panel data)
                                                     (nav/analytics-event "library-preview" "details-toggle-click"))}
-                                 (dom/div #js {:className "rotate"} "Details"))
+                                 (dom/div #js {:className "rotate"} (tr/translate :words/details)))
                         (om/build mcp-details data))))))
 
 (defn media-control-panel-component

@@ -4,7 +4,8 @@
             [camelot.component.util :as cutil]
             [camelot.state :as state]
             [om.core :as om]
-            [camelot.nav :as nav]))
+            [camelot.nav :as nav]
+            [camelot.translation.core :as tr]))
 
 (def collection-columns 3)
 
@@ -126,8 +127,8 @@
     om/IRender
     (render [_]
       (om/build cutil/blank-slate-component data
-                {:opts {:item-name "captures"
-                        :advice "Upload captures using 'Upload Captures' in your survey."}}))))
+                {:opts {:item-name (tr/translate :words/captures-lc)
+                        :advice (tr/translate ::upload-advice)}}))))
 
 (defn filter-blank-component
   [data owner]
@@ -135,8 +136,8 @@
     om/IRender
     (render [_]
       (om/build cutil/blank-slate-component data
-                {:opts {:notice "No matching captures found"
-                        :advice "That's a shame. Maybe try another search?"}}))))
+                {:opts {:notice (tr/translate ::filter-notice)
+                        :advice (tr/translate ::filter-advice)}}))))
 
 (defn media-item-collection-wrapper
   [data owner]
@@ -219,19 +220,19 @@
         (dom/button #js {:className "btn btn-default search-main-op"
                          :onClick #(do (util/deselect-all*)
                                        (nav/analytics-event "library-collection" "deselect-all-click"))
-                         :title "Remove all selections"
+                         :title (tr/translate ::select-none-button-title)
                          :id "select-all"
                          :disabled (if (get data :identify-selected)
                                      "disabled" "")}
-                    "Select None")
+                    (tr/translate ::select-none-button))
         (dom/button #js {:className "btn btn-default search-main-op"
-                         :title "Select all media on this page"
+                         :title (tr/translate ::select-all-button-title)
                          :id "select-all"
                          :disabled (if (get data :identify-selected)
                                      "disabled" "")
                          :onClick #(do (util/select-all*)
                                        (nav/analytics-event "library-collection" "select-all-click"))}
-                    "Select All")))))
+                    (tr/translate ::select-all-button))))))
 
 (defn subfilter-bar-component
   [data owner]

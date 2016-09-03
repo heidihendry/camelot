@@ -6,7 +6,8 @@
             [camelot.rest :as rest]
             [smithy.core :as smithy]
             [camelot.state :as state]
-            [camelot.component.util :as util]))
+            [camelot.component.util :as util]
+            [camelot.translation.core :as tr]))
 
 (defn item-component
   "A menu item for a single report."
@@ -61,7 +62,7 @@
                  (dom/div nil
                           (dom/input #js {:className "field-input"
                                           :value (:filter data)
-                                          :placeholder "Filter reports..."
+                                          :placeholder (tr/translate ::filter-reports-placeholder)
                                           :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu scroll"}
                           (let [filtered (filter #(if (or (nil? (:filter data)) (empty? (:filter data)))
@@ -71,11 +72,10 @@
                                                  (sort-by :title (:list data)))]
                             (if (empty? filtered)
                               (om/build util/blank-slate-component {}
-                                        {:opts {:item-name "reports"
-                                                :notice "No reports matched"
-                                                :advice "There weren't any results for this search"}})
+                                        {:opts {:item-name (tr/translate ::item-name)
+                                                :notice (tr/translate ::notice)
+                                                :advice (tr/translate ::advice)}})
                               (om/build-all item-component filtered
-                                            
                                             {:opts {:title-key :title
                                                     :id-key :report-key
                                                     :desc-key :description}

@@ -1,6 +1,7 @@
 (ns camelot.component.util
   (:require [om.core :as om]
-            [om.dom :as dom]))
+            [om.dom :as dom]
+            [camelot.translation.core :as tr]))
 
 (defn blank-slate-component
   [data owner {:keys [item-name advice notice]}]
@@ -10,10 +11,10 @@
       (dom/div #js {:className "blank-slate"}
                (dom/div #js {:className "large"}
                         (or notice
-                            (str "There aren't any " item-name " yet")))
+                            (tr/translate ::blank-notice-template item-name)))
                (dom/div #js {:className "advice"}
                         (or advice
-                            "You can set some up using the button below"))))))
+                            (tr/translate ::use-button-below)))))))
 
 (defn blank-slate-beta-component
   [data owner {:keys [item-name]}]
@@ -22,4 +23,4 @@
     (render [_]
       (om/build blank-slate-component {}
                 {:opts {:item-name item-name
-                        :advice "You can set some up using the 'Advanced' menu below"}}))))
+                        :advice (tr/translate ::use-advanced-menu)}}))))

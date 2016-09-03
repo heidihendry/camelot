@@ -10,7 +10,8 @@
             [camelot.component.report.core :as report]
             [smithy.util :as util]
             [camelot.component.nav :as cnav]
-            [camelot.nav :as nav])
+            [camelot.nav :as nav]
+            [camelot.translation.core :as tr])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn concept-item-component
@@ -57,7 +58,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section"}
-               (dom/div nil "Sorry, but this hasn't been developed yet")))))
+               (dom/div nil (tr/translate ::not-implemented))))))
 
 (defn organisation-management-component
   [data owner]
@@ -66,7 +67,7 @@
     (render [_]
       (dom/div #js {:className "split-menu"}
                (dom/div #js {:className "intro"}
-                        (dom/h4 nil "Your Organisation"))
+                        (dom/h4 nil (tr/translate ::organisation)))
                (dom/div nil
                         (dom/div #js {:className "section-container"}
                                  (om/build concept-menu-component data))
@@ -88,14 +89,14 @@
                          #(do (om/update! app :survey {:list (:body %)})
                               (when-not (:menu app)
                                 (om/update! app :menu [{:concept :survey
-                                                        :name "Surveys"
+                                                        :name (tr/translate :words/surveys)
                                                         :active true}
                                                        {:concept :site
-                                                        :name "Sites"}
+                                                        :name (tr/translate :words/sites)}
                                                        {:concept :camera
-                                                        :name "Cameras"}
+                                                        :name (tr/translate :words/cameras)}
                                                        {:concept :report
-                                                        :name "Reports"}]))
+                                                        :name (tr/translate :words/reports)}]))
                               (when-not (:active app)
                                 (om/update! app :active :survey))
                               (when-not (:camera app)
