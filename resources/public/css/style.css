@@ -1001,6 +1001,25 @@ pre.field-input {
     color: #99d344;
     opacity: 1;
 }
+.library .search-bar .testfire {
+    position: relative;
+    color: #999;
+    cursor: pointer;
+    top: 0.5rem;
+    padding-left: 1rem;
+    opacity: 0.4;
+}
+.library .search-bar .testfire:hover {
+    opacity: 0.6;
+}
+.library .testfire.lightblue {
+    color: #65b1ff;
+    opacity: 0.9;
+}
+.library .testfire.lightblue:hover {
+    color: #65c3ff;
+    opacity: 1;
+}
 .library .search-bar .action-container button.btn {
     position: relative;
     top: 0.4rem;

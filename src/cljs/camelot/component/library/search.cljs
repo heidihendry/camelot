@@ -115,7 +115,7 @@
   (let [cf (completion-field ctx)
         ep (get prefix-endpoints (first (str/split cf #"-")))]
     (cond
-      (some #(= ctx %) '("flagged" "processed" "reference-quality"))
+      (some #(= ctx %) '("flagged" "processed" "testfire" "reference-quality"))
       (go
         (->> ["true" "false"]
              basic-word-index
@@ -349,6 +349,13 @@
                                         :id "media-flag"
                                         :classFn #(str "fa fa-2x fa-flag flag"
                                                        (if % " red" ""))}})
+                (om/build media-flag-component data
+                          {:init-state {:title "Mark the selected media as a human-caused test fire"
+                                        :key :media-cameracheck
+                                        :fn util/set-cameracheck
+                                        :id "media-cameracheck"
+                                        :classFn #(str "fa fa-2x fa-user testfire"
+                                                       (if % " lightblue" ""))}})
                 (om/build media-flag-component data
                           {:init-state {:title "Set the selected media as processed or unprocessed"
                                         :key :media-processed

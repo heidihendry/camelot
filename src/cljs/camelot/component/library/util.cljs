@@ -57,16 +57,21 @@
 
 (defn set-attention-needed
   [flag-state]
-  (om/update! (:search (state/library-state)) :show-select-action (if flag-state
-                                                                    "flagged"
-                                                                    "unflagged"))
+  (om/update! (:search (state/library-state)) :show-select-action
+              (if flag-state
+                "flagged"
+                "unflagged"))
   (show-select-message)
-  (set-flag-state :media-attention-needed flag-state))
+  (set-flag-state :media-attention-needed flag-state)
+  (when flag-state
+    (set-flag-state :media-processed false)))
 
 (defn set-reference-quality
   [flag-state]
   (om/update! (:search (state/library-state))
-              :show-select-action (if flag-state "reference" "ordinary"))
+              :show-select-action (if flag-state
+                                    "reference quality"
+                                    "ordinary quality"))
   (show-select-message)
   (set-flag-state :media-reference-quality flag-state))
 
@@ -77,6 +82,17 @@
                                                                     "unprocessed"))
   (show-select-message)
   (set-flag-state :media-processed flag-state))
+
+(defn set-cameracheck
+  [flag-state]
+  (om/update! (:search (state/library-state))
+              :show-select-action (if flag-state
+                                    "test-fires"
+                                    "not test-fires"))
+  (show-select-message)
+  (set-flag-state :media-cameracheck flag-state)
+  (when flag-state
+    (set-flag-state :media-processed true)))
 
 (defn load-library
   ([]

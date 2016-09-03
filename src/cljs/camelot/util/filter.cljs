@@ -20,6 +20,7 @@
    "trapid" :trap-station-id
    "flagged" :media-attention-needed
    "processed" :media-processed
+   "testfire" :media-cameracheck
    "reference-quality" :media-reference-quality
    "city" :site-city})
 
