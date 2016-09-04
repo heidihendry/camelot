@@ -1,13 +1,12 @@
 (ns camelot.translation.core
-  (:require [taoensso.tower :as tower :refer-macros (with-tscope dict-compile*)]
+  (:require [taoensso.tower :as tower :refer-macros [with-tscope dict-compile*]]
             [camelot.state :as state]
-            [camelot.translation.en :refer [t-en]]
             [goog.string :as gstr]))
 
 (def tconfig
   "Configuration for translations."
   {:dev-mode? true
-   :compiled-dictionary (dict-compile* {:en t-en})
+   :compiled-dictionary (dict-compile* {:en camelot.translation.en/t-en})
    :fallback-locale :en})
 
 (defn translate
