@@ -256,7 +256,7 @@
   (let [d (generate-report state params data)
         cols (if (all-cols? (:columns params))
                all-columns
-               data)]
+               (:columns params))]
     (->> d
          (as-dashed-rows state cols)
          (cons-headings state cols)

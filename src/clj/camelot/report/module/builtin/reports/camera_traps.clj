@@ -34,7 +34,7 @@
                                     :value :survey-id}}}}})
 
 (module/register-report
- :effort-summary
+ :camera-traps
  {:file-prefix "camera-traps"
   :output report-output
   :title ::title

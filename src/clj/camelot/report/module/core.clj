@@ -39,7 +39,7 @@
                               (tr/translate (:config state) %)
                               %))
       (update :form #(if (fn? %)
-                       (apply % state)
+                       (% state)
                        %))))
 
 (defn get-report

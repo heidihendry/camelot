@@ -7,6 +7,10 @@
             [midje.sweet :refer :all]
             [camelot.model.taxonomy :as taxonomy]))
 
+(defn gen-state-helper
+  [config]
+  (state/gen-state (merge {:language :en} config)))
+
 (defn- calc-obs-nights
   [obs nights]
   (format "%.3f" (* 100 (double (/ obs nights)))))
@@ -49,7 +53,7 @@
                      :taxonomy-species "Wolf"
                      :taxonomy-id 1})]
       (let [sightings '()
-            state (state/gen-state {})
+            state (gen-state-helper {})
             result (report state 1 sightings)]
         result => '())))
 
@@ -66,7 +70,7 @@
                                         :media-id 1
                                         :taxonomy-id 1
                                         :trap-station-session-id 1}))
-            state (state/gen-state {:sighting-independence-minutes-threshold 20})
+            state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
         result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14)]))))
 
@@ -82,7 +86,7 @@
                                         :media-id 1
                                         :taxonomy-id 1
                                         :trap-station-session-id 1}))
-            state (state/gen-state {:sighting-independence-minutes-threshold 20})
+            state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
         result => (list ["Smiley" "Wolf" 5 30 "X" 3 7 (calc-obs-nights 3 7)]))))
 
@@ -108,7 +112,7 @@
                                         :trap-station-id 2
                                         :media-capture-timestamp (t/date-time 2015 1 4 10 50 15)
                                         :trap-station-session-id 2}))
-            state (state/gen-state {:sighting-independence-minutes-threshold 20})
+            state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
         result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14)]
                         ["Smiley" "Wolf" 5.5 30.5 "X" 5 14 (calc-obs-nights 5 14)]))))
@@ -133,7 +137,7 @@
                                         :taxonomy-id 1
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                         :trap-station-session-id 1}))
-            state (state/gen-state {:sighting-independence-minutes-threshold 10})
+            state (gen-state-helper {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
         result => (list ["Smiley" "Wolf" 5 30 "X" 8 7 (calc-obs-nights 8 7)]))))
 
@@ -160,7 +164,7 @@
                                         :trap-station-latitude 50
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 30 15)
                                         :trap-station-session-id 3}))
-            state (state/gen-state {:sighting-independence-minutes-threshold 10})
+            state (gen-state-helper {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
         result => (list ["Smiley" "Wolf" 5 30 "X" 3 21 (calc-obs-nights 3 21)]
                         ["Smiley" "Wolf" 10 40 nil nil 21 nil]
@@ -190,7 +194,7 @@
                                         :taxonomy-id 3
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                         :trap-station-session-id 3}))
-            state (state/gen-state {:sighting-independence-minutes-threshold 20})
+            state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 3 sightings)]
         result => (list ["A" "Meerkat" 5 30 "X" 1 21 (calc-obs-nights 1 21)])))))
 
@@ -202,7 +206,7 @@
                      :taxonomy-species "Wolf"
                      :taxonomy-id 1})]
       (let [sightings '()
-            state (state/gen-state {})
+            state (gen-state-helper {})
             result (csv-report state 1 sightings)]
         result => (str (str/join "," headings) "\n"))))
 
@@ -228,7 +232,7 @@
                                         :trap-station-id 2
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                         :trap-station-session-id 2}))
-            state (state/gen-state {:sighting-independence-minutes-threshold 20})
+            state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (csv-report state 1 sightings)]
         result => (str (str/join "," headings) "\n"
                        "Smiley,Wolf,5,30,X,3,14," (calc-obs-nights 3 14) "\n"

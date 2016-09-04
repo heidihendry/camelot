@@ -8,7 +8,7 @@
 (defn- gen-state-helper
   [config]
   (state/gen-state (merge {:language :en
-                         :timezone "Asia/Ho_Chi_Minh"}
+                           :timezone "Asia/Ho_Chi_Minh"}
                         config)))
 
 (defn- calc-obs-nights

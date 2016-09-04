@@ -6,7 +6,8 @@
 
 (defn- gen-state-helper
   [config]
-  (state/gen-state (merge {:timezone "Asia/Ho_Chi_Minh"}
+  (state/gen-state (merge {:timezone "Asia/Ho_Chi_Minh"
+                           :language :en}
                         config)))
 
 (defn report

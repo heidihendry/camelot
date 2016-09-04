@@ -17,7 +17,7 @@
 
   (fact "Schemas should have labels"
     (let [path [:survey :schema :survey-name :label]]
-      (get-in (sut/all-screens (gen-state-helper {})) path)) => "Survey Name")
+      (get-in (sut/all-screens (gen-state-helper {})) path)) => "Survey name")
 
   (fact "Schemas should have descriptions"
     (let [path [:site :schema :site-name :description]]

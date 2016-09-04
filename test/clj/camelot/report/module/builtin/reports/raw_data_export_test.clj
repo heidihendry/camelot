@@ -6,7 +6,7 @@
 
 (defn- gen-state-helper
   [config]
-  (state/gen-state config))
+  (state/gen-state (merge {:language :en} config)))
 
 (defn report
   [state id data]
@@ -91,10 +91,10 @@
                               :media-filename "file-id-2"}))
           state (gen-state-helper {})]
       (report state 1 records) =>
-      [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]
-       ["file-id-2" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 nil nil nil]]))
+      [["file-id-2" "2015-01-07 05:00:00" "ASite" nil
+        "Trap1" -25 130 nil nil nil]
+       ["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))
 
   (fact "Should display 2 records for two different sightings on an image"
     (let [records (list
