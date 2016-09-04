@@ -15,22 +15,10 @@
 (defn print-key
   [e]
   (cond
-    ;; crtl+p (frow wasd)
-    (and (= (.-keyCode e) 78) (.-ctrlKey e))
-    (do (.click (.getElementById js/document "next-page"))
-        (nav/analytics-event "library-key" "C-p")
-        (.preventDefault e))
-
     ;; ctrl+right
     (and (= (.-keyCode e) 39) (.-ctrlKey e))
     (do (.click (.getElementById js/document "next-page"))
         (nav/analytics-event "library-key" "C-<right>")
-        (.preventDefault e))
-
-    ;; ctrl+n (frow wasd)
-    (and (= (.-keyCode e) 80) (.-ctrlKey e))
-    (do (.click (.getElementById js/document "prev-page"))
-        (nav/analytics-event "library-key" "C-n")
         (.preventDefault e))
 
     ;; ctrl+left
@@ -65,24 +53,6 @@
     (and (= (.-keyCode e) 68) (.-ctrlKey e))
     (do (.click (.getElementById js/document "details-panel-toggle"))
         (nav/analytics-event "library-key" "C-d")
-        (.preventDefault e))
-
-    ;; ctrl+g
-    (and (= (.-keyCode e) 71) (.-ctrlKey e))
-    (do (.click (.getElementById js/document "media-flag"))
-        (nav/analytics-event "library-key" "C-g")
-        (.preventDefault e))
-
-    ;; ctrl+h
-    (and (= (.-keyCode e) 72) (.-ctrlKey e))
-    (do (.click (.getElementById js/document "media-processed"))
-        (nav/analytics-event "library-key" "C-h")
-        (.preventDefault e))
-
-    ;; ctrl+a
-    (and (= (.-keyCode e) 65) (.-ctrlKey e))
-    (do (.click (.getElementById js/document "select-all"))
-        (nav/analytics-event "library-key" "C-a")
         (.preventDefault e))))
 
 (defn tincan-listener

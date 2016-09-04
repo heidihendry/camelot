@@ -54,15 +54,31 @@
         cur (ffirst (filter #(= (:selected-media-id data) (second %))
                             media-idxs))]
     (cond
-      (and (= (.-keyCode e) 71) (not (.-ctrlKey e)))
+      (and (= (.-keyCode e) 70) (not (.-ctrlKey e)))
       (do
         (.click (.getElementById js/document "media-flag"))
-        (nav/analytics-event "library-key" "g"))
+        (nav/analytics-event "library-key" "f"))
 
-      (and (= (.-keyCode e) 72) (not (.-ctrlKey e)))
+      (and (= (.-keyCode e) 71) (not (.-ctrlKey e)))
       (do
         (.click (.getElementById js/document "media-processed"))
-        (nav/analytics-event "library-key" "h"))
+        (nav/analytics-event "library-key" "g"))
+
+      (and (= (.-keyCode e) 82) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-reference-quality"))
+        (nav/analytics-event "library-key" "r"))
+
+      (and (= (.-keyCode e) 67) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-cameracheck"))
+        (nav/analytics-event "library-key" "c"))
+
+      (and (= (.-keyCode e) 65) (.-ctrlKey e))
+      (do
+        (.preventDefault e)
+        (.click (.getElementById js/document "select-all"))
+        (nav/analytics-event "library-key" "C-a"))
 
       :else (if (seq media-idxs)
               (let [id (some->> (updated-select-position media-idxs e cur)
@@ -216,7 +232,7 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (if (:has-selected state)
+      (if (:all-selected state)
         (dom/button #js {:className "btn btn-default search-main-op"
                          :onClick #(do (util/deselect-all*)
                                        (nav/analytics-event "library-collection" "deselect-all-click"))
@@ -239,12 +255,12 @@
   (reify
     om/IRender
     (render [_]
-      (let [has-selected (first (filter (comp :selected util/find-with-id)
-                                        (get-in data [:search :matches])))]
+      (let [all-selected (every? (comp :selected util/find-with-id)
+                                 (get-in data [:search :matches]))]
         (dom/div #js {:className "subfilter-bar"}
                  (om/build pagination-component data)
                  (om/build select-button-components (:search data)
-                           {:state {:has-selected has-selected}}))))))
+                           {:state {:all-selected all-selected}}))))))
 
 (defn media-collection-content-component
   [data owner]

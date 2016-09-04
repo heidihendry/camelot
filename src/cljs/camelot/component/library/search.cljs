@@ -276,8 +276,7 @@
                        :title (tr/translate ::identification-panel-button-title)
                        :onClick #(do (identify-selected-prompt)
                                      (nav/analytics-event "library-id" "open-identification-panel"))
-                       :disabled (if (or (not (:has-selected state))
-                                         (:identify-selected (:search data)))
+                       :disabled (if (not (:has-selected state))
                                    "disabled" "")}
                   (tr/translate ::identification-panel-button-text)))))
 

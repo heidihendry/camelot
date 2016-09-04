@@ -27,18 +27,20 @@ So that trap photos can be processed efficiently, the Library has several keyboa
 * **Control + m**: Focus the media collection panel
 * **Control + d**: Toggle the details panel
 * **Control + i**: Open the identify panel
-* **Control + p**: Go to the previous page of media
-* **Control + n**: Go to the next page of media
-* **Control + a**: Select all media (or select none, if some are selected)
-* **Control + g**: Toggle the flag state of the selected media
-* **Control + h**: Toggle the processed state of the selected media
+* **Control + <left>**: Go to the previous page of media
+* **Control + <right>**: Go to the next page of media
 * **Control + f**: Focus the filter text input
 * **Alt + f**: Reapply the current filter
 
 With the Media Collection panel focused (**Control + m**):
 
 * **"wasd"** and **Arrow keys** can be used to select the next media in that direction.
-* hold **shift** + **"wasd"** OR **arrow keys** to select the next media in that direction, but also keep the existing selection.
+* **Control + a**: Select all media (or select none, if all are selected)
+* **f** flag the currently selected media
+* **g** mark the currently selected media as processed
+* **r** mark the currently selected media as being of reference quality
+* **c** mark the currently selected media as a camera-check (i.e., test-fire of the camera)
+* hold **shift** + **"wasd"** OR **arrow keys** to select the next media in that direction, and also keep the existing selection.
 
 ## Administration and Advanced Configuration
 
