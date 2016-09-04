@@ -1,5 +1,6 @@
 (ns camelot.report.module.core
-  "Column definitions for the report builder.")
+  "Column definitions for the report builder."
+  (:require [camelot.translation.core :as tr]))
 
 (defonce known-columns
   (atom {}))
@@ -28,10 +29,24 @@
   [k conf]
   (swap! known-reports assoc k conf))
 
+(defn report-for-state
+  [state report]
+  (-> report
+      (update :title #(if (keyword? %)
+                        (tr/translate (:config state) %)
+                        %))
+      (update :description #(if (keyword? %)
+                              (tr/translate (:config state) %)
+                              %))
+      (update :form #(if (fn? %)
+                       (apply % state)
+                       %))))
+
 (defn get-report
-  [report-key]
-  (get @known-reports report-key))
+  [state report-key]
+  (report-for-state state (get @known-reports report-key)))
 
 (defn all-reports
-  []
-  (deref known-reports))
+  [state]
+  (reduce-kv (fn [acc k v]
+               (assoc acc k (report-for-state state v))) {} @known-reports))

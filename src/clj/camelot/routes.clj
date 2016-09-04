@@ -202,9 +202,13 @@
 
   (context "/report" []
            (GET "/:report/download" {params :params}
-                (report/export (keyword (:report params)) (rest/coerce-string-fields params)))
-           (GET "/:report" [report] (r/response (report/get-configuration (keyword report))))
-           (GET "/" [] (r/response (report/available-reports))))
+                (report/export
+                 (app/gen-state (conf/config))
+                 (keyword (:report params)) (rest/coerce-string-fields params)))
+           (GET "/:report" [report] (r/response (report/get-configuration
+                                                 (app/gen-state (conf/config))
+                                                 (keyword report))))
+           (GET "/" [] (r/response (report/available-reports (app/gen-state (conf/config))))))
 
   (context "/library" []
            (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config)))))
