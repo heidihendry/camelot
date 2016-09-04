@@ -44,6 +44,7 @@
    :survey
    {:duplicate-name "A survey with the name '%s' already exists"
     :title "Survey"
+    :report-description "The survey to report on."
     :sidebar-title "Surveys"
     :survey-name.label "Survey name"
     :survey-name.description "The name which will be used to refer to the survey."
@@ -76,6 +77,7 @@
    :trap-station
    {:title "Trap Station"
     :sidebar-title "Trap Stations"
+    :report-description "The trap station to report on"
     :trap-station-name.label "Trap station name"
     :trap-station-name.description "Name of this Trap Station"
     :trap-station-longitude.label "Longitude"
@@ -196,6 +198,7 @@
    :taxonomy
    {:sidebar-title "Species"
     :title "Species"
+    :report-description "The species to report on"
     :taxonomy-class.label "Class"
     :taxonomy-class.description "Class name."
     :taxonomy-order.label "Order"
@@ -369,9 +372,9 @@
     :taxonomy-order "Order"
     :taxonomy-class "Class"
     :taxonomy-label "Species"
-    :species-common-name "Common Name"
-    :species-notes "Species Notes"
-    :species-id "Species ID"
+    :taxonomy-common-name "Common Name"
+    :taxonomy-notes "Species Notes"
+    :taxonomy-id "Species ID"
     :camera-id "Camera ID"
     :camera-name "Camera Name"
     :camera-make "Camera Make"
@@ -407,6 +410,41 @@
     :photo-orientation "Photo Orientation"
     :photo-resolution-x "Photo X Resolution (pixels)"
     :photo-resolution-y "Photo Y Resolution (pixels)"}
+
+   :camelot.report.module.builtin.reports.camera-traps
+   {:title "Camera Trap Export"
+    :description "A CamtrapR-compatible export of camera trap details. Set 'byCamera' to TRUE when importing into CamtrapR."}
+
+   :camelot.report.module.builtin.reports.effort-summary
+   {:title "Effort Summary"
+    :description "A breakdown of sites in a survey and their trap stations."}
+
+   :camelot.report.module.builtin.reports.full-export
+   {:title "Full Export"
+    :description "Export of data in Camelot, with one row per unique record."}
+
+   :camelot.report.module.builtin.reports.raw-data-export
+   {:title "Raw Data Export"
+    :description "Details about each uploaded capture."}
+
+   :camelot.report.module.builtin.reports.species-statistics
+   {:title "Species Statistics"
+    :description "Sightings breakdown for a single species across all surveys."}
+
+   :camelot.report.module.builtin.reports.summary-statistics
+   {:title "Summary Statistics"
+    :description "Summary report for the observations of each species in a survey."}
+
+   :camelot.report.module.builtin.reports.survey-site
+   {:title "Survey Site Statistics"
+    :description "The observations of each species in a Survey Site."}
+
+   :camelot.report.module.builtin.reports.trap-station
+   {:title "Trap Station Statistics"
+    :description "Observations at a given trap station and the time elapsed gathering those observations."}
+
+   :camelot.handler.capture
+   {:timestamp-outside-range "Timestamp is outside of the session dates."}
 
    :camelot.component.camera.core
    {:new-camera-name-placeholder "New camera name..."

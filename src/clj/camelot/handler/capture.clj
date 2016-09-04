@@ -8,7 +8,8 @@
             [camelot.db :as db]
             [camelot.handler.import :as import]
             [camelot.model.trap-station-session :as trap-station-session]
-            [clj-time.core :as t])
+            [clj-time.core :as t]
+            [camelot.translation.core :as tr])
   (:import [camelot.model.trap_station_session TrapStationSession]))
 
 (s/defn read-photo
@@ -50,5 +51,5 @@
               state session-camera-id)
         photo (read-photo state tempfile)]
     (if (valid-session-date? sess (:datetime photo))
-      {:error "Timestamp is outside of the session dates."}
+      {:error (tr/translate (:config state) ::timestamp-outside-range)}
       (create-media state content-type tempfile size session-camera-id photo))))

@@ -1,5 +1,6 @@
 (ns camelot.report.module.builtin.reports.trap-station
-  (:require [camelot.report.module.core :as module]))
+  (:require [camelot.report.module.core :as module]
+            [camelot.translation.core :as tr]))
 
 (defn report-output
   [state {:keys [trap-station-id]}]
@@ -27,12 +28,13 @@
    :filters [#(:taxonomy-species %)]
    :order-by [:taxonomy-genus :taxonomy-species]})
 
-(def form-smith
+(defn form-smith
+  [state]
   {:resource {}
    :layout [[:trap-station-id]]
    :schema {:trap-station-id
-            {:label "Trap Station"
-             :description "The trap station to report on"
+            {:label (tr/translate (:config state) :trap-station/trap-station-name.label)
+             :description (tr/translate (:config state) :trap-station/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/trap-stations"
@@ -42,8 +44,8 @@
 (module/register-report
  :trap-station-statistics
  {:file-prefix "trap-station-statistics"
-  :title "Trap Station Statistics"
-  :description "Observations at a given trap station and the time elapsed gathering those observations."
+  :title ::title
+  :description ::description
   :output report-output
   :form form-smith
   :by :all

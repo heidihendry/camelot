@@ -1,5 +1,6 @@
 (ns camelot.report.module.builtin.reports.effort-summary
-  (:require [camelot.report.module.core :as module]))
+  (:require [camelot.report.module.core :as module]
+            [camelot.translation.core :as tr]))
 
 (defn report-output
   [state {:keys [survey-id]}]
@@ -19,12 +20,13 @@
    :filters [#(= (:survey-id %) survey-id)]
    :order-by [:site-id]})
 
-(def form-smith
+(defn form-smith
+  [state]
   {:resource {}
    :layout [[:survey-id]]
    :schema {:survey-id
-            {:label "Survey"
-             :description "The survey to report on"
+            {:label (tr/translate (:config state) :survey/title)
+             :description (tr/translate (:config state) :survey/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/surveys"
@@ -35,8 +37,8 @@
  :effort-summary
  {:file-prefix "effort-summary-report"
   :output report-output
-  :title "Effort Summary"
-  :description "A breakdown of sites in a survey and their trap stations."
+  :title ::title
+  :description ::description
   :form form-smith
   :by :all
   :for :survey})

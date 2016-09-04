@@ -20,6 +20,52 @@
 
 (sql/defqueries "sql/reports.sql" {:connection db/spec})
 
+(def all-columns
+  [:survey-id
+   :survey-name
+   :survey-directory
+   :survey-site-id
+   :site-id
+   :site-name
+   :site-sublocation
+   :site-city
+   :site-state-province
+   :site-country
+   :site-area
+   :trap-station-id
+   :trap-station-name
+   :trap-station-longitude
+   :trap-station-latitude
+   :trap-station-altitude
+   :trap-station-session-start-date
+   :trap-station-session-end-date
+   :trap-station-session-id
+   :trap-station-session-camera-id
+   :camera-id
+   :camera-name
+   :camera-make
+   :camera-model
+   :media-id
+   :media-capture-timestamp
+   :media-filename
+   :taxonomy-id
+   :taxonomy-species
+   :taxonomy-genus
+   :taxonomy-family
+   :taxonomy-order
+   :taxonomy-class
+   :taxonomy-common-name
+   :sighting-quantity
+   :sighting-sex
+   :sighting-lifestage
+   :photo-iso-setting
+   :photo-exposure-value
+   :photo-flash-setting
+   :photo-fnumber-setting
+   :photo-orientation
+   :photo-resolution-x
+   :photo-resolution-y])
+
 (defn- get-all-by-survey
   []
   (db/clj-keys (-get-all-by-survey)))
@@ -76,7 +122,9 @@
 
 (defn- project
   [columns data]
-  (let [results (set/project data columns)]
+  (let [results (if (= (first columns) :all)
+                  (into #{} data)
+                  (set/project data columns))]
     (->> results
          (filter #(distinct-in-results results %))
          (fill-keys columns)
@@ -125,7 +173,8 @@
   (->> order-by
        (map #(fn [x y] (compare (get x %) (get y %))))
        (map #(% a b))
-       (cons (compare (into [] a) (into [] b)))
+       vec
+       (#(conj % (compare (into [] a) (into [] b))))
        (reduce #(if (zero? %2)
                   %1
                   (reduced %2)) 0)))
@@ -163,12 +212,19 @@
        (project columns)
        (sort-result order-by)))
 
+(defn- all-cols?
+  [cols]
+  (= (first cols) :all))
+
 (defn- cons-headings
   [state columns data]
-  (cons (map #(or (get-in @module/known-columns [% :heading])
-                  (tr/translate (:config state)
-                                (keyword (str "report/" (name %))))) columns)
-        data))
+  (let [cols (if (all-cols? columns)
+               (keys (first data))
+               columns)]
+    (cons (map #(or (get-in @module/known-columns [% :heading])
+                    (tr/translate (:config state)
+                                  (keyword (str "report/" (name %))))) cols)
+          data)))
 
 (defn- as-dashed-row
   [state cols row]
@@ -179,9 +235,8 @@
   (map #(get row %) cols))
 
 (defn- as-dashed-rows
-  [state params data]
-  (let [cols (:columns params)]
-    (map (partial as-dashed-row state cols) data)))
+  [state cols data]
+  (map (partial as-dashed-row state cols) data))
 
 (defn- as-rows
   [state params data]
@@ -198,11 +253,14 @@
 (defn- exportable-report
   "Generate a report as a CSV."
   [state params data]
-  (->> data
-       (generate-report state params)
-       (as-dashed-rows state params)
-       (cons-headings state (:columns params))
-       (to-csv-string)))
+  (let [d (generate-report state params data)
+        cols (if (all-cols? (:columns params))
+               all-columns
+               data)]
+    (->> d
+         (as-dashed-rows state cols)
+         (cons-headings state cols)
+         (to-csv-string))))
 
 (s/defn report :- [s/Any]
   "Produce a report, with each record represented as a vector."
@@ -211,7 +269,7 @@
    configuration
    data :- [{s/Keyword s/Any}]]
   (loader/load-user-modules)
-  (let [report (module/get-report report-key)
+  (let [report (module/get-report state report-key)
         conf ((:output report) state configuration)]
     (->> data
          (generate-report state conf)
@@ -223,7 +281,7 @@
    state :- State
    configuration
    data :- [{s/Keyword s/Any}]]
-  (let [report (module/get-report report-key)]
+  (let [report (module/get-report state report-key)]
     (exportable-report
      state
      ((:output report) state configuration)
@@ -239,12 +297,12 @@
 
 (s/defn export
   "Handler for an export request."
-  [report-key :- s/Keyword
+  [state :- State
+   report-key :- s/Keyword
    configuration]
   (loader/load-user-modules)
-  (if-let [report (module/get-report report-key)]
-    (let [state (app/gen-state (config/config))
-          sightings (get-by (:by report))
+  (if-let [report (module/get-report state report-key)]
+    (let [sightings (get-by (:by report))
           data (csv-report report-key state configuration sightings)]
       (-> (r/response data)
           (r/content-type "text/csv; charset=utf-8")
@@ -264,13 +322,13 @@
 
 (s/defn available-reports
   "Map of all available reports."
-  []
+  [state]
   (loader/load-user-modules)
-  (reduce-kv report-configuration-reducer [] (module/all-reports)))
+  (reduce-kv report-configuration-reducer [] (module/all-reports state)))
 
 (s/defn get-configuration
   "Configuration of the given report."
-  [report-key]
+  [state report-key]
   (loader/load-user-modules)
-  (let [r (get (module/all-reports) report-key)]
+  (let [r (get (module/all-reports state) report-key)]
     (->report-descriptor r report-key)))

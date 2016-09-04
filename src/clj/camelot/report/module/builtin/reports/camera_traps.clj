@@ -1,6 +1,7 @@
 (ns camelot.report.module.builtin.reports.camera-traps
   (:require [camelot.report.module.core :as module]
-            [clj-time.format :as tf]))
+            [clj-time.format :as tf]
+            [camelot.translation.core :as tr]))
 
 (def date-format (tf/formatter-local "yyyy-MM-dd"))
 
@@ -19,12 +20,13 @@
    :filters [#(= (:survey-id %) survey-id)]
    :order-by [:trap-station-id :trap-station-session-id]})
 
-(def form-smith
+(defn form-smith
+  [state]
   {:resource {}
    :layout [[:survey-id]]
    :schema {:survey-id
-            {:label "Survey"
-             :description "The survey to report on"
+            {:label (tr/translate (:config state) :survey/title)
+             :description (tr/translate (:config state) :survey/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/surveys"
@@ -35,8 +37,8 @@
  :effort-summary
  {:file-prefix "camera-traps"
   :output report-output
-  :title "Camera Trap Export"
-  :description "A CamtrapR-compatible export of camera trap details. Set byCamera to TRUE when importing into CamtrapR."
+  :title ::title
+  :description ::description
   :form form-smith
   :by :all
   :for :survey})

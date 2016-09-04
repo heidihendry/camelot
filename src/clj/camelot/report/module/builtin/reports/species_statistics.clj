@@ -1,7 +1,8 @@
 (ns camelot.report.module.builtin.reports.species-statistics
   (:require [camelot.model.taxonomy :as taxonomy]
             [camelot.report.module.core :as module]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [camelot.translation.core :as tr]))
 
 (defn report-output
   [state {:keys [taxonomy-id]}]
@@ -31,12 +32,13 @@
                      %)]
      :order-by [:taxonomy-genus :taxonomy-species]}))
 
-(def form-smith
+(defn form-smith
+  [state]
   {:resource {}
    :layout [[:taxonomy-id]]
    :schema {:taxonomy-id
-            {:label "Species"
-             :description "The species to report on"
+            {:label (tr/translate (:config state) :taxonomy/title)
+             :description (tr/translate (:config state) :taxonomy/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/taxonomy"
@@ -46,8 +48,8 @@
 (module/register-report
  :species-statistics
  {:file-prefix "species-statistics"
-  :title "Species Statistics"
-  :description "Sightings breakdown for a single species across all surveys."
+  :title ::title
+  :description ::description
   :output report-output
   :form form-smith
   :by :all

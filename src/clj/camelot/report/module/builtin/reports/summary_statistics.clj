@@ -1,5 +1,6 @@
 (ns camelot.report.module.builtin.reports.summary-statistics
-  (:require [camelot.report.module.core :as module]))
+  (:require [camelot.report.module.core :as module]
+            [camelot.translation.core :as tr]))
 
 (defn report-output
   [state {:keys [survey-id]}]
@@ -21,12 +22,13 @@
    :filters [#(not (nil? (:taxonomy-species %)))]
    :order-by [:taxonomy-genus :taxonomy-species]})
 
-(def form-smith
+(defn form-smith
+  [state]
   {:resource {}
    :layout [[:survey-id]]
    :schema {:survey-id
-            {:label "Survey"
-             :description "The survey to report on"
+            {:label (tr/translate (:config state) :survey/title)
+             :description (tr/translate (:config state) :survey/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/surveys"
@@ -36,8 +38,8 @@
 (module/register-report
  :summary-statistics
  {:file-prefix "summary-statistics-report"
-  :title "Summary Statistics"
-  :description "Summary report for the observations of each species in a survey."
+  :title ::title
+  :description ::description
   :output report-output
   :form form-smith
   :by :all

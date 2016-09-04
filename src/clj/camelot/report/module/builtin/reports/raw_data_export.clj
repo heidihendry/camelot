@@ -1,6 +1,7 @@
 (ns camelot.report.module.builtin.reports.raw-data-export
   (:require [camelot.report.module.core :as module]
-            [clj-time.format :as tf]))
+            [clj-time.format :as tf]
+            [camelot.translation.core :as tr]))
 
 (def timestamp-formatter (tf/formatter "yyyy-MM-dd hh:mm:ss"))
 
@@ -22,12 +23,13 @@
                          (partial tf/unparse timestamp-formatter))]
    :order-by [:taxonomy-genus :taxonomy-species]})
 
-(def form-smith
+(defn form-smith
+  [state]
   {:resource {}
    :layout [[:survey-id]]
    :schema {:survey-id
-            {:label "Survey"
-             :description "The survey to report on"
+            {:label (tr/translate (:config state) :survey/title)
+             :description (tr/translate (:config state) :survey/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/surveys"
@@ -37,8 +39,8 @@
 (module/register-report
  :raw-data-export
  {:file-prefix "raw-data-export"
-  :title "Raw Data Export"
-  :description "Details about each uploaded capture."
+  :title ::title
+  :description ::description
   :output report-output
   :form form-smith
   :by :all

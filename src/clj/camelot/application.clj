@@ -74,7 +74,6 @@ Currently the only application state is the user's configuration."
                          :rows 4
                          :cols 35}}
    :states {:create {:submit {:success {:type :event
-                                        ;; TODO implement
                                         :event :site-create-success}
                               :error {:type :event
                                       :event :site-create-error}}}
@@ -114,7 +113,6 @@ Currently the only application state is the user's configuration."
                            :rows 4
                            :cols 35}}
    :states {:create {:submit {:success {:type :event
-                                        ;; TODO implement
                                         :event :camera-create-success}
                               :error {:type :event
                                       :event :camera-create-error}}}
@@ -449,12 +447,10 @@ Currently the only application state is the user's configuration."
                            :rows 4
                            :cols 35}}
    :states {:create {:submit {:success {:type :event
-                                        ;; TODO implement
                                         :event :survey-create}
                               :error {:type :event
                                       :event :survey-error}}}
             :update {:submit {:success {:type :event
-                                        ;; TODO implement
                                         :event :survey-update-success}
                               :error {:type :event
                                       :event :survey-update-error}}}}})
