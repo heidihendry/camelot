@@ -53,8 +53,8 @@
                  (dom/table nil
                             (dom/thead nil
                                        (dom/tr #js {:className "table-heading"}
-                                               (dom/th nil (tr/translate :concepts/genus))
-                                               (dom/th nil (tr/translate :concepts/species))
+                                               (dom/th nil (tr/translate :taxonomy/taxonomy-genus.label))
+                                               (dom/th nil (tr/translate :taxonomy/taxonomy-species.label))
                                                (dom/th nil "")))
                             (dom/tbody #js {:className "selectable"}
                                        (om/build-all species-row-component
@@ -148,7 +148,7 @@
                                                      (go (>! extch {:type :select :taxonomy-id (cljs.reader/read-string v)})))))}
                                (om/build-all species-option-component
                                              (cons {:taxonomy-id -1
-                                                    :taxonomy-label (tr/translate :common/select)}
+                                                    :taxonomy-label (str (tr/translate :words/select) "...")}
                                                    (reverse (conj (into '()
                                                                         (sort-by :taxonomy-label
                                                                                  (filter #(not (some (fn [x]

@@ -21,16 +21,16 @@
                (dom/span #js {:className "menu-item-description"}
                          (when (:taxonomy-common-name data)
                            (dom/div nil
-                                    (tr/translate :concepts/common-name) ": "
+                                    (tr/translate :taxonomy/taxonomy-common-name.label) ": "
                                     (:taxonomy-common-name data)))
                          (when (:taxonomy-class data)
-                           (str (tr/translate :concepts/class)
+                           (str (tr/translate :taxonomy/taxonomy-class.label)
                                 ": " (:taxonomy-class data) "; "))
                          (when (:taxonomy-order data)
-                           (str (tr/translate :concepts/order) ": "
+                           (str (tr/translate :taxonomy/taxonomy-order.label) ": "
                                 (:taxonomy-order data) "; "))
                          (when (:taxonomy-family data)
-                           (str (tr/translate :concepts/family) ": "
+                           (str (tr/translate :taxonomy/taxonomy-family.label) ": "
                                 (:taxonomy-family data))))))))
 
 (defn update-view

@@ -52,10 +52,9 @@ Currently the only application state is the user's configuration."
                         :type :site
                         :id :site-id
                         :label :site-name}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}]}
    :layout [[:site-name]
             [:site-sublocation]
@@ -95,10 +94,9 @@ Currently the only application state is the user's configuration."
                         :type :camera
                         :id :camera-id
                         :label :camera-name}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}]}
    :layout [[:camera-name]
             [:camera-status-id]
@@ -137,8 +135,7 @@ Currently the only application state is the user's configuration."
                         :type :survey-site
                         :id :survey-site-id
                         :label :site-name}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :action/trap-stations)
                         :action :trap-stations}]}
@@ -163,10 +160,9 @@ Currently the only application state is the user's configuration."
                         :type :trap-station-session-camera
                         :id :trap-station-session-camera-id
                         :label :camera-name}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/media)
                         :action :media}]}
@@ -197,10 +193,9 @@ Currently the only application state is the user's configuration."
                         :type :trap-station
                         :id :trap-station-id
                         :label :trap-station-name}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/sessions)
                         :action :trap-station-sessions}]}
@@ -242,10 +237,9 @@ Currently the only application state is the user's configuration."
                         :type :trap-station-session
                         :id :trap-station-session-id
                         :label :trap-station-session-label}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/trap-station-session-cameras)
                         :action :trap-station-session-cameras}]}
@@ -277,10 +271,9 @@ Currently the only application state is the user's configuration."
                         :type :media
                         :id :media-id
                         :label :media-capture-timestamp}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/sightings)
                         :action :sightings}
@@ -312,10 +305,9 @@ Currently the only application state is the user's configuration."
                         :type :photo
                         :id :photo-id
                         :label :photo-created}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}]}
    :layout [[:photo-iso-setting]
             [:photo-exposure-value]
@@ -350,18 +342,35 @@ Currently the only application state is the user's configuration."
                         :type :sighting
                         :id :sighting-id
                         :label :taxonomy-label}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}]}
    :layout [[:taxonomy-id]
-            [:sighting-quantity]]
+            [:sighting-quantity]
+            [:sighting-sex]
+            [:sighting-lifestage]]
    :schema {:taxonomy-id {:type :select
                          :required true
                          :generator :taxonomy-available}
             :sighting-quantity {:type :number
-                                :required true}}
+                                :required true}
+            :sighting-sex {:type :select
+                           :required false
+                           :options {"unidentified" (tr/translate (:config state)
+                                                                        :sighting/sighting-property.unidentified)
+                                     "M" (tr/translate (:config state)
+                                                       :sighting/sighting-sex.male)
+                                     "F" (tr/translate (:config state)
+                                                       :sighting/sighting-sex.female)}}
+            :sighting-lifestage {:type :select
+                                 :required false
+                                 :options {"unidentified" (tr/translate (:config state)
+                                                                        :sighting/sighting-property.unidentified)
+                                           "adult" (tr/translate (:config state)
+                                                                 :sighting/sighting-lifestage.adult)
+                                           "juvenile" (tr/translate (:config state)
+                                                                    :sighting/sighting-lifestage.juvenile)}}}
    :states {:create {:submit {:success {:type :event
                                         :event :sighting-create}
                               :error {:type :event
@@ -378,10 +387,9 @@ Currently the only application state is the user's configuration."
                         :type :taxonomy
                         :id :taxonomy-id
                         :label :taxonomy-label}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}]}
    :layout [[:taxonomy-class]
             [:taxonomy-order]
@@ -421,10 +429,9 @@ Currently the only application state is the user's configuration."
                         :type :survey
                         :id :survey-id
                         :label :survey-name}}
-   :actionmenu {:title (tr/translate (:config state) :actionmenu/title)
-                :menu [{:label (tr/translate (:config state) :action/delete)
+   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/edit)
+                       {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/survey-sites)
                         :action :survey-sites}]}

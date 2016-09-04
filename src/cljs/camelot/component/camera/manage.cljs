@@ -37,15 +37,15 @@
 
 (defn form-layout
   [data]
-  [[(tr/translate :concepts/camera-name)
+  [[(tr/translate :camera/camera-name.label)
     :camera-name :text-input {:required true
                               :validator (fn [] (let [v (get-in data [:data :camera-name :value])]
                                                   (not (or (nil? v) (= "" v)
                                                            (some #(= v %) (map :camera-name (:list data)))))))
                               :warning "Must not be blank or have the same name as another camera."}]
-   [(tr/translate :concepts/camera-make) :camera-make :text-input {}]
-   [(tr/translate :concepts/camera-model) :camera-model :text-input {}]
-   [(tr/translate :concepts/camera-notes) :camera-notes :textarea {}]])
+   [(tr/translate :camera/camera-make.label) :camera-make :text-input {}]
+   [(tr/translate :camera/camera-model.label) :camera-model :text-input {}]
+   [(tr/translate :camera/camera-notes.label) :camera-notes :textarea {}]])
 
 (defn update-success-handler
   [data]

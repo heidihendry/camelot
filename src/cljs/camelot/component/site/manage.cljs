@@ -37,18 +37,18 @@
 
 (defn form-layout
   [data]
-  [[(tr/translate :concepts/site-name)
+  [[(tr/translate :site/site-name.label)
     :site-name :text-input {:required true
                             :validator (fn [] (let [v (get-in data [:data :site-name :value])]
                                                 (not (or (nil? v) (= "" v)
                                                          (some #(= v %) (map :site-name (:list data)))))))
                             :warning (tr/translate ::validation-site-name)}]
-   [(tr/translate :concepts/sublocation) :site-sublocation :text-input {}]
-   [(tr/translate :concepts/nearest-city) :site-city :text-input {}]
-   [(tr/translate :concepts/state-province) :site-state-province :text-input {}]
-   [(tr/translate :concepts/country) :site-country :text-input {}]
-   [(tr/translate :concepts/area-covered) :site-area :text-input {}]
-   [(tr/translate :words/notes) :site-notes :textarea {}]])
+   [(tr/translate :site/site-sublocation.label) :site-sublocation :text-input {}]
+   [(tr/translate :site/site-city.label) :site-city :text-input {}]
+   [(tr/translate :site/site-state-province.label) :site-state-province :text-input {}]
+   [(tr/translate :site/site-country.label) :site-country :text-input {}]
+   [(tr/translate :site/site-area.label) :site-area :text-input {}]
+   [(tr/translate :site/site-notes.label) :site-notes :textarea {}]])
 
 (defn update-success-handler
   [data]

@@ -127,7 +127,7 @@
     om/IRender
     (render [_]
       (om/build cutil/blank-slate-component data
-                {:opts {:item-name (tr/translate :words/captures-lc)
+                {:opts {:item-name (tr/translate ::item-name)
                         :advice (tr/translate ::upload-advice)}}))))
 
 (defn filter-blank-component

@@ -13,8 +13,8 @@
   [rtype schema translate-fn]
   (reduce (fn [acc [k v]]
             (assoc acc k
-                   {:label (translate-fn rtype (keyword (format "%s/label" (name k))))
-                    :description (translate-fn rtype (keyword (format "%s/description" (name k))))
+                   {:label (translate-fn rtype (keyword (format "%s.label" (name k))))
+                    :description (translate-fn rtype (keyword (format "%s.description" (name k))))
                     :schema v})) {} schema))
 
 (defn build-smith-reducer

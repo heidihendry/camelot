@@ -137,7 +137,7 @@
                         " -- "
                         (tf/unparse day-formatter (:trap-station-session-end-date data)))
                (dom/div #js {:className "menu-item-description"}
-                        (dom/label nil " " (tr/translate :concepts/camera-name)
+                        (dom/label nil " " (tr/translate :camera/camera-name.label)
                                    ":") " " (:camera-name data))
                (when-not (or (zero? (get state :total)) (nil? (get state :total)))
                  (dom/div #js {:className "progress-bar-container"

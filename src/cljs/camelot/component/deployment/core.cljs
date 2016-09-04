@@ -240,16 +240,16 @@
       (dom/div #js {:className "section"}
                (om/build read-only-field-component data
                          {:init-state {:field :site-name
-                                       :label (tr/translate :concepts/site)}})
+                                       :label (tr/translate :site/site-name.label)}})
                (om/build read-only-field-component data
                          {:init-state {:field :trap-station-latitude
-                                       :label (tr/translate :words/latitude)}})
+                                       :label (tr/translate :trap-station/trap-station-latitude.label)}})
                (om/build read-only-field-component data
                          {:init-state {:field :trap-station-longitude
-                                       :label (tr/translate :words/longitude)}})
+                                       :label (tr/translate :trap-station/trap-station-longitude.label)}})
                (om/build read-only-field-component data
                          {:init-state {:field :trap-station-altitude
-                                       :label (tr/translate :words/altitude)}})
+                                       :label (tr/translate :trap-station/trap-station-altitude.label)}})
                (om/build read-only-field-component data
                          {:init-state {:field :primary-camera-name
                                        :label (tr/translate ::primary-camera-name)}})
@@ -324,10 +324,10 @@
                (dom/span #js {:className "menu-item-title"}
                          (:trap-station-name data))
                (dom/span #js {:className "menu-item-description"}
-                         (dom/label nil (tr/translate :words/latitude) ":")
+                         (dom/label nil (tr/translate :trap-station/trap-station-latitude.label) ":")
                          " " (:trap-station-latitude data)
                          ", "
-                         (dom/label nil (tr/translate :words/longitude) ":")
+                         (dom/label nil (tr/translate :trap-station/trap-station-longitude.label) ":")
                          " " (:trap-station-longitude data))
                (dom/div #js {:className "menu-item-description"}
                          (dom/label nil (tr/translate ::start-date) ":")

@@ -107,7 +107,7 @@
                                                  (sort-by :camera-name (:list data)))]
                             (if (empty? filtered)
                               (om/build util/blank-slate-component {}
-                                        {:opts {:item-name (tr/translate :words/cameras-lc)
+                                        {:opts {:item-name (tr/translate ::blank-item-name)
                                                 :advice (tr/translate ::blank-filter-advice)}})
                               (om/build-all camera-list-component filtered
                                             {:key :camera-id}))))

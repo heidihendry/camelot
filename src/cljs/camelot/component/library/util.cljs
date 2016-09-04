@@ -60,8 +60,8 @@
   [flag-state]
   (om/update! (:search (state/library-state)) :show-select-action
               (if flag-state
-                (tr/translate :words/flagged-lc)
-                (tr/translate :words/unflagged-lc)))
+                (tr/translate ::flagged)
+                (tr/translate ::unflagged)))
   (show-select-message)
   (set-flag-state :media-attention-needed flag-state)
   (when flag-state
@@ -71,8 +71,8 @@
   [flag-state]
   (om/update! (:search (state/library-state))
               :show-select-action (if flag-state
-                                    (tr/translate :concepts/reference-quality-lc)
-                                    (tr/translate :concepts/ordinary-quality-lc)))
+                                    (tr/translate ::reference-quality)
+                                    (tr/translate ::ordinary-quality)))
   (show-select-message)
   (set-flag-state :media-reference-quality flag-state))
 
@@ -80,8 +80,8 @@
   [flag-state]
   (om/update! (:search (state/library-state)) :show-select-action
               (if flag-state
-                (tr/translate :words/processed-lc)
-                (tr/translate :words/unprocessed-lc)))
+                (tr/translate ::processed)
+                (tr/translate ::unprocessed)))
   (show-select-message)
   (set-flag-state :media-processed flag-state))
 
@@ -89,8 +89,8 @@
   [flag-state]
   (om/update! (:search (state/library-state)) :show-select-action
               (if flag-state
-                (tr/translate :concepts/test-fires-lc)
-                (tr/translate :concepts/not-test-fires-lc)))
+                (tr/translate ::test-fires)
+                (tr/translate ::not-test-fires)))
   (show-select-message)
   (set-flag-state :media-cameracheck flag-state)
   (when flag-state
@@ -153,14 +153,14 @@
 (defn select-all*
   []
   (om/update! (:search (state/library-state)) :show-select-action
-              (tr/translate :words/selected-lc))
+              (tr/translate ::selected))
   (show-select-message)
   (select-all))
 
 (defn deselect-all*
   []
   (om/update! (:search (state/library-state)) :show-select-action
-              (tr/translate :words/selected-lc))
+              (tr/translate ::selected))
   (show-select-message)
   (deselect-all))
 
@@ -173,5 +173,5 @@
     (deselect-all))
   (om/transact! data :selected not)
   (om/update! (:search (state/library-state)) :show-select-action
-              (tr/translate :words/selected-lc))
+              (tr/translate ::selected))
   (show-select-message))

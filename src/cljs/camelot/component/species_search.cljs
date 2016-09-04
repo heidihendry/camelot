@@ -128,8 +128,8 @@
                    (dom/table #js {:className "species-search-table"}
                               (dom/thead nil
                                          (dom/tr #js {:className "table-heading"}
-                                                 (dom/th nil (tr/translate :words/genus))
-                                                 (dom/th nil (tr/translate :words/species))
+                                                 (dom/th nil (tr/translate :taxonomy/taxonomy-genus.label))
+                                                 (dom/th nil (tr/translate :taxonomy/taxonomy-species.label))
                                                  (dom/th nil "")))
                               (dom/tbody #js {:className "selectable"}
                                          (om/build-all search-result-component

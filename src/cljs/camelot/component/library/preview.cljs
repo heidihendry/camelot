@@ -60,9 +60,9 @@
                           (str/join ", "
                                     (filter (complement nil?)
                                             [(when-not (unidentified? sex)
-                                               (str (tr/translate :words/sex) ":" sex))
+                                               (str (tr/translate :sighting/sighting-sex.label) ":" sex))
                                              (when-not (unidentified? ls)
-                                               (str (tr/translate :concepts/lifestage-abbrev)
+                                               (str (tr/translate :sighting/sighting-lifestage.abbrev)
                                                     ":" ls))])))))))))
 
 (defn mcp-detail
@@ -81,19 +81,19 @@
     (render [_]
       (dom/div #js {:className "details"}
                (map #(om/build mcp-detail data {:init-state %})
-                    [{:key :trap-station-latitude :label (tr/translate :words/latitude)}
-                     {:key :trap-station-longitude :label (tr/translate :words/longitude)}
-                     {:key :trap-station-name :label (tr/translate :concepts/trap-station)}
-                     {:key :site-sublocation :label (tr/translate :concepts/sublocation)}
-                     {:key :site-name :label (tr/translate :concepts/site)}
-                     {:key :camera-name :label (tr/translate :words/camera)}])
+                    [{:key :trap-station-latitude :label (tr/translate :trap-station/trap-station-latitude.label)}
+                     {:key :trap-station-longitude :label (tr/translate :trap-station/trap-station-longitude.label)}
+                     {:key :trap-station-name :label (tr/translate :trap-station/trap-station-name.label)}
+                     {:key :site-sublocation :label (tr/translate :site/site-sublocation.label)}
+                     {:key :site-name :label (tr/translate :site/site-name.label)}
+                     {:key :camera-name :label (tr/translate :camera/camera-name.label)}])
                (dom/div nil
-                        (dom/label nil (tr/translate :words/timestamp))
+                        (dom/label nil (tr/translate :media/media-capture-timestamp.label))
                         (let [df (DateTimeFormat. "hh:mm:ss EEE, dd LLL yyyy")]
                           (dom/div {:className "data"}
                                    (.format df (:media-capture-timestamp data)))))
                (dom/div nil
-                        (dom/label nil (tr/translate :words/sightings))
+                        (dom/label nil (tr/translate ::sightings))
                         (om/build-all mcp-details-sightings (:sightings data)
                                       {:key :sighting-id}))))))
 

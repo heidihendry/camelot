@@ -424,7 +424,7 @@
     (rest/post-x "/taxonomy"
                  {:data (merge {:taxonomy-genus (first segments)
                                 :taxonomy-species (second segments)
-                                :taxonomy-common-name (tr/translate :words/na)}
+                                :taxonomy-common-name (tr/translate :words/not-available)}
                                (if (and (:survey-id data) (not= (:survey-id data) -1))
                                  {:survey-id (:survey-id data)}
                                  {}))}
@@ -478,7 +478,8 @@
                                           (om/update! (:identification data) :dirty-state true))))}
                     (om/build-all species-option-component
                                   (cons {:taxonomy-id -1
-                                         :taxonomy-label (tr/translate :common/select)}
+                                         :taxonomy-label (str (tr/translate :words/select)
+                                                              "...")}
                                         (reverse (conj (into '()
                                                              (sort-by :taxonomy-label
                                                                       (vals (:species data))))
@@ -505,11 +506,11 @@
                                     (om/update! (:identification data) :dirty-state true))}
                   (om/build-all sighting-option-component
                                 (list {:key "unidentified"
-                                       :label (tr/translate :words/unidentified)}
+                                       :label (tr/translate :sighting/sighting-property.unidentified)}
                                       {:key "adult"
-                                       :label (tr/translate :words/adult)}
+                                       :label (tr/translate :sighting/sighting-lifestage.adult)}
                                       {:key "juvenile"
-                                       :label (tr/translate :words/juvenile)})
+                                       :label (tr/translate :sighting/sighting-lifestage.juvenile)})
                                 {:key :key})))))
 
 (defn sighting-sex-select-component
@@ -524,11 +525,11 @@
                                     (om/update! (:identification data) :dirty-state true))}
                   (om/build-all sighting-option-component
                                 (list {:key "unidentified"
-                                       :label (tr/translate :words/unidentified)}
+                                       :label (tr/translate :sighting/sighting-property.unidentified)}
                                       {:key "M"
-                                       :label (tr/translate :words/male)}
+                                       :label (tr/translate :sighting/sighting-sex.male)}
                                       {:key "F"
-                                       :label (tr/translate :words/female)})
+                                       :label (tr/translate :sighting/sighting-sex.female)})
                                 {:key :key})))))
 
 (defn identification-bar-component
@@ -543,10 +544,10 @@
                                       ))}
                (dom/div nil
                         (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :words/species))
+                                 (dom/label nil (tr/translate :sighting/taxonomy-id.label))
                                  (om/build taxonomy-select-component data))
                         (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :words/quantity))
+                                 (dom/label nil (tr/translate :sighting/sighting-quantity.label))
                                  (dom/input #js {:type "number"
                                                  :className "field-input short-input"
                                                  :value (get-in data [:identification :quantity])
@@ -556,10 +557,10 @@
                                                                           (cljs.reader/read-string (.. % -target -value)))
                                                               (nav/analytics-event "library-id" "quantity-change"))}))
                         (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :words/sex))
+                                 (dom/label nil (tr/translate :sighting/sighting-sex.label))
                                  (om/build sighting-sex-select-component data))
                         (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :concepts/lifestage))
+                                 (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
                                  (om/build sighting-lifestage-select-component data))
                         (dom/div #js {:className "field"}
                                  (dom/button #js {:className "btn btn-primary"

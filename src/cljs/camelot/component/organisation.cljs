@@ -89,14 +89,14 @@
                          #(do (om/update! app :survey {:list (:body %)})
                               (when-not (:menu app)
                                 (om/update! app :menu [{:concept :survey
-                                                        :name (tr/translate :words/surveys)
+                                                        :name (tr/translate ::surveys)
                                                         :active true}
                                                        {:concept :site
-                                                        :name (tr/translate :words/sites)}
+                                                        :name (tr/translate ::sites)}
                                                        {:concept :camera
-                                                        :name (tr/translate :words/cameras)}
+                                                        :name (tr/translate ::cameras)}
                                                        {:concept :report
-                                                        :name (tr/translate :words/reports)}]))
+                                                        :name (tr/translate ::reports)}]))
                               (when-not (:active app)
                                 (om/update! app :active :survey))
                               (when-not (:camera app)

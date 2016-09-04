@@ -98,28 +98,28 @@
     (render [_]
       (dom/div nil
                (dom/label #js {:className "field-label required"}
-                          (tr/translate :concepts/common-name))
+                          (tr/translate :taxonomy/taxonomy-common-name.label))
                (om/build text-input-component data {:opts {:field :taxonomy-common-name}})
                (dom/label #js {:className "field-label"}
-                          (tr/translate :concepts/class))
+                          (tr/translate :taxonomy/taxonomy-class.label))
                (om/build text-input-component data {:opts {:field :taxonomy-class}})
                (dom/label #js {:className "field-label"}
-                          (tr/translate :concepts/order))
+                          (tr/translate :taxonomy/taxonomy-order.label))
                (om/build text-input-component data {:opts {:field :taxonomy-order}})
                (dom/label #js {:className "field-label"}
-                          (tr/translate :concepts/family))
+                          (tr/translate :taxonomy/taxonomy-family.label))
                (om/build text-input-component data {:opts {:field :taxonomy-family}})
                (dom/label #js {:className "field-label required"}
-                          (tr/translate :concepts/genus))
+                          (tr/translate :taxonomy/taxonomy-genus.label))
                (om/build text-input-component data {:opts {:field :taxonomy-genus}})
                (dom/label #js {:className "field-label required"}
-                          (tr/translate :concepts/species))
+                          (tr/translate :taxonomy/taxonomy-species.label))
                (om/build text-input-component data {:opts {:field :taxonomy-species}})
                (dom/label #js {:className "field-label"}
-                          (tr/translate :concepts/species-mass))
+                          (tr/translate :taxonomy/species-mass-id.label))
                (om/build species-mass-select-component data)
                (dom/label #js {:className "field-label"}
-                          (tr/translate :words/notes))
+                          (tr/translate :taxonomy/taxonomy-notes.label))
                (om/build text-area-component data {:opts {:field :taxonomy-notes}})
                (om/build submit-button (:data data))))))
 

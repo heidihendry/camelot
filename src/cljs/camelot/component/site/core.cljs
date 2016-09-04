@@ -61,13 +61,13 @@
                (dom/span #js {:className "menu-item-description"}
                          (when-not (empty? (:site-sublocation data))
                            (dom/span nil
-                                     (dom/label nil (tr/translate :concepts/sublocation) ":")
+                                     (dom/label nil (tr/translate :site/site-sublocation.label) ":")
                                      " "
                                      (:site-sublocation data) ", "))
                          (when-not (empty? (:site-city data))
                            (dom/span nil
                                      (dom/label nil
-                                                (tr/translate :concepts/state-province) ":")
+                                                (tr/translate :site/site-state-province.label) ":")
                                      " "
                                      (:site-state-province data))))
                (dom/div #js {:className "menu-item-description"}

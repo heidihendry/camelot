@@ -206,9 +206,9 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "single-section"}
-               (dom/label #js {:className "field-label required"} (tr/translate :concepts/site))
+               (dom/label #js {:className "field-label required"} (tr/translate :site/site-name.label))
                (om/build site-select-component data)
-               (dom/label #js {:className "field-label required"} (tr/translate :concepts/trap-station))
+               (dom/label #js {:className "field-label required"} (tr/translate :trap-station/trap-station-name.label))
                (dom/input #js {:className "field-input"
                                :type "text"
                                :value (get-in data [:data :trap-station-name :value])
@@ -224,7 +224,7 @@
                  (dom/label #js {:className "validation-warning"}
                             (tr/translate ::valdiation-future-date)))
                (dom/label #js {:className "field-label required"}
-                          (tr/translate :words/latitude))
+                          (tr/translate :trap-station/trap-station-latitude.label))
                (dom/input #js {:className "field-input"
                                :type "number"
                                :value (get-in data [:data :trap-station-latitude :value])
@@ -236,7 +236,7 @@
                    (dom/label #js {:className "validation-warning"}
                               (tr/translate ::invalid-latitude))))
                (dom/label #js {:className "field-label required"}
-                          (tr/translate :words/longitude))
+                          (tr/translate :trap-station/trap-station-longitude.label))
                (dom/input #js {:className "field-input"
                                :type "number"
                                :value (get-in data [:data :trap-station-longitude :value])
@@ -248,7 +248,7 @@
                    (dom/label #js {:className "validation-warning"}
                               (tr/translate ::invalid-longitude))))
                (dom/label #js {:className "field-label"}
-                          (tr/translate :words/altitude))
+                          (tr/translate :trap-station/trap-station-altitude.label))
                (dom/input #js {:className "field-input"
                                :type "number"
                                :value (get-in data [:data :trap-station-altitude :value])
