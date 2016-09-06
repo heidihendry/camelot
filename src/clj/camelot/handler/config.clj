@@ -11,6 +11,7 @@
   (conf/save-config config))
 
 (def routes
-  (context "/settings" []
-           (GET "/" [] (r/response (cursorise/cursorise (conf/config))))
-           (PUT "/" [data] (r/response (config-save (cursorise/decursorise data))))))
+  (context "/settings" {session :session}
+           (GET "/" [] (r/response (cursorise/cursorise (conf/config session))))
+           (PUT "/" [data] (-> (r/response (config-save (cursorise/decursorise data)))
+                               (assoc :session {:language (:value (:language data))})))))

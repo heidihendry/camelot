@@ -182,6 +182,10 @@ Throws an IOException if the file cannot be read."
 
 (defn config
   "Return the configuration."
-  []
-  (merge (parse-dates default-config)
-         (read-config)))
+  ([]
+   (merge (parse-dates default-config)
+          (read-config)))
+  ([session]
+   (merge (parse-dates default-config)
+          (read-config)
+          session)))

@@ -7,11 +7,11 @@
 
 (defn get-all
   "Return all albums for the current configuration."
-  []
-  (let [c (conf/config)]
+  [session]
+  (let [c (conf/config session)]
     (r/response (a/read-albums (app/gen-state c) (:root-path c)))))
 
 (def routes
   "Album routes"
-  (context "/albums" []
-           (GET "/" [] (get-all))))
+  (context "/albums" {session :session}
+           (GET "/" [] (get-all session))))

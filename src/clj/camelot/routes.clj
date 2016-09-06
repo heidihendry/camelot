@@ -51,200 +51,200 @@
   (route/resources "/"))
 
 (defroutes app-routes
-  (context "/trap-stations" []
+  (context "/trap-stations" {session :session}
            (GET "/site/:id" [id]
-                (rest/list-resources trap-station/get-all :trap-station id))
+                (rest/list-resources trap-station/get-all :trap-station id session))
            (GET "/survey/:id" [id]
-                (rest/list-resources trap-station/get-all-for-survey :trap-station id))
+                (rest/list-resources trap-station/get-all-for-survey :trap-station id session))
            (GET "/" []
-                (rest/list-resources trap-station/get-all* :trap-station))
-           (GET "/:id" [id] (rest/specific-resource trap-station/get-specific id))
+                (rest/list-resources trap-station/get-all* :trap-station session))
+           (GET "/:id" [id] (rest/specific-resource trap-station/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource trap-station/update! id
-                                                       trap-station/ttrap-station data))
+                                                       trap-station/ttrap-station data session))
            (POST "/" [data] (rest/create-resource trap-station/create!
-                                                  trap-station/ttrap-station data))
-           (DELETE "/:id" [id] (rest/delete-resource trap-station/delete! id)))
+                                                  trap-station/ttrap-station data session))
+           (DELETE "/:id" [id] (rest/delete-resource trap-station/delete! id session)))
 
-  (context "/trap-station-sessions" []
+  (context "/trap-station-sessions" {session :session}
            (GET "/trap-station/:id" [id]
-                (rest/list-resources trap-station-session/get-all :trap-station-session id))
-           (GET "/:id" [id] (rest/specific-resource trap-station-session/get-specific id))
+                (rest/list-resources trap-station-session/get-all :trap-station-session id session))
+           (GET "/:id" [id] (rest/specific-resource trap-station-session/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource trap-station-session/update! id
-                                                       trap-station-session/ttrap-station-session data))
+                                                       trap-station-session/ttrap-station-session data session))
            (POST "/" [data] (rest/create-resource trap-station-session/create!
-                                                  trap-station-session/ttrap-station-session data))
-           (DELETE "/:id" [id] (rest/delete-resource trap-station-session/delete! id)))
+                                                  trap-station-session/ttrap-station-session data session))
+           (DELETE "/:id" [id] (rest/delete-resource trap-station-session/delete! id session)))
 
-  (context "/trap-station-session-cameras" []
+  (context "/trap-station-session-cameras" {session :session}
            (GET "/trap-station-session/:id" [id]
-                (rest/list-resources trap-station-session-camera/get-all :trap-station-session-camera id))
-           (GET "/available/:id" [id] (rest/list-available trap-station-session-camera/get-available id))
-           (GET "/alternatives/:id" [id] (rest/list-available trap-station-session-camera/get-alternatives id))
-           (GET "/:id" [id] (rest/specific-resource trap-station-session-camera/get-specific id))
+                (rest/list-resources trap-station-session-camera/get-all :trap-station-session-camera id session))
+           (GET "/available/:id" [id] (rest/list-available trap-station-session-camera/get-available id session))
+           (GET "/alternatives/:id" [id] (rest/list-available trap-station-session-camera/get-alternatives id session))
+           (GET "/:id" [id] (rest/specific-resource trap-station-session-camera/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource trap-station-session-camera/update! id
-                                                       trap-station-session-camera/ttrap-station-session-camera data))
+                                                       trap-station-session-camera/ttrap-station-session-camera data session))
            (POST "/" [data] (rest/create-resource trap-station-session-camera/create!
-                                                  trap-station-session-camera/ttrap-station-session-camera data))
-           (DELETE "/:id" [id] (rest/delete-resource trap-station-session-camera/delete! id)))
+                                                  trap-station-session-camera/ttrap-station-session-camera data session))
+           (DELETE "/:id" [id] (rest/delete-resource trap-station-session-camera/delete! id session)))
 
-  (context "/sites" []
-           (GET "/" [] (rest/list-resources site/get-all :site))
-           (GET "/:id" [id] (rest/specific-resource site/get-specific id))
+  (context "/sites" {session :session}
+           (GET "/" [] (rest/list-resources site/get-all :site session))
+           (GET "/:id" [id] (rest/specific-resource site/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource site/update! id
-                                                       site/tsite data))
+                                                       site/tsite data session))
            (POST "/" [data] (rest/create-resource site/create!
-                                                  site/tsite data))
-           (DELETE "/:id" [id] (rest/delete-resource site/delete! id)))
+                                                  site/tsite data session))
+           (DELETE "/:id" [id] (rest/delete-resource site/delete! id session)))
 
-  (context "/cameras" []
-           (GET "/" [] (rest/list-resources camera/get-all :camera))
-           (GET "/available" [] (rest/list-resources camera/get-available :camera))
-           (GET "/:id" [id] (rest/specific-resource camera/get-specific id))
+  (context "/cameras" {session :session}
+           (GET "/" [] (rest/list-resources camera/get-all :camera session))
+           (GET "/available" [] (rest/list-resources camera/get-available :camera session))
+           (GET "/:id" [id] (rest/specific-resource camera/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource camera/update! id
-                                                       camera/tcamera data))
+                                                       camera/tcamera data session))
            (POST "/" [data] (rest/create-resource camera/create!
-                                                  camera/tcamera data))
-           (DELETE "/:id" [id] (rest/delete-resource camera/delete! id)))
+                                                  camera/tcamera data session))
+           (DELETE "/:id" [id] (rest/delete-resource camera/delete! id session)))
 
-  (context "/surveys" []
-           (GET "/" [] (rest/list-resources survey/get-all :survey))
-           (GET "/:id" [id] (rest/specific-resource survey/get-specific id))
+  (context "/surveys" {session :session}
+           (GET "/" [] (rest/list-resources survey/get-all :survey session))
+           (GET "/:id" [id] (rest/specific-resource survey/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource survey/update! id
-                                                       survey/tsurvey data))
+                                                       survey/tsurvey data session))
            (POST "/" [data] (rest/create-resource survey/create!
-                                                  survey/tsurvey data))
-           (DELETE "/:id" [id] (rest/delete-resource survey/delete! id)))
+                                                  survey/tsurvey data session))
+           (DELETE "/:id" [id] (rest/delete-resource survey/delete! id session)))
 
-  (context "/survey-sites" []
-           (GET "/" [] (rest/list-resources survey-site/get-all* :survey-site))
-           (GET "/survey/:id" [id] (rest/list-resources survey-site/get-all :survey-site id))
-           (GET "/:id" [id] (rest/specific-resource survey-site/get-specific id))
-           (GET "/available/:id" [id] (rest/list-available survey-site/get-available id))
-           (GET "/alternatives/:id" [id] (rest/list-available survey-site/get-alternatives id))
+  (context "/survey-sites" {session :session}
+           (GET "/" [] (rest/list-resources survey-site/get-all* :survey-site session))
+           (GET "/survey/:id" [id] (rest/list-resources survey-site/get-all :survey-site id session))
+           (GET "/:id" [id] (rest/specific-resource survey-site/get-specific id session))
+           (GET "/available/:id" [id] (rest/list-available survey-site/get-available id session))
+           (GET "/alternatives/:id" [id] (rest/list-available survey-site/get-alternatives id session))
            (PUT "/:id" [id data] (rest/update-resource survey-site/update! id
-                                                       survey-site/tsurvey-site data))
+                                                       survey-site/tsurvey-site data session))
            (POST "/" [data] (rest/create-resource survey-site/create!
-                                                  survey-site/tsurvey-site data))
-           (DELETE "/:id" [id] (rest/delete-resource survey-site/delete! id)))
+                                                  survey-site/tsurvey-site data session))
+           (DELETE "/:id" [id] (rest/delete-resource survey-site/delete! id session)))
 
-  (context "/sightings" []
-           (GET "/media/:id" [id] (rest/list-resources sighting/get-all :sighting id))
-           (GET "/:id" [id] (rest/specific-resource sighting/get-specific id))
+  (context "/sightings" {session :session}
+           (GET "/media/:id" [id] (rest/list-resources sighting/get-all :sighting id session))
+           (GET "/:id" [id] (rest/specific-resource sighting/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource sighting/update! id
-                                                       sighting/tsighting data))
-           (GET "/available/:id" [id] (rest/list-available sighting/get-available id))
-           (GET "/alternatives/:id" [id] (rest/list-available sighting/get-alternatives id))
+                                                       sighting/tsighting data session))
+           (GET "/available/:id" [id] (rest/list-available sighting/get-available id session))
+           (GET "/alternatives/:id" [id] (rest/list-available sighting/get-alternatives id session))
            (POST "/" [data] (rest/create-resource sighting/create!
-                                                  sighting/tsighting data))
-           (DELETE "/:id" [id] (rest/delete-resource sighting/delete! id)))
+                                                  sighting/tsighting data session))
+           (DELETE "/:id" [id] (rest/delete-resource sighting/delete! id session)))
 
-  (context "/camera-statuses" []
-           (GET "/available/" [] (rest/list-resources camera-status/get-all :camera-status))
-           (GET "/alternatives/:id" [id] (rest/list-resources camera-status/get-all :camera-status)))
+  (context "/camera-statuses" {session :session}
+           (GET "/available/" [] (rest/list-resources camera-status/get-all :camera-status session))
+           (GET "/alternatives/:id" [id] (rest/list-resources camera-status/get-all :camera-status session)))
 
-  (context "/media" []
-           (GET "/trap-station-session-camera/:id" [id] (rest/list-resources media/get-all :media id))
-           (GET "/:id" [id] (rest/specific-resource media/get-specific id))
-           (PUT "/:id" [id data] (rest/update-resource media/update! id media/tmedia data))
+  (context "/media" {session :session}
+           (GET "/trap-station-session-camera/:id" [id] (rest/list-resources media/get-all :media id session))
+           (GET "/:id" [id] (rest/specific-resource media/get-specific id session))
+           (PUT "/:id" [id data] (rest/update-resource media/update! id media/tmedia data session))
            (POST "/" [data] (rest/create-resource media/create!
-                                                  media/tmedia data))
-           (DELETE "/:id" [id] (rest/delete-resource media/delete! id))
+                                                  media/tmedia data session))
+           (DELETE "/:id" [id] (rest/delete-resource media/delete! id session))
            (GET "/photo/:filename" [filename] (let [style :original]
                                                 {:status 200
                                                  :headers {"Content-Type" "image/jpeg; charset=utf-8"}
-                                                 :body (media/read-media-file (app/gen-state (conf/config))
+                                                 :body (media/read-media-file (app/gen-state (conf/config session))
                                                                               filename (keyword style))}))
            (GET "/photo/:filename/:style" [filename style] {:status 200
                                                             :headers {"Content-Type" "image/jpeg; charset=utf-8"}
-                                                            :body (media/read-media-file (app/gen-state (conf/config))
+                                                            :body (media/read-media-file (app/gen-state (conf/config session))
                                                                                          filename (keyword style))}))
 
-  (context "/photos" []
-           (GET "/media/:id" [id] (rest/list-resources photo/get-all :photo id))
-           (GET "/:id" [id] (rest/specific-resource photo/get-specific id))
+  (context "/photos" {session :session}
+           (GET "/media/:id" [id] (rest/list-resources photo/get-all :photo id session))
+           (GET "/:id" [id] (rest/specific-resource photo/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource photo/update! id
-                                                       photo/tphoto data))
+                                                       photo/tphoto data session))
            (POST "/" [data] (rest/create-resource photo/create!
-                                                  photo/tphoto data))
-           (DELETE "/:id" [id] (rest/delete-resource photo/delete! id)))
+                                                  photo/tphoto data session))
+           (DELETE "/:id" [id] (rest/delete-resource photo/delete! id session)))
 
-  (context "/taxonomy" []
-           (GET "/" [] (rest/list-resources taxonomy/get-all :taxonomy))
-           (GET "/:id" [id] (rest/specific-resource taxonomy/get-specific id))
+  (context "/taxonomy" {session :session}
+           (GET "/" [] (rest/list-resources taxonomy/get-all :taxonomy session))
+           (GET "/:id" [id] (rest/specific-resource taxonomy/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource taxonomy/update! id
-                                                       taxonomy/ttaxonomy data))
+                                                       taxonomy/ttaxonomy data session))
            (GET "/survey/:id" [id] (rest/list-resources taxonomy/get-all-for-survey
-                                                        :taxonomy id))
+                                                        :taxonomy id session))
            (DELETE "/:taxonomy-id/survey/:survey-id" [taxonomy-id survey-id]
                    (rest/delete-resource taxonomy/delete-from-survey!
                                          {:survey-id survey-id
-                                          :taxonomy-id taxonomy-id}))
+                                          :taxonomy-id taxonomy-id} session))
            (POST "/" [data] (rest/create-resource ataxonomy/create!
-                                                  ataxonomy/tassociated-taxonomy data))
-           (DELETE "/:id" [id] (rest/delete-resource taxonomy/delete! id)))
+                                                  ataxonomy/tassociated-taxonomy data session))
+           (DELETE "/:id" [id] (rest/delete-resource taxonomy/delete! id session)))
 
-  (context "/species-mass" []
-           (GET "/" [] (rest/list-resources species-mass/get-all :species-mass))
-           (GET "/available/" [id] (rest/list-resources species-mass/get-all :species-mass))
-           (GET "/alternatives/:id" [id] (rest/list-resources species-mass/get-all :species-mass)))
+  (context "/species-mass" {session :session}
+           (GET "/" [] (rest/list-resources species-mass/get-all :species-mass session))
+           (GET "/available/" [id] (rest/list-resources species-mass/get-all :species-mass session))
+           (GET "/alternatives/:id" [id] (rest/list-resources species-mass/get-all :species-mass session)))
 
-  (context "/application" []
-           (GET "/metadata" [] (r/response (application/get-metadata (app/gen-state (conf/config)))))
+  (context "/application" {session :session}
+           (GET "/metadata" [] (r/response (application/get-metadata (app/gen-state (conf/config session)))))
            (GET "/" [] (r/response {:version (application/get-version)
-                                    :nav (application/get-nav-menu (app/gen-state (conf/config)))})))
+                                    :nav (application/get-nav-menu (app/gen-state (conf/config session)))})))
 
-  (context "/screens" []
-           (GET "/" [] (r/response (app/all-screens (app/gen-state (conf/config))))))
+  (context "/screens" {session :session}
+           (GET "/" [] (r/response (app/all-screens (app/gen-state (conf/config session))))))
 
-  (context "/import" []
+  (context "/import" {session :session}
            (POST "/options" [data] (r/response (im.db/options data)))
            (POST "/media" [data] (r/response (import/media data))))
 
-  (context "/report" []
+  (context "/report" {session :session}
            (GET "/:report/download" {params :params}
                 (report/export
-                 (app/gen-state (conf/config))
+                 (app/gen-state (conf/config session))
                  (keyword (:report params)) (rest/coerce-string-fields params)))
            (GET "/:report" [report] (r/response (report/get-configuration
-                                                 (app/gen-state (conf/config))
+                                                 (app/gen-state (conf/config session))
                                                  (keyword report))))
-           (GET "/" [] (r/response (report/available-reports (app/gen-state (conf/config))))))
+           (GET "/" [] (r/response (report/available-reports (app/gen-state (conf/config session))))))
 
-  (context "/library" []
-           (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config)))))
-           (GET "/:id" [id] (r/response (library/build-library-for-survey (app/gen-state (conf/config))
+  (context "/library" {session :session}
+           (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config session)))))
+           (GET "/:id" [id] (r/response (library/build-library-for-survey (app/gen-state (conf/config session))
                                                                           (edn/read-string id))))
            (POST "/media/flags" [data] (r/response (library/update-bulk-media-flags
-                                                    (app/gen-state (conf/config)) data)))
-           (PUT "/identify" [data] (r/response (library/identify (app/gen-state (conf/config))
+                                                    (app/gen-state (conf/config session)) data)))
+           (PUT "/identify" [data] (r/response (library/identify (app/gen-state (conf/config session))
                                                                  data))))
-  (context "/species" []
+  (context "/species" {session :session}
            (GET "/search" {{search :search} :params}
                 (r/response (species-search/query-search
-                             (app/gen-state (conf/config))
+                             (app/gen-state (conf/config session))
                              {:search search})))
            (POST "/create" [data] (r/response (species-search/ensure-survey-species-known
-                                               (app/gen-state (conf/config))
+                                               (app/gen-state (conf/config session))
                                                (:species data)
                                                (:survey-id data)))))
 
-  (context "/capture" []
+  (context "/capture" {session :session}
            (POST "/upload" {params :multipart-params}
-                 (r/response (capture/import-capture! (app/gen-state (conf/config))
+                 (r/response (capture/import-capture! (app/gen-state (conf/config session))
                                                       (edn/read-string (get params "session-camera-id"))
                                                       (get params "file")))))
-  (context "/deployment" []
+  (context "/deployment" {session :session}
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
-                                                        :trap-station-session id))
+                                                        :trap-station-session id session))
            (GET "/survey/:id/recent" [id] (rest/list-resources deployment/get-awaiting-upload
-                                                                   :trap-station-session id))
-           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id))
+                                                                   :trap-station-session id session))
+           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id session))
            (POST "/create/:id" [id data] (rest/create-resource deployment/create!
                                                                deployment/tdeployment
                                                                (assoc data :survey-id
-                                                                      {:value (edn/read-string id)})))
+                                                                      {:value (edn/read-string id)}) session))
            (POST "/" [data] (rest/create-resource deployment/create-camera-check!
-                                                  deployment/tcamera-deployment data)))
+                                                  deployment/tcamera-deployment data session)))
 
   misc-routes
   config/routes

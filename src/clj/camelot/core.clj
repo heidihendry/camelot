@@ -11,6 +11,8 @@
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
+            [ring.middleware.session :refer [wrap-session]]
+            [ring.middleware.session.cookie :refer [cookie-store]]
             [ring.middleware.gzip :refer [wrap-gzip]]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [clojure.java.shell :refer [sh]])
@@ -56,6 +58,7 @@
   (-> app-routes
       wrap-params
       wrap-multipart-params
+      (wrap-session {:store (cookie-store {:key "insecureinsecure"})})
       (wrap-transit-response {:encoding :json, :opts tutil/transit-write-options})
       (wrap-transit-params {:opts tutil/transit-read-options})
       wrap-stacktrace-log

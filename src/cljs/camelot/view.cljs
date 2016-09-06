@@ -217,7 +217,15 @@
 
 (def events
   "Mapping of events to event functions."
-  {:settings-save (fn [d] (albums/reload-albums))
+  {:settings-legacy-save (fn [d]
+                           (albums/reload-albums)
+                           (om/update! (state/resources-state) :settings
+                                (deref (get-in (state/app-state-cursor)
+                                               [:view :settings :buffer]))))
+   :settings-save (fn [d]
+                    (om/update! (state/resources-state) :settings
+                                (deref (get-in (state/app-state-cursor)
+                                               [:view :settings :buffer]))))
    :settings-cancel #(identity 1)
    :build-generator build-generator
    :analytics-event (fn [event action] (cnav/analytics-event event action))

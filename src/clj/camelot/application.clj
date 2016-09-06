@@ -24,7 +24,7 @@ Currently the only application state is the user's configuration."
                    :label (tr/translate (:config state) :application/organisation)}
                   {:url "/library"
                    :label (tr/translate (:config state) :application/library)}
-                  {}]}))
+                  {:function "settings"}]}))
 
 (def smiths (atom {}))
 
@@ -455,7 +455,7 @@ Currently the only application state is the user's configuration."
                               :error {:type :event
                                       :event :survey-update-error}}}}})
 
-(when (env :camelot-legacy-features)
+(if (env :camelot-legacy-features)
   (defsmith settings smiths
     [state]
     {:resource {:type :settings
@@ -515,6 +515,23 @@ Currently the only application state is the user's configuration."
               :required-fields {:type :list
                                 :list-of :paths
                                 :complete-with :metadata}}
+     :states {:update {:submit {:success {:type :event
+                                          :event :settings-legacy-save}
+                                :error {:type :event
+                                        :event :settings-error}}
+                       :cancel {:type :event
+                                :event :settings-cancel}}}})
+  (defsmith settings smiths
+    [state]
+    {:resource {:type :settings
+                :title (tr/translate (:config state) :settings/title)
+                :endpoint "/settings"}
+     :layout [[:label (tr/translate (:config state) :settings/preferences)]
+              [:language]]
+     :schema {:language {:type :select
+                         :required true
+                         :options {:en (tr/translate (:config state) :language/en)
+                                   :vn (tr/translate (:config state) :language/vn)}}}
      :states {:update {:submit {:success {:type :event
                                           :event :settings-save}
                                 :error {:type :event

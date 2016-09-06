@@ -6,13 +6,22 @@
 (def tconfig
   "Configuration for translations."
   {:dev-mode? true
-   :compiled-dictionary (dict-compile* {:en camelot.translation.en/t-en})
+   :compiled-dictionary (dict-compile* {:en camelot.translation.en/t-en
+                                        :vn camelot.translation.vn/t-vn})
    :fallback-locale :en})
+
+(defn get-language
+  []
+  (if (:resources (state/app-state-cursor))
+    (get-in (get (state/resources-state)
+                 (get-in (state/app-state-cursor) [:view :settings :screen :type]))
+            [:language :value])
+    :en))
 
 (defn translate
   "Create a translator for the user's preferred language."
   [tkey & vars]
-  (let [tlookup (partial (tower/make-t tconfig) (:language (state/app-state-cursor)))]
+  (let [tlookup (partial (tower/make-t tconfig) (get-language))]
     (if (seq vars)
       (apply gstr/format (tlookup tkey) vars)
       (tlookup tkey))))
