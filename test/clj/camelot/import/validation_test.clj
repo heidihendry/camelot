@@ -226,7 +226,7 @@
                   :camera {:make "mymake"
                            :model "mymodel"
                            :software "2.0"}}]]
-      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :warn))
 
   (fact "A missing camera should fail"
     (let [config {}
@@ -235,7 +235,7 @@
                            :model "mymodel"
                            :software "1.0"}}
                  {:datetime (t/date-time 2015 1 5 0 0 0)}]]
-      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :warn))
 
   (fact "The model being different should fail"
     (let [config {}
@@ -247,7 +247,7 @@
                   :camera {:make "notmymake"
                            :model "mymodel"
                            :software "1.0"}}]]
-      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :warn))
 
   (fact "The model being different should fail"
     (let [config {}
@@ -259,7 +259,7 @@
                   :camera {:make "mymake"
                            :model "adifferentmodel"
                            :software "1.0"}}]]
-      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail))
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :warn))
 
   (fact "The software version being different should fail"
     (let [config {}
@@ -271,7 +271,7 @@
                   :camera {:make "mymake"
                            :model "mymodel"
                            :software "2.0"}}]]
-      (:result (check-camera-consistency (gen-state-helper config) album)) => :fail)))
+      (:result (check-camera-consistency (gen-state-helper config) album)) => :warn)))
 
 (facts "Required fields are respected"
   (fact "Required fields present across all files should pass"
