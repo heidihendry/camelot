@@ -112,8 +112,8 @@
   (if (or (not= (:make (:camera h1)) (:make (:camera h2)))
           (not= (:model (:camera h1)) (:model (:camera h2)))
           (not= (:software (:camera h1)) (:software (:camera h2))))
-    (reduced {:result :fail :reason (tr/translate (:config state) :checks/camera-consistency
-                                     (:filename h1) (:filename h2))})
+    (reduced {:result :warn :reason (tr/translate (:config state) :checks/camera-consistency
+                                                  (:filename h1) (:filename h2))})
     h1))
 
 (defn check-camera-consistency
