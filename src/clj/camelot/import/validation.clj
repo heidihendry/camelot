@@ -120,7 +120,7 @@
   "Check the camera used for all photos is consistent."
   [state photos]
   (let [r (reduce (partial compare-cameras state) (first photos) (rest photos))]
-    (if (= (:result r) :fail)
+    (if (= (:result r) :warn)
       r
       {:result :pass})))
 
