@@ -62,7 +62,9 @@
                                                      {:action :upload
                                                       :name (tr/translate ::upload-captures)}
                                                      {:action :species
-                                                      :name (tr/translate ::species)}]
+                                                      :name (tr/translate ::species)}
+                                                     {:action :files
+                                                      :name (tr/translate ::files)}]
                                               :active :deployment
                                               :species {}}))
     om/IRender

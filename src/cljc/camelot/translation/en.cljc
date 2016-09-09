@@ -634,7 +634,8 @@
    {:create-survey "Create survey"
     :manage-traps "Manage camera traps"
     :upload-captures "Upload captures"
-    :species "Species"}
+    :species "Species"
+    :files "Related files"}
 
    :camelot.component.survey.create
    {:search-instructions "Search and add species using the options to the right."
@@ -646,5 +647,10 @@
     :intro "Create Survey"
     :submit-title "Submit this survey."
     :validation-error-title "Complete all required fields before submitting."}
+
+   :camelot.component.survey.file
+   {:upload-time "Upload time"
+    :item-name "files"
+    :advice "You can upload some below, if you'd like."}
 
    :missing "[Translation missing]"})

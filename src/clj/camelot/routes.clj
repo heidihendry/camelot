@@ -20,6 +20,7 @@
              [species-mass :as species-mass]
              [survey :as survey]
              [survey-site :as survey-site]
+             [survey-file :as survey-file]
              [trap-station :as trap-station]
              [trap-station-session :as trap-station-session]
              [trap-station-session-camera :as trap-station-session-camera]
@@ -108,6 +109,14 @@
 
   (context "/surveys" {session :session}
            (GET "/" [] (rest/list-resources survey/get-all :survey session))
+           (GET "/:id/files" [id] (rest/list-resources survey-file/get-all :survey-file id session))
+           (GET "/:id/files/:file-id" [id file-id] (rest/specific-resource survey-file/get-specific
+                                                                           file-id session))
+           (POST "/files" {params :multipart-params}
+                 (r/response (survey-file/upload! (app/gen-state (conf/config session))
+                                                  (edn/read-string (get params "survey-id"))
+                                                   (get params "file"))))
+           (DELETE "/:id/files/:file-id" [id file-id] (rest/list-resources survey-file/delete! id session))
            (GET "/:id" [id] (rest/specific-resource survey/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource survey/update! id
                                                        survey/tsurvey data session))
@@ -237,7 +246,7 @@
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
                                                         :trap-station-session id session))
            (GET "/survey/:id/recent" [id] (rest/list-resources deployment/get-awaiting-upload
-                                                                   :trap-station-session id session))
+                                                               :trap-station-session id session))
            (GET "/:id" [id] (rest/specific-resource deployment/get-specific id session))
            (POST "/create/:id" [id data] (rest/create-resource deployment/create!
                                                                deployment/tdeployment

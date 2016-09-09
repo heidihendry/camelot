@@ -9,7 +9,8 @@
              [pprint :as pp]]
             [clojure.java.io :as io]
             [environ.core :refer [env]]
-            [camelot.util.java-file :as jf])
+            [camelot.util.java-file :as jf]
+            [clojure.string :as str])
   (:import [org.apache.commons.lang3 SystemUtils]
            [java.lang RuntimeException]
            [java.io IOException]))
@@ -33,6 +34,7 @@
 (def os (System/getProperty "os.name"))
 (def db-name "Database")
 (def media-directory-name "Media")
+(def filestore-directory-name "FileStore")
 
 (def config-filename "config.clj")
 
@@ -120,6 +122,44 @@
   (if (env :camelot-datadir)
     (str (checked-datadir (env :camelot-datadir)) SystemUtils/FILE_SEPARATOR media-directory-name)
     (get-std-media-path)))
+
+(defn- filestore-path
+  "Return the full path where imported filestore is stored."
+  [dir]
+  (format "%s%scamelot%s%s" dir SystemUtils/FILE_SEPARATOR
+          SystemUtils/FILE_SEPARATOR filestore-directory-name))
+
+(defn get-std-filestore-path
+  "Return the OS specific path to the filestore directory."
+  []
+  (cond
+      SystemUtils/IS_OS_WINDOWS (filestore-path (env :localappdata))
+      SystemUtils/IS_OS_LINUX (filestore-path (str (env :home) "/.local/share"))
+      SystemUtils/IS_OS_MAC_OSX (filestore-path (str (env :home) "/Library/Application Support"))
+      :else (filestore-path ".")))
+
+(defn filestore-base-path
+  "Return the base path to the filestore directory."
+  []
+  (if (env :camelot-datadir)
+    (str (checked-datadir (env :camelot-datadir)) SystemUtils/FILE_SEPARATOR filestore-directory-name)
+    (get-std-filestore-path)))
+
+(defn- replace-unsafe-chars
+  [filename]
+  (str/replace filename #"(?i)[^a-z0-9 .-_]+" "-"))
+
+(defn get-filestore-file-path
+  "Return the path to the survey's filestore directory."
+  [survey-id filename]
+  (let [fs (str (filestore-base-path)
+                SystemUtils/FILE_SEPARATOR survey-id
+                SystemUtils/FILE_SEPARATOR (replace-unsafe-chars filename))
+        parent (jf/get-parent-file (io/file fs))]
+    (when (not (jf/exists? parent))
+      (jf/mkdirs parent))
+    (checked-datadir parent)
+    fs))
 
 (defn- serialise-dates
   "Convert configuration dates to long (e.g., for serialisation)."
