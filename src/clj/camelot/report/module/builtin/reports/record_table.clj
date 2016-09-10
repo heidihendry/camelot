@@ -1,5 +1,6 @@
 (ns camelot.report.module.builtin.reports.record-table
   (:require [camelot.report.module.core :as module]
+            [clj-time.core :as t]
             [clj-time.format :as tf]
             [camelot.translation.core :as tr]
             [camelot.report.sighting-independence :as indep]
@@ -17,11 +18,15 @@
              :sighting-time-delta-hours
              :sighting-time-delta-days
              :media-directory
-             :media-filename]
+             :media-full-filename]
    :apply-fn (partial indep/->independent-sightings)
    :transforms [#(update % :media-capture-timestamp
-                         (partial tf/unparse (tf/formatters :date-time)))
-                #(assoc % :media-directory (config/get-media-path))]
+                         (partial tf/unparse (tf/formatters :mysql)))
+                #(assoc % :media-directory (config/get-media-path))
+                #(assoc % :media-full-filename (if (:media-filename %)
+                                                 (str (:media-filename %) "."
+                                                      (:media-format %))
+                                                 nil))]
    :filters [#(= (:survey-id %) survey-id)]
    :order-by [:media-capture-timestamp]})
 
@@ -40,7 +45,8 @@
 
 (defn column-titles
   [state]
-  {:media-directory (tr/translate (:config state) ::media-directory)})
+  {:media-directory (tr/translate (:config state) ::media-directory)
+   :media-full-filename (tr/translate (:config state) :report/media-filename)})
 
 (module/register-report
  :record-table

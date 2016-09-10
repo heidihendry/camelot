@@ -78,6 +78,47 @@
            (sut/calculate-sighting-time-delta (gen-state-helper {}))
            (map :sighting-time-delta)
            (remove nil?)
+           (map t/in-seconds)) => [600 1500]))
+
+  (fact "Should not break if some records have a nil trap or taxonomy ID"
+    (let [data [{:trap-station-id 1
+                 :taxonomy-id 1
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 0 0)}
+                {:trap-station-id 1
+                 :taxonomy-id 1
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 10 0)}
+                {:trap-station-id nil
+                 :taxonomy-id nil
+                 :media-capture-timestamp nil}
+                {:trap-station-id 2
+                 :taxonomy-id 2
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 20 0)}
+                {:trap-station-id 1
+                 :taxonomy-id 1
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 35 0)}]]
+      (->> data
+           (sut/calculate-sighting-time-delta (gen-state-helper {}))
+           (map :sighting-time-delta)
+           (remove nil?)
+           (map t/in-seconds)) => [600 1500]))
+
+  (fact "Copes with records which are out of order"
+    (let [data [{:trap-station-id 2
+                 :taxonomy-id 2
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 20 0)}
+                {:trap-station-id 1
+                 :taxonomy-id 1
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 10 0)}
+                {:trap-station-id 1
+                 :taxonomy-id 1
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 35 0)}
+                {:trap-station-id 1
+                 :taxonomy-id 1
+                 :media-capture-timestamp (t/date-time 2015 1 10 5 0 0)}]]
+      (->> data
+           (sut/calculate-sighting-time-delta (gen-state-helper {}))
+           (map :sighting-time-delta)
+           (remove nil?)
            (map t/in-seconds)) => [600 1500])))
 
 (facts "Species sighting base time delta representation colums"
@@ -90,7 +131,7 @@
                  :media-capture-timestamp (t/date-time 2015 1 10 5 10 0)}]]
       (->> data
            (sut/calculate-time-delta-in-seconds (gen-state-helper {}))
-           (map :sighting-time-delta-seconds)) => [nil "600"]))
+           (map :sighting-time-delta-seconds)) => ["0" "600"]))
 
   (fact "Should calculate time delta in seconds"
     (let [data [{:trap-station-id 1
@@ -101,7 +142,7 @@
                  :media-capture-timestamp (t/date-time 2015 1 10 5 10 0)}]]
       (->> data
            (sut/calculate-time-delta-in-minutes (gen-state-helper {}))
-           (map :sighting-time-delta-minutes)) => [nil "10"]))
+           (map :sighting-time-delta-minutes)) => ["0" "10"]))
 
   (fact "Should calculate time delta in hours, to 1dp"
     (let [data [{:trap-station-id 1
@@ -115,7 +156,7 @@
                  :media-capture-timestamp (t/date-time 2015 1 11 6 40 0)}]]
       (->> data
            (sut/calculate-time-delta-in-hours (gen-state-helper {}))
-           (map :sighting-time-delta-hours)) => [nil "0.2" "25.5"]))
+           (map :sighting-time-delta-hours)) => ["0.0" "0.2" "25.5"]))
 
   (fact "Should calculate time delta in days, to 1dp"
     (let [data [{:trap-station-id 1
@@ -126,7 +167,7 @@
                  :media-capture-timestamp (t/date-time 2015 1 11 7 30 0)}]]
       (->> data
            (sut/calculate-time-delta-in-days (gen-state-helper {}))
-           (map :sighting-time-delta-days)) => [nil "1.1"])))
+           (map :sighting-time-delta-days)) => ["0.0" "1.1"])))
 
 (facts "Species sighting optimisations"
   (fact "Should only perform difference calculations once"
@@ -141,6 +182,4 @@
                     (fn [a c] (throw (RuntimeException. "Reducer called but should not be")))]
         (->> processed
              (sut/calculate-time-delta-in-minutes (gen-state-helper {}))
-             (map :sighting-time-delta-minutes)
-             (remove nil?)
-             first) => "30"))))
+             (map :sighting-time-delta-minutes)) => ["0" "30"]))))

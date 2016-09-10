@@ -21,7 +21,8 @@
                nil)]
       (assoc-in
        (update acc :data #(conj % (assoc v :sighting-time-delta dt)))
-       [:state lt] (:media-capture-timestamp v)))))
+       [:state lt] (:media-capture-timestamp v)))
+    acc))
 
 (defn to-1dp
   [v]
@@ -31,7 +32,8 @@
   [state data]
   (if (some :sighting-time-delta data)
     data
-    (:data (reduce sighting-time-delta-reducer {:data []} data))))
+    (:data (reduce sighting-time-delta-reducer {:data []}
+                   (sort-by :media-capture-timestamp data)))))
 
 (defn calculate-time-delta-in-seconds
   [state data]
@@ -39,7 +41,8 @@
        (calculate-sighting-time-delta state)
        (map (fn [d]
               (assoc d :sighting-time-delta-seconds
-                     (some-> d :sighting-time-delta t/in-seconds str))))))
+                     (or (some-> d :sighting-time-delta t/in-seconds str)
+                         "0"))))))
 
 (defn calculate-time-delta-in-minutes
   [state data]
@@ -47,18 +50,20 @@
        (calculate-sighting-time-delta data)
        (map (fn [d]
               (assoc d :sighting-time-delta-minutes
-                     (some-> d :sighting-time-delta t/in-minutes str))))))
+                     (or (some-> d :sighting-time-delta t/in-minutes str)
+                         "0"))))))
 
 (defn calculate-time-delta-in-hours
   [state data]
   (->> data
        (calculate-sighting-time-delta data)
        (map (fn [d] (assoc d :sighting-time-delta-hours
-                           (some-> d
-                                   :sighting-time-delta
-                                   t/in-minutes
-                                   (/ (float 60))
-                                   to-1dp))))))
+                           (or (some-> d
+                                       :sighting-time-delta
+                                       t/in-minutes
+                                       (/ (float 60))
+                                       to-1dp)
+                               "0.0"))))))
 
 (defn calculate-time-delta-in-days
   [state data]
@@ -66,11 +71,12 @@
        (calculate-sighting-time-delta data)
        (map (fn [d]
               (assoc d :sighting-time-delta-days
-                     (some-> d
-                             :sighting-time-delta
-                             t/in-minutes
-                             (/ (float 60) 24)
-                             to-1dp))))))
+                     (or (some-> d
+                                 :sighting-time-delta
+                                 t/in-minutes
+                                 (/ (float 60) 24)
+                                 to-1dp)
+                         "0.0"))))))
 
 (module/register-column
  :sighting-time-delta-seconds

@@ -19,4 +19,6 @@
              summary-statistics
              survey-site
              trap-station
-             effort-summary]))
+             effort-summary
+             camera-traps
+             record-table]))
