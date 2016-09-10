@@ -1323,6 +1323,29 @@ pre.field-input {
     font-size: 100%;
     font-weight: 100;
 }
+#app .simple-menu .menu-item-link {
+    height: 100%;
+    width: 100%;
+    display: block;
+    padding: 2rem;
+    color: inherit;
+}
+#app .simple-menu a:hover {
+    text-decoration: none;
+}
+#app .simple-menu .menu-item-link:active {
+    text-decoration: none;
+}
+#app .simple-menu .menu-item-link:focus {
+    text-decoration: none;
+}
+#app .simple-menu .menu-item-link:visited {
+    text-decoration: none;
+}
+#app .simple-menu .menu-item.paddingless {
+    padding: 0;
+}
+
 #app .menu-item label {
     margin: 0;
 }
@@ -1488,4 +1511,17 @@ pre.field-input {
 }
 #app .typeahead-menu .menu-item:last-child {
     border-bottom: none;
+}
+#app .file-input-field {
+    width: 100%;
+}
+#app .remove-file {
+    padding: 0.8rem;
+    padding-bottom: 0.2rem;
+    margin-top: 1.5rem;
+    margin-right: 1.5rem;
+    color: #999;
+}
+#app .remove-file:hover {
+    color: #666;
 }

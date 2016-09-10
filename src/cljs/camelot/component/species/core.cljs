@@ -21,17 +21,20 @@
                (dom/span #js {:className "menu-item-description"}
                          (when (:taxonomy-common-name data)
                            (dom/div nil
-                                    (tr/translate :taxonomy/taxonomy-common-name.label) ": "
+                                    (dom/label nil (tr/translate :taxonomy/taxonomy-common-name.label)) ":"
+                                    " "
                                     (:taxonomy-common-name data)))
-                         (when (:taxonomy-class data)
-                           (str (tr/translate :taxonomy/taxonomy-class.label)
-                                ": " (:taxonomy-class data) "; "))
-                         (when (:taxonomy-order data)
-                           (str (tr/translate :taxonomy/taxonomy-order.label) ": "
-                                (:taxonomy-order data) "; "))
-                         (when (:taxonomy-family data)
-                           (str (tr/translate :taxonomy/taxonomy-family.label) ": "
-                                (:taxonomy-family data))))))))
+                         (dom/span nil
+                                   (when (:taxonomy-order data)
+                                     (dom/span nil
+                                               (dom/label nil (tr/translate :taxonomy/taxonomy-order.label) ":")
+                                               " "
+                                               (:taxonomy-order data) " "))
+                                   (when (:taxonomy-family data)
+                                     (dom/span nil
+                                               (dom/label nil (tr/translate :taxonomy/taxonomy-family.label) ":")
+                                               " "
+                                               (:taxonomy-family data)))))))))
 
 (defn update-view
   [data owner {:keys [taxonomy-id]}]

@@ -127,18 +127,18 @@
       (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(om/update! (state/display-state) :error (:errors state))}
                (dom/div #js {:className "menu-item-title"}
+                        (:camera-name data) " " (tr/translate :words/at-lc)" "
                         (:trap-station-name data))
                (dom/div #js {:className "menu-item-description"}
-                        (dom/label nil (tr/translate ::gps-coordinates) ": ")
-                        (:trap-station-latitude data) ", " (:trap-station-longitude data))
-               (dom/div #js {:className "menu-item-description"}
-                        (dom/label nil " " (tr/translate :words/date) ": ")
+                        (dom/label nil " " (tr/translate :words/date) ":")
+                        " "
                         (tf/unparse day-formatter (:trap-station-session-start-date data))
-                        " -- "
+                        " " (tr/translate :words/to-lc) " "
                         (tf/unparse day-formatter (:trap-station-session-end-date data)))
                (dom/div #js {:className "menu-item-description"}
-                        (dom/label nil " " (tr/translate :camera/camera-name.label)
-                                   ":") " " (:camera-name data))
+                        (dom/label nil (tr/translate ::gps-coordinates) ":")
+                        " "
+                        (:trap-station-latitude data) ", " (:trap-station-longitude data))
                (when-not (or (zero? (get state :total)) (nil? (get state :total)))
                  (dom/div #js {:className "progress-bar-container"
                                :title (tr/translate ::progress-bar-title

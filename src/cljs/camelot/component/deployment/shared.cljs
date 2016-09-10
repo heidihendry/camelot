@@ -22,7 +22,7 @@
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/label #js {:className "field-label"} (tr/translate ::sort-by) ": ")
+               (dom/label #js {:className "field-label"} (tr/translate ::sort-by) ":") " "
                (dom/button #js {:className (str "btn btn-default btn-sml"
                                                 (if (= (:deployment-sort-order data) :trap-station-name)
                                                   " active"

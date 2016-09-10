@@ -6,7 +6,9 @@
             [camelot.translation.core :as tr]
             [camelot.application :as app]
             [camelot.util.config :as config]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [ring.util.response :as r]
+            [camelot.util.java-file :as jf]))
 
 (sql/defqueries "sql/survey-file.sql" {:connection db/spec})
 
@@ -79,8 +81,12 @@
 
 (s/defn delete!
   [state :- State
-   id :- s/Int]
-  (db/with-db-keys state -delete! {:survey-file-id id}))
+   file-id :- s/Int]
+  (if-let [r (get-specific state file-id)]
+    (let [fs (config/get-filestore-file-path (:survey-id r)
+                                             (:survey-file-name r))]
+      (io/delete-file fs)
+      (db/with-db-keys state -delete! {:survey-file-id file-id}))))
 
 (s/defn upload!
   [state :- State
@@ -96,3 +102,24 @@
                                     :survey-file-name filename
                                     :survey-file-size size}))
       (update! state (:survey-file-id rec) size))))
+
+(defn- to-bytes
+  [path]
+  (let [f (io/file path)
+        data (byte-array (jf/length f))
+        stream (java.io.FileInputStream. f)]
+    (.read stream data)
+    (.close stream)
+    data))
+
+(s/defn download
+  [state :- State
+   file-id :- s/Int]
+  (if-let [r (get-specific state file-id)]
+    (let [fs (config/get-filestore-file-path (:survey-id r)
+                                             (:survey-file-name r))
+          data (io/input-stream (io/file fs))]
+      (-> (r/response data)
+          (r/header "Content-Length" (jf/length (io/file fs)))
+          (r/header "Content-Disposition"
+                    (format "attachment; filename=\"%s\"" (:survey-file-name r)))))))

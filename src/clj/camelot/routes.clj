@@ -112,11 +112,15 @@
            (GET "/:id/files" [id] (rest/list-resources survey-file/get-all :survey-file id session))
            (GET "/:id/files/:file-id" [id file-id] (rest/specific-resource survey-file/get-specific
                                                                            file-id session))
+           (GET "/:id/files/:file-id/download" [id file-id]
+                (survey-file/download (app/gen-state (conf/config session))
+                                      (edn/read-string file-id)))
            (POST "/files" {params :multipart-params}
                  (r/response (survey-file/upload! (app/gen-state (conf/config session))
                                                   (edn/read-string (get params "survey-id"))
                                                    (get params "file"))))
-           (DELETE "/:id/files/:file-id" [id file-id] (rest/list-resources survey-file/delete! id session))
+           (DELETE "/:id/files/:file-id" [id file-id] (rest/delete-resource survey-file/delete!
+                                                                            file-id session))
            (GET "/:id" [id] (rest/specific-resource survey/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource survey/update! id
                                                        survey/tsurvey data session))

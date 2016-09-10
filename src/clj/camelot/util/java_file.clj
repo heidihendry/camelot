@@ -60,6 +60,11 @@
   "Create the directory, and all parent directories, referred to by the given File."
   (.mkdirs ^File file))
 
+(defn length
+  [file]
+  "Returns the number of bytes in the file"
+  (.length ^File file))
+
 (defn pushback-reader
   [file-reader]
   "Create a pushback reader given a file reader"

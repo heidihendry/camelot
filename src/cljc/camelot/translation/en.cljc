@@ -22,6 +22,8 @@
     :name "Name"
     :notes "Notes"
     :or "Or"
+    :to-lc "to"
+    :at-lc "at"
     :remove "Remove"
     :search "Search"
     :select "Select"
@@ -650,7 +652,11 @@
 
    :camelot.component.survey.file
    {:upload-time "Upload time"
+    :upload-file "Upload file"
+    :file-size "File size"
     :item-name "files"
-    :advice "You can upload some below, if you'd like."}
+    :advice "You can upload some below, if you'd like."
+    :confirm-delete "Are you sure you want to delete this file?"
+    :help-text "Keep everything together by uploading files related to this survey."}
 
    :missing "[Translation missing]"})
