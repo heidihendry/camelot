@@ -195,16 +195,24 @@
 (def add-calculated-columns (module/build-calculated-columns :calculate))
 (def add-post-aggregate-columns (module/build-calculated-columns :post-aggregate))
 
+(defn maybe-apply
+  [state f data]
+  (if f
+    (f state data)
+    data))
+
 (s/defn generate-report
   "Generate a report given an output configuration and data."
   [state :- State
-   {:keys [columns rewrites pre-transforms pre-filters transforms filters aggregate-on order-by]}
+   {:keys [columns rewrites pre-transforms pre-filters apply-fn
+           transforms filters aggregate-on order-by]}
    data :- [{s/Keyword s/Any}]]
   (->> data
        (transform-records state rewrites)
        (add-calculated-columns state columns)
        (transform-records state pre-transforms)
        (filter-records state pre-filters)
+       (maybe-apply state apply-fn)
        (aggregate-data state columns aggregate-on)
        (add-post-aggregate-columns state columns)
        (transform-records state transforms)
@@ -217,11 +225,12 @@
   (= (first cols) :all))
 
 (defn- cons-headings
-  [state columns data]
+  [state columns cust-titles data]
   (let [cols (if (all-cols? columns)
                (keys (first data))
                columns)]
-    (cons (map #(or (get-in @module/known-columns [% :heading])
+    (cons (map #(or (get cust-titles %)
+                    (get-in @module/known-columns [% :heading])
                     (tr/translate (:config state)
                                   (keyword (str "report/" (name %))))) cols)
           data)))
@@ -250,16 +259,22 @@
     (csv/write-csv io-str data)
     (.toString io-str)))
 
+(defn custom-titles
+  [state title-fn]
+  (if title-fn
+    (title-fn state)
+    {}))
+
 (defn- exportable-report
   "Generate a report as a CSV."
-  [state params data]
+  [state params column-title-fn data]
   (let [d (generate-report state params data)
         cols (if (all-cols? (:columns params))
                all-columns
                (:columns params))]
     (->> d
          (as-dashed-rows state cols)
-         (cons-headings state cols)
+         (cons-headings state cols (custom-titles state column-title-fn))
          (to-csv-string))))
 
 (s/defn report :- [s/Any]
@@ -285,6 +300,7 @@
     (exportable-report
      state
      ((:output report) state configuration)
+     (:column-title-fn report)
      data)))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))

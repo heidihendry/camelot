@@ -288,7 +288,7 @@
 
    :settings
    {:preferences "Preferences"
-    :survey-settings "Survey Settings"
+    :survey-settings "Settings"
     :title "Settings"
     :erroneous-infrared-threshold.label "Erroneous Infrared Threshold"
     :erroneous-infrared-threshold.description "Value between 0.0 and 1.0 to set the treshold for date/time error detection"
@@ -351,6 +351,12 @@
     :total-nights "Nights Elapsed"
     :independent-observations "Independent Observations"
     :independent-observations-per-night "Abundance Index"
+    :media-capture-date "Capture Date"
+    :media-capture-time "Capture Time"
+    :sighting-time-delta-seconds "Time From Last Sighting (seconds)"
+    :sighting-time-delta-minutes "Time From Last Sighting (minutes)"
+    :sighting-time-delta-hours "Time From Last Sighting (hours)"
+    :sighting-time-delta-days "Time From Last Sighting (days)"
     :time-period-start "Period Start"
     :time-period-end "Period End"
     :percent-nocturnal "Nocturnal (%%)"
@@ -398,6 +404,7 @@
     :trap-station-session-count "Number of Trap Station Sessions"
     :trap-station-count "Number of Trap Stations"
     :media-count "Number of Photos"
+    :species-name "Species Name"
     :taxonomy-count "Number of Species"
     :media-capture-timestamp "Media Capture Timestamp"
     :media-notes "Media Notes"
@@ -414,7 +421,7 @@
     :photo-resolution-y "Photo Y Resolution (pixels)"}
 
    :camelot.report.module.builtin.reports.camera-traps
-   {:title "Camera Trap Export"
+   {:title "Camera Trap Export [CamtrapR]"
     :description "A CamtrapR-compatible export of camera trap details. Set 'byCamera' to TRUE when importing into CamtrapR."}
 
    :camelot.report.module.builtin.reports.effort-summary
@@ -444,6 +451,11 @@
    :camelot.report.module.builtin.reports.trap-station
    {:title "Trap Station Statistics"
     :description "Observations at a given trap station and the time elapsed gathering those observations."}
+
+   :camelot.report.module.builtin.reports.record-table
+   {:title "Record Table [CamtrapR]"
+    :description "A CamtrapR-compatible RecordTable export of independent sightings."
+    :media-directory "Media Directory"}
 
    :camelot.handler.capture
    {:timestamp-outside-range "Timestamp is outside of the session dates."}
