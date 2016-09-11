@@ -9,7 +9,10 @@
 (defn report-output
   [state {:keys [survey-id]}]
   {:columns [:trap-station-name
+             :trap-station-session-camera-id
+             :camera-name
              :species-name
+             :trap-camera-pair
              :media-capture-timestamp
              :media-capture-date
              :media-capture-time
@@ -23,6 +26,9 @@
    :transforms [#(update % :media-capture-timestamp
                          (partial tf/unparse (tf/formatters :mysql)))
                 #(assoc % :media-directory (config/get-media-path))
+                #(assoc % :trap-camera-pair (format "%s_%s"
+                                                    (:trap-station-name %)
+                                                    (:trap-station-session-camera-id %)))
                 #(assoc % :media-full-filename (if (:media-filename %)
                                                  (str (:media-filename %) "."
                                                       (:media-format %))
@@ -45,8 +51,20 @@
 
 (defn column-titles
   [state]
-  {:media-directory (tr/translate (:config state) ::media-directory)
-   :media-full-filename (tr/translate (:config state) :report/media-filename)})
+  {:trap-station-name "Station"
+   :camera-name "CameraName"
+   :trap-station-session-camera-id "Camera"
+   :species-name "Species"
+   :trap-camera-pair "TrapAndCamera"
+   :media-capture-timestamp "DateTimeOriginal"
+   :media-capture-date "Date"
+   :media-capture-time "Time"
+   :sighting-time-delta-seconds "delta.time.secs"
+   :sighting-time-delta-minutes "delta.time.mins"
+   :sighting-time-delta-hours "delta.time.hours"
+   :sighting-time-delta-days "delta.time.days"
+   :media-directory "Directory"
+   :media-full-filename "FileName"})
 
 (module/register-report
  :record-table

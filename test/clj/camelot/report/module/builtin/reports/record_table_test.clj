@@ -17,22 +17,27 @@
   [state id data]
   (report/csv-report :record-table state {:survey-id id} data))
 
-(def headings ["Trap Station Name"
-               "Species Name"
-               "Media Capture Timestamp"
-               "Capture Date"
-               "Capture Time"
-               "Time From Last Sighting (seconds)"
-               "Time From Last Sighting (minutes)"
-               "Time From Last Sighting (hours)"
-               "Time From Last Sighting (days)"
-               "Media Directory"
-               "Media Filename"])
+(def headings ["Station"
+               "Camera"
+               "CameraName"
+               "Species"
+               "TrapAndCamera"
+               "DateTimeOriginal"
+               "Date"
+               "Time"
+               "delta.time.secs"
+               "delta.time.mins"
+               "delta.time.hours"
+               "delta.time.days"
+               "Directory"
+               "FileName"])
 
 (def default-record
   {:site-id 1
    :site-name "ASite"
    :site-area 1
+   :camera-name "CAM1"
+   :trap-station-session-camera-id 1
    :trap-station-id 1
    :trap-station-session-start-date (t/date-time 2015 1 1 10 10 10)
    :trap-station-session-end-date (t/date-time 2015 1 10 5 0 0)
@@ -59,7 +64,9 @@
 (defn ->alt-record
   [r]
   (merge default-record {:taxonomy-id 40
+                         :camera-name "CAM2"
                          :trap-station-id 1
+                         :trap-station-session-camera-id 2
                          :trap-station-name "Trap2"
                          :taxonomy-species "Smiley"
                          :media-filename "file-id-2"
@@ -77,7 +84,7 @@
           state (gen-state-helper {})]
       (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
         (report state 1 records) =>
-        [["Trap1" "Cat Yellow Spotted" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+        [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
           "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]])))
 
   (fact "Should include time delta columns for independent sightings"
@@ -86,9 +93,9 @@
           state (gen-state-helper {})]
       (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
         (report state 1 records) =>
-        [["Trap1" "Cat Yellow Spotted" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+        [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
           "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]
-         ["Trap1" "Cat Yellow Spotted" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
+         ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
           "1800" "30" "0.5" "0.0" "/path" "file-id-1.jpg"]])))
 
   (fact "Should omit records which are dependent"
@@ -98,9 +105,9 @@
           state (gen-state-helper {})]
       (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
         (report state 1 records) =>
-        [["Trap1" "Cat Yellow Spotted" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+        [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
           "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]
-         ["Trap1" "Cat Yellow Spotted" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
+         ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
           "1800" "30" "0.5" "0.0" "/path" "file-id-1.jpg"]])))
 
   (fact "Should allow for a mix of trap stations and species"
@@ -111,11 +118,11 @@
           state (gen-state-helper {})]
       (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
         (report state 1 records) =>
-        [["Trap2" "Wolf Smiley" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+        [["Trap2" 2 "CAM2" "Wolf Smiley" "Trap2_2" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
           "0" "0" "0.0" "0.0" "/path" "file-id-2.jpg"]
-         ["Trap1" "Cat Yellow Spotted" "2015-01-07 05:15:00" "2015-01-07" "05:15:00"
+         ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:15:00" "2015-01-07" "05:15:00"
           "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]
-         ["Trap2" "Wolf Smiley" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
+         ["Trap2" 2 "CAM2" "Wolf Smiley" "Trap2_2" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
           "1800" "30" "0.5" "0.0" "/path" "file-id-2.jpg"]])))
 
   (fact "Should cope with records being out of order"
@@ -126,11 +133,11 @@
           state (gen-state-helper {})]
       (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
         (report state 1 records) =>
-        [["Trap2" "Wolf Smiley" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+        [["Trap2" 2 "CAM2" "Wolf Smiley" "Trap2_2" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
           "0" "0" "0.0" "0.0" "/path" "file-id-2.jpg"]
-         ["Trap1" "Cat Yellow Spotted" "2015-01-07 05:15:00" "2015-01-07" "05:15:00"
+         ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:15:00" "2015-01-07" "05:15:00"
           "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]
-         ["Trap2" "Wolf Smiley" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
+         ["Trap2" 2 "CAM2" "Wolf Smiley" "Trap2_2" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
           "1800" "30" "0.5" "0.0" "/path" "file-id-2.jpg"]]))))
 
 
@@ -147,4 +154,4 @@
       (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
         (csv-report state 1 records) =>
         (str (str/join "," headings) "\n"
-             "Trap1,Cat Yellow Spotted,2015-01-07 05:00:00,2015-01-07,05:00:00,0,0,0.0,0.0,/path,file-id-1.jpg\n")))))
+             "Trap1,1,CAM1,Cat Yellow Spotted,Trap1_1,2015-01-07 05:00:00,2015-01-07,05:00:00,0,0,0.0,0.0,/path,file-id-1.jpg\n")))))

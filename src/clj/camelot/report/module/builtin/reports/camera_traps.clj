@@ -7,7 +7,8 @@
 
 (defn report-output
   [state {:keys [survey-id]}]
-  {:columns [:trap-station-session-camera-id
+  {:columns [:trap-station-name
+             :trap-station-session-camera-id
              :trap-station-latitude
              :trap-station-longitude
              :trap-station-session-start-date
@@ -33,6 +34,15 @@
                                     :label :survey-name
                                     :value :survey-id}}}}})
 
+(defn column-titles
+  [state]
+  {:trap-station-name "Station"
+   :trap-station-session-camera-id "Camera"
+   :trap-station-latitude "gps_y"
+   :trap-station-longitude "gps_x"
+   :trap-station-session-start-date "Setup_date"
+   :trap-station-session-end-date "Retrieval_date"})
+
 (module/register-report
  :camera-traps
  {:file-prefix "camera-traps"
@@ -41,4 +51,5 @@
   :description ::description
   :form form-smith
   :by :all
-  :for :survey})
+  :for :survey
+  :column-title-fn column-titles})
