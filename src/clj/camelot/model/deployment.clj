@@ -23,7 +23,12 @@
      trap-station-longitude :- s/Num
      trap-station-latitude :- s/Num
      trap-station-altitude :- (s/maybe s/Num)
+     trap-station-distance-above-ground :- (s/maybe s/Num)
+     trap-station-distance-to-river :- (s/maybe s/Num)
+     trap-station-distance-to-road :- (s/maybe s/Num)
+     trap-station-distance-to-settlement :- (s/maybe s/Num)
      trap-station-session-start-date :- org.joda.time.DateTime
+     trap-station-notes :- (s/maybe s/Str)
      primary-camera-id :- s/Int
      secondary-camera-id :- (s/maybe s/Int)])
 
@@ -36,6 +41,10 @@
      trap-station-latitude
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
+     trap-station-distance-above-ground :- (s/maybe s/Num)
+     trap-station-distance-to-river :- (s/maybe s/Num)
+     trap-station-distance-to-road :- (s/maybe s/Num)
+     trap-station-distance-to-settlement :- (s/maybe s/Num)
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- org.joda.time.DateTime
      primary-camera-id :- s/Int
@@ -59,6 +68,10 @@
      trap-station-longitude :- (s/pred util.ts/valid-longitude?)
      trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
+     trap-station-distance-above-ground :- (s/maybe s/Num)
+     trap-station-distance-to-river :- (s/maybe s/Num)
+     trap-station-distance-to-road :- (s/maybe s/Num)
+     trap-station-distance-to-settlement :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
      primary-camera-id :- s/Int
@@ -80,6 +93,10 @@
      trap-station-longitude :- (s/pred util.ts/valid-longitude?)
      trap-station-latitude :- (s/pred util.ts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
+     trap-station-distance-above-ground :- (s/maybe s/Num)
+     trap-station-distance-to-river :- (s/maybe s/Num)
+     trap-station-distance-to-road :- (s/maybe s/Num)
+     trap-station-distance-to-settlement :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- org.joda.time.DateTime
@@ -98,26 +115,36 @@
 
 (s/defn tdeployment
   [{:keys [survey-id site-id trap-station-name trap-station-longitude trap-station-latitude
-           trap-station-altitude trap-station-session-start-date
+           trap-station-altitude
+           trap-station-distance-above-ground trap-station-distance-to-river
+           trap-station-distance-to-road trap-station-distance-to-settlement
+           trap-station-session-start-date trap-station-notes
            primary-camera-id secondary-camera-id]}]
   (->TDeployment survey-id site-id trap-station-name trap-station-longitude
                  trap-station-latitude trap-station-altitude
-                 trap-station-session-start-date primary-camera-id secondary-camera-id))
+                 trap-station-distance-above-ground trap-station-distance-to-river
+                 trap-station-distance-to-road trap-station-distance-to-settlement
+                 trap-station-session-start-date trap-station-notes primary-camera-id
+                 secondary-camera-id))
 
 (s/defn deployment
   [{:keys [trap-station-session-id trap-station-session-created
            trap-station-session-updated trap-station-id trap-station-name
            site-id survey-site-id site-name trap-station-longitude
-           trap-station-latitude trap-station-altitude trap-station-notes
-           trap-station-session-start-date primary-camera-id
+           trap-station-latitude trap-station-altitude
+           trap-station-distance-above-ground trap-station-distance-to-river
+           trap-station-distance-to-road trap-station-distance-to-settlement
+           trap-station-notes trap-station-session-start-date primary-camera-id
            primary-camera-name primary-camera-status-id secondary-camera-id
            secondary-camera-name secondary-camera-status-id]}]
   (->Deployment trap-station-session-id trap-station-session-created
                 trap-station-session-updated trap-station-id
                 trap-station-name site-id survey-site-id site-name
                 trap-station-longitude trap-station-latitude
-                trap-station-altitude trap-station-notes
-                trap-station-session-start-date primary-camera-id
+                trap-station-altitude
+                trap-station-distance-above-ground trap-station-distance-to-river
+                trap-station-distance-to-road trap-station-distance-to-settlement
+                trap-station-notes trap-station-session-start-date primary-camera-id
                 primary-camera-name primary-camera-status-id
                 secondary-camera-id secondary-camera-name
                 secondary-camera-status-id))
@@ -126,7 +153,10 @@
   [{:keys [trap-station-session-id trap-station-session-created
            trap-station-session-updated trap-station-id trap-station-name
            site-id survey-site-id site-name trap-station-longitude
-           trap-station-latitude trap-station-altitude trap-station-notes
+           trap-station-latitude trap-station-altitude
+           trap-station-distance-above-ground trap-station-distance-to-river
+           trap-station-distance-to-road trap-station-distance-to-settlement
+           trap-station-notes
            trap-station-session-start-date trap-station-session-end-date
            trap-station-session-camera-id
            trap-station-session-camera-media-unrecoverable
@@ -135,7 +165,10 @@
                       trap-station-session-updated trap-station-id
                       trap-station-name site-id survey-site-id site-name
                       trap-station-longitude trap-station-latitude
-                      trap-station-altitude trap-station-notes
+                      trap-station-altitude
+                      trap-station-distance-above-ground trap-station-distance-to-river
+                      trap-station-distance-to-road trap-station-distance-to-settlement
+                      trap-station-notes
                       trap-station-session-start-date trap-station-session-end-date
                       trap-station-session-camera-id
                       trap-station-session-camera-media-unrecoverable
@@ -144,6 +177,8 @@
 (s/defn tcamera-deployment
   [{:keys [trap-station-session-id trap-station-name site-id trap-station-id
            trap-station-longitude trap-station-latitude trap-station-altitude
+           trap-station-distance-above-ground trap-station-distance-to-river
+           trap-station-distance-to-road trap-station-distance-to-settlement
            trap-station-notes trap-station-session-start-date
            trap-station-session-end-date primary-camera-id primary-camera-name
            primary-camera-status-id primary-camera-media-unrecoverable
@@ -151,7 +186,10 @@
            secondary-camera-status-id secondary-camera-media-unrecoverable]}]
   (->TCameraDeployment trap-station-session-id trap-station-name site-id trap-station-id
                        trap-station-longitude trap-station-latitude
-                       trap-station-altitude trap-station-notes
+                       trap-station-altitude
+                       trap-station-distance-above-ground trap-station-distance-to-river
+                       trap-station-distance-to-road trap-station-distance-to-settlement
+                       trap-station-notes
                        trap-station-session-start-date trap-station-session-end-date
                        primary-camera-id primary-camera-name primary-camera-status-id
                        primary-camera-media-unrecoverable

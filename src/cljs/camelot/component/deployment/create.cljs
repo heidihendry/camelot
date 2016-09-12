@@ -200,7 +200,7 @@
        (not= (get-in data [:secondary-camera-id :value])
              (get-in data [:primary-camera-id :value]))))
 
-(defn deployment-form
+(defn important-fields-form
   [data owner]
   (reify
     om/IRender
@@ -247,14 +247,6 @@
                  (when (and v (not (util.ts/valid-longitude? v)))
                    (dom/label #js {:className "validation-warning"}
                               (tr/translate ::invalid-longitude))))
-               (dom/label #js {:className "field-label"}
-                          (tr/translate :trap-station/trap-station-altitude.label))
-               (dom/input #js {:className "field-input"
-                               :type "number"
-                               :value (get-in data [:data :trap-station-altitude :value])
-                               :onChange #(om/update! (get-in data [:data :trap-station-altitude])
-                                                      :value
-                                                      (.. % -target -value))})
                (dom/label #js {:className "field-label required"}
                           (tr/translate ::primary-camera))
                (om/build camera-select-component data
@@ -272,6 +264,68 @@
                                          :disabled (if (validate-form (:data data)) "" "disabled")
                                          :title (if (validate-form (:data data)) ""
                                                     (tr/translate ::validation-failure))
+                                         :onClick #(om/transact! data :page inc)}
+                                    (tr/translate :words/next) " "
+                                    (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
+
+(defn extra-fields-form
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "single-section"}
+               (dom/label #js {:className "field-label"}
+                          (tr/translate :trap-station/trap-station-altitude.label))
+               (dom/input #js {:className "field-input"
+                               :type "number"
+                               :value (get-in data [:data :trap-station-altitude :value])
+                               :onChange #(om/update! (get-in data [:data :trap-station-altitude])
+                                                      :value
+                                                      (.. % -target -value))})
+               (dom/label #js {:className "field-label"} (tr/translate :trap-station/trap-station-distance-above-ground.label))
+               (dom/input #js {:className "field-input"
+                               :type "number"
+                               :value (get-in data [:data :trap-station-distance-above-ground :value])
+                               :onChange #(om/update! (get-in data [:data :trap-station-distance-above-ground])
+                                                      :value
+                                                      (.. % -target -value))})
+               (dom/label #js {:className "field-label"} (tr/translate :trap-station/trap-station-distance-to-road.label))
+               (dom/input #js {:className "field-input"
+                               :type "number"
+                               :value (get-in data [:data :trap-station-distance-to-road :value])
+                               :onChange #(om/update! (get-in data [:data :trap-station-distance-to-road])
+                                                      :value
+                                                      (.. % -target -value))})
+               (dom/label #js {:className "field-label"} (tr/translate :trap-station/trap-station-distance-to-river.label))
+               (dom/input #js {:className "field-input"
+                               :type "number"
+                               :value (get-in data [:data :trap-station-distance-to-river :value])
+                               :onChange #(om/update! (get-in data [:data :trap-station-distance-to-river])
+                                                      :value
+                                                      (.. % -target -value))})
+               (dom/label #js {:className "field-label"} (tr/translate :trap-station/trap-station-distance-to-settlement.label))
+               (dom/input #js {:className "field-input"
+                               :type "number"
+                               :value (get-in data [:data :trap-station-distance-to-settlement :value])
+                               :onChange #(om/update! (get-in data [:data :trap-station-distance-to-settlement])
+                                                      :value
+                                                      (.. % -target -value))})
+               (dom/label #js {:className "field-label"} (tr/translate :trap-station/trap-station-notes.label))
+               (dom/textarea #js {:className "field-input"
+                                  :rows 3
+                                  :cols 48
+                                  :onChange #(om/update! data [:data :trap-station-notes :value] (.. % -target -value))
+                                  :value (get-in data [:data :trap-station-notes :value])})
+               (dom/div nil
+                        (dom/button #js {:className "btn btn-default"
+                                         :onClick #(om/transact! data :page dec)}
+                                    (dom/span #js {:className "fa fa-chevron-left"})
+                                    " "
+                                    (tr/translate :words/back))
+                        (dom/button #js {:className "btn btn-primary pull-right"
+                                         :disabled (if (validate-form (:data data)) "" "disabled")
+                                         :title (if (validate-form (:data data)) ""
+                                                    (tr/translate ::validation-failure))
                                          :onClick #(do
                                                      (nav/analytics-event "deployment"
                                                                           "cameracheck-submit")
@@ -284,6 +338,15 @@
                                                                                                [:selected-survey :survey-id :value]))))))}
                                     (tr/translate :words/create) " "
                                     (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
+
+(defn deployment-form
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (if (= (:page data) 1)
+        (om/build important-fields-form data)
+        (om/build extra-fields-form data)))))
 
 (defn section-containers-component
   [data owner]
@@ -306,7 +369,13 @@
                                            :trap-station-longitude {:value nil}
                                            :trap-station-altitude {:value nil}
                                            :trap-station-name {:value nil}
-                                           :site-id {:value nil}}})
+                                           :trap-station-distance-above-ground {:value nil}
+                                           :trap-station-distance-to-road {:value nil}
+                                           :trap-station-distance-to-river {:value nil}
+                                           :trap-station-distance-to-settlement {:value nil}
+                                           :trap-station-notes {:value nil}
+                                           :site-id {:value nil}}
+                                    :page 1})
       (go
         (let [c (chan)]
           (rest/get-x "/sites" #(go (>! c {:sites (:body %)})))

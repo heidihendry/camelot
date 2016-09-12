@@ -10,6 +10,7 @@
     :cancel "Cancel"
     :citation "Citation"
     :create "Create"
+    :next "Next"
     :date "Date"
     :delete "Delete"
     :details "Details"
