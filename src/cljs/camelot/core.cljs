@@ -19,9 +19,12 @@
 
 (defn disable-loading-screen
   []
-  (set! (.. (js/document.getElementById "loading") -style -cssText) "display: none")
-  (set! (.. (js/document.getElementById "navigation") -style -cssText) "")
-  (set! (.. (js/document.getElementById "app") -style -cssText) ""))
+  (js/setTimeout
+   (fn []
+     (set! (.. (js/document.getElementById "loading") -style -cssText) "display: none")
+     (set! (.. (js/document.getElementById "navigation") -style -cssText) "")
+     (set! (.. (js/document.getElementById "app") -style -cssText) ""))
+   1000))
 
 (defn navigate-dwim
   []
