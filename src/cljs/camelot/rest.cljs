@@ -28,6 +28,15 @@
   ([method url params status response]
    (-build-error method url params status response)))
 
+(defn set-error-state!
+  [resource response]
+  (om/update! (state/display-state) :error (build-error
+                                            "POST"
+                                            (misc/with-baseurl resource)
+                                            {:params-unavailable true}
+                                            (:status response)
+                                            (:body response))))
+
 (defn get-x-raw
   "Send an normal (transit-free) GET request."
   ([x-url params cb]
@@ -101,7 +110,7 @@
            (cb response))
          (do
            (if failcb
-             (failcb)
+             (failcb response)
              (om/update! (state/display-state) :error (build-error
                                                        "POST"
                                                        (misc/with-baseurl resource)

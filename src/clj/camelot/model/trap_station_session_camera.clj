@@ -48,10 +48,8 @@
            trap-station-session-camera-import-path]}]
   (->TTrapStationSessionCamera camera-id
                                trap-station-session-id
-                               trap-station-session-camera-media-unrecoverable
+                               (or trap-station-session-camera-media-unrecoverable false)
                                trap-station-session-camera-import-path))
-
-
 
 (s/defn get-all :- [TrapStationSessionCamera]
   [state :- State

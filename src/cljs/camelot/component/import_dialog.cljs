@@ -38,7 +38,8 @@
                     (nav/analytics-event "upload" "import-success")
                     (albums/reload-albums))
                #(do (om/update! (state/app-state-cursor) :loading nil)
-                    (nav/analytics-event "upload" "import-failure"))))
+                    (nav/analytics-event "upload" "import-failure")
+                    (rest/set-error-state! "/import/media" %))))
 
 (defn- generic-select
   [field e]
