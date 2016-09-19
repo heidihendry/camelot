@@ -7,6 +7,10 @@ PROJECT_FILE="project.clj"
 README_FILE="README.md"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
+echo "Switching to master and making sure it's clean..."
+git checkout master
+git status | grep -q 'working directory clean'
+
 echo "Bumping release version... "
 sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"$/${PROJECT_NAME} \"\1\"/" ${PROJECT_FILE}
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
