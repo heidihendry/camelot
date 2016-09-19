@@ -67,7 +67,7 @@
       wrap-gzip))
 
 (defn -main [& args]
-  (let [port (Integer. (or (env :camelot-port) 8080))]
+  (let [port (Integer. (or (env :camelot-port) 5341))]
     (migrate)
     (println (format "Camelot started on port %d.\n" port))
     (println "You might be able to connect to it from the following addresses:")

@@ -12,7 +12,7 @@ Run camelot with:
 java -jar camelot-<version>.jar
 ```
 
-This starts a web server which is available on TCP 8080 (by default).  If you wish to use another port, set the CAMELOT_PORT environment variable to the port number you desire.
+This starts a web server which is available on TCP 5341 (by default).  If you wish to use another port, set the CAMELOT_PORT environment variable to the port number you desire.
 
 You should connect to this port with your web browser.  Upon connecting, you'll be notified that Camelot is not configured.  Open the settings menu from the top right-hand corner, set the settings you wish to use, and press `Save' from the button left corner of the screen.
 
