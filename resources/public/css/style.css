@@ -314,17 +314,15 @@ pre.field-input {
     left: calc(50vw - 60px);
 }
 .supported-by {
-    font-size: 120%;
     position: fixed;
     bottom: 10vh;
     left: calc(50vw - 125px);
-    text-align: center;
     font-style:italic;
 }
 .supported-by .supported-by-text {
     position: relative;
-    top: 25px;
-    right: 55px;
+    top: 45px;
+    left: 30px;
     font-weight: light;
     color: #1c6b24;
 }
