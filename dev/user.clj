@@ -30,3 +30,6 @@
   (app/gen-state (config/config)))
 
 (def browser-repl figwheel/cljs-repl)
+
+(defn config []
+  (camelot.application/gen-state (camelot.util.config/config)))

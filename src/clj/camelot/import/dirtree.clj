@@ -57,9 +57,10 @@
 (defn- describe-raw-tag
   "Return a description for the given tag."
   [tag]
-  (->> tag
-       (get-description)
-       (str/trim)))
+  (or (some-> tag
+              get-description
+              str/trim)
+      ""))
 
 (defn- tag-key-value-pair
   "Return the key-value pair for the raw metadata tag given."
