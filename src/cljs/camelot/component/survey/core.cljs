@@ -95,7 +95,9 @@
                                                    {:action :species
                                                     :name (tr/translate ::species)}
                                                    {:action :files
-                                                    :name (tr/translate ::files)}]
+                                                    :name (tr/translate ::files)}
+                                                   {:action :import
+                                                    :name (tr/translate ::import)}]
                                             :active :deployment
                                             :species {}})))
     om/IRender

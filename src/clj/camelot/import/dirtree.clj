@@ -84,14 +84,15 @@
   [metadata]
   (map get-tags (get-directories metadata)))
 
-(s/defn file-metadata
+(s/defn extract-file-metadata :- mi/ImportRawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
   [reader file]
-  (->> file
-       (reader)
-       (extract-tags)
-       (map parse-tag)
-       (into {})))
+  (or (some->> file
+               (reader)
+               (extract-tags)
+               (map parse-tag)
+               (into {}))
+      ""))
 
 (s/defn exif-files-in-dir :- [File]
   "Return a list of the exif files in dir."
@@ -105,7 +106,7 @@
   [state file]
   (let [reader #(ImageMetadataReader/readMetadata ^File %)]
     (try
-      (file-metadata reader file)
+      (extract-file-metadata reader file)
       (catch java.lang.Exception e {}))))
 
 (s/defn path-components :- mi/ImportRawMetadata

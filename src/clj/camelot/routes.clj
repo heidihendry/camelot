@@ -6,7 +6,8 @@
              [associated-taxonomy :as ataxonomy]
              [config :as config]
              [capture :as capture]
-             [import :as import]]
+             [import :as import]
+             [bulk-import :as bulk-import]]
             [camelot.import.db :as im.db]
             [camelot.services.species-search :as species-search]
             [camelot.model
@@ -124,6 +125,8 @@
            (DELETE "/:id/files/:file-id" [id file-id] (rest/delete-resource survey-file/delete!
                                                                             file-id session))
            (GET "/:id" [id] (rest/specific-resource survey/get-specific id session))
+           (GET "/bulkimport/template" [] (bulk-import/metadata-template
+                                           (app/gen-state (conf/config session))))
            (PUT "/:id" [id data] (rest/update-resource survey/update! id
                                                        survey/tsurvey data session))
            (POST "/" [data] (rest/create-resource survey/create!

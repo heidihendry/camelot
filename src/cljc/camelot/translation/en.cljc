@@ -685,7 +685,11 @@
     :confirm-delete "Are you sure you want to delete this survey? This will also delete any associated media and files."
     :upload-captures "Upload media"
     :species "Species"
-    :files "Related files"}
+    :files "Related files"
+    :import "Bulk import"}
+
+   :camelot.component.survey.bulk-import
+   {:download "Download template"}
 
    :camelot.component.survey.create
    {:search-instructions "Search and add species using the options to the right."

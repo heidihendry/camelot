@@ -6,6 +6,7 @@
             [camelot.component.deployment.recent :as recent]
             [camelot.component.survey.create :as create]
             [camelot.component.survey.file :as file]
+            [camelot.component.survey.bulk-import :as bulk-import]
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.state :as state]
@@ -67,6 +68,7 @@
                           :upload (om/build recent/recent-deployment-section-component data)
                           :species (om/build species/species-menu-component (:species data))
                           :files (om/build file/file-menu-component data)
+                          :import (om/build bulk-import/bulk-import-component data)
                           ""))))))
 
 (defn survey-management-component

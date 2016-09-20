@@ -11,6 +11,7 @@
             [clojure.java.io :as io]
             [camelot.util.config :as util.config]
             [camelot.util.java-file :as jf]
+            [camelot.util.file :as file-util]
             [camelot.db :as db]
             [mikera.image.core :as image]
             [camelot.import.db :as im.db])
@@ -83,7 +84,7 @@
   "Import media"
   [{:keys [folder session-camera-id notes]}]
   (db/with-transaction [state (app/gen-state (conf/config))]
-    (let [[_ sitename _phase cameraname] (jf/rel-path-components folder)
+    (let [[_ sitename _phase cameraname] (file-util/rel-path-components folder)
           root-path (:root-path (:config state))
           full-path (str root-path folder)
           album (get-album state root-path full-path)
