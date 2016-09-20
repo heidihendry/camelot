@@ -457,7 +457,6 @@ Currently the only application state is the user's configuration."
      :layout [[:label (tr/translate (:config state) :settings/preferences)]
               [:language]
               [:label (tr/translate (:config state) :settings/survey-settings)]
-              [:root-path]
               [:project-start]
               [:project-end]
               [:required-fields]
@@ -501,8 +500,6 @@ Currently the only application state is the user's configuration."
                               :required true}
               :project-end {:type :datetime
                             :required true}
-              :root-path {:type :string
-                          :required true}
               :surveyed-species {:type :list
                                  :list-of :string}
               :required-fields {:type :list

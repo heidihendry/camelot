@@ -229,13 +229,8 @@ Throws an IOException if the file cannot be read."
        (edn/read)
        (parse-dates)))
 
-(defn save-config
-  "Save the configuration file.  Overwrites existing."
-  [config]
-  (save-config-helper (serialise-dates config) true))
-
-(defn config
-  "Return the configuration."
+(defn config*
+  "Return the configuration, though does not add a default root path."
   ([]
    (merge (parse-dates default-config)
           (read-config)))
@@ -243,3 +238,25 @@ Throws an IOException if the file cannot be read."
    (merge (parse-dates default-config)
           (read-config)
           session)))
+
+(defn config
+  "Return the configuration."
+  ([]
+   (merge {:root-path (System/getProperty "user.dir")}
+          (config*)))
+  ([session]
+   (merge {:root-path (System/getProperty "user.dir")}
+          (config* session))))
+
+(defn- assoc-root-dir
+  [config]
+  (let [rd (:root-dir (config*))]
+    (if rd
+      (assoc config :root-dir rd)
+      config)))
+
+(defn save-config
+  "Save the configuration file.  Overwrites existing."
+  [config]
+  (let [sc (serialise-dates config)]
+    (save-config-helper (assoc-root-dir sc) true)))

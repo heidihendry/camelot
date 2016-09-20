@@ -1,16 +1,23 @@
 (ns camelot.import.dirtree
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
+            [camelot.model.state :refer [State]]
             [schema.core :as s]
             [camelot.model.import :as mi]
-            [camelot.util.java-file :as f])
+            [camelot.util.java-file :as f]
+            [camelot.util.file :as file-util]
+            [camelot.util.java-file :as jf])
   (:import [com.drew.imaging ImageMetadataReader]
+           [org.apache.commons.lang3 SystemUtils]
            [com.drew.metadata Metadata Directory Tag]
            [java.io File]))
 
 (def RawAlbum {java.io.File mi/ImportRawMetadata})
 
 (def RawAlbumSet {java.io.File RawAlbum})
+
+(def path-component-prefix "Path Component ")
+(def absolute-path-key "Absolute Path")
 
 (def file-inclusion-regexp
     "Regexp for filenames to include.
@@ -77,7 +84,7 @@
   [metadata]
   (map get-tags (get-directories metadata)))
 
-(s/defn file-metadata :- mi/ImportRawMetadata
+(s/defn file-metadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
   [reader file]
   (->> file
@@ -86,9 +93,9 @@
        (map parse-tag)
        (into {})))
 
-(defn- exif-files-in-dir
+(s/defn exif-files-in-dir :- [File]
   "Return a list of the exif files in dir."
-  [dir]
+  [dir :- s/Str]
   (->> dir
        (io/file)
        (file-seq)
@@ -101,18 +108,44 @@
       (file-metadata reader file)
       (catch java.lang.Exception e {}))))
 
-(s/defn file-raw-metadata-pair
+(s/defn path-components :- mi/ImportRawMetadata
+  "Extract a map of components of the path, relative to the root directory."
+  [state :- State
+   file :- File]
+  (let [segfn (fn [i v] (hash-map (str path-component-prefix (inc i)) v))]
+    (->> file
+         (file-util/rel-path-components state)
+         (map-indexed segfn)
+         (apply merge))))
+
+(s/defn file-metadata :- mi/ImportRawMetadata
   "Return a pair of the file and its raw metadata."
-  [state file]
-  (vector file (file-raw-metadata state file)))
+  [state :- State
+   file :- File]
+  (merge (file-raw-metadata state file)
+         (path-components state file)
+         {absolute-path-key (jf/canonical-path file)}))
+
+(s/defn file-metadata-pair
+  [state :- State
+   file :- File]
+  (vector file (file-metadata state file)))
+
+(s/defn directory-metadata-collection :- [mi/ImportRawMetadata]
+  [state :- State
+   dir :- s/Str]
+  (->> dir
+       exif-files-in-dir
+       (map (partial file-metadata state))))
 
 (s/defn album-dir-raw-metadata :- RawAlbum
   "Return the raw exif data for files in `dir'."
-  [state dir]
+  [state :- State
+   dir :- s/Str]
   (->> dir
        (exif-files-in-dir)
-       (map (partial file-raw-metadata-pair state))
-       (filter identity)
+       (map (partial file-metadata-pair state))
+       (remove nil?)
        (into {})))
 
 (defn- album-dir-list

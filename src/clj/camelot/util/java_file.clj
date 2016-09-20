@@ -89,6 +89,11 @@
   "Returns the number of bytes in the file"
   (.length ^File file))
 
+(defn canonical-path
+  [file]
+  "Return the absolute, unique path to the file as a String."
+  (.getCanonicalPath ^File file))
+
 (defn pushback-reader
   [file-reader]
   "Create a pushback reader given a file reader"
