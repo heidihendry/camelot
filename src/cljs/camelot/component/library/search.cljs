@@ -550,8 +550,7 @@
                                  (dom/input #js {:type "number"
                                                  :className "field-input short-input"
                                                  :value (get-in data [:identification :quantity])
-                                                 :onChange #(when (re-find #"^[0-9]+$"
-                                                                           (get-in data [:identification :quantity]))
+                                                 :onChange #(do
                                                               (om/update! (:identification data) :quantity
                                                                           (cljs.reader/read-string (.. % -target -value)))
                                                               (nav/analytics-event "library-id" "quantity-change"))}))
