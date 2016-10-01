@@ -619,6 +619,7 @@
    :camelot.component.site.core
    {:new-site-name "New site name..."
     :validation-duplicate-site "A site with this name already exists."
+    :help-text "A 'site' is a geographic location where one or more camera trap stations will live. A site can belong to multiple surveys."
     :item-name "sites"
     :advice "You can add sites using the input field below."
     :filter-sites "Filter sites..."}
