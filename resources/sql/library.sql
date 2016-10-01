@@ -12,7 +12,6 @@ LEFT JOIN trap_station USING (trap_station_id)
 LEFT JOIN survey_site USING (survey_site_id)
 LEFT JOIN site USING (site_id)
 LEFT JOIN survey USING (survey_id)
-ORDER BY trap_station_session_id, media_capture_timestamp
 
 -- name: -all-media-for-survey
 SELECT media_id, media_created, media_updated, media_filename, media_format, media_cameracheck, media_attention_needed,
@@ -29,4 +28,3 @@ LEFT JOIN survey_site USING (survey_site_id)
 LEFT JOIN site USING (site_id)
 LEFT JOIN survey USING (survey_id)
 WHERE survey_id = :survey_id
-ORDER BY trap_station_session_id, media_capture_timestamp

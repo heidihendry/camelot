@@ -581,7 +581,8 @@
   (let [match-ids (map :media-id (filter/only-matching (:terms search)
                                                        (assoc search :results records)
                                                        (:species data)))]
-    (om/update! (:search-results data) :all-ids (vec match-ids))))
+    (om/update! (:search-results data) :all-ids
+                (filter (set match-ids) (get-in data [:search :ordered-ids])))))
 
 (defn search-component
   [data owner]
@@ -592,8 +593,6 @@
     om/IWillMount
     (will-mount [_]
       (om/update! (:search data) :page 1)
-      (om/update! (:search-results data) :all-ids
-                  (map :media-id (vals (get-in data [:search :results]))))
       (om/update! (:search data) :terms nil)
       (go
         (loop []

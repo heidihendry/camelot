@@ -23,7 +23,7 @@
    (mapv #(get-in data [:search :results %]) (media-ids-on-page data)))
   ([]
    (let [data (state/library-state)]
-     (mapv #(get-in data [:search :results %]) (media-ids-on-page data)))))
+     (media-on-page data))))
 
 (defn all-media-selected
   []
@@ -37,10 +37,11 @@
   [resp]
   (om/update! (state/library-state) :selected-media-id nil)
   (om/update! (get (state/library-state) :search) :results
-              (reduce-kv (fn [acc k v] (assoc acc k (first v))) {}
-                         (group-by :media-id (:body resp))))
-  (om/update! (get (state/library-state) :search-results)
-              :all-ids (map :media-id (:body resp)))
+              (reduce (fn [acc v] (assoc acc (:media-id v) v)) {}
+                      (:body resp)))
+  (let [mid (mapv :media-id (:body resp))]
+    (om/update! (get (state/library-state) :search) :ordered-ids mid)
+    (om/update! (get (state/library-state) :search-results) :all-ids mid))
   (om/update! (:search (state/library-state)) :page 1)
   (om/update! (:search (state/library-state)) :dirty-state true))
 

@@ -75,10 +75,16 @@
   (let [media-sightings (group-by :media-id sightings)
         media-uri #(format "/media/photo/%s" (:media-filename %))
         sightings-for #(get media-sightings (:media-id %))]
-    (map #(library-record (assoc %
-                                 :sightings (vec (sightings-for %))
-                                 :media-uri (media-uri %)))
-         media)))
+    (sort-by
+     (juxt
+      :trap-station-session-start-date
+      :trap-station-session-id
+      :trap-station-session-camera-id
+      :media-capture-timestamp)
+     (map #(library-record (assoc %
+                                  :sightings (vec (sightings-for %))
+                                  :media-uri (media-uri %)))
+          media))))
 
 (s/defn build-library :- [LibraryRecord]
   [state]
