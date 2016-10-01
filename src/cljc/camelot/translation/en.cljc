@@ -603,7 +603,7 @@
 
    :camelot.component.species-search
    {:scientific-name "Scientific name..."
-    :search-species "Search species"}
+    :search-species "Search species by scientific name"}
 
    :camelot.component.util
    {:blank-notice-template "There aren't any %s yet"
