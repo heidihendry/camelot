@@ -169,7 +169,8 @@
 (defn toggle-select-image
   [data ctrl]
   (if (and ctrl (:selected data))
-    (om/update! (state/library-state) :selected-media-id nil)
+    (om/update! (state/library-state) :selected-media-id
+                (:media-id (first (all-media-selected))))
     (om/update! (state/library-state) :selected-media-id (:media-id data)))
   (when (not ctrl)
     (deselect-all))
