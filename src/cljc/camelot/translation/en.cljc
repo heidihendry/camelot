@@ -547,7 +547,7 @@
     :secondary-camera-name "Camera name (secondary)"
     :record-camera-check "Record camera check"
     :start-date "State date"
-    :blank-item-name-lc "camera traps"
+    :blank-item-name-lc "camera trap stations"
     :advice-context "These are locations where cameras are deployed in the field."
     :advice-direction "You can set some up using the button below."
     :create-title "Add a new camera trap deployment."
@@ -578,7 +578,7 @@
     :progress-bar-title "%d complete, %d failed and %d ignored."
     :show-details "Show details"
     :blank-item-name "camera checks"
-    :blank-advice "These will appear when you add checks to your camera traps."}
+    :blank-advice "These will appear when you add checks to your camera trap stations."}
 
    :camelot.component.deployment.shared
    {:sort-by "Sort by"}
@@ -647,7 +647,7 @@
 
    :camelot.component.survey.core
    {:create-survey "Create survey"
-    :manage-traps "Manage camera traps"
+    :manage-traps "Manage camera trap stations"
     :upload-captures "Upload captures"
     :species "Species"
     :files "Related files"}
