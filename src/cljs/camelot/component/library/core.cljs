@@ -61,9 +61,9 @@
         reload (aget opts "reload")]
     (when reload
       (util/load-library))
-    (search/update-terms (get data :search) search)
-    (om/update! (:search data) :matches
-                (map :media-id (filter/only-matching search data)))))
+    (om/update! (:search-results data) :all-ids
+                (map :media-id (filter/only-matching search (deref (:search data))
+                                                     (deref (:species data)))))))
 
 (defn library-view-component
   "Render a collection of library."
@@ -74,6 +74,7 @@
       (when restricted-mode
         (om/update! (state/app-state-cursor) :restricted-mode true))
       (om/update! (get-in data [:library :search]) :page 1)
+      (om/update! (:library data) :search-results {})
       (om/update! (:library data) :survey-id (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! (get-in data [:library :search]) :show-select-count 0)
       (om/update! (get-in data [:library]) :identification {:quantity 1})
@@ -98,10 +99,10 @@
           (dom/div #js {:className "library"
                         :onKeyDown print-key
                         :tabIndex 0}
-                   (if restricted-mode
-                     (set! (.-tincan js/window) (partial tincan-listener lib))
-                     (om/build search/search-component lib))
-                   (when (get-in lib [:search :matches])
+                   (when restricted-mode
+                     (set! (.-tincan js/window) (partial tincan-listener lib)))
+                   (om/build search/search-component lib)
+                   (when (get-in lib [:search-results])
                      (om/build collection/media-collection-component lib))
                    (om/build preview/media-control-panel-component lib))
           (dom/div nil ""))))))

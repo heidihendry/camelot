@@ -16,18 +16,16 @@
                    :media-id 1}]
         results {1 {:sightings []
                     :media-id 1}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching nil data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching nil data species) expected))))
 
 (deftest empty-search-returns-all
   (let [expected [{:sightings []
                    :media-id 1}]
         results {1 {:sightings []
                     :media-id 1}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "" data species) expected))))
 
 (deftest species-search-returns-records-with-matching-species
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -36,9 +34,8 @@
                     :media-id 1}
                  2 {:sightings [{:taxonomy-id 1}]
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "Smiley" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "Smiley" data species) expected))))
 
 (deftest species-search-is-case-insensitive
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -47,9 +44,8 @@
                     :media-id 1}
                  2 {:sightings [{:taxonomy-id 1}]
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "smiley" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "smiley" data species) expected))))
 
 (deftest species-search-matches-middle-of-string
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -58,9 +54,8 @@
                     :media-id 1}
                  2 {:sightings [{:taxonomy-id 1}]
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "ley wolf" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "ley wolf" data species) expected))))
 
 (deftest non-matching-species-are-ignored
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -69,9 +64,8 @@
                     :media-id 1}
                  2 {:sightings [{:taxonomy-id 1}]
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "ley wolf" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "ley wolf" data species) expected))))
 
 (deftest search-by-site
   (let [expected [{:sightings []
@@ -83,9 +77,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "someothersite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "mysite" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "mysite" data species) expected))))
 
 (deftest matches-any-field
   (let [expected [{:sightings []
@@ -100,9 +93,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "MySite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "wolf" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "wolf" data species) expected))))
 
 (deftest terms-separated-by-space-are-conjunctive
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -114,9 +106,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "MySite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "wolf site" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "wolf site" data species) expected))))
 
 (deftest terms-separated-by-pipe-are-disjunctive
   (let [expected [{:sightings []
@@ -134,9 +125,8 @@
                  3 {:sightings [{:taxonomy-id 2}]
                     :site-name "Excluded"
                     :media-id 3}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "wolf site|den" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "wolf site|den" data species) expected))))
 
 (deftest allows-field-to-be-specified
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -148,9 +138,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "MySite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "taxonomy-species:wolf" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "taxonomy-species:wolf" data species) expected))))
 
 (deftest allows-field-shorthand-for-species
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -162,9 +151,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "MySite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "species:wolf" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "species:wolf" data species) expected))))
 
 (deftest allows-field-shorthand-for-site
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -176,9 +164,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "MySite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "site:mysite" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "site:mysite" data species) expected))))
 
 (deftest allows-field-shorthand-for-camera
   (let [expected [{:sightings []
@@ -190,9 +177,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :camera-name "XYZ3"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "camera:abc" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "camera:abc" data species) expected))))
 
 (deftest ignores-nonsense-fields
   (let [results {1 {:sightings []
@@ -201,9 +187,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "MySite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "nonexisty:wolf" data) '()))))
+        data {:results results}]
+    (is (= (sut/only-matching "nonexisty:wolf" data species) '()))))
 
 (deftest complex-searches-return-expected-results
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -215,11 +200,10 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :site-name "MySite"
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
+        data {:results results}]
     (is (= (sut/only-matching
             "taxonomy-species:wolf mysite|taxonomy-species:cat mysite"
-            data) expected))))
+            data species) expected))))
 
 (deftest finds-attention-needed-true-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -231,9 +215,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :media-attention-needed true
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "flagged:true" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "flagged:true" data species) expected))))
 
 (deftest finds-media-attention-needed-false-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -245,9 +228,8 @@
                  2 {:sightings [{:taxonomy-id 2}]
                     :media-attention-needed true
                     :media-id 1}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "flagged:false" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "flagged:false" data species) expected))))
 
 (deftest finds-media-processed-true-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -259,9 +241,8 @@
                  2 {:sightings [{:taxonomy-id 1}]
                     :media-processed true
                     :media-id 2}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "processed:true" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "processed:true" data species) expected))))
 
 (deftest finds-media-processed-false-boolean
   (let [expected [{:sightings [{:taxonomy-id 1}]
@@ -273,9 +254,8 @@
                  2 {:sightings [{:taxonomy-id 2}]
                     :media-processed true
                     :media-id 1}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "processed:false" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "processed:false" data species) expected))))
 
 (deftest supports-unprocessed-only-flag
   (let [expected [{:sightings [{:taxonomy-id 2}]
@@ -287,10 +267,9 @@
                  2 {:sightings [{:taxonomy-id 2}]
                     :media-id 1
                     :media-processed false}}
-        data {:search {:results results
-                       :unprocessed-only true}
-              :species species}]
-    (is (= (sut/only-matching nil data) expected))))
+        data {:results results
+              :unprocessed-only true}]
+    (is (= (sut/only-matching nil data species) expected))))
 
 (deftest trap-station-ids-are-matched-exactly
   (let [expected [{:sightings [{:taxonomy-id 2}]
@@ -303,9 +282,8 @@
                  2 {:sightings [{:taxonomy-id 2}]
                     :trap-station-id 5
                     :media-id 1}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching "trapid:5" data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching "trapid:5" data species) expected))))
 
 (deftest unprocessed-only-flag-supports-disjunction
   (let [search "taxonomy-species:wolf mysite|taxonomy-species:cat|wolf"]
@@ -343,9 +321,8 @@
                  3 {:sightings [{:taxonomy-id 3 :sighting-sex nil}]
                     :media-id 3
                     :media-processed false}}
-        data {:search {:results results}
-              :species species}]
-    (is (= (sut/only-matching search data) expected))))
+        data {:results results}]
+    (is (= (sut/only-matching search data species) expected))))
 
 (deftest term-formatter-replaces-spaces
   (let [search "this is a test"]

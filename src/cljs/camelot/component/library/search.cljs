@@ -8,7 +8,7 @@
             [camelot.nav :as nav]
             [typeahead.core :as typeahead]
             [clojure.string :as str]
-            [cljs.core.async :refer [<! chan >! timeout]]
+            [cljs.core.async :refer [<! chan >! timeout sliding-buffer]]
             [camelot.util.cursorise :as cursorise]
             [camelot.translation.core :as tr])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -74,22 +74,21 @@
 (defn filter-button-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/button #js {:className "fa fa-search btn search"
                        :title (tr/translate ::filter-button-title)
                        :id "apply-filter"
-                       :onClick #(do (om/update! data :dirty-state true)
+                       :onClick #(do (go (>! (:search-chan state) {:search (deref data)}))
                                      (nav/analytics-event "library-search" "forced-refresh-click"))}))))
 
 (defn select-media-collection-container
-  [e]
-  (if (and (= (.-keyCode e) 85) (.-ctrlKey e))
-    (do (om/update! (:search (state/library-state)) :terms "")
-        (.preventDefault e))
-    (when (= (.-keyCode e) 13)
-      (let [node (.getElementById js/document "media-collection-container")]
-        (.focus node)))))
+  [state data e]
+  (when (= (.-keyCode e) 13)
+    (let [node (.getElementById js/document "media-collection-container")]
+      (go (>! (:search-chan state) {:search (assoc (deref data)
+                                                   :terms (.. e -target -value))}))
+      (.focus node))))
 
 (defn completion-field
   [ctx]
@@ -153,6 +152,18 @@
 (defn filter-input-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:typeahead-index (typeahead/phrase-index
+                         (apply conj (map #(hash-map :term %
+                                                     :props {:field true
+                                                             :completion-fn completions})
+                                          (apply conj (keys filter/field-keys) filter/model-fields))
+                                (if (get-in data [:taxonomy-completions :species])
+                                  (mapv typeahead/->basic-entry
+                                        (apply conj (get-in data [:taxonomy-completions :species])
+                                               (get-in data [:taxonomy-completions :common-names])))
+                                  [])))})
     om/IWillMount
     (will-mount [_]
       (let [rf #(filter (complement nil?) (mapv %1 %2))]
@@ -160,26 +171,14 @@
                     #(om/update! data :taxonomy-completions
                                  {:species (rf :taxonomy-label (:body %))
                                   :common-names (rf :taxonomy-common-name (:body %))}))))
-    om/IRender
-    (render [_]
-      (om/build typeahead/typeahead (typeahead/phrase-index
-                                     (apply conj (map #(hash-map :term %
-                                                                 :props {:field true
-                                                                         :completion-fn completions})
-                                                      (apply conj (keys filter/field-keys)
-                                                             filter/model-fields))
-                                            (if (get-in data [:taxonomy-completions :species])
-                                              (mapv typeahead/->basic-entry
-                                                    (apply conj (get-in data [:taxonomy-completions :species])
-                                                           (get-in data [:taxonomy-completions :common-names])))
-                                              [])))
+    om/IRenderState
+    (render-state [_ state]
+      (om/build typeahead/typeahead (:typeahead-index state)
                 {:opts {:input-config {:placeholder (tr/translate ::filter-placeholder)
                                        :className "field-input search"
                                        :title (tr/translate ::filter-title)
                                        :id "filter"
-                                       :onChange (partial update-terms data)
-                                       :value (get data :terms)
-                                       :onKeyDown select-media-collection-container
+                                       :onKeyDown (partial select-media-collection-container state data)
                                        :disabled (if (get data :identify-selected)
                                                    "disabled" "")}
                         :multi-term true}}))))
@@ -291,15 +290,15 @@
 (defn trap-station-select-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/span nil
                (dom/select #js {:className "trap-station-select field-input"
                                 :value (:trap-station-id data)
                                 :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                              (om/update! (:search data) :trap-station-id sid)
-                                             (om/update! (:search data) :page 1)
-                                             (om/update! (:search data) :dirty-state true)
+                                             (go (>! (:search-chan state) {:search (assoc (deref (:search data))
+                                                                                          :trap-station-id sid)}))
                                              (nav/analytics-event "library-search" "trap-station-select-change"))}
                            (om/build-all trap-station-option-component
                                          (cons {:trap-station-id -1
@@ -319,7 +318,8 @@
                                :value (get-in data [:search (:key state)])
                                :onChange #(do (om/update! (:search (state/library-state))
                                                           (:key state) (.. % -target -checked))
-                                              (om/update! (:search data) :dirty-state true)
+                                              (go (>! (:search-chan state) {:search (assoc (deref (:search data))
+                                                                                           (:key state) (.. % -target -checked))}))
                                               (nav/analytics-event "library-search"
                                                                    (str (str/lower-case (:label state)) "-checkbox-change")))
                                :className "field-input"})))))
@@ -376,21 +376,21 @@
 (defn search-bar-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
-      (let [has-selected (first (filter (comp :selected util/find-with-id)
-                                        (get-in data [:search :matches])))]
+    om/IRenderState
+    (render-state [_ state]
+      (let [has-selected (first (util/all-media-selected))]
         (dom/div #js {:className "search-bar"}
-                 (om/build filter-button-component (:search data))
-                 (om/build filter-input-component (:search data))
+                 (om/build filter-input-component (:search data) {:init-state state})
+                 (om/build filter-button-component (:search data) {:init-state state})
                  (let [global-survey (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])]
                    (do
                      (dom/span nil (str " " (tr/translate :words/in) " "))
-                     (om/build filter-survey-component data)))
-                 (om/build trap-station-select-component data)
+                     (om/build filter-survey-component data {:init-state state})))
+                 (om/build trap-station-select-component data {:init-state state})
                  (om/build subfilter-checkbox-component data
                            {:init-state {:key :unprocessed-only
-                                         :label (tr/translate ::filter-unprocessed-label)}})
+                                         :label (tr/translate ::filter-unprocessed-label)
+                                         :search-chan (:search-chan state)}})
                  (dom/div #js {:className "pull-right action-container"}
                           (om/build media-flag-container-component data)
                           (dom/button #js {:className "btn btn-default"
@@ -576,23 +576,40 @@
                                                                 (nav/analytics-event "library-id" "cancel-identification"))}
                                              (tr/translate :words/cancel))))))))
 
+(defn search
+  [data search records]
+  (let [match-ids (map :media-id (filter/only-matching (:terms search)
+                                                       (assoc search :results records)
+                                                       (:species data)))]
+    (om/update! (:search-results data) :all-ids (vec match-ids))))
+
 (defn search-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:search-chan (chan (sliding-buffer 1))})
     om/IWillMount
     (will-mount [_]
       (om/update! (:search data) :page 1)
-      (om/update! (:search data) :matches (map :media-id (filter/only-matching nil data)))
-      (om/update! (:search data) :terms nil))
-    om/IRender
-    (render [_]
+      (om/update! (:search-results data) :all-ids
+                  (map :media-id (vals (get-in data [:search :results]))))
+      (om/update! (:search data) :terms nil)
+      (go
+        (loop []
+          (let [ch (om/get-state owner :search-chan)
+                r (<! ch)]
+            (om/update! (:search data) :dirty-state false)
+            (search data (:search r) (get-in r [:search :results]))
+            (om/update! (:search data) :page 1)
+            (recur)))))
+    om/IRenderState
+    (render-state [_ state]
       (when (-> data :search :dirty-state)
-        (om/update! (:search data) :dirty-state false)
-        (om/update! (:search data) :matches
-                    (map :media-id (filter/only-matching (-> data :search :terms) data))))
+        (go (>! (:search-chan state) {:search (deref (:search data))})))
       (when (-> data :identification :dirty-state)
         (om/update! (:identification data) :dirty-state false)
         (tincan-sender data false {:prevent-open true}))
       (dom/div #js {:className "search-container"}
-               (om/build search-bar-component data)
+               (om/build search-bar-component data {:init-state state})
                (om/build identification-bar-component data)))))

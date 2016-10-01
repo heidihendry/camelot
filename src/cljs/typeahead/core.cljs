@@ -1,7 +1,7 @@
 (ns typeahead.core
   "Input field with powerful typeahead."
   (:require [om.core :as om]
-            [cljs.core.async :refer [<! chan >! alts! timeout]]
+            [cljs.core.async :refer [<! chan >! sliding-buffer alts! timeout]]
             [om.dom :as dom]
             [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -207,7 +207,7 @@
     om/IInitState
     (init-state [_]
       {::value ""
-       ::int-chan (chan)
+       ::int-chan (chan (sliding-buffer 1))
        ::completion-chan (chan)
        ::selection-index 0})
     om/IWillUpdate
@@ -287,10 +287,15 @@
                                                                  (if (not (and (empty? v) (empty? ctx)))
                                                                    (let [comps (complete (or (and (::context state) ctx)
                                                                                              data) v)]
-                                                                     (go (>! (::int-chan state)
-                                                                             {::select (nth comps
-                                                                                            (mod (::selection-index state)
-                                                                                                 (count comps)))}))))
+                                                                     (if (seq comps)
+                                                                       (go (>! (::int-chan state)
+                                                                               {::select (nth comps
+                                                                                              (mod (::selection-index state)
+                                                                                                   (count comps)))}))
+                                                                       (when (:onKeyDown input-config)
+                                                                         ((:onKeyDown input-config) e))))
+                                                                   (when (:onKeyDown input-config)
+                                                                     ((:onKeyDown input-config) e)))
                                                                  (om/refresh! owner))))
                                              :onChange #(do
                                                           (let [tv (.. % -target -value)]

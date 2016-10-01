@@ -94,11 +94,17 @@
       SystemUtils/IS_OS_MAC_OSX (db-path (str (env :home) "/Library/Application Support"))
       :else (db-path ".")))
 
+(def ^:dynamic *db-override* nil)
+
+(defn datadir-path
+  []
+  (or *db-override* (env :camelot-datadir)))
+
 (defn get-db-path
   "Return the path to the database directory."
   []
-  (if (env :camelot-datadir)
-    (str (checked-datadir (env :camelot-datadir)) SystemUtils/FILE_SEPARATOR db-name)
+  (if (datadir-path)
+    (str (checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR db-name)
     (get-std-db-path)))
 
 (defn- media-path
@@ -119,8 +125,8 @@
 (defn get-media-path
   "Return the path to the media directory."
   []
-  (if (env :camelot-datadir)
-    (str (checked-datadir (env :camelot-datadir)) SystemUtils/FILE_SEPARATOR media-directory-name)
+  (if (datadir-path)
+    (str (checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR media-directory-name)
     (get-std-media-path)))
 
 (defn- filestore-path
@@ -141,8 +147,8 @@
 (defn filestore-base-path
   "Return the base path to the filestore directory."
   []
-  (if (env :camelot-datadir)
-    (str (checked-datadir (env :camelot-datadir)) SystemUtils/FILE_SEPARATOR filestore-directory-name)
+  (if (datadir-path)
+    (str (checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR filestore-directory-name)
     (get-std-filestore-path)))
 
 (defn- replace-unsafe-chars

@@ -501,7 +501,7 @@
    {:reference-window-button-text "Reference window"
     :reference-window-button-title "Additional window which displays reference-quality photos of the currently selected species for identification."
     :filter-button-title "Apply the current filters"
-    :filter-placeholder "Filter..."
+    :filter-placeholder "Search..."
     :filter-title "Type a keyword you want the media to contain"
     :filter-survey-title "Filter to only items in a certain survey"
     :filter-survey-all-surveys "All Surveys"

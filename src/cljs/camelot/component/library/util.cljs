@@ -5,14 +5,29 @@
             [camelot.util.filter :as filter]
             [camelot.translation.core :as tr]))
 
+(def page-size 50)
+
 (defn get-matching
   [data]
   (let [search (:search data)]
-    (map #(get-in search [:results %]) (:matches search))))
+    (map #(get-in search [:results %]) (get-in data [:search-results :all-ids]))))
+
+(defn media-ids-on-page
+  [data]
+  (->> (get-in data [:search-results :all-ids])
+       (drop (* (- (get-in data [:search :page]) 1) page-size))
+       (take page-size)))
+
+(defn media-on-page
+  ([data]
+   (mapv #(get-in data [:search :results %]) (media-ids-on-page data)))
+  ([]
+   (let [data (state/library-state)]
+     (mapv #(get-in data [:search :results %]) (media-ids-on-page data)))))
 
 (defn all-media-selected
   []
-  (filter :selected (get-matching (state/library-state))))
+  (filter :selected (media-on-page (state/library-state))))
 
 (defn find-with-id
   [media-id]
@@ -24,10 +39,10 @@
   (om/update! (get (state/library-state) :search) :results
               (reduce-kv (fn [acc k v] (assoc acc k (first v))) {}
                          (group-by :media-id (:body resp))))
+  (om/update! (get (state/library-state) :search-results)
+              :all-ids (map :media-id (:body resp)))
   (om/update! (:search (state/library-state)) :page 1)
-  (om/update! (:search (state/library-state)) :matches
-              (map :media-id (filter/only-matching (get-in (state/library-state) [:search :terms])
-                                            (state/library-state)))))
+  (om/update! (:search (state/library-state)) :dirty-state true))
 
 (defn get-media-flags
   [rec]
@@ -128,23 +143,9 @@
                (fn [resp]
                  (om/update! (state/library-state) :trap-stations (:body resp))))))
 
-(def page-size 50)
-
 (defn deselect-all
   []
   (dorun (map #(om/update! % :selected false) (all-media-selected))))
-
-(defn media-ids-on-page
-  [data]
-  (->> (get-in data [:search :matches])
-       (drop (* (- (get-in data [:search :page]) 1) page-size))
-       (take page-size)))
-
-(defn media-on-page
-  ([data] (mapv #(get-in data [:search :results %]) (media-ids-on-page data)))
-  ([]
-   (let [data (state/library-state)]
-     (mapv #(get-in data [:search :results %]) (media-ids-on-page data)))))
 
 (defn select-all
   []

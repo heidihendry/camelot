@@ -189,10 +189,10 @@
                                               (seq terms))))))
 
 (defn only-matching
-  [terms data]
+  [terms data species]
   (let [t (format-terms terms)]
     (filter
-     #(matches-search? (format-terms (append-subfilters (or t "") (:search data)))
-                       (:species data)
+     #(matches-search? (format-terms (append-subfilters (or t "") data))
+                       species
                        %)
-     (vals (get-in data [:search :results])))))
+     (vals (:results data)))))

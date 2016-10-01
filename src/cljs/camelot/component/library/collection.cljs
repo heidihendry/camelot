@@ -202,7 +202,7 @@
   (reify
     om/IRender
     (render [_]
-      (let [matches (get-in data [:search :match-count])]
+      (let [match-count (count (get-in data [:search-results :all-ids]))]
         (dom/div #js {:className "pagination-nav"}
                  (dom/button #js {:className "fa fa-2x fa-angle-left btn btn-default"
                                   :disabled (if (or (get-in data [:search :identify-selected])
@@ -215,16 +215,16 @@
                  (dom/div #js {:className "describe-pagination"}
                           (str (+ (- (* util/page-size (get-in data [:search :page])) util/page-size) 1)
                                " - "
-                               (min (* util/page-size (get-in data [:search :page])) matches)
+                               (min (* util/page-size (get-in data [:search :page])) match-count)
                                " of "
-                               matches))
+                               match-count))
                  (dom/button #js {:className "fa fa-2x fa-angle-right btn btn-default"
                                   :disabled (if (or (get-in data [:search :identify-selected])
-                                                    (>= (* util/page-size (get-in data [:search :page])) matches))
+                                                    (>= (* util/page-size (get-in data [:search :page])) match-count))
                                               "disabled" "")
                                   :id "next-page"
                                   :onClick #(do (util/deselect-all)
-                                                (om/transact! data [:search :page] (partial next-page matches))
+                                                (om/transact! data [:search :page] (partial next-page match-count))
                                                 (nav/analytics-event "library-collection" "next-page-click"))}))))))
 
 (defn select-button-components
@@ -255,8 +255,7 @@
   (reify
     om/IRender
     (render [_]
-      (let [all-selected (every? (comp :selected util/find-with-id)
-                                 (get-in data [:search :matches]))]
+      (let [all-selected (every? :selected (util/media-on-page data))]
         (dom/div #js {:className "subfilter-bar"}
                  (om/build pagination-component data)
                  (om/build select-button-components (:search data)
@@ -284,8 +283,6 @@
   (reify
     om/IRender
     (render [_]
-      (let [matches (util/get-matching data)]
-        (om/update! (:search data) :match-count (count matches))
-        (dom/div #js {:className "media-collection"
-                      :onKeyDown #(handle-key-event data %)}
-                 (om/build media-collection-content-component data))))))
+      (dom/div #js {:className "media-collection"
+                    :onKeyDown #(handle-key-event data %)}
+               (om/build media-collection-content-component data)))))
