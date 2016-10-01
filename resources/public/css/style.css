@@ -1439,6 +1439,8 @@ pre.field-input {
 }
 #app .blank-slate {
     padding-top: 6rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
     color: #999;
     text-align: center;
 }

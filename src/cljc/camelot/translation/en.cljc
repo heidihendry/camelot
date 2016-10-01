@@ -473,7 +473,7 @@
     :update-camera "Update Camera"}
 
    :camelot.component.library.collection
-   {:upload-advice "Upload captures using 'Upload Captures' in your survey."
+   {:upload-advice "Add media by adding Camera Trap Stations, adding Camera Checks to those, and then Upload Captures in your survey."
     :filter-notice "No matching captures found"
     :filter-advice "That's a shame. Maybe try another search?"
     :select-none-button-title "Remove all selections"
