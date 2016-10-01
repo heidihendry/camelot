@@ -127,6 +127,10 @@
            (GET "/:id" [id] (rest/specific-resource survey/get-specific id session))
            (GET "/bulkimport/template" [] (bulk-import/metadata-template
                                            (app/gen-state (conf/config session))))
+           (POST "/bulkimport/columnmap" {params :multipart-params}
+                 (->> (get params "file")
+                      (bulk-import/column-map-options (app/gen-state (conf/config session)))
+                      r/response))
            (PUT "/:id" [id data] (rest/update-resource survey/update! id
                                                        survey/tsurvey data session))
            (POST "/" [data] (rest/create-resource survey/create!

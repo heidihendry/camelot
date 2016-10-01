@@ -4,9 +4,11 @@
   itself."
   (:require [ring.util.response :as r]
             [camelot.import.dirtree :as dt]
+            [camelot.util.model :as model]
             [clojure.data.csv :as csv]
             [clj-time.format :as tf]
-            [clj-time.local :as tl]))
+            [clj-time.local :as tl]
+            [schema.core :as s]))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
 
@@ -50,3 +52,28 @@
         (r/header "Content-Length" (count data))
         (r/header "Content-Disposition"
                   (content-disposition)))))
+
+(defn transpose
+  [m]
+  (apply map list m))
+
+(defn associate-options
+  [xs]
+  model/fields)
+
+(defn column-map-options
+  [state
+   {:keys [tempfile :- s/Str
+           content-type :- s/Str
+           size :- s/Int]}]
+  (cond
+    (not= content-type "text/csv")
+    (throw (RuntimeException. "File format must be a CSV."))
+
+    (zero? size)
+    (throw (RuntimeException. "CSV must not be empty")))
+
+  (let [data (csv/read-csv (slurp tempfile))]
+    (reduce #(assoc %1 (first %2) (associate-options (rest %2)))
+            {}
+            (transpose data))))

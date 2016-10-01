@@ -1,6 +1,7 @@
 (ns camelot.util.filter
   "Record filtering and filter expressions."
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [camelot.util.model :as model]))
 
 (def field-keys
   {"species" :taxonomy-label
@@ -25,52 +26,7 @@
    "city" :site-city})
 
 (def model-fields
-  ["camera-id"
-   "camera-make"
-   "camera-model"
-   "camera-name"
-   "media-attention-needed"
-   "media-cameracheck"
-   "media-capture-timestamp"
-   "media-created"
-   "media-filename"
-   "media-format"
-   "media-id"
-   "media-processed"
-   "media-updated"
-   "media-uri"
-   "sighting-id"
-   "sighting-created"
-   "sighting-quantity"
-   "sighting-lifestage"
-   "sighting-sex"
-   "sighting-updated"
-   "site-city"
-   "site-id"
-   "site-name"
-   "site-sublocation"
-   "site-state-province"
-   "site-country"
-   "survey-id"
-   "survey-name"
-   "survey-site-id"
-   "taxonomy-class"
-   "taxonomy-created"
-   "taxonomy-common-name"
-   "taxonomy-family"
-   "taxonomy-genus"
-   "taxonomy-id"
-   "taxonomy-label"
-   "taxonomy-notes"
-   "taxonomy-order"
-   "taxonomy-species"
-   "taxonomy-updated"
-   "trap-station-id"
-   "trap-station-latitude"
-   "trap-station-longitude"
-   "trap-station-name"
-   "trap-station-session-camera-id"
-   "trap-station-session-id"])
+  (mapv name model/fields))
 
 (def exact-matches-needed
   #{:sighting-sex :sighting-lifestage})

@@ -4,10 +4,10 @@
             [camelot.state :as state]
             [om.dom :as dom]
             [camelot.component.util :as util]
+            [camelot.component.upload :as upload]
             [camelot.translation.core :as tr]
             [cljs.core.async :refer [<! chan >!]]
             [cljs-time.format :as tf]
-            [camelot.nav :as nav]
             [camelot.util.cursorise :as cursorise])
   (:import [goog.date DateTime])
   (:require-macros [cljs.core.async.macros :refer [go]]))
@@ -60,49 +60,6 @@
                                          (display-file-size
                                           (:survey-file-size data)))))))))
 
-(defn upload-file
-  [chan event]
-  (let [f (aget (.. event -target -files) 0)]
-    (rest/post-x-raw (str "/surveys/files")
-                     [["survey-id" (state/get-survey-id)]
-                      ["file" f]]
-                     #(go (>! chan {:response (:body %)
-                                    :success true}))
-                     #(go (>! chan {:response (:body %) :success false})))))
-
-(defn file-upload-component
-  [data owner]
-  (reify
-    om/IDidMount
-    (did-mount [_]
-      (let [ch (om/get-state owner :chan)]
-        (go
-          (loop []
-            (let [r (<! ch)]
-              (if (= (:event r) :remove-file)
-                (om/transact! data :files #(dissoc % (get-in r [:file :survey-file-id])))
-                (if (:success r)
-                  (do
-                    (rest/get-x (str "/surveys/" (:survey-id (:response r))
-                                     "/files/" (:survey-file-id (:response r)))
-                                (fn [resp]
-                                  (om/transact! data :files
-                                                #(assoc % (get-in resp [:body :survey-file-id :value])
-                                                        (cursorise/decursorise (:body resp))))))
-                    (nav/analytics-event "file-upload" "success"))
-                  (do
-                    ;; TODO notify user of error
-                    (nav/analytics-event "file-upload" "failure")))))
-            (recur)))))
-    om/IRenderState
-    (render-state [_ state]
-      (dom/div nil
-               (dom/div #js {:className "sep"})
-               (dom/input #js {:type "file"
-                               :ref "file-input"
-                               :className "btn btn-primary file-input-field"
-                               :onChange #(upload-file (:chan state) %)})))))
-
 (defn file-list-component
   [data owner]
   (reify
@@ -118,6 +75,15 @@
                                         (sort-by :survey-file-name (vals (:files data)))
                                         {:key :survey-file-id
                                          :init-state state})))))))
+
+(defn upload-success-handler
+  [r]
+  (rest/get-x (str "/surveys/" (:survey-id (:response r))
+                   "/files/" (:survey-file-id (:response r)))
+              (fn [resp]
+                (om/transact! data :files
+                              #(assoc % (get-in resp [:body :survey-file-id :value])
+                                      (cursorise/decursorise (:body resp)))))))
 
 (defn file-menu-component
   [data owner]
@@ -141,10 +107,14 @@
       (if (:files data)
         (dom/div #js {:className "section"}
                  (om/build file-list-component data {:init-state state})
-                 (om/build file-upload-component data
-                           {:init-state state}))
+                 ;; TODO notify user of error
+                 (om/build upload/file-upload-component data
+                           {:init-state state
+                            :opts {:analytics-event "file-upload"
+                                   :success-handler upload-success-handler
+                                   :endpoint "/surveys/files"}}))
         (dom/div #js {:className "align-center"}
-                   (dom/img #js {:className "spinner"
-                                 :src "images/spinner.gif"
-                                 :height "32"
-                                 :width "32"}))))))
+                 (dom/img #js {:className "spinner"
+                               :src "images/spinner.gif"
+                               :height "32"
+                               :width "32"}))))))
