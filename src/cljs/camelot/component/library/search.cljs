@@ -440,7 +440,7 @@
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input inline long-input"
                                   :autoFocus "autofocus"
-                                  :placeholder ::taxonomy-add-placeholder
+                                  :placeholder (tr/translate ::taxonomy-add-placeholder)
                                   :value (get-in data [:new-species-name])
                                   :onChange #(om/update! data :new-species-name
                                                          (.. % -target -value))})
