@@ -11,7 +11,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item detailed"
+      (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(do
                                 (nav/nav! (str "/" (:survey-id data)))
                                 (nav/analytics-event "org-survey" "survey-click"))}
