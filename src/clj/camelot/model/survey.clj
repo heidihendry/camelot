@@ -56,8 +56,6 @@
 (s/defn create! :- Survey
   [state :- State
    data :- TSurvey]
-  {:pre [(or (nil? (:survey-directory data))
-             (f/exists? (io/file (:survey-directory data))))]}
   (let [record (db/with-db-keys state -create<! data)]
     (survey (get-specific state (int (:1 record))))))
 
@@ -65,7 +63,6 @@
   [state :- State
    id :- s/Int
    data :- TSurvey]
-  {:pre [(f/exists? (io/file (:survey-directory data)))]}
   (db/with-db-keys state -update! (merge data {:survey-id id}))
   (survey (get-specific state id)))
 

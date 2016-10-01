@@ -434,15 +434,9 @@ Currently the only application state is the user's configuration."
                        {:label (tr/translate (:config state) :action/survey-sites)
                         :action :survey-sites}]}
    :layout [[:survey-name]
-            [:survey-sighting-independence-threshold]
-            [:survey-sampling-point-density]
             [:survey-notes]]
    :schema {:survey-name {:type :text
                           :required true}
-            :survey-directory {:type :text
-                               :required true}
-            :survey-sampling-point-density {:type :number}
-            :survey-sighting-independence-threshold {:type :number}
             :survey-notes {:type :textarea
                            :rows 4
                            :cols 35}}
