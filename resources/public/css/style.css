@@ -1657,3 +1657,6 @@ pre.field-input {
     text-align: center;
     padding-top: 4rem;
 }
+#app .full-width {
+    width: 100%;
+}

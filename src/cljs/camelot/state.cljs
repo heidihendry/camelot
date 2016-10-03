@@ -50,6 +50,10 @@
   []
   (om/ref-cursor (:library (om/root-cursor app-state))))
 
+(defn bulk-import-state
+  []
+  (om/ref-cursor (:bulk-import (om/root-cursor app-state))))
+
 (defn import-dialog-state
   []
   (when (nil? (:import-dialog (om/root-cursor app-state)))

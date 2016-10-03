@@ -689,7 +689,11 @@
     :import "Bulk import"}
 
    :camelot.component.survey.bulk-import
-   {:download "Download template"}
+   {:download "Download template"
+    :title "Bulk import"
+    :ready-to-upload "Import from template"
+    :help-text-step-1 "Step 1. Download a template of all data scanned in the survey folder."
+    :help-text-step-2 "Step 2. Modify the template as you see fit, then start the import once you're ready."}
 
    :camelot.component.survey.create
    {:search-instructions "Search and add species using the options to the right."
@@ -709,5 +713,21 @@
     :item-name "files"
     :advice "You can upload some below, if you'd like."
     :confirm-delete "Are you sure you want to delete this file?"}
+
+   :camelot.util.model
+   {:schema-not-found "No schema could be found for the column '%s'."
+    :datatype-and-required-constraint-problem "All records for this field should be %s and a value should always be present, but this is not the case."
+    :datatype-problem-only "All all records for this field should be %s, but this is not the case."
+    :required-constraint-problem-only "A value should always be present, but this is not the case."
+    ::datatype-integer "an integer"
+    ::datatype-number "a number"
+    ::datatype-sex "either 'male' or 'female'"
+    ::datatype-lifestage "either 'adult' or 'juvenile'"
+    ::datatype-timestamp "a timestamp"
+    ::datatype-longitude "a value in the range [-180, 180]"
+    ::datatype-latitude "a value in the range [-90, 90]"
+    ::datatype-boolean "either 'true' or 'false'"
+    ::datatype-file "the path to a file"
+    ::datatype-string "a string"}
 
    :missing "[Translation missing]"})
