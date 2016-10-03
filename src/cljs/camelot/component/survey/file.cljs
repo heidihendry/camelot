@@ -77,7 +77,7 @@
                                          :init-state state})))))))
 
 (defn upload-success-handler
-  [r]
+  [data r]
   (rest/get-x (str "/surveys/" (:survey-id (:response r))
                    "/files/" (:survey-file-id (:response r)))
               (fn [resp]
@@ -111,7 +111,7 @@
                  (om/build upload/file-upload-component data
                            {:init-state state
                             :opts {:analytics-event "file-upload"
-                                   :success-handler upload-success-handler
+                                   :success-handler (partial upload-success-handler data)
                                    :endpoint "/surveys/files"}}))
         (dom/div #js {:className "align-center"}
                  (dom/img #js {:className "spinner"
