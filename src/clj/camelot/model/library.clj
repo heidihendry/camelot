@@ -77,9 +77,10 @@
         sightings-for #(get media-sightings (:media-id %))]
     (sort-by
      (juxt
+      :trap-station-id
+      :camera-id
       :trap-station-session-start-date
       :trap-station-session-id
-      :trap-station-session-camera-id
       :media-capture-timestamp)
      (map #(library-record (assoc %
                                   :sightings (vec (sightings-for %))
