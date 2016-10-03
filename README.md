@@ -27,8 +27,8 @@ So that trap photos can be processed efficiently, the Library has several keyboa
 * **Control + m**: Focus the media collection panel
 * **Control + d**: Toggle the details panel
 * **Control + i**: Open the identify panel
-* **Control + <left>**: Go to the previous page of media
-* **Control + <right>**: Go to the next page of media
+* **Control + Left arrow**: Go to the previous page of media
+* **Control + Right arrow**: Go to the next page of media
 * **Control + f**: Focus the filter text input
 * **Alt + f**: Reapply the current filter
 
