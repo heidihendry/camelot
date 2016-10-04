@@ -178,6 +178,7 @@
                                        :className "field-input search"
                                        :title (tr/translate ::filter-title)
                                        :id "filter"
+                                       :onChange #(om/update! data :terms %)
                                        :onKeyDown (partial select-media-collection-container state data)
                                        :disabled (if (get data :identify-selected)
                                                    "disabled" "")}
