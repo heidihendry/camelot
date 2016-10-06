@@ -37,7 +37,7 @@
                               trap-station-session-camera-updated
                               camera-id
                               trap-station-session-id
-                              trap-station-session-camera-media-unrecoverable
+                              (or trap-station-session-camera-media-unrecoverable false)
                               trap-station-session-camera-import-path
                               camera-name))
 
