@@ -1,6 +1,6 @@
 (defproject camelot "0.6.8-SNAPSHOT"
-  :description "Camelot - Camera Trap Management"
-  :url "http://example.com/FIXME"
+  :description "Manage and analyse camera trap data. Designed for researchers and conservationists."
+  :url "http://gitlab.com/cshclm/camelot"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
