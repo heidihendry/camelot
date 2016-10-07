@@ -43,7 +43,7 @@
                             (dom/thead nil
                                        (dom/tr #js {:className "table-heading"}
                                                (dom/th nil (tr/translate :taxonomy/taxonomy-genus.label))
-                                               (dom/th nil (tr/translate :taxonomy/taxononmy-species.label))
+                                               (dom/th nil (tr/translate :taxonomy/taxonomy-species.label))
                                                (dom/th nil "")))
                             (dom/tbody #js {:className "selectable"}
                                        (om/build-all species-row-component
@@ -53,19 +53,23 @@
                  (dom/p nil
                         (tr/translate ::search-instructions)))))))
 
+(defn create-survey-success-handler
+  [data resp]
+  (rest/post-x-opts "/species/create"
+                    {:species (deref (:species data))
+                     :survey-id (get-in resp [:body :survey-id :value])}
+                    {:success #(if (seq (get-in (state/app-state-cursor) [:survey :list]))
+                                 (nav/nav! "/organisation")
+                                 (.reload js/location))
+                     :always #(om/update! data :submitting-form false)}))
+
 (defn create-survey
   [data]
   (let [ps (select-keys data [:survey-name
                               :survey-notes])]
-    (rest/post-x "/surveys" {:data ps}
-                 #(do
-                    (rest/post-x "/species/create"
-                                 {:data {:species (deref (:species data))
-                                         :survey-id (:value (:survey-id (:body %)))}}
-                                 (fn []
-                                   (if (seq (get-in (state/app-state-cursor) [:survey :list]))
-                                     (nav/nav! "/organisation")
-                                     (.reload js/location))))))))
+    (rest/post-x-opts "/surveys" ps
+                      {:success (partial create-survey-success-handler data)
+                       :failure #(om/update! data :submitting-form false)})))
 
 (defn survey-details-completed?
   [data]
@@ -105,9 +109,11 @@
                                                        (nav/analytics-event "org-survey-create" "cancel-click"))}
                                       (tr/translate :words/cancel)))
                         (dom/button #js {:className "btn btn-primary"
-                                         :onClick #(do (nav/analytics-event "org-survey-create" "submit-click")
-                                                       (create-survey data))
-                                         :disabled (if (survey-details-completed? data)
+                                         :onClick #(do (om/update! data :submitting-form true)
+                                                       (create-survey data)
+                                                       (nav/analytics-event "org-survey-create" "submit-click"))
+                                         :disabled (if (and (survey-details-completed? data)
+                                                            (not (:submitting-form data)))
                                                      "" "disabled")
                                          :title (if (survey-details-completed? data)
                                                   (tr/translate ::submit-title)

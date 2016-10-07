@@ -97,26 +97,35 @@
                                                    (:status response)
                                                    (:body response))))))))
 
+(defn post-x-opts
+  "POST state"
+  [resource params {:keys [success failure suppress-error-dialog always]}]
+  (go
+    (let [response (<! (transit-util/request http/post (misc/with-baseurl resource)
+                                             {:data params}))
+          success-code (some #{(:status response)} success-status-codes)]
+      (if success-code
+        (when success (success response))
+        (do
+          (when failure (failure response))
+          (when-not suppress-error-dialog
+            (om/update! (state/display-state) :error (build-error
+                                                      "POST"
+                                                      (misc/with-baseurl resource)
+                                                      params
+                                                      (:status response)
+                                                      (:body response))))))
+      (when always
+        (always response)))))
+
 (defn post-x
   "POST state"
-  ([resource params cb] (post-x resource params cb nil))
+  ([resource params cb]
+   (post-x-opts resource params {:success cb}))
   ([resource params cb failcb]
-   (go
-     (let [response (<! (transit-util/request http/post (misc/with-baseurl resource)
-                                              params))
-           success (some #{(:status response)} success-status-codes)]
-       (if success
-         (when cb
-           (cb response))
-         (do
-           (if failcb
-             (failcb response)
-             (om/update! (state/display-state) :error (build-error
-                                                       "POST"
-                                                       (misc/with-baseurl resource)
-                                                       params
-                                                       (:status response)
-                                                       (:body response))))))))))
+   (post-x-opts resource params {:success cb
+                                 :failure failcb
+                                 :suppress-error-dialog true})))
 
 (defn post-x-raw
   "POST state"

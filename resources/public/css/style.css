@@ -1534,3 +1534,6 @@ pre.field-input {
 #app .remove-file:hover {
     color: #666;
 }
+#app textarea {
+    resize: vertical;
+}
