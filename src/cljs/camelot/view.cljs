@@ -16,7 +16,7 @@
             [smithy.util :as util]
             [camelot.util.misc :as misc]
             [camelot.rest :as rest]
-            [camelot.component.error :as cerr]
+            [camelot.component.notification :as cnotif]
             [camelot.component.library.core :as library]
             [secretary.core :as secretary :refer-macros [defroute]]
             [camelot.component.report.core :as report]
@@ -257,10 +257,10 @@
   (om/root nav/nav-component state/app-state
            {:target (js/document.getElementById "navigation")}))
 
-(def error-dialog
-  "Render the error dialog"
-  (om/root cerr/error-dialog-component state/app-state
-           {:target (js/document.getElementById "error-dialog")}))
+(def notification-dialog
+  "Render the notification dialog"
+  (om/root cnotif/notification-dialog-component state/app-state
+           {:target (js/document.getElementById "notification-dialog")}))
 
 (def import-dialog
   "Render the import dialog"
@@ -352,4 +352,4 @@
   (generate-view deployment/deployment-view-component {:survey-id survey
                                                        :page-id trap-station-id}))
 (defroute "/survey/create" [] (generate-view survey/create-view-component))
-(defroute "*" [] (generate-view cerr/not-found-page-component))
+(defroute "*" [] (generate-view cnotif/not-found-page-component))

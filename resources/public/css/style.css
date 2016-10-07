@@ -504,7 +504,7 @@ pre.field-input {
 .datepicker .label {
     color: black;
 }
-#error-dialog {
+#notification-dialog {
     position: fixed;
     box-shadow: 0px 0px 15px 1px #000;
     z-index: 1000;
@@ -512,31 +512,40 @@ pre.field-input {
     left: calc(50vw - 25rem);
     border-radius: 0.5rem;
 }
-#error-dialog .content {
+#notification-dialog .content {
     background: #fff;
-    height: 35rem;
     width: 50rem;
     padding: 1rem 2rem;
+    padding-bottom: 2rem;
     border-radius: 0.5rem;
 }
-#error-dialog .error-title {
+#notification-dialog .error-title {
     margin-top: 0;
     text-align: center;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #800;
     color: #800;
 }
-#error-dialog .error-ack {
+#notification-dialog .info-title {
+    margin-top: 0;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #008;
+    color: #008;
+}
+#notification-dialog .error-ack {
     margin-top: 0;
     padding: 1rem;
-    width: 100%;
     background: #800;
 }
-#error-dialog .error-paragraph {
+#notification-dialog button {
+    width: 100%;
+}
+#notification-dialog p {
     text-align: center;
     padding: 0;
 }
-#error-dialog textarea {
+#notification-dialog textarea {
     max-width: 46rem;
 }
 #import-dialog {

@@ -9,6 +9,7 @@
     :back "Back"
     :cancel "Cancel"
     :citation "Citation"
+    :close "Close"
     :create "Create"
     :next "Next"
     :date "Date"
@@ -583,7 +584,7 @@
    :camelot.component.deployment.shared
    {:sort-by "Sort by"}
 
-   :camelot.component.error
+   :camelot.component.notification
    {:problems "There were some problems..."
     :page-not-found "A page with that name has not been sighted."
     :maybe-bug "If you think this is a bug, "

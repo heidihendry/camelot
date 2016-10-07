@@ -127,7 +127,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className "menu-item detailed dynamic"
-                    :onClick #(om/update! (state/display-state) :error (:errors state))}
+                    :onClick #(om/update! (state/display-state) [:notification :info] (:errors state))}
                (dom/div #js {:className "menu-item-title"}
                         (:camera-name data) " " (tr/translate :words/at-lc)" "
                         (:trap-station-name data))
