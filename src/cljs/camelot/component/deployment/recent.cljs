@@ -82,12 +82,9 @@
   [data owner files]
   (let [uploadable (uploadable-count files)
         upl-chan (chan)]
-    (om/set-state! owner {:total (.-length files)
-                          :complete 0
-                          :failed 0
-                          :errors nil
-                          :ignored (- (.-length files) uploadable)})
     (nav/analytics-event "capture-upload" "upload-init")
+    (om/update-state! owner :total #(+ % (.-length files)))
+    (om/update-state! owner :ignored #(+ % (- (.-length files) uploadable)))
     (go
       (loop []
         (let [r (<! upl-chan)]
@@ -112,6 +109,11 @@
     om/IDidMount
     (did-mount [_]
       (let [n (om/get-node owner)]
+        (om/set-state! owner {:total 0
+                              :complete 0
+                              :failed 0
+                              :errors nil
+                              :ignored 0})
         (.addEventListener n "dragenter"
                            #(do (.stopPropagation %) (.preventDefault %)))
         (.addEventListener n "dragover"
