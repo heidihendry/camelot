@@ -180,7 +180,7 @@
                    (empty? ms)
                    (om/build filter-blank-component data)
 
-                   :else (dom/div nil
+                   :else (dom/div #js {:className "media-item-wrapper"}
                                   (om/build-all media-item-component ms
                                                 {:key :media-id}))))))))
 
@@ -266,7 +266,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
+      (dom/div #js {:className "media-collection-content-wrapper"}
                (om/build subfilter-bar-component data)
                (when (> (count (util/all-media-selected)) 1)
                  (dom/div #js {:className (str "selected-count"

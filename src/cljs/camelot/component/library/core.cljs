@@ -102,7 +102,8 @@
                    (when restricted-mode
                      (set! (.-tincan js/window) (partial tincan-listener lib)))
                    (om/build search/search-component lib)
-                   (when (get-in lib [:search-results])
-                     (om/build collection/media-collection-component lib))
-                   (om/build preview/media-control-panel-component lib))
+                   (dom/div #js {:className "library-body"}
+                            (when (get-in lib [:search-results])
+                              (om/build collection/media-collection-component lib))
+                            (om/build preview/media-control-panel-component lib)))
           (dom/div nil ""))))))
