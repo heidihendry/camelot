@@ -1,26 +1,107 @@
 # Camelot
 
-Camelot is software for Camera Trap data management and analysis.
+Camelot is an open-source, web-based tool to help wildlife conservationists use camera traps in research.
+
+Camelot:
+
+* Makes classifying camera trap photos quick and easy
+* Keeps track of camera trap, camera and species data
+* Gives you a head start on data analysis
+* Plays nicely with other software, such as [CamtrapR](https://cran.r-project.org/web/packages/camtrapR/index.html).
+* Lets multiple people use it at the same time
+* Runs on Windows, OSX and Linux
+* Is easy to start using
 
 ## Getting Started
 
 Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.6.7.zip).
 
-Run camelot with:
+Unzip the archive.  To run Camelot:
 
-```sh
-java -jar camelot-<version>.jar
+*Windows*: Double click `camelot-desktop.bat`
+
+*OSX*: Double click `camelot-desktop.command`
+
+*Linux*: Double click `camelot-desktop.sh`
+
+After 10 seconds, Camelot should appear in a new tab in your web browser.  If Camelot doesn't open automatically, you can access it via your web browser be browsing to:
+
+```
+http://localhost:5341/
 ```
 
-This starts a web server which is available on TCP 5341 (by default).  If you wish to use another port, set the CAMELOT_PORT environment variable to the port number you desire.
+## User guide
 
-You should connect to this port with your web browser.  Upon connecting, you'll be notified that Camelot is not configured.  Open the settings menu from the top right-hand corner, set the settings you wish to use, and press `Save' from the button left corner of the screen.
+### Concepts in Camelot
 
-## Limitations
+The first time you run Camelot, you'll be taken to the 'Create Survey' screen.  Now would be good time to explain what a survey is, and some other important concepts in Camelot.
 
-This is a beta-quality release, and thus comes with numerous limitations and rough edges. If you find these limitations impact upon you, please let us know by reporting an issue.
+* *Survey*: a survey corresponds to a research project.  All of the data collected will be part of a survey.
+* *Camera*: a single, physical camera.  Each camera should be given a name and labelled.
+* *Camera Trap Station*: one or two cameras installed at a very specific location.
+* *Site*: a geographic area.  Typically multiple camera trap stations will be in each site.
+* *Deployment*: a deployment corresponds to a camera trap station which is active in the field.
+* *Media*: a photo from a camera trap.
 
-## Keyboard shortcuts
+Okay, with terminology out of the way, on to creating a survey!
+
+### Creating a survey
+
+The left hand side is the current survey configuration.  You can give a survey a name and description.  A survey will often start with one or more species are expecting to be found over the course of the study.  Species can be added by searching for the scientific name using the right-hand panel.  Behind the scenes, Camelot will automatically set additional details about the species, including its family and common name.
+
+Once ready, click "Create Survey".
+
+### Your organisation
+
+This is where understanding the concepts in camelot is invaluable.  On this menu, concepts are on the left, and the details about the selected concept are on the right.
+
+You'll notice Sites and Cameras are not *within* a survey.  This allows for some more sophisticated, *longitudinal* reports, where data is not only able to be analysed by survey, but also across multiple surveys.  For the same reason, reports live in this menu too.
+
+Each concept can be selected from the menu on the left, and then a specific entry navigated to using the menu on the right.  You'll find this is a common pattern in Camelot.
+
+#### Surveys
+
+Surveys you'll already be familiar with.  The right hand side shows all surveys, and allows you to add a survey.  You can click on any survey in the list to manage it, but let's first look at the other concepts.
+
+#### Sites
+
+The sites menu will have a very similar feel to the survey menu.  The main difference is that a site can be created just by entering a name and clicking "Add".  This lets you set up multiple sites very quickly, but if you want to come back and provide more information, you can click on the entry for that site in the list to access all the details.
+
+#### Cameras
+
+The camera menu is almost identical in behaviour to the sites menu.  Cameras are added just by entering its name and pressing add, though you're free to give more details too.  After creating a camera you'll notice a label alongside each camera (most likely "Available for use" if you've just added one).
+
+A handy feature is being able to filter the list to find all cameras with a particular status or camera name.  For example, imagine you have dozens of cameras, many of which are in the field, you can search "available" to see the cameras marked "Available For Use".
+
+#### Reports
+
+A camelot report is an export of data to a CSV.  Clicking on a report will take you to a report configuration screen, where you can set constraints for that report (e.g., to report on a specific survey) and then generate the data as a CSV.
+
+Camelot comes with a bunch of reports out of the box, though for advanced users, it also helps you to build and add your own reports.
+
+### Managing surveys
+
+#### Manage camera trap stations
+
+#### Upload captures
+
+#### Species
+
+#### Related files
+
+### Library
+
+#### Viewing photos
+
+#### Photo details
+
+#### Classifying photos
+
+#### Searching
+
+#### Reference window
+
+#### Keyboard shortcuts
 
 So that trap photos can be processed efficiently, the Library has several keyboard shortcuts:
 
@@ -42,7 +123,9 @@ With the Media Collection panel focused (**Control + m**):
 * **c** mark the currently selected media as a camera-check (i.e., test-fire of the camera)
 * hold **shift** + **"wasd"** OR **arrow keys** to select the next media in that direction, and also keep the existing selection.
 
-## Administration and Advanced Configuration
+### Advanced menus
+
+## Administration and advanced configuration
 
 Camelot has two directories: one for configuration, and one for data storage.  The location of these directories depends on the OS.
 
@@ -76,7 +159,7 @@ Both of the `Database` and `Media` directories should be backed up routinely.
 
 `config.clj` is the global camelot configuration file.  All configuration values available in this can also be set through the settings panel in the UI.
 
-#### Custom Reports
+## Custom Reports
 
 Custom reports and column definitions for reports can be registered by creating a *reports module*. A reports module can also override existing reports and columns.
 
@@ -152,100 +235,6 @@ Camelot will treat your field differently when it comes to generating the report
 * Fields ending in "-num" are converted to a suitable type. Check the `edn/read-string` documentation for details.
 
 For more module examples, check out Camelot's [built-in reports and columns](https://bitbucket.org/cshclm/camelot/src/master/src/clj/camelot/report/module/builtin/?at=master)
-
-## Configuration
-
-### Required Fields (deprecated)
-
-A list of properties which must be present in the metadata of a file.  Should any one of these properties not be present, a problem will be flagged in the dataset.
-
-### Project Start (deprecated)
-
-A timestamp indicating the beginning of the project. Should the timestamp of any file in the dataset fall occur before this, a problem will be flagged.  The start time is _inclusive_.
-
-### Project End (deprecated)
-
-Like 'project-start', but for the project end date.  The end time is _exclusive_.
-
-### Surveyed Species (deprecated)
-
-A list of strings with the names of the species in the survey.  Should any file's metadata include a species not present in this list, a problem will be flagged.
-
-`HUMAN-CAMERACHECK` is considered by Camelot as a special species used to verify the start and end of a phase.  Should a collection not contain a at least 2 files with this species, with unique dates, it will be flagged as a problem in the dataset.
-
-### Language
-
-Language used by Camelot. Currently only `English` is supported. 
-
-### Night Start Hour
-
-One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night is guaranteed to have fallen.  This should be set to the hour after there is no sign of daylight.
-
-### Night End Hour
-
-One of four properties used to (naively) identify camera time configuration issues.  This is the hour of the day at which night may have ended.  This should be set to the earliest time at which there's sign of daylight.
-
-### Infrared ISO Value Threshold
-
-One of four properties used to (naively) identify camera time configuration issues.  The ISO value of the cameras which is used to suggest a photo was taken at night.
-
-File ISO values greater than this threshold are considered `night` photos and thus are expected to lie within 'Night Start Hour' and 'Night End Hour'
-
-### Erroneous Infrared Threshold
-
-One of four properties used to (naively) identify camera time configuration issues. This is the maximum allowable proportion of photos which are `night` photos, but do not fall within the block of time denoted by `Night Start Hour` and `Night End Hour`.
-
-### Sighting Independence Minutes Threshold
-
-The number of minutes after a species is sighted before further photographs of that species at that location should be considered independent (and thus included in analysis).
-
-**Important:** Currently location is considered as being unique to a folder.  The dependence of two folders at the same location is not currently recognised.
-
-## Experimental Features
-
-Features which are under heavy development are hidden by default.  These can be enabled by setting the `CAMELOT_DEV_MODE` environment variable to `true`.
-
-## Development
-
-Open a terminal and type `lein repl` to start a Clojure REPL
-(interactive prompt).
-
-In the REPL, type
-
-```clojure
-(run)
-(browser-repl)
-```
-
-The call to `(run)` starts the Figwheel server at port 3449, which takes care of
-live reloading ClojureScript code and CSS. Figwheel's server will also act as
-your app server, so requests are correctly forwarded to the http-handler you
-define.
-
-Running `(browser-repl)` starts the Weasel REPL server, and drops you into a
-ClojureScript REPL. Evaluating expressions here will only work once you've
-loaded the page, so the browser can connect to Weasel.
-
-When you see the line `Successfully compiled "resources/public/app.js" in 21.36
-seconds.`, you're ready to go. Browse to `http://localhost:3449` and enjoy.
-
-**Attention: It is not needed to run `lein figwheel` separately. Instead we
-launch Figwheel directly from the REPL**
-
-### Emacs/Cider
-
-Start a repl in the context of your project with `M-x cider-jack-in`.
-
-Switch to repl-buffer with `C-c C-z` and start web and figwheel servers with
-`(run)`, and weasel server with `(browser-repl`). Load
-[http://localhost:3449](http://localhost:3449) on an external browser, which
-connects to weasel, and start evaluating cljs inside Cider.
-
-To run the Clojurescript tests, do
-
-```
-lein doo phantom
-```
 
 ## License
 
