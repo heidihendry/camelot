@@ -394,16 +394,20 @@ pre.field-input {
     margin-top: 2rem;
     position: relative;
     float: left;
-    display: block;
-    margin-left: 24rem;
-    margin-right: 26rem;
+    display: flex;
+    margin-left: 25rem;
     padding-right: 26rem;
-    margin-bottom: 2rem;
+    padding-bottom: 2rem;
     min-width: 40rem;
     width: 100%;
+    flex: 1 1;
+    flex-direction: column;
+    overflow: scroll;
 }
 #page-content .main-content-container {
     padding-left: 1rem;
+    flex: 1 1;
+    display: flex;
 }
 #page-content .no-problems {
     color: #283;
