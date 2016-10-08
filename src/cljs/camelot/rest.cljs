@@ -121,11 +121,11 @@
 (defn post-x
   "POST state"
   ([resource params cb]
-   (post-x-opts resource params {:success cb}))
+   (post-x-opts resource (:data params) {:success cb}))
   ([resource params cb failcb]
-   (post-x-opts resource params {:success cb
-                                 :failure failcb
-                                 :suppress-error-dialog true})))
+   (post-x-opts resource (:data params) {:success cb
+                                         :failure failcb
+                                         :suppress-error-dialog true})))
 
 (defn post-x-raw
   "POST state"
