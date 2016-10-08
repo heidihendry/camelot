@@ -64,6 +64,9 @@ html > body {
 #import-dialog .import-location-selector .field-input {
     display: block;
 }
+#app .generic-container {
+    overflow: auto;
+}
 #app button.btn-default {
   padding: 0.7rem 2rem;
 }
@@ -185,6 +188,9 @@ a:hover {
   padding: 0.7rem 2rem;
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
+}
+#app .field-details-item-container {
+    padding-bottom: 1rem;
 }
 #app .field-label {
     color: #777;

@@ -165,98 +165,126 @@
         (om/update! data :validation-problem {:value false})
         (if-let [sess-end (get-in data [:trap-station-session-end-date :value])]
           (dom/div #js {:className "section"}
-                   (dom/div #js {:className "help-text"} help-text)
-                   (dom/div nil
-                            (dom/label #js {:className "field-label"} (tr/translate ::camera-check-date))
-                            (dom/div #js {:className "field-details"}
-                                     (om/build datepicker (or (get data :trap-station-session-end-date)))))
-                   (when (< (.getTime sess-end) (.getTime (get-in data [:trap-station-session-start-date :value])))
-                     (om/update! (:validation-problem data) :value true)
-                     (dom/label #js {:className "validation-warning"}
-                                (tr/translate ::date-validation-past)))
-                   (when (> (.getTime sess-end) (.getTime (UtcDateTime.)))
-                     (om/update! (:validation-problem data) :value true)
-                     (dom/label #js {:className "validation-warning"}
-                                (tr/translate ::date-validation-future)))
-                   (dom/h5 nil
-                           (tr/translate ::primary-camera)
-                           ": "
-                           (get-in data [:primary-camera-name :value]))
-                   (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :primary}})
-                   (om/build camera-status-component data
-                             {:init-state {:camera-status-field :primary-camera-status-id
-                                           :camera-id-field :primary-camera-id}})
-                   (if (and (get-in data [:secondary-camera-id :value])
-                            (not (get-in data [:camera-is-new :value])))
-                     (dom/div nil
-                              (dom/h5 nil ": "
-                                      (get-in data [:secondary-camera-name :value]))
-                              (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :secondary}})
-                              (om/build camera-status-component data
-                                        {:init-state {:camera-status-field :secondary-camera-status-id
-                                                      :camera-id-field :secondary-camera-id}}))
-                     (dom/div nil
-                              (dom/h5 nil (tr/translate ::add-secondary-camera))
-                              (dom/label #js {:className "field-label"}
-                                         (tr/translate ::secondary-camera-label))
-                              (om/build camera-select-component data
-                                        {:init-state {:camera-status-field :secondary-camera-status-id
-                                                      :camera-id-field :secondary-camera-id
-                                                      :camera-is-new true}})))
-                   (when (= (get-in data [:primary-camera-id :value])
-                            (get-in data [:secondary-camera-id :value]))
-                     (om/update! (:validation-problem data) :value true)
-                     (dom/label #js {:className "validation-warning"}
-                                (tr/translate ::validation-same-camera)))
+                   (dom/div #js {:className "generic-container"}
+                            (dom/div #js {:className "help-text"} help-text)
+                            (dom/div nil
+                                     (dom/label #js {:className "field-label"} (tr/translate ::camera-check-date))
+                                     (dom/div #js {:className "field-details"}
+                                              (om/build datepicker (or (get data :trap-station-session-end-date)))))
+                            (when (< (.getTime sess-end) (.getTime (get-in data [:trap-station-session-start-date :value])))
+                              (om/update! (:validation-problem data) :value true)
+                              (dom/label #js {:className "validation-warning"}
+                                         (tr/translate ::date-validation-past)))
+                            (when (> (.getTime sess-end) (.getTime (UtcDateTime.)))
+                              (om/update! (:validation-problem data) :value true)
+                              (dom/label #js {:className "validation-warning"}
+                                         (tr/translate ::date-validation-future)))
+                            (dom/h5 nil
+                                    (tr/translate ::primary-camera)
+                                    ": "
+                                    (get-in data [:primary-camera-name :value]))
+                            (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :primary}})
+                            (om/build camera-status-component data
+                                      {:init-state {:camera-status-field :primary-camera-status-id
+                                                    :camera-id-field :primary-camera-id}})
+                            (if (and (get-in data [:secondary-camera-id :value])
+                                     (not (get-in data [:camera-is-new :value])))
+                              (dom/div nil
+                                       (dom/h5 nil (tr/translate ::secondary-camera) ": "
+                                               (get-in data [:secondary-camera-name :value]))
+                                       (om/build camera-media-unrecoverable-component data {:init-state {:camera-type :secondary}})
+                                       (om/build camera-status-component data
+                                                 {:init-state {:camera-status-field :secondary-camera-status-id
+                                                               :camera-id-field :secondary-camera-id}}))
+                              (dom/div nil
+                                       (dom/h5 nil (tr/translate ::add-secondary-camera))
+                                       (dom/label #js {:className "field-label"}
+                                                  (tr/translate ::secondary-camera-label))
+                                       (om/build camera-select-component data
+                                                 {:init-state {:camera-status-field :secondary-camera-status-id
+                                                               :camera-id-field :secondary-camera-id
+                                                               :camera-is-new true}})))
+                            (when (= (get-in data [:primary-camera-id :value])
+                                     (get-in data [:secondary-camera-id :value]))
+                              (om/update! (:validation-problem data) :value true)
+                              (dom/label #js {:className "validation-warning"}
+                                         (tr/translate ::validation-same-camera))))
                    (dom/div #js {:className "button-container"}
-                            (dom/button #js {:className "btn btn-primary"
-                                             :disabled (if (get-in data [:validation-problem :value]) "disabled" "")
-                                             :onClick #(do
-                                                         (nav/analytics-event "deployment"
-                                                                              "cameracheck-submit")
-                                                         (rest/post-x "/deployment" {:data (deref data)}
-                                                                      (fn [_]
-                                                                        (nav/nav! (str "/" (get-in (state/app-state-cursor)
-                                                                                                   [:selected-survey :survey-id :value]))))))}
-                                        "Submit "
-                                        (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))))
+                                     (dom/button #js {:className "btn btn-primary"
+                                                      :disabled (if (get-in data [:validation-problem :value]) "disabled" "")
+                                                      :onClick #(do
+                                                                  (nav/analytics-event "deployment"
+                                                                                       "cameracheck-submit")
+                                                                  (rest/post-x "/deployment" {:data (deref data)}
+                                                                               (fn [_]
+                                                                                 (nav/nav! (str "/" (get-in (state/app-state-cursor)
+                                                                                                            [:selected-survey :survey-id :value]))))))}
+                                                 "Submit "
+                                                 (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))))
 
 (defn read-only-field-component
   [data owner]
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/div nil
+      (dom/div #js {:className "field-details-item-container"}
                (dom/label #js {:className "field-label"}
                           (:label state))
                (dom/div #js {:className "field-details"}
-                        (get-in data [:data (:field state) :value]))))))
+                        (if (= (type (:field state)) cljs.core/Keyword)
+                          (get-in data [:data (:field state) :value])
+                          (:field state)))))))
 
 (defn deployment-selected-details-component
   [data owner]
   (reify
     om/IRender
     (render [_]
+      (prn data)
       (dom/div #js {:className "section"}
-               (om/build read-only-field-component data
-                         {:init-state {:field :site-name
-                                       :label (tr/translate :site/site-name.label)}})
-               (om/build read-only-field-component data
-                         {:init-state {:field :trap-station-latitude
-                                       :label (tr/translate :trap-station/trap-station-latitude.label)}})
-               (om/build read-only-field-component data
-                         {:init-state {:field :trap-station-longitude
-                                       :label (tr/translate :trap-station/trap-station-longitude.label)}})
-               (om/build read-only-field-component data
-                         {:init-state {:field :trap-station-altitude
-                                       :label (tr/translate :trap-station/trap-station-altitude.label)}})
-               (om/build read-only-field-component data
-                         {:init-state {:field :primary-camera-name
-                                       :label (tr/translate ::primary-camera-name)}})
-               (when (:camera-name-secondary data)
-                 (om/build read-only-field-component
-                           {:init-state {:field :secondary-camera-name
-                                         :label (tr/translate ::secondary-camera-name)}}))))))
+               (dom/div #js {:className "generic-container"}
+                        (om/build read-only-field-component data
+                                  {:init-state {:field :site-name
+                                                :label (tr/translate :site/site-name.label)}})
+                        (om/build read-only-field-component data
+                                  {:init-state {:field (tf/unparse day-formatter (get-in data [:data :trap-station-session-start-date :value]))
+                                                :label (tr/translate :trap-station-session/trap-station-session-start-date.label)}})
+                        (om/build read-only-field-component data
+                                  {:init-state {:field :trap-station-latitude
+                                                :label (tr/translate :trap-station/trap-station-latitude.label)}})
+                        (om/build read-only-field-component data
+                                  {:init-state {:field :trap-station-longitude
+                                                :label (tr/translate :trap-station/trap-station-longitude.label)}})
+                        (om/build read-only-field-component data
+                                  {:init-state {:field :primary-camera-name
+                                                :label (tr/translate ::primary-camera-name)}})
+                        (when (get-in data [:data :camera-name-secondary :value])
+                          (om/build read-only-field-component
+                                    {:init-state {:field :secondary-camera-name
+                                                  :label (tr/translate ::secondary-camera-name)}}))
+                        (when (get-in data [:data :trap-station-altitude :value])
+                          (om/build read-only-field-component data
+                                    {:init-state {:field :trap-station-altitude
+                                                  :label (tr/translate :trap-station/trap-station-altitude.label)}}))
+                        (when (get-in data [:data :trap-station-distance-above-ground :value])
+                          (om/build read-only-field-component data
+                                    {:init-state {:field :trap-station-distance-above-ground
+                                                  :label (tr/translate :trap-station/trap-station-distance-above-ground.label)}}))
+                        (when (get-in data [:data :trap-station-distance-to-road :value])
+                          (om/build read-only-field-component data
+                                    {:init-state {:field :trap-station-distance-to-road
+                                                  :label (tr/translate :trap-station/trap-station-distance-to-road.label)}}))
+                        (when (get-in data [:data :trap-station-distance-to-river :value])
+                          (om/build read-only-field-component data
+                                    {:init-state {:field :trap-station-distance-to-river
+                                                  :label (tr/translate :trap-station/trap-station-distance-to-river.label)}}))
+                        (when (get-in data [:data :trap-station-distance-to-settlement :value])
+                          (om/build read-only-field-component data
+                                    {:init-state {:field :trap-station-distance-to-settlement
+                                                  :label (tr/translate :trap-station/trap-station-distance-to-settlement.label)}}))
+                        (om/build read-only-field-component data
+                                  {:init-state {:field :trap-station-notes
+                                                :label (tr/translate :trap-station/trap-station-notes.label)}}))))))
 
 (defn deployment-section-containers-component
   [data owner]
