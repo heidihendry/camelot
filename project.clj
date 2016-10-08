@@ -27,6 +27,7 @@
                  [org.clojure/core.async "0.2.391"]
                  [org.clojure/data.csv "0.1.3"]
                  [org.clojure/java.jdbc "0.4.2"]
+                 [org.clojure/tools.nrepl "0.2.12"]
                  [org.omcljs/om "1.0.0-alpha32" :exclusions [com.cognitect/transit-cljs cljsjs/react]]
                  [prismatic/schema "1.0.5"]
                  ;; Note: ragtime.jdbc/basename has been redefined in camelot.db.

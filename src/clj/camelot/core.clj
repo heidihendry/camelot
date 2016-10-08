@@ -6,6 +6,7 @@
             [camelot.routes :refer [app-routes]]
             [environ.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]]
+            [clojure.tools.nrepl.server :as nrepl]
             [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [ring.middleware.params :refer [wrap-params]]
@@ -20,6 +21,9 @@
            [java.awt Desktop]
            [java.util Enumeration])
   (:gen-class))
+
+(defonce nrepl-server (when (env :camelot-debugger)
+                        (nrepl/start-server :port 7888)))
 
 (defn meaningful-address
   [n]
