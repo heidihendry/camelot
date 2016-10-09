@@ -30,6 +30,12 @@ After 10 seconds, Camelot should appear in a new tab in your web browser.  If Ca
 http://localhost:5341/
 ```
 
+If running Camelot on a server, you can instead use:
+
+```
+java -jar /path/to/camelot-<version>.jar
+```
+
 ## User guide
 
 ### Concepts in Camelot
@@ -48,7 +54,7 @@ With terminology out of the way, onwards to creating a survey!
 
 The left hand side is the current survey configuration.  You can give a survey a name and description.  A survey will often start with one or more species are expecting to be found over the course of the study.  Species can be added by searching for the scientific name using the right-hand panel.  Behind the scenes, Camelot will automatically set additional details about the species, including its family and common name.
 
-[TODO: Image]
+![](doc/screenshot/survey-create.png)
 
 Once ready, click "Create Survey".
 
