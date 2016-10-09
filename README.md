@@ -327,11 +327,11 @@ Camelot has two directories: one for configuration, and one for data storage.  T
 
 ### Data Directory
 
-The data directory will contain two subdirectories: `Database` and `Media`.  Database is an Apache Derby database.  Imported media is not stored in the database, but in the `Media' folder.
+The data directory will contain three subdirectories: `Database`, `Media` and `FileStore`.  Database is an Apache Derby database.  Imported media is not stored in the database, but in the `Media' folder.  Finally, the `FileStore` contains files for the Survey's "Related files" feature.
 
 A custom data directory can be set using the `CAMELOT_DATADIR` environment variable.  The Database and Media directories will be created (if necessary) and stored within that nominated directory.  If `CAMELOT_DATADIR` is not set, Camelot will fall-back to using the standard locations (as above).
 
-Both of the `Database` and `Media` directories should be backed up routinely.
+Each of the `Database`, `Media` and `FileStore` directories should be backed up routinely.
 
 ### Config Directory
 
