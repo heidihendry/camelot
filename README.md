@@ -1,6 +1,6 @@
 # Camelot
 
-Camelot is an open-source, web-based tool to help wildlife conservationists use camera traps in research.
+Camelot is an open-source, web-based tool to help wildlife conservationists with camera trapping.
 
 Camelot:
 
@@ -18,11 +18,11 @@ Download the [latest version of Camelot](http://camelot.bitpattern.com.au/releas
 
 Unzip the archive.  To run Camelot:
 
-*Windows*: Double click `camelot-desktop.bat`
+**Windows**: Double click `camelot-desktop.bat`
 
-*OSX*: Double click `camelot-desktop.command`
+**OSX**: Double click `camelot-desktop.command`
 
-*Linux*: Double click `camelot-desktop.sh`
+**Linux**: Double click `camelot-desktop.sh`
 
 After 10 seconds, Camelot should appear in a new tab in your web browser.  If Camelot doesn't open automatically, you can access it via your web browser be browsing to:
 
@@ -36,12 +36,12 @@ http://localhost:5341/
 
 The first time you run Camelot, you'll be taken to the 'Create Survey' screen.  Now would be good time to explain what a survey is, and some other important concepts in Camelot.
 
-* *Survey*: a survey corresponds to a research project.  All of the data collected will be part of a survey.
-* *Camera*: a single, physical camera.  Each camera should be given a name and labelled.
-* *Camera Trap Station*: one or two cameras installed at a very specific location.
-* *Site*: a geographic area.  Typically multiple camera trap stations will be in each site.
-* *Deployment*: a deployment corresponds to a camera trap station which is active in the field.
-* *Media*: a photo from a camera trap.
+* **Survey**: a survey corresponds to a research project.  All of the data collected will be part of a survey.
+* **Camera**: a single, physical camera.  Each camera should be given a name and labelled.
+* **Camera Trap Station**: one or two cameras installed at a very specific location.
+* **Site**: a geographic area.  Typically multiple camera trap stations will be in each site.
+* **Deployment**: a deployment corresponds to a camera trap station which is active in the field.
+* **Media**: a photo from a camera trap.
 
 Okay, with terminology out of the way, on to creating a survey!
 
@@ -77,7 +77,7 @@ A handy feature is being able to filter the list to find all cameras with a part
 
 A camelot report is an export of data to a CSV.  Clicking on a report will take you to a report configuration screen, where you can set constraints for that report (e.g., to report on a specific survey) and then generate the data as a CSV.
 
-Camelot comes with a bunch of reports out of the box, though for advanced users, it also helps you to build and add your own reports.
+Camelot comes with a bunch of reports out of the box.  And for advanced users, it also lets you build and add your own reports.
 
 ### Managing surveys
 
@@ -91,19 +91,100 @@ Camelot comes with a bunch of reports out of the box, though for advanced users,
 
 ### Library
 
+Okay, so you've had camera traps in the field for a while and collected a bunch of photos.  Now's where the *library* comes in.  All of your photos can be viewed, searched, flagged and identified through the library.
+
 #### Viewing photos
 
-#### Photo details
+The the "viewing" portion of the libary consists of 3 main parts:
 
-#### Classifying photos
+[TODO: Image]
+
+* A photo can be *selected* by clicking on the photo on the "media collection" view on the left.  When a photo has a green border, it is a selected photo.
+* When selecting a photo, a preview for it will be displayed in the preview panel in the middle of the screen.
+* Details for the currently viewed photo are available by clicking the "Details" tab on the right of screen to expand that panel.
+
+Selecting is an important concept in the library, as most actions will apply to the current selection.  Multiple photos can be selected by holding the "control" key and clicking a photo.  Allowing multiple photos to be selected is one technique Camelot uses to make processing of photos quicker and easier.
+
+Camelot's media collection shows images in page of 50.  Clicking the left and right arrows immediately above will change the page of photos displayed.  "Selecting all" will select all photos on the page.
+
+A photo can be viewed without being selected (useful if you have multiple photos selected already) by clicking the "eye" icon in the top left hand corner of each photo in the media collection panel.
+
+#### Flagging photos
+
+A flag is one of the four icons towards the top right of the library:
+
+[TODO: Image]
+
+From left to right these are:
+
+* **Needs Attention**: mark the photo is needing further review.
+* **Test fire**: the photo was triggered by someone attending to or testing the camera.
+* **Processed*: identification of the photo is complete.  If a photo doesn't show any species, it can and should be marked as processed without any species being identified in it.
+* **Reference Quality**: the photo has a species in it, and the photo of that species is a great example to refer to when doing future identification. (See: "Reference Window")
+
+These can be set and unset by clicking on the respective icon.  It will apply to all photos currently selected.
+
+#### Identifying photos
+
+Identification in Camelot is the process of indicating which species are present in a photo.  When you're ready to identify the selected photos, the bar for submitting details can be accessed via the "Identify Selected" button in the top right hand corner of the library.
+
+[TODO: Image]
+
+To submit an identification, set the species from the drop down, adjust the quantity if necessary, specify other identifiable details from the appropriate drop down and click "Submit".  The identification bar will disappear and the photo will automatically be marked as "Processed".
+
+[TODO: Image]
+
+If you need to know which species have already identified in a photo, these can be viewed (and removed) via the details panel.  If there aren't any species identified in a photo, there will not be any listed in the details panel for that photo.
+
+The identification details entered will be applied to all photos currently selected.
 
 #### Searching
 
+[TODO: Image]
+
+The search bar will change the photos shown in the media collection to only those which match the search.  The search bar has a few common search constraints readily-available: the survey, the trap station and a checkbox to show only unprocessed.  And of course a text input field where you can just type and press the search button (or "enter").
+
+The text input field deserves a little bit more explanation.  It can be used for simple searches, like typing the name of a camera to find all photos taken by it, or the name of a species (or genus).  But it can also be used for much more specific searches.
+
+If you wanted to find all photos at a certain sublocation, you could start typing:
+
+```
+site-s
+```
+
+[TODO: Image]
+
+At this point you should see completions below the input field for "site-sublocation" and "site-state-province".  Click "site-sublocation" to complete it for you, and, if you had set up some sublocations for sites previously, you'll notice another drop down: all of the sublocations in Camelot.
+
+Okay, but sometimes you want to search based on more than one thing.  For example, all photos at a site AND featuring a certain species.  Can do:
+
+```
+site-name:uluru species:"Osphranter rufus"
+```
+
+Camelot can also do disjunction in searches:
+
+```
+site-name:uluru | species:"Osphranter rufus"
+```
+
+Note the pipe ('|') in the above example: this means "OR" in a search.
+
+We think Camelot's search is pretty handy, and hope you think so too.
+
 #### Reference window
+
+The reference window is used to help with difficult identifications and make identification more accurate by using photos you have already classified.  By clicking the reference window, Camelot will open a new, specialised version of the library in another window which will display only photos marked as "Reference Quality" (see "Flagging Photos").
+
+Once opened, the media available through in the Reference Window will change depending on the species selected in the identification dropdown in the main Camelot window.  This can also be useful if there are a several possible species: by selecting the different species in the species identification drop down in the main window, you can quickly preview other photos identifying this species.
+
+A possible workflow is that clear photos are identified first and marked "Reference Quality" where appropriate.  Photos which are not so easy to identify can be marked as "Attention Needed".  After making a pass through the easy identifications, you can then come back and use the Reference Window, and quality photos you have already collected, to help with making identifications of species in those more tricky photos.
+
+This window is designed to be put on a second monitor, but if that is not available, can also be accessed quickly via "Alt-Tab".
 
 #### Keyboard shortcuts
 
-So that trap photos can be processed efficiently, the Library has several keyboard shortcuts:
+So that trap photos can be processed efficiently, the Library has a number of keyboard shortcuts:
 
 * **Control + m**: Focus the media collection panel
 * **Control + d**: Toggle the details panel
@@ -126,6 +207,8 @@ With the Media Collection panel focused (**Control + m**):
 ### Advanced menus
 
 ## Administration and advanced configuration
+
+*This section is not for the faint-of-heart, and intended for people with strong IT knowledge.*
 
 Camelot has two directories: one for configuration, and one for data storage.  The location of these directories depends on the OS.
 
@@ -159,7 +242,7 @@ Both of the `Database` and `Media` directories should be backed up routinely.
 
 `config.clj` is the global camelot configuration file.  All configuration values available in this can also be set through the settings panel in the UI.
 
-## Custom Reports
+### Custom Reports
 
 Custom reports and column definitions for reports can be registered by creating a *reports module*. A reports module can also override existing reports and columns.
 
