@@ -294,7 +294,14 @@ With the Media Collection panel focused (**Control + m**):
 * **c** mark the currently selected media as a camera-check (i.e., test-fire of the camera)
 * hold **shift** + **"wasd"** OR **arrow keys** to select the next media in that direction, and also keep the existing selection.
 
-### Advanced menus
+### Settings
+
+In the top right hand corner of the main navigation is the toggle to show the settings menu.  The settings menu in Camelot currently provides two options:
+
+![](doc/screenshot/settings.png)
+
+* *Language*: This is a user-specific preference. Currently only English is supported, though other translations are underway.
+* *Sighting Independence Threshold*: Camelot performs sighting independence checks on some reports.  This setting controls the duration within which photos of the same species (and, if known, the same sex and life-stage) are considered dependent in those reports.
 
 ## Administration and advanced configuration
 
