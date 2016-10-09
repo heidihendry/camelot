@@ -360,19 +360,17 @@ pre.field-input {
     display: block;
 }
 .sidebar {
-    float: left;
-    left: 0;
+    position: relative;
+    left: -1rem;
     margin: 0;
     padding: 0;
-    top: 0;
     display: block;
     height: 100%;
     background: #fafafa;
-    width: 24rem;
-    position: absolute;
-    overflow: scroll;
+    width: 36rem;
+    overflow: auto;
     border-right: 1px solid #ddd;
-    margin-bottom: 2rem;
+    height: calc(100vh - 6rem);
 }
 .sidebar ul {
     list-style: none;
@@ -393,21 +391,22 @@ pre.field-input {
 #page-content .main-content {
     margin-top: 2rem;
     position: relative;
-    float: left;
-    display: flex;
-    margin-left: 25rem;
-    padding-right: 26rem;
-    padding-bottom: 2rem;
+    margin-left: 2rem;
     min-width: 40rem;
     width: 100%;
-    flex: 1 1;
     flex-direction: column;
-    overflow: scroll;
+    flex-grow: 0;
+    padding: 2rem;
+    height: calc(100vh - 8rem);
+    overflow: auto;
 }
 #page-content .main-content-container {
     padding-left: 1rem;
     flex: 1 1;
     display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    width: 100%;
 }
 #page-content .no-problems {
     color: #283;
@@ -440,6 +439,7 @@ pre.field-input {
     padding: 0.1rem 1rem;
 }
 #page-content .breadcrumbs {
+    flex-grow: 0;
     padding-bottom: 1rem;
     border-bottom: 1px solid #eee;
     margin-bottom: 1rem;
