@@ -43,7 +43,7 @@ java -jar /path/to/camelot-<version>.jar
 The first time you run Camelot, you'll be taken to the 'Create Survey' screen.  Now would be good time to explain what a survey is, and some other important concepts in Camelot.
 
 * **Survey**: a survey corresponds to a research project.  All of the data collected will be part of a survey.
-* **Camera**: a single, physical camera.  Each camera should be given a name and labelled.
+* **Camera**: a single, physical camera.  Each camera should be given a name and labeled.
 * **Camera Trap Station**: one or two cameras installed at a very specific location.
 * **Site**: a geographic area.  Typically multiple camera trap stations will be in each site.
 * **Media**: a photo from a camera trap.
@@ -66,7 +66,7 @@ You'll notice Sites and Cameras are not *within* a survey.  This allows for some
 
 ![](doc/screenshot/your-organisation.png)
 
-Each concept can be selected from the menu on the left, and then a specific entry navigated to using the menu on the right.  You'll find this is a common pattern in Camelot.
+Each concept can be selected from the menu on the left, and then a specific entry navigated to using the menu on the right.  You'll find that this is a common pattern in Camelot.
 
 #### Surveys
 
@@ -76,39 +76,41 @@ Surveys you'll already be familiar with.  The right hand side shows all surveys,
 
 The sites menu will have a very similar feel to the survey menu.  The main difference is that a site can be created just by entering a name and clicking "Add".  This lets you set up multiple sites very quickly, but if you want to come back and provide more information, you can click on the entry for that site in the list to access all the details.
 
+Adding details to a site is just a matter of filling in the fields and clicking "Update".
+
 ![](doc/screenshot/site-edit.png)
 
 #### Cameras
 
-The camera menu is almost identical in behaviour to the sites menu.  Cameras are added just by entering its name and pressing add, though you're free to give more details too.  After creating a camera you'll notice a label alongside each camera (most likely "Available for use" if you've just added one).
+The camera menu functions almost identically sites menu just discussed.  Cameras are added by entering its name and pressing add right in the right-hand menu, though you're free to edit the camera afterwards to give more details too.  After creating a camera you'll notice a label alongside each camera (most likely "Available for use" if you've just added one).
 
-A handy feature is being able to filter the list to find all cameras with a particular status or camera name.  For example, imagine you have dozens of cameras, many of which are in the field, you can search "available" to see the cameras marked "Available For Use".
+A handy feature is being able to filter the list to find all cameras with a particular status or camera name.  For example, imagine you have dozens of cameras, many of which are in the field, you can search "available" to see the cameras marked "Available For Use".  Camelot ensures the camera status is updated as it is used in, and removed from, camera trap stations.
 
 #### Reports
 
-A camelot report is an export of data to a CSV.  Clicking on a report will take you to a report configuration screen, where you can set constraints for that report (e.g., to report on a specific survey) and then generate the data as a CSV.
+A *report* is an export of data to a CSV.  Clicking on a report will take you to a report configuration screen, where you can set constraints for that report (e.g., to report on a specific survey) and then generate the data as a CSV.
 
 Camelot comes with a bunch of reports out of the box.  For advanced users, it also lets you build and add your own reports.
 
 ### Managing surveys
 
-Survey management is the heart of Camelot, and also where it differs the most to other software for managing camera traps.  Our research shows that by understanding the new few sections, you'll be well on your way to being a Camelot expert, so listen up!
+Survey management is the heart of Camelot, and also where it differs the most from other camera trap software.  Our research shows that by understanding the next few sections, you'll be well on your way to being a Camelot expert.  So listen up!
 
-The authors recommend physically setting up the cameras, and noting the installation details, before recording those details in Camelot.  If you can record the details into Camelot while in the field, even better!  This is just a simple measure to help make sure the information in Camelot is consistent with reality.
+The authors recommend physically setting up the cameras, and noting the installation details, before recording those details in Camelot.  If you can record the details into Camelot while in the field, even better!
 
 #### Manage camera trap stations
 
-This menu shows camera traps stations currently in the field, and also allows you to add another camera trap station to the field.  A quick refresher: a camera trap station is one or two cameras at a specific location.
+This menu shows camera trap stations currently in the field, and also allows you to add another camera trap station to the field.  A quick refresher: a camera trap station is one or two cameras at a specific location.
 
-There are two pages in setting up a new camera trap.  The first page has the *essential* information.  All of the fields on this screen must be completed, with the exception of the "secondary camera" in the case there was only 1 camera installed.  While on the subject of cameras, don't be concerned about the distinction between "primary" and "secondary" cameras, as Camelot is a fair master and treats both cameras equally.
+There are two pages in setting up a new camera trap.  The first page has the *essential* information.  All of the fields on this screen must be completed, with the exception of the "secondary camera" in the case there was only 1 camera installed.  While on the subject of cameras, don't be concerned about the distinction between "primary" and "secondary" cameras: Camelot is a fair master and treats both cameras equally.
 
 ![](doc/screenshot/camera-trap-add.png)
 
-Once you're happy with all of the essential details, click "Next".  You can now set up any of the optional data for the camera trap.  This should be pretty self-explanatory.  Once you're happy with everything, click "Create".
+Once you're happy with all of the essential details, click "Next".  You can now set up any of the optional data for the camera trap.  This should be pretty self-explanatory.  This data, if provided, would usually be for reporting and analysis purposes later.  Once you're happy with everything, click "Create".
 
-If you've used other camera trap software, you may now be starting to notice some differences: the trap station, and the start date, and the cameras -- they were all one the one screen!  What if you need to change cameras later?  Do not fear!  Camelot supports all of this.  Read on!
+If you've used other camera trap software, you may now be starting to notice some differences: the trap station, and the start date, and the cameras -- they were all one the one screen!  What if you need to change cameras later?  Do not fear, Camelot supports all of this.  Read on!
 
-After creating a camera, you will see it under the "Manage camera trap stations" menu.  This indicates the camera trap is *active in the field*.  If you want to see more information about the camera trap or to record details about a *camera check*, click on the menu entry.
+After creating a camera, you will see it under the "Manage camera trap stations" menu.  This indicates the camera trap is *active in the field*.  If you want to see more information about the camera trap, or to record details about a *camera check*, click on the menu entry.
 
 ![](doc/screenshot/camera-trap-manage.png)
 
@@ -129,23 +131,23 @@ Camelot facilitates the following scenarios, for each of the cameras:
 * If the camera was previously installed and is still installed, it remains "Active in the field".
 * If that camera was replaced with another, you can specify the replacement camera or indicate "No replacement camera"
 
-Also if there wasn't previously a second camera installed, a new secondary camera can be selected.
+Also, if there wasn't previously a second camera installed, a new secondary camera can be selected.
 
 When all of the details are correct, click "Submit".
 
 When submitting, one of two things will happen:
 
-If there were still cameras assigned to that trap station (i.e., either a camera was still "Active in the field", or a new camera was assigned), Camelot will mark the camera check date as the last date of a the session, and start a new session on this date.
+1. If there were still cameras assigned to that trap station (i.e., either a camera was still "Active in the field", or a new camera was assigned), Camelot will mark the camera check date as the last date of a the session, and start a new session on this date.  Or,
 
-If at the time of submitting there are no cameras installed at a trap station, that trap station is no longer active and will no longer be available for management.  If this happens there's nothing stopping you from adding a new camera trap station at that location later on, but right now, Camelot knows photos aren't being taken, and will take care of finishing it up for you.
+2. If a check was submitted where there are now no cameras at a trap station, that trap station is no longer active and will no longer be available for management.  If this happens there's nothing stopping you from adding a new camera trap station at that location later on, but right now, Camelot knows photos aren't being taken, and will take care of finishing it up for you.
 
-Phew, okay that was a lot to take in!  Reward yourself with a cup of tea and biscuit.  The main take away is that Camelot will do a stack of behind-the-scenes book-keeping work for you, and that managing camera trap stations is all about telling Camelot what happened, and it will do The Right Thing.
+Phew, okay that was a lot to take in!  Reward yourself with a cup of tea and biscuit.  The main take away is that Camelot will do a stack of behind-the-scenes book-keeping work for you.  Managing camera trap stations is all about telling Camelot what happened, and it will take care of the rest for you.
 
 #### Upload media
 
-That last section went on for ages about managing camera trap stations, and doing checks and collecting media, but didn't say how to actually upload the photo!  What gives?  Okay, you got me.  This part is all about uploading photos.
+That last section went on for *ages* about managing camera trap stations, and doing checks and collecting media, but didn't say how to actually upload the photo!  What gives?  Well, good news, now we're all set up to start uploading photos.
 
-Click on "Upload media" on the main menu, to show a list of cameras which Camelot knows we've collected media for.  Camelot knows this because we've submitted a camera check, for that camera, and we said we had "recovered the media".  (If this is all double-dutch to you, see the section on "Managing Camera Trap Stations" above.)
+Click on "Upload media" on the main menu, and Camelot will show a list of cameras we've collected media for.  Camelot knows this because we've submitted a camera check, for that camera, and we said we had "recovered the media".  (If this is all double-dutch to you, see the section on "Managing Camera Trap Stations" above.)
 
 ![](doc/screenshot/media-upload.png)
 
@@ -185,13 +187,13 @@ Okay, so you've had camera traps in the field for a while and collected a bunch 
 
 #### Viewing photos
 
-The the "viewing" portion of the libary consists of 3 main parts:
+The the "viewing" portion of the library consists of 3 main parts:
 
 ![](doc/screenshot/library.png)
 
-* A photo can be *selected* by clicking on the photo on the "media collection" view on the left.  When a photo has a green border, it is a selected photo.
-* When selecting a photo, a preview for it will be displayed in the preview panel in the middle of the screen.
-* Details for the currently viewed photo are available by clicking the "Details" tab on the right of screen to expand that panel.
+1. A photo can be *selected* by clicking on the photo on the "media collection" view on the left.  When a photo has a green border, it is a selected photo.
+2. When selecting a photo, a preview for it will be displayed in the preview panel in the middle of the screen.
+3. Details for the currently viewed photo are available by clicking the "Details" tab on the right of screen to expand that panel.
 
 Selecting is an important concept in the library, as most actions will apply to the current selection.  Multiple photos can be selected by holding the "control" key and clicking a photo.  Allowing multiple photos to be selected is one technique Camelot uses to make processing of photos quicker and easier.
 
