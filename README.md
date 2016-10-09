@@ -211,7 +211,7 @@ From left to right these are:
 
 * **Needs Attention**: mark the photo is needing further review.
 * **Test fire**: the photo was triggered by someone attending to or testing the camera.
-* **Processed*: identification of the photo is complete.  If a photo doesn't show any species, it can and should be marked as processed without any species being identified in it.
+* **Processed**: identification of the photo is complete.  If a photo doesn't show any species, it can and should be marked as processed without any species being identified in it.
 * **Reference Quality**: the photo has a species in it, and the photo of that species is a great example to refer to when doing future identification. (See: "Reference Window")
 
 These can be set and unset by clicking on the respective icon.  It will apply to all photos currently selected.
