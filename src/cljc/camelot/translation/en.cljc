@@ -170,12 +170,12 @@
    :media
    {:sidebar-title "Media"
     :title "Media"
-    :media-filename.label "Capture"
+    :media-filename.label "Filename"
     :media-filename.description "The photo"
     :media-capture-timestamp.label "Capture time"
     :media-capture-timestamp.description "Capture time"
     :media-notes.label "Notes"
-    :media-notes.description "Notes about this capture"}
+    :media-notes.description "Notes about this photo"}
 
    :photo
    {:sidebar-title "Photo"
@@ -474,14 +474,14 @@
     :update-camera "Update Camera"}
 
    :camelot.component.library.collection
-   {:upload-advice "Add media by adding Camera Trap Stations, adding Camera Checks to those, and then Upload Captures in your survey."
-    :filter-notice "No matching captures found"
+   {:upload-advice "Add media by adding Camera Trap Stations, adding Camera Checks to those, and then Upload Media in your survey."
+    :filter-notice "No matching media found"
     :filter-advice "That's a shame. Maybe try another search?"
     :select-none-button-title "Remove all selections"
     :select-none-button "Select None"
     :select-all-button-title "Select all media on this page"
     :select-all-button "Select All"
-    :item-name "captures"}
+    :item-name "media"}
 
    :camelot.component.library.util
    {:reference-quality "reference quality"
@@ -572,7 +572,7 @@
     :add-camera-trap "Add Camera Trap"}
 
    :camelot.component.deployment.recent
-   {:help-text "Drag and drop capture files on to a Camera Check to add them."
+   {:help-text "Drag and drop media files on to a Camera Check to add them."
     :format-not-supported "'%s' is not in a supported format."
     :upload-error "error during upload"
     :gps-coordinates "GPS coordinates"
@@ -650,7 +650,7 @@
    :camelot.component.survey.core
    {:create-survey "Create survey"
     :manage-traps "Manage camera trap stations"
-    :upload-captures "Upload captures"
+    :upload-captures "Upload media"
     :species "Species"
     :files "Related files"}
 
