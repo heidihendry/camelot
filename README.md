@@ -64,7 +64,7 @@ This is where understanding the concepts in camelot is invaluable.  On this menu
 
 You'll notice Sites and Cameras are not *within* a survey.  This allows for some more sophisticated, *longitudinal* reports, where data is not only able to be analysed by survey, but also across multiple surveys.  For the same reason, reports live in this menu too.
 
-[TODO: Image]
+![](doc/screenshot/your-organisation.png)
 
 Each concept can be selected from the menu on the left, and then a specific entry navigated to using the menu on the right.  You'll find this is a common pattern in Camelot.
 
@@ -76,7 +76,7 @@ Surveys you'll already be familiar with.  The right hand side shows all surveys,
 
 The sites menu will have a very similar feel to the survey menu.  The main difference is that a site can be created just by entering a name and clicking "Add".  This lets you set up multiple sites very quickly, but if you want to come back and provide more information, you can click on the entry for that site in the list to access all the details.
 
-[TODO: Image]
+![](doc/screenshot/site-edit.png)
 
 #### Cameras
 
@@ -102,13 +102,15 @@ This menu shows camera traps stations currently in the field, and also allows yo
 
 There are two pages in setting up a new camera trap.  The first page has the *essential* information.  All of the fields on this screen must be completed, with the exception of the "secondary camera" in the case there was only 1 camera installed.  While on the subject of cameras, don't be concerned about the distinction between "primary" and "secondary" cameras, as Camelot is a fair master and treats both cameras equally.
 
-[TODO: Image]
+![](doc/screenshot/camera-trap-add.png)
 
 Once you're happy with all of the essential details, click "Next".  You can now set up any of the optional data for the camera trap.  This should be pretty self-explanatory.  Once you're happy with everything, click "Create".
 
 If you've used other camera trap software, you may now be starting to notice some differences: the trap station, and the start date, and the cameras -- they were all one the one screen!  What if you need to change cameras later?  Do not fear!  Camelot supports all of this.  Read on!
 
 After creating a camera, you will see it under the "Manage camera trap stations" menu.  This indicates the camera trap is *active in the field*.  If you want to see more information about the camera trap or to record details about a *camera check*, click on the menu entry.
+
+![](doc/screenshot/camera-trap-manage.png)
 
 So that's a piece of terminology which has not been introduced until now: a **camera check** is the process of going to a camera trap station, making sure the cameras are okay, collecting the media they've taken and doing any maintenance required (e.g., replacing batteries).
 
@@ -118,7 +120,7 @@ After checking a camera trap station and collecting the media, this information 
 * What happened with the "primary" camera?
 * What happened with the "secondary" camera?
 
-[TODO: Image]
+![](doc/screenshot/camera-check-add.png)
 
 Camelot facilitates the following scenarios, for each of the cameras:
 
@@ -145,7 +147,7 @@ That last section went on for ages about managing camera trap stations, and doin
 
 Click on "Upload media" on the main menu, to show a list of cameras which Camelot knows we've collected media for.  Camelot knows this because we've submitted a camera check, for that camera, and we said we had "recovered the media".  (If this is all double-dutch to you, see the section on "Managing Camera Trap Stations" above.)
 
-[TODO: Image]
+![](doc/screenshot/media-upload.png)
 
 To upload the media, it's as simple as opening your file browser, selecting all the files taken by that camera over the time period shown, and dragging them on to it!  Camelot will show a progress bar, telling you how the upload is going.  If there are any problems, a "Show Details" link will appear below the progress bar, which will give you the low-down.
 
@@ -163,7 +165,7 @@ To change the species available in a survey, click "Manage Species" towards the 
 
 Removal is simple: if you want to remove a species, click "Remove".  Removing a species will only change its availability in the identification dropdown for a survey.  If photos in the survey have already been identified with this species, they will still be, and as such these species will also appear on reports for the survey.
 
-[TODO: Image]
+![](doc/screenshot/species-manage.png)
 
 To add a species, there's a bit more involved.  Camelot gives 3 different ways to add a species:
 
@@ -185,7 +187,7 @@ Okay, so you've had camera traps in the field for a while and collected a bunch 
 
 The the "viewing" portion of the libary consists of 3 main parts:
 
-[TODO: Image]
+![](doc/screenshot/library.png)
 
 * A photo can be *selected* by clicking on the photo on the "media collection" view on the left.  When a photo has a green border, it is a selected photo.
 * When selecting a photo, a preview for it will be displayed in the preview panel in the middle of the screen.
@@ -201,7 +203,7 @@ A photo can be viewed without being selected (useful if you have multiple photos
 
 A flag is one of the four icons towards the top right of the library:
 
-[TODO: Image]
+![](doc/screenshot/library-flags.png)
 
 From left to right these are:
 
@@ -216,11 +218,9 @@ These can be set and unset by clicking on the respective icon.  It will apply to
 
 Identification in Camelot is the process of indicating which species are present in a photo.  When you're ready to identify the selected photos, the bar for submitting details can be accessed via the "Identify Selected" button in the top right hand corner of the library.
 
-[TODO: Image]
-
 To submit an identification, set the species from the drop down, adjust the quantity if necessary, specify other identifiable details from the appropriate drop down and click "Submit".  The identification bar will disappear and the photo will automatically be marked as "Processed".
 
-[TODO: Image]
+![](doc/screenshot/library-identify.png)
 
 Sometimes you'll come across a species you didn't expect to see in a survey, and haven't encountered before.  You can add this right away by using the "Add a new species..." option in the species dropdown, and then typing the species scientific name in the input field which appears.  This species will also be added in case it's needed in future.  Quick and easy.
 
@@ -230,7 +230,7 @@ The identification details entered will be applied to all photos currently selec
 
 #### Searching
 
-[TODO: Image]
+![](doc/screenshot/library-search.png)
 
 The search bar will change the photos shown in the media collection to only those which match the search.  The search bar has a few common search constraints readily-available: the survey, the trap station and a checkbox to show only unprocessed.  And of course a text input field where you can just type and press the search button (or "enter").
 
@@ -242,7 +242,7 @@ If you wanted to find all photos at a certain sublocation, you could start typin
 site-s
 ```
 
-[TODO: Image]
+![](doc/screenshot/library-search.png)
 
 At this point you should see completions below the input field for "site-sublocation" and "site-state-province".  Click "site-sublocation" to complete it for you, and, if you had set up some sublocations for sites previously, you'll notice another drop down: all of the sublocations in Camelot.
 

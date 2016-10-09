@@ -547,7 +547,7 @@
     :primary-camera-name "Camera name (primary)"
     :secondary-camera-name "Camera name (secondary)"
     :record-camera-check "Record camera check"
-    :start-date "State date"
+    :start-date "Start date"
     :blank-item-name-lc "camera trap stations"
     :advice-context "These are locations where cameras are deployed in the field."
     :advice-direction "You can set some up using the button below."
