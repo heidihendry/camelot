@@ -157,8 +157,6 @@ You can upload multiple sets of files to a camera, and even be uploading to many
 
 Once all of the uploads are complete -- you will know this, as all of the progress bars will be full -- you can head on to the *Library* to start identification.
 
-*Important*: once you've finished uploading media to a camera, it will not be available to be uploaded to again. Camelot expects you will upload all of your media at once!
-
 #### Species
 
 This provides a list of species either expected or encountered during a survey.  You can click on any species in the list in order to edit the details about the species, such as its common name, family and mass category.  Note that changes made to the species details here will apply to all surveys.

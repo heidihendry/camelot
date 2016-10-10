@@ -11,13 +11,20 @@
    :trap-station-session-start-date (comparator
                                      (fn [a b]
                                        (cond
-                                         (nil? (:trap-station-session-start-date b)) true
-                                         (nil? (:trap-station-session-start-date a)) false
-                                         :else (< (.getTime (:trap-station-session-start-date a))
-                                                  (.getTime (:trap-station-session-start-date b))))))})
+                                         (nil? (:trap-station-session-start-date b)) false
+                                         (nil? (:trap-station-session-start-date a)) true
+                                         :else (> (.getTime (:trap-station-session-start-date a))
+                                                  (.getTime (:trap-station-session-start-date b))))))
+   :trap-station-session-end-date (comparator
+                                     (fn [a b]
+                                       (cond
+                                         (nil? (:trap-station-session-end-date b)) false
+                                         (nil? (:trap-station-session-end-date a)) true
+                                         :else (> (.getTime (:trap-station-session-end-date a))
+                                                  (.getTime (:trap-station-session-end-date b))))))})
 
 (defn deployment-sort-menu
-  [data owner]
+  [data owner {:keys [show-end-date]}]
   (reify
     om/IRender
     (render [_]
@@ -35,4 +42,14 @@
                                                   " active"
                                                   ""))
                                 :onClick #(om/update! data :deployment-sort-order :trap-station-session-start-date)}
-                           (tr/translate :words/date))))))
+                           (if show-end-date
+                             (tr/translate ::start-date)
+                             (tr/translate :words/date)))
+               " "
+               (when show-end-date
+                 (dom/button #js {:className (str "btn btn-default btn-sml"
+                                                  (if (= (:deployment-sort-order data) :trap-station-session-end-date)
+                                                    " active"
+                                                    ""))
+                                  :onClick #(om/update! data :deployment-sort-order :trap-station-session-end-date)}
+                             (tr/translate ::end-date)))))))

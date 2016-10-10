@@ -366,6 +366,7 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! data :deployment-sort-order :trap-station-session-start-date)
       (rest/get-resource (str "/deployment/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value]))

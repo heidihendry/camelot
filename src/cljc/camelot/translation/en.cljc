@@ -579,10 +579,13 @@
     :progress-bar-title "%d complete, %d failed and %d ignored."
     :show-details "Show details"
     :blank-item-name "camera checks"
+    :media-uploaded "Media uploaded"
     :blank-advice "These will appear when you add checks to your camera trap stations."}
 
    :camelot.component.deployment.shared
-   {:sort-by "Sort by"}
+   {:sort-by "Sort by"
+    :start-date "Start date"
+    :end-date "End date"}
 
    :camelot.component.notification
    {:problems "There were some problems..."

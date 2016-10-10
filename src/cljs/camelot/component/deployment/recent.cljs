@@ -126,8 +126,11 @@
                                 (drop-file-handler data owner fs))))))
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "menu-item detailed dynamic"
+      (dom/div #js {:className "menu-item detailed dynamic no-click"
                     :onClick #(om/update! (state/display-state) [:notification :info] (:errors state))}
+               (when (:has-uploaded-media data)
+                 (dom/span #js {:className "status pull-right"}
+                           (tr/translate ::media-uploaded)))
                (dom/div #js {:className "menu-item-title"}
                         (:camera-name data) " " (tr/translate :words/at-lc)" "
                         (:trap-station-name data))
@@ -164,8 +167,7 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (or (:deployment-sort-order data)
-          (om/update! data :deployment-sort-order :trap-station-name))
+      (om/update! data :deployment-sort-order :trap-station-session-end-date)
       (rest/get-resource (str "/deployment/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value])
@@ -181,7 +183,7 @@
                                             :advice (tr/translate ::blank-advice)}})
                           (dom/div nil
                                    (dom/div #js {:className "help-text"} help-text)
-                                   (om/build shared/deployment-sort-menu data)
+                                   (om/build shared/deployment-sort-menu data {:opts {:show-end-date true}})
                                    (om/build-all recent-deployment-list-component
                                                  (sort (shared/deployment-sorters (get data :deployment-sort-order))
                                                        (:recent-deployments data))

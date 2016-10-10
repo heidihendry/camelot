@@ -249,7 +249,7 @@
   (context "/deployment" {session :session}
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
                                                         :trap-station-session id session))
-           (GET "/survey/:id/recent" [id] (rest/list-resources deployment/get-awaiting-upload
+           (GET "/survey/:id/recent" [id] (rest/list-resources deployment/get-uploadable
                                                                :trap-station-session id session))
            (GET "/:id" [id] (rest/specific-resource deployment/get-specific id session))
            (POST "/create/:id" [id data] (rest/create-resource deployment/create!

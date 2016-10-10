@@ -1335,6 +1335,9 @@ pre.field-input {
     background: #1175aa;
     color: #fff;
 }
+#app .simple-menu .menu-item.no-click {
+    cursor: default;
+}
 #app .simple-menu .menu-item {
     padding: 2rem;
     border: 1px solid #eee;

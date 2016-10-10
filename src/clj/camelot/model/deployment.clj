@@ -104,7 +104,8 @@
      trap-station-session-camera-media-unrecoverable :- s/Bool
      camera-id :- s/Int
      camera-name :- s/Str
-     camera-status-id :- s/Int])
+     camera-status-id :- s/Int
+     has-uploaded-media :- s/Bool])
 
 (defn validate-camera-check
   [state data]
@@ -160,7 +161,7 @@
            trap-station-session-start-date trap-station-session-end-date
            trap-station-session-camera-id
            trap-station-session-camera-media-unrecoverable
-           camera-id camera-name camera-status-id]}]
+           camera-id camera-name camera-status-id has-uploaded-media]}]
   (->CameraDeployment trap-station-session-id trap-station-session-created
                       trap-station-session-updated trap-station-id
                       trap-station-name site-id survey-site-id site-name
@@ -172,7 +173,7 @@
                       trap-station-session-start-date trap-station-session-end-date
                       trap-station-session-camera-id
                       trap-station-session-camera-media-unrecoverable
-                      camera-id camera-name camera-status-id))
+                      camera-id camera-name camera-status-id has-uploaded-media))
 
 (s/defn tcamera-deployment
   [{:keys [trap-station-session-id trap-station-name site-id trap-station-id
@@ -228,11 +229,20 @@
        assoc-cameras
        (map deployment)))
 
-(s/defn get-awaiting-upload :- [CameraDeployment]
+(s/defn get-uploaded-status
+  [state rec]
+  (assoc rec :has-uploaded-media
+         (or (:has-uploaded-media
+              (first (db/with-db-keys state -get-uploaded-status
+                       (select-keys rec [:trap-station-session-camera-id]))))
+             false)))
+
+(s/defn get-uploadable :- [CameraDeployment]
   [state :- State
    id :- s/Int]
   (->> {:survey-id id}
-       (db/with-db-keys state -get-awaiting-upload)
+       (db/with-db-keys state -get-uploadable)
+       (map (partial get-uploaded-status state))
        (map camera-deployment)))
 
 (s/defn get-specific :- (s/maybe Deployment)
