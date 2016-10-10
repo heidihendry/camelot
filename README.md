@@ -12,7 +12,17 @@ Camelot:
 * Runs on Windows, OSX and Linux
 * Is easy to start using
 
+## Prerequisites
+
+Camelot requires Java 8u91 (on later) to be installed on the system it will run on before it can be used.
+
+Java can be downloaded here: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+If using OSX, you will need to install the "JDK".  For Windows and Linux, you can install either the "JRE" or the "JDK".
+
 ## Getting Started
+
+### Installation
 
 Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.6.7.zip).
 
@@ -108,7 +118,7 @@ There are two pages in setting up a new camera trap.  The first page has the *es
 
 Once you're happy with all of the essential details, click "Next".  You can now set up any of the optional data for the camera trap.  This should be pretty self-explanatory.  This data, if provided, would usually be for reporting and analysis purposes later.  Once you're happy with everything, click "Create".
 
-If you've used other camera trap software, you may now be starting to notice some differences: the trap station, and the start date, and the cameras -- they were all one the one screen!  What if you need to change cameras later?  Do not fear, Camelot supports all of this.  Read on!
+If you've used other camera trap software, you may now be starting to notice some differences: the trap station, and the start date, and the cameras -- they were all on the one screen!  What if you need to change cameras later?  Do not fear, Camelot supports all of this.  Read on!
 
 After creating a camera, you will see it under the "Manage camera trap stations" menu.  This indicates the camera trap is *active in the field*.  If you want to see more information about the camera trap, or to record details about a *camera check*, click on the menu entry.
 
@@ -323,7 +333,7 @@ Camelot has two directories: one for configuration, and one for data storage.  T
 #### Linux
 
 * **Data**: $HOME/.local/share/camelot
-* **Data**: $HOME/.config/camelot
+* **Config**: $HOME/.config/camelot
 
 ### Data Directory
 
