@@ -163,7 +163,7 @@ Click on "Upload media" on the main menu, and Camelot will show a list of camera
 
 To upload the media, it's as simple as opening your file browser, selecting all the files taken by that camera over the time period shown, and dragging them on to it!  Camelot will show a progress bar, telling you how the upload is going.  If there are any problems, a "Show Details" link will appear below the progress bar, which will give you the low-down.
 
-You can upload multiple sets of files to a camera, and even be uploading to many cameras at once.  While uploading though, you should not do anything else with Camelot as this may interrupt the upload.
+You can upload multiple sets of files to a camera, and even be uploading to many cameras at once.  You should not leave the "Upload media" menu while photos are uploading, as doing so may interrupt the upload.
 
 Once all of the uploads are complete -- you will know this, as all of the progress bars will be full -- you can head on to the *Library* to start identification.
 
