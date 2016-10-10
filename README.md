@@ -195,7 +195,7 @@ Okay, so you've had camera traps in the field for a while and collected a bunch 
 
 #### Viewing photos
 
-The the "viewing" portion of the library consists of 3 main parts:
+The "viewing" portion of the library consists of 3 main parts:
 
 ![](doc/screenshot/library.png)
 
