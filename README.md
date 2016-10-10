@@ -34,7 +34,7 @@ Unzip the archive.  To run Camelot:
 
 **Linux**: Double click `camelot-desktop.sh`
 
-After 10 seconds, Camelot should appear in a new tab in your web browser.  If Camelot doesn't open automatically, you can access it via your web browser be browsing to:
+After 10 seconds, Camelot should appear in a new tab in your web browser.  If Camelot doesn't open automatically, you can access it via your web browser by browsing to:
 
 ```
 http://localhost:5341/
