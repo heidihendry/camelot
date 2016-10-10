@@ -240,7 +240,7 @@ The identification details entered will be applied to all photos currently selec
 
 #### Searching
 
-![](doc/screenshot/library-search.png)
+![](doc/screenshot/library-search-bar.png)
 
 The search bar will change the photos shown in the media collection to only those which match the search.  The search bar has a few common search constraints readily-available: the survey, the trap station and a checkbox to show only unprocessed.  And of course a text input field where you can just type and press the search button (or "enter").
 
