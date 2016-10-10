@@ -209,6 +209,8 @@ Camelot's media collection shows images in page of 50.  Clicking the left and ri
 
 A photo can be viewed without being selected (useful if you have multiple photos selected already) by clicking the "eye" icon in the top left hand corner of each photo in the media collection panel.
 
+Finally, you might notice some photos have either a blue or red border around them.  A blue border indicates the image is "processed", while a red border is "attention needed".  If an image is flagged as processed and attention needed, the border will be red; attention needed takes precedence.
+
 #### Flagging photos
 
 A flag is one of the four icons towards the top right of the library:
