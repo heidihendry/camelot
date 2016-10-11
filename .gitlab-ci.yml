@@ -19,7 +19,7 @@ build:
     - lein doo phantom test once
     - script/setup-testdata.sh
     - script/test-runtime.sh
-    - CAMELOT_DATADIR="camelot-testdata" script/test-runtime.sh
+    - CAMELOT_DATADIR="testdata" script/test-runtime.sh
     - script/prepare-snapshot.sh
     - mkdir -p "camelot-${CI_BUILD_REF_NAME}/"
     - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.bat script/bin/camelot-desktop.command "camelot-${CI_BUILD_REF_NAME}/"
