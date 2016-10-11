@@ -319,7 +319,7 @@ In the top right hand corner of the main navigation is the toggle to show the se
 
 To keep up to date with any new releases, or if you have any questions that haven't been answered here, please join the Google Group:
 
-https://groups.google.com/forum/#!managemembers/camelot-project/
+https://groups.google.com/forum/#!forum/camelot-project
 
 ## Administration and advanced configuration
 

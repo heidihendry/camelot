@@ -170,4 +170,4 @@ connects to weasel, and start evaluating cljs inside Cider.
 
 If you have any questions that haven't been answered here, please ask via the Google Group:
 
-https://groups.google.com/forum/#!managemembers/camelot-project/
+https://groups.google.com/forum/#!forum/camelot-project
