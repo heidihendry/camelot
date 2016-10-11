@@ -436,7 +436,5 @@ For more module examples, check out Camelot's [built-in reports and columns](htt
 
 ## License
 
-Copyright © 2016 Chris Mann
-
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
