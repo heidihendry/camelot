@@ -5,7 +5,7 @@
             [camelot.nav :as nav]
             [camelot.translation.core :as tr]))
 
-(def new-issue-url "https://gitlab.com/cshclm/camelot/issues")
+(def new-issue-url "https://gitlab.com/camelot-project/camelot/issues")
 
 (defn error-dialog-content
   [data owner]
