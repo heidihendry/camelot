@@ -315,6 +315,12 @@ In the top right hand corner of the main navigation is the toggle to show the se
 * **Language**: This is a user-specific preference. Currently only English is supported, though other translations are underway.
 * **Sighting Independence Threshold**: Camelot performs sighting independence checks on some reports.  This setting controls the duration within which photos of the same species (and, if known, the same sex and life-stage) are considered dependent in those reports.
 
+## The Community
+
+To keep up to date with any new releases, or if you have any questions that haven't been answered here, please join the Google Group:
+
+https://groups.google.com/forum/#!managemembers/camelot-project/
+
 ## Administration and advanced configuration
 
 *This section is not for the faint-of-heart, and intended for people with strong IT knowledge.*
