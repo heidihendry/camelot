@@ -432,7 +432,7 @@ Camelot will treat your field differently when it comes to generating the report
 * Fields ending in "-float" are converted to Java Floats.
 * Fields ending in "-num" are converted to a suitable type. Check the `edn/read-string` documentation for details.
 
-For more module examples, check out Camelot's [built-in reports and columns](https://bitbucket.org/cshclm/camelot/src/master/src/clj/camelot/report/module/builtin/?at=master)
+For more module examples, check out Camelot's [built-in reports and columns](https://gitlab.com/camelot-project/camelot/tree/master/src/clj/camelot/report/module/builtin/?at=master)
 
 ## License
 
