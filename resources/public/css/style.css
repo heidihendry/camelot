@@ -316,14 +316,15 @@ pre.field-input {
   margin-top: 0;
   padding: 0.5rem 0.5rem;
 }
-#loading {
-    height: 30px;
-    width: 120px;
-    background: url("../images/logo-inv.png");
-    background-repeat: no-repeat;
-    position: fixed;
-    top: calc(30vh);
-    left: calc(50vw - 60px);
+#loading p {
+    opacity: 0.5;
+    width: 100%;
+    position: relative;
+    margin: -48px;
+    padding-top: 16rem;
+    font-size: 40pt;
+    font-weight: 100;
+    text-align: center;
 }
 .supported-by {
     position: fixed;
