@@ -1237,6 +1237,10 @@ pre.field-input {
     height: calc(100vh - 16rem);
     max-width: 50rem;
 }
+#app .section-width {
+    max-width: 50rem;
+    margin: auto;
+}
 #app .split-menu .main-content-container {
     margin: auto;
     margin-top: 2rem;

@@ -74,6 +74,7 @@
      trap-station-distance-to-settlement :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
+     trap-station-session-end-date :- (s/maybe org.joda.time.DateTime)
      primary-camera-id :- s/Int
      primary-camera-name :- s/Str
      primary-camera-status-id :- s/Int
@@ -119,7 +120,7 @@
            trap-station-altitude
            trap-station-distance-above-ground trap-station-distance-to-river
            trap-station-distance-to-road trap-station-distance-to-settlement
-           trap-station-session-start-date trap-station-notes
+           trap-station-session-start-date trap-station-session-end-date trap-station-notes
            primary-camera-id secondary-camera-id]}]
   (->TDeployment survey-id site-id trap-station-name trap-station-longitude
                  trap-station-latitude trap-station-altitude
@@ -135,7 +136,8 @@
            trap-station-latitude trap-station-altitude
            trap-station-distance-above-ground trap-station-distance-to-river
            trap-station-distance-to-road trap-station-distance-to-settlement
-           trap-station-notes trap-station-session-start-date primary-camera-id
+           trap-station-notes trap-station-session-start-date
+           trap-station-session-end-date primary-camera-id
            primary-camera-name primary-camera-status-id secondary-camera-id
            secondary-camera-name secondary-camera-status-id]}]
   (->Deployment trap-station-session-id trap-station-session-created
@@ -145,8 +147,8 @@
                 trap-station-altitude
                 trap-station-distance-above-ground trap-station-distance-to-river
                 trap-station-distance-to-road trap-station-distance-to-settlement
-                trap-station-notes trap-station-session-start-date primary-camera-id
-                primary-camera-name primary-camera-status-id
+                trap-station-notes trap-station-session-start-date trap-station-session-end-date
+                primary-camera-id primary-camera-name primary-camera-status-id
                 secondary-camera-id secondary-camera-name
                 secondary-camera-status-id))
 
@@ -227,7 +229,11 @@
   (->> {:survey-id id}
        (db/with-db-keys state -get-all)
        assoc-cameras
-       (map deployment)))
+       (group-by :trap-station-id)
+       vals
+       (map #(sort-by :trap-station-session-start-date %))
+       (map last)
+       (mapv deployment)))
 
 (s/defn get-uploaded-status
   [state rec]

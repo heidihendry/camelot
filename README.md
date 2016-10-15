@@ -110,7 +110,7 @@ The authors recommend physically setting up the cameras, and noting the installa
 
 #### Manage camera trap stations
 
-This menu shows camera trap stations currently in the field, and also allows you to add another camera trap station to the field.  A quick refresher: a camera trap station is one or two cameras at a specific location.
+This menu shows all past and present camera trap stations, and also allows you to add another camera trap station to the field.  A quick refresher: a camera trap station is one or two cameras at a specific location.
 
 There are two pages in setting up a new camera trap.  The first page has the *essential* information.  All of the fields on this screen must be completed, with the exception of the "secondary camera" in the case there was only 1 camera installed.  While on the subject of cameras, don't be concerned about the distinction between "primary" and "secondary" cameras: Camelot is a fair master and treats both cameras equally.
 
@@ -120,7 +120,7 @@ Once you're happy with all of the essential details, click "Next".  You can now 
 
 If you've used other camera trap software, you may now be starting to notice some differences: the trap station, and the start date, and the cameras -- they were all on the one screen!  What if you need to change cameras later?  Do not fear, Camelot supports all of this.  Read on!
 
-After creating a camera, you will see it under the "Manage camera trap stations" menu.  This indicates the camera trap is *active in the field*.  If you want to see more information about the camera trap, or to record details about a *camera check*, click on the menu entry.
+After creating a camera, you will see it under the "Manage camera trap stations" menu.  All camera traps will be shown on this menu, with camera traps which are no longer active in the field being marked as "Finalised".  Each of these cameras can be clicked on to view its details, or if not finalised, to record details about a *camera check*.
 
 ![](doc/screenshot/camera-trap-manage.png)
 

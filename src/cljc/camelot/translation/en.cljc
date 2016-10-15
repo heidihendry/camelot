@@ -553,7 +553,10 @@
     :advice-context "These are locations where cameras are deployed in the field."
     :advice-direction "You can set some up using the button below."
     :create-title "Add a new camera trap deployment."
-    :create-button "Add camera trap"}
+    :create-button "Add camera trap"
+    :finalised "Finalised"
+    :finalised-trap-notice "This camera trap has been finalised."
+    :finalised-trap-advice "Camelot automatically finalises camera traps once they no longer has any active cameras. Create a new camera trap station to continue trapping at this location."}
 
    :camelot.component.deployment.create
    {:new-camera-name-placeholder "New camera name..."
