@@ -52,11 +52,19 @@
               (recur))))))
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "section simple-menu"}
-               (om/build-all action-item-component
-                             (:menu data)
-                             {:key :action
-                              :init-state state})))))
+      (dom/div #js {:className "section"}
+               (dom/div #js {:className "simple-menu"}
+                        (om/build-all action-item-component
+                                      (:menu data)
+                                      {:key :action
+                                       :init-state state}))
+               (dom/div #js {:className "sep"})
+               (dom/button #js {:className "btn btn-default"
+                                :onClick #(do
+                                            (nav/nav! (str "/trap-station-sessions/"
+                                                           (get-in data [:data :trap-station-id :value])))
+                                            (nav/analytics-event "org-survey" "advanced-click"))}
+                           (tr/translate :words/advanced))))))
 
 (defn camera-select-option-component
   [data owner]

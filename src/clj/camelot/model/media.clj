@@ -6,7 +6,8 @@
             [clojure.java.io :as io]
             [camelot.util.java-file :as jf]
             [camelot.util.config :as config]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [camelot.util.java-file :as f])
   (:import [org.apache.commons.lang3 SystemUtils]))
 
 (sql/defqueries "sql/media.sql" {:connection db/spec})
@@ -57,6 +58,31 @@
    id :- s/Int]
   (map media (db/with-db-keys state -get-all {:trap-station-session-camera-id id})))
 
+(s/defn get-all-files-by-survey :- [s/Str]
+  [state :- State
+   id :- s/Int]
+  (map :media-file (db/with-db-keys state -get-all-files-by-survey {:survey-id id})))
+
+(s/defn get-all-files-by-survey-site :- [s/Str]
+  [state :- State
+   id :- s/Int]
+  (map :media-file (db/with-db-keys state -get-all-files-by-survey-site {:survey-site-id id})))
+
+(s/defn get-all-files-by-trap-station :- [s/Str]
+  [state :- State
+   id :- s/Int]
+  (map :media-file (db/with-db-keys state -get-all-files-by-trap-station {:trap-station-id id})))
+
+(s/defn get-all-files-by-trap-station-session :- [s/Str]
+  [state :- State
+   id :- s/Int]
+  (map :media-file (db/with-db-keys state -get-all-files-by-trap-station-session {:trap-station-session-id id})))
+
+(s/defn get-all-files-by-trap-station-session-camera :- [s/Str]
+  [state :- State
+   id :- s/Int]
+  (map :media-file (db/with-db-keys state -get-all-files-by-trap-station-session-camera {:trap-station-session-camera-id id})))
+
 (s/defn get-specific :- (s/maybe Media)
   [state :- State
    id :- s/Int]
@@ -86,10 +112,23 @@
   (db/with-db-keys state -update! (merge data {:media-id id}))
   (media (get-specific state id)))
 
+(s/defn delete-files!
+  [state :- State
+   files :- [s/Str]]
+  (let [mp (config/get-media-path)]
+    (dorun (map #(jf/delete (io/file mp %))
+                (mapcat #(list %
+                               (str "preview-" (jf/basename (io/file %) #"\.\w+?$") ".png")
+                               (str "thumb-" (jf/basename (io/file %) #"\.\w+?$") ".png"))
+                        files)))))
+
 (s/defn delete!
   [state :- State
    id :- s/Num]
-  (db/with-db-keys state -delete! {:media-id id})
+  (let [fs (map #(str :media-filename "." :media-format)
+               (get-specific state id))]
+    (db/with-db-keys state -delete! {:media-id id})
+    (delete-files! state fs))
   nil)
 
 (s/defn update-processed-flag!

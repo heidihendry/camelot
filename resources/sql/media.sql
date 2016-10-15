@@ -25,6 +25,41 @@ FROM media
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 ORDER BY media_capture_timestamp
 
+-- name: -get-all-files-by-survey
+SELECT (media_filename || '.' || media_format) as media_file
+FROM media
+LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
+LEFT JOIN trap_station_session USING (trap_station_session_id)
+LEFT JOIN trap_station USING (trap_station_id)
+LEFT JOIN survey_site USING (survey_site_id)
+WHERE survey_id = :survey_id
+
+-- name: -get-all-files-by-survey-site
+SELECT (media_filename || '.' || media_format) as media_file
+FROM media
+LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
+LEFT JOIN trap_station_session USING (trap_station_session_id)
+LEFT JOIN trap_station USING (trap_station_id)
+WHERE survey_site_id = :survey_site_id
+
+-- name: -get-all-files-by-trap-station
+SELECT (media_filename || '.' || media_format) as media_file
+FROM media
+LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
+LEFT JOIN trap_station_session USING (trap_station_session_id)
+WHERE trap_station_id = :trap_station_id
+
+-- name: -get-all-files-by-trap-station-session
+SELECT (media_filename || '.' || media_format) as media_file
+FROM media
+LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
+WHERE trap_station_session_id = :trap_station_session_id
+
+-- name: -get-all-files-by-trap-station-session-camera
+SELECT (media_filename || '.' || media_format) as media_file
+FROM media
+WHERE trap_station_session_camera_id = :trap_station_session_camera_id
+
 -- name: -update!
 UPDATE media
 SET media_updated = CURRENT_TIMESTAMP,

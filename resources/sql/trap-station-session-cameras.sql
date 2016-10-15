@@ -16,6 +16,10 @@ WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 DELETE FROM trap_station_session_camera
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 
+-- name: -delete-media!
+DELETE FROM media
+WHERE trap_station_session_camera_id = :trap_station_session_camera_id
+
 -- name: -get-specific
 SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_id, camera_name, trap_station_session_camera_import_path, trap_station_session_camera_media_unrecoverable
 FROM trap_station_session_camera

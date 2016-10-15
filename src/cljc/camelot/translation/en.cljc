@@ -76,7 +76,8 @@
     :trap-station-session-camera-media-unrecoverable.description "The media associated with this camera session could not be recovered."
 
     :camera-id.label "Camera"
-    :camera-id.description "The camera to add to the Trap Station Session"}
+    :camera-id.description "The camera to add to the Trap Station Session"
+    :delete-media "Delete media"}
 
    :trap-station
    {:title "Trap Station"

@@ -3,7 +3,8 @@
             [yesql.core :as sql]
             [camelot.model.state :refer [State]]
             [camelot.util.trap-station :as util.ts]
-            [camelot.db :as db]))
+            [camelot.db :as db]
+            [camelot.model.media :as media]))
 
 (sql/defqueries "sql/trap-stations.sql" {:connection db/spec})
 
@@ -108,7 +109,10 @@
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -delete! {:trap-station-id id}))
+  (let [fs (media/get-all-files-by-trap-station state id)]
+    (db/with-db-keys state -delete! {:trap-station-id id})
+    (media/delete-files! state fs))
+  nil)
 
 (s/defn get-or-create! :- TrapStation
   [state :- State

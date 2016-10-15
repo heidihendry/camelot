@@ -4,7 +4,8 @@
             [clj-time.format :as tf]
             [camelot.model.state :refer [State]]
             [yesql.core :as sql]
-            [clj-time.core :as t]))
+            [clj-time.core :as t]
+            [camelot.model.media :as media]))
 
 (sql/defqueries "sql/trap-station-sessions.sql" {:connection db/spec})
 
@@ -133,7 +134,10 @@
 (s/defn delete!
   [state :- State
    id :- s/Num]
-  (db/with-db-keys state -delete! {:trap-station-session-id id}))
+  (let [fs (media/get-all-files-by-trap-station-session state id)]
+    (db/with-db-keys state -delete! {:trap-station-session-id id})
+    (media/delete-files! state fs))
+  nil)
 
 (s/defn get-or-create! :- TrapStationSession
   [state :- State

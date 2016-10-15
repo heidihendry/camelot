@@ -86,7 +86,9 @@
                                                        trap-station-session-camera/ttrap-station-session-camera data session))
            (POST "/" [data] (rest/create-resource trap-station-session-camera/create!
                                                   trap-station-session-camera/ttrap-station-session-camera data session))
-           (DELETE "/:id" [id] (rest/delete-resource trap-station-session-camera/delete! id session)))
+           (DELETE "/:id" [id] (rest/delete-resource trap-station-session-camera/delete! id session))
+           (DELETE "/:id/media" [id] (rest/delete-resource
+                                      trap-station-session-camera/delete-media! id session)))
 
   (context "/sites" {session :session}
            (GET "/" [] (rest/list-resources site/get-all :site session))

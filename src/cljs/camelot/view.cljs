@@ -146,6 +146,15 @@
                                (when cb
                                  (cb))))))
 
+(defn delete-media [success-key error-key vs resources key]
+  "Delete the resource with `key'."
+  (let [cb (get-in vs [:events-ref success-key])]
+    (cnav/analytics-event "delete-media" (util/get-resource-type-name vs))
+    (rest/delete-resource (str (util/get-url vs) "/media") {}
+                          #(do (om/update! (get vs :screen) :mode :create)
+                               (when cb
+                                 (cb))))))
+
 (defn build-generator
   "Drop-down menu generator for the given view-state."
   [vs]
@@ -209,6 +218,13 @@
                                              (if (get-in vs [:screen :resource-id])
                                                (om/update! (get vs :screen) :resource-id nil)
                                                (om/update! (get vs :screen) :mode :readonly)))))))
+   :delete-media (fn [vs rid]
+                   (let [screen (util/get-screen vs)]
+                     (when (js/confirm "Are you sure you wish to delete all media taken in the session by this camera?")
+                       (delete-media (get-in screen [:states :delete :submit :success :event])
+                                     (get-in screen [:states :delete :submit :error :event])
+                                     vs
+                                     (get vs :selected-resource) :details))))
    :delete (fn [vs rid] (let [screen (util/get-screen vs)]
                           (when (js/confirm "Are you sure you wish to delete this?")
                             (delete (get-in screen [:states :delete :submit :success :event])

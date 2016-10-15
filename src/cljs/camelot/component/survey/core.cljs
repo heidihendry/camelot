@@ -35,7 +35,7 @@
       (dom/div #js {:className "section"}
                (dom/div #js {:className "simple-menu"}
                         (om/build-all survey-list-component
-                                      (sort-by :survey-id (:list data))
+                                      (sort-by :survey-name (:list data))
                                       {:key :survey-id}))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"

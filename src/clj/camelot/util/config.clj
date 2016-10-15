@@ -155,13 +155,17 @@
   [filename]
   (str/replace filename #"(?i)[^a-z0-9 .-_]+" "-"))
 
-(defn get-filestore-file-path
+(defn get-filestore-survey-directory
   "Return the path to the survey's filestore directory."
+  [survey-id]
+  (io/file (filestore-base-path) (str survey-id)))
+
+(defn get-filestore-file-path
+  "Return the path to a file in the survey's filestore directory."
   [survey-id filename]
-  (let [fs (str (filestore-base-path)
-                SystemUtils/FILE_SEPARATOR survey-id
-                SystemUtils/FILE_SEPARATOR (replace-unsafe-chars filename))
-        parent (jf/get-parent-file (io/file fs))]
+  (let [parent (get-filestore-survey-directory survey-id)
+        fs (str (jf/get-path parent) SystemUtils/FILE_SEPARATOR
+                (replace-unsafe-chars filename))]
     (when (not (jf/exists? parent))
       (jf/mkdirs parent))
     (checked-datadir parent)

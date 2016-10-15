@@ -1318,12 +1318,12 @@ pre.field-input {
 #app .simple-menu.scroll {
     height: calc(100% - 20rem);
 }
-#app .simple-menu .menu-item:first-child {
+#app .simple-menu .menu-item:first-of-type {
     border-top: 1px solid #eee;
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;
 }
-#app .simple-menu .menu-item:last-child {
+#app .simple-menu .menu-item:last-of-type {
     border-bottom: 1px solid #eee;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;

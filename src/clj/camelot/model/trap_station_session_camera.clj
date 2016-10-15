@@ -3,7 +3,8 @@
             [yesql.core :as sql]
             [camelot.model.trap-station-session :as trap-station-session]
             [camelot.model.state :refer [State]]
-            [camelot.db :as db]))
+            [camelot.db :as db]
+            [camelot.model.media :as media]))
 
 (sql/defqueries "sql/trap-station-session-cameras.sql" {:connection db/spec})
 
@@ -117,7 +118,18 @@
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -delete! {:trap-station-session-camera-id id}))
+  (let [fs (media/get-all-files-by-trap-station-session-camera state id)]
+    (db/with-db-keys state -delete! {:trap-station-session-camera-id id})
+    (media/delete-files! state fs))
+  nil)
+
+(s/defn delete-media!
+  [state :- State
+   id :- s/Int]
+  (let [fs (media/get-all-files-by-trap-station-session-camera state id)]
+    (db/with-db-keys state -delete-media! {:trap-station-session-camera-id id})
+    (media/delete-files! state fs))
+  nil)
 
 (s/defn get-available
   "Return the available cameras, factoring in whether they're in use elsewhere."
@@ -131,8 +143,8 @@
   [state :- State
    id :- s/Int]
   (let [res (get-specific state id)]
-    (->> res
-         (db/with-db-keys state -get-alternatives))))
+    (some->> res
+             (db/with-db-keys state -get-alternatives))))
 
 (s/defn get-or-create! :- TrapStationSessionCamera
   [state :- State

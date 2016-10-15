@@ -2,7 +2,8 @@
   (:require [schema.core :as s]
             [yesql.core :as sql]
             [camelot.model.state :refer [State]]
-            [camelot.db :as db]))
+            [camelot.db :as db]
+            [camelot.model.media :as media]))
 
 (sql/defqueries "sql/survey-sites.sql" {:connection db/spec})
 
@@ -70,7 +71,10 @@
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -delete! {:survey-site-id id}))
+  (let [fs (media/get-all-files-by-survey-site state id)]
+    (db/with-db-keys state -delete! {:survey-site-id id})
+    (media/delete-files! state fs))
+  nil)
 
 (s/defn get-available
   [state :- State
@@ -81,7 +85,9 @@
   [state :- State
    id :- s/Int]
   (let [res (get-specific state id)]
-    (db/with-db-keys state -get-alternatives res)))
+    (if res
+      (db/with-db-keys state -get-alternatives res)
+      [])))
 
 (s/defn get-or-create! :- SurveySite
   [state :- State

@@ -160,18 +160,18 @@ Currently the only application state is the user's configuration."
                         :label :camera-name}}
    :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
+                       {:label (tr/translate (:config state)
+                                             :trap-station-session-camera/delete-media)
+                        :action :delete-media}
                        {:label (tr/translate (:config state) :words/edit)
                         :action :edit-mode}
                        {:label (tr/translate (:config state) :action/media)
                         :action :media}]}
    :layout [[:camera-id]
-            [:trap-station-session-camera-import-path]
             [:trap-station-session-camera-media-unrecoverable]]
    :schema {:camera-id {:type :select
                         :required true
                         :generator :trap-station-session-cameras-available}
-            :trap-station-session-camera-import-path {:type :text
-                                                      :required false}
             :trap-station-session-camera-media-unrecoverable {:type :boolean
                                                               :required true}}
    :states {:create {:submit {:success {:type :event
@@ -246,8 +246,7 @@ Currently the only application state is the user's configuration."
             [:trap-station-session-notes]]
    :schema {:trap-station-session-start-date {:type :datetime
                                               :required true}
-            :trap-station-session-end-date {:type :datetime
-                                            :required true}
+            :trap-station-session-end-date {:type :datetime}
             :trap-station-session-notes {:type :textarea
                                  :cols 35
                                  :rows 4}}
