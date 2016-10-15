@@ -556,7 +556,7 @@
     :create-button "Add camera trap"
     :finalised "Finalised"
     :finalised-trap-notice "This camera trap has been finalised."
-    :finalised-trap-advice "Camelot will automatically finalise a camera trap once it no longer has any active cameras. Create a new camera trap station to continue trapping at this location."}
+    :finalised-trap-advice "Camelot will automatically finalise a camera trap station once it no longer has any active cameras. Create a new camera trap station to continue trapping at this location."}
 
    :camelot.component.deployment.create
    {:new-camera-name-placeholder "New camera name..."
