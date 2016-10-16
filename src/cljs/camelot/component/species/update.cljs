@@ -6,10 +6,11 @@
             [camelot.state :as state]
             [camelot.translation.core :as tr]))
 
-(defn update-success-handler
+(defn navigate-away
   [data]
-  (nav/nav! (str "/" (get-in (state/app-state-cursor)
-                             [:selected-survey :survey-id :value]))))
+  (nav/nav! (str "/" (or (get-in (state/app-state-cursor)
+                                 [:selected-survey :survey-id :value])
+                         "organisation"))))
 
 (defn update-handler
   [data]
@@ -19,7 +20,7 @@
                                   [:taxonomy-species :taxonomy-genus :taxonomy-family
                                    :taxonomy-order :taxonomy-class :taxonomy-common-name
                                    :species-mass-id :taxonomy-notes])}
-              update-success-handler))
+              navigate-away))
 
 (defn blank?
   [d]
@@ -45,6 +46,16 @@
                                   (tr/translate ::validation-error-title))
                          :onClick (partial update-handler data)}
                     (tr/translate :words/update))))))
+
+(defn cancel-button
+  "Navigate away without saving the current form state"
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/button #js {:className "btn btn-default"
+                       :onClick navigate-away}
+                  (tr/translate :words/cancel)))))
 
 (defn species-mass-option-component
   [data owner]
@@ -121,7 +132,9 @@
                (dom/label #js {:className "field-label"}
                           (tr/translate :taxonomy/taxonomy-notes.label))
                (om/build text-area-component data {:opts {:field :taxonomy-notes}})
-               (om/build submit-button (:data data))))))
+               (dom/div #js {:className "button-container"}
+                        (om/build submit-button (:data data))
+                        (om/build cancel-button (:data data)))))))
 
 (defn update-component
   [data owner]

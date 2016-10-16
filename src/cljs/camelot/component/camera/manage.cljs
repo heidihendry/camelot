@@ -47,8 +47,8 @@
    [(tr/translate :camera/camera-model.label) :camera-model :text-input {}]
    [(tr/translate :camera/camera-notes.label) :camera-notes :textarea {}]])
 
-(defn update-success-handler
-  [data]
+(defn navigate-away
+  []
   (nav/nav-up! 2))
 
 (defn update-handler
@@ -58,7 +58,7 @@
               {:data (select-keys (deref data) [:camera-name :camera-make
                                                 :camera-model :camera-notes
                                                 :camera-status-id])}
-              update-success-handler))
+              navigate-away))
 
 (defn submit-button
   [data owner]
@@ -72,6 +72,16 @@
                                 (tr/translate ::validation-failure-title))
                        :onClick (partial update-handler data)}
                   (tr/translate :words/update)))))
+
+(defn cancel-button
+  "Navigate away without saving the current form state"
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/button #js {:className "btn btn-default"
+                       :onClick navigate-away}
+                  (tr/translate :words/cancel)))))
 
 (defn form-component
   [data owner]
@@ -87,7 +97,9 @@
                                              {:label (first %)
                                               :value-key (second %)})})
                     (form-layout data))
-               (om/build submit-button (:data data))))))
+               (dom/div #js {:className "button-container"}
+                        (om/build submit-button (:data data))
+                        (om/build cancel-button (:data data)))))))
 
 (defn manage-component
   [data owner]
