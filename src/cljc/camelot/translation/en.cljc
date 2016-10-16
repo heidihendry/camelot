@@ -424,7 +424,7 @@
     :photo-resolution-y "Photo Y Resolution (pixels)"}
 
    :camelot.report.module.builtin.reports.camera-traps
-   {:title "Camera Trap Export [CamtrapR]"
+   {:title "[CamtrapR] Camera Trap Export"
     :description "A CamtrapR-compatible export of camera trap details. Set 'byCamera' to TRUE when importing into CamtrapR."}
 
    :camelot.report.module.builtin.reports.effort-summary
@@ -456,7 +456,7 @@
     :description "Observations at a given trap station and the time elapsed gathering those observations."}
 
    :camelot.report.module.builtin.reports.record-table
-   {:title "Record Table [CamtrapR]"
+   {:title "[CamtrapR] Record Table"
     :description "A CamtrapR-compatible RecordTable export of independent sightings."
     :media-directory "Media Directory"}
 
