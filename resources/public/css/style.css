@@ -184,10 +184,11 @@ a:hover {
 }
 #settings button {
   margin: 0;
-  width: 100%;
+  flex-grow: 1;
   padding: 0.7rem 2rem;
-  margin-top: 0.3rem;
-  margin-bottom: 0.3rem;
+}
+#settings .button-container {
+    display: flex;
 }
 #app .field-details-item-container {
     padding-bottom: 1rem;
@@ -262,7 +263,7 @@ pre.field-input {
 }
 #settings .section-body {
   overflow-y: scroll;
-  height: calc(100vh - 19.5rem);
+  height: calc(100vh - 15.5rem);
   margin-bottom: 0.5rem;
   border-bottom: 1px solid #ddd;
   border-top: 1px solid #ddd;

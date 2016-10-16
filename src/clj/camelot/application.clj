@@ -519,9 +519,7 @@ Currently the only application state is the user's configuration."
     {:resource {:type :settings
                 :title (tr/translate (:config state) :settings/title)
                 :endpoint "/settings"}
-     :layout [[:label (tr/translate (:config state) :settings/preferences)]
-              [:language]
-              [:label (tr/translate (:config state) :settings/survey-settings)]
+     :layout [[:label (tr/translate (:config state) :settings/survey-settings)]
               [:sighting-independence-minutes-threshold]]
      :schema {:language {:type :select
                          :required true
