@@ -569,14 +569,15 @@
                    (om/build identification-bar-component data))
                  (dom/div #js {:className "pull-right action-container"}
                           (om/build media-flag-container-component data)
-                          (dom/button #js {:className "btn btn-default"
+                          (when (= (get-in data [:search :mode]) :search)
+                            (dom/button #js {:className "btn btn-default"
                                            :onClick #(do
                                                        (let [sw (:secondary-window data)]
                                                          (when (and sw (not (.-closed sw)))
                                                            (.focus sw)))
                                                        (tincan-sender data true {}))
                                            :title (tr/translate ::reference-window-button-title)}
-                                      (tr/translate ::reference-window-button-text))
+                                      (tr/translate ::reference-window-button-text)))
                           (om/build identification-panel-button-component data
                                     {:state {:has-selected has-selected}})))))))
 
