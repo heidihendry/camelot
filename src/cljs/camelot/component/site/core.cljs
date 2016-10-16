@@ -8,8 +8,6 @@
             [camelot.util.cursorise :as cursorise]
             [camelot.translation.core :as tr]))
 
-(def ^:private help-text (tr/translate ::help-text))
-
 (defn add-success-handler
   [data resp]
   (prn resp)
@@ -105,7 +103,6 @@
     (render [_]
       (when (:list data)
         (dom/div #js {:className "section"}
-                 (dom/div #js {:className "help-text"} help-text)
                  (dom/div nil
                           (dom/input #js {:className "field-input"
                                           :value (:filter data)

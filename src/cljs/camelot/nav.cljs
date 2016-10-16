@@ -20,10 +20,13 @@
 
 (defn survey-url
   [& paths]
-  (str "/"
-       (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
-       "/"
-       (str/join "/" paths)))
+  (let [survey-id (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])]
+    (if (some nil? (conj paths survey-id))
+      (str "/organisation")
+      (str "/"
+           (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])
+           "/"
+           (str/join "/" paths)))))
 
 (defn analytics-event
   ([component action]

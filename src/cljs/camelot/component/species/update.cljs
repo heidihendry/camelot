@@ -133,8 +133,8 @@
                           (tr/translate :taxonomy/taxonomy-notes.label))
                (om/build text-area-component data {:opts {:field :taxonomy-notes}})
                (dom/div #js {:className "button-container"}
-                        (om/build submit-button (:data data))
-                        (om/build cancel-button (:data data)))))))
+                        (om/build cancel-button (:data data))
+                        (om/build submit-button (:data data)))))))
 
 (defn update-component
   [data owner]

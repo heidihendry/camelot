@@ -628,7 +628,6 @@
    :camelot.component.site.core
    {:new-site-name "New site name..."
     :validation-duplicate-site "A site with this name already exists."
-    :help-text "A 'site' is a geographic location where one or more camera trap stations will live. A site can belong to multiple surveys."
     :item-name "sites"
     :advice "You can add sites using the input field below."
     :filter-sites "Filter sites..."}
@@ -679,7 +678,6 @@
     :file-size "File size"
     :item-name "files"
     :advice "You can upload some below, if you'd like."
-    :confirm-delete "Are you sure you want to delete this file?"
-    :help-text "Keep everything together by uploading files related to this survey."}
+    :confirm-delete "Are you sure you want to delete this file?"}
 
    :missing "[Translation missing]"})

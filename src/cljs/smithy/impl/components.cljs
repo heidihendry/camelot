@@ -109,12 +109,12 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "button-container"}
-               (dom/button #js {:className "btn btn-primary fa fa-check fa-2x"
-                                :onClick update}
-                           " Update")
-               (dom/button #js {:className "cancel-btn btn btn-default fa fa-undo fa-2x"
+               (dom/button #js {:className "btn btn-default fa fa-2x"
                                 :onClick cancel}
-                           " Cancel")))))
+                           " Cancel")
+               (dom/button #js {:className "btn btn-primary fa fa-2x"
+                                :onClick update}
+                           " Update")))))
 
 (defn resource-update-component
   "Component for Update Mode"

@@ -134,7 +134,6 @@
     (render-state [_ state]
       (when (:files data)
         (dom/div #js {:className "section"}
-                 (dom/div #js {:className "help-text"} (tr/translate ::help-text))
                  (om/build file-list-component data {:init-state state})
                  (om/build file-upload-component data
                            {:init-state state}))))))

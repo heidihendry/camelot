@@ -1278,7 +1278,7 @@ pre.field-input {
 #app .split-menu .button-container {
     text-align: right;
 }
-#app .split-menu .button-container button {
+#app .button-container button {
     margin: 0.5rem;
 }
 #page-content td .button-container button {

@@ -98,8 +98,8 @@
                                               :value-key (second %)})})
                     (form-layout data))
                (dom/div #js {:className "button-container"}
-                        (om/build submit-button (:data data))
-                        (om/build cancel-button (:data data)))))))
+                        (om/build cancel-button (:data data))
+                        (om/build submit-button (:data data)))))))
 
 (defn manage-component
   [data owner]

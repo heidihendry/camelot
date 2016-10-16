@@ -263,6 +263,11 @@
                    (dom/label #js {:className "validation-warning"}
                               (tr/translate ::validation-same-camera))))
                (dom/div #js {:className "button-container"}
+                        (dom/button #js {:className "btn btn-default"
+                                         :onClick #(nav/nav!
+                                                    (nav/survey-url "deployments"
+                                                                   (get-in data [:data :trap-station-session-id :value])))}
+                                    (tr/translate :words/cancel))
                         (dom/button #js {:className "btn btn-primary"
                                          :disabled (if (validate-form (:data data)) "" "disabled")
                                          :title (if (validate-form (:data data)) ""
@@ -281,18 +286,15 @@
         (rest/put-x (str "/deployment/" (get-in data [:data :trap-station-id :value]))
                     {:data (assoc (deref (:data data)) :survey-id survey-id)}
                     (fn [_]
-                      (nav/nav! (str "/" survey-id
-                                     "/deployments/"
-                                     (get-in data [:data :trap-station-session-id :value])))))))
+                      (nav/nav! (nav/survey-url "deployments"
+                                                (get-in data [:data :trap-station-session-id :value])))))))
     (do
       (nav/analytics-event "deployment" "submit-new")
       (rest/post-x (str "/deployment/create/"
                         (get-in (state/app-state-cursor)
                                 [:selected-survey :survey-id :value]))
                    {:data (deref (:data data))}
-                   (fn [_]
-                     (nav/nav! (str "/" (get-in (state/app-state-cursor)
-                                                [:selected-survey :survey-id :value]))))))))
+                   (fn [_] (nav/nav! (nav/survey-url)))))))
 
 (defn extra-fields-form
   [data owner {:keys [mode]}]
@@ -342,7 +344,7 @@
                                   :cols 48
                                   :onChange #(om/update! data [:data :trap-station-notes :value] (.. % -target -value))
                                   :value (get-in data [:data :trap-station-notes :value])})
-               (dom/div nil
+               (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-default"
                                          :onClick #(om/transact! data :page dec)}
                                     (dom/span #js {:className "fa fa-chevron-left"})
