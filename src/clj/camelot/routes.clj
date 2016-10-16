@@ -258,6 +258,10 @@
                                                                deployment/tdeployment
                                                                (assoc data :survey-id
                                                                       {:value (edn/read-string id)}) session))
+           (PUT "/:id" [id data] (rest/update-resource deployment/update! id
+                                                       deployment/tdeployment
+                                                       (assoc data :trap-station-id
+                                                              {:value (edn/read-string id)}) session))
            (POST "/" [data] (rest/create-resource deployment/create-camera-check!
                                                   deployment/tcamera-deployment data session)))
 

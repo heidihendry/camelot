@@ -573,7 +573,8 @@
     :secondary-camera "Secondary camera"
     :validation-same-camera "Secondary camera must not be the same as the primary camera."
     :validation-failure "Please complete all required fields and address any errors."
-    :add-camera-trap "Add Camera Trap"}
+    :add-camera-trap "Add Camera Trap Station"
+    :edit-camera-trap "Edit Camera Trap Station"}
 
    :camelot.component.deployment.recent
    {:help-text "Drag and drop media files on to a Camera Check to add them."

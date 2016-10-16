@@ -364,6 +364,9 @@
   (generate-view species/manage-view {:survey-id survey}))
 (defroute "/:survey/deployments/create" [survey]
   (generate-view deployment/create-view-component {:survey-id survey}))
+(defroute "/:survey/deployments/:trap-station-id/edit" [survey trap-station-id]
+  (generate-view deployment/edit-view-component {:survey-id survey
+                                                 :page-id trap-station-id}))
 (defroute "/:survey/deployments/:trap-station-id" [survey trap-station-id]
   (generate-view deployment/deployment-view-component {:survey-id survey
                                                        :page-id trap-station-id}))

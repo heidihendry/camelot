@@ -57,14 +57,7 @@
                         (om/build-all action-item-component
                                       (:menu data)
                                       {:key :action
-                                       :init-state state}))
-               (dom/div #js {:className "sep"})
-               (dom/button #js {:className "btn btn-default"
-                                :onClick #(do
-                                            (nav/nav! (str "/trap-station-sessions/"
-                                                           (get-in data [:data :trap-station-id :value])))
-                                            (nav/analytics-event "org-survey" "advanced-click"))}
-                           (tr/translate :words/advanced))))))
+                                       :init-state state}))))))
 
 (defn camera-select-option-component
   [data owner]
@@ -254,7 +247,7 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section"}
-               (dom/div #js {:className "generic-container"}
+               (dom/div #js {:className "generic-container simple-menu"}
                         (om/build read-only-field-component data
                                   {:init-state {:field :site-name
                                                 :label (tr/translate :site/site-name.label)}})
@@ -296,7 +289,20 @@
                                                   :label (tr/translate :trap-station/trap-station-distance-to-settlement.label)}}))
                         (om/build read-only-field-component data
                                   {:init-state {:field :trap-station-notes
-                                                :label (tr/translate :trap-station/trap-station-notes.label)}}))))))
+                                                :label (tr/translate :trap-station/trap-station-notes.label)}}))
+               (dom/div #js {:className "sep"})
+               (dom/button #js {:className "btn btn-primary"
+                                :onClick #(nav/nav!
+                                           (nav/survey-url "deployments"
+                                                           (get-in data [:data :trap-station-session-id :value])
+                                                           "edit"))}
+                           (tr/translate :words/edit))
+               (dom/button #js {:className "btn btn-default"
+                                :onClick #(do
+                                            (nav/nav! (str "/trap-station-sessions/"
+                                                           (get-in data [:data :trap-station-id :value])))
+                                            (nav/analytics-event "org-survey" "advanced-click"))}
+                           (tr/translate :words/advanced))))))
 
 (defn deployment-section-containers-component
   [data owner]
@@ -305,7 +311,6 @@
     (will-mount [_]
       (let [running (-> data :data :trap-station-session-end-date :value nil?)]
         (om/update! data :can-edit? running)
-        (prn running)
         (when-not running
           (om/update! data :active :details)
           (dorun (map #(om/update! % :active (= (:action %) :details))
@@ -321,6 +326,13 @@
                             :details (om/build deployment-selected-details-component data)
                             :check (om/build record-camera-check-component data)
                             nil)))))))
+
+(defn edit-view-component
+  [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build create/edit-component app))))
 
 (defn create-view-component
   [app owner]
@@ -359,8 +371,7 @@
                  (dom/div #js {:className "intro"}
                           (dom/h4 nil (get-in app [:page-state :data :trap-station-name :value])))
                  (dom/div nil
-                          (om/build deployment-section-containers-component
-                                    (:page-state app))))))))
+                          (om/build deployment-section-containers-component (:page-state app))))))))
 
 (defn deployment-list-component
   [data owner]

@@ -201,7 +201,7 @@
              (get-in data [:primary-camera-id :value]))))
 
 (defn important-fields-form
-  [data owner]
+  [data owner {:keys [mode]}]
   (reify
     om/IRender
     (render [_]
@@ -214,15 +214,16 @@
                                :value (get-in data [:data :trap-station-name :value])
                                :onChange #(om/update! (get-in data [:data :trap-station-name])
                                                       :value (.. % -target -value))})
-               (dom/div nil
-                        (dom/label #js {:className "field-label required"}
-                                   (tr/translate ::start-date))
-                        (dom/div #js {:className "field-details"}
-                                 (om/build datepicker (get-in data [:data :trap-station-session-start-date]))))
-               (when (> (.getTime (or (get-in data [:data :trap-station-session-start-date :value]) (UtcDateTime.)))
-                        (.getTime (UtcDateTime.)))
-                 (dom/label #js {:className "validation-warning"}
-                            (tr/translate ::valdiation-future-date)))
+               (when-not (= mode :edit)
+                 (dom/div nil
+                          (dom/label #js {:className "field-label required"}
+                                     (tr/translate ::start-date))
+                          (dom/div #js {:className "field-details"}
+                                   (om/build datepicker (get-in data [:data :trap-station-session-start-date])))
+                          (when (> (.getTime (or (get-in data [:data :trap-station-session-start-date :value]) (UtcDateTime.)))
+                                   (.getTime (UtcDateTime.)))
+                            (dom/label #js {:className "validation-warning"}
+                                       (tr/translate ::valdiation-future-date)))))
                (dom/label #js {:className "field-label required"}
                           (tr/translate :trap-station/trap-station-latitude.label))
                (dom/input #js {:className "field-input"
@@ -247,14 +248,16 @@
                  (when (and v (not (util.ts/valid-longitude? v)))
                    (dom/label #js {:className "validation-warning"}
                               (tr/translate ::invalid-longitude))))
-               (dom/label #js {:className "field-label required"}
-                          (tr/translate ::primary-camera))
-               (om/build camera-select-component data
-                         {:init-state {:camera-id-field :primary-camera-id}})
-               (dom/label #js {:className "field-label"}
-                          (tr/translate ::secondary-camera))
-               (om/build camera-select-component data
-                         {:init-state {:camera-id-field :secondary-camera-id}})
+               (when-not (= mode :edit)
+                 (dom/div nil
+                          (dom/label #js {:className "field-label required"}
+                                     (tr/translate ::primary-camera))
+                          (om/build camera-select-component data
+                                    {:init-state {:camera-id-field :primary-camera-id}})
+                          (dom/label #js {:className "field-label"}
+                                     (tr/translate ::secondary-camera))
+                          (om/build camera-select-component data
+                                    {:init-state {:camera-id-field :secondary-camera-id}})))
                (let [v (get-in data [:data :secondary-camera-id :value])]
                  (when (and v (= (get-in data [:data :primary-camera-id :value]) v))
                    (dom/label #js {:className "validation-warning"}
@@ -268,8 +271,31 @@
                                     (tr/translate :words/next) " "
                                     (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
 
+(defn submit-deployment
+  [data mode]
+  (if (= mode :edit)
+    (do
+      (nav/analytics-event "deployment" "submit-edit")
+      (let [survey-id (get-in (state/app-state-cursor)
+                              [:selected-survey :survey-id :value])]
+        (rest/put-x (str "/deployment/" (get-in data [:data :trap-station-id :value]))
+                    {:data (assoc (deref (:data data)) :survey-id survey-id)}
+                    (fn [_]
+                      (nav/nav! (str "/" survey-id
+                                     "/deployments/"
+                                     (get-in data [:data :trap-station-session-id :value])))))))
+    (do
+      (nav/analytics-event "deployment" "submit-new")
+      (rest/post-x (str "/deployment/create/"
+                        (get-in (state/app-state-cursor)
+                                [:selected-survey :survey-id :value]))
+                   {:data (deref (:data data))}
+                   (fn [_]
+                     (nav/nav! (str "/" (get-in (state/app-state-cursor)
+                                                [:selected-survey :survey-id :value]))))))))
+
 (defn extra-fields-form
-  [data owner]
+  [data owner {:keys [mode]}]
   (reify
     om/IRender
     (render [_]
@@ -326,36 +352,59 @@
                                          :disabled (if (validate-form (:data data)) "" "disabled")
                                          :title (if (validate-form (:data data)) ""
                                                     (tr/translate ::validation-failure))
-                                         :onClick #(do
-                                                     (nav/analytics-event "deployment"
-                                                                          "cameracheck-submit")
-                                                     (rest/post-x (str "/deployment/create/"
-                                                                       (get-in (state/app-state-cursor)
-                                                                               [:selected-survey :survey-id :value]))
-                                                                  {:data (deref (:data data))}
-                                                                  (fn [_]
-                                                                    (nav/nav! (str "/" (get-in (state/app-state-cursor)
-                                                                                               [:selected-survey :survey-id :value]))))))}
-                                    (tr/translate :words/create) " "
+                                         :onClick #(submit-deployment data mode)}
+                                    (if (= mode :edit)
+                                      (tr/translate :words/update)
+                                      (tr/translate :words/create)) " "
                                     (dom/span #js {:className "btn-right-icon fa fa-chevron-right"})))))))
 
 (defn deployment-form
-  [data owner]
+  [data owner opts]
   (reify
     om/IRender
     (render [_]
       (if (= (:page data) 1)
-        (om/build important-fields-form data)
-        (om/build extra-fields-form data)))))
+        (om/build important-fields-form data {:opts opts})
+        (om/build extra-fields-form data {:opts opts})))))
 
 (defn section-containers-component
-  [data owner]
+  [data owner opts]
   (reify
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/div #js {:className ""}
-                        (om/build deployment-form data))))))
+               (om/build deployment-form data {:opts opts})))))
+
+(defn edit-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (rest/get-x (str "/deployment/" (:page-id data))
+                  #(om/update! data :page-state {:data (:body %)
+                                                 :page 1}))
+      (go
+        (let [c (chan)]
+          (rest/get-x "/sites" #(go (>! c {:sites (:body %)})))
+          (rest/get-x "/cameras" #(go (>! c {:cameras (:body %)})))
+          (loop []
+            (let [v (<! c)]
+              (om/transact! data #(if (:page-state %)
+                                    (assoc % :page-state (merge (:page-state %) v))
+                                    (assoc % :page-state v))))
+            (recur)))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! data :page-state nil))
+    om/IRender
+    (render [_]
+      (when (:page-state data)
+        (dom/div #js {:className "split-menu"}
+                 (dom/div #js {:className "intro"}
+                          (dom/h4 nil (tr/translate ::edit-camera-trap)))
+                 (dom/div nil (om/build section-containers-component
+                                        (:page-state data)
+                                        {:opts {:mode :edit}})))))))
 
 (defn view-component
   [data owner]

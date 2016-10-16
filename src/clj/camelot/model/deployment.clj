@@ -396,6 +396,18 @@
       (create-new-session-and-cameras! s data))
     (throw (RuntimeException. "Invalid camera check"))))
 
+(s/defn update!
+  "Update trap station details for a deployment."
+  [state :- State
+   id :- s/Int
+   data :- TDeployment]
+  (db/with-transaction [s state]
+    (let [tss (survey-site/tsurvey-site (select-keys data [:survey-id :site-id]))
+          ss (survey-site/get-or-create! s tss)
+          ts (trap-station/update! s id
+                                   (trap-station/ttrap-station
+                                    (merge data (select-keys ss [:survey-site-id]))))])))
+
 (s/defn create!
   [state :- State
    data :- TDeployment]
