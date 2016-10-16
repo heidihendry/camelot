@@ -1,4 +1,4 @@
-## Welcome
+## Contribution Guide
 
 Welcome to the Camelot project!  Our goal is to provide an intuitive yet powerful platform for wildlife conservation research using camera trapping.  There's a whole variety of skills needed to achieve this and your skills would be very much appreciated.
 
@@ -71,6 +71,22 @@ When raising a feature request, remember the best feature requests clearly captu
 Regardless of how good a piece of software is, it offers no value if it can't be understood.  We want to provide excellent documentation, so if you see a mistake, omission or areas it can be improved, please do let us know.
 
 If you're comfortable with git, we gratefully accept [Merge Requests](https://docs.gitlab.com/ce/gitlab-basics/add-merge-request.html) for documentation improvements.  Otherwise please [raise an issue](https://gitlab.com/camelot-project/camelot/issues/new) describing the documentation change you would like to be included.
+
+### Translations
+
+Currently Camelot has internal support for translations, but has not been translated.  If you know English and another language, translations would be greatly appreciated.
+
+The Camelot project has two different types of resources available for translation:
+
+1. Camelot itself
+
+Building a translation simply involves taking the strings in the [English translation file](https://gitlab.com/camelot-project/camelot/blob/master/src/cljc/camelot/translation/en.cljc) and replacing them with translated strings.  Occasionally strings will contain `%s` or similar; this is a placeholder which gets replaced with other content by Camelot.
+
+2. Project documentation.
+
+Translations for project files, such as the User Guide or this Contribution Guide, are help to make Camelot more accessible to native speakers of other languages.
+
+To contribute new translations or improvements to existing translations back to the project, please either raise a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests) or [raise an issue](https://gitlab.com/camelot-project/camelot/issues/new).
 
 ### Code contributions
 
