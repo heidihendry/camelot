@@ -667,7 +667,7 @@ pre.field-input {
     position: relative;
     width: 100%;
     margin: 0;
-    padding: 0 1rem;
+    padding: 0 0rem;
 }
 .library .media-control-panel .preview {
     position: relative;
@@ -677,7 +677,8 @@ pre.field-input {
 }
 .library .media-control-panel img {
     position: relative;
-    flex-grow: 1;
+    float: left;
+    max-height: calc(100vh - 12rem);
     max-width: 100%;
     border: 1px solid #999;
     margin-bottom: 0;
@@ -853,40 +854,20 @@ pre.field-input {
     position: relative;
     clear: both;
 }
-#app .library .identify-selected {
-    position: absolute;
-    z-index: 600;
-    display: block;
-    width: calc(100% - 4rem);
-    height: 0;
-    clear: both;
-    top: -6rem;
-    z-index: -1;
-    transition: all 0.3s ease-in-out;
-    margin: 0 2rem;
-    border: 1px solid #ccc;
-    padding-left: 2rem;
-    padding-right: 2rem;
-    border-radius: 1rem;
-    background: #f5f5f5;
-}
-#app .library .identify-selected button {
-    margin: 0 0.5rem;
-}
-#app .library .identify-selected.show-prompt {
-    top: 5rem;
-    padding-top: 2rem;
-    padding-bottom: 4.5rem;
-    z-index: 5;
-}
-#app .library .identify-selected .field {
-    display: inline-block;
-    margin-right: 2rem;
-}
 #app .library .field-input.short-input {
     display: inline-block;
     width: 8rem;
     min-width: auto;
+}
+#app .library .identification-options {
+    position: relative;
+    top: 0.5rem;
+}
+#app .library .identification-options > * {
+    margin-left: 0.5rem;
+}
+#app .library .identification-options .field > label {
+    margin-right: 0.5rem;
 }
 #app .library .field-input.auto-input {
     display: inline-block;

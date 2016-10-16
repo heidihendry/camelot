@@ -42,17 +42,11 @@
                   (.focus (.getElementById js/document "media-collection-container"))
                   (om/update! (:identification (state/library-state)) :quantity 1)
                   (om/update! (:identification (state/library-state)) :species -1)
-                  (om/update! (:search (state/library-state)) :identify-selected false)))))
-
-(defn identify-selected-prompt
-  []
-  (if-let [el (.getElementById js/document "identify-species-select")]
-    (.focus el))
-  (om/transact! (:search (state/library-state)) :identify-selected not))
+                  (om/update! (:identification (state/library-state)) :sex -1)
+                  (om/update! (:identification (state/library-state)) :lifestage -1)))))
 
 (defn submit-identification
   []
-  (identify-selected-prompt)
   (add-sighting))
 
 (defn survey-option-component
@@ -179,9 +173,7 @@
                                        :title (tr/translate ::filter-title)
                                        :id "filter"
                                        :onChange #(om/update! data :terms %)
-                                       :onKeyDown (partial select-media-collection-container state data)
-                                       :disabled (if (get data :identify-selected)
-                                                   "disabled" "")}
+                                       :onKeyDown (partial select-media-collection-container state data)}
                         :multi-term true}}))))
 
 (defn filter-survey-component
@@ -271,14 +263,24 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/button #js {:className "btn btn-default"
-                       :id "identify-selected"
-                       :title (tr/translate ::identification-panel-button-title)
-                       :onClick #(do (identify-selected-prompt)
-                                     (nav/analytics-event "library-id" "open-identification-panel"))
-                       :disabled (if (not (:has-selected state))
-                                   "disabled" "")}
-                  (tr/translate ::identification-panel-button-text)))))
+      (if (= (get-in data [:search :mode]) :search)
+        (dom/button #js {:className "btn btn-default"
+                         :id "identify-selected"
+                         :style #js {:width "15rem"}
+                         :title (tr/translate ::identification-panel-button-title)
+                         :onClick #(do (om/update! data [:search :mode] :identify)
+                                       (nav/analytics-event "library-id" "open-identification-panel"))
+                         :disabled (if (not (:has-selected state))
+                                     "disabled" "")}
+                    (tr/translate ::identification-panel-button-text))
+        (dom/button #js {:className "btn btn-default"
+                         :style #js {:width "15rem"}
+                         :id "identify-selected"
+                         :onClick #(do (om/update! data [:search :mode] :search)
+                                       (nav/analytics-event "library-id" "open-search-panel"))
+                         :disabled (if (not (:has-selected state))
+                                     "disabled" "")}
+                    (tr/translate :words/search))))))
 
 (defn trap-station-option-component
   [data owner]
@@ -374,36 +376,24 @@
                                         :classFn #(str "fa fa-2x fa-trophy reference-quality"
                                                        (if % " yellow " ""))}})))))
 
-(defn search-bar-component
+(defn search-bar-options
   [data owner]
   (reify
     om/IRenderState
     (render-state [_ state]
-      (let [has-selected (first (util/all-media-selected))]
-        (dom/div #js {:className "search-bar"}
-                 (om/build filter-input-component (:search data) {:init-state state})
-                 (om/build filter-button-component (:search data) {:init-state state})
-                 (let [global-survey (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])]
-                   (do
-                     (dom/span nil (str " " (tr/translate :words/in) " "))
-                     (om/build filter-survey-component data {:init-state state})))
-                 (om/build trap-station-select-component data {:init-state state})
-                 (om/build subfilter-checkbox-component data
-                           {:init-state {:key :unprocessed-only
-                                         :label (tr/translate ::filter-unprocessed-label)
-                                         :search-chan (:search-chan state)}})
-                 (dom/div #js {:className "pull-right action-container"}
-                          (om/build media-flag-container-component data)
-                          (dom/button #js {:className "btn btn-default"
-                                           :onClick #(do
-                                                       (let [sw (:secondary-window data)]
-                                                         (when (and sw (not (.-closed sw)))
-                                                           (.focus sw)))
-                                                       (tincan-sender data true {}))
-                                           :title (tr/translate ::reference-window-button-title)}
-                                      (tr/translate ::reference-window-button-text))
-                          (om/build identification-panel-button-component data
-                                    {:state {:has-selected has-selected}})))))))
+      (dom/span nil
+                (om/build filter-input-component (:search data) {:init-state state})
+                (om/build filter-button-component (:search data) {:init-state state})
+                (let [global-survey (get-in (state/app-state-cursor)
+                                            [:selected-survey :survey-id :value])]
+                  (do
+                    (dom/span nil (str " " (tr/translate :words/in) " "))
+                    (om/build filter-survey-component data {:init-state state})))
+                (om/build trap-station-select-component data {:init-state state})
+                (om/build subfilter-checkbox-component data
+                          {:init-state {:key :unprocessed-only
+                                        :label (tr/translate ::filter-unprocessed-label)
+                                        :search-chan (:search-chan state)}})))))
 
 (defn validate-proposed-species
   [data]
@@ -537,45 +527,58 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className (str "identify-selected"
-                                    (if (get-in data [:search :identify-selected])
-                                      " show-prompt"
-                                      ""
-                                      ))}
-               (dom/div nil
-                        (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :sighting/taxonomy-id.label))
-                                 (om/build taxonomy-select-component data))
-                        (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :sighting/sighting-quantity.label))
-                                 (dom/input #js {:type "number"
-                                                 :className "field-input short-input"
-                                                 :value (get-in data [:identification :quantity])
-                                                 :onChange #(do
-                                                              (om/update! (:identification data) :quantity
-                                                                          (cljs.reader/read-string (.. % -target -value)))
-                                                              (nav/analytics-event "library-id" "quantity-change"))}))
-                        (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :sighting/sighting-sex.label))
-                                 (om/build sighting-sex-select-component data))
-                        (dom/div #js {:className "field"}
-                                 (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
-                                 (om/build sighting-lifestage-select-component data))
-                        (dom/div #js {:className "field"}
-                                 (dom/button #js {:className "btn btn-primary"
-                                                  :disabled (when (or (not (and (get-in data [:identification :quantity])
-                                                                                (get-in data [:identification :species])
-                                                                                (> (get-in data [:identification :species]) -1)))
-                                                                      (:taxonomy-create-mode data))
-                                                              "disabled")
-                                                  :onClick #(do (submit-identification)
-                                                                (nav/analytics-event "library-id" "submit-identification"))}
-                                             (tr/translate :words/submit))
-                                 (dom/button #js {:className "btn btn-default"
-                                                  :onClick #(do (om/update! (:search data) :identify-selected false)
-                                                                (.focus (.getElementById js/document "media-collection-container"))
-                                                                (nav/analytics-event "library-id" "cancel-identification"))}
-                                             (tr/translate :words/cancel))))))))
+      (dom/span #js {:className "identification-options"}
+                (dom/span #js {:className "field"}
+                          (dom/label nil (tr/translate :sighting/taxonomy-id.label))
+                          (om/build taxonomy-select-component data))
+                (dom/span #js {:className "field"}
+                          (dom/label nil (tr/translate :sighting/sighting-quantity.label))
+                          (dom/input #js {:type "number"
+                                          :className "field-input short-input"
+                                          :value (get-in data [:identification :quantity])
+                                          :onChange #(do
+                                                       (om/update! (:identification data) :quantity
+                                                                   (cljs.reader/read-string (.. % -target -value)))
+                                                       (nav/analytics-event "library-id" "quantity-change"))}))
+                (dom/span #js {:className "field"}
+                          (dom/label nil (tr/translate :sighting/sighting-sex.label))
+                          (om/build sighting-sex-select-component data))
+                (dom/span #js {:className "field"}
+                          (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
+                          (om/build sighting-lifestage-select-component data))
+                (dom/span #js {:className "field"}
+                          (dom/button #js {:className "btn btn-primary"
+                                           :disabled (when (or (not (and (get-in data [:identification :quantity])
+                                                                         (get-in data [:identification :species])
+                                                                         (> (get-in data [:identification :species]) -1)))
+                                                               (:taxonomy-create-mode data))
+                                                       "disabled")
+                                           :onClick #(do (submit-identification)
+                                                         (nav/analytics-event "library-id" "submit-identification"))}
+                                      (tr/translate :words/submit)))))))
+
+(defn search-bar-component
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ state]
+      (let [has-selected (first (util/all-media-selected))]
+        (dom/div #js {:className "search-bar"}
+                 (if (= (get-in data [:search :mode]) :search)
+                   (om/build search-bar-options data {:init-state state})
+                   (om/build identification-bar-component data))
+                 (dom/div #js {:className "pull-right action-container"}
+                          (om/build media-flag-container-component data)
+                          (dom/button #js {:className "btn btn-default"
+                                           :onClick #(do
+                                                       (let [sw (:secondary-window data)]
+                                                         (when (and sw (not (.-closed sw)))
+                                                           (.focus sw)))
+                                                       (tincan-sender data true {}))
+                                           :title (tr/translate ::reference-window-button-title)}
+                                      (tr/translate ::reference-window-button-text))
+                          (om/build identification-panel-button-component data
+                                    {:state {:has-selected has-selected}})))))))
 
 (defn search
   [data search records]
@@ -593,6 +596,7 @@
       {:search-chan (chan (sliding-buffer 1))})
     om/IWillMount
     (will-mount [_]
+      (om/update! (:search data) :mode :search)
       (om/update! (:search data) :page 1)
       (om/update! (:search data) :terms nil)
       (go
@@ -611,5 +615,4 @@
         (om/update! (:identification data) :dirty-state false)
         (tincan-sender data false {:prevent-open true}))
       (dom/div #js {:className "search-container"}
-               (om/build search-bar-component data {:init-state state})
-               (om/build identification-bar-component data)))))
+               (om/build search-bar-component data {:init-state state})))))
