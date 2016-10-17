@@ -180,21 +180,19 @@
 (defmethod input-field :datetime
   [[k v buf opts :as d] owner]
   (reify
-    om/IWillMount
-    (will-mount [_]
-      (when (nil? (get buf k))
-        (om/update! buf k {:value (UtcDateTime.)})))
     om/IRender
     (render [_]
       (if (:disabled opts)
-        (if (:detailed opts)
-          (let [df (DateTimeFormat. "EEE, dd LLL yyyy")
-                tf (DateTimeFormat. "HH:MM:ss")]
-            (dom/div nil
-                     (.format tf (get-in buf [k :value])) " on "
-                     (.format df (get-in buf [k :value]))))
-          (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
-            (dom/div nil (.format df (get-in buf [k :value])))))
+        (if (nil? (get-in buf [k :value]))
+          (dom/div nil "-")
+          (if (:detailed opts)
+            (let [df (DateTimeFormat. "EEE, dd LLL yyyy")
+                  tf (DateTimeFormat. "HH:MM:ss")]
+              (dom/div nil
+                       (.format tf (get-in buf [k :value])) " on "
+                       (.format df (get-in buf [k :value]))))
+            (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
+              (dom/div nil (.format df (get-in buf [k :value]))))))
         (when (get buf k)
           (om/build datepicker (get buf k)))))))
 

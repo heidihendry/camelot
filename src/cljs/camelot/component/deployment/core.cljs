@@ -157,15 +157,13 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! data [:data :validation-problem] {:value false})
-      (if-let [running (-> data :data :trap-station-session-end-date :value nil?)]
-        (om/update! data [:data :trap-station-session-end-date] {:value (UtcDateTime.)})))
+      (om/update! data [:data :validation-problem] {:value false}))
     om/IRender
     (render [_]
       (if (:can-edit? data)
         (let [data (:data data)]
           (om/update! data :validation-problem {:value false})
-          (if-let [sess-end (get-in data [:trap-station-session-end-date :value])]
+          (let [sess-end (get-in data [:trap-station-session-end-date :value])]
             (dom/div #js {:className "section"}
                      (dom/div #js {:className "generic-container"}
                               (dom/div #js {:className "help-text"} help-text)
@@ -173,11 +171,12 @@
                                        (dom/label #js {:className "field-label"} (tr/translate ::camera-check-date))
                                        (dom/div #js {:className "field-details"}
                                                 (om/build datepicker (or (get data :trap-station-session-end-date)))))
-                              (when (< (.getTime sess-end) (.getTime (get-in data [:trap-station-session-start-date :value])))
+                              (when (and sess-end
+                                         (< (.getTime sess-end) (.getTime (get-in data [:trap-station-session-start-date :value]))))
                                 (om/update! (:validation-problem data) :value true)
                                 (dom/label #js {:className "validation-warning"}
                                            (tr/translate ::date-validation-past)))
-                              (when (> (.getTime sess-end) (.getTime (UtcDateTime.)))
+                              (when (and sess-end (> (.getTime sess-end) (.getTime (UtcDateTime.))))
                                 (om/update! (:validation-problem data) :value true)
                                 (dom/label #js {:className "validation-warning"}
                                            (tr/translate ::date-validation-future)))
@@ -213,7 +212,8 @@
                                            (tr/translate ::validation-same-camera))))
                      (dom/div #js {:className "button-container"}
                               (dom/button #js {:className "btn btn-primary"
-                                               :disabled (if (get-in data [:validation-problem :value]) "disabled" "")
+                                               :disabled (if (or (nil? sess-end)
+                                                                 (get-in data [:validation-problem :value])) "disabled" "")
                                                :onClick #(do
                                                            (nav/analytics-event "deployment"
                                                                                 "cameracheck-submit")
@@ -313,19 +313,17 @@
         (om/update! data :can-edit? running)
         (when-not running
           (om/update! data :active :details)
-          (dorun (map #(om/update! % :active (= (:action %) :details))
-                      (:menu data))))))
+          (dorun (map #(om/update! % :active (= (:action %) :details)) (:menu data))))))
   om/IRender
     (render [_]
-      (when-not (nil? (:can-edit? data))
-        (dom/div nil
-                 (dom/div #js {:className "section-container"}
-                          (om/build action-menu-component data))
-                 (dom/div #js {:className "section-container"}
-                          (case (:active data)
-                            :details (om/build deployment-selected-details-component data)
-                            :check (om/build record-camera-check-component data)
-                            nil)))))))
+      (dom/div nil
+               (dom/div #js {:className "section-container"}
+                        (om/build action-menu-component data))
+               (dom/div #js {:className "section-container"}
+                        (case (:active data)
+                          :details (om/build deployment-selected-details-component data)
+                          :check (om/build record-camera-check-component data)
+                          nil))))))
 
 (defn edit-view-component
   [app owner]

@@ -26,9 +26,11 @@
 
 (defn- to-day-format
   [date style]
-  (let [labels (get days style)]
-    (str (get labels (.getDay date)) ", " (.getDate date) " "
-         (get (:short months) (.getMonth date)) " " (.getFullYear date))))
+  (if (nil? date)
+    "-"
+    (let [labels (get days style)]
+      (str (get labels (.getDay date)) ", " (.getDate date) " "
+           (get (:short months) (.getMonth date)) " " (.getFullYear date)))))
 
 (defn- to-date-format
   [date]
@@ -286,7 +288,7 @@
         {:month-change-ch (chan)
          :select-ch       (chan (sliding-buffer 1))
          :kill-ch         (chan (sliding-buffer 1))
-         :value           (d/first-of-month (get cursor :value (d/today)))})
+         :value           (d/first-of-month (or (get cursor :value) (d/today)))})
 
       om/IWillMount
       (will-mount [_]
@@ -315,7 +317,7 @@
 
       om/IRenderState
       (render-state [_ {:keys [month-change-ch select-ch value]}]
-        (let [selected (:value cursor)]
+        (let [selected (or (:value cursor) (d/today))]
           (dom/div #js {:className "gridline-wrapper"}
                  (om/build monthpicker-panel
                            {:value value}

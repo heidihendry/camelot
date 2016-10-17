@@ -223,7 +223,7 @@
                           (when (> (.getTime (or (get-in data [:data :trap-station-session-start-date :value]) (UtcDateTime.)))
                                    (.getTime (UtcDateTime.)))
                             (dom/label #js {:className "validation-warning"}
-                                       (tr/translate ::valdiation-future-date)))))
+                                       (tr/translate ::validation-future-date)))))
                (dom/label #js {:className "field-label required"}
                           (tr/translate :trap-station/trap-station-latitude.label))
                (dom/input #js {:className "field-input"
@@ -413,7 +413,7 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! data :page-state {:data {:trap-station-session-start-date {:value (UtcDateTime.)}
+      (om/update! data :page-state {:data {:trap-station-session-start-date {:value nil}
                                            :primary-camera-id {:value nil}
                                            :secondary-camera-id {:value nil}
                                            :trap-station-latitude {:value nil}
