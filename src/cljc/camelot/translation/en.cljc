@@ -639,7 +639,8 @@
 
    :camelot.component.species.core
    {:item-name "species"
-    :manage-species "Manage species"}
+    :manage-species "Manage species"
+    :confirm-delete "Are you sure you want to remove this species from the survey?"}
 
    :camelot.component.species.manage
    {:search-instructions "Search and add species using the options to the right."

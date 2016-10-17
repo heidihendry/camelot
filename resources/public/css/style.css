@@ -1549,12 +1549,19 @@ pre.field-input {
 #app .remove-file {
     padding: 0.8rem;
     padding-bottom: 0.2rem;
+    color: #999;
     margin-top: 1.5rem;
     margin-right: 1.5rem;
+}
+#app .remove {
+    padding: 1rem;
     color: #999;
 }
 #app .remove-file:hover {
     color: #666;
+}
+#app .remove:hover {
+    color: #333;
 }
 #app textarea {
     resize: vertical;

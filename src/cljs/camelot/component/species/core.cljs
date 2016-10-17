@@ -7,13 +7,24 @@
             [camelot.component.species.update :as update]
             [camelot.component.species.manage :as manage]
             [camelot.component.util :as util]
-            [camelot.translation.core :as tr]))
+            [cljs.core.async :refer [<! chan >!]]
+            [camelot.translation.core :as tr])
+    (:require-macros [cljs.core.async.macros :refer [go]]))
+
+(defn delete
+  [state data event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (when (js/confirm (tr/translate ::confirm-delete))
+    (rest/delete-x (str "/taxonomy/" (:taxonomy-id data) "/survey/" (state/get-survey-id))
+                   #(go (>! (:chan state) {:event :remove
+                                           :data data})))))
 
 (defn species-list-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/div #js {:className "menu-item detailed"
                     :onClick #(nav/nav! (str "/taxonomy/" (:taxonomy-id data)))}
                (dom/span #js {:className "menu-item-title"}
@@ -24,6 +35,8 @@
                                     (dom/label nil (tr/translate :taxonomy/taxonomy-common-name.label)) ":"
                                     " "
                                     (:taxonomy-common-name data)))
+                         (dom/div #js {:className "pull-right fa fa-trash remove"
+                                       :onClick (partial delete state data)})
                          (dom/span nil
                                    (when (:taxonomy-order data)
                                      (dom/span nil
@@ -73,14 +86,27 @@
 (defn species-menu-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:chan (chan)})
     om/IWillMount
     (will-mount [_]
       (rest/get-resource (str "/taxonomy/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value]))
-                         #(om/update! data :list (:body %))))
-    om/IRender
-    (render [_]
+                         #(om/update! data :list (:body %)))
+      (let [ch (om/get-state owner :chan)]
+        (go
+          (loop []
+            (let [r (<! ch)]
+              (cond
+                (= (:event r) :remove)
+                (do
+                  (prn "Removing")
+                  (om/transact! data :list #(remove (fn [x] (= x (:data r))) %)))))
+            (recur)))))
+    om/IRenderState
+    (render-state [_ state]
       (when (:list data)
         (dom/div #js {:className "section"}
                  (dom/div #js {:className "simple-menu scroll"}
@@ -89,7 +115,8 @@
                                       {:opts {:item-name (tr/translate ::item-name)}})
                             (om/build-all species-list-component
                                           (sort-by :taxonomy-label (:list data))
-                                          {:key :taxonomy-id})))
+                                          {:key :taxonomy-id
+                                           :init-state state})))
                  (dom/div #js {:className "sep"})
                  (dom/button #js {:className "btn btn-primary"
                                   :onClick #(do (nav/nav!
