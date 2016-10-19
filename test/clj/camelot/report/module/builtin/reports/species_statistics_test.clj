@@ -22,7 +22,12 @@
                "Presence"
                "Independent Observations"
                "Nights Elapsed"
-               "Abundance Index"])
+               "Abundance Index"
+               "Common Name"
+               "Family"
+               "Order"
+               "Class"
+               "Species Mass ID"])
 
 (defn report
   [state id data]
@@ -69,10 +74,15 @@
                                         :sighting-quantity 3
                                         :media-id 1
                                         :taxonomy-id 1
-                                        :trap-station-session-id 1}))
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))
 
   (fact "Report for one sighting should contain its summary"
     (with-redefs [taxonomy/get-specific
@@ -85,10 +95,15 @@
                                         :sighting-quantity 3
                                         :media-id 1
                                         :taxonomy-id 1
-                                        :trap-station-session-id 1}))
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 5 30 "X" 3 7 (calc-obs-nights 3 7)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 3 7 (calc-obs-nights 3 7) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))
 
   (fact "Should return a record per location."
     (with-redefs [taxonomy/get-specific
@@ -102,7 +117,12 @@
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
                                         :taxonomy-id 1
                                         :trap-station-id 1
-                                        :trap-station-session-id 1})
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2})
                             (as-sample {:taxonomy-genus "Smiley"
                                         :taxonomy-species "Wolf"
                                         :sighting-quantity 5
@@ -111,11 +131,16 @@
                                         :trap-station-latitude 5.5
                                         :trap-station-id 2
                                         :media-capture-timestamp (t/date-time 2015 1 4 10 50 15)
-                                        :trap-station-session-id 2}))
+                                        :trap-station-session-id 2
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14)]
-                        ["Smiley" "Wolf" 5.5 30.5 "X" 5 14 (calc-obs-nights 5 14)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]
+                        ["Smiley" "Wolf" 5.5 30.5 "X" 5 14 (calc-obs-nights 5 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))
 
   (fact "Should respect independence threshold setting"
     (with-redefs [taxonomy/get-specific
@@ -129,17 +154,27 @@
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
                                         :taxonomy-id 1
                                         :trap-station-id 1
-                                        :trap-station-session-id 1})
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2})
                             (as-sample {:taxonomy-genus "Smiley"
                                         :taxonomy-species "Wolf"
                                         :sighting-quantity 5
                                         :trap-station-id 1
                                         :taxonomy-id 1
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
-                                        :trap-station-session-id 1}))
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 5 30 "X" 8 7 (calc-obs-nights 8 7)]))))
+        result => (list ["Smiley" "Wolf" 5 30 "X" 8 7 (calc-obs-nights 8 7) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))
 
   (fact "Should include entries for locations the species was not found in"
     (with-redefs [taxonomy/get-specific
@@ -153,7 +188,12 @@
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
                                         :taxonomy-id 1
                                         :trap-station-id 1
-                                        :trap-station-session-id 1})
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2})
                             (as-sample {:trap-station-id 2
                                         :trap-station-longitude 40
                                         :trap-station-latitude 10
@@ -166,9 +206,9 @@
                                         :trap-station-session-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
-        result => (list ["Smiley" "Wolf" 5 30 "X" 3 21 (calc-obs-nights 3 21)]
-                        ["Smiley" "Wolf" 10 40 nil nil 21 nil]
-                        ["Smiley" "Wolf" 50 90 nil nil 21 nil]))))
+        (into #{} result) => #{["Smiley" "Wolf" 5 30 "X" 3 21 (calc-obs-nights 3 21) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]
+                               ["Smiley" "Wolf" 10 40 nil nil 21 nil nil nil nil nil nil]
+                               ["Smiley" "Wolf" 50 90 nil nil 21 nil nil nil nil nil nil]})))
 
   (fact "Should return only the species searched"
     (with-redefs [taxonomy/get-specific
@@ -181,22 +221,37 @@
                                         :sighting-quantity 3
                                         :taxonomy-id 1
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
-                                        :trap-station-session-id 1})
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2})
                             (as-sample {:taxonomy-genus "Yellow"
                                         :taxonomy-species "Spotted Cat"
                                         :sighting-quantity 5
                                         :taxonomy-id 2
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
-                                        :trap-station-session-id 2})
+                                        :trap-station-session-id 2
+                                        :taxonomy-common-name "Spotted Cat"
+                                        :taxonomy-family "Catos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 1})
                             (as-sample {:taxonomy-genus "A"
                                         :taxonomy-species "Meerkat"
                                         :sighting-quantity 1
                                         :taxonomy-id 3
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
-                                        :trap-station-session-id 3}))
+                                        :trap-station-session-id 3
+                                        :taxonomy-common-name "A Meerkat"
+                                        :taxonomy-family "Meerkatos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 1}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 3 sightings)]
-        result => (list ["A" "Meerkat" 5 30 "X" 1 21 (calc-obs-nights 1 21)])))))
+        result => (list ["A" "Meerkat" 5 30 "X" 1 21 (calc-obs-nights 1 21) "A Meerkat" "Meerkatos" "Mammal" "Animal" 1])))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
@@ -222,7 +277,12 @@
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
                                         :taxonomy-id 1
                                         :trap-station-id 1
-                                        :trap-station-session-id 1})
+                                        :trap-station-session-id 1
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2})
                             (as-sample {:taxonomy-genus "Smiley"
                                         :taxonomy-species "Wolf"
                                         :sighting-quantity 5
@@ -231,9 +291,14 @@
                                         :trap-station-latitude 5.5
                                         :trap-station-id 2
                                         :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
-                                        :trap-station-session-id 2}))
+                                        :trap-station-session-id 2
+                                        :taxonomy-common-name "Smiley Wolf"
+                                        :taxonomy-family "Wolfos"
+                                        :taxonomy-order "Mammal"
+                                        :taxonomy-class "Animal"
+                                        :species-mass-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (csv-report state 1 sightings)]
         result => (str (str/join "," headings) "\n"
-                       "Smiley,Wolf,5,30,X,3,14," (calc-obs-nights 3 14) "\n"
-                       "Smiley,Wolf,5.5,30.5,X,5,14," (calc-obs-nights 5 14) "\n")))))
+                       "Smiley,Wolf,5,30,X,3,14," (calc-obs-nights 3 14) ",Smiley Wolf,Wolfos,Mammal,Animal,2\n"
+                       "Smiley,Wolf,5.5,30.5,X,5,14," (calc-obs-nights 5 14) ",Smiley Wolf,Wolfos,Mammal,Animal,2\n")))))
