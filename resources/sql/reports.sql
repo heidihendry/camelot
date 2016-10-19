@@ -20,6 +20,9 @@ SELECT survey.survey_id,
        taxonomy.taxonomy_class,
        taxonomy.taxonomy_common_name,
        taxonomy.taxonomy_notes,
+       taxonomy.species_mass_id,
+       species_mass.species_mass_start,
+       species_mass.species_mass_end,
        camera.camera_id,
        camera.camera_name,
        camera.camera_make,
@@ -61,6 +64,7 @@ LEFT OUTER JOIN sighting USING (media_id)
 LEFT OUTER JOIN taxonomy USING (taxonomy_id)
 LEFT OUTER JOIN camera USING (camera_id)
 LEFT OUTER JOIN photo USING (media_id)
+LEFT OUTER JOIN species_mass USING (species_mass_id)
 
 -- name: -get-all-by-site
 SELECT survey.survey_id,
@@ -84,6 +88,9 @@ SELECT survey.survey_id,
        taxonomy.taxonomy_class,
        taxonomy.taxonomy_common_name,
        taxonomy.taxonomy_notes,
+       taxonomy.species_mass_id,
+       species_mass.species_mass_start,
+       species_mass.species_mass_end,
        camera.camera_id,
        camera.camera_name,
        camera.camera_make,
@@ -125,6 +132,7 @@ LEFT OUTER JOIN sighting USING (media_id)
 LEFT OUTER JOIN taxonomy USING (taxonomy_id)
 LEFT OUTER JOIN camera USING (camera_id)
 LEFT OUTER JOIN photo USING (media_id)
+LEFT OUTER JOIN species_mass USING (species_mass_id)
 
 -- name: -get-all-by-taxonomy
 SELECT survey.survey_id,
@@ -148,6 +156,9 @@ SELECT survey.survey_id,
        taxonomy.taxonomy_class,
        taxonomy.taxonomy_common_name,
        taxonomy.taxonomy_notes,
+       taxonomy.species_mass_id,
+       species_mass.species_mass_start,
+       species_mass.species_mass_end,
        camera.camera_id,
        camera.camera_name,
        camera.camera_make,
@@ -189,6 +200,7 @@ LEFT OUTER JOIN site USING (site_id)
 LEFT OUTER JOIN survey USING (survey_id)
 LEFT OUTER JOIN camera USING (camera_id)
 LEFT OUTER JOIN photo USING (media_id)
+LEFT OUTER JOIN species_mass USING (species_mass_id)
 
 -- name: -get-all-by-camera
 SELECT survey.survey_id,
@@ -212,6 +224,9 @@ SELECT survey.survey_id,
        taxonomy.taxonomy_class,
        taxonomy.taxonomy_common_name,
        taxonomy.taxonomy_notes,
+       taxonomy.species_mass_id,
+       species_mass.species_mass_start,
+       species_mass.species_mass_end,
        camera.camera_id,
        camera.camera_name,
        camera.camera_make,
@@ -253,6 +268,7 @@ LEFT OUTER JOIN media USING (trap_station_session_camera_id)
 LEFT OUTER JOIN sighting USING (media_id)
 LEFT OUTER JOIN taxonomy USING (taxonomy_id)
 LEFT OUTER JOIN photo USING (media_id)
+LEFT OUTER JOIN species_mass USING (species_mass_id)
 
 -- name: -get-all
 SELECT survey.survey_id,
@@ -311,6 +327,7 @@ LEFT OUTER JOIN site USING (site_id)
 LEFT OUTER JOIN survey USING (survey_id)
 LEFT OUTER JOIN camera USING (camera_id)
 LEFT OUTER JOIN photo USING (media_id)
+LEFT OUTER JOIN species_mass USING (species_mass_id)
 UNION
 SELECT survey.survey_id,
        survey.survey_name,
@@ -368,3 +385,4 @@ LEFT OUTER JOIN sighting USING (media_id)
 LEFT OUTER JOIN taxonomy USING (taxonomy_id)
 LEFT OUTER JOIN camera USING (camera_id)
 LEFT OUTER JOIN photo USING (media_id)
+LEFT OUTER JOIN species_mass USING (species_mass_id)

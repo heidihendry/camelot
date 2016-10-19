@@ -24,7 +24,7 @@
   [:survey-id
    :survey-name
    :survey-directory
-   :survey-site-id
+   :survey-notes
    :site-id
    :site-name
    :site-sublocation
@@ -32,22 +32,8 @@
    :site-state-province
    :site-country
    :site-area
-   :trap-station-id
-   :trap-station-name
-   :trap-station-longitude
-   :trap-station-latitude
-   :trap-station-altitude
-   :trap-station-session-start-date
-   :trap-station-session-end-date
-   :trap-station-session-id
-   :trap-station-session-camera-id
-   :camera-id
-   :camera-name
-   :camera-make
-   :camera-model
-   :media-id
-   :media-capture-timestamp
-   :media-filename
+   :site-notes
+   :survey-site-id
    :taxonomy-id
    :taxonomy-species
    :taxonomy-genus
@@ -55,6 +41,30 @@
    :taxonomy-order
    :taxonomy-class
    :taxonomy-common-name
+   :taxonomy-notes
+   :species-mass-id
+   :species-mass-start
+   :species-mass-end
+   :camera-id
+   :camera-name
+   :camera-make
+   :camera-model
+   :camera-notes
+   :trap-station-id
+   :trap-station-name
+   :trap-station-longitude
+   :trap-station-latitude
+   :trap-station-altitude
+   :trap-station-notes
+   :trap-station-session-start-date
+   :trap-station-session-end-date
+   :trap-station-session-id
+   :trap-station-session-camera-id
+   :media-id
+   :media-capture-timestamp
+   :media-filename
+   :media-format
+   :media-notes
    :sighting-quantity
    :sighting-sex
    :sighting-lifestage
