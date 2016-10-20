@@ -7,15 +7,7 @@
 
 (defn report-output
   [state {:keys []}]
-  {:columns [:all]
-   :order-by [:survey-id
-              :survey-site-id
-              :trap-station-id
-              :trap-station-session-id
-              :trap-station-session-camera-id
-              :media-id
-              :taxonomy-id
-              :sighting-id]})
+  {:columns [:all]})
 
 (defn form-smith
   [state]

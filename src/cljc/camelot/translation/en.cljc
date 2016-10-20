@@ -415,6 +415,7 @@
     :media-capture-timestamp "Media Capture Timestamp"
     :media-notes "Media Notes"
     :media-filename "Media Filename"
+    :media-format "Media Format"
     :sighting-quantity "Sighting Quantity"
     :sighting-lifestage "Sighting Life Stage"
     :sighting-sex "Sighting Sex"

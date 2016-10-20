@@ -58,6 +58,10 @@
    id :- s/Int]
   (map media (db/with-db-keys state -get-all {:trap-station-session-camera-id id})))
 
+(s/defn get-all* :- [Media]
+  [state :- State]
+  (map media (db/clj-keys (db/with-connection (:connection state) -get-all*))))
+
 (s/defn get-all-files-by-survey :- [s/Str]
   [state :- State
    id :- s/Int]

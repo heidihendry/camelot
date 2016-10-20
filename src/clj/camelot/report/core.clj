@@ -119,16 +119,20 @@
             columns)
    data))
 
-(defn- distinct-for-known-keys
-  [test-rec comp-rec]
-  (cond
-    (= test-rec comp-rec) true
-    (every? #(= (test-rec %) (comp-rec %)) (keys test-rec)) false
-    :else true))
+(defn- better-for-known-keys
+  [smaller larger]
+  (when (= smaller (select-keys larger (keys smaller)))
+    larger))
 
 (defn- distinct-in-results
-  [result-set testrec]
-  (every? #(distinct-for-known-keys testrec %) result-set))
+  [results]
+  (loop [{:keys [acc check against] :as ps} {:acc [] :against results :check results}]
+    (let [ag (drop-while #(= (count (first check)) (count %)) against)]
+      (if (empty? check)
+        acc
+        (if (first (filter #(better-for-known-keys (first check) %) ag))
+          (recur {:check (rest check) :against ag :acc acc})
+          (recur {:check (rest check) :against ag :acc (conj acc (first check))}))))))
 
 (defn- project
   [columns data]
@@ -136,7 +140,8 @@
                   (into #{} data)
                   (set/project data columns))]
     (->> results
-         (filter #(distinct-in-results results %))
+         (sort-by count)
+         distinct-in-results
          (fill-keys columns)
          (into #{}))))
 
