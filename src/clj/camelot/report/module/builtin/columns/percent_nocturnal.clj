@@ -45,8 +45,8 @@
 
 (defn aggregate-is-night
   [state col data]
-  (col-util/aggregate-boolean-by-sightings :media-id state col
-                                           (indep/->independent-sightings state data)))
+  (col-util/aggregate-boolean-by-independent-observations
+   :media-id state col (indep/->independent-sightings state data)))
 
 (module/register-column
  :percent-nocturnal

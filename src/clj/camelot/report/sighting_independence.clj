@@ -94,12 +94,23 @@
          (sort (partial datetime-comparison :media-capture-timestamp))
          (reduce indep-reducer {}))))
 
-(s/defn ->independent-sightings
+(s/defn sighting-group-independence
+  "Check independence of a group of sightings where they may be considered dependent based on time and sighting information."
   [state sightings]
   (->> (independent-sightings-by-species state sightings)
        vals
        flatten
        (sort-by :media-capture-timestamp)))
+
+(s/defn ->independent-sightings
+  "Process all records, subdividing by trap station session ID before checking
+  independence."
+  [state sightings]
+  (->> sightings
+       (group-by :trap-station-session-id)
+       vals
+       (map (partial sighting-group-independence state))
+       (flatten)))
 
 (s/defn extract-independent-sightings
   "Extract the sightings, accounting for the independence threshold, for an album."

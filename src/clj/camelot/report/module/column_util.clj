@@ -60,7 +60,7 @@
    data :- [{s/Keyword s/Any}]]
   (aggregate-boolean* boolean-reducer group-col state col data))
 
-(s/defn aggregate-boolean-by-sightings
+(s/defn aggregate-boolean-by-independent-observations
   "Aggregate boolean fields as a percentage of sighting quantities."
   [group-col :- s/Keyword
    state :- State

@@ -414,25 +414,25 @@
       result => (list ["Smiley" "Wolf" 2 2 4 "25.00" 14 (calc-obs-nights 4 14)]
                       ["Yellow" "Spotted Cat" 1 1 5 "100.00" 14 (calc-obs-nights 5 14)])))
 
-  (fact "Should calculate nocturnal sightings based on all sightings in media"
+  (fact "Dependent sightings which start at night should be classified as a night sighting."
     (let [sightings (list (->record {:taxonomy-id 2
                                      :taxonomy-genus "Smiley"
                                      :taxonomy-species "Wolf"
-                                     :sighting-quantity 3
-                                     :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 30 15)
                                      :survey-id 1
                                      :media-id 1
                                      :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
                                      :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
                                      :trap-station-session-id 1
                                      :trap-station-id 1})
-                          (->record {:taxonomy-id 1
-                                     :taxonomy-genus "Yellow"
-                                     :taxonomy-species "Spotted Cat"
-                                     :sighting-quantity 5
-                                     :media-capture-timestamp (t/date-time 2015 1 3 1 20 15)
+                          (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 45 15)
                                      :survey-id 1
-                                     :media-id 1
+                                     :media-id 3
                                      :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
                                      :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
                                      :trap-station-session-id 1
@@ -450,8 +450,150 @@
                                      :trap-station-id 3}))
           state (gen-state-helper {:sighting-independence-minutes-threshold 20})
           result (report state 1 sightings)]
-      result => (list ["Smiley" "Wolf" 2 2 4 "25.00" 14 (calc-obs-nights 4 14)]
-                      ["Yellow" "Spotted Cat" 1 1 5 "100.00" 14 (calc-obs-nights 5 14)]))))
+      result => (list ["Smiley" "Wolf" 2 3 2 "100.00" 14 (calc-obs-nights 2 14)])))
+
+  (fact "The number of sightings in a dependent sighting should affect the quantity."
+    (let [sightings (list (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 30 15)
+                                     :survey-id 1
+                                     :media-id 1
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 1
+                                     :trap-station-id 1})
+                          (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :sighting-quantity 9
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 45 15)
+                                     :survey-id 1
+                                     :media-id 3
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 1
+                                     :trap-station-id 1})
+                          (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :survey-id 1
+                                     :media-id 2
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 10 00 15)
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 3
+                                     :trap-station-id 3}))
+          state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+          result (report state 1 sightings)]
+      result => (list ["Smiley" "Wolf" 2 3 10 "90.00" 14 (calc-obs-nights 10 14)])))
+
+  (fact "Media with two different sightings should be calculated correctly."
+    (let [sightings (list (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 30 15)
+                                     :survey-id 1
+                                     :media-id 1
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 1
+                                     :trap-station-id 1})
+                          (->record {:taxonomy-id 1
+                                     :taxonomy-genus "Yellow"
+                                     :taxonomy-species "Spotted Cat"
+                                     :sighting-id 2
+                                     :sighting-quantity 2
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 30 15)
+                                     :survey-id 1
+                                     :media-id 1
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 1
+                                     :trap-station-id 1})
+                          (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :survey-id 1
+                                     :media-id 2
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 10 00 15)
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 3
+                                     :trap-station-id 3}))
+          state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+          result (report state 1 sightings)]
+      result => (list ["Smiley" "Wolf" 2 2 2 "50.00" 14 (calc-obs-nights 2 14)]
+                      ["Yellow" "Spotted Cat" 1 1 2 "100.00" 14 (calc-obs-nights 2 14)])))
+
+  (fact "Media from separate trap stations sessions are not to be considered dependent for nocturnal calculations."
+    (let [sightings (list (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 30 15)
+                                     :survey-id 1
+                                     :media-id 1
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 1
+                                     :trap-station-id 1})
+                          (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :survey-id 1
+                                     :media-id 2
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 50 00)
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 3
+                                     :trap-station-id 2}))
+          state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+          result (report state 1 sightings)]
+      result => (list ["Smiley" "Wolf" 2 2 2 "50.00" 14 (calc-obs-nights 2 14)])))
+
+  (fact "Independent sighting figures must not be counted twice."
+    (let [sightings (list (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 6 30 15)
+                                     :survey-id 1
+                                     :media-id 1
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 1
+                                     :trap-station-id 1})
+                          (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :survey-id 1
+                                     :media-id 2
+                                     :sighting-quantity 1
+                                     :media-capture-timestamp (t/date-time 2015 1 3 8 50 00)
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 3
+                                     :trap-station-id 2})
+                          (->record {:taxonomy-id 2
+                                     :taxonomy-genus "Smiley"
+                                     :taxonomy-species "Wolf"
+                                     :survey-id 1
+                                     :media-id 3
+                                     :sighting-quantity 2
+                                     :media-capture-timestamp (t/date-time 2015 1 3 10 0 00)
+                                     :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
+                                     :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+                                     :trap-station-session-id 3
+                                     :trap-station-id 2}))
+          state (gen-state-helper {:sighting-independence-minutes-threshold 20})
+          result (report state 1 sightings)]
+      result => (list ["Smiley" "Wolf" 2 3 4 "25.00" 14 (calc-obs-nights 4 14)]))))
 
 (facts "CSV output"
   (fact "CSV should contain header row"
