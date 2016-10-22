@@ -111,17 +111,26 @@ There are plenty of resources for working with Clojure; this contribution guide 
 
 ### Building Camelot
 
-Building Camelot is one command:
+There's only a couple of steps to getting Camelot built from sources\*.
 
+1. Camelot uses Leiningen for managing the project build.  First, follow [the installation instructions](http://leiningen.org/#install) for Leiningen.
+
+2. Once installed, building Camelot is one command\*\*:
+
+```
 ./script/clean-build.sh
+```
 
-This will produce artifacts in /target.  To run the artefact just built, use:
+This will produce artifacts in /target.  To run the new build, use:
 
 ```
 java -jar target/camelot.jar
 ```
 
-**Note**: building and running artifacts probably shouldn't be your normal dev-loop.  Most Clojure developers prefer to work interactively at a REPL.
+If you encounter problems, raise an issue or reach out via the Google Group.
+
+* \* Camelot is designed to be developed within a *nix environment (e.g., Linux or OSX).  It may be possible to follow this process within Windows using tools such as msys2.*
+* *\*\** Building and running artifacts probably shouldn't be your normal dev-loop.  Most Clojure developers prefer to work interactively at a REPL.
 
 ### Running tests
 
