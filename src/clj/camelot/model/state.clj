@@ -10,6 +10,7 @@
    (s/required-key :night-start-hour) s/Int
    (s/required-key :project-start) org.joda.time.DateTime
    (s/required-key :project-end) org.joda.time.DateTime
+   (s/required-key :submit-analytics) (s/maybe s/Bool)
    (s/required-key :sighting-independence-minutes-threshold) s/Num
    (s/required-key :surveyed-species) [s/Str]
    (s/required-key :required-fields) [[s/Keyword]]

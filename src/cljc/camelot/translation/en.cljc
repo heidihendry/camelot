@@ -299,6 +299,8 @@
     :infrared-iso-value-threshold.description "ISO value of the photos beyond which it is considered 'night'"
     :sighting-independence-minutes-threshold.label "Sighting Independence Threshold (mins)"
     :sighting-independence-minutes-threshold.description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"
+    :submit-analytics.label "Send anonymous usage data"
+    :submit-analytics.description "If this is enabled, anonymous usage data will be sent to the Camelot Project.  This data will only be used for the purpose of improving Camelot."
     :language.label "Language"
     :language.description "Interface language to use"
     :root-path.label "Survey Directory"

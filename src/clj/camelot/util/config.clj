@@ -20,6 +20,7 @@
   {:erroneous-infrared-threshold 0.2
    :infrared-iso-value-threshold 999
    :language :en
+   :submit-analytics false
    :root-path nil
    :night-end-hour 5
    :night-start-hour 21

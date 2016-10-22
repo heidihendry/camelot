@@ -241,6 +241,13 @@ a:hover {
     position: relative;
     top: 0.5rem;
 }
+#settings input.field-input-checkbox {
+    margin-left: 1rem;
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    top: 0.5rem;
+}
 pre.field-input {
     background: #ebebe4;
     color: #666;

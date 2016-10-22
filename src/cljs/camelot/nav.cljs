@@ -36,20 +36,23 @@
 
 (defn analytics-event
   ([component action]
-   (if-let [ga (aget js/window "cljs_ga")]
-     (ga "send" "event" component action)
-     (.warn js/console "Analytics library not found")))
+   (when (get-in (state/resources-state) [:settings :submit-analytics :value])
+     (if-let [ga (aget js/window "cljs_ga")]
+       (ga "send" "event" component action)
+       (.warn js/console "Analytics library not found"))))
   ([component action label]
-   (if-let [ga (aget js/window "cljs_ga")]
-     (ga "send" "event" component action label)
-     (.warn js/console "Analytics library not found"))))
+   (when (get-in (state/resources-state) [:settings :submit-analytics :value])
+     (if-let [ga (aget js/window "cljs_ga")]
+       (ga "send" "event" component action label)
+       (.warn js/console "Analytics library not found")))))
 
 (defn analytics-pageview
   [page]
-  (if-let [ga (aget js/window "cljs_ga")]
-    (do
-      (ga "set" "page" page)
-      (ga "send" "pageview"))))
+  (when (get-in (state/resources-state) [:settings :submit-analytics :value])
+    (if-let [ga (aget js/window "cljs_ga")]
+      (do
+        (ga "set" "page" page)
+        (ga "send" "pageview")))))
 
 (defn set-token!
   [history token]
