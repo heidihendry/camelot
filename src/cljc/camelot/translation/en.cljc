@@ -592,6 +592,8 @@
     :show-details "Show details"
     :blank-item-name "camera checks"
     :media-uploaded "Media uploaded"
+    :confirm-delete "Are you sure you want to delete this camera check?"
+    :confirm-delete-has-media "Are you sure you want to delete this camera check? This will also delete any associated media."
     :blank-advice "These will appear when you add checks to your camera trap stations."}
 
    :camelot.component.deployment.shared

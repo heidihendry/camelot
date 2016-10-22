@@ -16,6 +16,17 @@
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 (def ^:private help-text (tr/translate ::help-text))
 
+(defn delete
+  "Delete the session camera and trigger a removal event."
+  [state data event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (when (js/confirm (if (:has-uploaded-media data)
+                      (tr/translate ::confirm-delete-has-media)
+                      (tr/translate ::confirm-delete)))
+    (rest/delete-x (str "/trap-station-session-cameras/" (:trap-station-session-camera-id data))
+                   #(go (>! (:chan state) {:event :delete :data data})))))
+
 (defn- add-upload-problem
   [owner event-details desc]
   (apply (partial nav/analytics-event "capture-upload") event-details)
@@ -140,6 +151,9 @@
                         (tf/unparse day-formatter (:trap-station-session-start-date data))
                         " " (tr/translate :words/to-lc) " "
                         (tf/unparse day-formatter (:trap-station-session-end-date data)))
+               (when (or (zero? (get state :total)) (nil? (get state :total)))
+                 (dom/div #js {:className "pull-right fa fa-trash remove restricted"
+                               :onClick (partial delete state data)}))
                (dom/div #js {:className "menu-item-description"}
                         (dom/label nil (tr/translate ::gps-coordinates) ":")
                         " "
@@ -165,6 +179,9 @@
 (defn recent-deployment-section-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:chan (chan)})
     om/IWillMount
     (will-mount [_]
       (om/update! data :deployment-sort-order :trap-station-session-end-date)
@@ -172,9 +189,17 @@
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value])
                               "/recent")
-                         #(om/update! data :recent-deployments (:body %))))
-    om/IRender
-    (render [_]
+                         #(om/update! data :recent-deployments (:body %)))
+      (let [ch (om/get-state owner :chan)]
+        (go
+          (loop []
+            (let [r (<! ch)]
+              (cond
+                (= (:event r) :delete)
+                (om/transact! data :recent-deployments #(remove (fn [x] (= x (:data r))) %))))
+            (recur)))))
+    om/IRenderState
+    (render-state [_ state]
       (dom/div #js {:className "section"}
                (dom/div #js {:className "simple-menu"}
                         (if (empty? (:recent-deployments data))
@@ -187,4 +212,5 @@
                                    (om/build-all recent-deployment-list-component
                                                  (sort (shared/deployment-sorters (get data :deployment-sort-order))
                                                        (:recent-deployments data))
-                                                 {:key :trap-station-session-camera-id}))))))))
+                                                 {:key :trap-station-session-camera-id
+                                                  :state state}))))))))
