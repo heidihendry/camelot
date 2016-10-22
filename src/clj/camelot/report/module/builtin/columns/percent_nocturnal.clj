@@ -10,7 +10,7 @@
   [state]
   (let [tz-str (get-in state [:config :timezone])]
     (if tz-str
-      (TimeZone/getTimeZone tz-str)
+      (TimeZone/getTimeZone ^String tz-str)
       (TimeZone/getDefault))))
 
 (defn- is-night?
