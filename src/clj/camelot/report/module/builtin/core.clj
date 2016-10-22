@@ -21,4 +21,5 @@
              trap-station
              effort-summary
              camera-traps
-             record-table]))
+             record-table
+             occupancy-matrix]))

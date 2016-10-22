@@ -180,6 +180,10 @@
 (defmethod input-field :datetime
   [[k v buf opts :as d] owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (when (nil? (get buf k))
+        (om/update! buf k {:value nil})))
     om/IRender
     (render [_]
       (if (:disabled opts)
@@ -193,8 +197,7 @@
                        (.format df (get-in buf [k :value]))))
             (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
               (dom/div nil (.format df (get-in buf [k :value]))))))
-        (when (get buf k)
-          (om/build datepicker (get buf k)))))))
+        (om/build datepicker (get buf k))))))
 
 (defmethod input-field :percentage
   [[k v buf opts :as d] owner]

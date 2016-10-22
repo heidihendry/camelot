@@ -466,6 +466,16 @@
     :description "A CamtrapR-compatible RecordTable export of independent sightings."
     :media-directory "Media Directory"}
 
+   :camelot.report.module.builtin.reports.occupancy-matrix
+   {:title-count "Occupancy Matrix - species count"
+    :description-count "Occupancy matrix showing the number of independent sightings of a species per day per trap station. Suitable for use with PRESENCE."
+    :title-presence "Occupancy Matrix - species presence."
+    :description-presence "Occupancy matrix showing whether a species was present at a trap station on a certain day. Suitable for use with PRESENCE."
+    :start-date "Start date"
+    :start-date-description "Date to begin the matrix from, inclusive."
+    :end-date "End date"
+    :end-date-description "Date to end the matrix on, inclusive."}
+
    :camelot.handler.capture
    {:timestamp-outside-range "Timestamp is outside of the session dates."}
 
