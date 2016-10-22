@@ -361,7 +361,7 @@ Each of the `Database`, `Media` and `FileStore` directories should be backed up 
 
 Custom reports and column definitions for reports can be registered by creating a *reports module*. A reports module can also override existing reports and columns.
 
-Reports modules are Clojure files (`.clj` extension) and are stored under the subdirectory `/modules/reports` of Camelot's config directory (described above). If the `/modules/reports` subdirectories don't exist, you will need to create them.
+Reports modules are Clojure files (`.clj` extension) and are stored under the `modules` subdirectory of Camelot's config directory (described above).
 
 All modules in this directory will be loaded before each report is ran.
 
