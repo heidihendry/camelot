@@ -473,6 +473,7 @@
    {:new-camera-name-placeholder "New camera name..."
     :invalid-title "A camera with this name already exists."
     :filter-cameras "Filter cameras..."
+    :confirm-delete "Are you sure you want to delete this camera?"
     :blank-filter-advice "You can add cameras using the input field below"
     :blank-item-name "cameras"}
 

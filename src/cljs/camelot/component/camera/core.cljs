@@ -7,7 +7,19 @@
             [camelot.component.camera.manage :as manage]
             [camelot.util.cursorise :as cursorise]
             [camelot.translation.core :as tr]
-            [camelot.util.filter :as filter]))
+            [cljs.core.async :refer [<! chan >!]]
+            [camelot.util.filter :as filter])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
+
+(defn delete
+  "Delete the camera and trigger a removal event."
+  [state data event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (when (js/confirm (tr/translate ::confirm-delete))
+    (rest/delete-x (str "/cameras/" (:camera-id data))
+                   #(go (>! (:chan state) {:event :delete
+                                           :data data})))))
 
 (defn add-success-handler
   [data resp]
@@ -51,14 +63,16 @@
 (defn camera-list-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(nav/nav! (str "/camera/" (:camera-id data)))}
                (dom/span #js {:className "status pull-right"}
                          (:camera-status-description data))
                (dom/span #js {:className "menu-item-title"}
                          (:camera-name data))
+               (dom/div #js {:className "pull-right fa fa-trash remove restricted"
+                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-description"}
                          (:camera-notes data))))))
 
@@ -84,12 +98,23 @@
 (defn camera-menu-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:chan (chan)})
     om/IWillMount
     (will-mount [_]
       (rest/get-resource "/cameras"
-                         #(om/update! data :list (:body %))))
-    om/IRender
-    (render [_]
+                         #(om/update! data :list (:body %)))
+      (let [ch (om/get-state owner :chan)]
+        (go
+          (loop []
+            (let [r (<! ch)]
+              (cond
+                (= (:event r) :delete)
+                (om/transact! data :list #(remove (fn [x] (= x (:data r))) %))))
+            (recur)))))
+    om/IRenderState
+    (render-state [_ state]
       (when (:list data)
         (dom/div #js {:className "section"}
                  (dom/div nil
@@ -110,7 +135,8 @@
                                         {:opts {:item-name (tr/translate ::blank-item-name)
                                                 :advice (tr/translate ::blank-filter-advice)}})
                               (om/build-all camera-list-component filtered
-                                            {:key :camera-id}))))
+                                            {:key :camera-id
+                                             :init-state state}))))
                  (dom/div #js {:className "sep"})
                  (om/build add-camera-component data)
                  (dom/button #js {:className "btn btn-default"

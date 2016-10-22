@@ -9,7 +9,7 @@
             [camelot.component.util :as util]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.translation.core :as tr])
-    (:require-macros [cljs.core.async.macros :refer [go]]))
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn delete
   [state data event]
@@ -101,9 +101,7 @@
             (let [r (<! ch)]
               (cond
                 (= (:event r) :remove)
-                (do
-                  (prn "Removing")
-                  (om/transact! data :list #(remove (fn [x] (= x (:data r))) %)))))
+                (om/transact! data :list #(remove (fn [x] (= x (:data r))) %))))
             (recur)))))
     om/IRenderState
     (render-state [_ state]
