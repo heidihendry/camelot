@@ -12,8 +12,7 @@
   "Return a list of dates between start-date and end date, exclusive."
   [start-date end-date-excl]
   (loop [{:keys [day acc]} {:day start-date :acc []}]
-    (if (or (t/equal? day end-date-excl)
-            (t/after? day end-date-excl))
+    (if (t/after? day end-date-excl)
       acc
       (recur {:day (t/plus day (t/days 1)) :acc (conj acc (to-day day))}))))
 
@@ -32,9 +31,9 @@
   "Generate a row with one entry for each day."
   [state value-fn taxonomy-id start-date end-excl day-list data]
   (let [by-day (->> data
-                    (filter #(and (:media-capture-timestamp %)
-                                  (t/after? (:media-capture-timestamp %) start-date)
-                                  (t/before? (:media-capture-timestamp %) end-excl)))
+                    (remove #(or (not (:media-capture-timestamp %))
+                                 (t/before? (:media-capture-timestamp %) start-date)
+                                 (t/after? (:media-capture-timestamp %) end-excl)))
                     (filter #(= (:taxonomy-id %) taxonomy-id))
                     data-by-day)]
     (map (partial value-fn by-day) day-list)))
