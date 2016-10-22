@@ -220,20 +220,22 @@
   "Generate a report given an output configuration and data."
   [state :- State
    {:keys [columns rewrites pre-transforms pre-filters apply-fn
-           transforms filters aggregate-on order-by]}
+           transforms filters aggregate-on order-by function]}
    data :- [{s/Keyword s/Any}]]
-  (->> data
-       (transform-records state rewrites)
-       (add-calculated-columns state columns)
-       (transform-records state pre-transforms)
-       (filter-records state pre-filters)
-       (maybe-apply state apply-fn)
-       (aggregate-data state columns aggregate-on)
-       (add-post-aggregate-columns state columns)
-       (transform-records state transforms)
-       (filter-records state filters)
-       (project columns)
-       (sort-result order-by)))
+  (if function
+    (function state data)
+    (->> data
+         (transform-records state rewrites)
+         (add-calculated-columns state columns)
+         (transform-records state pre-transforms)
+         (filter-records state pre-filters)
+         (maybe-apply state apply-fn)
+         (aggregate-data state columns aggregate-on)
+         (add-post-aggregate-columns state columns)
+         (transform-records state transforms)
+         (filter-records state filters)
+         (project columns)
+         (sort-result order-by))))
 
 (defn- all-cols?
   [cols]
@@ -287,10 +289,12 @@
         cols (if (all-cols? (:columns params))
                all-columns
                (:columns params))]
-    (->> d
-         (as-dashed-rows state cols)
-         (cons-headings state cols (custom-titles state column-title-fn))
-         (to-csv-string))))
+    (if (:function params)
+      (to-csv-string d)
+      (->> d
+           (as-dashed-rows state cols)
+           (cons-headings state cols (custom-titles state column-title-fn))
+           (to-csv-string)))))
 
 (s/defn report :- [s/Any]
   "Produce a report, with each record represented as a vector."
