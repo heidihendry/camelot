@@ -6,7 +6,19 @@
             [camelot.rest :as rest]
             [camelot.component.site.manage :as manage]
             [camelot.util.cursorise :as cursorise]
-            [camelot.translation.core :as tr]))
+            [camelot.translation.core :as tr]
+            [cljs.core.async :refer [<! chan >!]])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
+
+(defn delete
+  "Delete the site and trigger a removal event."
+  [state data event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (when (js/confirm (tr/translate ::confirm-delete))
+    (rest/delete-x (str "/sites/" (:site-id data))
+                   #(go (>! (:chan state) {:event :delete
+                                           :data data})))))
 
 (defn add-success-handler
   [data resp]
@@ -50,21 +62,23 @@
 (defn site-list-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(nav/nav! (str "/site/" (:site-id data)))}
                (dom/span #js {:className "status pull-right"}
                          (:site-city data))
                (dom/span #js {:className "menu-item-title"}
                          (:site-name data))
+               (dom/div #js {:className "pull-right fa fa-trash remove restricted"
+                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-description"}
                          (when-not (empty? (:site-sublocation data))
                            (dom/span nil
                                      (dom/label nil (tr/translate :site/site-sublocation.label) ":")
                                      " "
                                      (:site-sublocation data) ", "))
-                         (when-not (empty? (:site-city data))
+                         (when-not (empty? (:site-state-province data))
                            (dom/span nil
                                      (dom/label nil
                                                 (tr/translate :site/site-state-province.label) ":")
@@ -95,12 +109,23 @@
 (defn site-menu-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:chan (chan)})
     om/IWillMount
     (will-mount [_]
       (rest/get-resource "/sites"
-                         #(om/update! data :list (:body %))))
-    om/IRender
-    (render [_]
+                         #(om/update! data :list (:body %)))
+      (let [ch (om/get-state owner :chan)]
+        (go
+          (loop []
+            (let [r (<! ch)]
+              (cond
+                (= (:event r) :delete)
+                (om/transact! data :list #(remove (fn [x] (= x (:data r))) %))))
+            (recur)))))
+    om/IRenderState
+    (render-state [_ state]
       (when (:list data)
         (dom/div #js {:className "section"}
                  (dom/div nil
@@ -124,7 +149,8 @@
                                         {:opts {:item-name (tr/translate ::item-name)
                                                 :advice (tr/translate ::advice)}})
                               (om/build-all site-list-component filtered
-                                            {:key :site-id}))))
+                                            {:key :site-id
+                                             :init-state state}))))
                  (dom/div #js {:className "sep"})
                  (om/build add-site-component data)
                  (dom/button #js {:className "btn btn-default"
