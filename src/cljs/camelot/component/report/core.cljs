@@ -44,7 +44,7 @@
     (render [_]
       (when (:content (get (state/app-state-cursor) :view))
         (dom/div #js {:className "split-menu"}
-                 (dom/div #js {:className "single-section"}
+                 (dom/div #js {:className "single-section long-single"}
                         (om/build (smithy/build-view-component :content) data)))))))
 
 (defn menu-component
