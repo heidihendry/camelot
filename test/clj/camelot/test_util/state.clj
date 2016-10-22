@@ -10,6 +10,7 @@
    :language :en
    :root-path "/path/to/root"
    :night-end-hour 5
+   :send-usage-data false
    :night-start-hour 21
    :project-start (t/date-time 2012 12 12 12 12 12)
    :project-end (t/date-time 2015 3 15 15 15 15)
