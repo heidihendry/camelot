@@ -129,8 +129,9 @@ java -jar target/camelot.jar
 
 If you encounter problems, raise an issue or reach out via the Google Group.
 
-* \* Camelot is designed to be developed within a *nix environment (e.g., Linux or OSX).  It may be possible to follow this process within Windows using tools such as msys2.*
-* *\*\** Building and running artifacts probably shouldn't be your normal dev-loop.  Most Clojure developers prefer to work interactively at a REPL.
+\* Camelot is designed to be developed within a \*nix environment (e.g., Linux or OSX).  It may be possible to follow this process within Windows using tools such as msys2.*
+
+\*\* Building and running artifacts probably shouldn't be your normal dev-loop.  Most Clojure developers prefer to work interactively at a REPL.
 
 ### Running tests
 
