@@ -27,6 +27,8 @@
     (render-state [_ state]
       (dom/div #js {:className "menu-item detailed"
                     :onClick #(nav/nav! (str "/taxonomy/" (:taxonomy-id data)))}
+               (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-title"}
                          (:taxonomy-label data))
                (dom/span #js {:className "menu-item-description"}
@@ -35,8 +37,6 @@
                                     (dom/label nil (tr/translate :taxonomy/taxonomy-common-name.label)) ":"
                                     " "
                                     (:taxonomy-common-name data)))
-                         (dom/div #js {:className "pull-right fa fa-trash remove"
-                                       :onClick (partial delete state data)})
                          (dom/span nil
                                    (when (:taxonomy-order data)
                                      (dom/span nil

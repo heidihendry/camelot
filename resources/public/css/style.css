@@ -1564,8 +1564,11 @@ pre.field-input {
     padding: 1rem;
     color: #999;
 }
-#app .remove.restricted {
+#app .remove.top-corner {
     padding: 0.2rem 1rem;
+    margin-top: -1.2rem;
+    margin-right: -2rem;
+    font-size: 70%;
     color: #999;
 }
 #app .remove-file:hover {

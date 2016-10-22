@@ -67,12 +67,12 @@
     (render-state [_ state]
       (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(nav/nav! (str "/camera/" (:camera-id data)))}
+               (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                             :onClick (partial delete state data)})
                (dom/span #js {:className "status pull-right"}
                          (:camera-status-description data))
                (dom/span #js {:className "menu-item-title"}
                          (:camera-name data))
-               (dom/div #js {:className "pull-right fa fa-trash remove restricted"
-                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-description"}
                          (:camera-notes data))))))
 

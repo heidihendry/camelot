@@ -139,6 +139,9 @@
     (render-state [_ state]
       (dom/div #js {:className "menu-item detailed dynamic no-click"
                     :onClick #(om/update! (state/display-state) [:notification :info] (:errors state))}
+               (when (or (zero? (get state :total)) (nil? (get state :total)))
+                 (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                               :onClick (partial delete state data)}))
                (when (:has-uploaded-media data)
                  (dom/span #js {:className "status pull-right"}
                            (tr/translate ::media-uploaded)))
@@ -151,9 +154,6 @@
                         (tf/unparse day-formatter (:trap-station-session-start-date data))
                         " " (tr/translate :words/to-lc) " "
                         (tf/unparse day-formatter (:trap-station-session-end-date data)))
-               (when (or (zero? (get state :total)) (nil? (get state :total)))
-                 (dom/div #js {:className "pull-right fa fa-trash remove restricted"
-                               :onClick (partial delete state data)}))
                (dom/div #js {:className "menu-item-description"}
                         (dom/label nil (tr/translate ::gps-coordinates) ":")
                         " "

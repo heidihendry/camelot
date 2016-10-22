@@ -66,12 +66,12 @@
     (render-state [_ state]
       (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(nav/nav! (str "/site/" (:site-id data)))}
+               (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                             :onClick (partial delete state data)})
                (dom/span #js {:className "status pull-right"}
                          (:site-city data))
                (dom/span #js {:className "menu-item-title"}
                          (:site-name data))
-               (dom/div #js {:className "pull-right fa fa-trash remove restricted"
-                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-description"}
                          (when-not (empty? (:site-sublocation data))
                            (dom/span nil

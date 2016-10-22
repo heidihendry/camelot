@@ -28,10 +28,10 @@
                     :onClick #(do
                                 (nav/nav! (str "/" (:survey-id data)))
                                 (nav/analytics-event "org-survey" "survey-click"))}
+               (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-title"}
                          (:survey-name data))
-               (dom/div #js {:className "pull-right fa fa-trash remove restricted"
-                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-description"}
                          (:survey-notes data))))))
 
