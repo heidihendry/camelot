@@ -49,6 +49,21 @@ LEFT JOIN trap_station_session USING (trap_station_session_id)
 LEFT JOIN trap_station USING (trap_station_id)
 WHERE survey_site_id = :survey_site_id
 
+-- name: -get-all-files-by-site
+SELECT (media_filename || '.' || media_format) as media_file
+FROM media
+LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
+LEFT JOIN trap_station_session USING (trap_station_session_id)
+LEFT JOIN trap_station USING (trap_station_id)
+LEFT JOIN survey_site USING (survey_site_id)
+WHERE site_id = :site_id
+
+-- name: -get-all-files-by-camera
+SELECT (media_filename || '.' || media_format) as media_file
+FROM media
+LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
+WHERE camera_id = :camera_id
+
 -- name: -get-all-files-by-trap-station
 SELECT (media_filename || '.' || media_format) as media_file
 FROM media

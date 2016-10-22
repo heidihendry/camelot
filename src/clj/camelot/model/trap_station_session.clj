@@ -133,7 +133,7 @@
 
 (s/defn delete!
   [state :- State
-   id :- s/Num]
+   id :- s/Int]
   (let [fs (media/get-all-files-by-trap-station-session state id)]
     (db/with-db-keys state -delete! {:trap-station-session-id id})
     (media/delete-files! state fs))

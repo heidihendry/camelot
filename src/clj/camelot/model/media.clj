@@ -72,6 +72,16 @@
    id :- s/Int]
   (map :media-file (db/with-db-keys state -get-all-files-by-survey-site {:survey-site-id id})))
 
+(s/defn get-all-files-by-site :- [s/Str]
+  [state :- State
+   id :- s/Int]
+  (map :media-file (db/with-db-keys state -get-all-files-by-site {:site-id id})))
+
+(s/defn get-all-files-by-camera :- [s/Str]
+  [state :- State
+   id :- s/Int]
+  (map :media-file (db/with-db-keys state -get-all-files-by-camera {:camera-id id})))
+
 (s/defn get-all-files-by-trap-station :- [s/Str]
   [state :- State
    id :- s/Int]

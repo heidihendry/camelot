@@ -5,7 +5,8 @@
             [yesql.core :as sql]
             [camelot.model.camera-status :as camera-status]
             [camelot.application :as app]
-            [camelot.util.config :as config]))
+            [camelot.util.config :as config]
+            [camelot.model.media :as media]))
 
 (sql/defqueries "sql/cameras.sql" {:connection db/spec})
 
@@ -81,8 +82,11 @@
 
 (s/defn delete!
   [state :- State
-   id :- s/Num]
-  (db/with-db-keys state -delete! {:camera-id id}))
+   id :- s/Int]
+  (let [fs (media/get-all-files-by-camera state id)]
+    (db/with-db-keys state -delete! {:camera-id id})
+    (media/delete-files! state fs))
+  nil)
 
 (s/defn get-or-create! :- Camera
   [state :- State

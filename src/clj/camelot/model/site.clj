@@ -2,7 +2,8 @@
   (:require [schema.core :as s]
             [yesql.core :as sql]
             [camelot.model.state :refer [State]]
-            [camelot.db :as db]))
+            [camelot.db :as db]
+            [camelot.model.media :as media]))
 
 (sql/defqueries "sql/sites.sql" {:connection db/spec})
 
@@ -75,7 +76,10 @@
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -delete! {:site-id id}))
+  (let [fs (media/get-all-files-by-site state id)]
+    (db/with-db-keys state -delete! {:site-id id})
+    (media/delete-files! state fs))
+  nil)
 
 (s/defn get-or-create! :- Site
   [state :- State

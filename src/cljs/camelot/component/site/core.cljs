@@ -131,5 +131,3 @@
                                   :onClick #(do (nav/nav! "/sites")
                                                 (nav/analytics-event "org-site" "advanced-click"))}
                              (tr/translate :words/advanced)))))))
-
-
