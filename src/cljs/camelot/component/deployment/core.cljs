@@ -20,6 +20,16 @@
 (def help-text (tr/translate ::help-text))
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 
+(defn delete
+  "Delete the trap station and trigger a removal event."
+  [state data event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (when (js/confirm (tr/translate ::confirm-delete))
+    (rest/delete-x (str "/trap-stations/" (:trap-station-id data))
+                   #(go (>! (:chan state) {:event :delete
+                                           :data data})))))
+
 (defn action-item-component
   [data owner]
   (reify
@@ -374,13 +384,15 @@
 (defn deployment-list-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/div #js {:className "menu-item detailed"
                     :onClick #(do
                                 (nav/analytics-event "survey-deployment" "trap-station-click")
                                 (nav/nav! (nav/survey-url "deployments"
                                                           (:trap-station-session-id data))))}
+               (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                             :onClick (partial delete state data)})
                (when (:trap-station-session-end-date data)
                  (dom/span #js {:className "status pull-right"}
                            (tr/translate ::finalised)))
@@ -399,15 +411,26 @@
 (defn deployment-list-section-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:chan (chan)})
     om/IWillMount
     (will-mount [_]
       (om/update! data :deployment-sort-order :trap-station-session-start-date)
       (rest/get-resource (str "/deployment/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value]))
-                         #(om/update! data :trap-stations (:body %))))
-    om/IRender
-    (render [_]
+                         #(om/update! data :trap-stations (:body %)))
+      (let [ch (om/get-state owner :chan)]
+        (go
+          (loop []
+            (let [r (<! ch)]
+              (cond
+                (= (:event r) :delete)
+                (om/transact! data :trap-stations #(remove (fn [x] (= x (:data r))) %))))
+            (recur)))))
+    om/IRenderState
+    (render-state [_ state]
       (if (:deployment-sort-order data)
         (dom/div #js {:className "section"}
                  (dom/div #js {:className "simple-menu"}
@@ -424,7 +447,8 @@
                                      (om/build-all deployment-list-component
                                                    (sort (shared/deployment-sorters (get data :deployment-sort-order))
                                                          (:trap-stations data))
-                                                   {:key :trap-station-session-id}))))
+                                                   {:key :trap-station-session-id
+                                                    :init-state state}))))
                  (dom/div #js {:className "sep"})
                  (dom/button #js {:className "btn btn-primary"
                                   :onClick #(do (nav/nav! (str "/"

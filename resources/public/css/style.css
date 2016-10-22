@@ -1571,6 +1571,12 @@ pre.field-input {
     font-size: 70%;
     color: #999;
 }
+#app .remove.top-corner.surveyfile {
+    padding: 0.2rem 1rem;
+    margin-top: 0.8rem;
+    margin-right: 0;
+    font-size: 70%;
+}
 #app .remove-file:hover {
     color: #666;
 }

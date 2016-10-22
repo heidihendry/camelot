@@ -561,6 +561,7 @@
     :advice-direction "You can set some up using the button below."
     :create-title "Add a new camera trap deployment."
     :create-button "Add camera trap"
+    :confirm-delete "Are you sure you want to delete this camera trap station, including any media and camera checks associated with it?"
     :finalised "Finalised"
     :finalised-trap-notice "This camera trap has been finalised."
     :finalised-trap-advice "Camelot will automatically finalise a camera trap station once it no longer has any active cameras. Create a new camera trap station to continue trapping at this location."}

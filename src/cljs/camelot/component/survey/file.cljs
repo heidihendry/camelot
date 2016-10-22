@@ -41,7 +41,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className "menu-item detailed dynamic paddingless"}
-               (dom/div #js {:className "pull-right fa fa-trash remove-file"
+               (dom/div #js {:className "pull-right fa fa-times remove top-corner surveyfile"
                              :onClick (partial delete-file state data)})
                (dom/a #js {:href (str "/surveys/" (state/get-survey-id)
                                       "/files/" (:survey-file-id data) "/download")
