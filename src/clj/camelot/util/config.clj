@@ -26,7 +26,7 @@
    :night-start-hour 21
    :project-start (tc/to-long (t/now))
    :project-end (tc/to-long (t/now))
-   :sighting-independence-minutes-threshold 20
+   :sighting-independence-minutes-threshold 30
    :surveyed-species []
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
                      [:location :gps-longitude] [:location :gps-latitude]
