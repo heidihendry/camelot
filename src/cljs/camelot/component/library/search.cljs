@@ -13,6 +13,10 @@
             [camelot.translation.core :as tr])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
+(defn unidentified?
+  [x]
+  (or (nil? x) (= "unidentified" x)))
+
 (defn add-sighting
   []
   (let [spp (cljs.reader/read-string (get-in (state/library-state) [:identification :species]))
@@ -23,8 +27,8 @@
         all-selected (util/all-media-selected)]
     (rest/put-x "/library/identify" {:data (merge {:identification
                                                    {:quantity qty
-                                                    :lifestage lifestage
-                                                    :sex sex
+                                                    :lifestage (if (unidentified? lifestage) nil lifestage)
+                                                    :sex (if (unidentified? sex) nil sex)
                                                     :species spp}}
                                                   {:media
                                                    (map :media-id all-selected)})}
@@ -39,11 +43,12 @@
                                                       :sighting-quantity qty}))
                                    (om/update! (second %) :media-processed true))
                               (zipmap (:body resp) all-selected)))
+                  (util/show-identified-message)
                   (.focus (.getElementById js/document "media-collection-container"))
                   (om/update! (:identification (state/library-state)) :quantity 1)
                   (om/update! (:identification (state/library-state)) :species -1)
-                  (om/update! (:identification (state/library-state)) :sex -1)
-                  (om/update! (:identification (state/library-state)) :lifestage -1)))))
+                  (om/update! (:identification (state/library-state)) :sex "unidentified")
+                  (om/update! (:identification (state/library-state)) :lifestage "unidentified")))))
 
 (defn submit-identification
   []
@@ -210,10 +215,6 @@
           (get (:species data)
                (cljs.reader/read-string spp))))
     ""))
-
-(defn unidentified?
-  [x]
-  (or (nil? x) (= "unidentified" x)))
 
 (defn maybe-unidentified-reference-filter
   [f x]

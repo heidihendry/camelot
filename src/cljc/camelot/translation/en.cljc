@@ -504,6 +504,7 @@
    :camelot.component.library.util
    {:reference-quality "reference quality"
     :ordinary-quality "ordinary quality"
+    :identified "identified"
     :test-fires "test-fires"
     :not-test-fires "no longer test-fires"
     :flagged "flagged"

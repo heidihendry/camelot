@@ -53,11 +53,19 @@
 
 (defn hide-select-message
   []
-  (om/transact! (:search (state/library-state)) :show-select-count dec))
+  (om/transact! (:search (state/library-state)) :show-select-count dec)
+  (om/update! (state/library-state) [:search :show-select-count-override] false))
 
 (defn show-select-message
   []
   (om/transact! (:search (state/library-state)) :show-select-count inc)
+  (.setTimeout js/window hide-select-message 1600))
+
+(defn show-identified-message
+  []
+  (om/transact! (:search (state/library-state)) :show-select-count inc)
+  (om/update! (state/library-state) [:search :show-select-action] (tr/translate ::identified))
+  (om/update! (state/library-state) [:search :show-select-count-override] true)
   (.setTimeout js/window hide-select-message 1600))
 
 (defn set-flag-state

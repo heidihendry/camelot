@@ -268,9 +268,11 @@
     (render [_]
       (dom/div #js {:className "media-collection-content-wrapper"}
                (om/build subfilter-bar-component data)
-               (when (> (count (util/all-media-selected)) 1)
+               (when (or (> (count (util/all-media-selected)) 1)
+                         (get-in data [:search :show-select-count-override]))
                  (dom/div #js {:className (str "selected-count"
-                                               (if (> (get-in data [:search :show-select-count]) 0)
+                                               (if (or (> (get-in data [:search :show-select-count]) 0)
+                                                       (get-in data [:search :show-select-count-override]))
                                                  ""
                                                  " hide-selected"))}
                           (str (count (util/all-media-selected)) " "
