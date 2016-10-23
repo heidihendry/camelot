@@ -24,7 +24,7 @@ If using OSX, you will need to install the "JDK".  For Windows and Linux, you ca
 
 ### Installation
 
-Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.8.0.zip).
+Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-0.8.1.zip).
 
 Unzip the archive.  To run Camelot:
 
