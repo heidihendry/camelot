@@ -106,7 +106,13 @@
                               (om/update! app :report {}))))
     om/IRender
     (render [_]
-      (when (get-in app [:survey :list])
-        (if (empty? (get-in app [:survey :list]))
-          (om/build create/create-survey-view-component app)
-          (om/build organisation-management-component app))))))
+      (let [l (get-in app [:survey :list])]
+        (cond
+          (nil? l) (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))
+          (empty? l) (om/build create/create-survey-view-component app)
+
+          :else (om/build organisation-management-component app))))))

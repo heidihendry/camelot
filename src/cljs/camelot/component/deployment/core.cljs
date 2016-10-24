@@ -324,16 +324,22 @@
         (when-not running
           (om/update! data :active :details)
           (dorun (map #(om/update! % :active (= (:action %) :details)) (:menu data))))))
-  om/IRender
+    om/IRender
     (render [_]
-      (dom/div nil
-               (dom/div #js {:className "section-container"}
-                        (om/build action-menu-component data))
-               (dom/div #js {:className "section-container"}
-                        (case (:active data)
-                          :details (om/build deployment-selected-details-component data)
-                          :check (om/build record-camera-check-component data)
-                          nil))))))
+      (if (nil? (:can-edit? data))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))
+        (dom/div nil
+                 (dom/div #js {:className "section-container"}
+                          (om/build action-menu-component data))
+                 (dom/div #js {:className "section-container"}
+                          (case (:active data)
+                            :details (om/build deployment-selected-details-component data)
+                            :check (om/build record-camera-check-component data)
+                            nil)))))))
 
 (defn edit-view-component
   [app owner]
@@ -355,6 +361,9 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! app :page-state nil))
+    om/IDidMount
+    (did-mount [_]
       (rest/get-x (str "/deployment/" (:page-id app))
                   #(om/update! app :page-state {:data (merge (:body %)
                                                              {:validation-problem {:value false}})
@@ -369,7 +378,7 @@
       (om/update! app :page-state nil))
     om/IRender
     (render [_]
-      (when (:page-state app)
+      (if (:page-state app)
         (dom/div #js {:className "split-menu"}
                  (dom/div #js {:className "back-button-container"}
                           (dom/button #js {:className "btn btn-default back"
@@ -379,7 +388,12 @@
                  (dom/div #js {:className "intro"}
                           (dom/h4 nil (get-in app [:page-state :data :trap-station-name :value])))
                  (dom/div nil
-                          (om/build deployment-section-containers-component (:page-state app))))))))
+                          (om/build deployment-section-containers-component (:page-state app))))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))
 
 (defn deployment-list-component
   [data owner]
@@ -416,6 +430,9 @@
       {:chan (chan)})
     om/IWillMount
     (will-mount [_]
+      (om/update! data :trap-stations nil))
+    om/IDidMount
+    (did-mount [_]
       (om/update! data :deployment-sort-order :trap-station-session-start-date)
       (rest/get-resource (str "/deployment/survey/"
                               (get-in (state/app-state-cursor)
@@ -431,7 +448,7 @@
             (recur)))))
     om/IRenderState
     (render-state [_ state]
-      (if (:deployment-sort-order data)
+      (if (:trap-stations data)
         (dom/div #js {:className "section"}
                  (dom/div #js {:className "simple-menu"}
                           (if (empty? (:trap-stations data))
@@ -460,4 +477,8 @@
                              " " (tr/translate ::create-button)))
         (do
           (om/update! data :deployment-sort-order :trap-station-session-start-date)
-          (dom/div nil))))))
+          (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"})))))))

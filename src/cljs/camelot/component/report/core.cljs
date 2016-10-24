@@ -53,11 +53,17 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! data :list nil))
+    om/IDidMount
+    (did-mount [_]
       (rest/get-resource "/report"
                          #(om/update! data :list (:body %))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! data :list nil))
     om/IRender
     (render [_]
-      (when (:list data)
+      (if (:list data)
         (dom/div #js {:className "section"}
                  (dom/div nil
                           (dom/input #js {:className "field-input"
@@ -79,5 +85,10 @@
                                             {:opts {:title-key :title
                                                     :id-key :report-key
                                                     :desc-key :description}
-                                             :key :report-key})))))))))
+                                             :key :report-key})))))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))
 

@@ -288,11 +288,14 @@
   [view & [{:keys [survey-id page-id report-key camera-id site-id taxonomy-id
                    restricted-mode]}]]
   (if survey-id
-    (rest/get-x (str "/surveys/" survey-id)
-                #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
-                     (om/update! (state/app-state-cursor) :page-id page-id)
-                     (om/root view state/app-state
-                              {:target (js/document.getElementById "page-content")})))
+    (do
+      (om/update! (state/app-state-cursor) :selected-survey nil)
+      (om/update! (state/app-state-cursor) :page-id nil)
+      (rest/get-x (str "/surveys/" survey-id)
+                  #(do (om/update! (state/app-state-cursor) :selected-survey (:body %))
+                       (om/update! (state/app-state-cursor) :page-id page-id)
+                       (om/root view state/app-state
+                                {:target (js/document.getElementById "page-content")}))))
     (om/root view state/app-state
              {:target (js/document.getElementById "page-content")
               :opts {:report-key report-key

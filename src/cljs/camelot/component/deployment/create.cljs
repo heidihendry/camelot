@@ -150,7 +150,7 @@
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input"
                                   :autoFocus "autofocus"
-                                  :placeholder (tr/translate ::new-site-name)
+                                  :placeholder (tr/translate ::new-site-name-placeholder)
                                   :value (get-in data [:new-site-name])
                                   :onChange #(om/update! data :new-site-name
                                                          (.. % -target -value))})
@@ -439,8 +439,13 @@
             (recur)))))
     om/IRender
     (render [_]
-      (when (:page-state data)
+      (if (:page-state data)
         (dom/div #js {:className "split-menu"}
                  (dom/div #js {:className "intro"}
                           (dom/h4 nil (tr/translate ::add-camera-trap)))
-                 (dom/div nil (om/build section-containers-component (:page-state data))))))))
+                 (dom/div nil (om/build section-containers-component (:page-state data))))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))

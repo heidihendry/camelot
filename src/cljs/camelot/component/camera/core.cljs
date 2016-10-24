@@ -38,10 +38,10 @@
 (defn validate-proposed-camera
   [data]
   (not (or (nil? (:new-camera-name data))
-           (empty? (:new-camera-name data))
-           (let [cam (str/lower-case (:new-camera-name data))]
-             (some #(= cam (str/lower-case %))
-                   (map :camera-name (:list data)))))))
+           (let [camera (-> data :new-camera-name str/trim str/lower-case)]
+             (or (empty? camera)
+                 (some #(= camera (-> % str/trim str/lower-case))
+                       (map :camera-name (:list data))))))))
 
 (defn add-camera-component
   [data owner]
@@ -96,7 +96,12 @@
                                        (om/update! data :list others)))))))
     om/IRender
     (render [_]
-      (when-not (nil? (:list data))
+      (if (nil? (:list data))
+        (dom/div #js {:className "align-center"}
+                 (dom/img #js {:className "spinner"
+                               :src "images/spinner.gif"
+                               :height "32"
+                               :width "32"}))
         (om/build manage/manage-component data)))))
 
 (defn camera-menu-component
@@ -107,6 +112,9 @@
       {:chan (chan)})
     om/IWillMount
     (will-mount [_]
+      (om/update! data :list nil))
+    om/IDidMount
+    (did-mount [_]
       (rest/get-resource "/cameras"
                          #(om/update! data :list (:body %)))
       (let [ch (om/get-state owner :chan)]
@@ -117,9 +125,12 @@
                 (= (:event r) :delete)
                 (om/transact! data :list #(remove (fn [x] (= x (:data r))) %))))
             (recur)))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! data :list nil))
     om/IRenderState
     (render-state [_ state]
-      (when (:list data)
+      (if (:list data)
         (dom/div #js {:className "section"}
                  (dom/div nil
                           (dom/input #js {:className "field-input"
@@ -147,4 +158,9 @@
                                   :onClick #(do
                                               (nav/nav! "/cameras")
                                               (nav/analytics-event "org-camera" "advanced-click"))}
-                             (tr/translate :words/advanced)))))))
+                             (tr/translate :words/advanced)))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))

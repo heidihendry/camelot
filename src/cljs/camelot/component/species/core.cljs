@@ -54,12 +54,22 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! data :data nil)
+      (om/update! data :data nil))
+    om/IDidMount
+    (did-mount [_]
       (rest/get-x (str "/taxonomy/" taxonomy-id)
                   #(om/update! data :data (:body %))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! data :data nil))
     om/IRender
     (render [_]
-      (when-not (nil? (:data data))
+      (if (nil? (:data data))
+        (dom/div #js {:className "align-center"}
+                 (dom/img #js {:className "spinner"
+                               :src "images/spinner.gif"
+                               :height "32"
+                               :width "32"}))
         (om/build update/update-component data)))))
 
 (defn manage-view
@@ -67,6 +77,10 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! data :species nil)
+      (om/update! data :known-species nil))
+    om/IDidMount
+    (did-mount [_]
       (rest/get-x (str "/taxonomy/survey/" (state/get-survey-id))
                   (fn [resp]
                     (om/update! data :species (into #{} (:body resp)))
@@ -80,8 +94,13 @@
                                            (:body resp)))))))
     om/IRender
     (render [_]
-      (when (and (get data :species-search) (get data :known-species))
-        (om/build manage/manage-component data)))))
+      (if (and (get data :species-search) (get data :known-species))
+        (om/build manage/manage-component data)
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))
 
 (defn species-menu-component
   [data owner]
@@ -91,6 +110,9 @@
       {:chan (chan)})
     om/IWillMount
     (will-mount [_]
+      (om/update! data :list nil))
+    om/IDidMount
+    (did-mount [_]
       (rest/get-resource (str "/taxonomy/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value]))
@@ -103,9 +125,12 @@
                 (= (:event r) :remove)
                 (om/transact! data :list #(remove (fn [x] (= x (:data r))) %))))
             (recur)))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! data :list nil))
     om/IRenderState
     (render-state [_ state]
-      (when (:list data)
+      (if (:list data)
         (dom/div #js {:className "section"}
                  (dom/div #js {:className "simple-menu scroll"}
                           (if (empty? (:list data))
@@ -128,4 +153,9 @@
                  (dom/button #js {:className "btn btn-default"
                                   :onClick #(do (nav/nav! "/taxonomy")
                                                 (nav/analytics-event "survey-species" "advanced-click"))}
-                             (tr/translate :words/advanced)))))))
+                             (tr/translate :words/advanced)))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))

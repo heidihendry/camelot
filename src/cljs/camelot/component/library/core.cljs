@@ -71,6 +71,9 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! data [:library :search] {}))
+    om/IDidMount
+    (did-mount [_]
       (when restricted-mode
         (om/update! (state/app-state-cursor) :restricted-mode true))
       (om/update! (get-in data [:library :search]) :page 1)
@@ -106,4 +109,8 @@
                             (when (get-in lib [:search-results])
                               (om/build collection/media-collection-component lib))
                             (om/build preview/media-control-panel-component lib)))
-          (dom/div nil ""))))))
+          (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"})))))))

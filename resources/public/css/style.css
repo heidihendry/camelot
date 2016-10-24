@@ -1019,6 +1019,12 @@ pre.field-input {
 .library .search-bar .processed:hover {
     opacity: 0.6;
 }
+.pointer {
+    cursor: pointer;
+}
+.green {
+    color: #99d344;
+}
 .library .processed.green {
     color: #99d344;
     opacity: 0.9;
@@ -1562,10 +1568,12 @@ pre.field-input {
     color: #999;
     margin-top: 1.5rem;
     margin-right: 1.5rem;
+    cursor: pointer;
 }
 #app .remove {
     padding: 1rem;
     color: #999;
+    cursor: pointer;
 }
 #app .remove.top-corner {
     padding: 0.2rem 1rem;
@@ -1588,4 +1596,9 @@ pre.field-input {
 }
 #app textarea {
     resize: vertical;
+}
+.align-center {
+    width: 100%;
+    text-align: center;
+    padding-top: 4rem;
 }

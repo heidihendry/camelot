@@ -154,4 +154,9 @@
                             (dom/div #js {:className "section-container"}
                                      (om/build create-survey-details-component data))
                             (dom/div #js {:className "section-container"}
-                                     (om/build species-listing-component data)))))))))
+                                     (om/build species-listing-component data)))))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))

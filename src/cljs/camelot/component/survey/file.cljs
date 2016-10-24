@@ -127,13 +127,24 @@
       {:chan (chan)})
     om/IWillMount
     (will-mount [_]
+      (om/update! data :files nil))
+    om/IDidMount
+    (did-mount [_]
       (rest/get-x (str "/surveys/" (state/get-survey-id) "/files")
                   #(om/update! data :files (reduce (fn [acc x] (assoc acc (:survey-file-id x) x))
                                                    {} (:body %)))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! data :files nil))
     om/IRenderState
     (render-state [_ state]
-      (when (:files data)
+      (if (:files data)
         (dom/div #js {:className "section"}
                  (om/build file-list-component data {:init-state state})
                  (om/build file-upload-component data
-                           {:init-state state}))))))
+                           {:init-state state}))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))

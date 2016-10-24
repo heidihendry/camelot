@@ -24,6 +24,7 @@
   (when (js/confirm (if (:has-uploaded-media data)
                       (tr/translate ::confirm-delete-has-media)
                       (tr/translate ::confirm-delete)))
+    (prn state)
     (rest/delete-x (str "/trap-station-session-cameras/" (:trap-station-session-camera-id data))
                    #(go (>! (:chan state) {:event :delete :data data})))))
 
@@ -120,11 +121,11 @@
     om/IDidMount
     (did-mount [_]
       (let [n (om/get-node owner)]
-        (om/set-state! owner {:total 0
-                              :complete 0
-                              :failed 0
-                              :errors nil
-                              :ignored 0})
+        (om/set-state! owner :total 0)
+        (om/set-state! owner :complete 0)
+        (om/set-state! owner :failed 0)
+        (om/set-state! owner :errors nil)
+        (om/set-state! owner :ignored 0)
         (.addEventListener n "dragenter"
                            #(do (.stopPropagation %) (.preventDefault %)))
         (.addEventListener n "dragover"
@@ -137,17 +138,21 @@
                                 (drop-file-handler data owner fs))))))
     om/IRenderState
     (render-state [_ state]
+      (prn state)
       (dom/div #js {:className "menu-item detailed dynamic no-click"
                     :onClick #(om/update! (state/display-state) [:notification :info] (:errors state))}
-               (when (or (zero? (get state :total)) (nil? (get state :total)))
-                 (dom/div #js {:className "pull-right fa fa-times remove top-corner"
-                               :onClick (partial delete state data)}))
+               (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                             :onClick (partial delete state data)})
                (when (:has-uploaded-media data)
                  (dom/span #js {:className "status pull-right"}
                            (tr/translate ::media-uploaded)))
                (dom/div #js {:className "menu-item-title"}
                         (:camera-name data) " " (tr/translate :words/at-lc)" "
                         (:trap-station-name data))
+               (when (and (:total state)
+                          (> (:total state) 0)
+                          (= (+ (:ignored state) (:failed state) (:complete state)) (:total state)))
+                 (dom/span #js {:className "pull-right fa fa-check fa-3x green"}))
                (dom/div #js {:className "menu-item-description"}
                         (dom/label nil " " (tr/translate :words/date) ":")
                         " "
@@ -158,7 +163,7 @@
                         (dom/label nil (tr/translate ::gps-coordinates) ":")
                         " "
                         (:trap-station-latitude data) ", " (:trap-station-longitude data))
-               (when-not (or (zero? (get state :total)) (nil? (get state :total)))
+               (when (and (get state :total)  (> (get state :total) 0))
                  (dom/div #js {:className "progress-bar-container"
                                :title (tr/translate ::progress-bar-title
                                                     (get state :complete)
@@ -174,7 +179,7 @@
                                         :style #js {:left (str (- 100 (failed-percent state)) "%")
                                                     :width (str (failed-percent state) "%")}})))
                (when-not (zero? (+ (get state :ignored) (get state :failed)))
-                 (dom/div nil (tr/translate ::show-details)))))))
+                 (dom/div #js {:className "pointer"} (tr/translate ::show-details)))))))
 
 (defn recent-deployment-section-component
   [data owner]
@@ -184,6 +189,9 @@
       {:chan (chan)})
     om/IWillMount
     (will-mount [_]
+      (om/update! data :recent-deployments nil))
+    om/IDidMount
+    (did-mount [_]
       (om/update! data :deployment-sort-order :trap-station-session-end-date)
       (rest/get-resource (str "/deployment/survey/"
                               (get-in (state/app-state-cursor)
@@ -200,17 +208,23 @@
             (recur)))))
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "section"}
-               (dom/div #js {:className "simple-menu"}
-                        (if (empty? (:recent-deployments data))
-                          (om/build util/blank-slate-component {}
-                                    {:opts {:item-name (tr/translate ::blank-item-name)
-                                            :advice (tr/translate ::blank-advice)}})
-                          (dom/div nil
-                                   (dom/div #js {:className "help-text"} help-text)
-                                   (om/build shared/deployment-sort-menu data {:opts {:show-end-date true}})
-                                   (om/build-all recent-deployment-list-component
-                                                 (sort (shared/deployment-sorters (get data :deployment-sort-order))
-                                                       (:recent-deployments data))
-                                                 {:key :trap-station-session-camera-id
-                                                  :state state}))))))))
+      (if (nil? (:recent-deployments data))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))
+        (dom/div #js {:className "section"}
+                 (dom/div #js {:className "simple-menu"}
+                          (if (empty? (:recent-deployments data))
+                            (om/build util/blank-slate-component {}
+                                      {:opts {:item-name (tr/translate ::blank-item-name)
+                                              :advice (tr/translate ::blank-advice)}})
+                            (dom/div nil
+                                     (dom/div #js {:className "help-text"} help-text)
+                                     (om/build shared/deployment-sort-menu data {:opts {:show-end-date true}})
+                                     (om/build-all recent-deployment-list-component
+                                                   (sort (shared/deployment-sorters (get data :deployment-sort-order))
+                                                         (:recent-deployments data))
+                                                   {:key :trap-station-session-camera-id
+                                                    :init-state state})))))))))

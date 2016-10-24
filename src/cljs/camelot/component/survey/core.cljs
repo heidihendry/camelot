@@ -48,8 +48,8 @@
     om/IInitState
     (init-state [_]
       {:chan (chan)})
-    om/IWillMount
-    (will-mount [_]
+    om/IDidMount
+    (did-mount [_]
       (let [ch (om/get-state owner :chan)]
         (go
           (loop []
@@ -85,6 +85,9 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! app :deployment-page-state nil))
+    om/IDidMount
+    (did-mount [_]
       (om/update! app :deployment-page-state {:menu [{:action :deployment
                                                       :name (tr/translate ::manage-traps)
                                                       :active true}
@@ -96,7 +99,15 @@
                                                       :name (tr/translate ::files)}]
                                               :active :deployment
                                               :species {}}))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! app :deployment-page-state nil))
     om/IRender
     (render [_]
-      (when (:deployment-page-state app)
-        (om/build manage/survey-management-component (:deployment-page-state app))))))
+      (if (:deployment-page-state app)
+        (om/build manage/survey-management-component (:deployment-page-state app))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))

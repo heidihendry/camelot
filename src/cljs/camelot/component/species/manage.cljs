@@ -235,7 +235,7 @@
             (recur)))))
     om/IRenderState
     (render-state [_ state]
-      (when (get data :known-species)
+      (if (get data :known-species)
         (dom/div #js {:className "split-menu"}
                  (dom/div #js {:className "intro"}
                           (dom/h4 nil (tr/translate ::intro)))
@@ -244,4 +244,9 @@
                                    (om/build expected-species-component data))
                           (dom/div #js {:className "section-container"}
                                    (om/build species-search-component data
-                                             {:init-state {:extch (:chan state)}}))))))))
+                                             {:init-state {:extch (:chan state)}}))))
+        (dom/div #js {:className "align-center"}
+                   (dom/img #js {:className "spinner"
+                                 :src "images/spinner.gif"
+                                 :height "32"
+                                 :width "32"}))))))
