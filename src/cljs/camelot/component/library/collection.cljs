@@ -93,7 +93,8 @@
                                     (map util/find-with-id))]
             (util/deselect-all)
             (dorun (map #(om/update! % :selected true) media-in-range))
-            (om/update! data :selected-media-id (second (nth media-idxs new-endpoint))))
+            (om/update! data :selected-media-id (second (nth media-idxs new-endpoint)))
+            (util/show-select-message))
           (let [id (second (nth media-idxs new-endpoint))]
             (util/deselect-all)
             (om/update! (util/find-with-id id) :selected true)
