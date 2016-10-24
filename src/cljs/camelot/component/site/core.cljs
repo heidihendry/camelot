@@ -7,7 +7,8 @@
             [camelot.component.site.manage :as manage]
             [camelot.util.cursorise :as cursorise]
             [camelot.translation.core :as tr]
-            [cljs.core.async :refer [<! chan >!]])
+            [cljs.core.async :refer [<! chan >!]]
+            [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn delete
@@ -35,8 +36,11 @@
 
 (defn validate-proposed-site
   [data]
-  (not (some #(= (:new-site-name data) %)
-             (map :site-name (:list data)))))
+  (not (or (nil? (:new-site-name data))
+           (empty? (:new-site-name data))
+           (let [cam (str/lower-case (:new-site-name data))]
+             (some #(= cam (str/lower-case %))
+                   (map :site-name (:list data)))))))
 
 (defn add-site-component
   [data owner]

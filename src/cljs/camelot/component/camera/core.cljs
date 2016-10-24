@@ -8,7 +8,8 @@
             [camelot.util.cursorise :as cursorise]
             [camelot.translation.core :as tr]
             [cljs.core.async :refer [<! chan >!]]
-            [camelot.util.filter :as filter])
+            [camelot.util.filter :as filter]
+            [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn delete
@@ -36,8 +37,11 @@
 
 (defn validate-proposed-camera
   [data]
-  (not (some #(= (:new-camera-name data) %)
-             (map :camera-name (:list data)))))
+  (not (or (nil? (:new-camera-name data))
+           (empty? (:new-camera-name data))
+           (let [cam (str/lower-case (:new-camera-name data))]
+             (some #(= cam (str/lower-case %))
+                   (map :camera-name (:list data)))))))
 
 (defn add-camera-component
   [data owner]

@@ -481,7 +481,7 @@
 
    :camelot.component.camera.core
    {:new-camera-name-placeholder "New camera name..."
-    :invalid-title "A camera with this name already exists."
+    :invalid-title "A camera name was not provided or a camera with this name already exists."
     :filter-cameras "Filter cameras..."
     :confirm-delete "Are you sure you want to delete this camera? This will also delet any associated media."
     :blank-filter-advice "You can add cameras using the input field below"
@@ -582,7 +582,7 @@
     :camera-invalid-title "A camera with this name already exists."
     :create-new-camera "Create a new camera..."
     :new-site-name-placeholder "New site name..."
-    :site-invalid-title "A site with this name already exists."
+    :site-invalid-title "A site name was not provided or site with this name already exists."
     :create-new-site "Create a new site..."
     :start-date "Start date"
     :validation-future-date "Date cannot be in the future."
