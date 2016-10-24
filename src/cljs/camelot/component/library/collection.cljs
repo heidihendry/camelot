@@ -50,45 +50,55 @@
 
 (defn handle-key-event
   [data e]
-  (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
-        cur (ffirst (filter #(= (:selected-media-id data) (second %))
-                            media-idxs))]
-    (cond
-      (and (= (.-keyCode e) 70) (not (.-ctrlKey e)))
-      (do
-        (.click (.getElementById js/document "media-flag"))
-        (nav/analytics-event "library-key" "f"))
+  (cond
+    (and (= (.-keyCode e) 70) (not (.-ctrlKey e)))
+    (do
+      (.click (.getElementById js/document "media-flag"))
+      (nav/analytics-event "library-key" "f"))
 
-      (and (= (.-keyCode e) 71) (not (.-ctrlKey e)))
-      (do
-        (.click (.getElementById js/document "media-processed"))
-        (nav/analytics-event "library-key" "g"))
+    (and (= (.-keyCode e) 71) (not (.-ctrlKey e)))
+    (do
+      (.click (.getElementById js/document "media-processed"))
+      (nav/analytics-event "library-key" "g"))
 
-      (and (= (.-keyCode e) 82) (not (.-ctrlKey e)))
-      (do
-        (.click (.getElementById js/document "media-reference-quality"))
-        (nav/analytics-event "library-key" "r"))
+    (and (= (.-keyCode e) 82) (not (.-ctrlKey e)))
+    (do
+      (.click (.getElementById js/document "media-reference-quality"))
+      (nav/analytics-event "library-key" "r"))
 
-      (and (= (.-keyCode e) 67) (not (.-ctrlKey e)))
-      (do
-        (.click (.getElementById js/document "media-cameracheck"))
-        (nav/analytics-event "library-key" "c"))
+    (and (= (.-keyCode e) 67) (not (.-ctrlKey e)))
+    (do
+      (.click (.getElementById js/document "media-cameracheck"))
+      (nav/analytics-event "library-key" "c"))
 
-      (and (= (.-keyCode e) 65) (.-ctrlKey e))
-      (do
-        (.preventDefault e)
-        (.click (.getElementById js/document "select-all"))
-        (nav/analytics-event "library-key" "C-a"))
+    (and (= (.-keyCode e) 65) (.-ctrlKey e))
+    (do
+      (.preventDefault e)
+      (.click (.getElementById js/document "select-all"))
+      (nav/analytics-event "library-key" "C-a"))
 
-      :else (if (seq media-idxs)
-              (let [id (some->> (updated-select-position media-idxs e cur)
-                                (nth media-idxs))
-                    media (util/find-with-id (second id))]
-                (when media
-                  (when-not (.-shiftKey e)
-                    (util/deselect-all))
-                  (om/update! media :selected true)
-                  (om/update! data :selected-media-id (second id))))))))
+    :else
+    (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
+          endpoint-idx (ffirst (filter #(= (:selected-media-id data) (second %)) media-idxs))
+          new-endpoint (updated-select-position media-idxs e endpoint-idx)]
+      (when new-endpoint
+        (if (and (.-shiftKey e) (:anchor-media-id data))
+          (let [anchor-idx (ffirst (filter #(= (:anchor-media-id data) (second %)) media-idxs))
+                first-idx (min anchor-idx new-endpoint)
+                last-idx (max anchor-idx new-endpoint)
+                media-in-range (->> media-idxs
+                                    (drop first-idx)
+                                    (take (inc (- last-idx first-idx)))
+                                    (map second)
+                                    (map util/find-with-id))]
+            (util/deselect-all)
+            (dorun (map #(om/update! % :selected true) media-in-range))
+            (om/update! data :selected-media-id (second (nth media-idxs new-endpoint))))
+          (let [id (second (nth media-idxs new-endpoint))]
+            (util/deselect-all)
+            (om/update! (util/find-with-id id) :selected true)
+            (om/update! data :selected-media-id id)
+            (om/update! data :anchor-media-id id)))))))
 
 (defn- media-thumb-class
   [data]
@@ -113,8 +123,7 @@
                              :src (str (get-in data [:media-uri]) "/thumb")})
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
                              :onClick #(do
-                                         (om/update! (state/library-state)
-                                                     :selected-media-id (:media-id data))
+                                         (om/update! (state/library-state) :selected-media-id (:media-id data))
                                          (nav/analytics-event "library-collection" "view-media"))})))))
 
 
