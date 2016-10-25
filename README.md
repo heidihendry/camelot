@@ -100,63 +100,7 @@ A handy feature is being able to filter the list to find all cameras with a part
 
 A *report* is an export of data to a CSV.  Clicking on a report will take you to a report configuration screen, where you can set constraints for that report (e.g., to report on a specific survey) and then generate the data as a CSV.
 
-Camelot comes with a bunch of reports out of the box.  For advanced users, it also lets you build and add your own reports.
-
-##### Interesting columns
-
-Some columns in Camelot are calculated from existing data, and some of those calculations are worthy of some explanation so that it's clear what that column represents.  Here are the most interesting ones:
-
-###### Independent observations
-A sighting is considered independent if two photos with the same sighting are taken at least some time threshold apart.  If they are not, it is considered dependent.  Whether they are considered dependent or independent effects the value of the data in this column.
-
-Photos may be considered dependent if they are within the same Trap Station Session.  That is to say, photos taken by two cameras of a Trap Station at the same time, if for the same sighting, will be **dependent**.
-
-Below are some examples showing the various rules of the calculation (assume T=30 as the threshold).  All rules assume sightings are within the same Trap Station Session; if that were not the case, they would always be **independent**.
-
-| Sighting | Quantity | Lifestage | Sex | T    |
-| :------- | :------- | :-------- | :-- | :--- |
-| Spp. 1   | 1        | Adult     | Male| 0    |
-| Spp. 2   | 1        | Adult     | Male| 5    |
-
-These are **independent** as it's a different species.  The number of Independent Observations is **2**.
-
-| Sighting | Quantity | Lifestage | Sex | T    |
-| :------- | :------- | :-------- | :-- | :--- |
-| Spp. 1   | 1        | Adult     | Male| 0    |
-| Spp. 1   | 1        | Adult     | Male| 40   |
-
-These are **independent** as while it's the same species, it is separated by T=40.  The number of Independent Observations is **2**.
-
-| Sighting | Quantity | Lifestage | Sex | T    |
-| :------- | :------- | :-------- | :-- | :--- |
-| Spp. 1   | 1        | Adult     | Male| 0    |
-| Spp. 1   | 2        | Adult     | Male| 5    |
-
-These are **dependent** as it's the same species, and up to 2 were sighted within the dependence window.  The number of Independent Observations is **2**.
-
-| Sighting | Quantity | Lifestage | Sex | T    |
-| :------- | :------- | :-------- | :-- | :--- |
-| Spp. 1   | 1        | Adult     | Male| 0    |
-| Spp. 1   | 1        | Juvenile  | Male| 5    |
-
-These are **independent** as while it's the same species, one is a juvenile and the other an adult.  The number of Independent Observations is **2**.
-
-| Sighting | Quantity | Lifestage     | Sex         | T    |
-| :------- | :------- | :------------ | :---------- | :--- |
-| Spp. 1   | 1        | Adult         | Male        | 0    |
-| Spp. 1   | 1        | Unidentified  | Unidentified| 5    |
-
-These are **dependent** as while the lifestage and sex are not the same, unidentified values are *inferred*.  The number of Independent Observations is **1**.
-
-| Sighting | Quantity | Lifestage     | Sex         | T    |
-| :------- | :------- | :------------ | :---------- | :--- |
-| Spp. 1   | 1        | Unidentified  | Unidentified| 0    |
-| Spp. 1   | 1        | Adult         | Male        | 5    |
-| Spp. 1   | 1        | Unidentified  | Female      | 10    |
-
-Sighting 2 of Spp. 1 is **dependent** on sighting 1, due to inference on Lifestage and Sex.  Sighting 3 is **independent** of both sighting 1 and sighting 2 due to that inference.  The number of independent observations is **2**.
-
-The value of the threshold is defined in Camelot's settings menu ("Independent Sighting Threshold (mins)").
+Camelot comes with a bunch of reports out of the box.  For advanced users, it also lets you build and add your own reports.  Reports will be covered in much more detail later.
 
 ### Managing surveys
 
@@ -370,6 +314,64 @@ In the top right hand corner of the main navigation is the toggle to show the se
 
 * **Sighting Independence Threshold**: Camelot performs sighting independence checks on some reports.  This setting controls the duration within which photos of the same species (and, if known, the same sex and life-stage) are considered dependent in those reports.
 * **Send anonymous usage data**: Enabled this option will provide data about how you use Camelot back to the Camelot Project. This data is anonymous and is used only for the purpose of improving Camelot. It is disabled by default, though if you have the consent of others using your Camelot instance, please consider enabling this.
+
+### Reports
+
+#### Interesting columns
+
+Some columns in Camelot are calculated from existing data, and some of those calculations are worthy of some explanation so that it's clear what that column represents.  Here are the most interesting ones:
+
+##### Independent observations
+A sighting is considered independent if two photos with the same sighting are taken at least some time threshold apart.  If they are not, it is considered dependent.  Whether they are considered dependent or independent effects the value of the data in this column.
+
+Photos may be considered dependent if they are within the same Trap Station Session.  That is to say, photos taken by two cameras of a Trap Station at the same time, if for the same sighting, will be **dependent**.
+
+Below are some examples showing the various rules of the calculation (assume T=30 as the threshold).  All rules assume sightings are within the same Trap Station Session; if that were not the case, they would always be **independent**.
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 2   | 1        | Adult     | Male| 5    |
+
+These are **independent** as it's a different species.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 1   | 1        | Adult     | Male| 40   |
+
+These are **independent** as while it's the same species, it is separated by T=40.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 1   | 2        | Adult     | Male| 5    |
+
+These are **dependent** as it's the same species, and up to 2 were sighted within the dependence window.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 1   | 1        | Juvenile  | Male| 5    |
+
+These are **independent** as while it's the same species, one is a juvenile and the other an adult.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage     | Sex         | T    |
+| :------- | :------- | :------------ | :---------- | :--- |
+| Spp. 1   | 1        | Adult         | Male        | 0    |
+| Spp. 1   | 1        | Unidentified  | Unidentified| 5    |
+
+These are **dependent** as while the lifestage and sex are not the same, unidentified values are *inferred*.  The number of Independent Observations is **1**.
+
+| Sighting | Quantity | Lifestage     | Sex         | T    |
+| :------- | :------- | :------------ | :---------- | :--- |
+| Spp. 1   | 1        | Unidentified  | Unidentified| 0    |
+| Spp. 1   | 1        | Adult         | Male        | 5    |
+| Spp. 1   | 1        | Unidentified  | Female      | 10    |
+
+Sighting 2 of Spp. 1 is **dependent** on sighting 1, due to inference on Lifestage and Sex.  Sighting 3 is **independent** of both sighting 1 and sighting 2 due to that inference.  The number of independent observations is **2**.
+
+The value of the threshold is defined in Camelot's settings menu ("Independent Sighting Threshold (mins)").
 
 ### Advanced menu
 
