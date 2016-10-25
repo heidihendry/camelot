@@ -312,8 +312,8 @@ In the top right hand corner of the main navigation is the toggle to show the se
 
 ![](doc/screenshot/settings.png)
 
-* **Language**: This is a user-specific preference. *Currently only English is supported, and so this option is hidden.*
 * **Sighting Independence Threshold**: Camelot performs sighting independence checks on some reports.  This setting controls the duration within which photos of the same species (and, if known, the same sex and life-stage) are considered dependent in those reports.
+* **Send anonymous usage data**: Enabled this option will provide data about how you use Camelot back to the Camelot Project. This data is anonymous and is used only for the purpose of improving Camelot. It is disabled by default, though if you have the consent of others using your Camelot instance, please consider enabling this.
 
 ## The Community
 
