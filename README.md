@@ -228,7 +228,7 @@ These can be set and unset by clicking on the respective icon.  It will apply to
 
 #### Identifying photos
 
-Identification in Camelot is the process of indicating which species are present in a photo.  When you're ready to identify the selected photos, the bar for submitting details can be accessed via the "Identify Selected" button in the top right hand corner of the library.
+Identification in Camelot is the process of indicating which species are present in a photo.  When you're ready to identify the selected photos, the mode for submitting details can be accessed via the "Identify Selected" button in the top right hand corner of the library.  To switch back to searching, just press the Search button in the same location.
 
 To submit an identification, set the species from the drop down, adjust the quantity if necessary, specify other identifiable details from the appropriate drop down and click "Submit".  The identification bar will disappear and the photo will automatically be marked as "Processed".
 
@@ -304,7 +304,7 @@ With the Media Collection panel focused (**Control + m**):
 * **g** mark the currently selected media as processed
 * **r** mark the currently selected media as being of reference quality
 * **c** mark the currently selected media as a camera-check (i.e., test-fire of the camera)
-* hold **shift** + **"wasd"** OR **arrow keys** to select the next media in that direction, and also keep the existing selection.
+* hold **shift** + **"wasd"** OR **arrow keys** to include more media, keeping the existing selection.
 
 ### Settings
 
