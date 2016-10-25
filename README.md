@@ -109,7 +109,9 @@ Some columns in Camelot are calculated from existing data, and some of those cal
 ###### Independent observations
 A sighting is considered independent if two photos with the same sighting are taken at least some time threshold apart.  If they are not, it is considered dependent.  Whether they are considered dependent or independent effects the value of the data in this column.
 
-To give some examples (assume T=30 as the threshold):
+Photos may be considered dependent if they are within the same Trap Station Session.  That is to say, photos taken by two cameras of a Trap Station at the same time, if for the same sighting, will be **dependent**.
+
+Below are some examples showing the various rules of the calculation (assume T=30 as the threshold).  All rules assume sightings are within the same Trap Station Session; if that were not the case, they would always be **independent**.
 
 | Sighting | Quantity | Lifestage | Sex | T    |
 | :------- | :------- | :-------- | :-- | :--- |
