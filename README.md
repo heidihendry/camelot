@@ -2,6 +2,8 @@
 
 Camelot is an open-source, web-based tool to help wildlife conservationists with camera trapping.
 
+The latest version of Camelot is: **[0.8.2](http://camelot.bitpattern.com.au/release/camelot-0.8.2.zip)**
+
 Camelot:
 
 * Makes classifying camera trap photos quick and easy
