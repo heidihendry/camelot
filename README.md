@@ -102,6 +102,60 @@ A *report* is an export of data to a CSV.  Clicking on a report will take you to
 
 Camelot comes with a bunch of reports out of the box.  For advanced users, it also lets you build and add your own reports.
 
+##### Interesting columns
+
+Some columns in Camelot are calculated from existing data, and some of those calculations are worthy of some explanation so that it's clear what that column represents.  Here are the most interesting ones:
+
+###### Independent observations
+A sighting is considered independent if two photos with the same sighting are taken at least some time threshold apart.  If they are not, it is considered dependent.  Whether they are considered dependent or independent effects the value of the data in this column.
+
+To give some examples (assume T=30 as the threshold):
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 2   | 1        | Adult     | Male| 5    |
+
+These are **independent** as it's a different species.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 1   | 1        | Adult     | Male| 40   |
+
+These are **independent** as while it's the same species, it is separated by T=40.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 1   | 2        | Adult     | Male| 5    |
+
+These are **dependent** as it's the same species, and up to 2 were sighted within the dependence window.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage | Sex | T    |
+| :------- | :------- | :-------- | :-- | :--- |
+| Spp. 1   | 1        | Adult     | Male| 0    |
+| Spp. 1   | 1        | Juvenile  | Male| 5    |
+
+These are **independent** as while it's the same species, one is a juvenile and the other an adult.  The number of Independent Observations is **2**.
+
+| Sighting | Quantity | Lifestage     | Sex         | T    |
+| :------- | :------- | :------------ | :---------- | :--- |
+| Spp. 1   | 1        | Adult         | Male        | 0    |
+| Spp. 1   | 1        | Unidentified  | Unidentified| 5    |
+
+These are **dependent** as while the lifestage and sex are not the same, unidentified values are *inferred*.  The number of Independent Observations is **1**.
+
+| Sighting | Quantity | Lifestage     | Sex         | T    |
+| :------- | :------- | :------------ | :---------- | :--- |
+| Spp. 1   | 1        | Unidentified  | Unidentified| 0    |
+| Spp. 1   | 1        | Adult         | Male        | 5    |
+| Spp. 1   | 1        | Unidentified  | Female      | 10    |
+
+Sighting #2 of Spp. 1 is **dependent** on sighting #1, due to inference on Lifestage and Sex.  Sighting #3 is **independent** of both sighting #1 and sighting #2 due to that inference.  The number of independent observations is **2**.
+
+The value of the threshold is defined in Camelot's settings menu ("Independent Sighting Threshold (mins)").
+
 ### Managing surveys
 
 Survey management is the heart of Camelot, and also where it differs the most from other camera trap software.  Our research shows that by understanding the next few sections, you'll be well on your way to being a Camelot expert.  So listen up!
