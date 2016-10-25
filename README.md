@@ -152,7 +152,7 @@ These are **dependent** as while the lifestage and sex are not the same, unident
 | Spp. 1   | 1        | Adult         | Male        | 5    |
 | Spp. 1   | 1        | Unidentified  | Female      | 10    |
 
-Sighting #2 of Spp. 1 is **dependent** on sighting #1, due to inference on Lifestage and Sex.  Sighting #3 is **independent** of both sighting #1 and sighting #2 due to that inference.  The number of independent observations is **2**.
+Sighting 2 of Spp. 1 is **dependent** on sighting #, due to inference on Lifestage and Sex.  Sighting 3 is **independent** of both sighting #1 and sighting 2 due to that inference.  The number of independent observations is **2**.
 
 The value of the threshold is defined in Camelot's settings menu ("Independent Sighting Threshold (mins)").
 
