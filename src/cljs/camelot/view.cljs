@@ -63,8 +63,8 @@
                             :desc :site-name
                             :baseurl "/survey-sites"}
    :taxonomy-available {:vkey :taxonomy-id
-                       :desc :taxonomy-species
-                        :baseurl "/sightings"}
+                        :desc :taxonomy-label
+                        :baseurl "/taxonomy"}
    :species-mass {:vkey :species-mass-id
                   :desc :species-mass-label
                   :baseurl "/species-mass"}

@@ -185,6 +185,8 @@
 
   (context "/taxonomy" {session :session}
            (GET "/" [] (rest/list-resources taxonomy/get-all :taxonomy session))
+           (GET "/available/:id" [id] (rest/list-resources taxonomy/get-all :taxonomy session))
+           (GET "/alternatives/:id" [id] (rest/list-resources taxonomy/get-all :taxonomy session))
            (GET "/:id" [id] (rest/specific-resource taxonomy/get-specific id session))
            (PUT "/:id" [id data] (rest/update-resource taxonomy/update! id
                                                        taxonomy/ttaxonomy data session))

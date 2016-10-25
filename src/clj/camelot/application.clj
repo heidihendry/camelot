@@ -267,7 +267,7 @@ Currently the only application state is the user's configuration."
                         :title (tr/translate (:config state) :media/sidebar-title)
                         :type :media
                         :id :media-id
-                        :label :media-capture-timestamp}}
+                        :label :media-capture-timestamp-label}}
    :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :words/edit)
@@ -338,7 +338,7 @@ Currently the only application state is the user's configuration."
                         :title (tr/translate (:config state) :sighting/sidebar-title)
                         :type :sighting
                         :id :sighting-id
-                        :label :taxonomy-label}}
+                        :label :sighting-label}}
    :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
                         :action :delete}
                        {:label (tr/translate (:config state) :words/edit)

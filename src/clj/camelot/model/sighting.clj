@@ -27,15 +27,18 @@
      sighting-lifestage :- (s/maybe s/Str)
      sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- (s/maybe s/Int)
-     media-id :- s/Int])
+     media-id :- s/Int
+     sighting-label :- s/Str])
 
 (s/defn sighting :- Sighting
   [{:keys [sighting-id sighting-created sighting-updated sighting-quantity
-           sighting-lifestage sighting-sex taxonomy-id media-id]}]
+           sighting-lifestage sighting-sex taxonomy-id media-id taxonomy-genus
+           taxonomy-species]}]
   (->Sighting sighting-id sighting-created sighting-updated sighting-quantity
               (or sighting-lifestage sighting-default-option)
               (or sighting-sex sighting-default-option)
-              taxonomy-id media-id))
+              taxonomy-id media-id
+              (str sighting-quantity "x " taxonomy-genus " " taxonomy-species)))
 
 (s/defn tsighting :- TSighting
   [{:keys [sighting-quantity sighting-lifestage sighting-sex taxonomy-id media-id]}]

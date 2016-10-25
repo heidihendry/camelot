@@ -7,7 +7,8 @@
             [camelot.util.java-file :as jf]
             [camelot.util.config :as config]
             [clojure.string :as str]
-            [camelot.util.java-file :as f])
+            [camelot.util.java-file :as f]
+            [clj-time.format :as tf])
   (:import [org.apache.commons.lang3 SystemUtils]))
 
 (sql/defqueries "sql/media.sql" {:connection db/spec})
@@ -35,7 +36,8 @@
      media-processed :- (s/maybe s/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
      media-reference-quality :- s/Bool
-     trap-station-session-camera-id :- s/Int])
+     trap-station-session-camera-id :- s/Int
+     media-capture-timestamp-label :- s/Str])
 
 (s/defn tmedia
   [{:keys [media-filename media-format media-notes media-cameracheck
@@ -51,7 +53,8 @@
            media-reference-quality media-capture-timestamp trap-station-session-camera-id]}]
   (->Media media-id media-created media-updated media-filename media-format
            media-notes media-cameracheck media-attention-needed media-processed
-           media-capture-timestamp media-reference-quality trap-station-session-camera-id))
+           media-capture-timestamp media-reference-quality trap-station-session-camera-id
+           (tf/unparse (tf/formatters :mysql) media-capture-timestamp)))
 
 (s/defn get-all :- [Media]
   [state :- State
