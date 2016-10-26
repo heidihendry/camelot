@@ -85,6 +85,7 @@
   (reify
     om/IWillMount
     (will-mount [_]
+      (om/update! app :selected-survey nil)
       (rest/get-resource "/surveys"
                          #(do (om/update! app :survey {:list (:body %)})
                               (when-not (:menu app)

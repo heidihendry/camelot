@@ -588,7 +588,7 @@
                                                        (assoc search :results records)
                                                        (:species data)))]
     (om/update! (:search-results data) :all-ids
-                (filter (set match-ids) (get-in data [:search :ordered-ids])))))
+                (filter (set match-ids) (:ordered-ids search)))))
 
 (defn search-component
   [data owner]
