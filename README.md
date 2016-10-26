@@ -319,7 +319,7 @@ In the top right hand corner of the main navigation is the toggle to show the se
 
 ### Reports
 
-#### Interesting columns
+#### Calculated columns
 
 Some columns in Camelot are calculated from existing data, and some of those calculations are worthy of some explanation so that it's clear what that column represents.  Here are the most interesting ones:
 
@@ -374,6 +374,20 @@ These are **dependent** as while the lifestage and sex are not the same, unident
 Sighting 2 of Spp. 1 is **dependent** on sighting 1, due to inference on Lifestage and Sex.  Sighting 3 is **independent** of both sighting 1 and sighting 2 due to that inference.  The number of independent observations is **2**.
 
 The value of the threshold is defined in Camelot's settings menu ("Independent Sighting Threshold (mins)").
+
+#### Nocturnal (%)
+
+This is simply the number of photos taken at night, divided by the number of photos.  The interesting part is what is considered to be "at night".
+
+Night is determined as a time after sunset and before sunrise, given a particular set of GPS coordinates and on a particular day using the sunrise and sunset times as calculated by [an algorithm published by the Nautical Almanac Office](http://williams.best.vwh.net/sunrise_sunset_algorithm.htm).  This algorithm does not attempt to account for atmospheric or geographical features, though will typically be accurate to within several minutes of the actual sunrise and sunset times.
+
+#### Abundance Index
+
+The Abundance Index is calculated using two pieces of data: the number of number of independent observations, and the number of nights of elapsed operation for a camera trap session, or for the combined elapsed time of all camera trap sessions (depending on the report).
+
+The calculation of this value is then:
+
+`100 * Independent Observations / Nights`
 
 ### Advanced menu
 
