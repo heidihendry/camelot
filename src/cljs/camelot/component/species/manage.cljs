@@ -128,11 +128,16 @@
   (reify
     om/IRender
     (render [_]
-      (let [defined-spps (into #{} (map :taxonomy-id (:species data)))]
+      (let [defined-spps (into #{} (map :taxonomy-id (:species data)))
+            addable-spps (into '()
+                               (sort-by :taxonomy-label
+                                        (filter #(not (some (fn [x]
+                                                              (= (:taxonomy-id %) x)) defined-spps))
+                                                (vals (:known-species data)))))]
         (dom/div nil
                  (dom/label #js {:className "field-label"}
                             (tr/translate ::new-or-existing))
-                 (if (or (empty? (:species data)) (:taxonomy-create-mode data))
+                 (if (or (empty? (:known-species data)) (:taxonomy-create-mode data))
                    (om/build add-taxonomy-component data
                              {:opts {:extch extch}})
                    (dom/select #js {:className "field-input"
@@ -149,11 +154,7 @@
                                (om/build-all species-option-component
                                              (cons {:taxonomy-id -1
                                                     :taxonomy-label (str (tr/translate :words/select) "...")}
-                                                   (reverse (conj (into '()
-                                                                        (sort-by :taxonomy-label
-                                                                                 (filter #(not (some (fn [x]
-                                                                                                       (= (:taxonomy-id %) x)) defined-spps))
-                                                                                         (vals (:known-species data)))))
+                                                   (reverse (conj addable-spps
                                                                   {:taxonomy-id "create"
                                                                    :taxonomy-label (tr/translate ::new-species)})))
                                              {:key :taxonomy-id}))))))))
