@@ -128,7 +128,7 @@
     :site-city.description "The city within which, or nearest city to which, this site resides."
     :site-sublocation.label "Sublocation"
     :site-sublocation.description "The name of the location which this site represents."
-    :site-area.label "Site area"
+    :site-area.label "Site area (km2)"
     :site-area.description "Area of this site in km2."
     :site-notes.label "Site notes"
     :site-notes.description "Notes about this site."}
@@ -566,7 +566,8 @@
     :primary-camera-name "Camera name (primary)"
     :secondary-camera-name "Camera name (secondary)"
     :record-camera-check "Record camera check"
-    :start-date "Start date"
+    :start-date "Session start date"
+    :end-date "Session end date"
     :blank-item-name-lc "camera trap stations"
     :advice-context "These are locations where cameras are deployed in the field."
     :advice-direction "You can set some up using the button below."

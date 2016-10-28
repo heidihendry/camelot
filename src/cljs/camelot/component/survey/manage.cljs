@@ -46,11 +46,12 @@
               (recur))))))
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "section simple-menu"}
-               (om/build-all action-item-component
-                             (:menu data)
-                             {:key :action
-                              :init-state state})))))
+      (when (:menu data)
+        (dom/div #js {:className "section simple-menu"}
+                 (om/build-all action-item-component
+                               (:menu data)
+                               {:key :action
+                                :init-state state}))))))
 
 (defn survey-section-containers-component
   [data owner]

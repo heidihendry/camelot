@@ -83,29 +83,25 @@
   "Render the view component for managing a survey."
   [app owner]
   (reify
-    om/IWillMount
-    (will-mount [_]
-      (om/update! app :deployment-page-state nil))
     om/IDidMount
     (did-mount [_]
-      (om/update! app :deployment-page-state {:menu [{:action :deployment
-                                                      :name (tr/translate ::manage-traps)
-                                                      :active true}
-                                                     {:action :upload
-                                                      :name (tr/translate ::upload-captures)}
-                                                     {:action :species
-                                                      :name (tr/translate ::species)}
-                                                     {:action :files
-                                                      :name (tr/translate ::files)}]
-                                              :active :deployment
-                                              :species {}}))
-    om/IWillUnmount
-    (will-unmount [_]
-      (om/update! app :deployment-page-state nil))
+      (if (:survey-page-state app)
+        (om/update! app [:survey-page-state :species] {})
+        (om/update! app :survey-page-state {:menu [{:action :deployment
+                                                    :name (tr/translate ::manage-traps)
+                                                    :active true}
+                                                   {:action :upload
+                                                    :name (tr/translate ::upload-captures)}
+                                                   {:action :species
+                                                    :name (tr/translate ::species)}
+                                                   {:action :files
+                                                    :name (tr/translate ::files)}]
+                                            :active :deployment
+                                            :species {}})))
     om/IRender
     (render [_]
-      (if (:deployment-page-state app)
-        (om/build manage/survey-management-component (:deployment-page-state app))
+      (if (seq (:survey-page-state app))
+        (om/build manage/survey-management-component (:survey-page-state app))
         (dom/div #js {:className "align-center"}
                    (dom/img #js {:className "spinner"
                                  :src "images/spinner.gif"

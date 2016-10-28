@@ -400,7 +400,7 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "menu-item detailed"
+      (dom/div #js {:className "menu-item detailed dynamic"
                     :onClick #(do
                                 (nav/analytics-event "survey-deployment" "trap-station-click")
                                 (nav/nav! (nav/survey-url "deployments"
@@ -420,7 +420,11 @@
                          " " (:trap-station-longitude data))
                (dom/div #js {:className "menu-item-description"}
                          (dom/label nil (tr/translate ::start-date) ":")
-                         " " (tf/unparse day-formatter (:trap-station-session-start-date data)))))))
+                         " " (tf/unparse day-formatter (:trap-station-session-start-date data)))
+               (when (:trap-station-session-end-date data)
+                 (dom/div #js {:className "menu-item-description"}
+                          (dom/label nil (tr/translate ::end-date) ":")
+                          " " (tf/unparse day-formatter (:trap-station-session-end-date data))))))))
 
 (defn deployment-list-section-component
   [data owner]
