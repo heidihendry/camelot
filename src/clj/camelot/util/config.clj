@@ -191,13 +191,16 @@
   `overwrite?' flag is set."
   [config overwrite?]
   (let [conf (get-config-file)
+        conftmp (str conf ".tmp")
         confdir (jf/get-parent-file (io/file conf))]
     (when-not (jf/exists? confdir)
       (jf/mkdirs confdir))
     (if (and (not overwrite?) (jf/exists? (io/file conf)))
       (throw (RuntimeException. (tr/translate config :problems/default-config-exists conf)))
-      (with-open [w (io/writer conf)]
-        (pp/write config :stream w)))
+      (do
+        (with-open [w (io/writer conftmp)]
+          (pp/write config :stream w))
+        (jf/rename (io/file conftmp) (io/file conf))))
     config))
 
 (defn- create-default-config

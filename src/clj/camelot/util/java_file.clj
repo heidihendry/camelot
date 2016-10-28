@@ -93,3 +93,8 @@
   [file-reader]
   "Create a pushback reader given a file reader"
   (java.io.PushbackReader. ^FileReader file-reader))
+
+(defn rename
+  "Rename the file at source to dest."
+  [source dest]
+  (.renameTo ^File source ^File dest))
