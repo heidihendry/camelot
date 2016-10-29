@@ -162,6 +162,10 @@
                                (dom/option #js {:value "false"} (tr/translate ::media-recovered))
                                (dom/option #js {:value "true"} (tr/translate ::media-not-recovered)))))))))
 
+(defn can-edit?
+  [data]
+  (-> data :data :trap-station-session-end-date :value nil?))
+
 (defn record-camera-check-component
   [data owner]
   (reify
@@ -170,7 +174,7 @@
       (om/update! data [:data :validation-problem] {:value false}))
     om/IRender
     (render [_]
-      (if (:can-edit? data)
+      (if (can-edit? data)
         (let [data (:data data)]
           (om/update! data :validation-problem {:value false})
           (let [sess-end (get-in data [:trap-station-session-end-date :value])]
@@ -319,27 +323,19 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (let [running (-> data :data :trap-station-session-end-date :value nil?)]
-        (om/update! data :can-edit? running)
-        (when-not running
-          (om/update! data :active :details)
-          (dorun (map #(om/update! % :active (= (:action %) :details)) (:menu data))))))
+      (when-not (can-edit? data)
+        (om/update! data :active :details)
+        (dorun (map #(om/update! % :active (= (:action %) :details)) (:menu data)))))
     om/IRender
     (render [_]
-      (if (nil? (:can-edit? data))
-        (dom/div #js {:className "align-center"}
-                   (dom/img #js {:className "spinner"
-                                 :src "images/spinner.gif"
-                                 :height "32"
-                                 :width "32"}))
-        (dom/div nil
-                 (dom/div #js {:className "section-container"}
-                          (om/build action-menu-component data))
-                 (dom/div #js {:className "section-container"}
-                          (case (:active data)
-                            :details (om/build deployment-selected-details-component data)
-                            :check (om/build record-camera-check-component data)
-                            nil)))))))
+      (dom/div nil
+               (dom/div #js {:className "section-container"}
+                        (om/build action-menu-component data))
+               (dom/div #js {:className "section-container"}
+                        (case (:active data)
+                          :details (om/build deployment-selected-details-component data)
+                          :check (om/build record-camera-check-component data)
+                          nil))))))
 
 (defn edit-view-component
   [app owner]
