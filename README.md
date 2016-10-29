@@ -16,11 +16,23 @@ Camelot:
 
 ## Prerequisites
 
+### Java Runtime
+
 Camelot requires Java 8u91 (on later) to be installed on the system it will run on before it can be used.
 
 Java can be downloaded here: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 If using OSX, you will need to install the "JDK".  For Windows and Linux, you can install either the "JRE" or the "JDK".
+
+### Web browser
+
+Camelot supports the latest versions of the following browsers:
+
+* Chrome
+* Firefox
+* Edge
+* Safari
+* Internet Explorer 11
 
 ## Getting Started
 

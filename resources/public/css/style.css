@@ -614,12 +614,34 @@ pre.field-input {
 }
 .library .media {
     padding: 1rem;
+    display: block;
     cursor: pointer;
     background: #fafafa;
     border: 1px solid #ddd;
+    height: 100%;
     width: 100%;
     transition: all 0.2s ease-in-out;
     margin-top: 0;
+}
+.library .media img {
+    position: relative;
+    z-index: 1;
+    max-height: 100%;
+    max-width: 100%;
+}
+.library .media img:hover {
+    opacity: 0.8;
+}
+#app .library .media:before {
+    font-family: FontAwesome;
+    font-size: calc(12.3vw * (3 / 6));
+    margin-left: calc(12.3vw * (1 / 6) - 2rem);
+    margin-top: -1.6rem;
+    content: "\f03e";
+    display: block;
+    position: absolute;
+    opacity: 0.1;
+    color: #333;
 }
 .library .media.selected {
     background: #88a400;
@@ -629,9 +651,6 @@ pre.field-input {
 }
 .library .media.attention-needed {
     border: 2px solid #aa3311;
-}
-.library .media:hover {
-    opacity: 0.8;
 }
 .library .media-collection {
     width: 32%;
@@ -643,6 +662,7 @@ pre.field-input {
 .library .media-collection-content-wrapper {
     display: flex;
     flex-grow: 1;
+    width: 100%;
     flex-direction: column;
     min-height: calc(100vh - 13.5rem);
 }
@@ -819,9 +839,12 @@ pre.field-input {
     width: 33%;
     height: calc(12.3vw * (4 / 6));
     margin-top: 0;
-    padding: 0.4%;
+    padding: 0.2rem;
     position: relative;
     display: inline-block;
+}
+#app .library .media-item:after:hover {
+    opacity: 0;
 }
 #app .library .view-photo {
     position: absolute;
@@ -930,9 +953,22 @@ pre.field-input {
 }
 #app .library input.search {
     margin-left: 0.5rem;
-    margin-right: 0.5rem;
     display: inline-block;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0;
     width: 20rem;
+}
+#app .library button.search {
+    position: relative;
+    z-index: 10;
+    opacity: 1;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -2px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background-color: #fafafa;
 }
 #app .library .search-bar button {
     margin-right: 0.5rem;
@@ -972,13 +1008,20 @@ pre.field-input {
 .library .search-bar label {
     display: block;
 }
+.library .search-bar .search-option-container {
+    position: relative;
+    top: 0.6rem;
+}
 .library .search-bar .checkbox-container {
     display: inline-block;
     position: absolute;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
-    margin-top: 0;
+    margin-top: -0.6rem;
     padding-top: 0;
+}
+#app .library .search-bar .checkbox-container label {
+    margin-top: 0;
 }
 .library .search-bar .flag {
     position: relative;

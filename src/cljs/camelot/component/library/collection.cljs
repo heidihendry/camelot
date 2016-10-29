@@ -117,11 +117,11 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "media-item"}
-               (dom/img #js {:className (media-thumb-class data)
-                             :onMouseDown #(do
-                                             (util/toggle-select-image data (.. % -ctrlKey))
-                                             (nav/analytics-event "library-collection" "select-media"))
-                             :src (str (get-in data [:media-uri]) "/thumb")})
+               (dom/div #js {:className (media-thumb-class data)}
+                        (dom/img #js {:onMouseDown #(do
+                                                      (util/toggle-select-image data (.. % -ctrlKey))
+                                                      (nav/analytics-event "library-collection" "select-media"))
+                                      :src (str (get-in data [:media-uri]) "/thumb")}))
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
                              :onClick #(do
                                          (om/update! (state/library-state) :selected-media-id (:media-id data))

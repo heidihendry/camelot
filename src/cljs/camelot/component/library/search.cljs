@@ -382,7 +382,7 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/span nil
+      (dom/span #js {:className "search-option-container"}
                 (om/build filter-input-component (:search data) {:init-state state})
                 (om/build filter-button-component (:search data) {:init-state state})
                 (let [global-survey (get-in (state/app-state-cursor)
