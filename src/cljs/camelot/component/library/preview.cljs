@@ -50,8 +50,9 @@
                                            (remove-sighting (:sighting-id sighting))
                                            (nav/analytics-event "library-preview" "delete-sighting"))}))
                (:sighting-quantity sighting) "x "
-               (:taxonomy-label (get (:species (state/library-state))
-                                     (:taxonomy-id sighting)))
+               (or (:taxonomy-label (get (:species (state/library-state))
+                                         (:taxonomy-id sighting)))
+                   (tr/translate ::species-not-in-survey))
                (let [ls (:sighting-lifestage sighting)
                      sex (:sighting-sex sighting)]
                  (when (or (unidentified? "unidentified")

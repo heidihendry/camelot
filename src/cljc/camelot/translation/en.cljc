@@ -515,6 +515,7 @@
 
    :camelot.component.library.preview
    {:photo-not-selected "Photo not selected"
+    :species-not-in-survey "[Species not in this survey]"
     :sightings "Sightings"}
 
    :camelot.component.library.search

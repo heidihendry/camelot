@@ -646,6 +646,9 @@ pre.field-input {
     flex-direction: column;
     min-height: calc(100vh - 13.5rem);
 }
+.library.restricted-mode .media-collection-content-wrapper {
+    min-height: calc(100vh - 7.5rem);
+}
 .library .media-collection-container {
     margin: auto;
     overflow: auto;
@@ -659,6 +662,9 @@ pre.field-input {
     flex-grow: 1;
     width: 100%;
     max-height: calc(100vh - 12rem);
+}
+.library.restricted-mode .library-body {
+    max-height: calc(100vh - 6rem);
 }
 .library .media-control-panel {
     position: relative;
@@ -681,6 +687,9 @@ pre.field-input {
     text-align: center;
     float: right;
     width: 100%;
+}
+.library.restricted-mode .media-control-panel img {
+    max-height: calc(100vh - 6rem);
 }
 .library .media-control-panel img {
     position: relative;
@@ -836,6 +845,9 @@ pre.field-input {
 #app .library .none-selected h4 {
     position: relative;
     top: calc((100vh - 12rem) / 2.4);
+}
+#app .library.restricted-mode .none-selected h4 {
+    top: calc((100vh - 6rem) / 2.4);
 }
 #app .library .selected-count {
     position: fixed;

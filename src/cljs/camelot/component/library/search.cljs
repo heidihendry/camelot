@@ -204,7 +204,7 @@
                   (om/build-all survey-option-component
                                 (cons {:survey-id -1 :survey-name
                                        (tr/translate ::filter-survey-all-surveys)}
-                                      (:surveys data))
+                                      (sort-by :survey-name (:surveys data)))
                                 {:key :survey-id})))))
 
 (defn species-reference-filter
@@ -307,7 +307,7 @@
                            (om/build-all trap-station-option-component
                                          (cons {:trap-station-id -1
                                                 :trap-station-name (tr/translate ::filter-trap-station-all-traps)}
-                                               (:trap-stations data))
+                                               (sort-by :trap-station-name (:trap-stations data)))
                                          {:key :trap-station-id}))))))
 
 (defn subfilter-checkbox-component

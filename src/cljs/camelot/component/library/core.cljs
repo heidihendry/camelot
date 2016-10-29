@@ -99,7 +99,7 @@
     (render [_]
       (let [lib (:library data)]
         (if (get-in lib [:search :results])
-          (dom/div #js {:className "library"
+          (dom/div #js {:className (str "library" (if restricted-mode " restricted-mode" ""))
                         :onKeyDown print-key
                         :tabIndex 0}
                    (if restricted-mode
