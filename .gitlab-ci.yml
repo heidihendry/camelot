@@ -1,8 +1,5 @@
 before_script:
   - export LEIN_ROOT=1
-  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-  - eval $(ssh-agent -s)
-  - ssh-add <(echo "$SSH_CI_PRIVATE_KEY")
   - apt-get update -y
   - apt-get install nodejs nodejs-legacy npm curl -y
   - npm install -g phantomjs-prebuilt
