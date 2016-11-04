@@ -606,3 +606,10 @@ For more module examples, check out Camelot's [built-in reports and columns](htt
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
+
+## Acknowledgements
+Species database: Species recognized by Guilbert E., Lace Bugs Database, ver. 1 of Aug 2013 in the Catalogue of Life: 2015 Annual Checklist.
+Developed in consultation: Fauna & Flora International - Vietnam programme
+Input into design was provided by Heidi Hendry, Data Scientist, & Dr Benjamin Rawson, Country Director, of Fauna & Flora International - Vietnam 
+With thanks to the Fauna & Flora International camera trappers in Myanmar and Indonesia, especially Wido Albert, Grant Cornette, and Patrick Oswald for detailed feedback about usability and preferred report outputs. 
+And further thanks to all the Fauna & Flora International Camelot Beta Testers for their support and feedback.
