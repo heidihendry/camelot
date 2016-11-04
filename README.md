@@ -523,7 +523,7 @@ Each of the `Database`, `Media` and `FileStore` directories should be backed up 
 
 #### config.clj
 
-`config.clj` is the global camelot configuration file.  All configuration values available in this can also be set through the settings panel in the UI.
+`config.clj` is the global camelot configuration file.  Some values in this file can be set via the Settings menu in Camelot, while others may be internal or legacy settings.  Care should be taken if editing this file manually.`config.clj` is the global camelot configuration file.  All configuration values available in this can also be set through the settings panel in the UI.
 
 ### Custom Reports
 
