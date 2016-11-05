@@ -319,7 +319,7 @@
                           (get orig-data (camera-id-key cam-type))
                           (get data (camera-status-id-key cam-type))))
     (update-session-camera! state
-                            (get data (camera-id-key cam-type))
+                            (get orig-data (camera-id-key cam-type))
                             (:trap-station-session-id data)
                             (get data (camera-media-unrecoverable-key cam-type)))))
 

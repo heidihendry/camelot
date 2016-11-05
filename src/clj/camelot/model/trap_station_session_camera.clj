@@ -164,6 +164,5 @@
     {:camera-id camera-id
      :trap-station-session-id trap-station-session-id
      :trap-station-session-camera-media-unrecoverable media-unrecoverable})
-  (trap-station-session-camera
-   (get-specific-with-camera-and-session state camera-id
-                                         trap-station-session-id)))
+  (get-specific-with-camera-and-session state camera-id
+                                        trap-station-session-id))
