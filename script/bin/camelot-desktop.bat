@@ -1,2 +1,2 @@
 @echo off
- java -jar camelot-1.0.0.jar --browser
+ java -jar camelot-1.0.1.jar --browser
