@@ -40,11 +40,11 @@
      trap-station-longitude
      trap-station-latitude
      trap-station-altitude :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)
      trap-station-distance-above-ground :- (s/maybe s/Num)
      trap-station-distance-to-river :- (s/maybe s/Num)
      trap-station-distance-to-road :- (s/maybe s/Num)
      trap-station-distance-to-settlement :- (s/maybe s/Num)
+     trap-station-notes :- (s/maybe s/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- org.joda.time.DateTime
      primary-camera-id :- s/Int
