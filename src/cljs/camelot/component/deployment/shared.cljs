@@ -1,7 +1,18 @@
 (ns camelot.component.deployment.shared
   (:require [om.core :as om]
             [om.dom :as dom]
-            [camelot.translation.core :as tr]))
+            [camelot.translation.core :as tr])
+  (:import [goog.date UtcDateTime]
+           [goog.date DateTime]
+           [goog.i18n DateTimeFormat]))
+
+(defn datetime-in-future?
+  "Predicate indicating whether the datetime is in the future.  False if datetime is nil."
+  [datetime]
+  (let [now (.getTime (DateTime.))
+        ms-today (mod now (* 24 60 60 1000))
+        start-of-day (- now ms-today (* 60 1000 (.getTimezoneOffset (DateTime.))))]
+    (and datetime (> (.getTime datetime) start-of-day))))
 
 (def deployment-sorters
   {:trap-station-name (comparator (fn [a b]

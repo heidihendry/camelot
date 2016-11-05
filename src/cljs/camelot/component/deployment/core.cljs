@@ -171,10 +171,11 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! data [:data :validation-problem] {:value false}))
+      (om/update! data [:data :validation-problem] {:value false})
+      (om/update! data :can-edit (can-edit? data)))
     om/IRender
     (render [_]
-      (if (can-edit? data)
+      (if (or (nil? (:can-edit data)) (:can-edit data))
         (let [data (:data data)]
           (om/update! data :validation-problem {:value false})
           (let [sess-end (get-in data [:trap-station-session-end-date :value])]
@@ -190,7 +191,7 @@
                                 (om/update! (:validation-problem data) :value true)
                                 (dom/label #js {:className "validation-warning"}
                                            (tr/translate ::date-validation-past)))
-                              (when (and sess-end (> (.getTime sess-end) (.getTime (UtcDateTime.))))
+                              (when (shared/datetime-in-future? sess-end)
                                 (om/update! (:validation-problem data) :value true)
                                 (dom/label #js {:className "validation-warning"}
                                            (tr/translate ::date-validation-future)))

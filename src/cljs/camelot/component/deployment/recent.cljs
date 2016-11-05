@@ -24,7 +24,6 @@
   (when (js/confirm (if (:has-uploaded-media data)
                       (tr/translate ::confirm-delete-has-media)
                       (tr/translate ::confirm-delete)))
-    (prn state)
     (rest/delete-x (str "/trap-station-session-cameras/" (:trap-station-session-camera-id data))
                    #(go (>! (:chan state) {:event :delete :data data})))))
 
