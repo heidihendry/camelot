@@ -1,8 +1,9 @@
 (ns camelot.model.taxonomy
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]))
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]))
 
 (sql/defqueries "sql/taxonomy.sql" {:connection db/spec})
 

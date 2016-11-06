@@ -1,10 +1,12 @@
 (ns camelot.report.module.builtin.columns.percent-nocturnal
-  (:require [camelot.util.sunrise-sunset :as sun]
-            [camelot.report.module.core :as module]
-            [clj-time.core :as t]
-            [camelot.report.module.column-util :as col-util]
-            [camelot.report.sighting-independence :as indep])
-  (:import [java.util TimeZone]))
+  (:require
+   [camelot.util.sunrise-sunset :as sun]
+   [camelot.report.module.core :as module]
+   [clj-time.core :as t]
+   [camelot.report.module.column-util :as col-util]
+   [camelot.report.sighting-independence :as indep])
+  (:import
+   (java.util TimeZone)))
 
 (defn- get-timezone
   [state]

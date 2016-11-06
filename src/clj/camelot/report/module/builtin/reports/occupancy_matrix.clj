@@ -1,8 +1,9 @@
 (ns camelot.report.module.builtin.reports.occupancy-matrix
-  (:require [camelot.report.module.core :as module]
-            [camelot.report.module.presence-util :as presence]
-            [camelot.translation.core :as tr]
-            [clojure.edn :as edn]))
+  (:require
+   [camelot.report.module.core :as module]
+   [camelot.report.module.presence-util :as presence]
+   [camelot.translation.core :as tr]
+   [clojure.edn :as edn]))
 
 (defn report-output-count
   [state {:keys [taxonomy-id start-date end-date]}]

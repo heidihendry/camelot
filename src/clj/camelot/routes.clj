@@ -1,42 +1,43 @@
 (ns camelot.routes
-  (:require [camelot.application :as app]
-            [camelot.handler
-             [albums :as albums]
-             [application :as application]
-             [associated-taxonomy :as ataxonomy]
-             [config :as config]
-             [capture :as capture]
-             [import :as import]]
-            [camelot.import.db :as im.db]
-            [camelot.services.species-search :as species-search]
-            [camelot.model
-             [camera :as camera]
-             [camera-status :as camera-status]
-             [media :as media]
-             [photo :as photo]
-             [sighting :as sighting]
-             [site :as site]
-             [taxonomy :as taxonomy]
-             [species-mass :as species-mass]
-             [survey :as survey]
-             [survey-site :as survey-site]
-             [survey-file :as survey-file]
-             [trap-station :as trap-station]
-             [trap-station-session :as trap-station-session]
-             [trap-station-session-camera :as trap-station-session-camera]
-             [deployment :as deployment]
-             [camera-deployment :as camera-deployment]
-             [library :as library]]
-            [camelot.report.core :as report]
-            [camelot.util
-             [config :as conf]
-             [rest :as rest]]
-            [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [compojure
-             [core :refer [context defroutes DELETE GET POST PUT routes]]
-             [route :as route]]
-            [ring.util.response :as r]))
+  (:require
+   [camelot.application :as app]
+   [camelot.handler
+    [albums :as albums]
+    [application :as application]
+    [associated-taxonomy :as ataxonomy]
+    [config :as config]
+    [capture :as capture]
+    [import :as import]]
+   [camelot.import.db :as im.db]
+   [camelot.services.species-search :as species-search]
+   [camelot.model
+    [camera :as camera]
+    [camera-status :as camera-status]
+    [media :as media]
+    [photo :as photo]
+    [sighting :as sighting]
+    [site :as site]
+    [taxonomy :as taxonomy]
+    [species-mass :as species-mass]
+    [survey :as survey]
+    [survey-site :as survey-site]
+    [survey-file :as survey-file]
+    [trap-station :as trap-station]
+    [trap-station-session :as trap-station-session]
+    [trap-station-session-camera :as trap-station-session-camera]
+    [deployment :as deployment]
+    [camera-deployment :as camera-deployment]
+    [library :as library]]
+   [camelot.report.core :as report]
+   [camelot.util
+    [config :as conf]
+    [rest :as rest]]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [compojure
+    [core :refer [context defroutes DELETE GET POST PUT routes]]
+    [route :as route]]
+   [ring.util.response :as r]))
 
 (defn- retrieve-index
   "Return a response for index.html"

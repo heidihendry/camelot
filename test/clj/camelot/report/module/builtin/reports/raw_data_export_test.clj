@@ -1,8 +1,9 @@
 (ns camelot.report.module.builtin.reports.raw-data-export-test
-  (:require [camelot.report.core :as sut]
-            [midje.sweet :refer :all]
-            [clj-time.core :as t]
-            [camelot.test-util.state :as state]))
+  (:require
+   [camelot.report.core :as sut]
+   [clojure.test :refer :all :exclude [report]]
+   [clj-time.core :as t]
+   [camelot.test-util.state :as state]))
 
 (defn- gen-state-helper
   [config]
@@ -53,62 +54,63 @@
   [r]
   (merge default-record r))
 
-(facts "Raw Data Export"
-  (fact "Export without records is empty"
-    (let [records '()
-          state (gen-state-helper {})
-          result (report state 1 records)]
-      result => '()))
+(deftest test-raw-data-export-report
+  (testing "Raw Data Export"
+    (testing "Export without records is empty"
+      (let [records '()
+            state (gen-state-helper {})
+            result (report state 1 records)]
+        (is (= result '()))))
 
-  (fact "Should export as expected for a single record"
-    (let [records (list (->record {}))
-          state (gen-state-helper {})]
-      (report state 1 records) =>
-      [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))
+    (testing "Should export as expected for a single record"
+      (let [records (list (->record {}))
+            state (gen-state-helper {})]
+        (is (= (report state 1 records)
+               [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))))
 
-  (fact "Should display separate rows for 2 media."
-    (let [records (list
-                   (->record {})
-                   (->record {:media-id 2
-                              :media-filename "file-id-2"}))
-          state (gen-state-helper {})]
-      (report state 1 records) =>
-      [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]
-       ["file-id-2" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))
+    (testing "Should display separate rows for 2 media."
+      (let [records (list
+                     (->record {})
+                     (->record {:media-id 2
+                                :media-filename "file-id-2"}))
+            state (gen-state-helper {})]
+        (is (= (report state 1 records)
+               [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]
+                ["file-id-2" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))))
 
-  (fact "Should display record even without having a sighting."
-    (let [records (list
-                   (->record {})
-                   (->record {:sighting-id nil
-                              :sighting-quantity nil
-                              :sighting-species nil
-                              :taxonomy-genus nil
-                              :taxonomy-species nil
-                              :media-id 2
-                              :media-filename "file-id-2"}))
-          state (gen-state-helper {})]
-      (report state 1 records) =>
-      [["file-id-2" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 nil nil nil]
-       ["file-id-1" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))
+    (testing "Should display record even without having a sighting."
+      (let [records (list
+                     (->record {})
+                     (->record {:sighting-id nil
+                                :sighting-quantity nil
+                                :sighting-species nil
+                                :taxonomy-genus nil
+                                :taxonomy-species nil
+                                :media-id 2
+                                :media-filename "file-id-2"}))
+            state (gen-state-helper {})]
+        (is (= (report state 1 records)
+               [["file-id-2" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 nil nil nil]
+                ["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))))
 
-  (fact "Should display 2 records for two different sightings on an image"
-    (let [records (list
-                   (->record {})
-                   (->record {:media-id 2
-                              :media-filename "file-id-2"})
-                   (->record {:sighting-quantity 2
-                              :sighting-id 2
-                              :taxonomy-genus "Bird"}))
-          state (gen-state-helper {})]
-      (report state 1 records) =>
-      [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Bird" "Yellow Spotted" 2]
-       ["file-id-1" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]
-       ["file-id-2" "2015-01-07 05:00:00" "ASite" nil
-        "Trap1" -25 130 "Cat" "Yellow Spotted" 1]])))
+    (testing "Should display 2 records for two different sightings on an image"
+      (let [records (list
+                     (->record {})
+                     (->record {:media-id 2
+                                :media-filename "file-id-2"})
+                     (->record {:sighting-quantity 2
+                                :sighting-id 2
+                                :taxonomy-genus "Bird"}))
+            state (gen-state-helper {})]
+        (is (= (report state 1 records)
+               [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Bird" "Yellow Spotted" 2]
+                ["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]
+                ["file-id-2" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))))))

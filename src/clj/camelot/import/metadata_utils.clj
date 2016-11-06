@@ -1,11 +1,13 @@
 (ns camelot.import.metadata-utils
-  (:require [clojure.string :as str]
-            [clj-time.core :as t]
-            [clojure.edn :as edn]
-            [schema.core :as s]
-            [camelot.model.import :as mi]
-            [clojure.tools.logging :as log])
-  (:import [camelot.model.import ImportPhotoMetadata]))
+  (:require
+   [clojure.string :as str]
+   [clj-time.core :as t]
+   [clojure.edn :as edn]
+   [schema.core :as s]
+   [camelot.model.import :as mi]
+   [clojure.tools.logging :as log])
+  (:import
+   (camelot.model.import ImportPhotoMetadata)))
 
 (s/defn gps-parts-to-decimal :- s/Num
   "Return the GPS parts as a decimal."

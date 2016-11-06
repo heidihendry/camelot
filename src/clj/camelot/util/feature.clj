@@ -1,6 +1,7 @@
 (ns camelot.util.feature
-  (:require [environ.core :refer [env]]
-            [schema.core :as s]))
+  (:require
+   [environ.core :refer [env]]
+   [schema.core :as s]))
 
 (def features
   "Map of feature keys and whether or not they're enabled"

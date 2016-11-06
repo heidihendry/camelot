@@ -1,5 +1,6 @@
 (ns camelot.model.state
-  (:require [schema.core :as s]))
+  (:require
+   [schema.core :as s]))
 
 (def Config
   {(s/required-key :erroneous-infrared-threshold) s/Num

@@ -1,7 +1,8 @@
 (ns camelot.report.module.builtin.reports.full-export
-  (:require [camelot.report.module.core :as module]
-            [clj-time.format :as tf]
-            [camelot.translation.core :as tr]))
+  (:require
+   [camelot.report.module.core :as module]
+   [clj-time.format :as tf]
+   [camelot.translation.core :as tr]))
 
 (def timestamp-formatter (tf/formatter "yyyy-MM-dd hh:mm:ss"))
 

@@ -1,12 +1,15 @@
 (ns camelot.handler.application
-  (:require [camelot.application :as app]
-            [camelot.import.util :as putil]
-            [clojure.java.io :as io]
-            [camelot.util
-             [config :as conf]]
-            [ring.util.response :as r]
-            [clojure.java.io :as io])
-  (:import [java.util Properties]))
+  "Application-level data request handler."
+  (:require
+   [camelot.application :as app]
+   [camelot.import.util :as putil]
+   [clojure.java.io :as io]
+   [camelot.util
+    [config :as conf]]
+   [ring.util.response :as r]
+   [clojure.java.io :as io])
+  (:import
+   (java.util Properties)))
 
 (defn- version-property-from-pom
   "Return a version string from the Jar metadata."

@@ -1,20 +1,22 @@
 (ns camelot.handler.import
-  (:require [camelot.import.album :as a]
-            [camelot.util.config :as conf]
-            [camelot.application :as app]
-            [compojure.core :refer [ANY context DELETE GET POST PUT]]
-            [ring.util.response :as r]
-            [camelot.import.validation :as validation]
-            [clojure.edn :as edn]
-            [camelot.import.album :as album]
-            [clojure.string :as str]
-            [clojure.java.io :as io]
-            [camelot.util.config :as util.config]
-            [camelot.util.java-file :as jf]
-            [camelot.db :as db]
-            [mikera.image.core :as image]
-            [camelot.import.db :as im.db])
-  (:import [org.apache.commons.lang3 SystemUtils]))
+  (:require
+   [camelot.import.album :as a]
+   [camelot.util.config :as conf]
+   [camelot.application :as app]
+   [compojure.core :refer [ANY context DELETE GET POST PUT]]
+   [ring.util.response :as r]
+   [camelot.import.validation :as validation]
+   [clojure.edn :as edn]
+   [camelot.import.album :as album]
+   [clojure.string :as str]
+   [clojure.java.io :as io]
+   [camelot.util.config :as util.config]
+   [camelot.util.java-file :as jf]
+   [camelot.db :as db]
+   [mikera.image.core :as image]
+   [camelot.import.db :as im.db])
+  (:import
+   (org.apache.commons.lang3 SystemUtils)))
 
 (defn- save-pathname
   [f dest]

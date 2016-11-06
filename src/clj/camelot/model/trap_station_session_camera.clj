@@ -1,10 +1,11 @@
 (ns camelot.model.trap-station-session-camera
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.trap-station-session :as trap-station-session]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]
-            [camelot.model.media :as media]))
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]
+   [camelot.model.media :as media]))
 
 (sql/defqueries "sql/trap-station-session-cameras.sql" {:connection db/spec})
 

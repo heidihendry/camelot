@@ -1,7 +1,8 @@
 (ns camelot.test-util.state
-  (:require [camelot.application :as app]
-            [clj-time.coerce :as tc]
-            [clj-time.core :as t]))
+  (:require
+   [camelot.application :as app]
+   [clj-time.coerce :as tc]
+   [clj-time.core :as t]))
 
 (def default-config
   "Return the default configuration."

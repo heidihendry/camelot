@@ -26,7 +26,6 @@ lein with-profiles -dev,-user,+uberjar uberjar
 
 echo "Running tests... "
 lein with-profiles +test test
-lein with-profiles +test midje
 lein doo phantom test once
 
 echo "Running camelot and ensuring it responds... "

@@ -1,13 +1,14 @@
 (ns camelot.db
-  (:require [camelot.util.config :as settings]
-            [clj-time.coerce :as tc]
-            [clojure.string :as str]
-            [clojure.java.jdbc :as jdbc]
-            [camelot.model.state :refer [State]]
-            [schema.core :as s]
-            [camelot.util.java-file :as f]
-            [clojure.java.io :as io])
-  (:import [java.io IOException]))
+  (:require
+   [camelot.util.config :as settings]
+   [clj-time.coerce :as tc]
+   [clojure.string :as str]
+   [clojure.java.jdbc :as jdbc]
+   [camelot.model.state :refer [State]]
+   [schema.core :as s]
+   [camelot.util.java-file :as f]
+   [clojure.java.io :as io])
+  (:import (java.io IOException)))
 
 (defn db-path
   []

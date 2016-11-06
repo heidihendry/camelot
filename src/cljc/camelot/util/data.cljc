@@ -1,4 +1,5 @@
-(ns camelot.util.data)
+(ns camelot.util.data
+  )
 
 (defn select-keys-inv
   [ks data]

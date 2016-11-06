@@ -1,17 +1,16 @@
-(ns camelot.migration.create-taxonomy-up
-  (:require [camelot.model.taxonomy :as taxonomy]
-            [yesql.core :as sql]
-            [camelot.db :as db]
-            [clojure.string :as str]
-            [camelot.application :as app]
-            [camelot.util.config :as config]
-            [camelot.model.species :as species]
-            [clojure.java.jdbc :as jdbc]))
+(require '[camelot.model.taxonomy :as taxonomy])
+(require '[yesql.core :as sql])
+(require '[camelot.db :as db])
+(require '[clojure.string :as str])
+(require '[camelot.application :as app])
+(require '[camelot.util.config :as config])
+(require '[camelot.model.species :as species])
+(require '[clojure.java.jdbc :as jdbc])
 
 (sql/defqueries "sql/migration-helpers/021.sql" {:connection db/spec})
 (sql/defqueries "sql/migration-helpers/db.sql" {:connection db/spec})
 
-(defn create-taxonomy
+(defn 021-create-taxonomy
   [spp]
   (let [name-parts (str/split (:species_scientific_name spp) #" ")]
     {:taxonomy_notes (:species_notes spp)
@@ -28,18 +27,18 @@
                          (first name-parts)
                          (str/join " " (rest name-parts)))}))
 
-(defn species-genus-migration
+(defn 021-species-genus-migration
   [s]
   (let [spps (-get-all-species {} (select-keys s [:connection]))
         build (comp #(-create-taxonomy<! % (select-keys s [:connection]))
-                    create-taxonomy)]
+                    021-create-taxonomy)]
     (->> spps
          (map #(hash-map :species_id (:species_id %)
                          :taxonomy_id (int (:1 (build %)))))
          (map #(-update-sightings! % (select-keys s [:connection])))
          (doall))))
 
-(defn remove-unnecessary-constraints
+(defn 021-remove-unnecessary-constraints
   [s]
   (let [constraints (-get-constraints {:source_table "SIGHTING"
                                        :relation_table "SPECIES"}
@@ -49,5 +48,5 @@
                                         (:constraintname c))))))
 
 (db/with-transaction [s (app/gen-state (config/config))]
-  (remove-unnecessary-constraints s)
-  (species-genus-migration s))
+  (021-remove-unnecessary-constraints s)
+  (021-species-genus-migration s))

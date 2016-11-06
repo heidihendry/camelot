@@ -1,17 +1,19 @@
 (ns camelot.model.camera-deployment
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.db :as db]
-            [camelot.model.state :refer [State]]
-            [clj-time.core :as t]
-            [camelot.util.trap-station :as util.ts]
-            [camelot.model.camera :as camera]
-            [camelot.model.camera-status :as camera-status]
-            [camelot.model.trap-station-session :as trap-station-session]
-            [camelot.model.trap-station-session-camera :as trap-station-session-camera]
-            [camelot.util.data :as data]
-            [camelot.util.deployment :as dep-util]
-            [camelot.model.deployment :as deployment]))
+  "Camera deployment / camera check model and data access."
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.db :as db]
+   [camelot.model.state :refer [State]]
+   [clj-time.core :as t]
+   [camelot.util.trap-station :as util.ts]
+   [camelot.model.camera :as camera]
+   [camelot.model.camera-status :as camera-status]
+   [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
+   [camelot.util.data :as data]
+   [camelot.util.deployment :as dep-util]
+   [camelot.model.deployment :as deployment]))
 
 (sql/defqueries "sql/deployments.sql" {:connection db/spec})
 

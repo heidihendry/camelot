@@ -1,9 +1,12 @@
 (ns camelot.util.transit
-  (:require [cognitect.transit :as transit]
-            [clj-time.coerce :as c]
-            [camelot.util.java-file :refer [get-path]])
-  (:import [org.joda.time DateTime]
-           [java.io File]))
+  "Transit readers and writers."
+  (:require
+   [cognitect.transit :as transit]
+   [clj-time.coerce :as c]
+   [camelot.util.java-file :refer [get-path]])
+  (:import
+   (org.joda.time DateTime)
+   (java.io File)))
 
 (def joda-time-reader
   "Process times from transit into Joda DateTimes."

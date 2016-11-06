@@ -1,8 +1,11 @@
 (ns camelot.util.deployment-test
-  (:require [camelot.util.deployment :as sut]
-            #?(:clj [clojure.test :refer [deftest is testing use-fixtures]]
-                    :cljs [cljs.test :refer-macros [deftest is testing use-fixtures]])
-            [schema.test :as st]))
+  (:require
+   [camelot.util.deployment :as sut]
+   #?(:clj
+      [clojure.test :refer [deftest is testing use-fixtures]]
+      :cljs
+      [cljs.test :refer-macros [deftest is testing use-fixtures]])
+   [schema.test :as st]))
 
 (use-fixtures :once st/validate-schemas)
 

@@ -1,11 +1,12 @@
 (ns camelot.model.survey-taxonomy
-  (:require [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [schema.core :as s]
-            [camelot.db :as db]
-            [camelot.translation.core :as tr]
-            [camelot.application :as app]
-            [camelot.util.config :as config]))
+  (:require
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [schema.core :as s]
+   [camelot.db :as db]
+   [camelot.translation.core :as tr]
+   [camelot.application :as app]
+   [camelot.util.config :as config]))
 
 (sql/defqueries "sql/survey-taxonomy.sql" {:connection db/spec})
 

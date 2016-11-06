@@ -1,8 +1,10 @@
 (ns camelot.model.species
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]))
+  "Species models and data access."
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]))
 
 (sql/defqueries "sql/species.sql" {:connection db/spec})
 

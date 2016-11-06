@@ -1,17 +1,18 @@
 (ns camelot.import.album-test
-  (:require [camelot.fixtures.exif-test-metadata :refer :all]
-            [camelot.import.album :refer :all]
-            [clj-time.core :as t]
-            [clojure.data :refer [diff]]
-            [midje.sweet :refer :all]
-            [schema.test :as st]
-            [camelot.application :as app]))
+  (:require
+   [camelot.fixtures.exif-test-metadata :refer :all]
+   [camelot.import.album :refer :all]
+   [clj-time.core :as t]
+   [clojure.data :refer [diff]]
+   [clojure.test :refer :all]
+   [schema.test :as st]
+   [camelot.application :as app]))
 
 (defn gen-state-helper
   [config]
   (app/gen-state (assoc config :language :en)))
 
-(namespace-state-changes (before :facts st/validate-schemas))
+(use-fixtures :once st/validate-schemas)
 
 (def config
   {:infrared-iso-value-threshold 999
@@ -29,40 +30,42 @@
 (def chrono-third {:datetime (t/date-time 2015 1 2 5 0 0) :camera camera})
 (def chrono-last {:datetime (t/date-time 2015 1 2 12 0 0) :camera camera})
 
-(facts "album creation"
-  (fact "An album is created for a single file's metadata"
-    (let [f (clojure.java.io/file "file")
-          data {f maginon-metadata}
-          result (album (gen-state-helper config) data)]
-      (:make (:camera (get (:photos result) f))) => "Maginon"))
+(deftest test-album-creation
+  (testing "album creation"
+    (testing "An album is created for a single file's metadata"
+      (let [f (clojure.java.io/file "file")
+            data {f maginon-metadata}
+            result (album (gen-state-helper config) data)]
+        (is (= (:make (:camera (get (:photos result) f))) "Maginon"))))
 
-  (fact "Can handle invalid metadata"
-    (let [f (clojure.java.io/file "file")
-          data {f invalid-metadata}
-          result (album (gen-state-helper config) data)]
-      (keys (get (:photos result) f))) => '(:invalid)))
+    (testing "Can handle invalid metadata"
+      (is (= (let [f (clojure.java.io/file "file")
+                   data {f invalid-metadata}
+                   result (album (gen-state-helper config) data)]
+               (keys (get (:photos result) f))) '(:invalid))))))
 
-(facts "metadata extraction"
-  (fact "Start date is extracted"
-    (let [album [chrono-second chrono-first chrono-last chrono-third]
-          state (gen-state-helper config)
-          result (extract-metadata state album)]
-      (:datetime-start result) => (:datetime chrono-first)))
+(deftest test-metadata-extraction
+  (testing "metadata extraction"
+    (testing "Start date is extracted"
+      (let [album [chrono-second chrono-first chrono-last chrono-third]
+            state (gen-state-helper config)
+            result (extract-metadata state album)]
+        (is (= (:datetime-start result) (:datetime chrono-first)))))
 
-  (fact "End date is extracted"
-    (let [album [chrono-second chrono-first chrono-last chrono-third]
-          state (gen-state-helper config)
-          result (extract-metadata state album)]
-      (:datetime-end result) => (:datetime chrono-last)))
+    (testing "End date is extracted"
+      (let [album [chrono-second chrono-first chrono-last chrono-third]
+            state (gen-state-helper config)
+            result (extract-metadata state album)]
+        (is (= (:datetime-end result) (:datetime chrono-last)))))
 
-  (fact "Make is extracted"
-    (let [album [chrono-second chrono-first chrono-last chrono-third]
-          state (gen-state-helper config)
-          result (extract-metadata state album)]
-      (:make result) => "CamMaker"))
+    (testing "Make is extracted"
+      (let [album [chrono-second chrono-first chrono-last chrono-third]
+            state (gen-state-helper config)
+            result (extract-metadata state album)]
+        (is (= (:make result) "CamMaker"))))
 
-  (fact "Model is extracted"
-    (let [album [chrono-second chrono-first chrono-last chrono-third]
-          state (gen-state-helper config)
-          result (extract-metadata state album)]
-      (:model result) => "MyCam")))
+    (testing "Model is extracted"
+      (let [album [chrono-second chrono-first chrono-last chrono-third]
+            state (gen-state-helper config)
+            result (extract-metadata state album)]
+        (is (= (:model result) "MyCam"))))))

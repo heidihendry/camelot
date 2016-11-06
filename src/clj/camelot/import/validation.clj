@@ -1,12 +1,13 @@
 (ns camelot.import.validation
-  (:require [camelot.import.photo :as photo]
-            [camelot.import.util :as putil]
-            [camelot.translation.core :as tr]
-            [clj-time.core :as t]
-            [clj-time.coerce :as tc]
-            [clojure.string :as str]
-            [incanter.stats :as istats]
-            [schema.core :as s]))
+  (:require
+   [camelot.import.photo :as photo]
+   [camelot.import.util :as putil]
+   [camelot.translation.core :as tr]
+   [clj-time.core :as t]
+   [clj-time.coerce :as tc]
+   [clojure.string :as str]
+   [incanter.stats :as istats]
+   [schema.core :as s]))
 
 (def sighting-quantity-exclusions-re
   #"(?i)\bcamera-?check\b|\bunknown\b|\bunidentified\b")

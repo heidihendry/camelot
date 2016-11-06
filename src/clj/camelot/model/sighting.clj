@@ -1,8 +1,10 @@
 (ns camelot.model.sighting
-  (:require [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]
-            [schema.core :as s]))
+  "Sighting models and data access."
+  (:require
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]
+   [schema.core :as s]))
 
 (sql/defqueries "sql/sightings.sql" {:connection db/spec})
 

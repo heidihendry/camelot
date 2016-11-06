@@ -1,8 +1,9 @@
 (ns camelot.report.module.builtin.reports.species-statistics
-  (:require [camelot.model.taxonomy :as taxonomy]
-            [camelot.report.module.core :as module]
-            [clojure.edn :as edn]
-            [camelot.translation.core :as tr]))
+  (:require
+   [camelot.model.taxonomy :as taxonomy]
+   [camelot.report.module.core :as module]
+   [clojure.edn :as edn]
+   [camelot.translation.core :as tr]))
 
 (defn report-output
   [state {:keys [taxonomy-id]}]

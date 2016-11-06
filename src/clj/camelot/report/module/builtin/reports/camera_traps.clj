@@ -1,7 +1,8 @@
 (ns camelot.report.module.builtin.reports.camera-traps
-  (:require [camelot.report.module.core :as module]
-            [clj-time.format :as tf]
-            [camelot.translation.core :as tr]))
+  (:require
+   [camelot.report.module.core :as module]
+   [clj-time.format :as tf]
+   [camelot.translation.core :as tr]))
 
 (def date-format (tf/formatter-local "yyyy-MM-dd"))
 

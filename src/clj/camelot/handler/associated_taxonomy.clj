@@ -1,11 +1,13 @@
 (ns camelot.handler.associated-taxonomy
-  (:require [camelot.model.taxonomy :as taxonomy]
-            [camelot.model.state :refer [State]]
-            [schema.core :as s]
-            [camelot.db :as db]
-            [camelot.model.survey :as survey]
-            [camelot.model.survey-taxonomy :as survey-taxonomy])
-  (:import [camelot.model.taxonomy TTaxonomy Taxonomy]))
+  (:require
+   [camelot.model.taxonomy :as taxonomy]
+   [camelot.model.state :refer [State]]
+   [schema.core :as s]
+   [camelot.db :as db]
+   [camelot.model.survey :as survey]
+   [camelot.model.survey-taxonomy :as survey-taxonomy])
+  (:import
+   (camelot.model.taxonomy TTaxonomy Taxonomy)))
 
 (s/defrecord TAssociatedTaxonomy
     [taxonomy-class :- (s/maybe s/Str)

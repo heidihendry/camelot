@@ -1,7 +1,9 @@
 (ns camelot.report.module.presence-util
-  (:require [clj-time.core :as t]
-            [camelot.report.sighting-independence :as indep]
-            [clj-time.format :as tf]))
+  "PRESENCE output generation."
+  (:require
+   [clj-time.core :as t]
+   [camelot.report.sighting-independence :as indep]
+   [clj-time.format :as tf]))
 
 (defn to-day
   "Floor a given date to midnight on that day."

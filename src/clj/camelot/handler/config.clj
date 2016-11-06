@@ -1,9 +1,10 @@
 (ns camelot.handler.config
-  (:require [compojure.core :refer [ANY context DELETE GET POST PUT]]
-            [camelot.util.cursorise :as cursorise]
-            [ring.util.response :as r]
-            [camelot.util
-             [config :as conf]]))
+  (:require
+   [compojure.core :refer [ANY context DELETE GET POST PUT]]
+   [camelot.util.cursorise :as cursorise]
+   [ring.util.response :as r]
+   [camelot.util
+    [config :as conf]]))
 
 (defn config-save
   "Save a configuration."

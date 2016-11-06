@@ -1,7 +1,8 @@
 (ns camelot.report.module.builtin.columns.taxonomy-extras
-  (:require [camelot.report.module
-             [column-util :as col-util]
-             [core :as module]]))
+  (:require
+   [camelot.report.module
+    [column-util :as col-util]
+    [core :as module]]))
 
 (defn calculate-species-name
   [state data]

@@ -18,10 +18,10 @@
                  [compojure "1.5.0"]
                  [environ "1.0.2"]
                  [incanter/incanter-core "1.5.7"]
-                 [midje "1.8.3"]
                  [net.mikera/imagez "0.10.0"]
                  [org.apache.commons/commons-lang3 "3.4"]
                  [org.apache.derby/derby "10.12.1.1"]
+                 [org.clojure/tools.namespace "0.2.11"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229"]
                  [org.clojure/core.async "0.2.391"]
@@ -41,13 +41,17 @@
                  [yesql "0.5.2"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
-            [lein-environ "1.0.2"]]
+            [lein-environ "1.0.2"]
+            [com.jakemccrary/lein-test-refresh "0.17.0"]]
 
   :min-lein-version "2.6.1"
 
   :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]
 
   :test-paths ["test/cljc" "test/clj"]
+
+  :test-refresh {:refresh-dirs ["resources" "test/clj" "test/cljc"]
+                 :watch-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]}
 
   :clean-targets ^{:protect false} [:target-path :compile-path "resources/public/js"]
 
@@ -119,8 +123,7 @@
                              [org.apache.derby/derbytools "10.12.1.1"]]
               :env {:camelot-dev-mode "true"}
               :plugins [[lein-figwheel "0.5.4" :exclusions [org.clojure/clojure]]
-                        [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]
-                        [lein-midje "3.2"]]
+                        [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]]
               :cljsbuild {:builds
                           {:test
                            {:source-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]

@@ -1,19 +1,21 @@
 (ns camelot.util.config
-  (:require [camelot.translation.core :as tr :refer :all]
-            [camelot.util.java-file :as jf]
-            [clj-time
-             [coerce :as tc]
-             [core :as t]]
-            [clojure
-             [edn :as edn]
-             [pprint :as pp]]
-            [clojure.java.io :as io]
-            [environ.core :refer [env]]
-            [camelot.util.java-file :as jf]
-            [clojure.string :as str])
-  (:import [org.apache.commons.lang3 SystemUtils]
-           [java.lang RuntimeException]
-           [java.io IOException]))
+  (:require
+   [camelot.translation.core :as tr :refer :all]
+   [camelot.util.java-file :as jf]
+   [clj-time
+    [coerce :as tc]
+    [core :as t]]
+   [clojure
+    [edn :as edn]
+    [pprint :as pp]]
+   [clojure.java.io :as io]
+   [environ.core :refer [env]]
+   [camelot.util.java-file :as jf]
+   [clojure.string :as str])
+  (:import
+   (org.apache.commons.lang3 SystemUtils)
+   (java.lang RuntimeException)
+   (java.io IOException)))
 
 (def default-config
   "Return the default configuration."

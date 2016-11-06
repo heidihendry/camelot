@@ -1,12 +1,14 @@
 (ns camelot.migrate
-  (:require [clojure.string :as str]
-            [clojure.java.jdbc :as jdbc]
-            [resauce.core :as resauce]
-            [camelot.db :as db]
-            [ragtime
-             [core :as rtc]
-             [protocols :as rtp]])
-  (:use [ragtime.jdbc :as ragjdbc]))
+  (:require
+   [clojure.string :as str]
+   [clojure.java.jdbc :as jdbc]
+   [resauce.core :as resauce]
+   [camelot.db :as db]
+   [ragtime
+    [core :as rtc]
+    [protocols :as rtp]])
+  (:use
+   [ragtime.jdbc :as ragjdbc]))
 
 (defn- clj-migration-file-parts [file]
   (rest (re-matches #"(.*?)\.(up|down)(?:\.(\d+))?\.clj" (str file))))

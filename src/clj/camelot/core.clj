@@ -1,25 +1,27 @@
 (ns camelot.core
   "Camelot - Camera Trap management software for conservation research.
   Core initialisation."
-  (:require [camelot.util.transit :as tutil]
-            [camelot.migrate :refer [migrate]]
-            [camelot.routes :refer [app-routes]]
-            [environ.core :refer [env]]
-            [ring.adapter.jetty :refer [run-jetty]]
-            [clojure.tools.nrepl.server :as nrepl]
-            [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
-            [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-            [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
-            [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
-            [ring.middleware.session :refer [wrap-session]]
-            [ring.middleware.session.cookie :refer [cookie-store]]
-            [ring.middleware.gzip :refer [wrap-gzip]]
-            [ring.middleware.logger :refer [wrap-with-logger]]
-            [clojure.java.shell :refer [sh]])
-  (:import [java.net URI NetworkInterface InetAddress]
-           [java.awt Desktop]
-           [java.util Enumeration])
+  (:require
+   [camelot.util.transit :as tutil]
+   [camelot.migrate :refer [migrate]]
+   [camelot.routes :refer [app-routes]]
+   [environ.core :refer [env]]
+   [ring.adapter.jetty :refer [run-jetty]]
+   [clojure.tools.nrepl.server :as nrepl]
+   [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
+   [ring.middleware.multipart-params :refer [wrap-multipart-params]]
+   [ring.middleware.params :refer [wrap-params]]
+   [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+   [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
+   [ring.middleware.session :refer [wrap-session]]
+   [ring.middleware.session.cookie :refer [cookie-store]]
+   [ring.middleware.gzip :refer [wrap-gzip]]
+   [ring.middleware.logger :refer [wrap-with-logger]]
+   [clojure.java.shell :refer [sh]])
+  (:import
+   (java.net URI NetworkInterface InetAddress)
+   (java.awt Desktop)
+   (java.util Enumeration))
   (:gen-class))
 
 (defonce nrepl-server (when (env :camelot-debugger)

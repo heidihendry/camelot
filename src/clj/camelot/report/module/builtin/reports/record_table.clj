@@ -1,10 +1,11 @@
 (ns camelot.report.module.builtin.reports.record-table
-  (:require [camelot.report.module.core :as module]
-            [clj-time.core :as t]
-            [clj-time.format :as tf]
-            [camelot.translation.core :as tr]
-            [camelot.report.sighting-independence :as indep]
-            [camelot.util.config :as config]))
+  (:require
+   [camelot.report.module.core :as module]
+   [clj-time.core :as t]
+   [clj-time.format :as tf]
+   [camelot.translation.core :as tr]
+   [camelot.report.sighting-independence :as indep]
+   [camelot.util.config :as config]))
 
 (defn report-output
   [state {:keys [survey-id]}]

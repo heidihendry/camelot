@@ -1,20 +1,23 @@
 (ns camelot.model.deployment
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]
-            [camelot.util.data :as data]
-            [camelot.model.trap-station :as trap-station]
-            [camelot.util.trap-station :as util.ts]
-            [camelot.model.trap-station-session :as trap-station-session]
-            [camelot.model.trap-station-session-camera :as trap-station-session-camera]
-            [camelot.util.deployment :as dep-util]
-            [camelot.model.survey-site :as survey-site]
-            [camelot.model.camera-status :as camera-status]
-            [camelot.model.camera :as camera]
-            [camelot.util.trap-station :as util.ts]
-            [clojure.set :as set])
-  (:import [camelot.model.trap_station_session_camera TrapStationSessionCamera]))
+  "Deployment model and data access."
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]
+   [camelot.util.data :as data]
+   [camelot.model.trap-station :as trap-station]
+   [camelot.util.trap-station :as util.ts]
+   [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
+   [camelot.util.deployment :as dep-util]
+   [camelot.model.survey-site :as survey-site]
+   [camelot.model.camera-status :as camera-status]
+   [camelot.model.camera :as camera]
+   [camelot.util.trap-station :as util.ts]
+   [clojure.set :as set])
+  (:import
+   (camelot.model.trap_station_session_camera TrapStationSessionCamera)))
 
 (sql/defqueries "sql/deployments.sql" {:connection db/spec})
 

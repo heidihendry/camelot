@@ -1,11 +1,13 @@
 (ns camelot.model.camera-status
-  (:require [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [schema.core :as s]
-            [camelot.db :as db]
-            [camelot.translation.core :as tr]
-            [camelot.application :as app]
-            [camelot.util.config :as config]))
+  "Camera status model and data access."
+  (:require
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [schema.core :as s]
+   [camelot.db :as db]
+   [camelot.translation.core :as tr]
+   [camelot.application :as app]
+   [camelot.util.config :as config]))
 
 (sql/defqueries "sql/camera-status.sql" {:connection db/spec})
 

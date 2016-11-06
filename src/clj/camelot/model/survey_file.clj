@@ -1,14 +1,15 @@
 (ns camelot.model.survey-file
-  (:require [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [schema.core :as s]
-            [camelot.db :as db]
-            [camelot.translation.core :as tr]
-            [camelot.application :as app]
-            [camelot.util.config :as config]
-            [clojure.java.io :as io]
-            [ring.util.response :as r]
-            [camelot.util.java-file :as jf]))
+  (:require
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [schema.core :as s]
+   [camelot.db :as db]
+   [camelot.translation.core :as tr]
+   [camelot.application :as app]
+   [camelot.util.config :as config]
+   [clojure.java.io :as io]
+   [ring.util.response :as r]
+   [camelot.util.java-file :as jf]))
 
 (sql/defqueries "sql/survey-file.sql" {:connection db/spec})
 

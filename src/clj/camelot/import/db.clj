@@ -1,20 +1,21 @@
 (ns camelot.import.db
-  (:require [camelot.model.survey :as survey]
-            [camelot.model.survey-site :as survey-site]
-            [camelot.model.trap-station :as trap-station]
-            [camelot.model.trap-station-session :as trap-station-session]
-            [camelot.model.trap-station-session-camera :as trap-station-session-camera]
-            [camelot.model.media :as media]
-            [camelot.model.photo :as photo]
-            [camelot.model.sighting :as sighting]
-            [camelot.model.taxonomy :as taxonomy]
-            [camelot.model.site :as site]
-            [camelot.model.camera :as camera]
-            [camelot.model.camera-status :as camera-status]
-            [clojure.string :as str]
-            [camelot.application :as app]
-            [camelot.util.config :as conf]
-            [clojure.edn :as edn]))
+  (:require
+   [camelot.model.survey :as survey]
+   [camelot.model.survey-site :as survey-site]
+   [camelot.model.trap-station :as trap-station]
+   [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
+   [camelot.model.media :as media]
+   [camelot.model.photo :as photo]
+   [camelot.model.sighting :as sighting]
+   [camelot.model.taxonomy :as taxonomy]
+   [camelot.model.site :as site]
+   [camelot.model.camera :as camera]
+   [camelot.model.camera-status :as camera-status]
+   [clojure.string :as str]
+   [camelot.application :as app]
+   [camelot.util.config :as conf]
+   [clojure.edn :as edn]))
 
 (def default-survey-name "Initial survey")
 

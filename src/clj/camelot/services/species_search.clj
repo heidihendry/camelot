@@ -1,9 +1,10 @@
 (ns camelot.services.species-search
-  (:require [clj-http.client :as http]
-            [clojure.core.async :refer [go <!]]
-            [cheshire.core :as json]
-            [camelot.model.taxonomy :as taxonomy]
-            [camelot.handler.associated-taxonomy :as ataxonomy]))
+  (:require
+   [clj-http.client :as http]
+   [clojure.core.async :refer [go <!]]
+   [cheshire.core :as json]
+   [camelot.model.taxonomy :as taxonomy]
+   [camelot.handler.associated-taxonomy :as ataxonomy]))
 
 (def service-url "http://www.catalogueoflife.org/col/webservice")
 

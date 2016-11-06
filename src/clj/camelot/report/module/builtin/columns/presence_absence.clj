@@ -1,7 +1,8 @@
 (ns camelot.report.module.builtin.columns.presence-absence
-  (:require [camelot.report.module
-             [column-util :as col-util]
-             [core :as module]]))
+  (:require
+   [camelot.report.module
+    [column-util :as col-util]
+    [core :as module]]))
 
 (defn- presense-flag
   [v]
