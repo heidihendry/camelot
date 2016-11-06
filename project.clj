@@ -122,8 +122,8 @@
                              [org.clojure/tools.nrepl "0.2.12"]
                              [org.apache.derby/derbytools "10.12.1.1"]]
               :env {:camelot-dev-mode "true"}
-              :plugins [[lein-figwheel "0.5.4" :exclusions [org.clojure/clojure]]
-                        [lein-doo "0.1.6" :exclusions [org.clojure/clojure]]]
+              :plugins [[lein-figwheel "0.5.8" :exclusions [org.clojure/clojure]]
+                        [lein-doo "0.1.7" :exclusions [org.clojure/clojure]]]
               :cljsbuild {:builds
                           {:test
                            {:source-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]
