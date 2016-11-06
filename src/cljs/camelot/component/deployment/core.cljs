@@ -19,6 +19,8 @@
 
 (def help-text (tr/translate ::help-text))
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
+;; TODO should not be hard-coded
+(def camera-active-status-id 2)
 
 (defn delete
   "Delete the trap station and trigger a removal event."
@@ -89,9 +91,11 @@
       (dom/select #js {:className "field-input"
                        :onChange #(do
                                     (when-not (nil? (:camera-is-new state))
-                                      (om/update! data [:camera-is-new :value] (:camera-is-new state)))
-                                    (om/update! (get data (:camera-id-field state))
-                                                :value (.. % -target -value)))}
+                                      (om/update! data [:camera-is-new :value]
+                                                  (:camera-is-new state)))
+                                    (om/update! data
+                                                [(:camera-id-field state) :value]
+                                                (.. % -target -value)))}
                   (om/build-all camera-select-option-component
                                 (if (seq (:options state))
                                   (conj (:options state)
@@ -137,11 +141,13 @@
       (dom/div nil
                (dom/label #js {:className "field-label"} (tr/translate ::status-question))
                (om/build camera-status-select-component data {:init-state state})
-               (when (not= (js/parseInt (get-in data [(:camera-status-field state) :value])) 2)
+               (when-not (= (js/parseInt (get-in data [(:camera-status-field state) :value]))
+                      camera-active-status-id)
                  (dom/div nil
                           (dom/label #js {:className "field-label"} (tr/translate ::replacer-question))
                           (om/build camera-select-component data {:init-state state
-                                                                  :opts {:blank-description "No replacement camera"}})))))))
+                                                                  :opts {:blank-description
+                                                                         (tr/translate ::no-replacement-camera)}})))))))
 
 (defn camera-media-unrecoverable-component
   [data owner]
@@ -172,6 +178,8 @@
     om/IWillMount
     (will-mount [_]
       (om/update! data [:data :validation-problem] {:value false})
+      (om/update! data [:data :primary-camera-original-id] (deref (get-in data [:data :primary-camera-id])))
+      (om/update! data [:data :secondary-camera-original-id] (deref (get-in data [:data :secondary-camera-id])))
       (om/update! data :can-edit (can-edit? data)))
     om/IRender
     (render [_]
@@ -232,7 +240,7 @@
                                                :onClick #(do
                                                            (nav/analytics-event "deployment"
                                                                                 "cameracheck-submit")
-                                                           (rest/post-x "/deployment" {:data (deref data)}
+                                                           (rest/post-x "/camera-deployment" {:data (deref data)}
                                                                         (fn [_]
                                                                           (nav/nav! (str "/" (get-in (state/app-state-cursor)
                                                                                                      [:selected-survey :survey-id :value]))))))}

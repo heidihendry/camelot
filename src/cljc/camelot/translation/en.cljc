@@ -551,6 +551,7 @@
    :camelot.component.deployment.core
    {:help-text "Record a camera check each time you visit a camera trap in the field. A camera trap deployment will be finished automatically once there are no 'Active' cameras assigned to it."
     :no-cameras "No Cameras Available"
+    :no-replacement-camera "No replacement camera"
     :status-question "What is the new status of this camera?"
     :replacer-question "Which camera replaced it in the field, if any?"
     :media-retrieved "Media retrieved?"

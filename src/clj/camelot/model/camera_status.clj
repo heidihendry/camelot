@@ -77,3 +77,9 @@
   []
   (get-specific-with-description (app/gen-state (config/config))
                                  camera-available))
+
+(s/defn active-status-id
+  [state]
+  (->> "camera-status/active"
+       (get-specific-with-description state)
+       :camera-status-id))

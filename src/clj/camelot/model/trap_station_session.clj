@@ -144,3 +144,8 @@
    data :- TTrapStationSession]
   (or (get-specific-by-dates state data)
       (create! state data)))
+
+(s/defn set-session-end-date!
+  [state :- State
+   data]
+  (db/with-db-keys state -set-session-end-date! data))

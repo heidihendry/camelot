@@ -25,6 +25,7 @@
              [trap-station-session :as trap-station-session]
              [trap-station-session-camera :as trap-station-session-camera]
              [deployment :as deployment]
+             [camera-deployment :as camera-deployment]
              [library :as library]]
             [camelot.report.core :as report]
             [camelot.util
@@ -253,9 +254,6 @@
   (context "/deployment" {session :session}
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
                                                         :trap-station-session id session))
-           (GET "/survey/:id/recent" [id] (rest/list-resources deployment/get-uploadable
-                                                               :trap-station-session id session))
-           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id session))
            (POST "/create/:id" [id data] (rest/create-resource deployment/create!
                                                                deployment/tdeployment
                                                                (assoc data :survey-id
@@ -264,8 +262,12 @@
                                                        deployment/tdeployment
                                                        (assoc data :trap-station-id
                                                               {:value (edn/read-string id)}) session))
-           (POST "/" [data] (rest/create-resource deployment/create-camera-check!
-                                                  deployment/tcamera-deployment data session)))
+           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id session)))
+  (context "/camera-deployment" {session :session}
+           (GET "/survey/:id/recent" [id] (rest/list-resources camera-deployment/get-uploadable
+                                                               :trap-station-session id session))
+           (POST "/" [data] (rest/create-resource camera-deployment/create-camera-check!
+                                                  camera-deployment/tcamera-deployment data session)))
 
   misc-routes
   config/routes

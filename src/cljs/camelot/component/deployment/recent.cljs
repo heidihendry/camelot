@@ -192,7 +192,7 @@
     om/IDidMount
     (did-mount [_]
       (om/update! data :deployment-sort-order :trap-station-session-end-date)
-      (rest/get-resource (str "/deployment/survey/"
+      (rest/get-resource (str "/camera-deployment/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value])
                               "/recent")

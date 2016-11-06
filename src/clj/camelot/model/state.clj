@@ -19,4 +19,5 @@
 
 (def State
   {(s/required-key :config) Config
-   (s/optional-key :connection) clojure.lang.PersistentArrayMap})
+   (s/optional-key :connection) clojure.lang.PersistentArrayMap
+   (s/optional-key :camera-status-active-id) s/Int})

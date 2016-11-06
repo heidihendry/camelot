@@ -93,3 +93,11 @@
    data :- TCamera]
   (or (get-specific-by-name state (select-keys data [:camera-name]))
       (create! state data)))
+
+(s/defn set-camera-status!
+  [state :- State
+   cam-id :- s/Int
+   cam-status :- s/Int]
+  (db/with-db-keys state -set-camera-status!
+    {:camera-id cam-id
+     :camera-status-id cam-status}))
