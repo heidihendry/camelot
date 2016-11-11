@@ -81,59 +81,33 @@
                (dom/label #js {:className "field-label"}
                           (:label state))
                (dom/div #js {:className "field-details"}
-                        (if (= (type (:field state)) cljs.core/Keyword)
+                        (if (:field state)
                           (get-in data [:data (:field state) :value])
-                          (:field state)))))))
+                          (:value state)))))))
 
 (defn deployment-selected-details-component
+  "Component for read-only details about the currently selected deployment."
   [data owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:className "section"}
-               (dom/div #js {:className "generic-container simple-menu"}
-                        (om/build read-only-field-component data
-                                  {:init-state {:field :site-name
-                                                :label (tr/translate :site/site-name.label)}})
-                        (om/build read-only-field-component data
-                                  {:init-state {:field (tf/unparse day-formatter (get-in data [:data :trap-station-session-start-date :value]))
-                                                :label (tr/translate :trap-station-session/trap-station-session-start-date.label)}})
-                        (om/build read-only-field-component data
-                                  {:init-state {:field :trap-station-latitude
-                                                :label (tr/translate :trap-station/trap-station-latitude.label)}})
-                        (om/build read-only-field-component data
-                                  {:init-state {:field :trap-station-longitude
-                                                :label (tr/translate :trap-station/trap-station-longitude.label)}})
-                        (om/build read-only-field-component data
-                                  {:init-state {:field :primary-camera-name
-                                                :label (tr/translate ::primary-camera-name)}})
-                        (when (get-in data [:data :secondary-camera-name :value])
-                          (om/build read-only-field-component data
-                                    {:init-state {:field :secondary-camera-name
-                                                  :label (tr/translate ::secondary-camera-name)}}))
-                        (when (get-in data [:data :trap-station-altitude :value])
-                          (om/build read-only-field-component data
-                                    {:init-state {:field :trap-station-altitude
-                                                  :label (tr/translate :trap-station/trap-station-altitude.label)}}))
-                        (when (get-in data [:data :trap-station-distance-above-ground :value])
-                          (om/build read-only-field-component data
-                                    {:init-state {:field :trap-station-distance-above-ground
-                                                  :label (tr/translate :trap-station/trap-station-distance-above-ground.label)}}))
-                        (when (get-in data [:data :trap-station-distance-to-road :value])
-                          (om/build read-only-field-component data
-                                    {:init-state {:field :trap-station-distance-to-road
-                                                  :label (tr/translate :trap-station/trap-station-distance-to-road.label)}}))
-                        (when (get-in data [:data :trap-station-distance-to-river :value])
-                          (om/build read-only-field-component data
-                                    {:init-state {:field :trap-station-distance-to-river
-                                                  :label (tr/translate :trap-station/trap-station-distance-to-river.label)}}))
-                        (when (get-in data [:data :trap-station-distance-to-settlement :value])
-                          (om/build read-only-field-component data
-                                    {:init-state {:field :trap-station-distance-to-settlement
-                                                  :label (tr/translate :trap-station/trap-station-distance-to-settlement.label)}}))
-                        (om/build read-only-field-component data
-                                  {:init-state {:field :trap-station-notes
-                                                :label (tr/translate :trap-station/trap-station-notes.label)}}))
+               (m/with-builders (dom/div #js {:className "generic-container simple-menu"})
+                 [om/build read-only-field-component tr/translate data]
+                 (m/build-read-only-field :site-name :site/site-name.label)
+                 (m/build-read-only-calculated-field :trap-station-session-start-date
+                                                     :trap-station-session/trap-station-session-start-date.label
+                                                     (partial tf/unparse day-formatter))
+                 (m/build-read-only-field :trap-station-latitude :trap-station/trap-station-latitude.label)
+                 (m/build-read-only-field :trap-station-longitude :trap-station/trap-station-longitude.label)
+                 (m/build-read-only-field :primary-camera-name ::primary-camera-name)
+                 (m/build-read-only-field :secondary-camera-name ::secondary-camera-name)
+                 (m/build-read-only-field :trap-station-altitude :trap-station/trap-station-altitude.label)
+                 (m/build-read-only-field :trap-station-distance-above-ground :trap-station/trap-station-distance-above-ground.label)
+                 (m/build-read-only-field :trap-station-distance-to-road :trap-station/trap-station-distance-to-road.label)
+                 (m/build-read-only-field :trap-station-distance-to-river :trap-station/trap-station-distance-to-river.label)
+                 (m/build-read-only-field :trap-station-distance-to-settlement :trap-station/trap-station-distance-to-settlement.label)
+                 (m/build-read-only-field :trap-station-notes :trap-station/trap-station-notes.label))
                (dom/div #js {:className "sep"})
                (dom/button #js {:className "btn btn-primary"
                                 :onClick #(nav/nav!
