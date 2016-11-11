@@ -17,7 +17,7 @@
   "Inject variables into build-read-only macros."
   [container inject-list & body]
   (apply conj
-         (map (partial inject-list) body)
+         (map (partial inject-into inject-list) body)
          (reverse container)))
 
 (defmacro build-read-only-field
