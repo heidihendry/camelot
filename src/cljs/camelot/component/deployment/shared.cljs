@@ -6,6 +6,10 @@
            [goog.date DateTime]
            [goog.i18n DateTimeFormat]))
 
+(defn can-edit?
+  [data]
+  (-> data :data :trap-station-session-end-date :value nil?))
+
 (defn datetime-in-future?
   "Predicate indicating whether the datetime is in the future.  False if datetime is nil."
   [datetime]

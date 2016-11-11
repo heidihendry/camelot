@@ -549,7 +549,7 @@
     :no-problems "No problems found. Time to analyse!"
     :loading "Loading Data"}
 
-   :camelot.component.deployment.core
+   :camelot.component.deployment.camera-check
    {:help-text "Record a camera check each time you visit a camera trap in the field. A camera trap deployment will be finished automatically once there are no 'Active' cameras assigned to it."
     :no-cameras "No Cameras Available"
     :no-replacement-camera "No replacement camera"
@@ -566,7 +566,11 @@
     :add-secondary-camera "Add a secondary camera"
     :secondary-camera-label "Secondary camera, if any"
     :validation-same-camera "Secondary camera must not be the same as the primary camera."
-    :primary-camera-name "Camera name (primary)"
+    :finalised-trap-notice "This camera trap has been finalised."
+    :finalised-trap-advice "Camelot will automatically finalise a camera trap station once it no longer has any active cameras. Create a new camera trap station to continue trapping at this location."}
+
+   :camelot.component.deployment.core
+   {:primary-camera-name "Camera name (primary)"
     :secondary-camera-name "Camera name (secondary)"
     :record-camera-check "Record camera check"
     :start-date "Session start date"
@@ -577,9 +581,7 @@
     :create-title "Add a new camera trap deployment."
     :create-button "Add camera trap"
     :confirm-delete "Are you sure you want to delete this camera trap station, including any media and camera checks associated with it?"
-    :finalised "Finalised"
-    :finalised-trap-notice "This camera trap has been finalised."
-    :finalised-trap-advice "Camelot will automatically finalise a camera trap station once it no longer has any active cameras. Create a new camera trap station to continue trapping at this location."}
+    :finalised "Finalised"}
 
    :camelot.component.deployment.create
    {:new-camera-name-placeholder "New camera name..."
