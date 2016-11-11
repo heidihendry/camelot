@@ -5,14 +5,19 @@
   "Regexp matching the symbol of all build-read-only-field-like macros."
   #".*build-read-only-(calculated-)?field$")
 
+(defn- inject-into
+  "Insert list of expressions into `sexp' should `sexp' be an expression for a
+  read-only field."
+  [inject-list sexp]
+  (if (re-find read-only-field-symbol-pattern (name (first sexp)))
+    (cons (first sexp) (apply conj (rest sexp) (reverse inject-list)))
+    sexp))
+
 (defmacro with-builders
   "Inject variables into build-read-only macros."
-  [container [om-build component translator data] & body]
-  (apply conj (map #(if (re-find read-only-field-symbol-pattern (name (first %)))
-                      (cons (first %) (conj (rest %)
-                                            data translator component om-build))
-                      %)
-                   body)
+  [container inject-list & body]
+  (apply conj
+         (map (partial inject-list) body)
          (reverse container)))
 
 (defmacro build-read-only-field
