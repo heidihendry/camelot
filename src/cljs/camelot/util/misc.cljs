@@ -1,6 +1,13 @@
 (ns camelot.util.misc
   "Miscellaneous utilities."
-  (:require [cljs-time.core :as t]))
+  (:require
+   [cljs-time.core :as t])
+  (:import
+   (goog.date UtcDateTime)))
+
+(defn ->utc
+  [date]
+  (UtcDateTime.fromTimestamp (.getTime date)))
 
 (defn nights-elapsed
   "Calculate the number of `nights' between two dates."

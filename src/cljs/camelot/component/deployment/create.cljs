@@ -10,9 +10,6 @@
             [camelot.util.cursorise :as cursorise]
             [camelot.translation.core :as tr]
             [camelot.component.deployment.shared :as shared])
-  (:import [goog.date UtcDateTime]
-           [goog.date DateTime]
-           [goog.i18n DateTimeFormat])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn add-camera-success-handler

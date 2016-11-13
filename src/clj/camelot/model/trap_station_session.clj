@@ -128,8 +128,6 @@
   (db/with-transaction [s state]
     (let [data (dissoc data :trap-station-session-label)]
       (db/with-db-keys s -update! (merge data {:trap-station-session-id id}))
-      (let [active (get-active s id)]
-        (assert (= (count active) (count (distinct active)))))
       (get-specific s id))))
 
 (s/defn delete!

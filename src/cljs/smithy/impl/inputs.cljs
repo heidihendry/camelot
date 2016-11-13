@@ -4,7 +4,8 @@
             [smithy.impl.state :as state]
             [clojure.string :as string]
             [om-datepicker.components :refer [datepicker]]
-            [camelot.rest :as rest])
+            [camelot.rest :as rest]
+            [camelot.util.misc :as misc])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat]))
 
@@ -191,13 +192,14 @@
           (dom/div nil "-")
           (if (:detailed opts)
             (let [df (DateTimeFormat. "EEE, dd LLL yyyy")
-                  tf (DateTimeFormat. "HH:MM:ss")]
+                  tf (DateTimeFormat. "HH:mm:ss")]
               (dom/div nil
-                       (.format tf (get-in buf [k :value])) " on "
-                       (.format df (get-in buf [k :value]))))
+                       (.format tf (misc/->utc (get-in buf [k :value]))) " on "
+                       (.format df (misc/->utc (get-in buf [k :value])))))
             (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
-              (dom/div nil (.format df (get-in buf [k :value]))))))
-        (om/build datepicker (get buf k))))))
+              (dom/div nil (.format df (misc/->utc (get-in buf [k :value])))))))
+        (when (get buf k)
+          (om/build datepicker (get buf k)))))))
 
 (defmethod input-field :percentage
   [[k v buf opts :as d] owner]

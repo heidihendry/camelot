@@ -3,6 +3,7 @@
   (:require [om.dom :as dom]
             [camelot.state :as state]
             [om.core :as om]
+            [camelot.util.misc :as misc]
             [camelot.component.library.util :as util]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
@@ -90,9 +91,9 @@
                      {:key :camera-name :label (tr/translate :camera/camera-name.label)}])
                (dom/div nil
                         (dom/label nil (tr/translate :media/media-capture-timestamp.label))
-                        (let [df (DateTimeFormat. "hh:mm:ss EEE, dd LLL yyyy")]
+                        (let [df (DateTimeFormat. "HH:mm:ss EEE, dd LLL yyyy")]
                           (dom/div {:className "data"}
-                                   (.format df (:media-capture-timestamp data)))))
+                                   (.format df (misc/->utc (:media-capture-timestamp data))))))
                (dom/div nil
                         (dom/label nil (tr/translate ::sightings))
                         (om/build-all mcp-details-sightings (:sightings data)

@@ -14,10 +14,7 @@
    [camelot.translation.core :as tr])
   (:require-macros
    [cljs.core.async.macros :refer [go]]
-   [camelot.macros.ui.deployment :as m])
-  (:import
-   (goog.date UtcDateTime)
-   (goog.i18n DateTimeFormat)))
+   [camelot.macros.ui.deployment :as m]))
 
 (def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 

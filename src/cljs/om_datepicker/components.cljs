@@ -22,19 +22,19 @@
 
 (defn- to-month-format
   [date]
-  (str (get (:long months) (.getMonth date)) " " (.getFullYear date)))
+  (str (get (:long months) (.getUTCMonth date)) " " (.getUTCFullYear date)))
 
 (defn- to-day-format
   [date style]
   (if (nil? date)
     "-"
     (let [labels (get days style)]
-      (str (get labels (.getDay date)) ", " (.getDate date) " "
-           (get (:short months) (.getMonth date)) " " (.getFullYear date)))))
+      (str (get labels (.getUTCDay date)) ", " (.getUTCDate date) " "
+           (get (:short months) (.getUTCMonth date)) " " (.getUTCFullYear date)))))
 
 (defn- to-date-format
   [date]
-  (str (get (:short months) (.getMonth date)) " " (.getDate date) ", " (.getFullYear date)))
+  (str (get (:short months) (.getUTCMonth date)) " " (.getUTCDate date) ", " (.getUTCFullYear date)))
 
 ;;
 ;; Grid Generation
@@ -42,11 +42,11 @@
 
 (defn- calendar-start-date
   [month-date first-day]
-  (let [month-date (doto (js/Date. month-date) (.setDate 1))
-        day        (.getDay month-date)
+  (let [month-date (doto (js/Date. month-date) (.setUTCDate 1))
+        day        (.getUTCDay month-date)
         offset     (- day (dec first-day))
         offset     (if (pos? offset) offset (+ offset 7))]
-    (.setDate month-date (- (.getDate month-date) offset))
+    (.setUTCDate month-date (- (.getUTCDate month-date) offset))
     month-date))
 
 (defn- generate-month-gridline
@@ -59,15 +59,13 @@
                                   (before? min-date sliding-date))
                               (or (nil? max-date)
                                   (before? sliding-date max-date)))
-            day          (.getDay sliding-date)
-            same-month?  (= (.getMonth month-date) (.getMonth sliding-date))]
+            day          (.getUTCDay sliding-date)
+            same-month?  (= (.getUTCMonth month-date) (.getUTCMonth sliding-date))]
         {:class    (str "cell"
                         (when-not allowed?
                           " disabled")
                         (when (and same-month?
-                                   (between? sliding-date
-                                             (d/truncate-time selection-start)
-                                             (d/truncate-time selection-end)))
+                                   (between? sliding-date selection-start selection-end))
                           " selected")
                         (when same-month?
                           " instant")
@@ -76,7 +74,7 @@
          :allowed? allowed?
          :date     (d/date-instance sliding-date)
          :text     (when (or same-month? (not instant-only?))
-                     (.getDate sliding-date))}))))
+                     (.getUTCDate sliding-date))}))))
 
 (defn- generate-months-range
   [date]
@@ -86,7 +84,7 @@
        (iterate d/next-month)
        (take 3)
        (map (fn [month]
-              {:lable (str (get-in months [:long (.getMonth month)]) " " (.getFullYear month))
+              {:lable (str (get-in months [:long (.getUTCMonth month)]) " " (.getUTCFullYear month))
                :value month}))))
 
 ;;
