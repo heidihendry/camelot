@@ -1,6 +1,8 @@
 (ns camelot.state
-  (:require [om.core :as om :include-macros true]
-            [cljs.reader :as reader]))
+  (:require
+   [om.core :as om :include-macros true]
+   [camelot.util.cursorise :as cursorise]
+   [cljs.reader :as reader]))
 
 (defonce app-state
   (atom {}))
@@ -59,3 +61,10 @@
   (when (nil? (:import-dialog (om/root-cursor app-state)))
     (om/update! (app-state-cursor) :import-dialog {:visible false}))
   (om/ref-cursor (:import-dialog (om/root-cursor app-state))))
+
+(defn settings
+  "Return a map of application settings."
+  []
+  (some-> (get (resources-state) :settings)
+          deref
+          cursorise/decursorise))

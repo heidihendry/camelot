@@ -1,6 +1,8 @@
 (ns camelot.component.survey.core
   (:require [om.core :as om]
             [camelot.nav :as nav]
+            [camelot.util.feature :as feature]
+            [camelot.state :as state]
             [camelot.component.survey.create :as create]
             [camelot.component.survey.manage :as manage]
             [om.dom :as dom]
@@ -87,19 +89,23 @@
     (did-mount [_]
       (if (:survey-page-state app)
         (om/update! app [:survey-page-state :species] {})
-        (om/update! app :survey-page-state {:menu [{:action :deployment
-                                                    :name (tr/translate ::manage-traps)
-                                                    :active true}
-                                                   {:action :upload
-                                                    :name (tr/translate ::upload-captures)}
-                                                   {:action :species
-                                                    :name (tr/translate ::species)}
-                                                   {:action :files
-                                                    :name (tr/translate ::files)}
-                                                   {:action :import
-                                                    :name (tr/translate ::import)}]
-                                            :active :deployment
-                                            :species {}})))
+        (do
+          (om/update! app :survey-page-state
+                      {:menu [{:action :deployment
+                               :name (tr/translate ::manage-traps)
+                               :active true}
+                              {:action :upload
+                               :name (tr/translate ::upload-captures)}
+                              {:action :species
+                               :name (tr/translate ::species)}
+                              {:action :files
+                               :name (tr/translate ::files)}]
+                       :active :deployment
+                       :species {}})
+          (when (feature/enabled? (state/settings) :bulk-import)
+            (om/transact! app [:survey-page-state :menu]
+                          #(conj % {:action :import
+                                    :name (tr/translate ::import)}))))))
     om/IRender
     (render [_]
       (if (seq (:survey-page-state app))

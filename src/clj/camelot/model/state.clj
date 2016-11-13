@@ -16,7 +16,8 @@
    (s/required-key :surveyed-species) [s/Str]
    (s/required-key :required-fields) [[s/Keyword]]
    (s/optional-key :rename) s/Any
-   (s/optional-key :timezone) s/Str})
+   (s/optional-key :timezone) s/Str
+   (s/optional-key :features) (s/maybe {s/Keyword s/Bool})})
 
 (def State
   {(s/required-key :config) Config
