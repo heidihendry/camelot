@@ -1,7 +1,9 @@
 (ns camelot.report.sighting-independence
-  (:require [clj-time.core :as t]
-            [schema.core :as s]
-            [clojure.string :as str]))
+  "Sighting independence transformations."
+  (:require
+   [clj-time.core :as t]
+   [schema.core :as s]
+   [clojure.string :as str]))
 
 (defn- add-sighting
   "Add a new (i.e., independent) sighting."

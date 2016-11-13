@@ -1,7 +1,27 @@
 (ns camelot.component.deployment.shared
   (:require [om.core :as om]
             [om.dom :as dom]
-            [camelot.translation.core :as tr]))
+            [camelot.translation.core :as tr])
+  (:import [goog.date UtcDateTime]
+           [goog.date DateTime]
+           [goog.i18n DateTimeFormat]))
+
+(defn can-edit?
+  [data]
+  (-> data :data :trap-station-session-end-date :value nil?))
+
+(defn datetime-in-future?
+  "Predicate indicating whether the datetime is in the future.  False if datetime is nil."
+  [datetime]
+  (let [now (DateTime.)
+        now-ms (.getTime now)
+        normalised-ms (- now-ms (* 60 1000 (.getTimezoneOffset now)))
+        ms-day (* 24 60 60 1000)
+        elapsed-part-of-day (mod normalised-ms ms-day)
+        start-of-tomorrow (+ (- now-ms elapsed-part-of-day
+                                (* 60 1000 (.getTimezoneOffset now)))
+                             ms-day)]
+    (and datetime (>= (.getTime datetime) start-of-tomorrow))))
 
 (def deployment-sorters
   {:trap-station-name (comparator (fn [a b]

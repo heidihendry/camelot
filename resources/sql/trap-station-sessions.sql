@@ -63,3 +63,10 @@ SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
 FROM trap_station_session
 LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
+
+-- name: -set-session-end-date!
+UPDATE trap_station_session
+       SET trap_station_session_end_date = :trap_station_session_end_date,
+           trap_station_session_updated = CURRENT_TIMESTAMP
+WHERE trap_station_session_id = :trap_station_session_id
+      AND trap_station_session_end_date IS NULL

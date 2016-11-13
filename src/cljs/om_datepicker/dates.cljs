@@ -31,25 +31,25 @@
 
 (defn date-instance
   [date]
-  (truncate-tz (js/Date. (.getFullYear date) (.getMonth date) (.getDate date))))
+  (truncate-tz (js/Date. (.getUTCFullYear date) (.getUTCMonth date) (.getUTCDate date))))
 
 (defn today
   []
-  (date-instance (js/Date.)))
+  (date-instance (truncate-tz)))
 
 (defn first-of-month
   [date]
-  (truncate-tz (js/Date. (.getFullYear date) (.getMonth date) 1)))
+  (truncate-tz (js/Date. (.getUTCFullYear date) (.getUTCMonth date) 1)))
 
 (defn last-of-month
   [date]
-  (let [year (.getFullYear date)
-        month (.getMonth date)]
+  (let [year (.getUTCFullYear date)
+        month (.getUTCMonth date)]
     (truncate-tz (js/Date. year month (days-in-month year month)))))
 
 (defn- switch-date!
   [date offset]
-  (.setDate date (+ (.getDate date) offset))
+  (.setUTCDate date (+ (.getUTCDate date) offset))
   date)
 
 (defn current-month
@@ -58,10 +58,10 @@
 
 (defn add-months
   [date months]
-  (let [day  (.getDate date)
-        date (truncate-tz (js/Date. (.getFullYear date)
-                                    (+ (.getMonth date) months) 1))]
-    (.setDate date (min day (days-in-month (.getFullYear date) (.getMonth date))))
+  (let [day  (.getUTCDate date)
+        date (truncate-tz (js/Date. (.getUTCFullYear date)
+                                    (+ (.getUTCMonth date) months) 1))]
+    (.setUTCDate date (min day (days-in-month (.getUTCFullYear date) (.getUTCMonth date))))
     date))
 
 (defn next-month
@@ -111,5 +111,5 @@
     (> (.getTime this) (.getTime (truncate-tz))))
 
   (same-month? [this that]
-    (and (= (.getFullYear this) (.getFullYear that))
-         (= (.getMonth this) (.getMonth that)))))
+    (and (= (.getUTCFullYear this) (.getUTCFullYear that))
+         (= (.getUTCMonth this) (.getUTCMonth that)))))

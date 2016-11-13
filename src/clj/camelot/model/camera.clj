@@ -1,12 +1,14 @@
 (ns camelot.model.camera
-  (:require [schema.core :as s]
-            [camelot.db :as db]
-            [camelot.model.state :refer [State]]
-            [yesql.core :as sql]
-            [camelot.model.camera-status :as camera-status]
-            [camelot.application :as app]
-            [camelot.util.config :as config]
-            [camelot.model.media :as media]))
+  "Camera model and data-access."
+  (:require
+   [schema.core :as s]
+   [camelot.db :as db]
+   [camelot.model.state :refer [State]]
+   [yesql.core :as sql]
+   [camelot.model.camera-status :as camera-status]
+   [camelot.application :as app]
+   [camelot.util.config :as config]
+   [camelot.model.media :as media]))
 
 (sql/defqueries "sql/cameras.sql" {:connection db/spec})
 
@@ -93,3 +95,11 @@
    data :- TCamera]
   (or (get-specific-by-name state (select-keys data [:camera-name]))
       (create! state data)))
+
+(s/defn set-camera-status!
+  [state :- State
+   cam-id :- s/Int
+   cam-status :- s/Int]
+  (db/with-db-keys state -set-camera-status!
+    {:camera-id cam-id
+     :camera-status-id cam-status}))

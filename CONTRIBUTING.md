@@ -135,12 +135,11 @@ If you encounter problems, raise an issue or reach out via the Google Group.
 
 ### Running tests
 
-Camelot currently has 3 test suites, one for .cljc, one for clj, and one for cljs.
+Camelot currently has 2 test suites, one for .cljc and clj, and one for cljs.
 
 The commands to invoke them are, respectively:
 
-* `lein with-profiles +test test`
-* `lein with-profiles +test midje`
+* `lein test`
 * `lein doo phantom test once`
 
 (If someone is keen to raise a merge request to tidy this up, that would be awesome!)

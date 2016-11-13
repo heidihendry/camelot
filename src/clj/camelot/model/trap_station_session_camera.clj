@@ -1,10 +1,11 @@
 (ns camelot.model.trap-station-session-camera
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.trap-station-session :as trap-station-session]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]
-            [camelot.model.media :as media]))
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]
+   [camelot.model.media :as media]))
 
 (sql/defqueries "sql/trap-station-session-cameras.sql" {:connection db/spec})
 
@@ -92,12 +93,18 @@
              (trap-station-session/get-active
               state (int (:trap-station-session-id data))))))
 
+(s/defn create!* :- TrapStationSessionCamera
+  "Create without checking camera availability."
+  [state :- State
+   data :- TTrapStationSessionCamera]
+  (let [record (db/with-db-keys state -create<! data)]
+    (trap-station-session-camera (get-specific state (int (:1 record))))))
+
 (s/defn create! :- TrapStationSessionCamera
   [state :- State
    data :- TTrapStationSessionCamera]
   {:pre [(camera-available? state data)]}
-  (let [record (db/with-db-keys state -create<! data)]
-    (trap-station-session-camera (get-specific state (int (:1 record))))))
+  (create!* state data))
 
 (defn- camera-available-for-update?
   [state id data]
@@ -164,6 +171,5 @@
     {:camera-id camera-id
      :trap-station-session-id trap-station-session-id
      :trap-station-session-camera-media-unrecoverable media-unrecoverable})
-  (trap-station-session-camera
-   (get-specific-with-camera-and-session state camera-id
-                                         trap-station-session-id)))
+  (get-specific-with-camera-and-session state camera-id
+                                        trap-station-session-id))

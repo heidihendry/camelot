@@ -1,10 +1,11 @@
 (ns camelot.model.trap-station
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.util.trap-station :as util.ts]
-            [camelot.db :as db]
-            [camelot.model.media :as media]))
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.util.trap-station :as util.ts]
+   [camelot.db :as db]
+   [camelot.model.media :as media]))
 
 (sql/defqueries "sql/trap-stations.sql" {:connection db/spec})
 

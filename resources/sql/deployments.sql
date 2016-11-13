@@ -61,16 +61,3 @@ SELECT (media_id IS NOT NULL) as has_uploaded_media
 FROM media
 WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 FETCH FIRST 1 ROWS ONLY
-
--- name: -set-session-end-date!
-UPDATE trap_station_session
-       SET trap_station_session_end_date = :trap_station_session_end_date,
-           trap_station_session_updated = CURRENT_TIMESTAMP
-WHERE trap_station_session_id = :trap_station_session_id
-      AND trap_station_session_end_date IS NULL
-
--- name: -set-camera-status!
-UPDATE camera
-       SET camera_status_id = :camera_status_id,
-           camera_updated = CURRENT_TIMESTAMP
-WHERE camera_id = :camera_id

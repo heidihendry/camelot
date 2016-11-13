@@ -2,7 +2,7 @@
 
 Camelot is an open-source, web-based tool to help wildlife conservationists with camera trapping.
 
-The latest version of Camelot is: **[1.0.0](http://camelot.bitpattern.com.au/release/camelot-1.0.0.zip)**
+The latest version of Camelot is: **[1.0.2](http://camelot.bitpattern.com.au/release/camelot-1.0.2.zip)**
 
 Camelot:
 
@@ -38,7 +38,7 @@ Camelot supports the latest versions of the following browsers:
 
 ### Installation
 
-Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-1.0.0.zip).
+Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-1.0.2.zip).
 
 Unzip the archive.  To run Camelot:
 

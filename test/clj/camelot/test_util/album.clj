@@ -1,8 +1,9 @@
 (ns camelot.test-util.album
-  (:require [camelot.model.import :as mi]
-            [clojure.java.io :as io]
-            [clj-time.core :as t]
-            [clj-time.core :as t]))
+  (:require
+   [camelot.model.import :as mi]
+   [clojure.java.io :as io]
+   [clj-time.core :as t]
+   [clj-time.core :as t]))
 
 (def std-location
   {:gps-longitude 100.0

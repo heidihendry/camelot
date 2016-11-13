@@ -8,9 +8,8 @@
             [camelot.util.trap-station :as util.ts]
             [camelot.state :as state]
             [camelot.util.cursorise :as cursorise]
-            [camelot.translation.core :as tr])
-  (:import [goog.date UtcDateTime]
-           [goog.i18n DateTimeFormat])
+            [camelot.translation.core :as tr]
+            [camelot.component.deployment.shared :as shared])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn add-camera-success-handler
@@ -192,10 +191,11 @@
   (and (get-in data [:trap-station-session-start-date :value])
        (and (get-in data [:trap-station-name :value])
             (not (empty? (get-in data [:trap-station-name :value]))))
-       (util.ts/valid-latitude? (get-in data [:trap-station-latitude :value]))
-       (util.ts/valid-longitude? (get-in data [:trap-station-longitude :value]))
-       (<= (.getTime (or (get-in data [:trap-station-session-start-date :value]) (UtcDateTime.)))
-           (.getTime (UtcDateTime.)))
+       (and (not (nil? (get-in data [:trap-station-latitude :value])))
+            (util.ts/valid-latitude? (get-in data [:trap-station-latitude :value])))
+       (and (not (nil? (get-in data [:trap-station-longitude :value])))
+            (util.ts/valid-longitude? (get-in data [:trap-station-longitude :value])))
+       (not (shared/datetime-in-future? (get-in data [:trap-station-session-start-date :value])))
        (get-in data [:primary-camera-id :value])
        (not= (get-in data [:secondary-camera-id :value])
              (get-in data [:primary-camera-id :value]))))
@@ -220,10 +220,9 @@
                                      (tr/translate ::start-date))
                           (dom/div #js {:className "field-details"}
                                    (om/build datepicker (get-in data [:data :trap-station-session-start-date])))
-                          (when (> (.getTime (or (get-in data [:data :trap-station-session-start-date :value]) (UtcDateTime.)))
-                                   (.getTime (UtcDateTime.)))
-                            (dom/label #js {:className "validation-warning"}
-                                       (tr/translate ::validation-future-date)))))
+                          (when (shared/datetime-in-future? (get-in data [:data :trap-station-session-start-date :value]))
+                              (dom/label #js {:className "validation-warning"}
+                                         (tr/translate ::validation-future-date)))))
                (dom/label #js {:className "field-label required"}
                           (tr/translate :trap-station/trap-station-latitude.label))
                (dom/input #js {:className "field-input"

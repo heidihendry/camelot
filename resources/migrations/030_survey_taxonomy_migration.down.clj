@@ -1,14 +1,8 @@
-(ns migrations.survey-taxonomy-migration-down
-  "Remove all survey-taxonomy records."
-  (:require [yesql.core :as sql]
-            [camelot.db :as db]
-            [camelot.model.state :refer [State]]
-            [camelot.model.survey-taxonomy :as survey-taxonomy]
-            [camelot.application :as app]
-            [camelot.util.config :as config]
-            [clojure.java.jdbc :as jdbc]
-            [schema.core :as s]))
+(require '[yesql.core :as sql])
+(require '[camelot.model.state :refer [State]])
+(require '[clojure.java.jdbc :as jdbc])
+(require '[schema.core :as s]))
 
-(db/with-transaction [s (app/gen-state (config/config))]
-  (doseq [st (survey-taxonomy/get-all s)]
-    (survey-taxonomy/delete! s (:survey-taxonomy-id st))))
+(camelot.db/with-transaction [s (camelot.application/gen-state (camelot.util.config/config))]
+  (doseq [st (camelot.model.survey-taxonomy/get-all s)]
+    (camelot.model.survey-taxonomy/delete! s (:survey-taxonomy-id st))))

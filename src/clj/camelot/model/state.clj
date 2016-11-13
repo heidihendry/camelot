@@ -1,5 +1,6 @@
 (ns camelot.model.state
-  (:require [schema.core :as s]))
+  (:require
+   [schema.core :as s]))
 
 (def Config
   {(s/required-key :erroneous-infrared-threshold) s/Num
@@ -19,4 +20,5 @@
 
 (def State
   {(s/required-key :config) Config
-   (s/optional-key :connection) clojure.lang.PersistentArrayMap})
+   (s/optional-key :connection) clojure.lang.PersistentArrayMap
+   (s/optional-key :camera-status-active-id) s/Int})

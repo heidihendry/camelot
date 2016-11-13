@@ -1,7 +1,8 @@
 (ns camelot.application-test
-  (:require [camelot.test-util.state :as state]
-            [camelot.application :as sut]
-            [midje.sweet :refer :all]))
+  (:require
+   [camelot.test-util.state :as state]
+   [camelot.application :as sut]
+   [clojure.test :refer :all]))
 
 (defn gen-state-helper
   [config]
@@ -11,26 +12,27 @@
   #{:camera :survey :survey-site :site :trap-station :trap-station-session
     :trap-station-session-camera :taxonomy :photo :media :sighting :settings})
 
-(facts "Screen smith"
-  (fact "Should contain keys for all known screens"
-    (set (keys (sut/all-screens (gen-state-helper {})))) => defined-screens)
+(deftest test-screen-smith
+  (testing "Screen smith"
+    (testing "Should contain keys for all known screens"
+      (is (= (set (keys (sut/all-screens (gen-state-helper {})))) defined-screens)))
 
-  (fact "Schemas should have labels"
-    (let [path [:survey :schema :survey-name :label]]
-      (get-in (sut/all-screens (gen-state-helper {})) path)) => "Survey name")
+    (testing "Schemas should have labels"
+      (let [path [:survey :schema :survey-name :label]]
+        (is (= (get-in (sut/all-screens (gen-state-helper {})) path) "Survey name"))))
 
-  (fact "Schemas should have descriptions"
-    (let [path [:site :schema :site-name :description]]
-      (type (get-in (sut/all-screens (gen-state-helper {})) path)) => String))
+    (testing "Schemas should have descriptions"
+      (let [path [:site :schema :site-name :description]]
+        (is (= (type (get-in (sut/all-screens (gen-state-helper {})) path)) String))))
 
-  (fact "Schemas should have field schema types"
-    (let [path [:site :schema :site-sublocation :schema :type]]
-      (get-in (sut/all-screens (gen-state-helper {})) path) => :text))
+    (testing "Schemas should have field schema types"
+      (let [path [:site :schema :site-sublocation :schema :type]]
+        (is (= (get-in (sut/all-screens (gen-state-helper {})) path) :text))))
 
-  (fact "Camera schema should have a `:camera' resource type"
-    (let [path [:camera :resource :type]]
-      (get-in (sut/all-screens (gen-state-helper {})) path) => :camera))
+    (testing "Camera schema should have a `:camera' resource type"
+      (let [path [:camera :resource :type]]
+        (is (= (get-in (sut/all-screens (gen-state-helper {})) path) :camera))))
 
-  (fact "Resource title should be translated'"
-    (let [path [:trap-station-session-camera :resource :title]]
-      (get-in (sut/all-screens (gen-state-helper {})) path) => "Session Camera")))
+    (testing "Resource title should be translated'"
+      (let [path [:trap-station-session-camera :resource :title]]
+        (is (= (get-in (sut/all-screens (gen-state-helper {})) path) "Session Camera"))))))

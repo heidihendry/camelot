@@ -1,15 +1,18 @@
 (ns camelot.model.media
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]
-            [clojure.java.io :as io]
-            [camelot.util.java-file :as jf]
-            [camelot.util.config :as config]
-            [clojure.string :as str]
-            [camelot.util.java-file :as f]
-            [clj-time.format :as tf])
-  (:import [org.apache.commons.lang3 SystemUtils]))
+  "Media models and data access."
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]
+   [clojure.java.io :as io]
+   [camelot.util.java-file :as jf]
+   [camelot.util.config :as config]
+   [clojure.string :as str]
+   [camelot.util.java-file :as f]
+   [clj-time.format :as tf])
+  (:import
+   (org.apache.commons.lang3 SystemUtils)))
 
 (sql/defqueries "sql/media.sql" {:connection db/spec})
 

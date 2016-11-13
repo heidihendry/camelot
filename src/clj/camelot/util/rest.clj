@@ -1,11 +1,12 @@
 (ns camelot.util.rest
-  (:require [camelot.util.config :as conf]
-            [clojure.edn :as edn]
-            [camelot.util.cursorise :refer [cursorise decursorise]]
-            [camelot.application :as app]
-            [clojure.tools.logging :as log]
-            [ring.util.response :as r]
-            [clj-time.coerce :as c]))
+  (:require
+   [camelot.util.config :as conf]
+   [clojure.edn :as edn]
+   [camelot.util.cursorise :refer [cursorise decursorise]]
+   [camelot.application :as app]
+   [clojure.tools.logging :as log]
+   [ring.util.response :as r]
+   [clj-time.coerce :as c]))
 
 (def floating-point-fields
   "Set of keys for floating-point fields."

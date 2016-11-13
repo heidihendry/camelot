@@ -1,12 +1,15 @@
 (ns camelot.model.library
-  (:require  [schema.core :as s]
-             [yesql.core :as sql]
-             [camelot.db :as db]
-             [camelot.model.sighting :as sighting]
-             [camelot.model.media :as media]
-             [camelot.model.state :refer [State]]
-             [camelot.util.trap-station :as util.ts])
-  (:import [camelot.model.sighting Sighting]))
+  "Library models and data access."
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.db :as db]
+   [camelot.model.sighting :as sighting]
+   [camelot.model.media :as media]
+   [camelot.model.state :refer [State]]
+   [camelot.util.trap-station :as util.ts])
+  (:import
+   (camelot.model.sighting Sighting)))
 
 (sql/defqueries "sql/library.sql" {:connection db/spec})
 

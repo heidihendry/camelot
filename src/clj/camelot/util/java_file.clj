@@ -1,6 +1,8 @@
 (ns camelot.util.java-file
-  (:import [java.io File])
-  (:require [clojure.string :as str]))
+  (:require
+   [clojure.string :as str])
+  (:import
+   (java.io File)))
 
 (defn get-parent
   [file]

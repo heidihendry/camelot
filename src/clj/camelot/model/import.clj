@@ -1,5 +1,7 @@
 (ns camelot.model.import
-  (:require [schema.core :as s]))
+  "Data import models."
+  (:require
+   [schema.core :as s]))
 
 (defn valid-photo?
   [photo]

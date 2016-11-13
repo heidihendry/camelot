@@ -1,18 +1,20 @@
 (ns camelot.handler.application-test
-  (:require [camelot.handler.application :refer :all]
-            [midje.sweet :refer :all]
-            [schema.test :as st]))
+  (:require
+   [camelot.handler.application :refer :all]
+   [clojure.test :refer :all]
+   [schema.test :as st]))
 
-(namespace-state-changes (before :facts st/validate-schemas))
+(use-fixtures :once st/validate-schemas)
 
-(facts "Metadata flattening"
-  (fact "Datastructure produced is vector of paths"
-    (let [data metadata-paths]
-      (every? identity (flatten (map #(map keyword? %) data))) => true
-      (every? identity (map vector? data)) => true
-      (vector? data) => true))
+(deftest test-metadata-paths
+  (testing "Metadata flattening"
+    (testing "Datastructure produced is vector of paths"
+      (let [data metadata-paths]
+        (is (= (every? identity (flatten (map #(map keyword? %) data))) true))
+        (is (= (every? identity (map vector? data)) true))
+        (is (= (vector? data) true))))
 
-  (fact "An entry is available for GPS Location"
-    (let [search [:location :gps-longitude]]
-      (some #{search} metadata-paths) => search)))
+    (testing "An entry is available for GPS Location"
+      (let [search [:location :gps-longitude]]
+        (is (= (some #{search} metadata-paths) search))))))
 

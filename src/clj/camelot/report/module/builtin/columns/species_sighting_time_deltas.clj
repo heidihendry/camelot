@@ -1,6 +1,7 @@
 (ns camelot.report.module.builtin.columns.species-sighting-time-deltas
-  (:require [camelot.report.module.core :as module]
-            [clj-time.core :as t]))
+  (:require
+   [camelot.report.module.core :as module]
+   [clj-time.core :as t]))
 
 (defn- get-nights-per-independent-observation
   [record]

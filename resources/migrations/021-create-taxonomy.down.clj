@@ -1,17 +1,13 @@
-(ns camelot.migration.create-taxonomy-down
-  (:require [camelot.model.taxonomy :as taxonomy]
-            [yesql.core :as sql]
-            [camelot.db :as db]
-            [clojure.string :as str]
-            [camelot.application :as app]
-            [camelot.util.config :as config]
-            [camelot.model.species :as species]))
+(require '[camelot.model.taxonomy :as taxonomy])
+(require '[camelot.db :as db])
+(require '[camelot.application :as app])
+(require '[camelot.util.config :as config])
 
-(defn delete-taxonomies
+(defn- -m021-delete-taxonomies
   []
   (let [state (app/gen-state (config/config))]
     (db/with-transaction [s state]
       (let [taxonomies (taxonomy/get-all s)]
         (dorun (map #(taxonomy/delete! s (:taxonomy-id %)) taxonomies))))))
 
-(delete-taxonomies)
+(-m021-delete-taxonomies)

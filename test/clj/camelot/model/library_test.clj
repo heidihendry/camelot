@@ -1,9 +1,10 @@
 (ns camelot.model.library-test
-  (:require [camelot.model.library :as sut]
-            [midje.sweet :refer :all]
-            [clj-time.core :as t]
-            [camelot.test-util.state :as state]
-            [camelot.model.sighting :as sighting]))
+  (:require
+   [camelot.model.library :as sut]
+   [clojure.test :refer :all]
+   [clj-time.core :as t]
+   [camelot.test-util.state :as state]
+   [camelot.model.sighting :as sighting]))
 
 (def media-fixture
   {:media-id 1
@@ -47,34 +48,35 @@
   [params]
   (sighting/sighting (merge sighting-fixture params)))
 
-(facts "Library"
-  (fact "Constructs media without sighting"
-    (let [sightings []
-          media [(mock-record {:media-filename "file"})]
-          result (sut/build-records (state/gen-state) sightings media)]
-      (count result) => 1
-      (:sightings (first result)) => []
-      (:media-uri (first result)) => "/media/photo/file"))
+(deftest test-build-records
+  (testing "Library"
+    (testing "Constructs media without sighting"
+      (let [sightings []
+            media [(mock-record {:media-filename "file"})]
+            result (sut/build-records (state/gen-state) sightings media)]
+        (is (= (count result) 1))
+        (is (= (:sightings (first result)) []))
+        (is (= (:media-uri (first result)) "/media/photo/file"))))
 
-  (fact "Constructs media, excluding sightings not matching media ID"
-    (let [sightings [(mock-sighting {:media-id 30})]
-          media [(mock-record {:media-id 1})]
-          result (sut/build-records (state/gen-state) sightings media)]
-      (count result) => 1
-      (:sightings (first result)) => []))
+    (testing "Constructs media, excluding sightings not matching media ID"
+      (let [sightings [(mock-sighting {:media-id 30})]
+            media [(mock-record {:media-id 1})]
+            result (sut/build-records (state/gen-state) sightings media)]
+        (is (= (count result) 1))
+        (is (= (:sightings (first result)) []))))
 
-  (fact "Constructs media, including sighting matching media ID"
-    (let [sightings [(mock-sighting {:media-id 1})]
-          media [(mock-record {:media-id 1})]
-          result (sut/build-records (state/gen-state) sightings media)]
-      (count result) => 1
-      (:sightings (first result)) => sightings)))
+    (testing "Constructs media, including sighting matching media ID"
+      (let [sightings [(mock-sighting {:media-id 1})]
+            media [(mock-record {:media-id 1})]
+            result (sut/build-records (state/gen-state) sightings media)]
+        (is (= (count result) 1))
+        (is (= (:sightings (first result)) sightings))))
 
-  (fact "Constructs media, including multiple sightings matching media ID"
-    (let [sightings [(mock-sighting {:media-id 1 :species-id 3})
-                     (mock-sighting {:media-id 3 :species-id 3})
-                     (mock-sighting {:media-id 1 :species-id 10})]
-          media [(mock-record {:media-id 1})]
-          result (sut/build-records (state/gen-state) sightings media)]
-      (count result) => 1
-      (:sightings (first result)) => (filter #(= (:media-id %) 1) sightings)))
+    (testing "Constructs media, including multiple sightings matching media ID"
+      (let [sightings [(mock-sighting {:media-id 1 :species-id 3})
+                       (mock-sighting {:media-id 3 :species-id 3})
+                       (mock-sighting {:media-id 1 :species-id 10})]
+            media [(mock-record {:media-id 1})]
+            result (sut/build-records (state/gen-state) sightings media)]
+        (is (= (count result) 1))
+        (is (= (:sightings (first result)) (filter #(= (:media-id %) 1) sightings)))))))

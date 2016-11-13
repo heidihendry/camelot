@@ -1,16 +1,17 @@
 (ns camelot.import.dirtree
-  (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [camelot.model.state :refer [State]]
-            [schema.core :as s]
-            [camelot.model.import :as mi]
-            [camelot.util.java-file :as f]
-            [camelot.util.file :as file-util]
-            [camelot.util.java-file :as jf])
-  (:import [com.drew.imaging ImageMetadataReader]
-           [org.apache.commons.lang3 SystemUtils]
-           [com.drew.metadata Metadata Directory Tag]
-           [java.io File]))
+  (:require
+   [clojure.java.io :as io]
+   [clojure.string :as str]
+   [camelot.model.state :refer [State]]
+   [schema.core :as s]
+   [camelot.model.import :as mi]
+   [camelot.util.java-file :as f]
+   [camelot.util.file :as file-util]
+   [camelot.util.java-file :as jf])
+  (:import
+   (com.drew.imaging ImageMetadataReader)
+   (com.drew.metadata Metadata Directory Tag)
+   (java.io File)))
 
 (def RawAlbum {java.io.File mi/ImportRawMetadata})
 

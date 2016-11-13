@@ -1,4 +1,5 @@
-(ns camelot.util.cursorise)
+(ns camelot.util.cursorise
+  )
 
 (defn decursorise
   "Remove :value keys used for Om cursors to leaves from the configuration data."

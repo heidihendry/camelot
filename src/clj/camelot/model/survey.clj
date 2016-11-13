@@ -1,13 +1,14 @@
 (ns camelot.model.survey
-  (:require [schema.core :as s]
-            [camelot.db :as db]
-            [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.util.java-file :as f]
-            [clojure.java.io :as io]
-            [camelot.model.media :as media]
-            [camelot.util.java-file :as jf]
-            [camelot.util.config :as config]))
+  (:require
+   [schema.core :as s]
+   [camelot.db :as db]
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.util.java-file :as f]
+   [clojure.java.io :as io]
+   [camelot.model.media :as media]
+   [camelot.util.java-file :as jf]
+   [camelot.util.config :as config]))
 
 (sql/defqueries "sql/surveys.sql" {:connection db/spec})
 

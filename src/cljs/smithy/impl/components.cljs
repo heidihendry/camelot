@@ -3,7 +3,8 @@
             [om.dom :as dom :include-macros true]
             [smithy.impl.inputs :as inputs]
             [smithy.util :as util])
-  (:import [goog.date UtcDateTime]
+  (:import [goog.date DateTime]
+           [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat]))
 
 (defn actionmenu-item-component
@@ -166,9 +167,9 @@
                               (get data :view-state)
                               (get data :resource-id))}
               (let [label (get (:item data) (get data :label))]
-                (if (= (type label) UtcDateTime)
-                  (let [df (DateTimeFormat. "yyyy-MM-dd HH:MM:ss")]
-                    (dom/a nil (.format df label)))
+                (if (= (type label) DateTime)
+                  (let [df (DateTimeFormat. "yyyy-MM-dd HH:mm:ss")]
+                    (dom/a nil (.format df (UtcDateTime.fromTimestamp (.getTime label)))))
                   (dom/a nil label)))))))
 
 (defn build-sidebar-item-components

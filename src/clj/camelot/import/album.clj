@@ -1,15 +1,16 @@
 (ns camelot.import.album
-  (:require [clj-time.core :as t]
-            [clj-time.coerce :as tc]
-            [schema.core :as s]
-            [camelot.util.java-file :as jf]
-            [camelot.translation.core :as tr]
-            [camelot.import.dirtree :as dt]
-            [camelot.model.import :as mi]
-            [camelot.import.photo :as photo]
-            [camelot.import.validation :refer [list-problems check-invalid-photos]]
-            [clojure.java.io :as io]
-            [camelot.model.trap-station-session-camera :as trap-station-session-camera]))
+  (:require
+   [clj-time.core :as t]
+   [clj-time.coerce :as tc]
+   [schema.core :as s]
+   [camelot.util.java-file :as jf]
+   [camelot.translation.core :as tr]
+   [camelot.import.dirtree :as dt]
+   [camelot.model.import :as mi]
+   [camelot.import.photo :as photo]
+   [camelot.import.validation :refer [list-problems check-invalid-photos]]
+   [clojure.java.io :as io]
+   [camelot.model.trap-station-session-camera :as trap-station-session-camera]))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."

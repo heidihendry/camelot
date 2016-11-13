@@ -1,6 +1,7 @@
 (ns camelot.report.module.core
   "Column definitions for the report builder."
-  (:require [camelot.translation.core :as tr]))
+  (:require
+   [camelot.translation.core :as tr]))
 
 (defonce known-columns
   (atom {}))

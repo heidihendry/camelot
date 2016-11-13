@@ -1,42 +1,40 @@
 (ns camelot.routes
-  (:require [camelot.application :as app]
-            [camelot.handler
-             [albums :as albums]
-             [application :as application]
-             [associated-taxonomy :as ataxonomy]
-             [config :as config]
-             [capture :as capture]
-             [import :as import]
-             [bulk-import :as bulk-import]]
-            [camelot.import.db :as im.db]
-            [camelot.services.species-search :as species-search]
-            [camelot.model
-             [camera :as camera]
-             [camera-status :as camera-status]
-             [media :as media]
-             [photo :as photo]
-             [sighting :as sighting]
-             [site :as site]
-             [taxonomy :as taxonomy]
-             [species-mass :as species-mass]
-             [survey :as survey]
-             [survey-site :as survey-site]
-             [survey-file :as survey-file]
-             [trap-station :as trap-station]
-             [trap-station-session :as trap-station-session]
-             [trap-station-session-camera :as trap-station-session-camera]
-             [deployment :as deployment]
-             [library :as library]]
-            [camelot.report.core :as report]
-            [camelot.util
-             [config :as conf]
-             [rest :as rest]]
-            [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [compojure
-             [core :refer [context defroutes DELETE GET POST PUT routes]]
-             [route :as route]]
-            [ring.util.response :as r]))
+  (:require
+   [camelot.application :as app]
+   [camelot.handler.albums :as albums]
+   [camelot.handler.application :as application]
+   [camelot.handler.associated-taxonomy :as ataxonomy]
+   [camelot.handler.config :as config]
+   [camelot.handler.capture :as capture]
+   [camelot.handler.import :as import]
+   [camelot.handler.bulk-import :as bulk-import]
+   [camelot.import.db :as im.db]
+   [camelot.services.species-search :as species-search]
+   [camelot.model.camera :as camera]
+   [camelot.model.camera-status :as camera-status]
+   [camelot.model.media :as media]
+   [camelot.model.photo :as photo]
+   [camelot.model.sighting :as sighting]
+   [camelot.model.site :as site]
+   [camelot.model.taxonomy :as taxonomy]
+   [camelot.model.species-mass :as species-mass]
+   [camelot.model.survey :as survey]
+   [camelot.model.survey-site :as survey-site]
+   [camelot.model.survey-file :as survey-file]
+   [camelot.model.trap-station :as trap-station]
+   [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
+   [camelot.model.deployment :as deployment]
+   [camelot.model.camera-deployment :as camera-deployment]
+   [camelot.model.library :as library]
+   [camelot.report.core :as report]
+   [camelot.util.config :as conf]
+   [camelot.util.rest :as rest]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [compojure.core :refer [context defroutes DELETE GET POST PUT routes]]
+   [compojure.route :as route]
+   [ring.util.response :as r]))
 
 (defn- retrieve-index
   "Return a response for index.html"
@@ -260,9 +258,6 @@
   (context "/deployment" {session :session}
            (GET "/survey/:id" [id] (rest/list-resources deployment/get-all
                                                         :trap-station-session id session))
-           (GET "/survey/:id/recent" [id] (rest/list-resources deployment/get-uploadable
-                                                               :trap-station-session id session))
-           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id session))
            (POST "/create/:id" [id data] (rest/create-resource deployment/create!
                                                                deployment/tdeployment
                                                                (assoc data :survey-id
@@ -271,8 +266,12 @@
                                                        deployment/tdeployment
                                                        (assoc data :trap-station-id
                                                               {:value (edn/read-string id)}) session))
-           (POST "/" [data] (rest/create-resource deployment/create-camera-check!
-                                                  deployment/tcamera-deployment data session)))
+           (GET "/:id" [id] (rest/specific-resource deployment/get-specific id session)))
+  (context "/camera-deployment" {session :session}
+           (GET "/survey/:id/recent" [id] (rest/list-resources camera-deployment/get-uploadable
+                                                               :trap-station-session id session))
+           (POST "/" [data] (rest/create-resource camera-deployment/create-camera-check!
+                                                  camera-deployment/tcamera-deployment data session)))
 
   misc-routes
   config/routes

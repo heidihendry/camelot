@@ -1,6 +1,7 @@
 (ns camelot.report.module.builtin.reports.survey-site
-  (:require [camelot.report.module.core :as module]
-            [camelot.translation.core :as tr]))
+  (:require
+   [camelot.report.module.core :as module]
+   [camelot.translation.core :as tr]))
 
 (defn report-output
   [state {:keys [survey-site-id]}]

@@ -1,12 +1,14 @@
 (ns camelot.util.sunrise-sunset
-  (:require [schema.core :as s]
-            [clj-time.coerce :as tc]
-            [clj-time.local :as tl]
-            [clj-time.core :as t])
-  (:import [com.luckycatlabs.sunrisesunset SunriseSunsetCalculator]
-           [com.luckycatlabs.sunrisesunset.dto Location]
-           [org.joda.time DateTime Seconds]
-           [java.util TimeZone]))
+  (:require
+   [schema.core :as s]
+   [clj-time.coerce :as tc]
+   [clj-time.local :as tl]
+   [clj-time.core :as t])
+  (:import
+   (com.luckycatlabs.sunrisesunset SunriseSunsetCalculator)
+   (com.luckycatlabs.sunrisesunset.dto Location)
+   (org.joda.time DateTime Seconds)
+   (java.util TimeZone)))
 
 (s/defn calendar-for-date
   [date :- DateTime]

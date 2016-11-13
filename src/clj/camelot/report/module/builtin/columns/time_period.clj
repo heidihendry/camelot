@@ -1,10 +1,11 @@
 (ns camelot.report.module.builtin.columns.time-period
-  (:require [camelot.import.album :as album]
-            [camelot.report.module
-             [column-util :as col-util]
-             [core :as module]]
-            [clj-time.core :as t]
-            [clj-time.format :as tf]))
+  (:require
+   [camelot.import.album :as album]
+   [camelot.report.module
+    [column-util :as col-util]
+    [core :as module]]
+   [clj-time.core :as t]
+   [clj-time.format :as tf]))
 
 (defn before-reducer
   [a b]

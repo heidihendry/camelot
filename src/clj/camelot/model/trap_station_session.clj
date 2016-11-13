@@ -1,11 +1,12 @@
 (ns camelot.model.trap-station-session
-  (:require [schema.core :as s]
-            [camelot.db :as db]
-            [clj-time.format :as tf]
-            [camelot.model.state :refer [State]]
-            [yesql.core :as sql]
-            [clj-time.core :as t]
-            [camelot.model.media :as media]))
+  (:require
+   [schema.core :as s]
+   [camelot.db :as db]
+   [clj-time.format :as tf]
+   [camelot.model.state :refer [State]]
+   [yesql.core :as sql]
+   [clj-time.core :as t]
+   [camelot.model.media :as media]))
 
 (sql/defqueries "sql/trap-station-sessions.sql" {:connection db/spec})
 
@@ -127,8 +128,6 @@
   (db/with-transaction [s state]
     (let [data (dissoc data :trap-station-session-label)]
       (db/with-db-keys s -update! (merge data {:trap-station-session-id id}))
-      (let [active (get-active s id)]
-        (assert (= (count active) (count (distinct active)))))
       (get-specific s id))))
 
 (s/defn delete!
@@ -144,3 +143,8 @@
    data :- TTrapStationSession]
   (or (get-specific-by-dates state data)
       (create! state data)))
+
+(s/defn set-session-end-date!
+  [state :- State
+   data]
+  (db/with-db-keys state -set-session-end-date! data))

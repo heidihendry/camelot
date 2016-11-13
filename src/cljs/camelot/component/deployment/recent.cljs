@@ -24,7 +24,6 @@
   (when (js/confirm (if (:has-uploaded-media data)
                       (tr/translate ::confirm-delete-has-media)
                       (tr/translate ::confirm-delete)))
-    (prn state)
     (rest/delete-x (str "/trap-station-session-cameras/" (:trap-station-session-camera-id data))
                    #(go (>! (:chan state) {:event :delete :data data})))))
 
@@ -193,7 +192,7 @@
     om/IDidMount
     (did-mount [_]
       (om/update! data :deployment-sort-order :trap-station-session-end-date)
-      (rest/get-resource (str "/deployment/survey/"
+      (rest/get-resource (str "/camera-deployment/survey/"
                               (get-in (state/app-state-cursor)
                                       [:selected-survey :survey-id :value])
                               "/recent")

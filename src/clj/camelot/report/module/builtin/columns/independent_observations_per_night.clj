@@ -1,5 +1,6 @@
 (ns camelot.report.module.builtin.columns.independent-observations-per-night
-  (:require [camelot.report.module.core :as module]))
+  (:require
+   [camelot.report.module.core :as module]))
 
 (defn- get-nights-per-independent-observation
   [record]

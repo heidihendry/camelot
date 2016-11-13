@@ -1,9 +1,11 @@
 (ns camelot.model.site
-  (:require [schema.core :as s]
-            [yesql.core :as sql]
-            [camelot.model.state :refer [State]]
-            [camelot.db :as db]
-            [camelot.model.media :as media]))
+  "Site models and data access."
+  (:require
+   [schema.core :as s]
+   [yesql.core :as sql]
+   [camelot.model.state :refer [State]]
+   [camelot.db :as db]
+   [camelot.model.media :as media]))
 
 (sql/defqueries "sql/sites.sql" {:connection db/spec})
 

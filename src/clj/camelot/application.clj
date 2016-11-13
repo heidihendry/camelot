@@ -1,7 +1,8 @@
 (ns camelot.application
-  (:require [smithy.core :refer [defsmith] :as smithy]
-            [environ.core :refer [env]]
-            [camelot.translation.core :as tr]))
+  (:require
+   [smithy.core :refer [defsmith] :as smithy]
+   [environ.core :refer [env]]
+   [camelot.translation.core :as tr]))
 
 (defn gen-state
   "Return the global application state.

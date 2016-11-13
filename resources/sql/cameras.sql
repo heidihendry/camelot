@@ -44,3 +44,9 @@ SELECT camera_id, camera_created, camera_updated, camera_name, camera_status_id,
 FROM camera
 LEFT JOIN camera_status USING (camera_status_id)
 WHERE camera_status_description = 'camera-status/available'
+
+-- name: -set-camera-status!
+UPDATE camera
+       SET camera_status_id = :camera_status_id,
+           camera_updated = CURRENT_TIMESTAMP
+WHERE camera_id = :camera_id

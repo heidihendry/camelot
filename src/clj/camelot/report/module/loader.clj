@@ -1,9 +1,11 @@
 (ns camelot.report.module.loader
-  (:require [camelot.util.java-file :as f]
-            [camelot.util.config :as conf]
-            [clojure.java.io :as io]
-            [camelot.report.module.builtin.core])
-  (:import [org.apache.commons.lang3 SystemUtils]))
+  (:require
+   [camelot.util.java-file :as f]
+   [camelot.util.config :as conf]
+   [clojure.java.io :as io]
+   [camelot.report.module.builtin.core])
+  (:import
+   (org.apache.commons.lang3 SystemUtils)))
 
 (def clj-file-re #"(?i)\.clj$")
 

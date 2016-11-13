@@ -1,10 +1,12 @@
 (ns camelot.report.module.column-util
   "Utilities for defining report columns."
-  (:require [camelot.report.sighting-independence :as indep]
-            [clj-time.core :as t]
-            [schema.core :as s]
-            [camelot.model.state :refer [State]])
-  (:import [clojure.lang IFn]))
+  (:require
+   [camelot.report.sighting-independence :as indep]
+   [clj-time.core :as t]
+   [schema.core :as s]
+   [camelot.model.state :refer [State]])
+  (:import
+   (clojure.lang IFn)))
 
 (s/defn aggregate-numeric :- s/Num
   "Aggregate numeric values of `col' by summation."

@@ -1,7 +1,8 @@
 (ns camelot.translation.core
-  (:require [camelot.translation.en :refer :all]
-            [camelot.translation.vn :refer :all]
-            [taoensso.tower :as tower]))
+  (:require
+   [camelot.translation.en :refer :all]
+   [camelot.translation.vn :refer :all]
+   [taoensso.tower :as tower]))
 
 (def tconfig
   "Configuration for translations."

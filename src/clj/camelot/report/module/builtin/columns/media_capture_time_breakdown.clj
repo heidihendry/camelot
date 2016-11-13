@@ -1,7 +1,8 @@
 (ns camelot.report.module.builtin.columns.media-capture-time-breakdown
-  (:require [camelot.report.module.core :as module]
-            [clj-time.core :as t]
-            [clj-time.format :as tf]))
+  (:require
+   [camelot.report.module.core :as module]
+   [clj-time.core :as t]
+   [clj-time.format :as tf]))
 
 (def date-formatter (tf/formatter "YYYY-MM-dd"))
 (def time-formatter (tf/formatter "HH:mm:ss"))

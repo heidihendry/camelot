@@ -1,6 +1,7 @@
 (ns camelot.import.util
-  (:require [clojure.string :as str]
-            [camelot.translation.core :as tr]))
+  (:require
+   [clojure.string :as str]
+   [camelot.translation.core :as tr]))
 
 (defn path-description
   "Return a translation for a given path"
