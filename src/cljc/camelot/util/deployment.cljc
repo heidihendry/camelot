@@ -5,21 +5,14 @@
 
 (defn- assoc-cameras-for-group
   [[session-id group]]
-  (let [g1 (first group)
-        g1' (dissoc g1 :camera-id :camera-name :camera-status-id :camera-media-unrecoverable)
-        g2 (second group)]
-    (assoc
-     (if g2
-       (assoc g1'
-              :secondary-camera-id (:camera-id g2)
-              :secondary-camera-name (:camera-name g2)
-              :secondary-camera-status-id (:camera-status-id g2)
-              :secondary-camera-media-unrecoverable (:camera-media-unrecoverable g2))
-       g1')
-     :primary-camera-id (:camera-id g1)
-     :primary-camera-name (:camera-name g1)
-     :primary-camera-status-id (:camera-status-id g1)
-     :primary-camera-media-unrecoverable (:camera-media-unrecoverable g1))))
+  (let [dissoc-list #(apply dissoc %1 %2)
+        keys [:camera-id :camera-name :camera-status-id :camera-media-unrecoverable]
+        [g1 g2] group]
+    (-> g1
+        (merge {:primary (select-keys g1 keys)})
+        (merge {:secondary (select-keys g2 keys)})
+        (data/map-keys-to-key-prefix [:primary :secondary])
+        (dissoc-list keys))))
 
 (defn assoc-cameras
   "Associate data for primary and secondary cameras."
@@ -32,7 +25,7 @@
   "Convert primary and secondary camera data into a list of cameras, stripping the prefix."
   [d]
   (let [types [:primary :secondary]
-        nd (data/prefix-key d types)
+        nd (data/key-prefix-to-map d types)
         cams (->> nd
                   (data/select-keys-inv types)
                   vals

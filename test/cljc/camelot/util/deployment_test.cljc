@@ -33,7 +33,7 @@
   [c]
   (merge default-session-data c))
 
-(deftest test-assoc-cameras-for-group
+(deftest test-assoc-cameras
   (testing "Add primary/secondary camera information"
     (testing "Should add details for a session"
       (is (= (sut/assoc-cameras [(->camera {})])
