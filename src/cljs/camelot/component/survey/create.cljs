@@ -1,6 +1,9 @@
 (ns camelot.component.survey.create
   (:require [om.core :as om]
             [camelot.rest :as rest]
+            [camelot.util.feature :as feature]
+            [camelot.component.util :as util]
+            [camelot.util.cursorise :as cursorise]
             [camelot.nav :as nav]
             [camelot.state :as state]
             [cljs.core.async :refer [<! chan >!]]
@@ -53,22 +56,32 @@
                  (dom/p nil
                         (tr/translate ::search-instructions)))))))
 
+(defn navigate-bypassing-bulk-import
+  "Navigate back to the organisation top-level page."
+  []
+  (if (seq (get-in (state/app-state-cursor) [:survey :list]))
+    (nav/nav! "/organisation")
+    (.reload js/location)))
+
 (defn create-survey-success-handler
-  [data resp]
-  (rest/post-x-opts "/species/create"
-                    {:species (deref (:species data))
-                     :survey-id (get-in resp [:body :survey-id :value])}
-                    {:success #(if (seq (get-in (state/app-state-cursor) [:survey :list]))
-                                 (nav/nav! "/organisation")
-                                 (.reload js/location))
-                     :always #(om/update! data :submitting-form false)}))
+  [data nextaction resp]
+  (let [survey-id (get-in resp [:body :survey-id :value])]
+    (om/transact! (state/app-state-cursor) [:survey :list] #(conj % (cursorise/decursorise (:body resp))))
+    (om/update! data :survey-id survey-id)
+    (rest/post-x-opts "/species/create"
+                      {:species (deref (:species data))
+                       :survey-id survey-id}
+                      {:success #(nextaction resp)
+                       :always #(om/update! data :submitting-form false)})))
 
 (defn create-survey
-  [data]
+  "Create a new survey."
+  [data nextaction]
+  (om/update! data :submitting-form true)
   (let [ps (select-keys data [:survey-name
                               :survey-notes])]
     (rest/post-x-opts "/surveys" ps
-                      {:success (partial create-survey-success-handler data)
+                      {:success (partial create-survey-success-handler data nextaction)
                        :failure #(om/update! data :submitting-form false)})))
 
 (defn survey-details-completed?
@@ -109,9 +122,11 @@
                                                        (nav/analytics-event "org-survey-create" "cancel-click"))}
                                       (tr/translate :words/cancel)))
                         (dom/button #js {:className "btn btn-primary"
-                                         :onClick #(do (om/update! data :submitting-form true)
-                                                       (create-survey data)
-                                                       (nav/analytics-event "org-survey-create" "submit-click"))
+                                         :onClick #(do
+                                                     (nav/analytics-event "org-survey-create" "submit-next-click")
+                                                     (if (feature/enabled? (state/settings) :bulk-import)
+                                                       (om/update! data :show-bulk-import-prompt true)
+                                                       (create-survey data navigate-bypassing-bulk-import)))
                                          :disabled (if (and (survey-details-completed? data)
                                                             (not (:submitting-form data)))
                                                      "" "disabled")
@@ -139,6 +154,10 @@
                                       :sighting-independence-threshold 20
                                       :survey-name nil
                                       :survey-notes ""}))
+    om/IWillUnmount
+    (will-unmount [_]
+      (when (:create-survey app)
+        (om/update! app [:create-survey :show-bulk-import-prompt] false)))
     om/IRender
     (render [_]
       (if-let [data (get app :create-survey)]
@@ -148,6 +167,31 @@
                           #(conj % (deref (get-in data [:species-search :selection]))))
             (om/update! (:species-search data) :selection nil))
           (dom/div #js {:className "split-menu"}
+                   (when (feature/enabled? (state/settings) :bulk-import)
+                     (om/build util/prompt-component data
+                               {:opts {:active-key :show-bulk-import-prompt
+                                       :title (tr/translate ::bulk-import-prompt-title)
+                                       :body (dom/div nil
+                                                      (dom/p #js {:className "bulk-import-introduction"}
+                                                             (tr/translate ::bulk-import-introduction))
+                                                      (dom/label #js {:className "question prompt-question"}
+                                                                 (tr/translate ::bulk-import-question)))
+                                       :actions (dom/div #js {:className "button-container"}
+                                                         (dom/button #js {:className "btn btn-default"
+                                                                          :ref "action-first"
+                                                                          :onClick #(create-survey data
+                                                                                                   (fn [surv-resp]
+                                                                                                     (nav/analytics-event "org-survey-create" "skip-bulk-import")
+                                                                                                     (navigate-bypassing-bulk-import)))}
+                                                                     (tr/translate ::create-only))
+                                                         (dom/button #js {:className "btn btn-primary"
+                                                                          :ref "action-first"
+                                                                          :onClick #(create-survey data
+                                                                                     (fn [surv-resp]
+                                                                                       (nav/analytics-event "org-survey-create" "nav-to-bulk-import")
+                                                                                       (nav/nav! (str "/" (get-in surv-resp [:body :survey-id :value])
+                                                                                                      "/bulk-import"))))}
+                                                                     (tr/translate ::create-and-import)))}}))
                    (dom/div #js {:className "intro"}
                             (dom/h4 nil (tr/translate ::intro)))
                    (dom/div nil

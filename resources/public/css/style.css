@@ -1452,7 +1452,7 @@ pre.field-input {
     color: #666;
     font-size: 90%;
 }
-#app .split-menu .section .sep {
+#app .split-menu .sep {
     padding-bottom: 2rem;
     margin-bottom: 2rem;
     border-bottom: 1px solid #eee;
@@ -1659,4 +1659,54 @@ pre.field-input {
 }
 #app .full-width {
     width: 100%;
+}
+
+#app .prompt .prompt-dialog {
+    top: 4rem;
+    width: 50rem;
+    margin-left: calc(100vw / 2 - 25rem);
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    padding: 2rem;
+    transition: all 0.2s ease-in-out;
+    border-radius: 0.5rem;
+    outline: none;
+}
+#app .prompt .prompt-dialog.hide-above {
+    top: -100vh;
+}
+#app .prompt-dialog .prompt-title {
+    margin-top: 0;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #ccc;
+    font-size: 150%;
+}
+#app .prompt-dialog .prompt-body {
+    margin: 3rem 0;
+}
+#app .prompt-dialog .prompt-actions {
+    padding-top: 1rem;
+    border-top: 1px solid #ccc;
+}
+#app .btn-flat {
+    background: none;
+    border: none;
+}
+#app .prompt .blanket {
+    position: fixed;
+    z-index: 999;
+    opacity: 0.7;
+    background: #333;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+#app .prompt .hide-above {
+}
+#app .prompt-question {
+    padding-top: 2rem;
 }

@@ -708,7 +708,12 @@
     :create-survey "Create survey"
     :intro "Create Survey"
     :submit-title "Submit this survey."
-    :validation-error-title "Complete all required fields before submitting."}
+    :validation-error-title "Complete all required fields before submitting."
+    :bulk-import-prompt-title "Bulk Import"
+    :bulk-import-introduction "You can import all of the data for a survey at once, should you already have all of the data collected. This can only be done during survey creation."
+    :bulk-import-question "Would you like to perform a Bulk Data Import for this survey once it is created?"
+    :create-only "Create only"
+    :create-and-import "Create and import"}
 
    :camelot.component.survey.file
    {:upload-time "Upload time"

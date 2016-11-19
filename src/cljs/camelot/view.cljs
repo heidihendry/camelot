@@ -353,8 +353,10 @@
 (defroute "/library" [] (generate-view library/library-view-component))
 (defroute "/:survey/library" [survey] (generate-view library/library-view-component
                                                      {:survey-id survey}))
-(defroute "/:survey/bulk-import" [survey] (generate-view bulk-import/bulk-import-mapping-view
+(defroute "/:survey/bulk-import" [survey] (generate-view bulk-import/bulk-import-view
                                                          {:survey-id survey}))
+(defroute "/:survey/bulk-import/mapper" [survey] (generate-view bulk-import/bulk-import-mapping-view
+                                                                {:survey-id survey}))
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))

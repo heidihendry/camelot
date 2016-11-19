@@ -44,6 +44,8 @@
    #(do (om/update! (state/app-state-cursor) :screens (:body %))
         (om/update! (state/app-state-cursor) :library {:search {}
                                                        :search-results {}})
+        (rest/get-resource "/surveys"
+                           (fn [r] (om/update! (state/app-state-cursor) :survey {:list (:body r)})))
         (om/update! (state/app-state-cursor) :language :en)
         (om/update! (state/app-state-cursor) :display {:error nil})
         (om/update! (state/app-state-cursor) :view
