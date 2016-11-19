@@ -465,16 +465,16 @@ Coming back to the example given earlier on when and where to use the Advanced m
 Here's a step-by-step process on how you might go about fixing that:
 
 1. Organisation -> Cameras -> Create a new camera called "Temporary".
-2. Access the Advanced menu for Problem Trap Station #1: Organisations -> Surveys -> MySurvey -> Manage Camera Trap Stations -> MyTrap1 -> Details -> Advanced
+2. Access the Advanced menu for Problem Trap Station 1: Organisations -> Surveys -> MySurvey -> Manage Camera Trap Stations -> MyTrap1 -> Details -> Advanced
 3. Select the session from the Sidebar where the cameras are known to be wrong
 4. Actions -> View Cameras
 5. Select the camera wrongly assigned, then Actions -> Edit
 6. Set the Camera to "Temporary", as we created earlier
-7. Access the Advanced menu for Problem Trap Station #2: Manage Camera Trap Stations -> MyTrap2 -> Details -> Advanced
+7. Access the Advanced menu for Problem Trap Station 2: Manage Camera Trap Stations -> MyTrap2 -> Details -> Advanced
 8. Now we repeat the process: select the session, Actions -> View Cameras, select the wrongly assigned camera, Actions -> Edit
-9. Assign the camera we unassigned from Problem Trap Station #1.
+9. Assign the camera we unassigned from Problem Trap Station 1.
 10. And we repeat the process again: select the session, Actions -> View Cameras, select the wrongly assigned camera, Actions -> Edit
-11. Assign the camera unassigned from Problem Trap Station #2 to complete the swap.
+11. Assign the camera unassigned from Problem Trap Station 2 to complete the swap.
 12. Finally, Organisation -> Cameras -> Remove "Temporary" to clean up the temporary camera.
 
 #### Parting advice
