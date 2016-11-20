@@ -8,6 +8,9 @@
    [camelot.application :as app]
    [camelot.util.config :as config]))
 
+;; NOTE: 030_survey_taxonomy_migration needs to be updated should this model
+;; change.
+
 (sql/defqueries "sql/survey-taxonomy.sql" {:connection db/spec})
 
 (s/defrecord TSurveyTaxonomy
