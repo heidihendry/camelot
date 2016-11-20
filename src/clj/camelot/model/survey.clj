@@ -1,4 +1,5 @@
 (ns camelot.model.survey
+  "Survey data model and persistence."
   (:require
    [schema.core :as s]
    [camelot.db :as db]
@@ -17,7 +18,8 @@
      survey-sighting-independence-threshold :- s/Num
      survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
-     survey-notes :- (s/maybe s/Str)])
+     survey-notes :- (s/maybe s/Str)
+     survey-bulk-import-mode :- (s/maybe s/Bool)])
 
 (s/defrecord Survey
     [survey-id :- s/Int
@@ -27,23 +29,26 @@
      survey-sighting-independence-threshold :- s/Num
      survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
-     survey-notes :- (s/maybe s/Str)])
+     survey-notes :- (s/maybe s/Str)
+     survey-bulk-import-mode :- (s/maybe s/Bool)])
 
 (s/defn survey :- Survey
   [{:keys [survey-id survey-created survey-updated survey-name
            survey-sighting-independence-threshold
            survey-directory survey-sampling-point-density
-           survey-notes]}]
+           survey-notes survey-bulk-import-mode]}]
   (->Survey survey-id survey-created survey-updated survey-name
             survey-sighting-independence-threshold survey-directory
-            survey-sampling-point-density survey-notes))
+            survey-sampling-point-density survey-notes
+            (or survey-bulk-import-mode false)))
 
 (s/defn tsurvey :- TSurvey
   [{:keys [survey-name survey-sighting-independence-threshold survey-directory
            survey-sampling-point-density
-           survey-notes]}]
+           survey-notes survey-bulk-import-mode]}]
   (->TSurvey survey-name (or survey-sighting-independence-threshold 20)
-             survey-directory survey-sampling-point-density survey-notes))
+             survey-directory survey-sampling-point-density survey-notes
+             (or survey-bulk-import-mode false)))
 
 (s/defn get-all :- [Survey]
   [state :- State]

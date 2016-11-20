@@ -50,7 +50,9 @@
       (when (:menu data)
         (dom/div #js {:className "section simple-menu"}
                  (om/build-all action-item-component
-                               (:menu data)
+                               (filter #(if (nil? (:condition %))
+                                          true
+                                          (:condition %)) (:menu data))
                                {:key :action
                                 :init-state state}))))))
 

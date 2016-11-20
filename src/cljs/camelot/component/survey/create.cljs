@@ -76,10 +76,11 @@
 
 (defn create-survey
   "Create a new survey."
-  [data nextaction]
+  [data bulk-import-mode nextaction]
   (om/update! data :submitting-form true)
-  (let [ps (select-keys data [:survey-name
-                              :survey-notes])]
+  (let [ps (assoc (select-keys data [:survey-name
+                                     :survey-notes])
+                  :survey-bulk-import-mode bulk-import-mode)]
     (rest/post-x-opts "/surveys" ps
                       {:success (partial create-survey-success-handler data nextaction)
                        :failure #(om/update! data :submitting-form false)})))
@@ -126,7 +127,7 @@
                                                      (nav/analytics-event "org-survey-create" "submit-next-click")
                                                      (if (feature/enabled? (state/settings) :bulk-import)
                                                        (om/update! data :show-bulk-import-prompt true)
-                                                       (create-survey data navigate-bypassing-bulk-import)))
+                                                       (create-survey data false navigate-bypassing-bulk-import)))
                                          :disabled (if (and (survey-details-completed? data)
                                                             (not (:submitting-form data)))
                                                      "" "disabled")
@@ -179,18 +180,18 @@
                                        :actions (dom/div #js {:className "button-container"}
                                                          (dom/button #js {:className "btn btn-default"
                                                                           :ref "action-first"
-                                                                          :onClick #(create-survey data
+                                                                          :onClick #(create-survey data false
                                                                                                    (fn [surv-resp]
                                                                                                      (nav/analytics-event "org-survey-create" "skip-bulk-import")
                                                                                                      (navigate-bypassing-bulk-import)))}
                                                                      (tr/translate ::create-only))
                                                          (dom/button #js {:className "btn btn-primary"
                                                                           :ref "action-first"
-                                                                          :onClick #(create-survey data
-                                                                                     (fn [surv-resp]
-                                                                                       (nav/analytics-event "org-survey-create" "nav-to-bulk-import")
-                                                                                       (nav/nav! (str "/" (get-in surv-resp [:body :survey-id :value])
-                                                                                                      "/bulk-import"))))}
+                                                                          :onClick #(create-survey data true
+                                                                                                   (fn [surv-resp]
+                                                                                                     (nav/analytics-event "org-survey-create" "nav-to-bulk-import")
+                                                                                                     (nav/nav! (str "/" (get-in surv-resp [:body :survey-id :value])
+                                                                                                                    "/bulk-import"))))}
                                                                      (tr/translate ::create-and-import)))}}))
                    (dom/div #js {:className "intro"}
                             (dom/h4 nil (tr/translate ::intro)))

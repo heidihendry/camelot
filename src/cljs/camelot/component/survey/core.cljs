@@ -21,6 +21,12 @@
                    #(go (>! (:chan state) {:event :delete
                                            :data data})))))
 
+(defn bulk-import-mode?
+  []
+  (and (feature/enabled? (state/settings) :bulk-import)
+       (get-in (state/app-state-cursor)
+               [:selected-survey :survey-bulk-import-mode :value])))
+
 (defn survey-list-component
   [data owner]
   (reify
@@ -85,27 +91,40 @@
   "Render the view component for managing a survey."
   [app owner]
   (reify
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! app :survey-page-state {}))
     om/IDidMount
     (did-mount [_]
-      (if (:survey-page-state app)
-        (om/update! app [:survey-page-state :species] {})
-        (do
-          (om/update! app :survey-page-state
-                      {:menu [{:action :deployment
-                               :name (tr/translate ::manage-traps)
-                               :active true}
-                              {:action :upload
-                               :name (tr/translate ::upload-captures)}
-                              {:action :species
-                               :name (tr/translate ::species)}
-                              {:action :files
-                               :name (tr/translate ::files)}]
-                       :active :deployment
-                       :species {}})
-          (when (feature/enabled? (state/settings) :bulk-import)
-            (om/transact! app [:survey-page-state :menu]
-                          #(conj % {:action :import
-                                    :name (tr/translate ::import)}))))))
+      (om/update! app :survey-page-state
+                  {:menu [{:action :deployment
+                           :name (tr/translate ::manage-traps)
+                           :condition (not (bulk-import-mode?))}
+                          {:action :upload
+                           :name (tr/translate ::upload-captures)
+                           :condition (not (bulk-import-mode?))}
+                          {:action :import
+                           :name (tr/translate ::import)
+                           :condition (bulk-import-mode?)}
+                          {:action :species
+                           :name (tr/translate ::species)}
+                          {:action :files
+                           :name (tr/translate ::files)}]
+                   :active :deployment
+                   :species {}})
+      (om/transact! app [:survey-page-state :menu]
+                    (fn [d]
+                      (let [m (first (filter #(if (nil? (:condition %))
+                                                true
+                                                (:condition %)) d))]
+                        (vec (conj (remove #{m} d)
+                                   (assoc m :active true))))))
+      (om/transact! app [:survey-page-state]
+                    (fn [d]
+                      (assoc d :active (->> (:menu d)
+                                            (filter #(:active %))
+                                            first
+                                            :action)))))
     om/IRender
     (render [_]
       (if (seq (:survey-page-state app))
