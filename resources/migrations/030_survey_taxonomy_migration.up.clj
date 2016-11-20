@@ -1,5 +1,6 @@
 (require '[clojure.math.combinatorics :as combinatorics])
 (require '[yesql.core :as sql])
+(require '[camelot.db :as db])
 (require '[camelot.model.state :refer [State]])
 (require '[clojure.java.jdbc :as jdbc])
 (require '[schema.core :as s])
