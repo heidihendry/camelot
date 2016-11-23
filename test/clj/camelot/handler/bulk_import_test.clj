@@ -17,6 +17,11 @@
           (is (= (sut/resolve-directory state "G:\\srv\\mydata\\survey1")
                  (io/file "G:\\srv\\mydata\\survey1"))))))
 
+    (testing "Should use root path if unable to resolve directory."
+      (let [state (state/gen-state {:root-path "/my/path"})]
+        (is (= (sut/resolve-directory state "/random/non-matching/location")
+               (io/file "/my/path")))))
+
     (testing "Should know be able to resolve simple directories on nix with nix client."
       (is (= (sut/resolve-server-directory "/srv/research data/camelot"
                                            "/mnt/server/research data/camelot/survey1")

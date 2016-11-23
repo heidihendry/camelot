@@ -49,9 +49,10 @@
   {:pre (nil? client-dir)}
   (let [root (-> state :config :root-path)
         res (resolve-server-directory root client-dir)]
-    (io/file (if (empty? res)
-               client-dir
-               res))))
+    (io/file (cond
+               (and (empty? res) (nil? root)) client-dir
+               (empty? res) root
+               :else res))))
 
 (defn calculate-gps-latitude
   [data]
