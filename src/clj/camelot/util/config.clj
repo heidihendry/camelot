@@ -34,7 +34,6 @@
                      [:location :gps-longitude] [:location :gps-latitude]
                      [:datetime] [:filename]]})
 
-(def os (System/getProperty "os.name"))
 (def db-name "Database")
 (def media-directory-name "Media")
 (def filestore-directory-name "FileStore")
@@ -51,13 +50,29 @@
   [dir]
   (format "%s%s%s" (config-dir dir) SystemUtils/FILE_SEPARATOR config-filename))
 
+(defn get-os
+  "Return a key representing the OS Camelot is running upon."
+  []
+  (cond
+    SystemUtils/IS_OS_WINDOWS :windows
+    SystemUtils/IS_OS_LINUX :linux
+    SystemUtils/IS_OS_MAC_OSX :macosx
+    :else :other))
+
+(defn get-directory-separator
+  "Return the path separator for the OS Camelot is running upon."
+  []
+  (if (= :windows (get-os))
+    "\\"
+    "/"))
+
 (defn get-config-location
   [loc-fn]
-  (cond
-    SystemUtils/IS_OS_WINDOWS (loc-fn (env :appdata))
-    SystemUtils/IS_OS_LINUX (loc-fn (str (env :home) "/.config"))
-    SystemUtils/IS_OS_MAC_OSX (loc-fn (str (env :home) "/Library/Preferences"))
-    :else (loc-fn (str (env :pwd) ".camelot"))))
+  (case (get-os)
+    :windows (loc-fn (env :appdata))
+    :linux (loc-fn (str (env :home) "/.config"))
+    :macosx (loc-fn (str (env :home) "/Library/Preferences"))
+    :other (loc-fn (str (env :pwd) ".camelot"))))
 
 (defn get-config-file
   "Return the OS-specific path to the configuration file."
@@ -91,11 +106,11 @@
 (defn get-std-db-path
   "Return the OS-specific path to the database directory."
   []
-  (cond
-      SystemUtils/IS_OS_WINDOWS (db-path (env :localappdata))
-      SystemUtils/IS_OS_LINUX (db-path (str (env :home) "/.local/share"))
-      SystemUtils/IS_OS_MAC_OSX (db-path (str (env :home) "/Library/Application Support"))
-      :else (db-path ".")))
+  (case (get-os)
+    :windows (db-path (env :localappdata))
+    :linux (db-path (str (env :home) "/.local/share"))
+    :macosx (db-path (str (env :home) "/Library/Application Support"))
+    :other (db-path ".")))
 
 (def ^:dynamic *db-override* nil)
 
@@ -119,11 +134,11 @@
 (defn get-std-media-path
   "Return the OS specific path to the media directory."
   []
-  (cond
-      SystemUtils/IS_OS_WINDOWS (media-path (env :localappdata))
-      SystemUtils/IS_OS_LINUX (media-path (str (env :home) "/.local/share"))
-      SystemUtils/IS_OS_MAC_OSX (media-path (str (env :home) "/Library/Application Support"))
-      :else (media-path ".")))
+  (case (get-os)
+    :windows (media-path (env :localappdata))
+    :linux (media-path (str (env :home) "/.local/share"))
+    :macosx (media-path (str (env :home) "/Library/Application Support"))
+    :other (media-path ".")))
 
 (defn get-media-path
   "Return the path to the media directory."
@@ -141,11 +156,11 @@
 (defn get-std-filestore-path
   "Return the OS specific path to the filestore directory."
   []
-  (cond
-      SystemUtils/IS_OS_WINDOWS (filestore-path (env :localappdata))
-      SystemUtils/IS_OS_LINUX (filestore-path (str (env :home) "/.local/share"))
-      SystemUtils/IS_OS_MAC_OSX (filestore-path (str (env :home) "/Library/Application Support"))
-      :else (filestore-path ".")))
+  (case (get-os)
+    :windows (filestore-path (env :localappdata))
+    :linux (filestore-path (str (env :home) "/.local/share"))
+    :macosx (filestore-path (str (env :home) "/Library/Application Support"))
+    :other (filestore-path ".")))
 
 (defn filestore-base-path
   "Return the base path to the filestore directory."

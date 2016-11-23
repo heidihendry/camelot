@@ -2,21 +2,56 @@
   "Provide high-level handling for bulk import support.  Bulk import consists
   of template generation, field mapping, validation and the actual import
   itself."
-  (:require [ring.util.response :as r]
-            [camelot.import.dirtree :as dt]
-            [camelot.util.model :as model]
-            [clojure.data.csv :as csv]
-            [clj-time.format :as tf]
-            [clj-time.local :as tl]
-            [camelot.import.metadata-utils :as mutil]
-            [schema.core :as s]
-            [clojure.string :as str]
-            [clojure.edn :as edn]
-            [camelot.util.trap-station :as trap]
-            [clojure.java.io :as io]
-            [camelot.util.java-file :as jf]))
+  (:require
+   [ring.util.response :as r]
+   [camelot.import.dirtree :as dt]
+   [camelot.util.model :as model]
+   [camelot.util.config :as config]
+   [clojure.data.csv :as csv]
+   [clj-time.format :as tf]
+   [clj-time.local :as tl]
+   [camelot.import.metadata-utils :as mutil]
+   [schema.core :as s]
+   [clojure.string :as str]
+   [clojure.edn :as edn]
+   [camelot.util.trap-station :as trap]
+   [clojure.java.io :as io]
+   [camelot.util.java-file :as jf]))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
+
+(defn detect-separator
+  [path]
+  (cond
+    (nil? path) (config/get-directory-separator)
+    (re-find #"^[A-Z]:(?:\\|$)" path) "\\"
+    :else "/"))
+
+(defn resolve-server-directory
+  "Resolve a directory relative to the configured server directory, if any."
+  [server-base-dir client-dir]
+  (let [svr-sep (detect-separator server-base-dir)
+        svr-path (clojure.string/split (or server-base-dir "")
+                                       (re-pattern (str "\\" svr-sep)))]
+    (->> client-dir
+         detect-separator
+         (str "\\")
+         re-pattern
+         (clojure.string/split client-dir)
+         (drop-while #(not= % (last svr-path)))
+         rest
+         (apply conj svr-path)
+         (str/join svr-sep))))
+
+(defn resolve-directory
+  "Resolve a corresponding server directory for a given 'client' directory."
+  [state client-dir]
+  {:pre (nil? client-dir)}
+  (let [root (-> state :config :root-path)
+        res (resolve-server-directory root client-dir)]
+    (io/file (if (empty? res)
+               client-dir
+               res))))
 
 (defn calculate-gps-latitude
   [data]
