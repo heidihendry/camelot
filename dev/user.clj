@@ -18,13 +18,13 @@
 
 (defn migrate
   []
-  (camelot.migrate/migrate))
+  (camelot.db.migrate/migrate))
 
 (defn run []
-  (camelot.migrate/migrate)
+  (camelot.db.migrate/migrate)
   (figwheel/start-figwheel!))
 
 (def browser-repl figwheel/cljs-repl)
 
 (defn state []
-  (camelot.application/gen-state (camelot.util.config/config)))
+  (camelot.app.state/gen-state (camelot.util.config/config)))

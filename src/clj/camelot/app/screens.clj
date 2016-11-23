@@ -1,14 +1,8 @@
-(ns camelot.application
+(ns camelot.app.screens
   (:require
    [smithy.core :refer [defsmith] :as smithy]
    [environ.core :refer [env]]
    [camelot.translation.core :as tr]))
-
-(defn gen-state
-  "Return the global application state.
-Currently the only application state is the user's configuration."
-  [conf]
-  {:config conf})
 
 (defn nav-menu
   "Main navigation menu structure."

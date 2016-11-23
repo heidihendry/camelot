@@ -1,11 +1,10 @@
-(ns camelot.model.survey-taxonomy
+(ns camelot.db.survey-taxonomy
   (:require
    [yesql.core :as sql]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.db :as db]
+   [camelot.db.core :as db]
    [camelot.translation.core :as tr]
-   [camelot.application :as app]
    [camelot.util.config :as config]))
 
 ;; NOTE: 030_survey_taxonomy_migration needs to be updated should this model

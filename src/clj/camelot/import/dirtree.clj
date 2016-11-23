@@ -2,9 +2,9 @@
   (:require
    [clojure.java.io :as io]
    [clojure.string :as str]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.model.import :as mi]
+   [camelot.import.model :as mi]
    [camelot.util.java-file :as f]
    [camelot.util.file :as file-util]
    [camelot.util.java-file :as jf])

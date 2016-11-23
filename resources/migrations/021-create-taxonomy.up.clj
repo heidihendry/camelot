@@ -1,10 +1,10 @@
-(require '[camelot.model.taxonomy :as taxonomy])
+(require '[camelot.db.taxonomy :as taxonomy])
 (require '[yesql.core :as sql])
-(require '[camelot.db :as db])
+(require '[camelot.db.core :as db])
 (require '[clojure.string :as str])
-(require '[camelot.application :as app])
+(require '[camelot.app.state :as state])
 (require '[camelot.util.config :as config])
-(require '[camelot.model.species :as species])
+(require '[camelot.db.species :as species])
 (require '[clojure.java.jdbc :as jdbc])
 
 (sql/defqueries "sql/migration-helpers/021.sql" {:connection db/spec})
@@ -47,6 +47,6 @@
       (jdbc/db-do-commands db/spec (str "ALTER TABLE sighting DROP CONSTRAINT "
                                         (:constraintname c))))))
 
-(db/with-transaction [s (app/gen-state (config/config))]
+(db/with-transaction [s (state/gen-state (config/config))]
   (-m021-remove-unnecessary-constraints s)
   (-m021-species-genus-migration s))

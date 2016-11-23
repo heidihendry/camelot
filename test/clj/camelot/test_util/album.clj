@@ -1,6 +1,6 @@
 (ns camelot.test-util.album
   (:require
-   [camelot.model.import :as mi]
+   [camelot.import.model :as mi]
    [clojure.java.io :as io]
    [clj-time.core :as t]
    [clj-time.core :as t]))

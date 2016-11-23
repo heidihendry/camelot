@@ -1,10 +1,10 @@
-(ns camelot.db
+(ns camelot.db.core
   (:require
    [camelot.util.config :as settings]
    [clj-time.coerce :as tc]
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State]]
    [schema.core :as s]
    [camelot.util.java-file :as f]
    [clojure.java.io :as io])

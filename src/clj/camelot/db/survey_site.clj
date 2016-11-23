@@ -1,10 +1,10 @@
-(ns camelot.model.survey-site
+(ns camelot.db.survey-site
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
-   [camelot.model.state :refer [State]]
-   [camelot.db :as db]
-   [camelot.model.media :as media]))
+   [camelot.app.state :refer [State]]
+   [camelot.db.core :as db]
+   [camelot.db.media :as media]))
 
 (sql/defqueries "sql/survey-sites.sql" {:connection db/spec})
 

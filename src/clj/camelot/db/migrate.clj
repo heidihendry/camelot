@@ -1,9 +1,9 @@
-(ns camelot.migrate
+(ns camelot.db.migrate
   (:require
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
    [resauce.core :as resauce]
-   [camelot.db :as db]
+   [camelot.db.core :as db]
    [ragtime
     [core :as rtc]
     [protocols :as rtp]])

@@ -1,12 +1,12 @@
-(ns camelot.model.trap-station-session
+(ns camelot.db.trap-station-session
   (:require
    [schema.core :as s]
-   [camelot.db :as db]
+   [camelot.db.core :as db]
    [clj-time.format :as tf]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State]]
    [yesql.core :as sql]
    [clj-time.core :as t]
-   [camelot.model.media :as media]))
+   [camelot.db.media :as media]))
 
 (sql/defqueries "sql/trap-station-sessions.sql" {:connection db/spec})
 

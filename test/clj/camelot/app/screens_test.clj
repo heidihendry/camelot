@@ -1,7 +1,7 @@
-(ns camelot.application-test
+(ns camelot.app.screens-test
   (:require
    [camelot.test-util.state :as state]
-   [camelot.application :as sut]
+   [camelot.app.screens :as sut]
    [clojure.test :refer :all]))
 
 (defn gen-state-helper

@@ -3,7 +3,7 @@
    [camelot.util.config :as conf]
    [clojure.edn :as edn]
    [camelot.util.cursorise :refer [cursorise decursorise]]
-   [camelot.application :as app]
+   [camelot.app.state :as state]
    [clojure.tools.logging :as log]
    [ring.util.response :as r]
    [clj-time.coerce :as c]))
@@ -122,7 +122,7 @@
   [f id-str session]
   (let [id (as-long id-str)]
     (-> (conf/config session)
-        (app/gen-state)
+        (state/gen-state)
         (f id)
         (r/response))))
 
@@ -135,14 +135,14 @@
   the second argument to `f'."
   ([f resource-key session]
    (-> (conf/config session)
-       (app/gen-state)
+       (state/gen-state)
        (f)
        (add-resource-uris resource-key)
        (r/response)))
   ([f resource-key id-str session]
    (let [id (as-long id-str)]
      (-> (conf/config session)
-         (app/gen-state)
+         (state/gen-state)
          (f id)
          (add-resource-uris resource-key)
          (r/response)))))
@@ -154,7 +154,7 @@
   [f id-str session]
   (let [id (as-long id-str)]
     (-> (conf/config session)
-        (app/gen-state)
+        (state/gen-state)
         (f id)
         (cursorise)
         (r/response))))
@@ -169,7 +169,7 @@
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))
          id (as-long id-str)]
      (-> (conf/config session)
-         (app/gen-state)
+         (state/gen-state)
          (f id stddata)
          (cursorise)
          (r/response))))
@@ -177,7 +177,7 @@
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))
          id (as-long id-str)]
      (-> (conf/config session)
-         (app/gen-state)
+         (state/gen-state)
          (f id stddata)
          (cursorise)
          (r/response)))))
@@ -190,14 +190,14 @@
   ([f data session]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))]
      (-> (conf/config session)
-         (app/gen-state)
+         (state/gen-state)
          (f stddata)
          (cursorise)
          (r/response))))
   ([f ctor data session]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))]
      (-> (conf/config session)
-         (app/gen-state)
+         (state/gen-state)
          (f stddata)
          (cursorise)
          (r/response)))))
@@ -209,7 +209,7 @@
   [f id-str session]
   (let [id (as-long id-str)]
     (-> (conf/config session)
-        (app/gen-state)
+        (state/gen-state)
         (f id)
         ((fn [v] (hash-map :data v)))
         (r/response))))

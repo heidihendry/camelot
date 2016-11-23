@@ -6,11 +6,11 @@
    [camelot.util.java-file :as jf]
    [camelot.translation.core :as tr]
    [camelot.import.dirtree :as dt]
-   [camelot.model.import :as mi]
+   [camelot.import.model :as mi]
    [camelot.import.photo :as photo]
    [camelot.import.validation :refer [list-problems check-invalid-photos]]
    [clojure.java.io :as io]
-   [camelot.model.trap-station-session-camera :as trap-station-session-camera]))
+   [camelot.db.trap-station-session-camera :as trap-station-session-camera]))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."

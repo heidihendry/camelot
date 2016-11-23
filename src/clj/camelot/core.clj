@@ -3,8 +3,8 @@
   Core initialisation."
   (:require
    [camelot.util.transit :as tutil]
-   [camelot.migrate :refer [migrate]]
-   [camelot.routes :refer [app-routes]]
+   [camelot.db.migrate :refer [migrate]]
+   [camelot.app.routes :refer [app-routes]]
    [environ.core :refer [env]]
    [ring.adapter.jetty :refer [run-jetty]]
    [clojure.tools.nrepl.server :as nrepl]

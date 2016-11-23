@@ -1,10 +1,10 @@
-(ns camelot.model.species-mass
+(ns camelot.db.species-mass
   "Species mass models and data access."
   (:require
    [yesql.core :as sql]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.db :as db]))
+   [camelot.db.core :as db]))
 
 (sql/defqueries "sql/species-mass.sql" {:connection db/spec})
 

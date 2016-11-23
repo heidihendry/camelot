@@ -1,13 +1,13 @@
-(ns camelot.model.survey
+(ns camelot.db.survey
   "Survey data model and persistence."
   (:require
    [schema.core :as s]
-   [camelot.db :as db]
+   [camelot.db.core :as db]
    [yesql.core :as sql]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State]]
    [camelot.util.java-file :as f]
    [clojure.java.io :as io]
-   [camelot.model.media :as media]
+   [camelot.db.media :as media]
    [camelot.util.java-file :as jf]
    [camelot.util.config :as config]))
 

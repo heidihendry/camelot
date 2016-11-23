@@ -3,7 +3,7 @@
    [clj-http.client :as http]
    [clojure.core.async :refer [go <!]]
    [cheshire.core :as json]
-   [camelot.model.taxonomy :as taxonomy]
+   [camelot.db.taxonomy :as taxonomy]
    [camelot.handler.associated-taxonomy :as ataxonomy]))
 
 (def service-url "http://www.catalogueoflife.org/col/webservice")

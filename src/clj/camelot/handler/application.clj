@@ -1,7 +1,7 @@
 (ns camelot.handler.application
   "Application-level data request handler."
   (:require
-   [camelot.application :as app]
+   [camelot.app.screens :as screens]
    [camelot.import.util :as putil]
    [clojure.java.io :as io]
    [camelot.util
@@ -31,7 +31,7 @@
                    []
                    md)))
 
-(def metadata-paths (flatten-metadata-structure app/metadata-structure))
+(def metadata-paths (flatten-metadata-structure screens/metadata-structure))
 
 (defn get-metadata
   "Return paths alongside a (translated) description of the metadata represented
@@ -48,4 +48,4 @@
 (defn get-nav-menu
   "Return the application navigation menu."
   [state]
-  (app/nav-menu state))
+  (screens/nav-menu state))

@@ -4,10 +4,10 @@
    [clj-time.core :as t]
    [clojure.edn :as edn]
    [schema.core :as s]
-   [camelot.model.import :as mi]
+   [camelot.import.model :as mi]
    [clojure.tools.logging :as log])
   (:import
-   (camelot.model.import ImportPhotoMetadata)))
+   (camelot.import.model ImportPhotoMetadata)))
 
 (s/defn gps-parts-to-decimal :- s/Num
   "Return the GPS parts as a decimal."

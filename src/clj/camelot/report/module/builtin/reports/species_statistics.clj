@@ -1,6 +1,6 @@
 (ns camelot.report.module.builtin.reports.species-statistics
   (:require
-   [camelot.model.taxonomy :as taxonomy]
+   [camelot.db.taxonomy :as taxonomy]
    [camelot.report.module.core :as module]
    [clojure.edn :as edn]
    [camelot.translation.core :as tr]))

@@ -1,17 +1,14 @@
 (ns camelot.report.core
   "Generate a report from a DSL."
   (:require
-   [camelot
-    [application :as app]
-    [db :as db]]
-   [camelot.model.state :refer [State]]
+   [camelot.db.core :as db]
+   [camelot.app.state :refer [State]]
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
    [camelot.translation.core :as tr]
    [camelot.util.config :as config]
-   [clj-time
-    [local :as tl]
-    [format :as tf]]
+   [clj-time.local :as tl]
+   [clj-time.format :as tf]
    [clojure.data.csv :as csv]
    [clojure.set :as set]
    [ring.util.response :as r]

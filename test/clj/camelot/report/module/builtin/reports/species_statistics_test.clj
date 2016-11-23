@@ -1,12 +1,11 @@
 (ns camelot.report.module.builtin.reports.species-statistics-test
   (:require
-   [camelot.application :as app]
    [camelot.report.core :as sut]
    [camelot.test-util.state :as state]
    [clj-time.core :as t]
    [clojure.string :as str]
    [clojure.test :refer :all :exclude [report]]
-   [camelot.model.taxonomy :as taxonomy]))
+   [camelot.db.taxonomy :as taxonomy]))
 
 (defn gen-state-helper
   [config]

@@ -6,11 +6,11 @@
    [clojure.data :refer [diff]]
    [clojure.test :refer :all]
    [schema.test :as st]
-   [camelot.application :as app]))
+   [camelot.test-util.state :as state]))
 
 (defn gen-state-helper
   [config]
-  (app/gen-state (assoc config :language :en)))
+  (state/gen-state (assoc config :language :en)))
 
 (use-fixtures :once st/validate-schemas)
 

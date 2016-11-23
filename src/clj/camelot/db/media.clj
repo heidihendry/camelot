@@ -1,10 +1,10 @@
-(ns camelot.model.media
+(ns camelot.db.media
   "Media models and data access."
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
-   [camelot.model.state :refer [State]]
-   [camelot.db :as db]
+   [camelot.app.state :refer [State]]
+   [camelot.db.core :as db]
    [clojure.java.io :as io]
    [camelot.util.java-file :as jf]
    [camelot.util.config :as config]

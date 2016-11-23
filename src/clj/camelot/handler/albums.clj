@@ -2,7 +2,7 @@
   (:require
    [camelot.import.album :as a]
    [camelot.util.config :as conf]
-   [camelot.application :as app]
+   [camelot.app.state :as state]
    [compojure.core :refer [ANY context DELETE GET POST PUT]]
    [ring.util.response :as r]))
 
@@ -10,7 +10,7 @@
   "Return all albums for the current configuration."
   [session]
   (let [c (conf/config session)]
-    (r/response (a/read-albums (app/gen-state c) (:root-path c)))))
+    (r/response (a/read-albums (state/gen-state c) (:root-path c)))))
 
 (def routes
   "Album routes"

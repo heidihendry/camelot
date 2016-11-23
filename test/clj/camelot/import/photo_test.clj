@@ -2,7 +2,7 @@
   (:require
    [camelot.fixtures.exif-test-metadata :refer :all]
    [camelot.import.photo :as photo]
-   [camelot.application :as app]
+   [camelot.test-util.state :as state]
    [clj-time.core :as t]
    [clojure.data :refer [diff]]
    [clojure.test :refer :all]
@@ -13,22 +13,20 @@
 (deftest test-metadata-parsing
   (testing "Metadata parsing"
     (testing "Maginon metadata normalises okay"
-      (let [config []
-            output (photo/parse (app/gen-state config) maginon-metadata)]
+      (let [output (photo/parse (state/gen-state {}) maginon-metadata)]
         (is (= (:filesize output) 1175819))
         (is (= (:make (:camera output)) "Maginon"))
         (is (= (:datetime output) (t/date-time 2014 4 11 16 37 52)))))
 
     (testing "Cuddeback metadata normalises okay"
-      (let [config []
-            output (photo/parse (app/gen-state config) cuddeback-metadata)]
+      (let [output (photo/parse (state/gen-state {}) cuddeback-metadata)]
         (is (= (:filesize output) 513653))
         (is (= (:make (:camera output)) "CUDDEBACK"))
         (is (= (:datetime output) (t/date-time 2014 4 11 19 47 46)))))
 
     (testing "Metadata with nil required fields is not valid"
       (let [config {:language :en}
-            res (photo/parse (app/gen-state config) {})]
+            res (photo/parse (state/gen-state config) {})]
         (is (= (contains? res :invalid) true))
         (is (= (boolean (re-find #"Date/Time" (:invalid res))) true))))))
 

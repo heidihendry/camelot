@@ -1,6 +1,5 @@
 (ns camelot.test-util.state
   (:require
-   [camelot.application :as app]
    [clj-time.coerce :as tc]
    [clj-time.core :as t]))
 

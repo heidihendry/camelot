@@ -1,11 +1,10 @@
-(ns camelot.model.survey-file
+(ns camelot.db.survey-file
   (:require
    [yesql.core :as sql]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.db :as db]
+   [camelot.db.core :as db]
    [camelot.translation.core :as tr]
-   [camelot.application :as app]
    [camelot.util.config :as config]
    [clojure.java.io :as io]
    [ring.util.response :as r]

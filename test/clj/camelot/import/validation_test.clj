@@ -1,7 +1,7 @@
 (ns camelot.import.validation-test
   (:require
    [camelot.import.validation :refer :all]
-   [camelot.application :as app]
+   [camelot.test-util.state :as state]
    [clj-time.core :as t]
    [clojure.test :refer :all]
    [schema.test :as st]))
@@ -17,7 +17,7 @@
 
 (defn gen-state-helper
   [config]
-  (app/gen-state (assoc config :language :en)))
+  (state/gen-state (assoc config :language :en)))
 
 (def night (t/date-time 2015 1 1 0 0 0))
 (def day (t/date-time 2015 1 1 12 0 0))

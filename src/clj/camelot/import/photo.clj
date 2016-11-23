@@ -3,10 +3,10 @@
    [clj-time.core :as t]
    [clj-time.coerce :as tc]
    [schema.core :as s]
-   [camelot.model.import :as mi]
+   [camelot.import.model :as mi]
    [camelot.import.metadata-utils :as metadata])
   (:import
-   (camelot.model.import ImportPhotoMetadata)))
+   (camelot.import.model ImportPhotoMetadata)))
 
 (s/defn get-time-difference :- s/Num
   "Return the difference between two dates in seconds."

@@ -1,12 +1,11 @@
-(ns camelot.model.camera-status
+(ns camelot.db.camera-status
   "Camera status model and data access."
   (:require
    [yesql.core :as sql]
-   [camelot.model.state :refer [State]]
+   [camelot.app.state :refer [State] :as state]
    [schema.core :as s]
-   [camelot.db :as db]
+   [camelot.db.core :as db]
    [camelot.translation.core :as tr]
-   [camelot.application :as app]
    [camelot.util.config :as config]))
 
 (sql/defqueries "sql/camera-status.sql" {:connection db/spec})
@@ -16,7 +15,7 @@
 (defn translate-status
   "Translate a camera status to something readable."
   ([status]
-   (tr/translate (app/gen-state (config/config))
+   (tr/translate (state/gen-state (config/config))
                  (keyword status)))
   ([state status]
    (tr/translate (:config state) (keyword status))))
@@ -77,7 +76,7 @@
 (s/defn default-camera-status :- (s/maybe CameraStatus)
   "Return the camera status which should be assigned to new cameras."
   []
-  (get-specific-with-description (app/gen-state (config/config))
+  (get-specific-with-description (state/gen-state (config/config))
                                  camera-available))
 
 (s/defn active-status-id

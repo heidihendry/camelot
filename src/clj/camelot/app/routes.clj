@@ -1,6 +1,7 @@
-(ns camelot.routes
+(ns camelot.app.routes
   (:require
-   [camelot.application :as app]
+   [camelot.app.screens :as screens]
+   [camelot.app.state :as state]
    [camelot.handler.albums :as albums]
    [camelot.handler.application :as application]
    [camelot.handler.associated-taxonomy :as ataxonomy]
@@ -10,23 +11,23 @@
    [camelot.handler.bulk-import :as bulk-import]
    [camelot.import.db :as im.db]
    [camelot.services.species-search :as species-search]
-   [camelot.model.camera :as camera]
-   [camelot.model.camera-status :as camera-status]
-   [camelot.model.media :as media]
-   [camelot.model.photo :as photo]
-   [camelot.model.sighting :as sighting]
-   [camelot.model.site :as site]
-   [camelot.model.taxonomy :as taxonomy]
-   [camelot.model.species-mass :as species-mass]
-   [camelot.model.survey :as survey]
-   [camelot.model.survey-site :as survey-site]
-   [camelot.model.survey-file :as survey-file]
-   [camelot.model.trap-station :as trap-station]
-   [camelot.model.trap-station-session :as trap-station-session]
-   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
-   [camelot.model.deployment :as deployment]
-   [camelot.model.camera-deployment :as camera-deployment]
-   [camelot.model.library :as library]
+   [camelot.db.camera :as camera]
+   [camelot.db.camera-status :as camera-status]
+   [camelot.db.media :as media]
+   [camelot.db.photo :as photo]
+   [camelot.db.sighting :as sighting]
+   [camelot.db.site :as site]
+   [camelot.db.taxonomy :as taxonomy]
+   [camelot.db.species-mass :as species-mass]
+   [camelot.db.survey :as survey]
+   [camelot.db.survey-site :as survey-site]
+   [camelot.db.survey-file :as survey-file]
+   [camelot.db.trap-station :as trap-station]
+   [camelot.db.trap-station-session :as trap-station-session]
+   [camelot.db.trap-station-session-camera :as trap-station-session-camera]
+   [camelot.db.deployment :as deployment]
+   [camelot.db.camera-deployment :as camera-deployment]
+   [camelot.db.library :as library]
    [camelot.report.core :as report]
    [camelot.util.config :as conf]
    [camelot.util.rest :as rest]
@@ -114,20 +115,20 @@
            (GET "/:id/files/:file-id" [id file-id] (rest/specific-resource survey-file/get-specific
                                                                            file-id session))
            (GET "/:id/files/:file-id/download" [id file-id]
-                (survey-file/download (app/gen-state (conf/config session))
+                (survey-file/download (state/gen-state (conf/config session))
                                       (edn/read-string file-id)))
            (POST "/files" {params :multipart-params}
-                 (r/response (survey-file/upload! (app/gen-state (conf/config session))
+                 (r/response (survey-file/upload! (state/gen-state (conf/config session))
                                                   (edn/read-string (get params "survey-id"))
                                                    (get params "file"))))
            (DELETE "/:id/files/:file-id" [id file-id] (rest/delete-resource survey-file/delete!
                                                                             file-id session))
            (GET "/:id" [id] (rest/specific-resource survey/get-specific id session))
            (GET "/bulkimport/template" [] (bulk-import/metadata-template
-                                           (app/gen-state (conf/config session))))
+                                           (state/gen-state (conf/config session))))
            (POST "/bulkimport/columnmap" {params :multipart-params}
                  (->> (get params "file")
-                      (bulk-import/column-map-options (app/gen-state (conf/config session)))
+                      (bulk-import/column-map-options (state/gen-state (conf/config session)))
                       r/response))
            (PUT "/:id" [id data] (rest/update-resource survey/update! id
                                                        survey/tsurvey data session))
@@ -172,11 +173,11 @@
            (GET "/photo/:filename" [filename] (let [style :original]
                                                 {:status 200
                                                  :headers {"Content-Type" "image/jpeg; charset=utf-8"}
-                                                 :body (media/read-media-file (app/gen-state (conf/config session))
+                                                 :body (media/read-media-file (state/gen-state (conf/config session))
                                                                               filename (keyword style))}))
            (GET "/photo/:filename/:style" [filename style] {:status 200
                                                             :headers {"Content-Type" "image/jpeg; charset=utf-8"}
-                                                            :body (media/read-media-file (app/gen-state (conf/config session))
+                                                            :body (media/read-media-file (state/gen-state (conf/config session))
                                                                                          filename (keyword style))}))
 
   (context "/photos" {session :session}
@@ -211,12 +212,12 @@
            (GET "/alternatives/:id" [id] (rest/list-resources species-mass/get-all :species-mass session)))
 
   (context "/application" {session :session}
-           (GET "/metadata" [] (r/response (application/get-metadata (app/gen-state (conf/config session)))))
+           (GET "/metadata" [] (r/response (application/get-metadata (state/gen-state (conf/config session)))))
            (GET "/" [] (r/response {:version (application/get-version)
-                                    :nav (application/get-nav-menu (app/gen-state (conf/config session)))})))
+                                    :nav (application/get-nav-menu (state/gen-state (conf/config session)))})))
 
   (context "/screens" {session :session}
-           (GET "/" [] (r/response (app/all-screens (app/gen-state (conf/config session))))))
+           (GET "/" [] (r/response (screens/all-screens (state/gen-state (conf/config session))))))
 
   (context "/import" {session :session}
            (POST "/options" [data] (r/response (im.db/options data)))
@@ -225,34 +226,34 @@
   (context "/report" {session :session}
            (GET "/:report/download" {params :params}
                 (report/export
-                 (app/gen-state (conf/config session))
+                 (state/gen-state (conf/config session))
                  (keyword (:report params)) (rest/coerce-string-fields params)))
            (GET "/:report" [report] (r/response (report/get-configuration
-                                                 (app/gen-state (conf/config session))
+                                                 (state/gen-state (conf/config session))
                                                  (keyword report))))
-           (GET "/" [] (r/response (report/available-reports (app/gen-state (conf/config session))))))
+           (GET "/" [] (r/response (report/available-reports (state/gen-state (conf/config session))))))
 
   (context "/library" {session :session}
-           (GET "/" [] (r/response (library/build-library (app/gen-state (conf/config session)))))
-           (GET "/:id" [id] (r/response (library/build-library-for-survey (app/gen-state (conf/config session))
+           (GET "/" [] (r/response (library/build-library (state/gen-state (conf/config session)))))
+           (GET "/:id" [id] (r/response (library/build-library-for-survey (state/gen-state (conf/config session))
                                                                           (edn/read-string id))))
            (POST "/media/flags" [data] (r/response (library/update-bulk-media-flags
-                                                    (app/gen-state (conf/config session)) data)))
-           (PUT "/identify" [data] (r/response (library/identify (app/gen-state (conf/config session))
+                                                    (state/gen-state (conf/config session)) data)))
+           (PUT "/identify" [data] (r/response (library/identify (state/gen-state (conf/config session))
                                                                  data))))
   (context "/species" {session :session}
            (GET "/search" {{search :search} :params}
                 (r/response (species-search/query-search
-                             (app/gen-state (conf/config session))
+                             (state/gen-state (conf/config session))
                              {:search search})))
            (POST "/create" [data] (r/response (species-search/ensure-survey-species-known
-                                               (app/gen-state (conf/config session))
+                                               (state/gen-state (conf/config session))
                                                (:species data)
                                                (:survey-id data)))))
 
   (context "/capture" {session :session}
            (POST "/upload" {params :multipart-params}
-                 (r/response (capture/import-capture! (app/gen-state (conf/config session))
+                 (r/response (capture/import-capture! (state/gen-state (conf/config session))
                                                       (edn/read-string (get params "session-camera-id"))
                                                       (get params "file")))))
   (context "/deployment" {session :session}

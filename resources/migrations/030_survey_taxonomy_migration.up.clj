@@ -1,9 +1,12 @@
 (require '[clojure.math.combinatorics :as combinatorics])
 (require '[yesql.core :as sql])
-(require '[camelot.db :as db])
-(require '[camelot.model.state :refer [State]])
+(require '[camelot.db.core :as db])
+(require '[camelot.app.state :refer [State] :as state])
 (require '[clojure.java.jdbc :as jdbc])
 (require '[schema.core :as s])
+(require '[camelot.db.core :as db])
+(require '[camelot.util.config :as config])
+(require '[camelot.db.survey-taxonomy :as survey-taxonomy])
 
 (sql/defqueries "sql/migration-helpers/030.sql" {:connection db/spec})
 
@@ -23,10 +26,10 @@
 
 (s/defn -m030-->survey-taxonomy
   [[survey taxonomy]]
-  (camelot.model.survey-taxonomy/tsurvey-taxonomy {:survey-id survey
+  (survey-taxonomy/tsurvey-taxonomy {:survey-id survey
                                                    :taxonomy-id taxonomy}))
 
-(camelot.db/with-transaction
-  [s (camelot.application/gen-state (camelot.util.config/config))]
+(db/with-transaction
+  [s (state/gen-state (config/config))]
   (doseq [p (-m030-all-pairs s)]
-    (camelot.model.survey-taxonomy/create! s (-m030-->survey-taxonomy p))))
+    (survey-taxonomy/create! s (-m030-->survey-taxonomy p))))

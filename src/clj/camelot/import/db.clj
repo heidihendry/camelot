@@ -1,19 +1,19 @@
 (ns camelot.import.db
   (:require
-   [camelot.model.survey :as survey]
-   [camelot.model.survey-site :as survey-site]
-   [camelot.model.trap-station :as trap-station]
-   [camelot.model.trap-station-session :as trap-station-session]
-   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
-   [camelot.model.media :as media]
-   [camelot.model.photo :as photo]
-   [camelot.model.sighting :as sighting]
-   [camelot.model.taxonomy :as taxonomy]
-   [camelot.model.site :as site]
-   [camelot.model.camera :as camera]
-   [camelot.model.camera-status :as camera-status]
+   [camelot.db.survey :as survey]
+   [camelot.db.survey-site :as survey-site]
+   [camelot.db.trap-station :as trap-station]
+   [camelot.db.trap-station-session :as trap-station-session]
+   [camelot.db.trap-station-session-camera :as trap-station-session-camera]
+   [camelot.db.media :as media]
+   [camelot.db.photo :as photo]
+   [camelot.db.sighting :as sighting]
+   [camelot.db.taxonomy :as taxonomy]
+   [camelot.db.site :as site]
+   [camelot.db.camera :as camera]
+   [camelot.db.camera-status :as camera-status]
    [clojure.string :as str]
-   [camelot.application :as app]
+   [camelot.app.state :as state]
    [camelot.util.config :as conf]
    [clojure.edn :as edn]))
 
@@ -31,7 +31,7 @@
 (defn- maybe-get
   [resource v]
   (if v
-    (let [state (app/gen-state (conf/config))]
+    (let [state (state/gen-state (conf/config))]
       (resource state v))
     []))
 
@@ -47,7 +47,7 @@
 (defn options
   "Return all albums for the current configuration."
   [params]
-  (let [surveys (canonicalise (survey/get-all (app/gen-state (conf/config)))
+  (let [surveys (canonicalise (survey/get-all (state/gen-state (conf/config)))
                               :survey-id :survey-name)
         survey-sites (canonicalise (maybe-get survey-site/get-all (:survey params))
                                    :survey-site-id :site-name)

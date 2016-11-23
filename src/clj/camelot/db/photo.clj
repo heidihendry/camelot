@@ -1,9 +1,9 @@
-(ns camelot.model.photo
+(ns camelot.db.photo
   "Photo models and data access."
   (:require
    [schema.core :as s]
-   [camelot.db :as db]
-   [camelot.model.state :refer [State]]
+   [camelot.db.core :as db]
+   [camelot.app.state :refer [State]]
    [yesql.core :as sql]))
 
 (sql/defqueries "sql/photos.sql" {:connection db/spec})

@@ -1,4 +1,5 @@
-(ns camelot.model.state
+(ns camelot.app.state
+  "Application state."
   (:require
    [schema.core :as s]))
 
@@ -23,3 +24,9 @@
   {(s/required-key :config) Config
    (s/optional-key :connection) clojure.lang.PersistentArrayMap
    (s/optional-key :camera-status-active-id) s/Int})
+
+(defn gen-state
+  "Return the global application state.
+Currently the only application state is the user's configuration."
+  [conf]
+  {:config conf})

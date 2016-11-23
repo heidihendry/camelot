@@ -1,4 +1,4 @@
-(ns camelot.model.import
+(ns camelot.import.model
   "Data import models."
   (:require
    [schema.core :as s]))

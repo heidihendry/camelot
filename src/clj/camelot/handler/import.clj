@@ -2,7 +2,7 @@
   (:require
    [camelot.import.album :as a]
    [camelot.util.config :as conf]
-   [camelot.application :as app]
+   [camelot.app.state :as state]
    [compojure.core :refer [ANY context DELETE GET POST PUT]]
    [ring.util.response :as r]
    [camelot.import.validation :as validation]
@@ -13,7 +13,7 @@
    [camelot.util.config :as util.config]
    [camelot.util.java-file :as jf]
    [camelot.util.file :as file-util]
-   [camelot.db :as db]
+   [camelot.db.core :as db]
    [mikera.image.core :as image]
    [camelot.import.db :as im.db])
   (:import (org.apache.commons.lang3 SystemUtils)))
@@ -84,7 +84,7 @@
 (defn media
   "Import media"
   [{:keys [folder session-camera-id notes]}]
-  (db/with-transaction [state (app/gen-state (conf/config))]
+  (db/with-transaction [state (state/gen-state (conf/config))]
     (let [[_ sitename _phase cameraname] (file-util/rel-path-components folder)
           root-path (:root-path (:config state))
           full-path (str root-path folder)

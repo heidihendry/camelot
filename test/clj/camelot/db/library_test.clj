@@ -1,10 +1,10 @@
-(ns camelot.model.library-test
+(ns camelot.db.library-test
   (:require
-   [camelot.model.library :as sut]
+   [camelot.db.library :as sut]
    [clojure.test :refer :all]
    [clj-time.core :as t]
    [camelot.test-util.state :as state]
-   [camelot.model.sighting :as sighting]))
+   [camelot.db.sighting :as sighting]))
 
 (def media-fixture
   {:media-id 1
