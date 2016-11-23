@@ -1,6 +1,6 @@
 # Camelot
 
-Camelot is an open-source, web-based tool to help wildlife conservationists with camera trapping.
+Camelot is open-source camera trapping software for wildlife researchers and conservationists.
 
 The latest version of Camelot is: **[1.0.2](http://camelot.bitpattern.com.au/release/camelot-1.0.2.zip)**
 
@@ -9,7 +9,7 @@ Camelot:
 * Makes classifying camera trap photos quick and easy
 * Keeps track of camera trap, camera and species data
 * Gives you a head start on data analysis
-* Plays nicely with other software, such as [CamtrapR](https://cran.r-project.org/web/packages/camtrapR/index.html).
+* Plays nicely with other camera trap software, such as [CamtrapR](https://cran.r-project.org/web/packages/camtrapR/index.html) and [PRESENCE](http://www.mbr-pwrc.usgs.gov/software/doc/presence/presence.html)
 * Lets multiple people use it at the same time
 * Runs on Windows, OSX and Linux
 * Is easy to start using
@@ -608,8 +608,6 @@ Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
 
 ## Acknowledgements
-Species database: Species recognized by Guilbert E., Lace Bugs Database, ver. 1 of Aug 2013 in the Catalogue of Life: 2015 Annual Checklist.
-Developed in consultation: Fauna & Flora International - Vietnam programme
-Input into design was provided by Heidi Hendry, Data Scientist, & Dr Benjamin Rawson, Country Director, of Fauna & Flora International - Vietnam 
-With thanks to the Fauna & Flora International camera trappers in Myanmar and Indonesia, especially Wido Albert, Grant Cornette, and Patrick Oswald for detailed feedback about usability and preferred report outputs. 
-And further thanks to all the Fauna & Flora International Camelot Beta Testers for their support and feedback.
+Camelot was developed in consultation with Fauna & Flora International - Vietnam programme.  Input into design was provided by Heidi Hendry, Data Scientist, & Dr Benjamin Rawson, Country Director, of Fauna & Flora International - Vietnam.
+
+With thanks to the Fauna & Flora International camera trappers in Myanmar and Indonesia, especially Wido Albert, Grant Cornette, and Patrick Oswald for detailed feedback about usability and preferred report outputs.  And further thanks to all the Fauna & Flora International Camelot Beta Testers for their support and feedback.
