@@ -116,8 +116,8 @@
            (DELETE "/:id/files/:file-id" [id file-id] (crud/delete-resource survey-file/delete!
                                                                             file-id session))
            (GET "/:id" [id] (crud/specific-resource survey/get-specific id session))
-           (GET "/bulkimport/template" [] (bulk-import/metadata-template
-                                           (state/gen-state session)))
+           (GET "/bulkimport/template" {params :params}
+                (bulk-import/metadata-template (state/gen-state session) (:dir params)))
            (POST "/bulkimport/columnmap" {params :multipart-params}
                  (->> (get params "file")
                       (bulk-import/column-map-options (state/gen-state session))

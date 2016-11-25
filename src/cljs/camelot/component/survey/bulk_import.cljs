@@ -29,7 +29,12 @@
       (dom/div nil
                (dom/div #js {:className "help-text"}
                         (tr/translate ::help-text-step-1))
-               (dom/a #js {:href "/surveys/bulkimport/template"}
+               (dom/label #js {:className "field-label"}
+                          (tr/translate ::survey-directory))
+               (dom/input #js {:className "field-input"
+                               :onChange #(om/update! data ::survey-directory (.. % -target -value))
+                               :value (::survey-directory data)})
+               (dom/a #js {:href (str "/surveys/bulkimport/template?dir=" (::survey-directory data))}
                       (dom/button #js {:className "btn btn-primary full-width"}
                                   (tr/translate ::download)))
                (dom/div #js {:className "sep"})

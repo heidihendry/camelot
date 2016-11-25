@@ -19,15 +19,20 @@
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
 
+(s/defn relative-path? :- s/Bool
+  [dir :- s/Str]
+  (not (re-find #"^(/|[A-Z]:)" dir)))
+
 (defn detect-separator
   [path]
   (cond
     (nil? path) (state/get-directory-separator)
     (re-find #"^[A-Z]:(?:\\|$)" path) "\\"
+    (and (re-find #"\\" path) (relative-path? path)) "\\"
     :else "/"))
 
-(defn resolve-server-directory
-  "Resolve a directory relative to the configured server directory, if any."
+(defn resolve-absolute-server-directory
+  "Resolve a client directory, unifying it with the configured server directory, if possible."
   [server-base-dir client-dir]
   (let [svr-sep (detect-separator server-base-dir)
         svr-path (clojure.string/split (or server-base-dir "")
@@ -42,16 +47,38 @@
          (apply conj svr-path)
          (str/join svr-sep))))
 
+(defn resolve-relative-server-directory
+  "Resolve a directory relative to the configured server directory, if any."
+  [server-base-dir client-dir]
+  (let [svr-sep (detect-separator server-base-dir)
+        svr-path (clojure.string/split (or server-base-dir "")
+                                       (re-pattern (str "\\" svr-sep)))]
+    (->> client-dir
+         detect-separator
+         (str "\\")
+         re-pattern
+         (clojure.string/split client-dir)
+         (apply conj svr-path)
+         (str/join svr-sep))))
+
+(defn resolve-server-directory
+  "Resolve a directory, either relative to the base-dir or absolutely."
+  [server-base-dir client-dir]
+  (if (and (relative-path? client-dir)
+           (not (nil? server-base-dir)))
+    (resolve-relative-server-directory server-base-dir client-dir)
+    (resolve-absolute-server-directory server-base-dir client-dir)))
+
 (defn resolve-directory
   "Resolve a corresponding server directory for a given 'client' directory."
   [state client-dir]
   {:pre (nil? client-dir)}
   (let [root (-> state :config :root-path)
         res (resolve-server-directory root client-dir)]
-    (file/->file (cond
-               (and (empty? res) (nil? root)) client-dir
-               (empty? res) root
-               :else res))))
+    (cond
+      (and (empty? res) (nil? root)) client-dir
+      (empty? res) root
+      :else res)))
 
 (defn calculate-gps-latitude
   [data]
@@ -93,8 +120,8 @@
     (cons ks (standardise-metadata ks data))))
 
 (defn generate-template
-  [state]
-  (->> (get-in state [:config :root-path])
+  [state client-dir]
+  (->> (resolve-directory state client-dir)
        (dt/directory-metadata-collection state)
        ->data-table))
 
@@ -105,8 +132,8 @@
 
 (defn metadata-template
   "Respond with the template as a CSV."
-  [state]
-  (let [data (to-csv-string (generate-template state))]
+  [state client-dir]
+  (let [data (to-csv-string (generate-template state client-dir))]
     (-> (r/response data)
         (r/content-type "text/csv; charset=utf-8")
         (r/header "Content-Length" (count data))
