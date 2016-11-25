@@ -1,14 +1,13 @@
 (ns camelot.db.survey-file
   (:require
    [yesql.core :as sql]
-   [camelot.app.state :refer [State]]
+   [camelot.app.state :refer [State] :as state]
    [schema.core :as s]
    [camelot.db.core :as db]
    [camelot.translation.core :as tr]
-   [camelot.util.config :as config]
    [clojure.java.io :as io]
    [ring.util.response :as r]
-   [camelot.util.java-file :as jf]))
+   [camelot.util.file :as file]))
 
 (sql/defqueries "sql/survey-file.sql" {:connection db/spec})
 
@@ -83,7 +82,7 @@
   [state :- State
    file-id :- s/Int]
   (if-let [r (get-specific state file-id)]
-    (let [fs (config/get-filestore-file-path (:survey-id r)
+    (let [fs (state/get-filestore-file-path (:survey-id r)
                                              (:survey-file-name r))]
       (io/delete-file fs)
       (db/with-db-keys state -delete! {:survey-file-id file-id}))))
@@ -94,9 +93,9 @@
    {:keys [tempfile :- s/Str
            filename :- s/Str
            size :- s/Int]}]
-  (let [fs (config/get-filestore-file-path survey-id filename)
+  (let [fs (state/get-filestore-file-path survey-id filename)
         rec (get-specific-by-details state survey-id filename)]
-    (io/copy (io/file tempfile) (io/file fs))
+    (io/copy (file/->file tempfile) (file/->file fs))
     (if (nil? rec)
       (create! state (tsurvey-file {:survey-id survey-id
                                     :survey-file-name filename
@@ -106,7 +105,7 @@
 (defn- to-bytes
   [path]
   (let [f (io/file path)
-        data (byte-array (jf/length f))
+        data (byte-array (file/length f))
         stream (java.io.FileInputStream. f)]
     (.read stream data)
     (.close stream)
@@ -116,10 +115,10 @@
   [state :- State
    file-id :- s/Int]
   (if-let [r (get-specific state file-id)]
-    (let [fs (config/get-filestore-file-path (:survey-id r)
+    (let [fs (state/get-filestore-file-path (:survey-id r)
                                              (:survey-file-name r))
-          data (io/input-stream (io/file fs))]
+          data (io/input-stream (file/->file fs))]
       (-> (r/response data)
-          (r/header "Content-Length" (jf/length (io/file fs)))
+          (r/header "Content-Length" (file/length (file/->file fs)))
           (r/header "Content-Disposition"
                     (format "attachment; filename=\"%s\"" (:survey-file-name r)))))))

@@ -3,13 +3,11 @@
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
-   [camelot.app.state :refer [State]]
+   [camelot.app.state :refer [State] :as state]
    [camelot.db.core :as db]
    [clojure.java.io :as io]
-   [camelot.util.java-file :as jf]
-   [camelot.util.config :as config]
+   [camelot.util.file :as file]
    [clojure.string :as str]
-   [camelot.util.java-file :as f]
    [clj-time.format :as tf])
   (:import
    (org.apache.commons.lang3 SystemUtils)))
@@ -135,11 +133,11 @@
 (s/defn delete-files!
   [state :- State
    files :- [s/Str]]
-  (let [mp (config/get-media-path)]
-    (dorun (map #(jf/delete (io/file mp %))
+  (let [mp (state/get-media-path)]
+    (dorun (map #(file/delete (io/file mp %))
                 (mapcat #(list %
-                               (str "preview-" (jf/basename (io/file %) #"\.\w+?$") ".png")
-                               (str "thumb-" (jf/basename (io/file %) #"\.\w+?$") ".png"))
+                               (str "preview-" (file/basename (io/file %) #"\.\w+?$") ".png")
+                               (str "thumb-" (file/basename (io/file %) #"\.\w+?$") ".png"))
                         files)))))
 
 (s/defn delete!
@@ -179,8 +177,8 @@
   (if-let [media (get-specific-by-filename state filename)]
     (io/input-stream
      (if (= variant :original)
-       (io/file (str (config/get-media-path) SystemUtils/FILE_SEPARATOR
+       (io/file (str (state/get-media-path) SystemUtils/FILE_SEPARATOR
                      filename "."
                      (:media-format media)))
-       (io/file (str (config/get-media-path) SystemUtils/FILE_SEPARATOR
+       (io/file (str (state/get-media-path) SystemUtils/FILE_SEPARATOR
                      (name variant) "-" filename ".png"))))))

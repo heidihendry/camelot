@@ -2,7 +2,7 @@
   "Camelot - Camera Trap management software for conservation research.
   Core initialisation."
   (:require
-   [camelot.util.transit :as tutil]
+   [camelot.app.transit :as transit]
    [camelot.db.migrate :refer [migrate]]
    [camelot.app.routes :refer [app-routes]]
    [environ.core :refer [env]]
@@ -17,7 +17,7 @@
    [ring.middleware.session.cookie :refer [cookie-store]]
    [ring.middleware.gzip :refer [wrap-gzip]]
    [ring.middleware.logger :refer [wrap-with-logger]]
-   [camelot.handler.application :as application]
+   [camelot.app.version :as version]
    [clojure.java.shell :refer [sh]])
   (:import
    (java.net URI NetworkInterface InetAddress)
@@ -66,8 +66,8 @@
       wrap-params
       wrap-multipart-params
       (wrap-session {:store (cookie-store {:key "insecureinsecure"})})
-      (wrap-transit-response {:encoding :json, :opts tutil/transit-write-options})
-      (wrap-transit-params {:opts tutil/transit-read-options})
+      (wrap-transit-response {:encoding :json, :opts transit/transit-write-options})
+      (wrap-transit-params {:opts transit/transit-read-options})
       wrap-stacktrace-log
       (wrap-defaults api-defaults)
       wrap-with-logger
@@ -76,7 +76,7 @@
 (defn -main [& args]
   (let [port (Integer. (or (env :camelot-port) 5341))]
     (migrate)
-    (println (format "Camelot %s started on port %d.\n" (application/get-version) port))
+    (println (format "Camelot %s started on port %d.\n" (version/get-version) port))
     (println "You might be able to connect to it from the following addresses:")
     (->> (get-network-addresses)
          (mapcat #(InetAddress/getAllByName %))

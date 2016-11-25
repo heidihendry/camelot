@@ -2,7 +2,10 @@
   (:require
    [camelot.test-util.state :as state]
    [camelot.app.screens :as sut]
-   [clojure.test :refer :all]))
+   [clojure.test :refer :all]
+   [schema.test :as st]))
+
+(use-fixtures :once st/validate-schemas)
 
 (defn gen-state-helper
   [config]
@@ -36,3 +39,15 @@
     (testing "Resource title should be translated'"
       (let [path [:trap-station-session-camera :resource :title]]
         (is (= (get-in (sut/all-screens (gen-state-helper {})) path) "Session Camera"))))))
+
+(deftest test-metadata-paths
+  (testing "Metadata flattening"
+    (testing "Datastructure produced is vector of paths"
+      (let [data sut/metadata-paths]
+        (is (= (every? identity (flatten (map #(map keyword? %) data))) true))
+        (is (= (every? identity (map vector? data)) true))
+        (is (= (vector? data) true))))
+
+    (testing "An entry is available for GPS Location"
+      (let [search [:location :gps-longitude]]
+        (is (= (some #{search} sut/metadata-paths) search))))))

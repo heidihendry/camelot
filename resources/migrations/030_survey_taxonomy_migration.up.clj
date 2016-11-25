@@ -5,7 +5,6 @@
 (require '[clojure.java.jdbc :as jdbc])
 (require '[schema.core :as s])
 (require '[camelot.db.core :as db])
-(require '[camelot.util.config :as config])
 (require '[camelot.db.survey-taxonomy :as survey-taxonomy])
 
 (sql/defqueries "sql/migration-helpers/030.sql" {:connection db/spec})
@@ -30,6 +29,6 @@
                                                    :taxonomy-id taxonomy}))
 
 (db/with-transaction
-  [s (state/gen-state (config/config))]
+  [s (state/gen-state)]
   (doseq [p (-m030-all-pairs s)]
     (survey-taxonomy/create! s (-m030-->survey-taxonomy p))))

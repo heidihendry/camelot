@@ -1,29 +1,28 @@
-(ns camelot.handler.bulk-import
+(ns camelot.bulk-import.core
   "Provide high-level handling for bulk import support.  Bulk import consists
   of template generation, field mapping, validation and the actual import
   itself."
   (:require
    [ring.util.response :as r]
    [camelot.import.dirtree :as dt]
+   [camelot.import.metadata-utils :as mutil]
    [camelot.util.model :as model]
-   [camelot.util.config :as config]
+   [camelot.app.state :as state]
    [clojure.data.csv :as csv]
    [clj-time.format :as tf]
    [clj-time.local :as tl]
-   [camelot.import.metadata-utils :as mutil]
    [schema.core :as s]
    [clojure.string :as str]
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
-   [clojure.java.io :as io]
-   [camelot.util.java-file :as jf]))
+   [camelot.util.file :as file]))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
 
 (defn detect-separator
   [path]
   (cond
-    (nil? path) (config/get-directory-separator)
+    (nil? path) (state/get-directory-separator)
     (re-find #"^[A-Z]:(?:\\|$)" path) "\\"
     :else "/"))
 
@@ -49,7 +48,7 @@
   {:pre (nil? client-dir)}
   (let [root (-> state :config :root-path)
         res (resolve-server-directory root client-dir)]
-    (io/file (cond
+    (file/->file (cond
                (and (empty? res) (nil? root)) client-dir
                (empty? res) root
                :else res))))
@@ -190,10 +189,10 @@
 
 (defn could-be-file?
   [x]
-  (let [f (io/file x)]
-    (and (jf/exists? f)
-         (jf/readable? f)
-         (jf/file? f))))
+  (let [f (file/->file x)]
+    (and (file/exists? f)
+         (file/readable? f)
+         (file/file? f))))
 
 (defn could-be-required?
   [x]

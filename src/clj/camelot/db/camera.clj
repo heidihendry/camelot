@@ -6,7 +6,6 @@
    [camelot.app.state :refer [State]]
    [yesql.core :as sql]
    [camelot.db.camera-status :as camera-status]
-   [camelot.util.config :as config]
    [camelot.db.media :as media]))
 
 (sql/defqueries "sql/cameras.sql" {:connection db/spec})

@@ -3,7 +3,6 @@
 (require '[camelot.db.core :as db])
 (require '[clojure.string :as str])
 (require '[camelot.app.state :as state])
-(require '[camelot.util.config :as config])
 (require '[camelot.db.species :as species])
 (require '[clojure.java.jdbc :as jdbc])
 
@@ -47,6 +46,6 @@
       (jdbc/db-do-commands db/spec (str "ALTER TABLE sighting DROP CONSTRAINT "
                                         (:constraintname c))))))
 
-(db/with-transaction [s (state/gen-state (config/config))]
+(db/with-transaction [s (state/gen-state)]
   (-m021-remove-unnecessary-constraints s)
   (-m021-species-genus-migration s))

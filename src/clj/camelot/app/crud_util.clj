@@ -1,6 +1,6 @@
-(ns camelot.util.rest
+(ns camelot.app.crud-util
   (:require
-   [camelot.util.config :as conf]
+   [camelot.app.state :as state]
    [clojure.edn :as edn]
    [camelot.util.cursorise :refer [cursorise decursorise]]
    [camelot.app.state :as state]
@@ -121,8 +121,7 @@
   where there's a constraint that they must be unique."
   [f id-str session]
   (let [id (as-long id-str)]
-    (-> (conf/config session)
-        (state/gen-state)
+    (-> (state/gen-state session)
         (f id)
         (r/response))))
 
@@ -134,15 +133,13 @@
   '-id' suffix.  If `id-str' is provided, this will be parsed and passed as
   the second argument to `f'."
   ([f resource-key session]
-   (-> (conf/config session)
-       (state/gen-state)
+   (-> (state/gen-state session)
        (f)
        (add-resource-uris resource-key)
        (r/response)))
   ([f resource-key id-str session]
    (let [id (as-long id-str)]
-     (-> (conf/config session)
-         (state/gen-state)
+     (-> (state/gen-state session)
          (f id)
          (add-resource-uris resource-key)
          (r/response)))))
@@ -153,8 +150,7 @@
   first argument, and a parsed ID is its second argument."
   [f id-str session]
   (let [id (as-long id-str)]
-    (-> (conf/config session)
-        (state/gen-state)
+    (-> (state/gen-state session)
         (f id)
         (cursorise)
         (r/response))))
@@ -168,16 +164,14 @@
   ([f id-str data session]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))
          id (as-long id-str)]
-     (-> (conf/config session)
-         (state/gen-state)
+     (-> (state/gen-state session)
          (f id stddata)
          (cursorise)
          (r/response))))
   ([f id-str ctor data session]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))
          id (as-long id-str)]
-     (-> (conf/config session)
-         (state/gen-state)
+     (-> (state/gen-state session)
          (f id stddata)
          (cursorise)
          (r/response)))))
@@ -189,15 +183,13 @@
   its second argument."
   ([f data session]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))]
-     (-> (conf/config session)
-         (state/gen-state)
+     (-> (state/gen-state session)
          (f stddata)
          (cursorise)
          (r/response))))
   ([f ctor data session]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))]
-     (-> (conf/config session)
-         (state/gen-state)
+     (-> (state/gen-state session)
          (f stddata)
          (cursorise)
          (r/response)))))
@@ -208,8 +200,7 @@
   the string representation of a resource to delete."
   [f id-str session]
   (let [id (as-long id-str)]
-    (-> (conf/config session)
-        (state/gen-state)
+    (-> (state/gen-state session)
         (f id)
         ((fn [v] (hash-map :data v)))
         (r/response))))

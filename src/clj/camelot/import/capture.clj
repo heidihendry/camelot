@@ -1,4 +1,4 @@
-(ns camelot.handler.capture
+(ns camelot.import.capture
   (:require
    [schema.core :as s]
    [camelot.util.capture :as capture]
@@ -7,7 +7,7 @@
    [camelot.import.dirtree :as dt]
    [camelot.import.photo :as photo]
    [camelot.db.core :as db]
-   [camelot.handler.import :as import]
+   [camelot.import.core :as import]
    [camelot.db.trap-station-session :as trap-station-session]
    [clj-time.core :as t]
    [camelot.translation.core :as tr])

@@ -6,7 +6,6 @@
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
    [camelot.translation.core :as tr]
-   [camelot.util.config :as config]
    [clj-time.local :as tl]
    [clj-time.format :as tf]
    [clojure.data.csv :as csv]

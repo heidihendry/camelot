@@ -14,7 +14,6 @@
    [camelot.db.camera-status :as camera-status]
    [clojure.string :as str]
    [camelot.app.state :as state]
-   [camelot.util.config :as conf]
    [clojure.edn :as edn]))
 
 (def default-survey-name "Initial survey")
@@ -31,7 +30,7 @@
 (defn- maybe-get
   [resource v]
   (if v
-    (let [state (state/gen-state (conf/config))]
+    (let [state (state/gen-state)]
       (resource state v))
     []))
 
@@ -47,7 +46,7 @@
 (defn options
   "Return all albums for the current configuration."
   [params]
-  (let [surveys (canonicalise (survey/get-all (state/gen-state (conf/config)))
+  (let [surveys (canonicalise (survey/get-all (state/gen-state))
                               :survey-id :survey-name)
         survey-sites (canonicalise (maybe-get survey-site/get-all (:survey params))
                                    :survey-site-id :site-name)

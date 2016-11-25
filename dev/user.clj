@@ -26,5 +26,4 @@
 
 (def browser-repl figwheel/cljs-repl)
 
-(defn state []
-  (camelot.app.state/gen-state (camelot.util.config/config)))
+(def state camelot.app.state/gen-state)

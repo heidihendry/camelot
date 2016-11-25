@@ -1,5 +1,5 @@
-(ns camelot.handler.bulk-import-test
-  (:require [camelot.handler.bulk-import :as sut]
+(ns camelot.bulk-import.core-test
+  (:require [camelot.bulk-import.core :as sut]
             [camelot.test-util.state :as state]
             [clojure.test :refer :all]
             [clojure.java.io :as io]))
@@ -13,7 +13,7 @@
 
     (testing "Should know how to treat Windows drive letters coming from the client when root-path not set."
       (let [state (state/gen-state {:root-path nil})]
-        (with-redefs [camelot.util.config/get-os #(constantly :windows)]
+        (with-redefs [camelot.app.state/get-os #(constantly :windows)]
           (is (= (sut/resolve-directory state "G:\\srv\\mydata\\survey1")
                  (io/file "G:\\srv\\mydata\\survey1"))))))
 

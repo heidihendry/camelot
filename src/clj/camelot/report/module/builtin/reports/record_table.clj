@@ -5,7 +5,7 @@
    [clj-time.format :as tf]
    [camelot.translation.core :as tr]
    [camelot.report.sighting-independence :as indep]
-   [camelot.util.config :as config]))
+   [camelot.app.state :as state]))
 
 (defn report-output
   [state {:keys [survey-id]}]
@@ -26,7 +26,7 @@
    :apply-fn (partial indep/->independent-sightings)
    :transforms [#(update % :media-capture-timestamp
                          (partial tf/unparse (tf/formatters :mysql)))
-                #(assoc % :media-directory (config/get-media-path))
+                #(assoc % :media-directory (state/get-media-path))
                 #(assoc % :trap-camera-pair (format "%s_%s"
                                                     (:trap-station-name %)
                                                     (:trap-station-session-camera-id %)))

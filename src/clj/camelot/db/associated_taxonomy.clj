@@ -1,4 +1,4 @@
-(ns camelot.handler.associated-taxonomy
+(ns camelot.db.associated-taxonomy
   (:require
    [camelot.db.taxonomy :as taxonomy]
    [camelot.app.state :refer [State]]
@@ -20,12 +20,7 @@
      taxonomy-notes :- (s/maybe s/Str)
      survey-id :- (s/maybe s/Int)])
 
-(s/defn tassociated-taxonomy :- TAssociatedTaxonomy
-  [{:keys [taxonomy-class taxonomy-order taxonomy-family taxonomy-genus
-           taxonomy-species taxonomy-common-name species-mass-id taxonomy-notes survey-id]}]
-  (->TAssociatedTaxonomy taxonomy-class taxonomy-order taxonomy-family taxonomy-genus
-                         taxonomy-species taxonomy-common-name species-mass-id
-                         taxonomy-notes survey-id))
+(def tassociated-taxonomy map->TAssociatedTaxonomy)
 
 (s/defn get-or-create-taxonomy :- Taxonomy
   [state :- State

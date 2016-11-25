@@ -22,11 +22,11 @@
    lon :- s/Str
    date :- DateTime]
   (let [l (Location. ^String lat ^String lon)]
-    (t/plus
-     (tc/from-date
-      (.getTime (.getOfficialSunriseCalendarForDate (SunriseSunsetCalculator. ^Location l ^TimeZone tz)
-                                                    (calendar-for-date date))))
-     (Seconds/seconds (/ (.getOffset tz (tc/to-long date)) 1000)))))
+    (t/plus (tc/from-date
+             (.getTime (.getOfficialSunriseCalendarForDate
+                        (SunriseSunsetCalculator. ^Location l ^TimeZone tz)
+                        (calendar-for-date date))))
+            (Seconds/seconds (/ (.getOffset tz (tc/to-long date)) 1000)))))
 
 (s/defn get-sunset-time
   [tz :- TimeZone
@@ -35,6 +35,7 @@
    date :- DateTime]
   (let [l (Location. ^String lat ^String lon)]
     (t/plus (tc/from-date
-             (.getTime (.getOfficialSunsetCalendarForDate (SunriseSunsetCalculator. ^Location l ^TimeZone tz)
-                                                          (calendar-for-date date))))
+             (.getTime (.getOfficialSunsetCalendarForDate
+                        (SunriseSunsetCalculator. ^Location l ^TimeZone tz)
+                        (calendar-for-date date))))
             (Seconds/seconds (/ (.getOffset tz (tc/to-long date)) 1000)))))

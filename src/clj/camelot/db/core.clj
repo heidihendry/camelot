@@ -1,25 +1,24 @@
 (ns camelot.db.core
   (:require
-   [camelot.util.config :as settings]
    [clj-time.coerce :as tc]
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
-   [camelot.app.state :refer [State]]
+   [camelot.app.state :refer [State] :as state]
    [schema.core :as s]
-   [camelot.util.java-file :as f]
+   [camelot.util.file :as file]
    [clojure.java.io :as io])
   (:import (java.io IOException)))
 
 (defn db-path
   []
-  (let [path (settings/get-db-path)
-        fpath (f/get-parent-file (io/file path))]
-    (if (f/exists? fpath)
-      (if (and (f/readable? fpath) (f/writable? fpath))
+  (let [path (state/get-db-path)
+        fpath (file/get-parent-file (io/file path))]
+    (if (file/exists? fpath)
+      (if (and (file/readable? fpath) (file/writable? fpath))
         path
         (throw (IOException. (str path ": Permission denied"))))
       (do
-        (f/mkdirs fpath)
+        (file/mkdirs fpath)
         path))))
 
 (def spec

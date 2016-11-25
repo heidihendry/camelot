@@ -4,8 +4,7 @@
    [camelot.app.state :refer [State]]
    [schema.core :as s]
    [camelot.db.core :as db]
-   [camelot.translation.core :as tr]
-   [camelot.util.config :as config]))
+   [camelot.translation.core :as tr]))
 
 ;; NOTE: 030_survey_taxonomy_migration needs to be updated should this model
 ;; change.

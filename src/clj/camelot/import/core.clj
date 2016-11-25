@@ -1,28 +1,25 @@
-(ns camelot.handler.import
+(ns camelot.import.core
   (:require
-   [camelot.import.album :as a]
-   [camelot.util.config :as conf]
    [camelot.app.state :as state]
-   [compojure.core :refer [ANY context DELETE GET POST PUT]]
-   [ring.util.response :as r]
-   [camelot.import.validation :as validation]
-   [clojure.edn :as edn]
-   [camelot.import.album :as album]
-   [clojure.string :as str]
-   [clojure.java.io :as io]
-   [camelot.util.config :as util.config]
-   [camelot.util.java-file :as jf]
-   [camelot.util.file :as file-util]
    [camelot.db.core :as db]
+   [camelot.import.album :as album]
+   [camelot.import.db :as im.db]
+   [camelot.import.validation :as validation]
+   [camelot.util.file :as file]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [clojure.string :as str]
+   [compojure.core :refer [ANY context DELETE GET POST PUT]]
    [mikera.image.core :as image]
-   [camelot.import.db :as im.db])
-  (:import (org.apache.commons.lang3 SystemUtils)))
+   [ring.util.response :as r])
+  (:import
+   (org.apache.commons.lang3 SystemUtils)))
 
 (defn- save-pathname
   [f dest]
   (io/make-parents dest)
-  (let [d (io/file dest)]
-    (if (jf/exists? d)
+  (let [d (file/->file dest)]
+    (if (file/exists? d)
       (throw (java.io.IOException. (format "copy-pathname: file '%s' already exists", dest)))
       (f dest))))
 
@@ -33,7 +30,7 @@
 
 (defn- store-original
   [src dest]
-  (save-pathname #(io/copy (io/file src) (io/file %)) dest))
+  (save-pathname #(io/copy (file/->file src) (file/->file %)) dest))
 
 (defn- store-variant
   [^java.awt.image.BufferedImage image dest]
@@ -46,7 +43,7 @@
 
 (defn- create-image
   [path file-basename extension variant width]
-  (let [target (str (util.config/get-media-path) SystemUtils/FILE_SEPARATOR
+  (let [target (str (state/get-media-path) SystemUtils/FILE_SEPARATOR
                     variant (str/lower-case file-basename))]
     (if width
       ;; Always create variants as .png; OpenJDK cannot write .jpg
@@ -60,7 +57,7 @@
 (defn- get-album
   [state root-path path]
   (-> (album/read-albums state root-path)
-      (get (io/file path))))
+      (get (file/->file path))))
 
 (defn- create-sightings
   [state media-id sightings]
@@ -84,8 +81,8 @@
 (defn media
   "Import media"
   [{:keys [folder session-camera-id notes]}]
-  (db/with-transaction [state (state/gen-state (conf/config))]
-    (let [[_ sitename _phase cameraname] (file-util/rel-path-components folder)
+  (db/with-transaction [state (state/gen-state)]
+    (let [[_ sitename _phase cameraname] (file/rel-path-components folder)
           root-path (:root-path (:config state))
           full-path (str root-path folder)
           album (get-album state root-path full-path)

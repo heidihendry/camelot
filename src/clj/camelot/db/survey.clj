@@ -4,12 +4,10 @@
    [schema.core :as s]
    [camelot.db.core :as db]
    [yesql.core :as sql]
-   [camelot.app.state :refer [State]]
-   [camelot.util.java-file :as f]
+   [camelot.app.state :refer [State] :as state]
+   [camelot.util.file :as file]
    [clojure.java.io :as io]
-   [camelot.db.media :as media]
-   [camelot.util.java-file :as jf]
-   [camelot.util.config :as config]))
+   [camelot.db.media :as media]))
 
 (sql/defqueries "sql/surveys.sql" {:connection db/spec})
 
@@ -80,7 +78,7 @@
    id :- s/Int]
   (let [fs (media/get-all-files-by-survey state id)]
     (media/delete-files! state fs)
-    (jf/delete-recursive (config/get-filestore-survey-directory id)))
+    (file/delete-recursive (state/get-filestore-survey-directory id)))
     (db/with-db-keys state -delete! {:survey-id id})
   nil)
 

@@ -3,13 +3,12 @@
    [clj-time.core :as t]
    [clj-time.coerce :as tc]
    [schema.core :as s]
-   [camelot.util.java-file :as jf]
+   [camelot.util.file :as file]
    [camelot.translation.core :as tr]
    [camelot.import.dirtree :as dt]
    [camelot.import.model :as mi]
    [camelot.import.photo :as photo]
    [camelot.import.validation :refer [list-problems check-invalid-photos]]
-   [clojure.java.io :as io]
    [camelot.db.trap-station-session-camera :as trap-station-session-camera]))
 
 (defn- extract-date
@@ -78,10 +77,10 @@
 (defn read-albums
   "Read photo directories and return metadata structured as albums."
   [state dir]
-  (let [fdir (io/file dir)]
+  (let [fdir (file/->file dir)]
     (cond
       (nil? dir) (tr/translate (:config state) :problems/root-path-missing)
-      (not (jf/readable? fdir)) (tr/translate (:config state) :problems/root-path-not-found)
+      (not (file/readable? fdir)) (tr/translate (:config state) :problems/root-path-not-found)
       :else
       (->> dir
            (dt/read-tree state)

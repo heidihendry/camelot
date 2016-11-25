@@ -1,8 +1,46 @@
 (ns camelot.app.screens
   (:require
    [smithy.core :refer [defsmith] :as smithy]
+   [camelot.import.util :as putil]
    [environ.core :refer [env]]
    [camelot.translation.core :as tr]))
+
+(def smiths (atom {}))
+
+(def metadata-structure
+  "Layout of all photo metadata fields."
+  [[:location [:gps-longitude
+               :gps-longitude-ref
+               :gps-latitude
+               :gps-latitude-ref
+               :gps-altitude
+               :gps-altitude-ref
+               :sublocation
+               :city
+               :state-province
+               :country
+               :country-code
+               :map-datum]]
+   [:camera-settings [:aperture
+                      :exposure
+                      :flash
+                      :focal-length
+                      :fstop
+                      :iso
+                      :orientation
+                      :resolution-x
+                      :resolution-y]]
+   [:camera [:make
+             :model
+             :software]]
+   :datetime
+   :headline
+   :artist
+   :phase
+   :copyright
+   :description
+   :filename
+   :filesize])
 
 (defn nav-menu
   "Main navigation menu structure."
@@ -20,8 +58,6 @@
                   {:url "/library"
                    :label (tr/translate (:config state) :application/library)}
                   {:function "settings"}]}))
-
-(def smiths (atom {}))
 
 (defn- translate-fn
   "Return a key translation function for the smithy build process."
@@ -528,37 +564,19 @@
                        :cancel {:type :event
                                 :event :settings-cancel}}}}))
 
-(def metadata-structure
-  "Layout of all photo metadata fields."
-  [[:location [:gps-longitude
-               :gps-longitude-ref
-               :gps-latitude
-               :gps-latitude-ref
-               :gps-altitude
-               :gps-altitude-ref
-               :sublocation
-               :city
-               :state-province
-               :country
-               :country-code
-               :map-datum]]
-   [:camera-settings [:aperture
-                      :exposure
-                      :flash
-                      :focal-length
-                      :fstop
-                      :iso
-                      :orientation
-                      :resolution-x
-                      :resolution-y]]
-   [:camera [:make
-             :model
-             :software]]
-   :datetime
-   :headline
-   :artist
-   :phase
-   :copyright
-   :description
-   :filename
-   :filesize])
+(defn- flatten-metadata-structure
+  "Transfor metadata structure in to a vector of paths"
+  [md]
+  (vec (reduce #(into %1 (if (= (type %2) clojure.lang.Keyword)
+                              [[%2]]
+                              (mapv (fn [v] [(first %2) v]) (second %2))))
+                   []
+                   md)))
+
+(def metadata-paths (flatten-metadata-structure metadata-structure))
+
+(defn get-metadata
+  "Return paths alongside a (translated) description of the metadata represented
+  by that path."
+  [state]
+  (into {} (map #(hash-map % (putil/path-description state %)) metadata-paths)))

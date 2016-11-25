@@ -84,7 +84,7 @@
     (testing "Should export basic data for a single record"
       (let [records (list (->record {}))
             state (gen-state-helper {})]
-        (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
+        (with-redefs [camelot.app.state/get-media-path #(identity "/path")]
           (is (= (report state 1 records)
                  [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
                    "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]])))))
@@ -93,7 +93,7 @@
       (let [records (list (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)})
                           (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)}))
             state (gen-state-helper {})]
-        (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
+        (with-redefs [camelot.app.state/get-media-path #(identity "/path")]
           (is (= (report state 1 records)
                  [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
                    "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]
@@ -105,7 +105,7 @@
                           (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 10 0)})
                           (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)}))
             state (gen-state-helper {})]
-        (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
+        (with-redefs [camelot.app.state/get-media-path #(identity "/path")]
           (is (= (report state 1 records)
                  [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
                    "0" "0" "0.0" "0.0" "/path" "file-id-1.jpg"]
@@ -118,7 +118,7 @@
                           (->alt-record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)})
                           (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)}))
             state (gen-state-helper {})]
-        (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
+        (with-redefs [camelot.app.state/get-media-path #(identity "/path")]
           (is (= (report state 1 records)
                  [["Trap2" 2 "CAM2" "Wolf Smiley" "Trap2_2" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
                    "0" "0" "0.0" "0.0" "/path" "file-id-2.jpg"]
@@ -133,7 +133,7 @@
                           (->alt-record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)})
                           (->alt-record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)}))
             state (gen-state-helper {})]
-        (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
+        (with-redefs [camelot.app.state/get-media-path #(identity "/path")]
           (is (= (report state 1 records)
                  [["Trap2" 2 "CAM2" "Wolf Smiley" "Trap2_2" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
                    "0" "0" "0.0" "0.0" "/path" "file-id-2.jpg"]
@@ -153,7 +153,7 @@
     (testing "Should export basic data for a single record"
       (let [records (list (->record {}))
             state (gen-state-helper {})]
-        (with-redefs [camelot.util.config/get-media-path #(identity "/path")]
+        (with-redefs [camelot.app.state/get-media-path #(identity "/path")]
           (is (= (csv-report state 1 records)
                  (str (str/join "," headings) "\n"
                       "Trap1,1,CAM1,Cat Yellow Spotted,Trap1_1,2015-01-07 05:00:00,2015-01-07,05:00:00,0,0,0.0,0.0,/path,file-id-1.jpg\n"))))))))

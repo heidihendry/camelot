@@ -1,13 +1,10 @@
 (ns camelot.import.dirtree
   (:require
-   [clojure.java.io :as io]
-   [clojure.string :as str]
    [camelot.app.state :refer [State]]
-   [schema.core :as s]
    [camelot.import.model :as mi]
-   [camelot.util.java-file :as f]
-   [camelot.util.file :as file-util]
-   [camelot.util.java-file :as jf])
+   [camelot.util.file :as file]
+   [clojure.string :as str]
+   [schema.core :as s])
   (:import
    (com.drew.imaging ImageMetadataReader)
    (com.drew.metadata Metadata Directory Tag)
@@ -49,10 +46,10 @@
 (s/defn exif-file? :- s/Bool
   "Predicate for whether a given file is a usable, exif-containing file."
   [file]
-  (or (and (f/file? file)
-           (f/readable? file)
-           (re-find file-inclusion-regexp (f/get-name file))
-           (not (re-find file-exclusion-regexp (f/get-name file)))
+  (or (and (file/file? file)
+           (file/readable? file)
+           (re-find file-inclusion-regexp (file/get-name file))
+           (not (re-find file-exclusion-regexp (file/get-name file)))
            true)
       false))
 
@@ -60,7 +57,7 @@
   "Return true if there are exif-containing files and the directory hasn't any subdirectories. False otherwise."
   [files]
   (and (some exif-file? files)
-       (not-any? f/directory? files)))
+       (not-any? file/directory? files)))
 
 (defn- describe-raw-tag
   "Return a description for the given tag."
@@ -99,7 +96,7 @@
   "Return a list of the exif files in dir."
   [dir :- s/Str]
   (->> dir
-       (io/file)
+       (file/->file)
        (file-seq)
        (filter exif-file?)))
 
@@ -116,7 +113,7 @@
    file :- File]
   (let [segfn (fn [i v] (hash-map (str path-component-prefix (inc i)) v))]
     (->> file
-         (file-util/rel-path-components state)
+         (file/rel-path-components state)
          (map-indexed segfn)
          (apply merge))))
 
@@ -126,7 +123,7 @@
    file :- File]
   (merge (file-raw-metadata state file)
          (path-components state file)
-         {absolute-path-key (jf/canonical-path file)}))
+         {absolute-path-key (file/canonical-path file)}))
 
 (s/defn file-metadata-pair
   [state :- State
@@ -153,9 +150,9 @@
 (defn- album-dir-list
   "Return a list of valid album directories under `root'."
   [root]
-  (let [dirname #(f/get-parent-file (io/file %))]
+  (let [dirname #(file/get-parent-file (file/->file %))]
     (->> root
-         (io/file)
+         (file/->file)
          (file-seq)
          (group-by dirname)
          (filter (fn [[k v]] (album-dir? v)))
