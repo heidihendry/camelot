@@ -6,7 +6,8 @@
             [camelot.component.albums :as albums]
             [camelot.component.albums :as calb]
             [camelot.component.survey.core :as survey]
-            [camelot.component.survey.bulk-import :as bulk-import]
+            [camelot.component.bulk-import.core :as bulk-import]
+            [camelot.component.bulk-import.mapper :as bulk-import-mapper]
             [camelot.component.deployment.core :as deployment]
             [camelot.component.organisation :as organisation]
             [camelot.component.nav :as nav]
@@ -355,7 +356,7 @@
                                                      {:survey-id survey}))
 (defroute "/:survey/bulk-import" [survey] (generate-view bulk-import/bulk-import-view
                                                          {:survey-id survey}))
-(defroute "/:survey/bulk-import/mapper" [survey] (generate-view bulk-import/bulk-import-mapping-view
+(defroute "/:survey/bulk-import/mapper" [survey] (generate-view bulk-import-mapper/bulk-import-mapping-view
                                                                 {:survey-id survey}))
 (defroute "/organisation" [] (generate-view organisation/organisation-view-component))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component

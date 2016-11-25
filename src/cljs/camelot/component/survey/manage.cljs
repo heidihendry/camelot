@@ -6,7 +6,7 @@
             [camelot.component.deployment.recent :as recent]
             [camelot.component.survey.create :as create]
             [camelot.component.survey.file :as file]
-            [camelot.component.survey.bulk-import :as bulk-import]
+            [camelot.component.bulk-import.core :as bulk-import]
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.state :as state]
