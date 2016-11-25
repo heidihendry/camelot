@@ -15,13 +15,15 @@
    [clojure.string :as str]
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
-   [camelot.util.file :as file]))
+   [camelot.util.file :as file])
+  (:import
+   (java.util.regex Pattern)))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
 
 (s/defn relative-path? :- s/Bool
   [dir :- s/Str]
-  (not (re-find #"^(/|[A-Z]:)" dir)))
+  (nil? (re-find #"^(/|[A-Z]:)" dir)))
 
 (defn detect-separator
   [path]
@@ -61,13 +63,31 @@
          (apply conj svr-path)
          (str/join svr-sep))))
 
-(defn resolve-server-directory
+(defn strategic-directory-resolver
   "Resolve a directory, either relative to the base-dir or absolutely."
   [server-base-dir client-dir]
-  (if (and (relative-path? client-dir)
-           (not (nil? server-base-dir)))
-    (resolve-relative-server-directory server-base-dir client-dir)
-    (resolve-absolute-server-directory server-base-dir client-dir)))
+  (let [f (if (and (relative-path? client-dir) (not (nil? server-base-dir)))
+            resolve-relative-server-directory
+            resolve-absolute-server-directory)]
+    (f server-base-dir client-dir)))
+
+(defn ^String re-quote
+  [^String s]
+  (Pattern/quote ^String s))
+
+(defn resolve-server-directory
+  "Resolve the directory, defaulting to the root path should the client attempt to escape it."
+  [server-base-dir client-dir]
+  (if server-base-dir
+    (let [f-can (file/canonical-path (file/->file (strategic-directory-resolver server-base-dir client-dir)))
+          s-can (file/canonical-path (file/->file server-base-dir))]
+      (if (re-find (re-pattern (str "^" (re-quote s-can))) f-can)
+        f-can
+        (do
+          (prn s-can)
+          (prn f-can)
+          s-can)))
+    client-dir))
 
 (defn resolve-directory
   "Resolve a corresponding server directory for a given 'client' directory."
