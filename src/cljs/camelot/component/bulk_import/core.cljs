@@ -28,11 +28,12 @@
                (dom/label #js {:className "field-label"}
                           (tr/translate ::survey-directory))
                (dom/input #js {:className "field-input"
+                               :placeholder (tr/translate ::path-name-placeholder)
                                :onChange #(om/update! data ::survey-directory (.. % -target -value))
                                :value (::survey-directory data)})
                (dom/a #js {:href (str "/surveys/bulkimport/template?dir=" (::survey-directory data))}
                       (dom/button #js {:className "btn btn-primary full-width"
-                                       :disabled (if (::survey-directory data) "" "disabled")}
+                                       :disabled (if (seq (::survey-directory data)) "" "disabled")}
                                   (tr/translate ::download)))
                (dom/div #js {:className "sep"})
                (dom/div #js {:className "help-text"}

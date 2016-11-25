@@ -696,6 +696,7 @@
    {:download "Download template"
     :title "Bulk import"
     :ready-to-upload "Import from template"
+    :path-name-placeholder "Absolute or relative path name..."
     :help-text-step-1 "Step 1. Download a template of all data scanned in the survey folder."
     :help-text-step-2 "Step 2. Modify the template as you see fit, then start the import once you're ready."
     :survey-directory "Path to survey directory"}
