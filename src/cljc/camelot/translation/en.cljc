@@ -694,7 +694,7 @@
 
    :camelot.component.bulk-import.core
    {:download "Download template"
-    :title "Bulk import"
+    :title "Bulk Import"
     :ready-to-upload "Import from template"
     :path-name-placeholder "Absolute or relative path name..."
     :help-text-step-1 "Step 1. Download a template of all data scanned in the survey folder."
@@ -702,7 +702,7 @@
     :survey-directory "Path to survey directory"}
 
    :camelot.component.bulk-import.mapper
-   {:title "Bulk import"}
+   {:title "Bulk Import"}
 
    :camelot.component.survey.create
    {:search-instructions "Search and add species using the options to the right."
