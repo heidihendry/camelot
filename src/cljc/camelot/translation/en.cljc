@@ -733,15 +733,15 @@
     :datatype-and-required-constraint-problem "All records for this field should be %s and a value should always be present, but this is not the case."
     :datatype-problem-only "All all records for this field should be %s, but this is not the case."
     :required-constraint-problem-only "A value should always be present, but this is not the case."
-    ::datatype-integer "an integer"
-    ::datatype-number "a number"
-    ::datatype-sex "either 'male' or 'female'"
-    ::datatype-lifestage "either 'adult' or 'juvenile'"
-    ::datatype-timestamp "a timestamp"
-    ::datatype-longitude "a value in the range [-180, 180]"
-    ::datatype-latitude "a value in the range [-90, 90]"
-    ::datatype-boolean "either 'true' or 'false'"
-    ::datatype-file "the path to a file"
-    ::datatype-string "a string"}
+    :datatype-integer "an integer"
+    :datatype-number "a number"
+    :datatype-sex "either 'male' or 'female'"
+    :datatype-lifestage "either 'adult' or 'juvenile'"
+    :datatype-timestamp "a timestamp"
+    :datatype-longitude "a value in the range [-180, 180]"
+    :datatype-latitude "a value in the range [-90, 90]"
+    :datatype-boolean "either 'true' or 'false'"
+    :datatype-file "the path to a file"
+    :datatype-string "a string"}
 
    :missing "[Translation missing]"})

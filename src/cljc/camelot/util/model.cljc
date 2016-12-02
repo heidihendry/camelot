@@ -153,14 +153,15 @@
   [column calculated-schema]
   (let [s (schema-definitions column)]
     (if s
-      (-> {}
-          (partial maybe-datatype-problem s calculated-schema)
-          (partial maybe-required-constraint-problem s calculated-schema))
+      (->> {}
+           (maybe-datatype-problem s calculated-schema)
+           (maybe-required-constraint-problem s calculated-schema))
       {:global ::schema-not-found})))
 
 (defn describe-datatype
   [translation-fn dt]
-  (translation-fn (case dt
+  (translation-fn (case (or (:validation-type dt)
+                            (:datatype dt))
                     :integer ::datatype-integer
                     :number ::datatype-number
                     :sex ::datatype-sex
