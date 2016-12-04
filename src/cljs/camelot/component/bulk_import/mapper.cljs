@@ -4,19 +4,35 @@
    [cljs.core.async :refer [chan]]
    [om.core :as om]
    [camelot.translation.core :as tr]
+   [camelot.component.util :as util]
    [camelot.util.model :as model]
    [camelot.component.upload :as upload]
    [om.dom :as dom]
    [camelot.nav :as nav]
    [camelot.state :as state]
-   [cljs.core.async :refer [<! chan >!]])
+   [cljs.core.async :refer [<! chan >!]]
+   [camelot.rest :as rest])
   (:require-macros
    [cljs.core.async.macros :refer [go]]))
+
+(defn get-import-data
+  [data]
+  {:file-data (deref (:file-data data))
+   :mappings (deref (:mappings data))})
+
+(defn submit-mappings
+  [data]
+  (om/update! data :show-import-status-dialog true)
+  (om/update! data :import-status :initialising)
+  (rest/post-x "/surveys/bulkimport/import" {:data (get-import-data data)}
+               #(om/update! data :import-status :active)
+               #(om/update! data :import-status :failed)))
 
 (defn upload-success-handler
   [data r]
   (om/update! data :upload-pending false)
-  (om/update! data :column-properties (:response r)))
+  (om/update! data :column-properties (get-in r [:response :column-properties]))
+  (om/update! data :file-data (get-in r [:response :file-data])))
 
 (defn upload-pending-handler
   [data r]
@@ -85,6 +101,83 @@
                                                             (get column-properties m)
                                                             tr/translate))))))))
 
+(defn import-status-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (case (:import-status data)
+        :complete (dom/p nil "Import complete (enable close button)")
+        :active (dom/p nil "Import active")
+        :failed (dom/p nil "Import failed")
+        :initialising (dom/p nil "Import initialising")
+        nil (dom/p nil "Unsure what's going on")))))
+
+(defn import-status-dialog
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build util/prompt-component data
+                {:opts {:active-key :show-import-status-dialog
+                        :title (tr/translate ::import-status-dialog-title)
+                        :body (dom/div nil (om/build import-status-component data))
+                        :actions (dom/div #js {:className "button-container"}
+                                          (dom/button #js {:className "btn btn-default"
+                                                           :ref "action-first"
+                                                           :onClick #(do
+                                                                       (om/update! data :show-import-status-dialog false)
+                                                                       (om/update! data :import-status nil))}
+                                                      (tr/translate :words/cancel)))}}))))
+
+(defn column-mapping-form-component
+  [data owner]
+  (reify
+    om/IRenderState
+    (render-state [_ state]
+      (if-let [cps (:column-properties data)]
+        (let [colmaps (:mappings data)]
+          (dom/div nil
+                   (dom/h5 nil "Required fields")
+                   (om/build-all
+                    field-mapping-component
+                    (mapv #(hash-map :column-properties cps
+                                     :mappings colmaps
+                                     :field %
+                                     :vkey (first %))
+                          (sort-by first (-> model/schema-definitions
+                                             model/mappable-fields
+                                             model/required-fields)))
+                    {:init-state state
+                     :opts {:required true}
+                     :key :vkey})
+                   (dom/h5 nil "Optional fields")
+                   (om/build-all
+                    field-mapping-component
+                    (mapv #(hash-map :column-properties cps
+                                     :mappings colmaps
+                                     :field %
+                                     :vkey (first %))
+                          (sort-by first (-> model/schema-definitions
+                                             model/mappable-fields
+                                             model/optional-fields)))
+                    {:init-state state
+                     :key :vkey})
+                   (let [vs (validation-summary (:validation-problem data))]
+                     (dom/div nil
+                              (when (= (:result vs) :fail)
+                                (dom/label #js {:className "validation-warning"}
+                                           (:reason vs)))
+                              (dom/div #js {:className "button-container pull-right"}
+                                       (om/build cancel-button-component data)
+                                       (dom/button #js {:className "btn btn-primary"
+                                        ;:disabled (if (:validation-problem data) "disabled" nil)
+                                                        :onClick #(submit-mappings data)
+                                                        :title (:reason vs)}
+                                                   (tr/translate :words/submit)))))))
+        (dom/div #js {:className "button-container pull-right"}
+                 (om/build cancel-button-component data))))))
+
 (defn bulk-import-mapping-component
   [data owner]
   (reify
@@ -121,6 +214,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className "split-menu"}
+               (om/build import-status-dialog data)
                (dom/div #js {:className "intro"}
                         (dom/h4 nil (tr/translate ::title)))
                (dom/div #js {:className "single-section"}
@@ -139,47 +233,8 @@
                                                  :width "32"})
                                    (dom/p nil
                                           (tr/translate ::scanning)))
-                          (if-let [cps (:column-properties data)]
-                            (let [colmaps (:mappings data)]
-                              (dom/div nil
-                                       (dom/h5 nil "Required fields")
-                                       (om/build-all
-                                        field-mapping-component
-                                        (mapv #(hash-map :column-properties cps
-                                                         :mappings colmaps
-                                                         :field %
-                                                         :vkey (first %))
-                                              (sort-by first (-> model/schema-definitions
-                                                                 model/mappable-fields
-                                                                 model/required-fields)))
-                                        {:init-state state
-                                         :opts {:required true}
-                                         :key :vkey})
-                                       (dom/h5 nil "Optional fields")
-                                       (om/build-all
-                                        field-mapping-component
-                                        (mapv #(hash-map :column-properties cps
-                                                         :mappings colmaps
-                                                         :field %
-                                                         :vkey (first %))
-                                              (sort-by first (-> model/schema-definitions
-                                                                 model/mappable-fields
-                                                                 model/optional-fields)))
-                                        {:init-state state
-                                         :key :vkey})
-                                       (let [vs (validation-summary (:validation-problem data))]
-                                         (dom/div nil
-                                                  (when (= (:result vs) :fail)
-                                                    (dom/label #js {:className "validation-warning"}
-                                                               (:reason vs)))
-                                                  (dom/div #js {:className "button-container pull-right"}
-                                                           (om/build cancel-button-component data)
-                                                           (dom/button #js {:className "btn btn-primary"
-                                                                            :disabled (if (:validation-problem data) "disabled" nil)
-                                                                            :title (:reason vs)}
-                                                                       (tr/translate :words/submit)))))))
-                            (dom/div #js {:className "button-container pull-right"}
-                                     (om/build cancel-button-component data)))))))))
+                          (om/build column-mapping-form-component data
+                                    {:init-state state})))))))
 
 (defn bulk-import-mapping-view
   [app owner]

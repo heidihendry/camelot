@@ -295,6 +295,12 @@
     (throw (RuntimeException. "CSV must not be empty")))
 
   (let [data (csv/read-csv (slurp tempfile))]
-    (reduce #(assoc %1 (first %2) (column-compatibility (rest %2)))
-            {}
-            (transpose data))))
+    {:column-properties
+     (reduce #(assoc %1 (first %2) (column-compatibility (rest %2)))
+             {}
+             (transpose data))
+     :file-data data}))
+
+(defn import-with-mappings
+  [session data]
+  data)

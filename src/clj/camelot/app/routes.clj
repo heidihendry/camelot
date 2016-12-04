@@ -122,6 +122,8 @@
                  (->> (get params "file")
                       (bulk-import/column-map-options (state/gen-state session))
                       r/response))
+           (POST "/bulkimport/import" [data]
+                 (r/response (bulk-import/import-with-mappings (state/gen-state session) data)))
            (PUT "/:id" [id data] (crud/update-resource survey/update! id
                                                        survey/tsurvey data session))
            (POST "/" [data] (crud/create-resource survey/create!

@@ -707,6 +707,7 @@
    :camelot.component.bulk-import.mapper
    {:title "Bulk Import"
     :scanning "Preparing data for mapping..."
+    :import-status-dialog-title "Importing..."
     :validation-mismatch "One or more fields do not have the necessary data to satisfy the assigned mappings."
     :validation-missing "One or more required fields do not have a mapping assigned."
     :validation-passed "Submit mappings for import."}
