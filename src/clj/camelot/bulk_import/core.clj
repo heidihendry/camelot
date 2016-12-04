@@ -282,6 +282,28 @@
   {:constraints (possible-constraints vs)
    :datatypes (possible-datatypes vs)})
 
+(defmacro cond-column->
+  [testfn initexpr mapping]
+  (let [m# (fn [x#] (list `(~testfn (second ~x#))
+                          `(assoc (first ~x#) (second ~x#))))]
+    `(cond-> ~initexpr
+       ~@(mapcat m# mapping))))
+
+(defn assign-default-mappings
+  [props]
+  (cond-column->
+   #(get props %) {}
+   {:trap-station-latitude "Camelot GPS Latitude"
+    :trap-station-longitude "Camelot GPS Longitude"
+    :media-capture-timestamp "Date/Time"
+    :camera-make "Make"
+    :camera-model "Model"
+    :trap-station-altitude "GPS Altitude"
+    :site-country "Country/Primary Location Name"
+    :site-state-province "Province/State"
+    :site-city "City"
+    :site-sublocation "Sub-location"}))
+
 (defn column-map-options
   [state
    {:keys [tempfile :- s/Str
@@ -294,11 +316,13 @@
     (zero? size)
     (throw (RuntimeException. "CSV must not be empty")))
 
-  (let [data (csv/read-csv (slurp tempfile))]
-    {:column-properties
-     (reduce #(assoc %1 (first %2) (column-compatibility (rest %2)))
-             {}
-             (transpose data))
+  (let [data (csv/read-csv (slurp tempfile))
+        props (reduce #(assoc %1 (first %2) (column-compatibility (rest %2)))
+                      {}
+                      (transpose data))]
+    {:default-mappings (assoc (assign-default-mappings props)
+                              :absolute-path "Absolute Path")
+     :column-properties props
      :file-data data}))
 
 (defn import-with-mappings

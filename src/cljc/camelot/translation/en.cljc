@@ -353,7 +353,8 @@
    :default-config-created "A default configuration has been created in '%s'"
 
    :report
-   {:nights-elapsed "Nights Elapsed"
+   {:absolute-path "Absolute path"
+    :nights-elapsed "Nights Elapsed"
     :total-nights "Nights Elapsed"
     :independent-observations "Independent Observations"
     :independent-observations-per-night "Abundance Index"

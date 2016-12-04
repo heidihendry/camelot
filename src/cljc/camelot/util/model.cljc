@@ -123,6 +123,16 @@
    :trap-station-session-end-date {:datatype :timestamp
                                    :required false}})
 
+(def absolute-path {:absolute-path {:datatype :file
+                                    :required true}})
+
+(def extended-schema-definitions
+  (merge schema-definitions absolute-path))
+
+(defn with-absolute-path
+  [xs]
+  (conj xs (first (vec absolute-path))))
+
 (defn mappable-fields
   [sd]
   (remove #(:unmappable (second %)) sd))
@@ -151,7 +161,7 @@
 
 (defn mapping-validation-problems
   [column calculated-schema]
-  (let [s (schema-definitions column)]
+  (let [s (extended-schema-definitions column)]
     (if s
       (->> {}
            (maybe-datatype-problem s calculated-schema)
