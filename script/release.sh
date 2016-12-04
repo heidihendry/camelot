@@ -5,6 +5,7 @@ set -e
 PROJECT_NAME="camelot"
 PROJECT_FILE="project.clj"
 README_FILE="README.md"
+HTML_FILE="resources/public/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
 echo "Switching to master and making sure it's clean..."
@@ -17,6 +18,7 @@ released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${README_FILE}
 sed -i "s/\([0-9]\+\.[0-9]\+\.[0-9]\+\)\]/${released_version}\]/" ${README_FILE}
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).jar/${PROJECT_NAME}-${released_version}.jar/" ${BATCH_FILE}
+sed -i "s/\\?v=\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT/?v=${released_version}/" ${HTML_FILE}
 git commit -a -m "Version bump: $released_version"
 git tag -sa "v$released_version" -m "Release: $released_version"
 
@@ -37,6 +39,7 @@ patch_version=$(echo $released_version | cut -d\. -f3)
 new_patch_version=$(($patch_version+1))
 new_version="$(basename "${released_version}" ".${patch_version}").${new_patch_version}"
 sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"$/${PROJECT_NAME} \"${new_version}-SNAPSHOT\"/" ${PROJECT_FILE}
+sed -i "s/\\?v=${released_version}/?v=${new_version}-SNAPSHOT/" ${HTML_FILE}
 git commit -a -m "Version bump: ${new_version}-SNAPSHOT"
 
 echo "Cleaning up"
