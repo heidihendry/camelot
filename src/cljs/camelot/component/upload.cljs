@@ -10,14 +10,20 @@
 (defn upload-file
   [ep chan event]
   (let [f (aget (.. event -target -files) 0)]
+    (go (>! chan {:status :pending}))
     (rest/post-x-raw ep
                      [["survey-id" (state/get-survey-id)]
                       ["file" f]]
-                     #(go (>! chan {:response (:body %) :success true}))
-                     #(go (>! chan {:response (:body %) :success false})))))
+                     #(go (>! chan {:status :complete
+                                    :response (:body %)
+                                    :success true}))
+                     #(go (>! chan {:status :complete
+                                    :response (:body %)
+                                    :success false})))))
 
 (defn file-upload-component
-  [data owner {:keys [analytics-event success-handler failure-handler endpoint]}]
+  [data owner {:keys [analytics-event success-handler
+                      failure-handler pending-handler endpoint]}]
   (reify
     om/IDidMount
     (did-mount [_]
@@ -27,18 +33,19 @@
             (let [r (<! ch)]
               (if (= (:event r) :remove-file)
                 (om/transact! data :files #(dissoc % (get-in r [:file :survey-file-id])))
-                (if (:success r)
-                  (do
-                    (and success-handler (success-handler r))
-                    (nav/analytics-event analytics-event "success"))
-                  (do
-                    (and failure-handler (failure-handler r))
-                    (nav/analytics-event analytics-event "failure")))))
+                (case (:status r)
+                  :pending (and pending-handler (pending-handler r))
+                  :complete (if (:success r)
+                              (do
+                                (and success-handler (success-handler r))
+                                (nav/analytics-event analytics-event "success"))
+                              (do
+                                (and failure-handler (failure-handler r))
+                                (nav/analytics-event analytics-event "failure"))))))
             (recur)))))
     om/IRenderState
     (render-state [_ state]
       (dom/div nil
-               (dom/div #js {:className "sep"})
                (dom/input #js {:type "file"
                                :ref "file-input"
                                :className "btn btn-primary file-input-field"

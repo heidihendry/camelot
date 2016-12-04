@@ -130,7 +130,7 @@
       (if (seq (:survey-page-state app))
         (om/build manage/survey-management-component (:survey-page-state app))
         (dom/div #js {:className "align-center"}
-                   (dom/img #js {:className "spinner"
-                                 :src "images/spinner.gif"
-                                 :height "32"
-                                 :width "32"}))))))
+                 (dom/img #js {:className "spinner"
+                               :src "images/spinner.gif"
+                               :height "32"
+                               :width "32"}))))))

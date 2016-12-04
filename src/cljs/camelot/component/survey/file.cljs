@@ -108,6 +108,7 @@
         (dom/div #js {:className "section"}
                  (om/build file-list-component data {:init-state state})
                  ;; TODO notify user of error
+                 (dom/div #js {:className "sep"})
                  (om/build upload/file-upload-component data
                            {:init-state state
                             :opts {:analytics-event "file-upload"

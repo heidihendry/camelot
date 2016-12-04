@@ -419,6 +419,9 @@
     :media-notes "Media Notes"
     :media-filename "Media Filename"
     :media-format "Media Format"
+    :media-attention-needed "Media Attention Needed"
+    :media-cameracheck "Media Camera Check"
+    :media-processed "Media Processed"
     :sighting-quantity "Sighting Quantity"
     :sighting-lifestage "Sighting Life Stage"
     :sighting-sex "Sighting Sex"
@@ -702,7 +705,11 @@
     :survey-directory "Path to survey directory"}
 
    :camelot.component.bulk-import.mapper
-   {:title "Bulk Import"}
+   {:title "Bulk Import"
+    :scanning "Preparing data for mapping..."
+    :validation-mismatch "One or more fields do not have the necessary data to satisfy the assigned mappings."
+    :validation-missing "One or more required fields do not have a mapping assigned."
+    :validation-passed "Submit mappings for import."}
 
    :camelot.component.survey.create
    {:search-instructions "Search and add species using the options to the right."
