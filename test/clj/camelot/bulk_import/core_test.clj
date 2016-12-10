@@ -63,3 +63,23 @@
         (is (= (sut/resolve-server-directory "/srv/research data/camelot"
                                              "survey1\\something")
                "/srv/research data/camelot/survey1/something"))))))
+
+(deftest test-default-mapping-assignment
+  (testing "Default mapping assignment."
+    (testing "should map known default values"
+      (let [ps {"Camelot GPS Latitude" true}]
+        (is (= (sut/assign-default-mappings ps)
+               {:trap-station-latitude "Camelot GPS Latitude"}))))
+
+    (testing "should be additive."
+      (let [ps {"Camelot GPS Latitude" true
+                "Camelot GPS Longitude" true}]
+        (is (= (sut/assign-default-mappings ps)
+               {:trap-station-latitude "Camelot GPS Latitude"
+                :trap-station-longitude "Camelot GPS Longitude"}))))
+
+    (testing "should ignore columns which to not have a default mapping."
+      (let [ps {"Camelot GPS Latitude" true
+                "Something" true}]
+        (is (= (sut/assign-default-mappings ps)
+               {:trap-station-latitude "Camelot GPS Latitude"}))))))

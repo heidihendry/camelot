@@ -5,17 +5,23 @@
                :required true
                :unmappable true}
    :camera-make {:datatype :string
-                 :required false}
+                 :required false
+                 :order 21}
    :camera-model {:datatype :string
-                  :required false}
+                  :required false
+                  :order 20}
    :camera-name {:datatype :string
-                 :required true}
+                 :required true
+                 :order 10}
    :media-attention-needed {:datatype :boolean
-                            :required false}
+                            :required false
+                            :order 80}
    :media-cameracheck {:datatype :boolean
-                       :required false}
+                       :required false
+                       :order 82}
    :media-capture-timestamp {:datatype :timestamp
-                             :required true}
+                             :required true
+                             :order 30}
    :media-created {:datatype :timestamp
                    :required true
                    :unmappable true}
@@ -29,7 +35,8 @@
               :required true
               :unmappable true}
    :media-processed {:datatype :boolean
-                     :required false}
+                     :required false
+                     :order 81}
    :media-updated {:datatype :timestamp
                    :required true
                    :unmappable true}
@@ -43,29 +50,37 @@
                       :required true
                       :unmappable true}
    :sighting-quantity {:datatype :integer
-                       :required false}
+                       :required false
+                       :order 40}
    :sighting-lifestage {:datatype :string
                         :validation-type :lifestage
-                        :required false}
+                        :required false
+                        :order 42}
    :sighting-sex {:datatype :string
                   :validation-type :sex
-                  :required false}
+                  :required false
+                  :order 41}
    :sighting-updated {:datatype :timestamp
                       :required true
                       :unmappable true}
    :site-city {:datatype :string
-               :required false}
+               :required false
+               :order 5}
    :site-id {:datatype :integer
              :required true
              :unmappable true}
    :site-name {:datatype :string
-               :required true}
+               :required true
+               :order 3}
    :site-sublocation {:datatype :string
-                      :required false}
+                      :required false
+                      :order 4}
    :site-state-province {:datatype :string
-                         :required false}
+                         :required false
+                         :order 6}
    :site-country {:datatype :string
-                  :required false}
+                  :required false
+                  :order 7}
    :survey-id {:datatype :integer
                :required true
                :unmappable true}
@@ -76,16 +91,20 @@
                     :required true
                     :unmappable true}
    :taxonomy-class {:datatype :string
-                    :required false}
+                    :required false
+                    :order 64}
    :taxonomy-created {:datatype :timestamp
                       :required true
                       :unmappable true}
    :taxonomy-common-name {:datatype :string
-                          :required false}
+                          :required false
+                          :order 60}
    :taxonomy-family {:datatype :string
-                     :required false}
+                     :required false
+                     :order 63}
    :taxonomy-genus {:datatype :string
-                    :required false}
+                    :required false
+                    :order 62}
    :taxonomy-id {:datatype :integer
                  :required true
                  :unmappable true}
@@ -93,11 +112,14 @@
                     :required true
                     :unmappable true}
    :taxonomy-notes {:datatype :string
-                    :required false}
+                    :required false
+                    :order 66}
    :taxonomy-order {:datatype :string
-                    :required false}
+                    :required false
+                    :order 65}
    :taxonomy-species {:datatype :string
-                      :required false}
+                      :required false
+                      :order 61}
    :taxonomy-updated {:datatype :timestamp
                       :required true
                       :unmappable true}
@@ -106,12 +128,15 @@
                      :unmappable true}
    :trap-station-latitude {:datatype :number
                            :validation-type :latitude
-                           :required true}
+                           :required true
+                           :order 30}
    :trap-station-longitude {:datatype :number
                             :validation-type :longitude
-                            :required true}
+                            :required true
+                            :order 31}
    :trap-station-name {:datatype :string
-                       :required true}
+                       :required true
+                       :order 15}
    :trap-station-session-camera-id {:datatype :integer
                                     :required true
                                     :unmappable true}
@@ -119,12 +144,40 @@
                              :required true
                              :unmappable true}
    :trap-station-session-start-date {:datatype :timestamp
-                                     :required true}
+                                     :required true
+                                     :order 20}
    :trap-station-session-end-date {:datatype :timestamp
-                                   :required false}})
+                                   :required true
+                                   :order 22}
+   :photo-fnumber-setting {:datatype :string
+                           :required false
+                           :order 70}
+   :photo-exposure-value {:datatype :string
+                          :required false
+                          :order 71}
+   :photo-flash-setting {:datatype :string
+                         :required false
+                         :order 72}
+   :photo-focal-setting {:datatype :string
+                         :required false
+                         :order 73}
+   :photo-iso-setting {:datatype :integer
+                       :required false
+                       :order 74}
+   :photo-orientation {:datatype :string
+                       :required false
+                       :order 75}
+   :photo-resolution-x {:datatype :string
+                        :required false
+                        :order 76}
+   :photo-resolution-y {:datatype :string
+                        :required false
+                        :order 77}
+   })
 
 (def absolute-path {:absolute-path {:datatype :file
-                                    :required true}})
+                                    :required true
+                                    :order 40}})
 
 (def extended-schema-definitions
   (merge schema-definitions absolute-path))

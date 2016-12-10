@@ -20,6 +20,25 @@
    (java.util.regex Pattern)))
 
 (def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
+(def default-column-mappings
+  {:trap-station-latitude "Camelot GPS Latitude"
+   :trap-station-longitude "Camelot GPS Longitude"
+   :media-capture-timestamp "Date/Time"
+   :camera-make "Make"
+   :camera-model "Model"
+   :trap-station-altitude "GPS Altitude"
+   :site-country "Country/Primary Location Name"
+   :site-state-province "Province/State"
+   :site-city "City"
+   :site-sublocation "Sub-location"
+   :photo-fnumber-setting "Aperture Value"
+   :photo-exposure-value "Exposure Bias Value"
+   :photo-flash-setting "Flash"
+   :photo-focal-setting "Focal Length"
+   :photo-iso-setting "ISO Speed Ratings"
+   :photo-orientation "Orientation"
+   :photo-resolution-x "Image Height"
+   :photo-resolution-y "Image Width"})
 
 (s/defn relative-path? :- s/Bool
   [dir :- s/Str]
@@ -287,22 +306,13 @@
   (let [m# (fn [x#] (list `(~testfn (second ~x#))
                           `(assoc (first ~x#) (second ~x#))))]
     `(cond-> ~initexpr
-       ~@(mapcat m# mapping))))
+       ~@(mapcat m# (eval mapping)))))
 
 (defn assign-default-mappings
   [props]
   (cond-column->
    #(get props %) {}
-   {:trap-station-latitude "Camelot GPS Latitude"
-    :trap-station-longitude "Camelot GPS Longitude"
-    :media-capture-timestamp "Date/Time"
-    :camera-make "Make"
-    :camera-model "Model"
-    :trap-station-altitude "GPS Altitude"
-    :site-country "Country/Primary Location Name"
-    :site-state-province "Province/State"
-    :site-city "City"
-    :site-sublocation "Sub-location"}))
+   default-column-mappings))
 
 (defn column-map-options
   [state

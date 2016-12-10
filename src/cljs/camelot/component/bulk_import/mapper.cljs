@@ -95,7 +95,7 @@
                                   :value (get mappings (first field))}
                              (om/build-all field-mapping-option
                                            (sort-by first (conj column-properties
-                                                                (hash-map "" {})))
+                                                                   (hash-map "" {})))
                                            {:key first}))
                  (if-let [m (get mappings (first field))]
                    (dom/label #js {:className "validation-warning"}
@@ -132,6 +132,17 @@
                                                                        (om/update! data :import-status nil))}
                                                       (tr/translate :words/cancel)))}}))))
 
+(defn compare-column-schema-weight
+  "Sort based on column schema weightings."
+  [a b]
+  (prn (first a))
+  (let [da (get model/schema-definitions (first a))
+        db (get model/schema-definitions (first b))]
+    (let [o (compare (:order da) (:order db))]
+      (if (zero? o)
+        (compare (first a) (first b))
+        o))))
+
 (defn column-mapping-form-component
   [data owner]
   (reify
@@ -147,10 +158,11 @@
                                      :mappings colmaps
                                      :field %
                                      :vkey (first %))
-                          (sort-by first (-> model/schema-definitions
-                                             model/mappable-fields
-                                             model/required-fields
-                                             model/with-absolute-path)))
+                          (sort compare-column-schema-weight
+                                (-> model/schema-definitions
+                                    model/mappable-fields
+                                    model/required-fields
+                                    model/with-absolute-path)))
                     {:init-state state
                      :opts {:required true}
                      :key :vkey})
@@ -161,9 +173,10 @@
                                      :mappings colmaps
                                      :field %
                                      :vkey (first %))
-                          (sort-by first (-> model/schema-definitions
-                                             model/mappable-fields
-                                             model/optional-fields)))
+                          (sort compare-column-schema-weight
+                                (-> model/schema-definitions
+                                    model/mappable-fields
+                                    model/optional-fields)))
                     {:init-state state
                      :key :vkey})
                    (let [vs (validation-summary (:validation-problem data))]
