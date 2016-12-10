@@ -99,9 +99,11 @@
                                            {:key first}))
                  (if-let [m (get mappings (first field))]
                    (dom/label #js {:className "validation-warning"}
-                              (model/reason-mapping-invalid (first field)
-                                                            (get column-properties m)
-                                                            tr/translate))))))))
+                              (model/reason-mapping-invalid
+                               model/extended-schema-definitions
+                               (first field)
+                               (get column-properties m)
+                               tr/translate))))))))
 
 (defn import-status-component
   [data owner]
@@ -135,7 +137,6 @@
 (defn compare-column-schema-weight
   "Sort based on column schema weightings."
   [a b]
-  (prn (first a))
   (let [da (get model/schema-definitions (first a))
         db (get model/schema-definitions (first b))]
     (let [o (compare (:order da) (:order db))]
@@ -213,14 +214,17 @@
     om/IWillUpdate
     (will-update [_ _ _]
       (let [fs (-> model/schema-definitions
-                   model/mappable-fields)]
+                   model/mappable-fields
+                   model/with-absolute-path)]
         (om/update! data :validation-problem
                     (or
                      (reduce #(let [m (get data [:mappings (first %2)])]
                                 (if (and m
-                                         (model/reason-mapping-invalid (first %2)
-                                                                       (get-in data [:column-properties m])
-                                                                       identity))
+                                         (model/reason-mapping-invalid
+                                          model/extended-schema-definitions
+                                          (first %2)
+                                          (get-in data [:column-properties m])
+                                          identity))
                                   (reduced :mismatch)))
                              nil fs)
                      (reduce #(let [m (get data [:mappings (first %2)])]

@@ -301,6 +301,14 @@
   {:constraints (possible-constraints vs)
    :datatypes (possible-datatypes vs)})
 
+(defn calculate-column-properties
+  "Return a map representing the properties of each column of a vector of
+  vectors."
+  [data]
+  (reduce #(assoc %1 (first %2) (column-compatibility (rest %2)))
+                      {}
+                      (transpose data)))
+
 (defmacro cond-column->
   [testfn initexpr mapping]
   (let [m# (fn [x#] (list `(~testfn (second ~x#))
@@ -327,14 +335,12 @@
     (throw (RuntimeException. "CSV must not be empty")))
 
   (let [data (csv/read-csv (slurp tempfile))
-        props (reduce #(assoc %1 (first %2) (column-compatibility (rest %2)))
-                      {}
-                      (transpose data))]
+        props (calculate-column-properties data)]
     {:default-mappings (assoc (assign-default-mappings props)
                               :absolute-path "Absolute Path")
      :column-properties props
      :file-data data}))
 
 (defn import-with-mappings
-  [session data]
+  [session {:keys [file-data mappings] :as data}]
   data)

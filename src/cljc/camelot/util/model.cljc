@@ -199,22 +199,22 @@
   (remove #(:required (second %)) sd))
 
 (defn maybe-datatype-problem
-  [s calculated-constraints results]
-  (if (not-any? #{(or (:validation-type s) (:datatype s))}
+  [schema calculated-constraints results]
+  (if (not-any? #{(or (:validation-type schema) (:datatype schema))}
                 (:datatypes calculated-constraints))
-    (assoc results :datatype s)
+    (assoc results :datatype schema)
     results))
 
 (defn maybe-required-constraint-problem
-  [s calculated-constraints results]
-  (if (and (:required s)
+  [schema calculated-constraints results]
+  (if (and (:required schema)
            (not-any? #{:required} (:constraints calculated-constraints)))
     (assoc results :required-constraint true)
     results))
 
 (defn mapping-validation-problems
-  [column calculated-schema]
-  (let [s (extended-schema-definitions column)]
+  [schemas column calculated-schema]
+  (let [s (get schemas column)]
     (if s
       (->> {}
            (maybe-datatype-problem s calculated-schema)
@@ -222,9 +222,9 @@
       {:global ::schema-not-found})))
 
 (defn describe-datatype
-  [translation-fn dt]
-  (translation-fn (case (or (:validation-type dt)
-                            (:datatype dt))
+  [schema translation-fn]
+  (translation-fn (case (or (:validation-type schema)
+                            (:datatype schema))
                     :integer ::datatype-integer
                     :number ::datatype-number
                     :sex ::datatype-sex
@@ -237,20 +237,36 @@
                     :string ::datatype-string)))
 
 (defn reason-mapping-invalid
-  [column calculated-schema translation-fn]
-  (let [ps (mapping-validation-problems column calculated-schema)]
+  [schemas column calculated-schema translation-fn]
+  (let [ps (mapping-validation-problems schemas column calculated-schema)]
     (if (:global ps)
       (translation-fn (:global ps) column)
       (cond
+        (nil? calculated-schema)
+        (translation-fn ::calculated-schema-not-available
+                        column)
+
         (and (:required-constraint ps) (:datatype ps))
         (translation-fn ::datatype-and-required-constraint-problem
-                        (describe-datatype translation-fn (:datatype ps)))
+                        (describe-datatype  (:datatype ps) translation-fn))
 
         (and (:datatype ps))
         (translation-fn ::datatype-problem-only
-                        (describe-datatype translation-fn (:datatype ps)))
+                        (describe-datatype (:datatype ps) translation-fn))
 
         (and (:required-constraint ps))
         (translation-fn ::required-constraint-problem-only)))))
+
+(defn check-mapping
+  "Validate all mappings, returning a list of invalid mappings."
+  ([schemas mappings calculated-schema translation-fn]
+   (let [xform (comp (map (fn [[k v]]
+                            (let [r (get calculated-schema (get mappings k))]
+                              (reason-mapping-invalid schemas k r translation-fn))))
+                     (remove nil?))]
+     (reduce (xform conj) [] schemas)))
+  ([mappings calculated-schema translation-fn]
+   (check-mapping (-> schema-definitions mappable-fields with-absolute-path)
+                  mappings calculated-schema translation-fn)))
 
 (def fields (keys schema-definitions))

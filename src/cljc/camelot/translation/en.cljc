@@ -742,6 +742,7 @@
     :datatype-and-required-constraint-problem "All records for this field should be %s and a value should always be present, but this is not the case."
     :datatype-problem-only "All all records for this field should be %s, but this is not the case."
     :required-constraint-problem-only "A value should always be present, but this is not the case."
+    :calculated-schema-not-available "Schema not found mapping for column '%s'."
     :datatype-integer "an integer"
     :datatype-number "a number"
     :datatype-sex "either 'male' or 'female'"
