@@ -1,4 +1,5 @@
-(ns camelot.util.model)
+(ns camelot.util.model
+)
 
 (def schema-definitions
   {:camera-id {:datatype :integer
@@ -172,8 +173,7 @@
                         :order 76}
    :photo-resolution-y {:datatype :string
                         :required false
-                        :order 77}
-   })
+                        :order 77}})
 
 (def absolute-path {:absolute-path {:datatype :file
                                     :required true
@@ -189,6 +189,12 @@
 (defn mappable-fields
   [sd]
   (remove #(:unmappable (second %)) sd))
+
+(def all-mappable-fields
+  "All fields which a user may mapped to."
+  (into {} (-> schema-definitions
+               mappable-fields
+               with-absolute-path)))
 
 (defn required-fields
   [sd]
@@ -266,7 +272,7 @@
                      (remove nil?))]
      (reduce (xform conj) [] schemas)))
   ([mappings calculated-schema translation-fn]
-   (check-mapping (-> schema-definitions mappable-fields with-absolute-path)
+   (check-mapping all-mappable-fields
                   mappings calculated-schema translation-fn)))
 
 (def fields (keys schema-definitions))
