@@ -6,7 +6,7 @@
    [schema.core :as s]
    [camelot.db.core :as db]))
 
-(sql/defqueries "sql/species-mass.sql" {:connection db/spec})
+(sql/defqueries "sql/species-mass.sql")
 
 (defn- label-record
   "Add label to species record data."

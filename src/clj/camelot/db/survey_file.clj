@@ -9,7 +9,7 @@
    [ring.util.response :as r]
    [camelot.util.file :as file]))
 
-(sql/defqueries "sql/survey-file.sql" {:connection db/spec})
+(sql/defqueries "sql/survey-file.sql")
 
 (s/defrecord TSurveyFile
     [survey-id :- s/Int

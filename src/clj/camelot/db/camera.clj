@@ -8,7 +8,7 @@
    [camelot.db.camera-status :as camera-status]
    [camelot.db.media :as media]))
 
-(sql/defqueries "sql/cameras.sql" {:connection db/spec})
+(sql/defqueries "sql/cameras.sql")
 
 (s/defrecord TCamera
     [camera-name :- s/Str
@@ -34,22 +34,30 @@
            camera-status-description]}]
   (->Camera camera-id camera-created camera-updated camera-name
             camera-make camera-model camera-notes camera-status-id
-            (camera-status/translate-status camera-status-description)))
+            camera-status-description))
 
 (s/defn tcamera :- TCamera
   [{:keys [camera-name camera-make camera-model camera-notes
            camera-status-id]}]
   (->TCamera camera-name camera-make camera-model camera-notes
-             (or camera-status-id (:camera-status-id
-                                   (camera-status/default-camera-status)))))
+             (or camera-status-id 1)))
+
+(s/defn to-camera :- Camera
+  [state record]
+  (-> record
+      (update :camera-status-description
+              #(camera-status/translate-status state %))
+      camera))
 
 (s/defn get-all :- [Camera]
   [state :- State]
-  (map camera (db/clj-keys (db/with-connection (:connection state) -get-all))))
+  (map #(to-camera state %)
+       (db/clj-keys (db/with-connection (:connection state) -get-all))))
 
 (s/defn get-available :- [Camera]
   [state :- State]
-  (map camera (db/clj-keys (db/with-connection (:connection state) -get-available))))
+  (->> (db/clj-keys (db/with-connection (:connection state) -get-available))
+       (to-camera state)))
 
 (s/defn get-specific :- (s/maybe Camera)
   [state :- State
@@ -57,15 +65,15 @@
   (some->> {:camera-id id}
            (db/with-db-keys state -get-specific)
            (first)
-           (camera)))
+           (to-camera state)))
 
 (s/defn get-specific-by-name :- (s/maybe Camera)
   [state :- State
    data :- {:camera-name s/Str}]
   (some->> data
            (db/with-db-keys state -get-specific-by-name)
-           (first)
-           (camera)))
+           first
+           (to-camera state)))
 
 (s/defn create!
   [state :- State

@@ -7,15 +7,12 @@
    [camelot.db.core :as db]
    [camelot.translation.core :as tr]))
 
-(sql/defqueries "sql/camera-status.sql" {:connection db/spec})
+(sql/defqueries "sql/camera-status.sql")
 
 (def camera-available "camera-status/available")
 
 (defn translate-status
   "Translate a camera status to something readable."
-  ([status]
-   (tr/translate (state/gen-state)
-                 (keyword status)))
   ([state status]
    (tr/translate (:config state) (keyword status))))
 
@@ -71,12 +68,6 @@
   (->> (get-all-raw state)
        (filter #(= desc (:camera-status-description %)))
        (first)))
-
-(s/defn default-camera-status :- (s/maybe CameraStatus)
-  "Return the camera status which should be assigned to new cameras."
-  []
-  (get-specific-with-description (state/gen-state)
-                                 camera-available))
 
 (s/defn active-status-id
   [state]

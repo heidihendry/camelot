@@ -7,7 +7,7 @@
    [camelot.db.core :as db]
    [camelot.db.media :as media]))
 
-(sql/defqueries "sql/sites.sql" {:connection db/spec})
+(sql/defqueries "sql/sites.sql")
 
 (s/defrecord TSite
     [site-name :- s/Str

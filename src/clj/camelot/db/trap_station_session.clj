@@ -8,7 +8,7 @@
    [clj-time.core :as t]
    [camelot.db.media :as media]))
 
-(sql/defqueries "sql/trap-station-sessions.sql" {:connection db/spec})
+(sql/defqueries "sql/trap-station-sessions.sql")
 
 (s/defrecord TTrapStationSession
     [trap-station-id :- s/Int

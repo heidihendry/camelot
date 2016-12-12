@@ -11,7 +11,7 @@
   (:import
    (camelot.db.sighting Sighting)))
 
-(sql/defqueries "sql/library.sql" {:connection db/spec})
+(sql/defqueries "sql/library.sql")
 
 (s/defrecord LibraryRecord
     [media-id :- s/Int

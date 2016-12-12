@@ -5,7 +5,7 @@
    [camelot.app.state :refer [State]]
    [camelot.db.core :as db]))
 
-(sql/defqueries "sql/taxonomy.sql" {:connection db/spec})
+(sql/defqueries "sql/taxonomy.sql")
 
 (s/defrecord TTaxonomy
     [taxonomy-class :- (s/maybe s/Str)

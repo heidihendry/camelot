@@ -28,10 +28,9 @@
        resources))
 
 (defn- maybe-get
-  [resource v]
+  [state resource v]
   (if v
-    (let [state (state/gen-state)]
-      (resource state v))
+    (resource state v)
     []))
 
 (def cameracheck-re
@@ -45,16 +44,16 @@
 
 (defn options
   "Return all albums for the current configuration."
-  [params]
-  (let [surveys (canonicalise (survey/get-all (state/gen-state))
+  [state params]
+  (let [surveys (canonicalise (survey/get-all state)
                               :survey-id :survey-name)
-        survey-sites (canonicalise (maybe-get survey-site/get-all (:survey params))
+        survey-sites (canonicalise (maybe-get state survey-site/get-all (:survey params))
                                    :survey-site-id :site-name)
-        trap-stations (canonicalise (maybe-get trap-station/get-all (:survey-site params))
+        trap-stations (canonicalise (maybe-get state trap-station/get-all (:survey-site params))
                                     :trap-station-id :trap-station-name)
-        trap-sessions (canonicalise (maybe-get trap-station-session/get-all (:trap-station params))
+        trap-sessions (canonicalise (maybe-get state trap-station-session/get-all (:trap-station params))
                                     :trap-station-session-id :trap-station-session-label)
-        trap-cameras (canonicalise (maybe-get trap-station-session-camera/get-all
+        trap-cameras (canonicalise (maybe-get state trap-station-session-camera/get-all
                                               (:trap-station-session params))
                                    :trap-station-session-camera-id
                                    :camera-name)]

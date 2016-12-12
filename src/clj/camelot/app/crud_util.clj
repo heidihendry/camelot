@@ -119,9 +119,9 @@
   an as its second argument.  `id-str' the string representation of the
   desired resource ID.  This is typically used for finding possible resources
   where there's a constraint that they must be unique."
-  [f id-str session]
+  [f id-str state]
   (let [id (as-long id-str)]
-    (-> (state/gen-state session)
+    (-> state
         (f id)
         (r/response))))
 
@@ -132,14 +132,14 @@
   each record.  It should be the key representing the ID of a record, sans the
   '-id' suffix.  If `id-str' is provided, this will be parsed and passed as
   the second argument to `f'."
-  ([f resource-key session]
-   (-> (state/gen-state session)
+  ([f resource-key state]
+   (-> state
        (f)
        (add-resource-uris resource-key)
        (r/response)))
-  ([f resource-key id-str session]
+  ([f resource-key id-str state]
    (let [id (as-long id-str)]
-     (-> (state/gen-state session)
+     (-> state
          (f id)
          (add-resource-uris resource-key)
          (r/response)))))
@@ -148,9 +148,9 @@
   "Return a single resource.
   `f' is a resource-fetching function which takes the configuration as its
   first argument, and a parsed ID is its second argument."
-  [f id-str session]
+  [f id-str state]
   (let [id (as-long id-str)]
-    (-> (state/gen-state session)
+    (-> state
         (f id)
         (cursorise)
         (r/response))))
@@ -161,17 +161,17 @@
   - the configuration as its first argument,
   - a parsed ID is its second argument,
   - a (processed) map as its third argument"
-  ([f id-str data session]
+  ([f id-str data state]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))
          id (as-long id-str)]
-     (-> (state/gen-state session)
+     (-> state
          (f id stddata)
          (cursorise)
          (r/response))))
-  ([f id-str ctor data session]
+  ([f id-str ctor data state]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))
          id (as-long id-str)]
-     (-> (state/gen-state session)
+     (-> state
          (f id stddata)
          (cursorise)
          (r/response)))))
@@ -181,15 +181,15 @@
   `f' is a function which creates a resource.  It will take the configuration
   as its first argument, and a (processed) map of the data for the resource as
   its second argument."
-  ([f data session]
+  ([f data state]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats))]
-     (-> (state/gen-state session)
+     (-> state
          (f stddata)
          (cursorise)
          (r/response))))
-  ([f ctor data session]
+  ([f ctor data state]
    (let [stddata (-> data (decursorise) (parse-ids) (parse-floats) (ctor))]
-     (-> (state/gen-state session)
+     (-> state
          (f stddata)
          (cursorise)
          (r/response)))))
@@ -198,9 +198,9 @@
   "Delete a resource.
   `f' is a function which deletes a resource given a (parsed) ID.  `id-str' is
   the string representation of a resource to delete."
-  [f id-str session]
+  [f id-str state]
   (let [id (as-long id-str)]
-    (-> (state/gen-state session)
+    (-> state
         (f id)
         ((fn [v] (hash-map :data v)))
         (r/response))))

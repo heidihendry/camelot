@@ -12,7 +12,7 @@
   (:import
    (org.apache.commons.lang3 SystemUtils)))
 
-(sql/defqueries "sql/media.sql" {:connection db/spec})
+(sql/defqueries "sql/media.sql")
 
 (s/defrecord TMedia
     [media-filename :- s/Str

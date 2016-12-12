@@ -21,8 +21,13 @@
   (camelot.db.migrate/migrate))
 
 (defn run []
-  (camelot.db.migrate/migrate)
-  (figwheel/start-figwheel!))
+  (camelot.core/start))
+
+(defn runprod []
+  (camelot.core/start-prod))
+
+(defn stop []
+  (camelot.core/stop))
 
 (def browser-repl figwheel/cljs-repl)
 

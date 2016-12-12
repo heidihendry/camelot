@@ -5,6 +5,13 @@
    [camelot.app.transit :as transit]
    [camelot.db.migrate :refer [migrate]]
    [camelot.app.routes :refer [app-routes]]
+   [camelot.app.state :as state]
+   [camelot.app.version :as version]
+   [camelot.db.core :as db]
+   [camelot.app.network :as network]
+   [camelot.app.desktop :as desktop]
+   [figwheel-sidecar.repl-api :as ra]
+   [com.stuartsierra.component :as component]
    [environ.core :refer [env]]
    [ring.adapter.jetty :refer [run-jetty]]
    [clojure.tools.nrepl.server :as nrepl]
@@ -16,56 +23,27 @@
    [ring.middleware.session :refer [wrap-session]]
    [ring.middleware.session.cookie :refer [cookie-store]]
    [ring.middleware.gzip :refer [wrap-gzip]]
-   [ring.middleware.logger :refer [wrap-with-logger]]
-   [camelot.app.version :as version]
-   [clojure.java.shell :refer [sh]])
-  (:import
-   (java.net URI NetworkInterface InetAddress)
-   (java.awt Desktop)
-   (java.util Enumeration))
+   [ring.middleware.logger :refer [wrap-with-logger]])
   (:gen-class))
 
 (defonce nrepl-server (when (env :camelot-debugger)
                         (nrepl/start-server :port 7888)))
+(defonce system (atom {}))
+(defonce jetty (atom nil))
+(defonce cookie-store-key "insecureinsecure")
 
-(defn meaningful-address
-  [n]
-  (let [as (.getInetAddresses ^NetworkInterface n)
-        check (atom nil)]
-    (while (and (nil? @check) (.hasMoreElements ^Enumeration as))
-      (let [a (.nextElement ^Enumeration as)]
-        (when (and (not (.isLinkLocalAddress ^InetAddress a))
-                   (= (type a) java.net.Inet4Address))
-          (reset! check a))))
-    @check))
-
-(defn get-network-addresses
-  []
-  (let [ns (NetworkInterface/getNetworkInterfaces)
-        check (atom [])]
-    (while (.hasMoreElements ^Enumeration ns)
-      (let [e (.nextElement ^Enumeration ns)
-            r (meaningful-address e)]
-        (when r
-          (swap! check #(conj % r)))))
-    (map #(.getHostAddress ^InetAddress %) @check)))
-
-(defn- start-browser
-  [port]
-  (let [addr (str "http://localhost:" port "/")
-        uri (new URI addr)]
-    (try
-      (if (Desktop/isDesktopSupported)
-        (.browse (Desktop/getDesktop) uri))
-      (catch java.lang.UnsupportedOperationException e
-        (sh "bash" "-c" (str "xdg-open " addr " &> /dev/null &"))))))
+(defn wrap-system
+  [handler & [options]]
+  (fn [request]
+    (handler (merge-with merge request {:system @system}))))
 
 (def http-handler
   "Handler for HTTP requests"
   (-> app-routes
       wrap-params
+      wrap-system
       wrap-multipart-params
-      (wrap-session {:store (cookie-store {:key "insecureinsecure"})})
+      (wrap-session {:store (cookie-store {:key cookie-store-key})})
       (wrap-transit-response {:encoding :json, :opts transit/transit-write-options})
       (wrap-transit-params {:opts transit/transit-read-options})
       wrap-stacktrace-log
@@ -73,16 +51,80 @@
       wrap-with-logger
       wrap-gzip))
 
-(defn -main [& args]
-  (let [port (Integer. (or (env :camelot-port) 5341))]
+(defrecord HttpServer [cli-args dev-mode port connection config]
+  component/Lifecycle
+  (start [this]
+    (if dev-mode
+      (do
+        (ra/start-figwheel!)
+        (assoc this :figwheel true))
+      (if @jetty
+        (do
+          (println "Jetty already running; not starting.")
+          (assoc this :jetty @jetty))
+        (do
+          (println (format "Camelot %s started on port %d.\n" (version/get-version) port))
+          (println "You might be able to connect to it from the following addresses:")
+          (network/print-network-addresses port)
+          (when (some #(= "--browser" %) cli-args)
+            (desktop/start-browser port))
+          (let [j (run-jetty http-handler {:port port :join? false})]
+            (reset! jetty j)
+            (assoc this :jetty j))))))
+
+  (stop [this]
+    (when (get this :jetty)
+      (.stop (get this :jetty))
+      (reset! jetty nil))
+    {}))
+
+;; TODO make sure this is updated when user updates config
+;; TODO these always need to return instance of itself.  But this breaks things...
+(defrecord Config [config]
+  component/Lifecycle
+  (start [this]
+    (merge (dissoc this :config) config))
+
+  (stop [this]
+    {}))
+
+;; TODO these always need to return instance of itself.  But this breaks things...
+(defrecord Database [conn]
+  component/Lifecycle
+  (start [this]
+    (db/connect)
     (migrate)
-    (println (format "Camelot %s started on port %d.\n" (version/get-version) port))
-    (println "You might be able to connect to it from the following addresses:")
-    (->> (get-network-addresses)
-         (mapcat #(InetAddress/getAllByName %))
-         (map #(.getCanonicalHostName ^InetAddress %))
-         (map #(println (format "  - http://%s:%d/" % port)))
-         (doall))
-    (when (some #(= "--browser" %) args)
-      (start-browser port))
-    (run-jetty http-handler {:port port :join? false})))
+    conn)
+
+  (stop [this]
+    (db/close)
+    {}))
+
+(defn camelot
+  [{:keys [cli-args options]}]
+  (-> (component/system-map
+       :config (map->Config (state/config))
+       :connection (map->Database {:conn db/spec})
+       :app (map->HttpServer {:port (or (:port options)
+                                        (Integer. (or (env :camelot-port) 5341)))
+                              :dev-mode (:dev-mode options)
+                              :cli-args (or cli-args [])}))
+      (component/system-using
+       {:app {:config :config
+              :connection :connection}})))
+
+(defn start []
+  (reset! system (component/start (camelot {:options {:dev-mode true}})))
+  nil)
+
+(defn stop []
+  (swap! system component/stop)
+  nil)
+
+(defn start-prod []
+  (reset! system (component/start (camelot {})))
+  nil)
+
+(defn -main [& args]
+  (camelot {:cli args})
+  (start-prod))

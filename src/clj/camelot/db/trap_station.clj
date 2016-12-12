@@ -7,7 +7,7 @@
    [camelot.db.core :as db]
    [camelot.db.media :as media]))
 
-(sql/defqueries "sql/trap-stations.sql" {:connection db/spec})
+(sql/defqueries "sql/trap-stations.sql")
 
 (s/defrecord TTrapStation
     [trap-station-name :- s/Str

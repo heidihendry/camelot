@@ -7,7 +7,7 @@
    [camelot.db.core :as db]
    [camelot.db.media :as media]))
 
-(sql/defqueries "sql/trap-station-session-cameras.sql" {:connection db/spec})
+(sql/defqueries "sql/trap-station-session-cameras.sql")
 
 (s/defrecord TrapStationSessionCamera
     [trap-station-session-camera-id :- s/Int
@@ -142,7 +142,7 @@
   "Return the available cameras, factoring in whether they're in use elsewhere."
   [state :- State
    id :- s/Int]
-  (db/clj-keys (-get-available)))
+  (db/clj-keys (db/with-connection (:connection state) -get-available)))
 
 (s/defn get-alternatives
   "Return the current and alternative cameras, factoring in whether they're in

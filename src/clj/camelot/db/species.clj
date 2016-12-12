@@ -6,7 +6,7 @@
    [camelot.app.state :refer [State]]
    [camelot.db.core :as db]))
 
-(sql/defqueries "sql/species.sql" {:connection db/spec})
+(sql/defqueries "sql/species.sql")
 
 (s/defrecord TSpecies
     [species-scientific-name :- s/Str

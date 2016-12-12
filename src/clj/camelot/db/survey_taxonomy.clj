@@ -9,7 +9,7 @@
 ;; NOTE: 030_survey_taxonomy_migration needs to be updated should this model
 ;; change.
 
-(sql/defqueries "sql/survey-taxonomy.sql" {:connection db/spec})
+(sql/defqueries "sql/survey-taxonomy.sql")
 
 (s/defrecord TSurveyTaxonomy
     [survey-id :- s/Int

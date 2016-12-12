@@ -15,7 +15,7 @@
    [yesql.core :as sql])
   (:import (clojure.lang IFn)))
 
-(sql/defqueries "sql/reports.sql" {:connection db/spec})
+(sql/defqueries "sql/reports.sql")
 
 (def all-columns
   [:survey-id
@@ -74,24 +74,24 @@
    :photo-resolution-y])
 
 (defn- get-all-by-survey
-  []
-  (db/clj-keys (-get-all-by-survey)))
+  [state]
+  (db/clj-keys (db/with-connection (:connection state) -get-all-by-survey)))
 
 (defn- get-all-by-taxonomy
-  []
-  (db/clj-keys (-get-all-by-taxonomy)))
+  [state]
+  (db/clj-keys (db/with-connection (:connection state) -get-all-by-taxonomy)))
 
 (defn- get-all-by-site
-  []
-  (db/clj-keys (-get-all-by-site)))
+  [state]
+  (db/clj-keys (db/with-connection (:connection state) -get-all-by-site)))
 
 (defn- get-all-by-camera
-  []
-  (db/clj-keys (-get-all-by-camera)))
+  [state]
+  (db/clj-keys (db/with-connection (:connection state) -get-all-by-camera)))
 
 (defn- get-all
-  []
-  (db/clj-keys (-get-all)))
+  [state]
+  (db/clj-keys (db/with-connection (:connection state) -get-all)))
 
 (def ^:private query-fn-map
   {:survey get-all-by-survey
@@ -102,8 +102,9 @@
 
 (s/defn get-by :- [{s/Keyword s/Any}]
   "Retrieve the data for the given report type."
-  [by :- s/Keyword]
-  ((get query-fn-map by)))
+  [state :- State
+   by :- s/Keyword]
+  ((get query-fn-map by) state))
 
 (defn- fill-keys
   [columns data]
@@ -334,7 +335,7 @@
    configuration]
   (loader/load-user-modules)
   (if-let [report (module/get-report state report-key)]
-    (let [sightings (get-by (:by report))
+    (let [sightings (get-by state (:by report))
           data (csv-report report-key state configuration sightings)]
       (-> (r/response data)
           (r/content-type "text/csv; charset=utf-8")
@@ -351,6 +352,11 @@
 (defn- report-configuration-reducer
   [acc k v]
   (conj acc (->report-descriptor v k)))
+
+(s/defn refresh-reports
+  "Rediscover and evaluate report modules."
+  [state]
+  (loader/load-user-modules))
 
 (s/defn available-reports
   "Map of all available reports."

@@ -19,7 +19,7 @@
   (:import
    (camelot.db.trap_station_session_camera TrapStationSessionCamera)))
 
-(sql/defqueries "sql/deployments.sql" {:connection db/spec})
+(sql/defqueries "sql/deployments.sql")
 
 (s/defrecord TDeployment
     [survey-id :- s/Int

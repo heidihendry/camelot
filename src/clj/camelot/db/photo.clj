@@ -6,7 +6,7 @@
    [camelot.app.state :refer [State]]
    [yesql.core :as sql]))
 
-(sql/defqueries "sql/photos.sql" {:connection db/spec})
+(sql/defqueries "sql/photos.sql")
 
 (s/defrecord TPhoto
     [photo-iso-setting :- (s/maybe s/Int)

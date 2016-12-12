@@ -6,7 +6,7 @@
    [camelot.db.core :as db]
    [camelot.db.media :as media]))
 
-(sql/defqueries "sql/survey-sites.sql" {:connection db/spec})
+(sql/defqueries "sql/survey-sites.sql")
 
 (s/defrecord TSurveySite
     [survey-id :- s/Int

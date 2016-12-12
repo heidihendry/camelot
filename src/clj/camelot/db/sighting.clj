@@ -6,7 +6,7 @@
    [camelot.db.core :as db]
    [schema.core :as s]))
 
-(sql/defqueries "sql/sightings.sql" {:connection db/spec})
+(sql/defqueries "sql/sightings.sql")
 
 (def sighting-default-option "unidentified")
 

@@ -28,6 +28,19 @@
    :subname (db-path),
    :create true})
 
+(defn connect
+  []
+  (jdbc/get-connection spec))
+
+(defn close
+  []
+  (try
+    (-> (assoc (dissoc spec :create)
+               :shutdown true)
+        jdbc/get-connection)
+    (catch Exception e
+      (println (.getMessage e)))))
+
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]

@@ -9,7 +9,7 @@
    [clojure.java.io :as io]
    [camelot.db.media :as media]))
 
-(sql/defqueries "sql/surveys.sql" {:connection db/spec})
+(sql/defqueries "sql/surveys.sql")
 
 (s/defrecord TSurvey
     [survey-name :- s/Str

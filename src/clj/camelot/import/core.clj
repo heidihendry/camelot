@@ -80,20 +80,20 @@
 
 (defn media
   "Import media"
-  [{:keys [folder session-camera-id notes]}]
-  (db/with-transaction [state (state/gen-state)]
+  [state {:keys [folder session-camera-id notes]}]
+  (db/with-transaction [s state]
     (let [[_ sitename _phase cameraname] (file/rel-path-components folder)
-          root-path (:root-path (:config state))
+          root-path (:root-path (:config s))
           full-path (str root-path folder)
-          album (get-album state root-path full-path)
+          album (get-album s root-path full-path)
           sample (second (first (:photos album)))
-          survey (im.db/get-or-create-survey! state root-path)
-          camera (im.db/get-or-create-camera! state cameraname sample)
-          trap-camera (->> (im.db/get-or-create-site! state sitename sample)
-                           (im.db/get-or-create-survey-site! state survey)
-                           (im.db/get-or-create-trap-station! state sample)
-                           (im.db/get-or-create-trap-session! state album)
-                           (im.db/get-or-create-trap-camera! state camera folder))]
-      (import-media-for-camera state notes full-path
+          survey (im.db/get-or-create-survey! s root-path)
+          camera (im.db/get-or-create-camera! s cameraname sample)
+          trap-camera (->> (im.db/get-or-create-site! s sitename sample)
+                           (im.db/get-or-create-survey-site! s survey)
+                           (im.db/get-or-create-trap-station! s sample)
+                           (im.db/get-or-create-trap-session! s album)
+                           (im.db/get-or-create-trap-camera! s camera folder))]
+      (import-media-for-camera s notes full-path
                                (:trap-station-session-camera-id trap-camera)
                                (vals (:photos album))))))

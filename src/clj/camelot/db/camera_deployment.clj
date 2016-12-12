@@ -15,7 +15,7 @@
    [camelot.util.deployment :as dep-util]
    [camelot.db.deployment :as deployment]))
 
-(sql/defqueries "sql/deployments.sql" {:connection db/spec})
+(sql/defqueries "sql/deployments.sql")
 
 (s/defrecord TCameraDeployment
     [trap-station-session-id :- s/Int

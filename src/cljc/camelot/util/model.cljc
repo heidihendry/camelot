@@ -270,7 +270,7 @@
                             (let [r (get calculated-schema (get mappings k))]
                               (reason-mapping-invalid schemas k r translation-fn))))
                      (remove nil?))]
-     (reduce (xform conj) [] schemas)))
+     (sequence xform schemas)))
   ([mappings calculated-schema translation-fn]
    (check-mapping all-mappable-fields
                   mappings calculated-schema translation-fn)))
