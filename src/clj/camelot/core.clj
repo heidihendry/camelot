@@ -3,11 +3,9 @@
   Core initialisation."
   (:require
    [camelot.app.transit :as transit]
-   [camelot.db.migrate :refer [migrate]]
    [camelot.app.routes :refer [app-routes]]
    [camelot.app.state :as state]
    [camelot.app.version :as version]
-   [camelot.db.core :as db]
    [camelot.app.network :as network]
    [camelot.app.desktop :as desktop]
    [figwheel-sidecar.repl-api :as ra]
@@ -78,40 +76,19 @@
       (reset! jetty nil))
     {}))
 
-;; TODO make sure this is updated when user updates config
-;; TODO these always need to return instance of itself.  But this breaks things...
-(defrecord Config [config]
-  component/Lifecycle
-  (start [this]
-    (merge (dissoc this :config) config))
-
-  (stop [this]
-    {}))
-
-;; TODO these always need to return instance of itself.  But this breaks things...
-(defrecord Database [conn]
-  component/Lifecycle
-  (start [this]
-    (db/connect)
-    (migrate)
-    conn)
-
-  (stop [this]
-    (db/close)
-    {}))
-
 (defn camelot
   [{:keys [cli-args options]}]
   (-> (component/system-map
-       :config (map->Config (state/config))
-       :connection (map->Database {:conn db/spec})
+       :config (state/map->Config {:store state/config-store
+                                   :config (state/config)})
+       :database (state/map->Database {:connection state/spec})
        :app (map->HttpServer {:port (or (:port options)
                                         (Integer. (or (env :camelot-port) 5341)))
                               :dev-mode (:dev-mode options)
                               :cli-args (or cli-args [])}))
       (component/system-using
        {:app {:config :config
-              :connection :connection}})))
+              :database :database}})))
 
 (defn start []
   (reset! system (component/start (camelot {:options {:dev-mode true}})))

@@ -5,6 +5,6 @@
 (require '[camelot.db.core :as db])
 (require '[camelot.db.survey-taxonomy :as survey-taxonomy])
 
-(db/with-transaction [s (state/gen-state)]
+(db/with-transaction [s (state/gen-state*)]
   (doseq [st (survey-taxonomy/get-all s)]
     (survey-taxonomy/delete! s (:survey-taxonomy-id st))))

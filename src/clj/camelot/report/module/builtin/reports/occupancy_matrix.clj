@@ -20,8 +20,8 @@
             [:start-date]
             [:end-date]]
    :schema {:taxonomy-id
-            {:label (tr/translate (:config state) :taxonomy/title)
-             :description (tr/translate (:config state) :taxonomy/report-description)
+            {:label (tr/translate state :taxonomy/title)
+             :description (tr/translate state :taxonomy/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/taxonomy"
@@ -29,14 +29,14 @@
                                     :value :taxonomy-id}}}
 
             :start-date
-            {:label (tr/translate (:config state) ::start-date)
-             :description (tr/translate (:config state) ::start-date)
+            {:label (tr/translate state ::start-date)
+             :description (tr/translate state ::start-date)
              :schema {:type :datetime
                       :required true}}
 
             :end-date
-            {:label (tr/translate (:config state) ::end-date)
-             :description (tr/translate (:config state) ::end-date)
+            {:label (tr/translate state ::end-date)
+             :description (tr/translate state ::end-date)
              :schema {:type :datetime
                       :required true}}}})
 

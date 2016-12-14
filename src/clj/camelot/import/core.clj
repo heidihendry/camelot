@@ -83,7 +83,7 @@
   [state {:keys [folder session-camera-id notes]}]
   (db/with-transaction [s state]
     (let [[_ sitename _phase cameraname] (file/rel-path-components folder)
-          root-path (:root-path (:config s))
+          root-path (state/lookup s :root-path)
           full-path (str root-path folder)
           album (get-album s root-path full-path)
           sample (second (first (:photos album)))

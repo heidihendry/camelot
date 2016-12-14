@@ -1,7 +1,8 @@
 (ns camelot.test-util.state
   (:require
    [clj-time.coerce :as tc]
-   [clj-time.core :as t]))
+   [clj-time.core :as t]
+   [camelot.app.state :as state]))
 
 (def default-config
   "Return the default configuration."
@@ -21,6 +22,12 @@
                      [:datetime] [:filename]]})
 
 (defn gen-state
-  ([] {:config default-config})
+  ([] {:config (.start (state/->Config (atom {})
+                                      default-config))
+       :database {:connection {}}
+       :app {}})
   ([config]
-   {:config (merge default-config config)}))
+   {:config (.start (state/->Config (atom {})
+                                   (merge default-config config)))
+    :database {:connection {}}
+    :app {}}))

@@ -54,8 +54,7 @@
 
 (s/defn get-all*
   [state :- State]
-  (map sighting (db/clj-keys (db/with-connection (:connection state)
-                               -get-all*))))
+  (map sighting (db/clj-keys (db/with-connection state -get-all*))))
 
 (s/defn get-specific
   [state :- State

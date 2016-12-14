@@ -122,6 +122,7 @@
 (defn rel-path-components
   "Return the relative path to `file' as a list of strings, each string representing a component of the path."
   [state file]
-  (let [rp (canonical-path (io/file (get-in state [:config :root-path])))]
+  (let [store (get-in state [:config :store])
+        rp (canonical-path (io/file (:root-path @store)))]
     (str/split (subs (canonical-path file) (inc (count rp)))
                (path-separator-re))))

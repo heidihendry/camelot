@@ -54,8 +54,7 @@
 (s/defn get-all :- [Taxonomy]
   [state :- State]
   (map (comp taxonomy add-label)
-       (db/clj-keys (db/with-connection (:connection state)
-                      -get-all))))
+       (db/clj-keys (db/with-connection state -get-all))))
 
 (s/defn get-all-for-survey :- [Taxonomy]
   [state :- State

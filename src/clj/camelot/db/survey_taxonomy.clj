@@ -35,7 +35,7 @@
 (s/defn get-all :- [SurveyTaxonomy]
   "Retrieve all available survey taxonomies."
   [state :- State]
-  (->> (db/with-connection (:connection state) -get-all)
+  (->> (db/with-connection state -get-all)
        (db/clj-keys)
        (map survey-taxonomy)))
 

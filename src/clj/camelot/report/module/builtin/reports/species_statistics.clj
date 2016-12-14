@@ -43,8 +43,8 @@
   {:resource {}
    :layout [[:taxonomy-id]]
    :schema {:taxonomy-id
-            {:label (tr/translate (:config state) :taxonomy/title)
-             :description (tr/translate (:config state) :taxonomy/report-description)
+            {:label (tr/translate state :taxonomy/title)
+             :description (tr/translate state :taxonomy/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/taxonomy"

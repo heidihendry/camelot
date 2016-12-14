@@ -17,8 +17,8 @@
   (wrap-reload #'camelot.core/http-handler))
 
 (defn migrate
-  []
-  (camelot.db.migrate/migrate))
+  [state]
+  (camelot.db.migrate/migrate (get-in state [:database :connection])))
 
 (defn run []
   (camelot.core/start))

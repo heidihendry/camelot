@@ -11,4 +11,4 @@
        (str/join ".")
        (str "metadata/")
        (keyword)
-       (tr/translate (:config state))))
+       (tr/translate state)))

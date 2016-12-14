@@ -2,11 +2,12 @@
   (:require
    [camelot.util.file :as sut]
    [clojure.test :refer :all]
-   [clojure.java.io :as io]))
+   [clojure.java.io :as io]
+   [camelot.test-util.state :as state]))
 
 (defn state
   [p]
-  {:config {:root-path p}})
+  (state/gen-state {:root-path p}))
 
 (deftest test-file-utils
   (testing "File utils"

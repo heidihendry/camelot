@@ -60,16 +60,7 @@
 (deftest test-with-db-keys
   (testing "Converting between database types"
     (testing "Calls a function with the `db' data, returning a `clj' result."
-      (let [fn #(update % :column_name inc)
+      (let [fn (fn [a c] (update a :column_name inc))
             data {:column-name 5}
             state (state/gen-state)]
-        (is (= (sut/with-db-keys state fn data) {:column-name 6}))))
-
-    (testing "Calls function with a connection should one be provided."
-      (let [fn (fn
-                 ([data opts] (:connection opts))
-                 ([data] false))
-            data {:column-name 5}
-            state (assoc (state/gen-state)
-                         :connection {:v true})]
-        (is (= (sut/with-db-keys state fn data) {:v true}))))))
+        (is (= (sut/with-db-keys state fn data) {:column-name 6}))))))

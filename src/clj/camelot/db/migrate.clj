@@ -3,10 +3,8 @@
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
    [resauce.core :as resauce]
-   [camelot.db.core :as db]
-   [ragtime
-    [core :as rtc]
-    [protocols :as rtp]])
+   [ragtime.core :as rtc]
+   [ragtime.protocols :as rtp])
   (:use
    [ragtime.jdbc :as ragjdbc]))
 
@@ -40,44 +38,42 @@
         :up   (mapv slurp up)
         :down (mapv slurp down)}))))
 
-(def ragtime-config
+(defn ragtime-config
+  [connection]
   "Ragtime configuration"
-  {:datastore (ragjdbc/sql-database db/spec)
+  {:datastore (ragjdbc/sql-database connection)
    :migrations (sort-by :id (ragjdbc/load-resources "migrations"))})
 
 (defn migrate
   "Apply the available database migrations."
-  ([]
-   (rtc/migrate-all (:datastore ragtime-config)
-                    (rtc/into-index (:migrations ragtime-config))
-                    (:migrations ragtime-config)))
-  ([c]
-   (rtc/migrate-all (:datastore c)
-                    (rtc/into-index (:migrations c))
-                    (:migrations c))))
+  ([connection]
+   (let [conf (ragtime-config connection)]
+     (rtc/migrate-all (:datastore conf)
+                      (rtc/into-index (:migrations conf))
+                      (:migrations conf)))))
 
 (defn version
   "Return the prefix of the latest migration name as a string, e.g., '019'.
 This will return nil if a migration has never been applied."
-  []
-  (some->> ragtime-config
-           :migrations
-           rtc/into-index
-           (ragtime.core/applied-migrations (:datastore ragtime-config))
-           (map :id)
-           last
-           (take-while #(not= % \-))
-           (str/join "")))
+  [connection]
+  (let [conf (ragtime-config connection)]
+    (some->> conf
+             :migrations
+             rtc/into-index
+             (ragtime.core/applied-migrations (:datastore conf))
+             (map :id)
+             last
+             (take-while #(not= % \-))
+             (str/join ""))))
 
 (defn rollback
   "Rollback the last migration."
-  ([]
-   (rtc/rollback-last (:datastore ragtime-config)
-                      (rtc/into-index (:migrations ragtime-config))))
-  ([c]
-   (rtc/rollback-last (:datastore c)
-                      (rtc/into-index (:migrations c))))
-  ([c n]
-   (rtc/rollback-last (:datastore c)
-                      (rtc/into-index (:migrations c))
-                      n)))
+  ([connection]
+   (let [conf (ragtime-config connection)]
+     (rtc/rollback-last (:datastore conf)
+                        (rtc/into-index (:migrations conf)))))
+  ([connection n]
+   (let [conf (ragtime-config connection)]
+     (rtc/rollback-last (:datastore conf)
+                        (rtc/into-index (:migrations conf))
+                        n))))

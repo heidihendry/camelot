@@ -4,8 +4,10 @@
    [schema.core :as s]
    [clj-time.core :as t]
    [clj-time.coerce :as tc]
+   [camelot.db.migrate :refer [migrate]]
+   [camelot.db.core :as db]
    [camelot.util.file :as file]
-   [camelot.translation.core :as tr]
+   [com.stuartsierra.component :as component]
    [clojure.java.io :as io]
    [clojure.pprint :as pp]
    [clojure.edn :as edn]
@@ -16,30 +18,7 @@
    (java.lang RuntimeException)
    (java.io IOException)))
 
-(def Config
-  {(s/required-key :erroneous-infrared-threshold) s/Num
-   (s/required-key :infrared-iso-value-threshold) s/Int
-   (s/required-key :language) (s/enum :en :vn)
-   (s/required-key :root-path) (s/maybe s/Str)
-   (s/required-key :night-end-hour) s/Int
-   (s/required-key :night-start-hour) s/Int
-   (s/required-key :project-start) org.joda.time.DateTime
-   (s/required-key :project-end) org.joda.time.DateTime
-   (s/required-key :send-usage-data) s/Bool
-   (s/required-key :sighting-independence-minutes-threshold) s/Num
-   (s/required-key :surveyed-species) [s/Str]
-   (s/required-key :required-fields) [[s/Keyword]]
-   (s/optional-key :rename) s/Any
-   (s/optional-key :timezone) s/Str
-   (s/optional-key :features) (s/maybe {s/Keyword s/Bool})})
-
-(def State
-  {(s/required-key :config) Config
-   (s/required-key :connection) clojure.lang.PersistentArrayMap
-   (s/required-key :app) s/Any
-   (s/optional-key :figwheel) s/Any
-   (s/optional-key :jetty) s/Any
-   (s/optional-key :camera-status-active-id) s/Int})
+(def config-store (atom {}))
 
 (def default-config
   "Return the default configuration."
@@ -237,10 +216,11 @@
     (when-not (file/exists? confdir)
       (file/mkdirs confdir))
     (if (and (not overwrite?) (file/exists? (io/file conf)))
-      (throw (RuntimeException. (tr/translate config :problems/default-config-exists conf)))
+      (throw (RuntimeException. "A default configuration file already exists."))
       (do
         (with-open [w (io/writer conftmp)]
           (pp/write config :stream w))
+        (reset! config-store config)
         (file/rename (io/file conftmp) (io/file conf))))
     config))
 
@@ -256,7 +236,7 @@ Throws an IOException if the file cannot be read."
   (if (file/exists? (io/file path))
     (if (file/readable? (io/file path))
       (io/reader path)
-      (throw (IOException. (tr/translate default-config :problems/read-permission-denied path))))
+      (throw (IOException. (str path ": Could not be read: permission denied"))))
     (do
       (create-default-config)
       (io/reader path))))
@@ -302,6 +282,32 @@ Throws an IOException if the file cannot be read."
   (let [sc (serialise-dates config)]
     (save-config-helper (assoc-root-dir sc) true)))
 
+(defn final-db-path
+  []
+  (let [path (get-db-path)
+        fpath (file/get-parent-file (io/file path))]
+    (if (file/exists? fpath)
+      (if (and (file/readable? fpath) (file/writable? fpath))
+        path
+        (throw (IOException. (str path ": Permission denied"))))
+      (do
+        (file/mkdirs fpath)
+        path))))
+
+(def spec
+  "JDBC spec for the primary database."
+  {:classname "org.apache.derby.jdbc.EmbeddedDriver",
+   :subprotocol "derby",
+   :subname (final-db-path),
+   :create true})
+
+(defn gen-state*
+  "Return the global application state, augmented with the default database
+  connection."
+  ([]
+   {:config (config)
+    :database {:connection spec}}))
+
 (defn gen-state
   "Return the global application state.
 Currently the only application state is the user's configuration."
@@ -309,3 +315,43 @@ Currently the only application state is the user's configuration."
    {:config (config session)})
   ([]
    {:config (config)}))
+
+(s/defrecord Database
+    [connection :- clojure.lang.PersistentArrayMap]
+
+  component/Lifecycle
+  (start [this]
+    (db/connect connection)
+    (migrate connection)
+    this)
+
+  (stop [this]
+    (db/close connection)
+    (assoc this :connection nil)))
+
+(defn lookup [state k]
+  (let [store (get-in state [:config :store])]
+    (let [sv @store]
+      (get (merge sv (or (:session state) {})) k))))
+
+(defrecord Config [store config]
+  component/Lifecycle
+  (start [this]
+    (reset! store config)
+    this)
+
+  (stop [this]
+    (println "Stopping Config...")
+    (reset! store {})
+    (assoc this
+           :store nil
+           :config nil)))
+
+(def State
+  {(s/required-key :config) Config
+   (s/required-key :database) s/Any
+   (s/required-key :app) s/Any
+   (s/optional-key :figwheel) s/Any
+   (s/optional-key :session) s/Any
+   (s/optional-key :jetty) s/Any
+   (s/optional-key :camera-status-active-id) s/Int})

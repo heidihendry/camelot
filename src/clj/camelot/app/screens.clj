@@ -47,23 +47,23 @@
   [state]
   (if (env :camelot-legacy-features)
     {:menu-items [{:url "/organisation"
-                   :label (tr/translate (:config state) :application/organisation)}
+                   :label (tr/translate state :application/organisation)}
                   {:url "/library"
-                   :label (tr/translate (:config state) :application/library)}
+                   :label (tr/translate state :application/library)}
                   {:url "/dashboard"
-                   :label (tr/translate (:config state) :application/import)}
+                   :label (tr/translate state :application/import)}
                   {:function "settings"}]}
     {:menu-items [{:url "/organisation"
-                   :label (tr/translate (:config state) :application/organisation)}
+                   :label (tr/translate state :application/organisation)}
                   {:url "/library"
-                   :label (tr/translate (:config state) :application/library)}
+                   :label (tr/translate state :application/library)}
                   {:function "settings"}]}))
 
 (defn- translate-fn
   "Return a key translation function for the smithy build process."
   [state]
   (fn [resource lookup]
-    (tr/translate (:config state) (keyword (format "%s/%s"
+    (tr/translate state (keyword (format "%s/%s"
                                                    (name resource)
                                                    (subs (str lookup) 1))))))
 
@@ -75,17 +75,17 @@
 (defsmith site smiths
   [state]
   {:resource {:type :site
-              :title (tr/translate (:config state) :site/title)
+              :title (tr/translate state :site/title)
               :endpoint "/sites"
               :id :site-id}
    :sidebar {:resource {:endpoint "/sites"
-                        :title (tr/translate (:config state) :site/sidebar-title)
+                        :title (tr/translate state :site/sidebar-title)
                         :type :site
                         :id :site-id
                         :label :site-name}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}]}
    :layout [[:site-name]
             [:site-sublocation]
@@ -116,17 +116,17 @@
 (defsmith camera smiths
   [state]
   {:resource {:type :camera
-              :title (tr/translate (:config state) :camera/title)
+              :title (tr/translate state :camera/title)
               :endpoint "/cameras"
               :id :camera-id}
    :sidebar {:resource {:endpoint "/cameras"
-                        :title (tr/translate (:config state) :camera/sidebar-title)
+                        :title (tr/translate state :camera/sidebar-title)
                         :type :camera
                         :id :camera-id
                         :label :camera-name}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}]}
    :layout [[:camera-name]
             [:camera-status-id]
@@ -155,18 +155,18 @@
 (defsmith survey-site smiths
   [state]
   {:resource {:type :survey-site
-              :title (tr/translate (:config state) :survey-site/title)
+              :title (tr/translate state :survey-site/title)
               :endpoint "/survey-sites"
               :parent-id-key :survey-id
               :id :survey-site-id}
    :sidebar {:resource {:endpoint "/survey-sites/survey"
-                        :title (tr/translate (:config state) :survey-site/sidebar-title)
+                        :title (tr/translate state :survey-site/sidebar-title)
                         :type :survey-site
                         :id :survey-site-id
                         :label :site-name}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :action/trap-stations)
+                       {:label (tr/translate state :action/trap-stations)
                         :action :trap-stations}]}
    :layout [[:site-id]]
    :schema {:site-id {:type :select
@@ -180,23 +180,23 @@
 (defsmith trap-station-session-camera smiths
   [state]
   {:resource {:type :trap-station-session-camera
-              :title (tr/translate (:config state) :trap-station-session-camera/title)
+              :title (tr/translate state :trap-station-session-camera/title)
               :endpoint "/trap-station-session-cameras"
               :parent-id-key :trap-station-session-id
               :id :trap-station-session-camera-id}
    :sidebar {:resource {:endpoint "/trap-station-session-cameras/trap-station-session"
-                        :title (tr/translate (:config state) :trap-station-session-camera/sidebar-title)
+                        :title (tr/translate state :trap-station-session-camera/sidebar-title)
                         :type :trap-station-session-camera
                         :id :trap-station-session-camera-id
                         :label :camera-name}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state)
+                       {:label (tr/translate state
                                              :trap-station-session-camera/delete-media)
                         :action :delete-media}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}
-                       {:label (tr/translate (:config state) :action/media)
+                       {:label (tr/translate state :action/media)
                         :action :media}]}
    :layout [[:camera-id]
             [:trap-station-session-camera-media-unrecoverable]]
@@ -213,20 +213,20 @@
 (defsmith trap-station smiths
   [state]
   {:resource {:type :trap-station
-              :title (tr/translate (:config state) :trap-station/title)
+              :title (tr/translate state :trap-station/title)
               :endpoint "/trap-stations"
               :parent-id-key :survey-site-id
               :id :trap-station-id}
    :sidebar {:resource {:endpoint "/trap-stations/site"
-                        :title (tr/translate (:config state) :trap-station/sidebar-title)
+                        :title (tr/translate state :trap-station/sidebar-title)
                         :type :trap-station
                         :id :trap-station-id
                         :label :trap-station-name}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}
-                       {:label (tr/translate (:config state) :action/sessions)
+                       {:label (tr/translate state :action/sessions)
                         :action :trap-station-sessions}]}
    :layout [[:trap-station-name]
             [:trap-station-longitude]
@@ -257,20 +257,20 @@
 (defsmith trap-station-session smiths
   [state]
   {:resource {:type :trap-station-session
-              :title (tr/translate (:config state) :trap-station-session/title)
+              :title (tr/translate state :trap-station-session/title)
               :endpoint "/trap-station-sessions"
               :parent-id-key :trap-station-id
               :id :trap-station-session-id}
    :sidebar {:resource {:endpoint "/trap-station-sessions/trap-station"
-                        :title (tr/translate (:config state) :trap-station-session/sidebar-title)
+                        :title (tr/translate state :trap-station-session/sidebar-title)
                         :type :trap-station-session
                         :id :trap-station-session-id
                         :label :trap-station-session-label}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}
-                       {:label (tr/translate (:config state) :action/trap-station-session-cameras)
+                       {:label (tr/translate state :action/trap-station-session-cameras)
                         :action :trap-station-session-cameras}]}
    :layout [[:trap-station-session-start-date]
             [:trap-station-session-end-date]
@@ -289,23 +289,23 @@
 (defsmith media smiths
   [state]
   {:resource {:type :media
-              :title (tr/translate (:config state) :media/title)
+              :title (tr/translate state :media/title)
               :endpoint "/media"
               :non-creatable true
               :parent-id-key :camera-trap-session-camera-id
               :id :media-id}
    :sidebar {:resource {:endpoint "/media/trap-station-session-camera"
-                        :title (tr/translate (:config state) :media/sidebar-title)
+                        :title (tr/translate state :media/sidebar-title)
                         :type :media
                         :id :media-id
                         :label :media-capture-timestamp-label}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}
-                       {:label (tr/translate (:config state) :action/sightings)
+                       {:label (tr/translate state :action/sightings)
                         :action :sightings}
-                       {:label (tr/translate (:config state) :action/photo)
+                       {:label (tr/translate state :action/photo)
                         :action :photos}]}
    :layout [[:media-filename]
             [:media-capture-timestamp]
@@ -323,19 +323,19 @@
 (defsmith photo smiths
   [state]
   {:resource {:type :photo
-              :title (tr/translate (:config state) :photo/title)
+              :title (tr/translate state :photo/title)
               :endpoint "/photos"
               :non-creatable true
               :parent-id-key :media-id
               :id :photo-id}
    :sidebar {:resource {:endpoint "/photos/media"
-                        :title (tr/translate (:config state) :photo/sidebar-title)
+                        :title (tr/translate state :photo/sidebar-title)
                         :type :photo
                         :id :photo-id
                         :label :photo-created}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}]}
    :layout [[:photo-iso-setting]
             [:photo-exposure-value]
@@ -361,18 +361,18 @@
 (defsmith sighting smiths
   [state]
   {:resource {:type :sighting
-              :title (tr/translate (:config state) :sighting/title)
+              :title (tr/translate state :sighting/title)
               :endpoint "/sightings"
               :parent-id-key :media-id
               :id :sighting-id}
    :sidebar {:resource {:endpoint "/sightings/media"
-                        :title (tr/translate (:config state) :sighting/sidebar-title)
+                        :title (tr/translate state :sighting/sidebar-title)
                         :type :sighting
                         :id :sighting-id
                         :label :sighting-label}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}]}
    :layout [[:taxonomy-id]
             [:sighting-quantity]
@@ -385,19 +385,19 @@
                                 :required true}
             :sighting-sex {:type :select
                            :required false
-                           :options {"unidentified" (tr/translate (:config state)
+                           :options {"unidentified" (tr/translate state
                                                                         :sighting/sighting-property.unidentified)
-                                     "M" (tr/translate (:config state)
+                                     "M" (tr/translate state
                                                        :sighting/sighting-sex.male)
-                                     "F" (tr/translate (:config state)
+                                     "F" (tr/translate state
                                                        :sighting/sighting-sex.female)}}
             :sighting-lifestage {:type :select
                                  :required false
-                                 :options {"unidentified" (tr/translate (:config state)
+                                 :options {"unidentified" (tr/translate state
                                                                         :sighting/sighting-property.unidentified)
-                                           "adult" (tr/translate (:config state)
+                                           "adult" (tr/translate state
                                                                  :sighting/sighting-lifestage.adult)
-                                           "juvenile" (tr/translate (:config state)
+                                           "juvenile" (tr/translate state
                                                                     :sighting/sighting-lifestage.juvenile)}}}
    :states {:create {:submit {:success {:type :event
                                         :event :sighting-create}
@@ -407,17 +407,17 @@
 (defsmith taxonomy smiths
   [state]
   {:resource {:type :taxonomy
-              :title (tr/translate (:config state) :taxonomy/title)
+              :title (tr/translate state :taxonomy/title)
               :endpoint "/taxonomy"
               :id :taxonomy-id}
    :sidebar {:resource {:endpoint "/taxonomy"
-                        :title (tr/translate (:config state) :taxonomy/sidebar-title)
+                        :title (tr/translate state :taxonomy/sidebar-title)
                         :type :taxonomy
                         :id :taxonomy-id
                         :label :taxonomy-label}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}]}
    :layout [[:taxonomy-class]
             [:taxonomy-order]
@@ -449,19 +449,19 @@
 (defsmith survey smiths
   [state]
   {:resource {:type :survey
-              :title (tr/translate (:config state) :survey/title)
+              :title (tr/translate state :survey/title)
               :endpoint "/surveys"
               :id :survey-id}
    :sidebar {:resource {:endpoint "/surveys"
-                        :title (tr/translate (:config state) :survey/sidebar-title)
+                        :title (tr/translate state :survey/sidebar-title)
                         :type :survey
                         :id :survey-id
                         :label :survey-name}}
-   :actionmenu {:menu [{:label (tr/translate (:config state) :words/delete)
+   :actionmenu {:menu [{:label (tr/translate state :words/delete)
                         :action :delete}
-                       {:label (tr/translate (:config state) :words/edit)
+                       {:label (tr/translate state :words/edit)
                         :action :edit-mode}
-                       {:label (tr/translate (:config state) :action/survey-sites)
+                       {:label (tr/translate state :action/survey-sites)
                         :action :survey-sites}]}
    :layout [[:survey-name]
             [:survey-notes]]
@@ -483,11 +483,11 @@
   (defsmith settings smiths
     [state]
     {:resource {:type :settings
-                :title (tr/translate (:config state) :settings/title)
+                :title (tr/translate state :settings/title)
                 :endpoint "/settings"}
-     :layout [[:label (tr/translate (:config state) :settings/preferences)]
+     :layout [[:label (tr/translate state :settings/preferences)]
               [:language]
-              [:label (tr/translate (:config state) :settings/survey-settings)]
+              [:label (tr/translate state :settings/survey-settings)]
               [:project-start]
               [:project-end]
               [:required-fields]
@@ -505,8 +505,8 @@
                                                         :required true}
               :language {:type :select
                          :required true
-                         :options {:en (tr/translate (:config state) :language/en)
-                                   :vn (tr/translate (:config state) :language/vn)}}
+                         :options {:en (tr/translate state :language/en)
+                                   :vn (tr/translate state :language/vn)}}
               :night-start-hour {:type :select
                                  :required true
                                  :options {17 "17:00"
@@ -545,15 +545,15 @@
   (defsmith settings smiths
     [state]
     {:resource {:type :settings
-                :title (tr/translate (:config state) :settings/title)
+                :title (tr/translate state :settings/title)
                 :endpoint "/settings"}
-     :layout [[:label (tr/translate (:config state) :settings/survey-settings)]
+     :layout [[:label (tr/translate state :settings/survey-settings)]
               [:sighting-independence-minutes-threshold]
               [:send-usage-data]]
      :schema {:language {:type :select
                          :required true
-                         :options {:en (tr/translate (:config state) :language/en)
-                                   :vn (tr/translate (:config state) :language/vn)}}
+                         :options {:en (tr/translate state :language/en)
+                                   :vn (tr/translate state :language/vn)}}
               :send-usage-data {:type :boolean}
               :sighting-independence-minutes-threshold {:type :number
                                                         :required true}}

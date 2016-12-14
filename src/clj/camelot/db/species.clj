@@ -33,8 +33,7 @@
 
 (s/defn get-all :- [Species]
   [state :- State]
-  (map species (db/clj-keys (db/with-connection (:connection state)
-                              -get-all))))
+  (map species (db/clj-keys (db/with-connection state -get-all))))
 
 (s/defn get-specific :- (s/maybe Species)
   [state :- State

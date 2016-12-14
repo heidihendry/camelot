@@ -40,10 +40,8 @@
     :root-path-not-found "The directory for the survey was not found or could not be read"
     :path-not-found "%s: Path not found"
     :not-directory "%s: Is not a directory"
-    :read-permission-denied "%s: Could not be read: permission denied"
     :species-quantity-missing "%s: has species without a quantity"
     :species-name-missing "%s: has quantity without a species"
-    :default-config-exists "A default configuration file already exists. Please delete '%s' and try again."
     :config-not-found "A configuration file was not found.  Please run camelot with the 'init' option and adjust the configuration file created."}
 
    :survey

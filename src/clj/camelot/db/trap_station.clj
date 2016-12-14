@@ -71,7 +71,7 @@
 
 (s/defn get-all* :- [TrapStation]
   [state :- State]
-  (map trap-station (db/clj-keys (db/with-connection (:connection state) -get-all*))))
+  (map trap-station (db/clj-keys (db/with-connection state -get-all*))))
 
 (s/defn get-all-for-survey :- [TrapStation]
   [state :- State

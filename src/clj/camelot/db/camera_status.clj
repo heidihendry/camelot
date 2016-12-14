@@ -14,7 +14,7 @@
 (defn translate-status
   "Translate a camera status to something readable."
   ([state status]
-   (tr/translate (:config state) (keyword status))))
+   (tr/translate state (keyword status))))
 
 (defn- translate-statuses
   "Translate the description of camera statuses."
@@ -49,7 +49,7 @@
 (s/defn get-all :- [CameraStatus]
   "Retrieve, translate and return all available camera statuses."
   [state :- State]
-  (->> (db/with-connection (:connection state) -get-all)
+  (->> (db/with-connection state -get-all)
        (db/clj-keys)
        (translate-statuses state)
        (map camera-status)))
@@ -57,7 +57,7 @@
 (s/defn get-all-raw :- [CameraStatus]
   "Retrieve, translate and return all available camera statuses without translating."
   [state :- State]
-  (->> (db/with-connection (:connection state) -get-all)
+  (->> (db/with-connection state -get-all)
        db/clj-keys
        (map camera-status)))
 

@@ -34,10 +34,10 @@
   [state report]
   (-> report
       (update :title #(if (keyword? %)
-                        (tr/translate (:config state) %)
+                        (tr/translate state %)
                         %))
       (update :description #(if (keyword? %)
-                              (tr/translate (:config state) %)
+                              (tr/translate state %)
                               %))
       (update :form #(if (fn? %)
                        (% state)

@@ -42,8 +42,8 @@
   {:resource {}
    :layout [[:survey-id]]
    :schema {:survey-id
-            {:label (tr/translate (:config state) :survey/title)
-             :description (tr/translate (:config state) :survey/report-description)
+            {:label (tr/translate state :survey/title)
+             :description (tr/translate state :survey/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/surveys"

@@ -4,13 +4,14 @@
    [camelot.report.module.core :as module]
    [clj-time.core :as t]
    [camelot.report.module.column-util :as col-util]
-   [camelot.report.sighting-independence :as indep])
+   [camelot.report.sighting-independence :as indep]
+   [camelot.app.state :as state])
   (:import
    (java.util TimeZone)))
 
 (defn- get-timezone
   [state]
-  (let [tz-str (get-in state [:config :timezone])]
+  (let [tz-str (state/lookup state :timezone)]
     (if tz-str
       (TimeZone/getTimeZone ^String tz-str)
       (TimeZone/getDefault))))

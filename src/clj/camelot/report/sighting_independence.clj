@@ -3,12 +3,13 @@
   (:require
    [clj-time.core :as t]
    [schema.core :as s]
+   [camelot.app.state :as state]
    [clojure.string :as str]))
 
 (defn- add-sighting
   "Add a new (i.e., independent) sighting."
   [state previous-sightings this-sighting]
-  (let [duration (:sighting-independence-minutes-threshold (:config state))]
+  (let [duration (state/lookup state :sighting-independence-minutes-threshold)]
     (conj previous-sightings (assoc this-sighting
                                     :sighting-independence-window-end
                                     (t/plus (:media-capture-timestamp this-sighting)

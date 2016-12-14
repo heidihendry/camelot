@@ -75,23 +75,23 @@
 
 (defn- get-all-by-survey
   [state]
-  (db/clj-keys (db/with-connection (:connection state) -get-all-by-survey)))
+  (db/clj-keys (db/with-connection state -get-all-by-survey)))
 
 (defn- get-all-by-taxonomy
   [state]
-  (db/clj-keys (db/with-connection (:connection state) -get-all-by-taxonomy)))
+  (db/clj-keys (db/with-connection state -get-all-by-taxonomy)))
 
 (defn- get-all-by-site
   [state]
-  (db/clj-keys (db/with-connection (:connection state) -get-all-by-site)))
+  (db/clj-keys (db/with-connection state -get-all-by-site)))
 
 (defn- get-all-by-camera
   [state]
-  (db/clj-keys (db/with-connection (:connection state) -get-all-by-camera)))
+  (db/clj-keys (db/with-connection state -get-all-by-camera)))
 
 (defn- get-all
   [state]
-  (db/clj-keys (db/with-connection (:connection state) -get-all)))
+  (db/clj-keys (db/with-connection state -get-all)))
 
 (def ^:private query-fn-map
   {:survey get-all-by-survey
@@ -246,7 +246,7 @@
                columns)]
     (cons (map #(or (get cust-titles %)
                     (get-in @module/known-columns [% :heading])
-                    (tr/translate (:config state)
+                    (tr/translate state
                                   (keyword (str "report/" (name %))))) cols)
           data)))
 

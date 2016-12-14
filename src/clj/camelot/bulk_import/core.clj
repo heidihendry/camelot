@@ -114,7 +114,7 @@
   "Resolve a corresponding server directory for a given 'client' directory."
   [state client-dir]
   {:pre (nil? client-dir)}
-  (let [root (-> state :config :root-path)
+  (let [root (state/lookup state :root-path)
         res (resolve-server-directory root client-dir)]
     (cond
       (and (empty? res) (nil? root)) client-dir

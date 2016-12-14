@@ -7,7 +7,8 @@
    [clj-time.coerce :as tc]
    [clojure.string :as str]
    [incanter.stats :as istats]
-   [schema.core :as s]))
+   [schema.core :as s]
+   [camelot.app.state :as state]))
 
 (def sighting-quantity-exclusions-re
   #"(?i)\bcamera-?check\b|\bunknown\b|\bunidentified\b")
@@ -15,14 +16,15 @@
 (defn check-ir-threshold
   "Check whether the album's photos exceed the user-defined infrared check thresholds."
   [state photos]
-  (let [nightfn (partial photo/night? (:night-start-hour (:config state)) (:night-end-hour (:config state)))
+  (let [nightfn (partial photo/night? (state/lookup state :night-start-hour)
+                         (state/lookup state :night-end-hour))
         ir-check-fn (partial photo/infrared-sane? nightfn
-                             (:infrared-iso-value-threshold (:config state)))
+                             (state/lookup state :infrared-iso-value-threshold))
         ir-failed (count (remove identity (map ir-check-fn photos)))]
     (if-let [night-violations (seq (filter #(nightfn (t/hour (:datetime %))) photos))]
       (if (> (/ ir-failed (count night-violations))
-             (:erroneous-infrared-threshold (:config state)))
-        {:result :warn :reason (tr/translate (:config state) :checks/time-light-sanity)}
+             (state/lookup state :erroneous-infrared-threshold))
+        {:result :warn :reason (tr/translate state :checks/time-light-sanity)}
         {:result :pass})
       {:result :pass})))
 
@@ -41,9 +43,9 @@
           above (filter #(> (ms %) abovet) photos)]
       (cond
         (first below) {:result :warn :reason
-                       (tr/translate (:config state) :checks/stddev-before (:filename (first below)))}
+                       (tr/translate state :checks/stddev-before (:filename (first below)))}
         (first above) {:result :warn :reason
-                       (tr/translate (:config state) :checks/stddev-after (:filename (first above)))}
+                       (tr/translate state :checks/stddev-after (:filename (first above)))}
         :else {:result :pass}))))
 
 (defn check-project-dates
@@ -51,12 +53,12 @@
   [state photo]
   (let [datetime (:datetime photo)
         file (:filename photo)]
-    (cond (t/before? datetime (:project-start (:config state)))
+    (cond (t/before? datetime (state/lookup state :project-start))
           {:result :fail
-           :reason (tr/translate (:config state) :checks/project-date-before file)}
-          (t/after? datetime (:project-end (:config state)))
+           :reason (tr/translate state :checks/project-date-before file)}
+          (t/after? datetime (state/lookup state :project-end))
           {:result :fail
-           :reason (tr/translate (:config state) :checks/project-date-after file)}
+           :reason (tr/translate state :checks/project-date-after file)}
           :else {:result :pass})))
 
 (defn check-camera-checks
@@ -73,13 +75,13 @@
                           (into #{}))]
     (if (> (count check-photos) 1)
       {:result :pass}
-      {:result :warn :reason (tr/translate (:config state) :checks/camera-checks)})))
+      {:result :warn :reason (tr/translate state :checks/camera-checks)})))
 
 (defn compare-headlines
   "Compare two handlines, failing if they're not consistent."
   [state h1 h2]
   (if (not= (:headline h1) (:headline h2))
-    (reduced {:result :fail :reason (tr/translate (:config state) :checks/headline-consistency
+    (reduced {:result :fail :reason (tr/translate state :checks/headline-consistency
                                      (:filename h1) (:filename h2))})
     h1))
 
@@ -95,7 +97,7 @@
   "Compare two source fields, failing if they're not consistent."
   [state h1 h2]
   (if (not= (:source h1) (:source h2))
-    (reduced {:result :fail :reason (tr/translate (:config state) :checks/source-consistency
+    (reduced {:result :fail :reason (tr/translate state :checks/source-consistency
                                      (:filename h1) (:filename h2))})
     h1))
 
@@ -113,7 +115,7 @@
   (if (or (not= (:make (:camera h1)) (:make (:camera h2)))
           (not= (:model (:camera h1)) (:model (:camera h2)))
           (not= (:software (:camera h1)) (:software (:camera h2))))
-    (reduced {:result :warn :reason (tr/translate (:config state) :checks/camera-consistency
+    (reduced {:result :warn :reason (tr/translate state :checks/camera-consistency
                                                   (:filename h1) (:filename h2))})
     h1))
 
@@ -128,10 +130,10 @@
 (defn check-required-fields
   "Ensure all Require Fields contain data."
   [state photo]
-  (let [fields (:required-fields (:config state))]
+  (let [fields (state/lookup state :required-fields)]
     (if-let [missing (seq (filter #(nil? (photo/extract-path-value photo %)) fields))]
       {:result :fail
-       :reason (tr/translate (:config state)
+       :reason (tr/translate state
                              :checks/required-fields (:filename photo) (str/join ", " (map #(putil/path-description state %) missing)))}
       {:result :pass})))
 
@@ -140,7 +142,7 @@
   [state photos]
   (if (empty? photos)
     {:result :fail
-     :reason (tr/translate (:config state) :checks/album-has-data)}
+     :reason (tr/translate state :checks/album-has-data)}
     {:result :pass}))
 
 (defn sightings-reducer
@@ -154,12 +156,12 @@
       (and (nil? (:quantity sighting))
            (nil? (re-find sighting-quantity-exclusions-re (:species sighting))))
       (reduced {:result :fail
-                :reason (tr/translate (:config state)
+                :reason (tr/translate state
                          :checks/sighting-consistency-quantity-needed
                          (:filename photo))})
       (nil? (:species sighting))
       (reduced {:result :fail
-                :reason (tr/translate (:config state)
+                :reason (tr/translate state
                          :checks/sighting-consistency-species-needed
                          (:filename photo))}))))
 
@@ -176,9 +178,10 @@
                     (map :species)
                     (remove #(or (nil? %) (re-find sighting-quantity-exclusions-re %)))
                     (map str/lower-case)
-                    (remove (set (map str/lower-case (:surveyed-species (:config state)))))))]
+                    (remove (set (map str/lower-case
+                                      (state/lookup state :surveyed-species))))))]
     {:result :fail
-     :reason (tr/translate (:config state) :checks/surveyed-species (:filename photo)
+     :reason (tr/translate state :checks/surveyed-species (:filename photo)
                            (str/join ", " m))}
     {:result :pass}))
 
@@ -187,7 +190,7 @@
   [state photo]
   (if (t/after? (:datetime photo) (t/now))
     {:result :fail
-     :reason (tr/translate (:config state) :checks/future-timestamp
+     :reason (tr/translate state :checks/future-timestamp
               (:filename photo))}
     {:result :pass}))
 
@@ -196,7 +199,7 @@
   [state photos]
   (if-let [res (first (filter #(contains? % :invalid) photos))]
     {:result :fail
-     :reason (tr/translate (:config state) :checks/invalid-photos (:invalid res))}
+     :reason (tr/translate state :checks/invalid-photos (:invalid res))}
     {:result :pass}))
 
 (defn check-location-gps-set
@@ -204,7 +207,7 @@
   (let [loc (:location photo)]
     (if (or (nil? (:gps-longitude loc))
             (nil? (:gps-latitude loc)))
-      {:result :fail :reason (tr/translate (:config state) :checks/gps-data-missing
+      {:result :fail :reason (tr/translate state :checks/gps-data-missing
                                            (:filename photo))})))
 
 (s/defn list-photo-problems
@@ -239,8 +242,8 @@
                                              (name)
                                              (str "checks/")
                                              (keyword)
-                                             (tr/translate (:config state))
-                                             (tr/translate (:config state) :checks/problem-without-reason)))))))
+                                             (tr/translate state)
+                                             (tr/translate state :checks/problem-without-reason)))))))
                  tests))))
 
 (s/defn list-problems

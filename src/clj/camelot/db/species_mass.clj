@@ -31,7 +31,7 @@
 (s/defn get-all :- [SpeciesMass]
   "Retrieve, translate and return all species mass brackets."
   [state :- State]
-  (->> (db/with-connection (:connection state) -get-all)
+  (->> (db/with-connection state -get-all)
        (db/clj-keys)
        label-record
        (map species-mass)))

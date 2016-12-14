@@ -3,39 +3,19 @@
    [clj-time.coerce :as tc]
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
-   [camelot.app.state :refer [State] :as state]
    [schema.core :as s]
    [camelot.util.file :as file]
    [clojure.java.io :as io])
   (:import (java.io IOException)))
 
-(defn db-path
-  []
-  (let [path (state/get-db-path)
-        fpath (file/get-parent-file (io/file path))]
-    (if (file/exists? fpath)
-      (if (and (file/readable? fpath) (file/writable? fpath))
-        path
-        (throw (IOException. (str path ": Permission denied"))))
-      (do
-        (file/mkdirs fpath)
-        path))))
-
-(def spec
-  "JDBC spec for the primary database."
-  {:classname "org.apache.derby.jdbc.EmbeddedDriver",
-   :subprotocol "derby",
-   :subname (db-path),
-   :create true})
-
 (defn connect
-  []
-  (jdbc/get-connection spec))
+  [connection]
+  (jdbc/get-connection connection))
 
 (defn close
-  []
+  [connection]
   (try
-    (-> (assoc (dissoc spec :create)
+    (-> (assoc (dissoc connection :create)
                :shutdown true)
         jdbc/get-connection)
     (catch Exception e
@@ -44,8 +24,8 @@
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]
-  `(jdbc/with-db-transaction [tx# spec]
-     (let [~bind (merge ~state {:connection tx#})]
+  `(jdbc/with-db-transaction [tx# (get-in ~state [:database :connection])]
+     (let [~bind (assoc-in ~state [:database :connection] tx#)]
        ~@body)))
 
 (defn- clj-key
@@ -82,21 +62,17 @@
 
 (defn with-connection
   "Run a query with the given connection, if any."
-  ([ks conn q]
-   (if conn
-     (q ks {:connection conn})
-     (q ks)))
-  ([conn q]
-   (if conn
-     (q {} {:connection conn})
-     (q))))
+  ([ks state q]
+   (if-let [conn (get-in state [:database :connection])]
+     (q ks {:connection conn})))
+  ([state q]
+   (if-let [conn (get-in state [:database :connection])]
+     (q {} {:connection conn}))))
 
 (s/defn with-db-keys
   "Run a function, translating the parameters and results as needed."
-  [state :- State
-   f
-   data]
+  [state f data]
   (-> data
       (db-keys)
-      (with-connection (:connection state) f)
+      (with-connection state f)
       (clj-keys)))

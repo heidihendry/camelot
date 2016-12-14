@@ -1,13 +1,12 @@
 (require '[camelot.db.taxonomy :as taxonomy])
 (require '[yesql.core :as sql])
-(require '[camelot.db.core :as db])
 (require '[clojure.string :as str])
 (require '[camelot.app.state :as state])
 (require '[camelot.db.species :as species])
 (require '[clojure.java.jdbc :as jdbc])
 
-(sql/defqueries "sql/migration-helpers/021.sql" {:connection db/spec})
-(sql/defqueries "sql/migration-helpers/db.sql" {:connection db/spec})
+(sql/defqueries "sql/migration-helpers/021.sql" {:connection state/spec})
+(sql/defqueries "sql/migration-helpers/db.sql" {:connection state/spec})
 
 (defn- -m021-create-taxonomy
   [spp]
@@ -28,24 +27,24 @@
 
 (defn- -m021-species-genus-migration
   [s]
-  (let [spps (-get-all-species {} (select-keys s [:connection]))
-        build (comp #(-create-taxonomy<! % (select-keys s [:connection]))
+  (let [spps (-get-all-species {} (select-keys (:database s) [:connection]))
+        build (comp #(-create-taxonomy<! % (select-keys (:database s) [:connection]))
                     -m021-create-taxonomy)]
     (->> spps
          (map #(hash-map :species_id (:species_id %)
                          :taxonomy_id (int (:1 (build %)))))
-         (map #(-update-sightings! % (select-keys s [:connection])))
+         (map #(-update-sightings! % (select-keys (:database s) [:connection])))
          (doall))))
 
 (defn- -m021-remove-unnecessary-constraints
   [s]
   (let [constraints (-get-constraints {:source_table "SIGHTING"
                                        :relation_table "SPECIES"}
-                                      (select-keys s [:connection]))]
+                                      (select-keys (:database s) [:connection]))]
     (doseq [c constraints]
-      (jdbc/db-do-commands db/spec (str "ALTER TABLE sighting DROP CONSTRAINT "
-                                        (:constraintname c))))))
+      (jdbc/db-do-commands state/spec (str "ALTER TABLE sighting DROP CONSTRAINT "
+                                           (:constraintname c))))))
 
-(db/with-transaction [s (state/gen-state)]
+(db/with-transaction [s (state/gen-state*)]
   (-m021-remove-unnecessary-constraints s)
   (-m021-species-genus-migration s))

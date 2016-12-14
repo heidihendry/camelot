@@ -44,7 +44,7 @@
 
 (s/defn get-all :- [Site]
   [state :- State]
-  (map site (db/clj-keys (db/with-connection (:connection state) -get-all))))
+  (map site (db/clj-keys (db/with-connection state -get-all))))
 
 (s/defn get-specific :- (s/maybe Site)
   [state :- State

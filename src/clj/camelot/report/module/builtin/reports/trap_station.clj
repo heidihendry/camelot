@@ -34,8 +34,8 @@
   {:resource {}
    :layout [[:trap-station-id]]
    :schema {:trap-station-id
-            {:label (tr/translate (:config state) :trap-station/trap-station-name.label)
-             :description (tr/translate (:config state) :trap-station/report-description)
+            {:label (tr/translate state :trap-station/trap-station-name.label)
+             :description (tr/translate state :trap-station/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/trap-stations"

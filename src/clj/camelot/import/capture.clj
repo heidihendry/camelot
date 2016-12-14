@@ -52,5 +52,5 @@
               state session-camera-id)
         photo (read-photo state tempfile)]
     (if (valid-session-date? sess (:datetime photo))
-      {:error (tr/translate (:config state) ::timestamp-outside-range)}
+      {:error (tr/translate state ::timestamp-outside-range)}
       (create-media state content-type tempfile size session-camera-id photo))))
