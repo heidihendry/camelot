@@ -1,6 +1,6 @@
-(ns camelot.db.core-test
+(ns camelot.util.db-test
   (:require
-   [camelot.db.core :as sut]
+   [camelot.util.db :as sut]
    [clojure.test :refer :all]
    [clj-time.core :as t]
    [clj-time.coerce :as tc]

@@ -3,7 +3,7 @@
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.app.state :refer [State]]
    [clj-time.core :as t]
    [camelot.util.trap-station :as util.ts]

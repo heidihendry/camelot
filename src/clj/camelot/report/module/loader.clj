@@ -1,7 +1,6 @@
 (ns camelot.report.module.loader
   (:require
    [camelot.util.file :as file]
-   [camelot.app.state :as state]
    [camelot.report.module.builtin.core])
   (:import
    (org.apache.commons.lang3 SystemUtils)))
@@ -9,8 +8,8 @@
 (def clj-file-re #"(?i)\.clj$")
 
 (defn- module-path
-  []
-  (format "%s%s%s" (state/get-config-dir)
+  [state]
+  (format "%s%s%s" (get-in state [:config :path :config])
           SystemUtils/FILE_SEPARATOR
           "modules"))
 
@@ -24,8 +23,8 @@
       false))
 
 (defn load-user-modules
-  []
-  (let [dir (file/->file (module-path))
+  [state]
+  (let [dir (file/->file (module-path state))
         modules (file-seq dir)]
     (when-not (file/exists? dir)
       (file/mkdirs dir))

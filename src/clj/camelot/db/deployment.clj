@@ -4,7 +4,7 @@
    [schema.core :as s]
    [yesql.core :as sql]
    [camelot.app.state :refer [State]]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.util.data :as data]
    [camelot.db.trap-station :as trap-station]
    [camelot.util.trap-station :as util.ts]

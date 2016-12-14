@@ -8,7 +8,7 @@
    [camelot.import.dirtree :as dt]
    [camelot.import.metadata-utils :as mutil]
    [camelot.util.model :as model]
-   [camelot.app.state :as state]
+   [camelot.util.config :as config]
    [camelot.translation.core :as tr]
    [clojure.data.csv :as csv]
    [clj-time.format :as tf]
@@ -114,7 +114,7 @@
   "Resolve a corresponding server directory for a given 'client' directory."
   [state client-dir]
   {:pre (nil? client-dir)}
-  (let [root (state/lookup state :root-path)
+  (let [root (config/lookup state :root-path)
         res (resolve-server-directory root client-dir)]
     (cond
       (and (empty? res) (nil? root)) client-dir

@@ -4,7 +4,7 @@
    [yesql.core :as sql]
    [camelot.app.state :refer [State]]
    [camelot.util.trap-station :as util.ts]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.db.media :as media]))
 
 (sql/defqueries "sql/trap-stations.sql")

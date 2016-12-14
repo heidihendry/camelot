@@ -2,9 +2,9 @@
   "Camera status model and data access."
   (:require
    [yesql.core :as sql]
-   [camelot.app.state :refer [State] :as state]
+   [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.translation.core :as tr]))
 
 (sql/defqueries "sql/camera-status.sql")

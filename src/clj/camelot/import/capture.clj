@@ -6,7 +6,7 @@
    [camelot.app.state :refer [State]]
    [camelot.import.dirtree :as dt]
    [camelot.import.photo :as photo]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.import.core :as import]
    [camelot.db.trap-station-session :as trap-station-session]
    [clj-time.core :as t]

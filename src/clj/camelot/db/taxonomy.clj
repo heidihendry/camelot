@@ -3,7 +3,7 @@
    [schema.core :as s]
    [yesql.core :as sql]
    [camelot.app.state :refer [State]]
-   [camelot.db.core :as db]))
+   [camelot.util.db :as db]))
 
 (sql/defqueries "sql/taxonomy.sql")
 

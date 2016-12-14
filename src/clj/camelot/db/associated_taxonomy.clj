@@ -3,7 +3,7 @@
    [camelot.db.taxonomy :as taxonomy]
    [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.db.survey :as survey]
    [camelot.db.survey-taxonomy :as survey-taxonomy])
   (:import

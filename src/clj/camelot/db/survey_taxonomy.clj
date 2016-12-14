@@ -3,7 +3,7 @@
    [yesql.core :as sql]
    [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.translation.core :as tr]))
 
 ;; NOTE: 030_survey_taxonomy_migration needs to be updated should this model

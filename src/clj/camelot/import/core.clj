@@ -1,7 +1,7 @@
 (ns camelot.import.core
   (:require
-   [camelot.app.state :as state]
-   [camelot.db.core :as db]
+   [camelot.util.config :as config]
+   [camelot.util.db :as db]
    [camelot.import.album :as album]
    [camelot.import.db :as im.db]
    [camelot.import.validation :as validation]
@@ -83,7 +83,7 @@
   [state {:keys [folder session-camera-id notes]}]
   (db/with-transaction [s state]
     (let [[_ sitename _phase cameraname] (file/rel-path-components folder)
-          root-path (state/lookup s :root-path)
+          root-path (config/lookup s :root-path)
           full-path (str root-path folder)
           album (get-album s root-path full-path)
           sample (second (first (:photos album)))

@@ -1,30 +1,8 @@
-(ns camelot.db.core
+(ns camelot.util.db
   (:require
-   [com.stuartsierra.component :as component]
-   [clj-time.coerce :as tc]
-   [camelot.db.migrate :as migrate]
-   [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
-   [schema.core :as s]
-   [camelot.util.file :as file]
-   [clojure.java.io :as io])
-  (:import
-   (java.io IOException)))
-
-(defn connect
-  "Establish a connection to the database given a JDBC spec."
-  [spec]
-  (jdbc/get-connection spec))
-
-(defn close
-  "Close a connection to the database given a JDBC spec."
-  [spec]
-  (try
-    (-> (assoc (dissoc spec :create)
-               :shutdown true)
-        jdbc/get-connection)
-    (catch Exception e
-      (println (.getMessage e)))))
+   [clojure.string :as str]
+   [clj-time.coerce :as tc]))
 
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
@@ -74,23 +52,10 @@
    (if-let [conn (get-in state [:database :connection])]
      (q {} {:connection conn}))))
 
-(s/defn with-db-keys
+(defn with-db-keys
   "Run a function, translating the parameters and results as needed."
   [state f data]
   (-> data
       (db-keys)
       (with-connection state f)
       (clj-keys)))
-
-(s/defrecord Database
-    [connection :- clojure.lang.PersistentArrayMap]
-
-  component/Lifecycle
-  (start [this]
-    (connect connection)
-    (migrate/migrate connection)
-    this)
-
-  (stop [this]
-    (close connection)
-    (assoc this :connection nil)))

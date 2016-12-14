@@ -5,7 +5,7 @@
    [clj-time.format :as tf]
    [camelot.translation.core :as tr]
    [camelot.report.sighting-independence :as indep]
-   [camelot.app.state :as state]))
+   [camelot.util.config :as config]))
 
 (defn report-output
   [state {:keys [survey-id]}]

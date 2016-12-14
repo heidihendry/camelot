@@ -14,11 +14,11 @@
 (s/set-fn-validation! true)
 
 (def http-handler
-  (wrap-reload #'camelot.core/http-handler))
+  (wrap-reload #'camelot.app.http/http-handler))
 
 (defn migrate
   [state]
-  (camelot.db.migrate/migrate (get-in state [:database :connection])))
+  (camelot.app.db-migrate/migrate (get-in state [:database :connection])))
 
 (defn run []
   (camelot.core/start))
@@ -30,5 +30,3 @@
   (camelot.core/stop))
 
 (def browser-repl figwheel/cljs-repl)
-
-(def state camelot.app.state/gen-state)

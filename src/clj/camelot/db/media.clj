@@ -3,8 +3,8 @@
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
-   [camelot.app.state :refer [State] :as state]
-   [camelot.db.core :as db]
+   [camelot.app.state :refer [State]]
+   [camelot.util.db :as db]
    [clojure.java.io :as io]
    [camelot.util.file :as file]
    [clojure.string :as str]

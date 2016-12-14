@@ -4,7 +4,7 @@
    [yesql.core :as sql]
    [camelot.db.trap-station-session :as trap-station-session]
    [camelot.app.state :refer [State]]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.db.media :as media]))
 
 (sql/defqueries "sql/trap-station-session-cameras.sql")

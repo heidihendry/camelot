@@ -1,13 +1,11 @@
 (ns camelot.app.state
   "Application state."
   (:require
+   [camelot.util.file :as file]
+   [camelot.util.filesystem :as filesystem]
    [schema.core :as s]
    [clj-time.core :as t]
    [clj-time.coerce :as tc]
-   [camelot.db.migrate :refer [migrate]]
-   [camelot.db.core :as db]
-   [camelot.util.file :as file]
-   [camelot.util.filesystem :as filesystem]
    [com.stuartsierra.component :as component]
    [clojure.java.io :as io]
    [clojure.pprint :as pp]
@@ -263,21 +261,6 @@ Throws an IOException if the file cannot be read."
    :subprotocol "derby",
    :subname (final-db-path),
    :create true})
-
-(defn gen-state*
-  "Return the global application state, augmented with the default database
-  connection."
-  ([]
-   {:config (config)
-    :database {:connection spec}}))
-
-(defn gen-state
-  "Return the global application state.
-Currently the only application state is the user's configuration."
-  ([session]
-   {:config (config session)})
-  ([]
-   {:config (config)}))
 
 (defn path-map
   []

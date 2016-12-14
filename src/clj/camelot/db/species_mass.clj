@@ -4,7 +4,7 @@
    [yesql.core :as sql]
    [camelot.app.state :refer [State]]
    [schema.core :as s]
-   [camelot.db.core :as db]))
+   [camelot.util.db :as db]))
 
 (sql/defqueries "sql/species-mass.sql")
 

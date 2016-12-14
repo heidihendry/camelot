@@ -13,7 +13,7 @@
    [camelot.db.camera :as camera]
    [camelot.db.camera-status :as camera-status]
    [clojure.string :as str]
-   [camelot.app.state :as state]
+   [camelot.util.config :as config]
    [clojure.edn :as edn]))
 
 (def default-survey-name "Initial survey")

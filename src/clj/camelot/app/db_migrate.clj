@@ -1,4 +1,4 @@
-(ns camelot.db.migrate
+(ns camelot.app.db-migrate
   (:require
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]

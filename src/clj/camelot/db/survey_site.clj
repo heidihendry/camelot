@@ -3,7 +3,7 @@
    [schema.core :as s]
    [yesql.core :as sql]
    [camelot.app.state :refer [State]]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.db.media :as media]))
 
 (sql/defqueries "sql/survey-sites.sql")

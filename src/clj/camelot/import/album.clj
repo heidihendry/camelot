@@ -8,7 +8,7 @@
    [camelot.import.dirtree :as dt]
    [camelot.import.model :as mi]
    [camelot.import.photo :as photo]
-   [camelot.app.state :as state]
+   [camelot.util.config :as config]
    [camelot.import.validation :refer [list-problems check-invalid-photos]]
    [camelot.db.trap-station-session-camera :as trap-station-session-camera]))
 
@@ -67,7 +67,7 @@
   [state file]
   (nil? (trap-station-session-camera/get-specific-by-import-path
          state (subs (.toString file)
-                     (count (state/lookup state :root-path))))))
+                     (count (config/lookup state :root-path))))))
 
 (s/defn album-set :- {java.io.File mi/ImportAlbum}
   "Return a datastructure representing all albums and their metadata"

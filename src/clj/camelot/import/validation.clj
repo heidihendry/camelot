@@ -8,7 +8,7 @@
    [clojure.string :as str]
    [incanter.stats :as istats]
    [schema.core :as s]
-   [camelot.app.state :as state]))
+   [camelot.util.config :as config]))
 
 (def sighting-quantity-exclusions-re
   #"(?i)\bcamera-?check\b|\bunknown\b|\bunidentified\b")
@@ -16,14 +16,14 @@
 (defn check-ir-threshold
   "Check whether the album's photos exceed the user-defined infrared check thresholds."
   [state photos]
-  (let [nightfn (partial photo/night? (state/lookup state :night-start-hour)
-                         (state/lookup state :night-end-hour))
+  (let [nightfn (partial photo/night? (config/lookup state :night-start-hour)
+                         (config/lookup state :night-end-hour))
         ir-check-fn (partial photo/infrared-sane? nightfn
-                             (state/lookup state :infrared-iso-value-threshold))
+                             (config/lookup state :infrared-iso-value-threshold))
         ir-failed (count (remove identity (map ir-check-fn photos)))]
     (if-let [night-violations (seq (filter #(nightfn (t/hour (:datetime %))) photos))]
       (if (> (/ ir-failed (count night-violations))
-             (state/lookup state :erroneous-infrared-threshold))
+             (config/lookup state :erroneous-infrared-threshold))
         {:result :warn :reason (tr/translate state :checks/time-light-sanity)}
         {:result :pass})
       {:result :pass})))
@@ -53,10 +53,10 @@
   [state photo]
   (let [datetime (:datetime photo)
         file (:filename photo)]
-    (cond (t/before? datetime (state/lookup state :project-start))
+    (cond (t/before? datetime (config/lookup state :project-start))
           {:result :fail
            :reason (tr/translate state :checks/project-date-before file)}
-          (t/after? datetime (state/lookup state :project-end))
+          (t/after? datetime (config/lookup state :project-end))
           {:result :fail
            :reason (tr/translate state :checks/project-date-after file)}
           :else {:result :pass})))
@@ -130,7 +130,7 @@
 (defn check-required-fields
   "Ensure all Require Fields contain data."
   [state photo]
-  (let [fields (state/lookup state :required-fields)]
+  (let [fields (config/lookup state :required-fields)]
     (if-let [missing (seq (filter #(nil? (photo/extract-path-value photo %)) fields))]
       {:result :fail
        :reason (tr/translate state
@@ -179,7 +179,7 @@
                     (remove #(or (nil? %) (re-find sighting-quantity-exclusions-re %)))
                     (map str/lower-case)
                     (remove (set (map str/lower-case
-                                      (state/lookup state :surveyed-species))))))]
+                                      (config/lookup state :surveyed-species))))))]
     {:result :fail
      :reason (tr/translate state :checks/surveyed-species (:filename photo)
                            (str/join ", " m))}

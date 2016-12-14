@@ -3,7 +3,7 @@
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.db.sighting :as sighting]
    [camelot.db.media :as media]
    [camelot.app.state :refer [State]]

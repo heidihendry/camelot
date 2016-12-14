@@ -2,7 +2,7 @@
   "Photo models and data access."
   (:require
    [schema.core :as s]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.app.state :refer [State]]
    [yesql.core :as sql]))
 

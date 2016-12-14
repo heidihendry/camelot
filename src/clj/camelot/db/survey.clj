@@ -2,9 +2,9 @@
   "Survey data model and persistence."
   (:require
    [schema.core :as s]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [yesql.core :as sql]
-   [camelot.app.state :refer [State] :as state]
+   [camelot.app.state :refer [State]]
    [camelot.util.file :as file]
    [camelot.util.filesystem :as filesystem]
    [clojure.java.io :as io]

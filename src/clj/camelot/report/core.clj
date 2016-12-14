@@ -1,7 +1,7 @@
 (ns camelot.report.core
   "Generate a report from a DSL."
   (:require
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [camelot.app.state :refer [State]]
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
@@ -300,7 +300,7 @@
    state :- State
    configuration
    data :- [{s/Keyword s/Any}]]
-  (loader/load-user-modules)
+  (loader/load-user-modules state)
   (let [report (module/get-report state report-key)
         conf ((:output report) state configuration)]
     (->> data
@@ -333,7 +333,7 @@
   [state :- State
    report-key :- s/Keyword
    configuration]
-  (loader/load-user-modules)
+  (loader/load-user-modules state)
   (if-let [report (module/get-report state report-key)]
     (let [sightings (get-by state (:by report))
           data (csv-report report-key state configuration sightings)]
@@ -356,17 +356,17 @@
 (s/defn refresh-reports
   "Rediscover and evaluate report modules."
   [state]
-  (loader/load-user-modules))
+  (loader/load-user-modules state))
 
 (s/defn available-reports
   "Map of all available reports."
   [state]
-  (loader/load-user-modules)
+  (loader/load-user-modules state)
   (reduce-kv report-configuration-reducer [] (module/all-reports state)))
 
 (s/defn get-configuration
   "Configuration of the given report."
   [state report-key]
-  (loader/load-user-modules)
+  (loader/load-user-modules state)
   (let [r (get (module/all-reports state) report-key)]
     (->report-descriptor r report-key)))

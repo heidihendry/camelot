@@ -1,7 +1,7 @@
 (ns camelot.db.trap-station-session
   (:require
    [schema.core :as s]
-   [camelot.db.core :as db]
+   [camelot.util.db :as db]
    [clj-time.format :as tf]
    [camelot.app.state :refer [State]]
    [yesql.core :as sql]
