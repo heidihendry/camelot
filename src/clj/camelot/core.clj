@@ -8,6 +8,7 @@
    [camelot.app.version :as version]
    [camelot.app.network :as network]
    [camelot.app.desktop :as desktop]
+   [camelot.db.core :as db]
    [figwheel-sidecar.repl-api :as ra]
    [com.stuartsierra.component :as component]
    [environ.core :refer [env]]
@@ -80,8 +81,9 @@
   [{:keys [cli-args options]}]
   (-> (component/system-map
        :config (state/map->Config {:store state/config-store
-                                   :config (state/config)})
-       :database (state/map->Database {:connection state/spec})
+                                   :config (state/config)
+                                   :path (state/path-map)})
+       :database (db/map->Database {:connection state/spec})
        :app (map->HttpServer {:port (or (:port options)
                                         (Integer. (or (env :camelot-port) 5341)))
                               :dev-mode (:dev-mode options)

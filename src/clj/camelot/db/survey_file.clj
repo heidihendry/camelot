@@ -7,7 +7,8 @@
    [camelot.translation.core :as tr]
    [clojure.java.io :as io]
    [ring.util.response :as r]
-   [camelot.util.file :as file]))
+   [camelot.util.file :as file]
+   [camelot.util.filesystem :as filesystem]))
 
 (sql/defqueries "sql/survey-file.sql")
 
@@ -82,7 +83,7 @@
   [state :- State
    file-id :- s/Int]
   (if-let [r (get-specific state file-id)]
-    (let [fs (state/get-filestore-file-path (:survey-id r)
+    (let [fs (filesystem/filestore-file-path state (:survey-id r)
                                              (:survey-file-name r))]
       (io/delete-file fs)
       (db/with-db-keys state -delete! {:survey-file-id file-id}))))
@@ -93,7 +94,7 @@
    {:keys [tempfile :- s/Str
            filename :- s/Str
            size :- s/Int]}]
-  (let [fs (state/get-filestore-file-path survey-id filename)
+  (let [fs (filesystem/filestore-file-path state survey-id filename)
         rec (get-specific-by-details state survey-id filename)]
     (io/copy (file/->file tempfile) (file/->file fs))
     (if (nil? rec)
@@ -115,7 +116,7 @@
   [state :- State
    file-id :- s/Int]
   (if-let [r (get-specific state file-id)]
-    (let [fs (state/get-filestore-file-path (:survey-id r)
+    (let [fs (filesystem/filestore-file-path state (:survey-id r)
                                              (:survey-file-name r))
           data (io/input-stream (file/->file fs))]
       (-> (r/response data)

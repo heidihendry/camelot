@@ -49,7 +49,7 @@
 (defn detect-separator
   [path]
   (cond
-    (nil? path) (state/get-directory-separator)
+    (nil? path) (file/path-separator)
     (re-find #"^[A-Z]:(?:\\|$)" path) "\\"
     (and (re-find #"\\" path) (relative-path? path)) "\\"
     :else "/"))

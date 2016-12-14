@@ -133,7 +133,7 @@
 (s/defn delete-files!
   [state :- State
    files :- [s/Str]]
-  (let [mp (state/get-media-path)]
+  (let [mp (get-in state [:config :path :media])]
     (dorun (map #(file/delete (io/file mp %))
                 (mapcat #(list %
                                (str "preview-" (file/basename (io/file %) #"\.\w+?$") ".png")
@@ -174,11 +174,11 @@
   [state :- State
    filename :- s/Str
    variant :- (s/enum :thumb :preview :original)]
-  (if-let [media (get-specific-by-filename state filename)]
-    (io/input-stream
-     (if (= variant :original)
-       (io/file (str (state/get-media-path) SystemUtils/FILE_SEPARATOR
-                     filename "."
-                     (:media-format media)))
-       (io/file (str (state/get-media-path) SystemUtils/FILE_SEPARATOR
-                     (name variant) "-" filename ".png"))))))
+  (let [mpath (get-in state [:config :path :media])]
+    (if-let [media (get-specific-by-filename state filename)]
+      (io/input-stream
+       (if (= variant :original)
+         (io/file (str mpath SystemUtils/FILE_SEPARATOR
+                       filename "." (:media-format media)))
+         (io/file (str mpath SystemUtils/FILE_SEPARATOR
+                       (name variant) "-" filename ".png")))))))

@@ -22,12 +22,14 @@
                      [:datetime] [:filename]]})
 
 (defn gen-state
-  ([] {:config (.start (state/->Config (atom {})
-                                      default-config))
+  ([] {:config (.start (state/map->Config {:store (atom {})
+                                           :config default-config
+                                           :path {}}))
        :database {:connection {}}
        :app {}})
   ([config]
-   {:config (.start (state/->Config (atom {})
-                                   (merge default-config config)))
+   {:config (.start (state/map->Config {:store (atom {})
+                                        :config (merge default-config config)
+                                        :path {}}))
     :database {:connection {}}
     :app {}}))

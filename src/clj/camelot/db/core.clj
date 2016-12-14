@@ -1,21 +1,26 @@
 (ns camelot.db.core
   (:require
+   [com.stuartsierra.component :as component]
    [clj-time.coerce :as tc]
+   [camelot.db.migrate :as migrate]
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
    [schema.core :as s]
    [camelot.util.file :as file]
    [clojure.java.io :as io])
-  (:import (java.io IOException)))
+  (:import
+   (java.io IOException)))
 
 (defn connect
-  [connection]
-  (jdbc/get-connection connection))
+  "Establish a connection to the database given a JDBC spec."
+  [spec]
+  (jdbc/get-connection spec))
 
 (defn close
-  [connection]
+  "Close a connection to the database given a JDBC spec."
+  [spec]
   (try
-    (-> (assoc (dissoc connection :create)
+    (-> (assoc (dissoc spec :create)
                :shutdown true)
         jdbc/get-connection)
     (catch Exception e
@@ -76,3 +81,16 @@
       (db-keys)
       (with-connection state f)
       (clj-keys)))
+
+(s/defrecord Database
+    [connection :- clojure.lang.PersistentArrayMap]
+
+  component/Lifecycle
+  (start [this]
+    (connect connection)
+    (migrate/migrate connection)
+    this)
+
+  (stop [this]
+    (close connection)
+    (assoc this :connection nil)))

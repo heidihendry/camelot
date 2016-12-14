@@ -26,7 +26,7 @@
    :apply-fn (partial indep/->independent-sightings)
    :transforms [#(update % :media-capture-timestamp
                          (partial tf/unparse (tf/formatters :mysql)))
-                #(assoc % :media-directory (state/get-media-path))
+                #(assoc % :media-directory (get-in state [:config :path :media]))
                 #(assoc % :trap-camera-pair (format "%s_%s"
                                                     (:trap-station-name %)
                                                     (:trap-station-session-camera-id %)))

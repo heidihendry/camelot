@@ -108,6 +108,13 @@
   [source dest]
   (.renameTo ^File source ^File dest))
 
+(defn path-separator
+  "Return the path separator for the OS Camelot is running upon."
+  []
+  (if SystemUtils/IS_OS_WINDOWS
+    "\\"
+    "/"))
+
 (defn- path-separator-re
   []
   (if SystemUtils/IS_OS_WINDOWS

@@ -6,6 +6,7 @@
    [yesql.core :as sql]
    [camelot.app.state :refer [State] :as state]
    [camelot.util.file :as file]
+   [camelot.util.filesystem :as filesystem]
    [clojure.java.io :as io]
    [camelot.db.media :as media]))
 
@@ -78,7 +79,7 @@
    id :- s/Int]
   (let [fs (media/get-all-files-by-survey state id)]
     (media/delete-files! state fs)
-    (file/delete-recursive (state/get-filestore-survey-directory id)))
+    (file/delete-recursive (filesystem/filestore-survey-directory state id)))
     (db/with-db-keys state -delete! {:survey-id id})
   nil)
 

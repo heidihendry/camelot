@@ -42,8 +42,8 @@
     (store-variant (image/resize img width) target)))
 
 (defn- create-image
-  [path file-basename extension variant width]
-  (let [target (str (state/get-media-path) SystemUtils/FILE_SEPARATOR
+  [state path file-basename extension variant width]
+  (let [target (str (get-in state [:config :path :media]) SystemUtils/FILE_SEPARATOR
                     variant (str/lower-case file-basename))]
     (if width
       ;; Always create variants as .png; OpenJDK cannot write .jpg
@@ -51,8 +51,8 @@
       (store-original path (str target "." extension)))))
 
 (defn create-image-files
-  [path filename extension]
-  (dorun (map (fn [[k v]] (create-image path filename extension k v)) image-variants)))
+  [state path filename extension]
+  (dorun (map (fn [[k v]] (create-image state path filename extension k v)) image-variants)))
 
 (defn- get-album
   [state root-path path]
@@ -76,7 +76,7 @@
           media (im.db/create-media! state photo filename fmt notes attn trap-camera)]
       (im.db/create-photo! state (:media-id media) camset)
       (create-sightings state (:media-id media) (:sightings photo))
-      (create-image-files photopath filename fmt))))
+      (create-image-files state photopath filename fmt))))
 
 (defn media
   "Import media"

@@ -7,6 +7,7 @@
    [camelot.db.migrate :refer [migrate]]
    [camelot.db.core :as db]
    [camelot.util.file :as file]
+   [camelot.util.filesystem :as filesystem]
    [com.stuartsierra.component :as component]
    [clojure.java.io :as io]
    [clojure.pprint :as pp]
@@ -62,13 +63,6 @@
     SystemUtils/IS_OS_MAC_OSX :macosx
     :else :other))
 
-(defn get-directory-separator
-  "Return the path separator for the OS Camelot is running upon."
-  []
-  (if (= :windows (get-os))
-    "\\"
-    "/"))
-
 (defn get-config-location
   [loc-fn]
   (case (get-os)
@@ -86,19 +80,6 @@
   "Return the OS-specific path to the configuration directory."
   []
   (get-config-location config-dir))
-
-(defn checked-datadir
-  "Check the custom datadir, and return the canonicalised path.
-  throws an IO Exception if unsuitable."
-  [dir]
-  (let [f (io/file dir)]
-    (when (not (file/exists? f))
-      (throw (IOException. (str "File does not exist: " (file/get-path f)))))
-    (when (not (file/directory? f))
-      (throw (IOException. (str "File is not a directory: " (file/get-path f)))))
-    (when (or (not (file/readable? f)) (not (file/writable? f)))
-      (throw (IOException. (str "Permission denied: " (file/get-path f)))))
-    (file/get-path f)))
 
 (defn- db-path
   "Return the full path where the database is stored."
@@ -125,7 +106,7 @@
   "Return the path to the database directory."
   []
   (if (datadir-path)
-    (str (checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR db-name)
+    (str (filesystem/checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR db-name)
     (get-std-db-path)))
 
 (defn- media-path
@@ -147,7 +128,8 @@
   "Return the path to the media directory."
   []
   (if (datadir-path)
-    (str (checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR media-directory-name)
+    (str (filesystem/checked-datadir (datadir-path))
+         SystemUtils/FILE_SEPARATOR media-directory-name)
     (get-std-media-path)))
 
 (defn- filestore-path
@@ -169,28 +151,9 @@
   "Return the base path to the filestore directory."
   []
   (if (datadir-path)
-    (str (checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR filestore-directory-name)
+    (str (filesystem/checked-datadir (datadir-path))
+         SystemUtils/FILE_SEPARATOR filestore-directory-name)
     (get-std-filestore-path)))
-
-(defn- replace-unsafe-chars
-  [filename]
-  (str/replace filename #"(?i)[^a-z0-9 .-_]+" "-"))
-
-(defn get-filestore-survey-directory
-  "Return the path to the survey's filestore directory."
-  [survey-id]
-  (io/file (filestore-base-path) (str survey-id)))
-
-(defn get-filestore-file-path
-  "Return the path to a file in the survey's filestore directory."
-  [survey-id filename]
-  (let [parent (get-filestore-survey-directory survey-id)
-        fs (str (file/get-path parent) SystemUtils/FILE_SEPARATOR
-                (replace-unsafe-chars filename))]
-    (when (not (file/exists? parent))
-      (file/mkdirs parent))
-    (checked-datadir parent)
-    fs))
 
 (defn- serialise-dates
   "Convert configuration dates to long (e.g., for serialisation)."
@@ -316,25 +279,19 @@ Currently the only application state is the user's configuration."
   ([]
    {:config (config)}))
 
-(s/defrecord Database
-    [connection :- clojure.lang.PersistentArrayMap]
-
-  component/Lifecycle
-  (start [this]
-    (db/connect connection)
-    (migrate connection)
-    this)
-
-  (stop [this]
-    (db/close connection)
-    (assoc this :connection nil)))
+(defn path-map
+  []
+  {:filestore-base (filestore-base-path)
+   :media (get-media-path)
+   :database (get-db-path)
+   :config (get-config-dir)})
 
 (defn lookup [state k]
   (let [store (get-in state [:config :store])]
     (let [sv @store]
       (get (merge sv (or (:session state) {})) k))))
 
-(defrecord Config [store config]
+(defrecord Config [store config path]
   component/Lifecycle
   (start [this]
     (reset! store config)
@@ -345,7 +302,8 @@ Currently the only application state is the user's configuration."
     (reset! store {})
     (assoc this
            :store nil
-           :config nil)))
+           :config nil
+           :path nil)))
 
 (def State
   {(s/required-key :config) Config

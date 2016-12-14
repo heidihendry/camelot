@@ -15,7 +15,7 @@
 
       (testing "Should know how to treat Windows drive letters coming from the client when root-path not set."
         (let [state (state/gen-state {:root-path nil})]
-          (with-redefs [camelot.app.state/get-os #(constantly :windows)]
+          (with-redefs [camelot.util.file/path-separator #(constantly "\\")]
             (is (= (sut/resolve-directory state "G:\\srv\\mydata\\survey1")
                    "G:\\srv\\mydata\\survey1")))))
 
