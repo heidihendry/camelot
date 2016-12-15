@@ -2,7 +2,7 @@
 (require '[clojure.string :as str])
 (require '[camelot.system.state :as state])
 (require '[clojure.java.jdbc :as jdbc])
-(require '[clojure.util.db :as db])
+(require '[camelot.util.db :as db])
 
 (sql/defqueries "sql/migration-helpers/021.sql")
 (sql/defqueries "sql/migration-helpers/db.sql")
