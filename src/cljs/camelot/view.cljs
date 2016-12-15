@@ -358,7 +358,7 @@
                                                          {:survey-id survey}))
 (defroute "/:survey/bulk-import/mapper" [survey] (generate-view bulk-import-mapper/bulk-import-mapping-view
                                                                 {:survey-id survey}))
-(defroute "/organisation" [] (generate-view organisation/organisation-view-component))
+(defroute "/organisation" [] (generate-view organisation/organisation-view))
 (defroute "/:survey" [survey] (generate-view survey/survey-view-component
                                              {:survey-id survey}))
 (defroute "/taxonomy/:taxonomy-id" [taxonomy-id]

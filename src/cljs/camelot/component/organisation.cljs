@@ -80,40 +80,54 @@
                                    (om/build not-implemented data))))))))
 
 (defn organisation-view-component
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data {:menu [{:concept :survey
+                                :name (tr/translate ::surveys)
+                                :active true}
+                               {:concept :site
+                                :name (tr/translate ::sites)}
+                               {:concept :camera
+                                :name (tr/translate ::cameras)}
+                               {:concept :report
+                                :name (tr/translate ::reports)}]})
+      (om/update! data :active :survey)
+      (om/update! data :camera {})
+      (om/update! data :site {})
+      (om/update! data :report {})
+      (rest/get-resource "/surveys"
+                         #(om/update! data :survey {:list (:body %)})))
+
+    om/IRender
+    (render [_]
+      (let [l (get-in data [:survey :list])]
+        (cond
+          (nil? l) (dom/div #js {:className "align-center"}
+                            (dom/img #js {:className "spinner"
+                                          :src "images/spinner.gif"
+                                          :height "32"
+                                          :width "32"}))
+
+          (empty? l) (om/build create/create-survey-view-component data)
+
+          :else (om/build organisation-management-component data))))))
+
+(defn organisation-view
   "Render an album validation summary."
   [app owner]
   (reify
     om/IWillMount
     (will-mount [_]
       (om/update! app :selected-survey nil)
-      (rest/get-resource "/surveys"
-                         #(do (om/update! app :survey {:list (:body %)})
-                              (when-not (:menu app)
-                                (om/update! app :menu [{:concept :survey
-                                                        :name (tr/translate ::surveys)
-                                                        :active true}
-                                                       {:concept :site
-                                                        :name (tr/translate ::sites)}
-                                                       {:concept :camera
-                                                        :name (tr/translate ::cameras)}
-                                                       {:concept :report
-                                                        :name (tr/translate ::reports)}]))
-                              (when-not (:active app)
-                                (om/update! app :active :survey))
-                              (when-not (:camera app)
-                                (om/update! app :camera {}))
-                              (when-not (:site app)
-                                (om/update! app :site {}))
-                              (om/update! app :report {}))))
+      (om/update! app :organisation {}))
+
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! app :organisation {}))
+
     om/IRender
     (render [_]
-      (let [l (get-in app [:survey :list])]
-        (cond
-          (nil? l) (dom/div #js {:className "align-center"}
-                   (dom/img #js {:className "spinner"
-                                 :src "images/spinner.gif"
-                                 :height "32"
-                                 :width "32"}))
-          (empty? l) (om/build create/create-survey-view-component app)
-
-          :else (om/build organisation-management-component app))))))
+      (when (:organisation app)
+        (om/build organisation-view-component (:organisation app))))))
