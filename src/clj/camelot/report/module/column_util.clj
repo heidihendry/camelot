@@ -4,7 +4,7 @@
    [camelot.report.sighting-independence :as indep]
    [clj-time.core :as t]
    [schema.core :as s]
-   [camelot.app.state :refer [State]])
+   [camelot.system.state :refer [State]])
   (:import
    (clojure.lang IFn)))
 

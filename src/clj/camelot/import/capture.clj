@@ -3,15 +3,15 @@
    [schema.core :as s]
    [camelot.util.capture :as capture]
    [camelot.import.db :as im.db]
-   [camelot.app.state :refer [State]]
+   [camelot.system.state :refer [State]]
    [camelot.import.dirtree :as dt]
    [camelot.import.photo :as photo]
    [camelot.util.db :as db]
    [camelot.import.core :as import]
-   [camelot.db.trap-station-session :as trap-station-session]
+   [camelot.model.trap-station-session :as trap-station-session]
    [clj-time.core :as t]
    [camelot.translation.core :as tr])
-  (:import (camelot.db.trap_station_session TrapStationSession)))
+  (:import (camelot.model.trap_station_session TrapStationSession)))
 
 (s/defn read-photo
   [state tempfile]

@@ -2,7 +2,7 @@
   "Generate a report from a DSL."
   (:require
    [camelot.util.db :as db]
-   [camelot.app.state :refer [State]]
+   [camelot.system.state :refer [State]]
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
    [camelot.translation.core :as tr]

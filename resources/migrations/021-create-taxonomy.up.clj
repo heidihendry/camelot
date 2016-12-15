@@ -1,12 +1,11 @@
-(require '[camelot.db.taxonomy :as taxonomy])
 (require '[yesql.core :as sql])
 (require '[clojure.string :as str])
-(require '[camelot.app.state :as state])
-(require '[camelot.db.species :as species])
+(require '[camelot.system.state :as state])
 (require '[clojure.java.jdbc :as jdbc])
+(require '[clojure.util.db :as db])
 
-(sql/defqueries "sql/migration-helpers/021.sql" {:connection state/spec})
-(sql/defqueries "sql/migration-helpers/db.sql" {:connection state/spec})
+(sql/defqueries "sql/migration-helpers/021.sql")
+(sql/defqueries "sql/migration-helpers/db.sql")
 
 (defn- -m021-create-taxonomy
   [spp]
@@ -42,9 +41,10 @@
                                        :relation_table "SPECIES"}
                                       (select-keys (:database s) [:connection]))]
     (doseq [c constraints]
-      (jdbc/db-do-commands state/spec (str "ALTER TABLE sighting DROP CONSTRAINT "
-                                           (:constraintname c))))))
+      (jdbc/db-do-commands (get-in s [:database :connection])
+                           (str "ALTER TABLE sighting DROP CONSTRAINT "
+                                (:constraintname c))))))
 
-(db/with-transaction [s (state/gen-state*)]
+(db/with-transaction [s {:database {:connection state/spec}}]
   (-m021-remove-unnecessary-constraints s)
   (-m021-species-genus-migration s))

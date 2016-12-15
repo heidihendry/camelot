@@ -1,6 +1,8 @@
 (ns user
   (:require
    [camelot.core]
+   [camelot.system.http :as http]
+   [com.stuartsierra.component :as component]
    [schema.core :as s]
    [ring.middleware.reload :refer [wrap-reload]]
    [figwheel-sidecar.repl-api :as figwheel]))
@@ -14,19 +16,34 @@
 (s/set-fn-validation! true)
 
 (def http-handler
-  (wrap-reload #'camelot.app.http/http-handler))
+  (wrap-reload #'camelot.system.http/http-handler))
 
 (defn migrate
   [state]
-  (camelot.app.db-migrate/migrate (get-in state [:database :connection])))
-
-(defn run []
-  (camelot.core/start))
+  (camelot.system.db-migrate/migrate (get-in state [:database :connection])))
 
 (defn runprod []
   (camelot.core/start-prod))
 
-(defn stop []
-  (camelot.core/stop))
-
 (def browser-repl figwheel/cljs-repl)
+
+(defrecord DevHttpServer [database config]
+  component/Lifecycle
+  (start [this]
+    (figwheel/start-figwheel!)
+    (assoc this :figwheel true))
+
+  (stop [this]
+    (when (get this :figwheel)
+      (figwheel/stop-figwheel!)
+      (assoc this :figwheel nil))))
+
+(defn start []
+  (reset! http/system (->> {:options {:dev-server (map->DevHttpServer {})}}
+                           camelot.core/camelot
+                           component/start))
+  nil)
+
+(defn stop []
+  (swap! http/system component/stop)
+  nil)

@@ -10,7 +10,7 @@
    [camelot.import.photo :as photo]
    [camelot.util.config :as config]
    [camelot.import.validation :refer [list-problems check-invalid-photos]]
-   [camelot.db.trap-station-session-camera :as trap-station-session-camera]))
+   [camelot.model.trap-station-session-camera :as trap-station-session-camera]))
 
 (defn- extract-date
   "Extract the first date from an album, given a custom comparison function `cmp'."

@@ -15,3 +15,13 @@ VALUES (:taxonomy_created, :taxonomy_updated, :taxonomy_class, :taxonomy_order,
 UPDATE sighting
   SET taxonomy_id = :taxonomy_id
   WHERE species_id = :species_id
+
+-- name: -get-all
+SELECT taxonomy_id, taxonomy_created, taxonomy_updated, taxonomy_class, taxonomy_order,
+       taxonomy_family, taxonomy_genus, taxonomy_species, taxonomy_common_name,
+       species_mass_id, taxonomy_notes
+FROM taxonomy
+
+-- name: -delete!
+DELETE FROM taxonomy
+WHERE taxonomy_id = :taxonomy_id

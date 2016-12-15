@@ -5,7 +5,7 @@
    [clj-time.core :as t]
    [clojure.string :as str]
    [clojure.test :refer :all :exclude [report]]
-   [camelot.db.taxonomy :as taxonomy]))
+   [camelot.model.taxonomy :as taxonomy]))
 
 (defn gen-state-helper
   [config]

@@ -2,7 +2,7 @@
   (:require
    [clj-time.coerce :as tc]
    [clj-time.core :as t]
-   [camelot.app.state :as state]))
+   [camelot.system.state :as state]))
 
 (def default-config
   "Return the default configuration."

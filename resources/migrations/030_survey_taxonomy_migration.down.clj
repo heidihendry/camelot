@@ -1,10 +1,12 @@
 (require '[yesql.core :as sql])
-(require '[camelot.app.state :refer [State] :as state])
+(require '[camelot.system.state :as state])
 (require '[clojure.java.jdbc :as jdbc])
 (require '[schema.core :as s])
-(require '[camelot.db.core :as db])
-(require '[camelot.db.survey-taxonomy :as survey-taxonomy])
+(require '[camelot.util.db :as db])
 
-(db/with-transaction [s (state/gen-state*)]
-  (doseq [st (survey-taxonomy/get-all s)]
-    (survey-taxonomy/delete! s (:survey-taxonomy-id st))))
+(sql/defqueries "sql/migration-helpers/030.sql")
+
+(db/with-transaction [s {:database {:connection state/spec}}]
+  (let [conn (select-keys (:database s) [:connection])]
+    (doseq [st (-get-all-survey-taxonomy {} conn)]
+      (-delete! {:survey_taxonomy_id st} conn))))
