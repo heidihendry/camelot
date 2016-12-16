@@ -110,10 +110,10 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "button-container"}
-               (dom/button #js {:className "btn btn-default fa fa-2x"
+               (dom/button #js {:className "btn btn-default"
                                 :onClick cancel}
                            " Cancel")
-               (dom/button #js {:className "btn btn-primary fa fa-2x"
+               (dom/button #js {:className "btn btn-primary"
                                 :onClick update}
                            " Update")))))
 

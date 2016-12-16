@@ -42,12 +42,14 @@
     ;; ctrl+m
     (and (>= (.-keyCode e) 77) (.-ctrlKey e))
     (do (.focus (.getElementById js/document "media-collection-container"))
-        (nav/analytics-event "library-key" "C-m"))
+        (nav/analytics-event "library-key" "C-m")
+        (.preventDefault e))
 
     ;; ctrl+i
     (and (= (.-keyCode e) 73) (.-ctrlKey e))
     (do (.click (.getElementById js/document "identify-selected"))
-        (nav/analytics-event "library-key" "C-i"))
+        (nav/analytics-event "library-key" "C-i")
+        (.preventDefault e))
 
     ;; ctrl+d
     (and (= (.-keyCode e) 68) (.-ctrlKey e))
