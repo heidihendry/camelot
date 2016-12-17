@@ -16,9 +16,7 @@
   "Close a connection to the database given a JDBC spec."
   [spec]
   (try
-    (-> (assoc (dissoc spec :create)
-               :shutdown true)
-        jdbc/get-connection)
+    (jdbc/get-connection (assoc (dissoc spec :create) :shutdown true))
     (catch Exception e
       (println (.getMessage e)))))
 

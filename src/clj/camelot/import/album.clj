@@ -66,7 +66,7 @@
 (defn imported-album?
   [state file]
   (nil? (trap-station-session-camera/get-specific-by-import-path
-         state (subs (.toString file)
+         state (subs (str file)
                      (count (config/lookup state :root-path))))))
 
 (s/defn album-set :- {java.io.File mi/ImportAlbum}

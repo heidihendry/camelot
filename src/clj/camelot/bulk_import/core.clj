@@ -113,7 +113,7 @@
 (defn resolve-directory
   "Resolve a corresponding server directory for a given 'client' directory."
   [state client-dir]
-  {:pre (nil? client-dir)}
+  {:pre [(not (nil? client-dir))]}
   (let [root (config/lookup state :root-path)
         res (resolve-server-directory root client-dir)]
     (cond
@@ -139,7 +139,7 @@
   [data]
   (with-open [io-str (java.io.StringWriter.)]
     (csv/write-csv io-str data)
-    (.toString io-str)))
+    (str io-str)))
 
 (defn calculate-key-value
   [data k]

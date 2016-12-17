@@ -14,19 +14,18 @@
                         (nrepl/start-server :port 7888)))
 (defn camelot
   [{:keys [cli-args options]}]
-  (-> (component/system-map
-       :config (state/map->Config {:store state/config-store
-                                   :config (state/config)
-                                   :path (state/path-map)})
-       :database (db/map->Database {:connection state/spec})
-       :app (if-let [dsvr (:dev-server options)]
-              dsvr
-              (http/map->HttpServer {:port (or (:port options)
-                                               (Integer. (or (env :camelot-port) 5341)))
-                                     :cli-args (or cli-args [])})))
-      (component/system-using
-       {:app {:config :config
-              :database :database}})))
+  (let [smap (component/system-map
+              :config (state/map->Config {:store state/config-store
+                                          :config (state/config)
+                                          :path (state/path-map)})
+              :database (db/map->Database {:connection state/spec})
+              :app (if-let [dsvr (:dev-server options)]
+                     dsvr
+                     (http/map->HttpServer {:port (or (:port options)
+                                                      (Integer. (or (env :camelot-port) 5341)))
+                                            :cli-args (or cli-args [])})))]
+    (component/system-using smap {:app {:config :config
+                                        :database :database}})))
 
 (defn start-prod []
   (reset! http/system (component/start (camelot {})))

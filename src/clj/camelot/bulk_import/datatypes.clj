@@ -21,7 +21,7 @@
 
 (defn as-datetime
   [x]
-  (when-not (empty? x)
+  (when (seq x)
     (or (some #(try-parse % x) timestamp-formatters)
         (tf/parse x))))
 
@@ -101,7 +101,7 @@
 
 (defn as-sex
   [v]
-  (when-not (empty? v)
+  (when (seq v)
     (if (seq (re-matches #"^(?i)M(ale)?$" v))
       "M"
       "F")))
@@ -115,7 +115,7 @@
 
 (defn as-lifestage
   [v]
-  (when-not (empty? v)
+  (when (seq v)
     (if (seq (re-matches #"^(?i)A(dult)?$" v))
       "adult"
       "juvenile")))
@@ -136,7 +136,7 @@
 
 (defn could-be-required?
   [x]
-  (not (empty? x)))
+  (if (seq x) true false))
 
 (defn check-possible
   [token checkfn xs]

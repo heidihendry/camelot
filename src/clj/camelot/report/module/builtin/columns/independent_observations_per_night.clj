@@ -13,9 +13,9 @@
 
 (defn- calculate-independent-observations-per-night
   [state data]
-  (->> data
-       (map #(assoc % :independent-observations-per-night
-                    (get-nights-per-independent-observation %)))))
+  (map #(assoc % :independent-observations-per-night
+               (get-nights-per-independent-observation %))
+       data))
 
 (module/register-column
  :independent-observations-per-night

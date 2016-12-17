@@ -39,8 +39,8 @@
         :down (mapv slurp down)}))))
 
 (defn ragtime-config
-  [connection]
   "Ragtime configuration"
+  [connection]
   {:datastore (ragjdbc/sql-database connection)
    :migrations (sort-by :id (ragjdbc/load-resources "migrations"))})
 

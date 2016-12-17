@@ -89,9 +89,9 @@
 
 (defn- camera-available?
   [state data]
-  (not (some #(= % (:camera-id data))
-             (trap-station-session/get-active
-              state (int (:trap-station-session-id data))))))
+  (let [tid (int (:trap-station-session-id data))
+        active-sess (trap-station-session/get-active state tid)]
+    (not-any? #(= % (:camera-id data)) active-sess)))
 
 (s/defn create!* :- TrapStationSessionCamera
   "Create without checking camera availability."
@@ -108,10 +108,9 @@
 
 (defn- camera-available-for-update?
   [state id data]
-  (not (some #(= % (:camera-id data))
-             (trap-station-session/get-active state
-                         (int (:trap-station-session-id data))
-                         id))))
+  (let [tid (int (:trap-station-session-id data))
+        active-sess (trap-station-session/get-active state tid id)]
+    (not-any? #(= % (:camera-id data)) active-sess)))
 
 (s/defn update! :- TrapStationSessionCamera
   [state :- State

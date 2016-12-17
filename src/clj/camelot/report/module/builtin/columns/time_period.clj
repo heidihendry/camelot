@@ -11,14 +11,14 @@
   [a b]
   (cond (nil? a) b
         (nil? b) a
-        (> (compare a b) 0) b
+        (pos? (compare a b)) b
         :else a))
 
 (defn after-reducer
   [a b]
   (cond (nil? a) b
         (nil? b) a
-        (< (compare a b) 0) b
+        (neg? (compare a b)) b
         :else a))
 
 (def month-formatter (tf/formatter "YYYY/MM"))

@@ -235,15 +235,14 @@
             (map (fn [[t f]]
                    (let [res (f state photos)]
                      (when (not= (:result res) :pass)
-                       (assoc res
-                              :reason (if (:reason res)
-                                        (:reason res)
-                                        (->> t
-                                             (name)
-                                             (str "checks/")
-                                             (keyword)
-                                             (tr/translate state)
-                                             (tr/translate state :checks/problem-without-reason)))))))
+                       (assoc res :reason
+                               (or (:reason res)
+                                   (->> t
+                                        name
+                                        (str "checks/")
+                                        keyword
+                                        (tr/translate state)
+                                        (tr/translate state :checks/problem-without-reason)))))))
                  tests))))
 
 (s/defn list-problems

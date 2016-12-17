@@ -17,9 +17,8 @@
   (if (and (:trap-station-id v) (:taxonomy-id v))
     (let [lt (vector (:trap-station-id v) (:taxonomy-id v))
           last (or (get-in acc [:state lt]) nil)
-          dt (if last
-               (t/interval last (:media-capture-timestamp v))
-               nil)]
+          dt (when last
+               (t/interval last (:media-capture-timestamp v)))]
       (assoc-in
        (update acc :data #(conj % (assoc v :sighting-time-delta dt)))
        [:state lt] (:media-capture-timestamp v)))

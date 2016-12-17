@@ -12,7 +12,8 @@
 
 (defn known-or-nil
   [v]
-  (if (= v sighting-default-option) nil v))
+  (when-not (= v sighting-default-option)
+    v))
 
 (s/defrecord TSighting
     [sighting-quantity :- s/Int

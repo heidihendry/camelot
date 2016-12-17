@@ -56,8 +56,7 @@
 
 (defn- get-album
   [state root-path path]
-  (-> (album/read-albums state root-path)
-      (get (file/->file path))))
+  (get (album/read-albums state root-path) (file/->file path)))
 
 (defn- create-sightings
   [state media-id sightings]
@@ -82,7 +81,7 @@
   "Import media"
   [state {:keys [folder session-camera-id notes]}]
   (db/with-transaction [s state]
-    (let [[_ sitename _phase cameraname] (file/rel-path-components folder)
+    (let [[_ sitename _phase cameraname] (file/rel-path-components state folder)
           root-path (config/lookup s :root-path)
           full-path (str root-path folder)
           album (get-album s root-path full-path)

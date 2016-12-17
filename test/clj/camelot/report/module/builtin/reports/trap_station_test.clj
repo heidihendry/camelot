@@ -11,7 +11,7 @@
   (state/gen-state (assoc config :language :en)))
 
 (defn- calc-obs-nights
-  [obs nights]
+  [^long obs ^long nights]
   (format "%.3f" (* 100 (double (/ obs nights)))))
 
 (defn report

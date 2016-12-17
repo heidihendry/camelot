@@ -279,8 +279,8 @@
 
   (context "/settings" {session :session state :system}
            (GET "/" [] (r/response (cursorise/cursorise (merge (deref (get-in state [:config :store])) session))))
-           (PUT "/" [data] (-> (r/response (state/save-config (cursorise/decursorise data)))
-                               (assoc :session {:language (:value (:language data))}))))
+           (PUT "/" [data] (assoc (r/response (state/save-config (cursorise/decursorise data)))
+                                  :session {:language (:value (:language data))})))
 
   (GET "/" _ (retrieve-index))
   (POST "/quit" [] (System/exit 0))

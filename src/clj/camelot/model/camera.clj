@@ -56,7 +56,8 @@
 
 (s/defn get-available :- [Camera]
   [state :- State]
-  (->> (db/clj-keys (db/with-connection state -get-available))
+  (->> (db/with-connection state -get-available)
+       db/clj-keys
        (to-camera state)))
 
 (s/defn get-specific :- (s/maybe Camera)

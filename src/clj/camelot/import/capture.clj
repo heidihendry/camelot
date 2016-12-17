@@ -39,7 +39,7 @@
   [state content-type tempfile size session-camera-id photo]
   (let [fmt (get capture/image-mimes content-type)
         filename (java.util.UUID/randomUUID)]
-    (import/create-image-files tempfile filename fmt)
+    (import/create-image-files state tempfile filename fmt)
     (create-record! state session-camera-id fmt photo filename)))
 
 (s/defn import-capture!

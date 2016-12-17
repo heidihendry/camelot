@@ -135,7 +135,7 @@
 (defn- project
   [columns data]
   (let [results (if (= (first columns) :all)
-                  (into #{} data)
+                  (set data)
                   (set/project data columns))]
     (->> results
          (sort-by count)
@@ -187,7 +187,7 @@
        (map #(fn [x y] (compare (get x %) (get y %))))
        (map #(% a b))
        vec
-       (#(conj % (compare (into [] a) (into [] b))))
+       (#(conj % (compare (vec a) (vec b))))
        (reduce #(if (zero? %2)
                   %1
                   (reduced %2)) 0)))
@@ -272,7 +272,7 @@
   [data]
   (with-open [io-str (java.io.StringWriter.)]
     (csv/write-csv io-str data)
-    (.toString io-str)))
+    (str io-str)))
 
 (defn custom-titles
   [state title-fn]

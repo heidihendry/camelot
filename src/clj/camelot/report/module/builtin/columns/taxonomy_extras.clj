@@ -7,9 +7,8 @@
 (defn calculate-species-name
   [state data]
   (map
-   #(assoc % :species-name (if (and (:taxonomy-genus %) (:taxonomy-species %))
-                             (format "%s %s" (:taxonomy-genus %) (:taxonomy-species %))
-                             nil))
+   #(assoc % :species-name (when (and (:taxonomy-genus %) (:taxonomy-species %))
+                             (format "%s %s" (:taxonomy-genus %) (:taxonomy-species %))))
    data))
 
 (module/register-column

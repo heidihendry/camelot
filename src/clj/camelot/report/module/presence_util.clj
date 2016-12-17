@@ -65,4 +65,4 @@
 (def generate-presence
   (partial generate (fn [by-day x]
                       (let [v (get by-day x)]
-                        (if (and v (> v 0)) 1 0)))))
+                        (if (and v (pos? v)) 1 0)))))

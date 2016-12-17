@@ -23,7 +23,7 @@
              :sighting-time-delta-days
              :media-directory
              :media-full-filename]
-   :apply-fn (partial indep/->independent-sightings)
+   :apply-fn indep/->independent-sightings
    :transforms [#(update % :media-capture-timestamp
                          (partial tf/unparse (tf/formatters :mysql)))
                 #(assoc % :media-directory (get-in state [:config :path :media]))

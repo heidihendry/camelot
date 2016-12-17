@@ -22,10 +22,9 @@
            trap-station-longitude
            media-capture-timestamp]}]
   (let [tz (get-timezone state)]
-    (if (or (nil? media-capture-timestamp)
-            (nil? trap-station-longitude)
-            (nil? trap-station-latitude))
-      nil
+    (when-not (or (nil? media-capture-timestamp)
+                  (nil? trap-station-longitude)
+                  (nil? trap-station-latitude))
       (let [sunrise (sun/get-sunrise-time tz
                      (str trap-station-latitude)
                      (str trap-station-longitude)

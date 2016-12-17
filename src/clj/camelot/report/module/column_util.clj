@@ -25,8 +25,7 @@
 
 (defn- ->percentage
   [{:keys [n d]}]
-  (if (zero? d)
-    nil
+  (when-not (zero? d)
     (format "%.2f" (* 100 (float (/ n d))))))
 
 (defn- boolean-reducer
@@ -161,15 +160,6 @@
   (let [nights (get-nights-for-sessions data)]
     (map #(assoc % :nights-elapsed
                  (get nights (:trap-station-session-id %))) data)))
-
-(s/defn column-from-existing
-  "Assoc a column `newcol', with the value from `col'.
-Useful for performing different types of aggregations."
-  [col :- s/Keyword
-   newcol :- s/Keyword
-   state :- State
-   data :- [{s/Keyword s/Any}]]
-  (map #(assoc % newcol (get % col))) data)
 
 (s/defn calculate-total-nights
   "Assoc the number of nights elapsed for a session."

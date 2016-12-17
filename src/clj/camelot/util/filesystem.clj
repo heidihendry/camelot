@@ -16,9 +16,9 @@
   throws an IO Exception if unsuitable."
   [dir]
   (let [f (io/file dir)]
-    (when (not (file/exists? f))
+    (when-not (file/exists? f)
       (throw (IOException. (str "File does not exist: " (file/get-path f)))))
-    (when (not (file/directory? f))
+    (when-not (file/directory? f)
       (throw (IOException. (str "File is not a directory: " (file/get-path f)))))
     (when (or (not (file/readable? f)) (not (file/writable? f)))
       (throw (IOException. (str "Permission denied: " (file/get-path f)))))
@@ -35,7 +35,7 @@
   (let [parent (filestore-survey-directory state survey-id)
         fs (str (file/get-path parent) SystemUtils/FILE_SEPARATOR
                 (replace-unsafe-chars filename))]
-    (when (not (file/exists? parent))
+    (when-not (file/exists? parent)
       (file/mkdirs parent))
     (checked-datadir parent)
     fs))

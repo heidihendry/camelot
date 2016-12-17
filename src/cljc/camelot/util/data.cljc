@@ -1,5 +1,6 @@
 (ns camelot.util.data
-  )
+  (:require
+   [clojure.string :as str]))
 
 (defn select-keys-inv
   [ks data]
@@ -34,9 +35,8 @@
 
 (defn- strip-key-prefix
   [k p]
-  (let [n (apply str (drop-while #(= % \-) (strip-prefix p (name k))))]
-    (if (empty? n)
-      nil
+  (let [n (str/join (drop-while #(= % \-) (strip-prefix p (name k))))]
+    (when (seq n)
       (keyword n))))
 
 (defn- key-prefix-reducer-fn
