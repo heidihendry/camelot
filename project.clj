@@ -47,6 +47,8 @@
 
   :min-lein-version "2.6.1"
 
+  :env {:squiggly "{:checkers [:eastwood :kibit]}"}
+
   :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]
 
   :test-paths ["test/cljc" "test/clj"]
