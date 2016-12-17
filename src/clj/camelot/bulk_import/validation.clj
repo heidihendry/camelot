@@ -125,3 +125,15 @@
                                             :test t
                                             :row (+ %1 2)))
                          tests) records)))))
+
+(defn list-dataset-problems
+  "Validate records, returning any dataset level problems."
+  [state records]
+  (let [tests {:camera-overlaps check-overlapping-camera-usage}]
+    (mapcat (fn [[t f]] (map #(assoc % :test t) (f state records))) tests)))
+
+(defn validate
+  "Validate records."
+  [state records]
+  (let [vs (juxt list-dataset-problems list-record-problems)]
+    (apply concat (vs state records))))

@@ -257,3 +257,28 @@
           first "2016-02-02 and 2016-02-05"
           second "CAM2"
           second "2016-02-06 and 2016-02-10")))))
+
+(deftest test-validate
+  (testing "validation"
+    (testing "should return validation errors in a dataset."
+      (let [data [{:trap-station-session-start-date (t/date-time 2016 1 1)
+                   :trap-station-session-end-date (t/date-time 2016 2 5)
+                   :media-capture-timestamp (t/date-time 2016 1 5)
+                   :camera-name "CAM1"}
+                  {:trap-station-session-start-date (t/date-time 2016 2 2)
+                   :trap-station-session-end-date (t/date-time 2016 2 5)
+                   :media-capture-timestamp (t/date-time 2016 1 5)
+                   :camera-name "CAM1"}
+                  {:trap-station-session-start-date (t/date-time 2016 2 3)
+                   :trap-station-session-end-date (t/date-time 2016 2 10)
+                   :media-capture-timestamp (t/date-time 2016 2 10)
+                   :camera-name "CAM2"}
+                  {:trap-station-session-start-date (t/date-time 2016 2 6)
+                   :media-capture-timestamp (t/date-time 2016 2 10)
+                   :trap-station-session-end-date (t/date-time 2016 2 20)
+                   :camera-name "CAM2"}]
+            result (sut/validate (gen-state) data)]
+        (is (= (sort (map #(:test %) result))
+               [:camera-overlaps
+                :camera-overlaps
+                :session-dates]))))))
