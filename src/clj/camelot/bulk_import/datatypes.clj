@@ -13,6 +13,11 @@
    (tf/formatter "E MMM d H:m:s Z yyyy")
    (tf/formatter "yyyy:M:d H:m:s")])
 
+(def date-formatters
+  [(tf/formatter "yyyy:M:d")
+   (tf/formatter "yyyy-M-d")
+   (tf/formatter "yyyy/M/d")])
+
 (defn try-parse
   [fmt x]
   (try
@@ -25,6 +30,12 @@
     (or (some #(try-parse % x) timestamp-formatters)
         (tf/parse x))))
 
+(defn as-date
+  [x]
+  (when (seq x)
+    (or (some #(try-parse % x) (concat timestamp-formatters date-formatters))
+        (tf/parse x))))
+
 (defn could-be-timestamp?
   [x]
   (cond
@@ -33,6 +44,13 @@
     (some? (some #(try-parse % x) timestamp-formatters)) true
     (tf/parse x) true
     :else false))
+
+(defn could-be-date?
+  [x]
+  (if (or (could-be-timestamp? x)
+          (some? (some #(try-parse % x) date-formatters)))
+    true
+    false))
 
 (defn could-be-number?
   [x]
@@ -153,6 +171,7 @@
   [xs]
   (disj (set
          [(check-possible :timestamp could-be-timestamp? xs)
+          (check-possible :date could-be-date? xs)
           (check-possible :number could-be-number? xs)
           (check-possible :integer could-be-integer? xs)
           (check-possible :boolean could-be-yes-no? xs)
@@ -175,6 +194,7 @@
     :sex as-sex
     :lifestage as-lifestage
     :timestamp as-datetime
+    :date as-date
     :longitude edn/read-string
     :latitude edn/read-string
     :boolean as-boolean

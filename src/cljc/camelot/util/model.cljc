@@ -144,10 +144,10 @@
    :trap-station-session-id {:datatype :integer
                              :required true
                              :unmappable true}
-   :trap-station-session-start-date {:datatype :timestamp
+   :trap-station-session-start-date {:datatype :date
                                      :required true
                                      :order 20}
-   :trap-station-session-end-date {:datatype :timestamp
+   :trap-station-session-end-date {:datatype :date
                                    :required true
                                    :order 22}
    :photo-fnumber-setting {:datatype :string

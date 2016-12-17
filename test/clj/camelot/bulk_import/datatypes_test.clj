@@ -47,7 +47,44 @@
       (is (= (sut/could-be-timestamp? "") true)))
 
     (testing "rejects other values"
-      (is (= (sut/could-be-timestamp? "100") false)))))
+      (is (= (sut/could-be-timestamp? "100") false)))
+
+    (testing "rejects dates"
+      (is (= (sut/could-be-timestamp? "2014/02/01") false)))))
+
+(deftest test-date
+  (testing "as-date"
+    (testing "understands yyyy/mm/dd HH:MM:SS"
+      (is (= (sut/as-date "2014/02/01 01:09:02")
+             (t/date-time 2014 2 1 1 9 2))))
+
+    (testing "understands yyyy/mm/dd"
+      (is (= (sut/as-date "2014/02/01")
+             (t/date-time 2014 2 1))))
+
+    (testing "understands yyyy-mm-dd"
+      (is (= (sut/as-date "2014-02-01")
+             (t/date-time 2014 2 1))))
+
+    (testing "understands yyyy:mm:dd"
+      (is (= (sut/as-date "2014:02:01")
+             (t/date-time 2014 2 1)))))
+
+  (testing "could-be-date?"
+    (testing "understands yyyy/mm/dd HH:MM:SS"
+      (is (= (sut/could-be-date? "2014/02/01 01:09:02") true)))
+
+    (testing "understands yyyy/mm/dd"
+      (is (= (sut/could-be-date? "2014/02/01") true)))
+
+    (testing "understands yyyy-mm-dd"
+      (is (= (sut/could-be-date? "2014-02-01") true)))
+
+    (testing "understands yyyy:mm:dd"
+      (is (= (sut/could-be-date? "2014:02:01") true)))
+
+    (testing "rejects other values"
+      (is (= (sut/could-be-date? "100") false)))))
 
 (deftest test-number
   (testing "could-be-number?"
