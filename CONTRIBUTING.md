@@ -152,10 +152,10 @@ Open a terminal and type `lein repl` to start a Clojure REPL
 To run Camelot  from the REPL:
 
 ```clojure
-(run)
+(start)
 ```
 
-The call to `(run)` starts the Figwheel server at port 3449, which takes care
+The call to `(start)` starts the Figwheel server at port 3449, which takes care
 of live reloading ClojureScript code and CSS. Figwheel's server will also act
 as your app server, so requests are correctly forwarded to the http-handler
 you define.
@@ -182,7 +182,7 @@ To start midje's autotest (for clj tests):
 Start a repl in the context of your project with `M-x cider-jack-in`.
 
 Switch to repl-buffer with `C-c C-z` and start web and figwheel servers with
-`(run)`, and weasel server with `(browser-repl`). Load
+`(start)`, and weasel server with `(browser-repl`). Load
 [http://localhost:3449](http://localhost:3449) on an external browser, which
 connects to weasel, and start evaluating cljs inside Cider.
 
