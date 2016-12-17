@@ -703,6 +703,9 @@
     :help-text-step-2 "Step 2. Modify the template as you see fit, then start the import once you're ready."
     :survey-directory "Path to survey directory"}
 
+   :camelot.bulk-import.validation
+   {:camera-overlap "%s is used in multiple sessions between %s"}
+
    :camelot.component.bulk-import.mapper
    {:title "Bulk Import"
     :scanning "Preparing data for mapping..."

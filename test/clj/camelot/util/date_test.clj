@@ -41,3 +41,69 @@
     (testing "Should return true if first timestamp is after as second timestamp"
       (is (sut/at-or-after? (t/date-time 2016 1 1 10 30 0)
                              (t/date-time 2016 1 1 10 0 0))))))
+
+(deftest test-latest
+  (testing "latest"
+    (testing "Should return the latest of 2 dates"
+      (is (= (sut/latest (t/date-time 2016 1 1 10 30 0)
+                         (t/date-time 2016 1 1 10 0 0))
+             (t/date-time 2016 1 1 10 30 0))))
+
+    (testing "Should return the latest of 3 dates"
+      (is (= (sut/latest (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 30 0)
+                         (t/date-time 2016 1 1 10 0 0))
+             (t/date-time 2016 1 1 10 30 0))))
+
+    (testing "Should return the latest of 3 dates, regardless of order"
+      (is (= (sut/latest (t/date-time 2016 1 1 10 0 0)
+                         (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 30 0))
+             (t/date-time 2016 1 1 10 30 0))))
+
+    (testing "Should return the latest of 5 dates"
+      (is (= (sut/latest (t/date-time 2016 1 1 10 0 0)
+                         (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 30 0))
+             (t/date-time 2016 1 1 10 30 0))))
+
+    (testing "Should return the latest of 5 dates"
+      (is (= (sut/latest (t/date-time 2016 1 1 10 40 0)
+                         (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 10 0)
+                         (t/date-time 2016 1 1 10 20 0)
+                         (t/date-time 2016 1 1 10 35 0))
+             (t/date-time 2016 1 1 10 40 0))))))
+
+(deftest test-earliest
+  (testing "earliest"
+    (testing "Should return the earliest of 2 dates"
+      (is (= (sut/earliest (t/date-time 2016 1 1 10 30 0)
+                         (t/date-time 2016 1 1 10 0 0))
+             (t/date-time 2016 1 1 10 0 0))))
+
+    (testing "Should return the earliest of 3 dates"
+      (is (= (sut/earliest (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 30 0)
+                         (t/date-time 2016 1 1 10 0 0))
+             (t/date-time 2016 1 1 10 0 0))))
+
+    (testing "Should return the earliest of 3 dates, regardless of order"
+      (is (= (sut/earliest (t/date-time 2016 1 1 10 0 0)
+                         (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 30 0))
+             (t/date-time 2016 1 1 10 0 0))))
+
+    (testing "Should return the earliest of 5 dates"
+      (is (= (sut/earliest (t/date-time 2016 1 1 10 0 0)
+                         (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 30 0))
+             (t/date-time 2016 1 1 10 0 0))))
+
+    (testing "Should return the earliest of 5 dates"
+      (is (= (sut/earliest (t/date-time 2016 1 1 10 40 0)
+                         (t/date-time 2016 1 1 10 15 0)
+                         (t/date-time 2016 1 1 10 10 0)
+                         (t/date-time 2016 1 1 10 20 0)
+                         (t/date-time 2016 1 1 10 35 0))
+             (t/date-time 2016 1 1 10 10 0))))))
