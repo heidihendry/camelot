@@ -123,15 +123,25 @@
                                        {:always-fail (fn [s r] (hash-map :result :fail))
                                         :always-fail2 (fn [s r] (hash-map :result :fail))}
                                        [{}])
-             [(hash-map :result :fail
-                        :test :always-fail
-                        :row 2)
-              (hash-map :result :fail
-                        :test :always-fail2
-                        :row 2)])))
+             [{:result :fail
+               :test :always-fail
+               :row 2}
+              {:result :fail
+               :test :always-fail2
+               :row 2}])))
 
     (testing "should omit all successful executions"
       (is (= (sut/list-record-problems (state/gen-state)
                                        {:always-passes (fn [s r] (hash-map :result :pass))}
                                        [{} {}])
-             [])))))
+             [])))
+
+    (testing "should run default tests if no tests provided"
+      (is (= (sut/list-record-problems
+              (state/gen-state)
+              [{:trap-station-session-start-date (t/date-time 2016 1 1 0 0 0)
+                :trap-station-session-end-date (t/date-time 2016 2 1 0 0 0)
+                :media-capture-timestamp (t/date-time 2016 2 2 0 0 0)}])
+             [{:result :fail
+               :test :session-dates
+               :row 2}])))))
