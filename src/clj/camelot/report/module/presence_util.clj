@@ -20,7 +20,7 @@
   (reduce
    (fn [acc d]
      (if (:sighting-quantity d)
-       (update acc (to-day (:media-capture-timestamp d))
+       (update acc (date/at-midnight (:media-capture-timestamp d))
                #(+ (or % 0) (:sighting-quantity d)))
        acc))
    {} data))

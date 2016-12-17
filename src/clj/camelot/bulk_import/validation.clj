@@ -15,7 +15,8 @@
       {:result :fail}
 
       (and (t/equal? (date/at-midnight end) end)
-           (t/before? (t/plus end (t/days 1)) capture))
+           (or (date/at-or-after? capture (t/plus (date/at-midnight end)
+                                                  (t/days 1)))))
       {:result :fail}
 
       (and (not (t/equal? (date/at-midnight end) end))

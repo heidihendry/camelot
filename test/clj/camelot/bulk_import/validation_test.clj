@@ -17,7 +17,7 @@
 
 (defn check-within-session-date
   [data]
-  (:result (sut/check-photo-within-session-date (state/gen-state) data)))
+  (:result (sut/check-media-within-session-date (state/gen-state) data)))
 
 (defn check-end-date-not-in-future
   [data]
@@ -31,7 +31,7 @@
             {:trap-station-session-start-date start-date
              :trap-station-session-end-date end-date})))
 
-(deftest test-check-photo-within-session-date
+(deftest test-check-media-within-session-date
   (testing "Media within session date"
     (testing "should be valid between start and end date."
       (let [data (->record)]
