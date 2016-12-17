@@ -3,12 +3,8 @@
   (:require
    [clj-time.core :as t]
    [camelot.report.sighting-independence :as indep]
-   [clj-time.format :as tf]))
-
-(defn to-day
-  "Floor a given date to midnight on that day."
-  [date]
-  (t/date-time (t/year date) (t/month date) (t/day date)))
+   [clj-time.format :as tf]
+   [camelot.util.date :as date]))
 
 (defn list-days
   "Return a list of dates between start-date and end date, exclusive."
@@ -16,7 +12,7 @@
   (loop [{:keys [day acc]} {:day start-date :acc []}]
     (if (t/after? day end-date-excl)
       acc
-      (recur {:day (t/plus day (t/days 1)) :acc (conj acc (to-day day))}))))
+      (recur {:day (t/plus day (t/days 1)) :acc (conj acc (date/at-midnight day))}))))
 
 (defn data-by-day
   "Transform data in to a map of days and species counts."
