@@ -96,7 +96,7 @@
                                   :value (get mappings (first field))}
                              (om/build-all field-mapping-option
                                            (sort-by first (conj column-properties
-                                                                   (hash-map "" {})))
+                                                                (hash-map "" {})))
                                            {:key first}))
                  (if-let [m (get mappings (first field))]
                    (dom/label #js {:className "validation-warning"}

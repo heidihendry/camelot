@@ -14,7 +14,8 @@
    [camelot.model.camera-status :as camera-status]
    [clojure.string :as str]
    [camelot.util.config :as config]
-   [clojure.edn :as edn]))
+   [clojure.edn :as edn]
+   [clojure.tools.logging :as log]))
 
 (defn get-survey
   [state record]
@@ -78,14 +79,27 @@
        (media/create! state)
        (merge record)))
 
+(defn read-metadata-string
+  "Return str as a number, or zero if nil."
+  [str]
+  (when str
+    (try (edn/read-string str)
+         (catch java.lang.Exception e
+           (log/warn "read-metadata-string: Attempt to read-string on '" str "'")
+           nil))))
+
 (defn create-photo!
   [state record]
-  (if (and (:photo-resolution-x record) (:photo-resolution-y record))
-    (->> record
-         photo/tphoto
-         (photo/create! state)
-         (merge record))
-    record))
+  ;; TODO this is crap
+  (let [updatek (fn [k r] (update r k read-metadata-string))]
+    (if (and (:photo-resolution-x record) (:photo-resolution-y record))
+      (->> record
+           (updatek :photo-resolution-x)
+           (updatek :photo-resolution-y)
+           photo/tphoto
+           (photo/create! state)
+           (merge record))
+      record)))
 
 (defn create-sighting!
   [state record]

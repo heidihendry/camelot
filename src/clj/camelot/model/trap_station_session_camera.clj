@@ -157,7 +157,7 @@
    data :- TTrapStationSessionCamera]
   (or (get-specific-with-camera-and-session
        state (:camera-id data) (:trap-station-session-id data))
-      (create! state data)))
+      (create!* state data)))
 
 (s/defn get-or-create! :- TrapStationSessionCamera
   [state :- State

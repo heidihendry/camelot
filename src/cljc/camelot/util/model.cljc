@@ -240,6 +240,7 @@
                     :latitude ::datatype-latitude
                     :boolean ::datatype-boolean
                     :file ::datatype-file
+                    :date ::datatype-date
                     :string ::datatype-string)))
 
 (defn reason-mapping-invalid
@@ -248,9 +249,9 @@
     (if (:global ps)
       (translation-fn (:global ps) column)
       (cond
-        (nil? calculated-schema)
-        (translation-fn ::calculated-schema-not-available
-                        column)
+        ;; TODO what to do with this?
+        ;;(nil? calculated-schema)
+        ;;(translation-fn ::calculated-schema-not-available column)
 
         (and (:required-constraint ps) (:datatype ps))
         (translation-fn ::datatype-and-required-constraint-problem
@@ -268,7 +269,8 @@
   ([schemas mappings calculated-schema translation-fn]
    (let [xform (comp (map (fn [[k v]]
                             (let [r (get calculated-schema (get mappings k))]
-                              (reason-mapping-invalid schemas k r translation-fn))))
+                              (when r
+                                (reason-mapping-invalid schemas k r translation-fn)))))
                      (remove nil?))]
      (sequence xform schemas)))
   ([mappings calculated-schema translation-fn]

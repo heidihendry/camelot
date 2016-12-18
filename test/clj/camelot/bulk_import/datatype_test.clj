@@ -226,6 +226,12 @@
     (testing "-91 is not a valid latitude"
       (is (= (sut/could-be-latitude? "-91") false)))
 
+    (testing "-90.3 is not a valid latitude"
+      (is (= (sut/could-be-latitude? "-90.3") false)))
+
+    (testing "-70.3 is a valid latitude"
+      (is (= (sut/could-be-latitude? "-70.3") true)))
+
     (testing "nil is a valid latitude"
       (is (= (sut/could-be-latitude? nil) true)))))
 
@@ -242,6 +248,12 @@
 
     (testing "-181 is not a valid longitude"
       (is (= (sut/could-be-longitude? "-181") false)))
+
+    (testing "-180.3 is not a valid longitude"
+      (is (= (sut/could-be-longitude? "-180.3") false)))
+
+    (testing "-170.3 is a valid longitude"
+      (is (= (sut/could-be-longitude? "-170.3") true)))
 
     (testing "nil is a valid longitude"
       (is (= (sut/could-be-longitude? nil) true)))))

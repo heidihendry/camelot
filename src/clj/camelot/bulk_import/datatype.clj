@@ -102,7 +102,7 @@
   (if (empty? x)
     true
     (if (try
-          (trap/valid-longitude? (Long/parseLong x))
+          (trap/valid-longitude? (Double/parseDouble x))
           (catch Exception _ nil))
       true
       false)))
@@ -112,7 +112,7 @@
   (if (empty? x)
     true
     (if (try
-          (trap/valid-latitude? (Long/parseLong x))
+          (trap/valid-latitude? (Double/parseDouble x))
           (catch Exception _ nil))
       true
       false)))

@@ -744,7 +744,7 @@
    :camelot.util.model
    {:schema-not-found "No schema could be found for the column '%s'."
     :datatype-and-required-constraint-problem "All records for this field should be %s and a value should always be present, but this is not the case."
-    :datatype-problem-only "All all records for this field should be %s, but this is not the case."
+    :datatype-problem-only "All records for this field should be %s, but this is not the case."
     :required-constraint-problem-only "A value should always be present, but this is not the case."
     :calculated-schema-not-available "Schema not found mapping for column '%s'."
     :datatype-integer "an integer"
@@ -756,6 +756,7 @@
     :datatype-latitude "a value in the range [-90, 90]"
     :datatype-boolean "either 'true' or 'false'"
     :datatype-file "the path to a file"
-    :datatype-string "a string"}
+    :datatype-string "a string"
+    :datatype-date "a date"}
 
    :missing "[Translation missing]"})

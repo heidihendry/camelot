@@ -82,12 +82,15 @@
 (defn check-overlap
   "Return map with camera name and all overlapping dates."
   [[camera entries]]
-   (->> entries
-        (sort-by :trap-station-session-start-date)
-        (reduce overlap-reducer {:overlaps []})
-        :overlaps
-        simplify-overlap
-        (hash-map :camera camera :overlaps)))
+  (->> entries
+       (map #(select-keys % [:trap-station-session-start-date
+                             :trap-station-session-end-date]))
+       distinct
+       (sort-by :trap-station-session-start-date)
+       (reduce overlap-reducer {:overlaps []})
+       :overlaps
+       simplify-overlap
+       (hash-map :camera camera :overlaps)))
 
 (defn overlap-fail-with-reason
   "Return a failure describing the problem overlap."

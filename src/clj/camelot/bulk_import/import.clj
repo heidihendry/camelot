@@ -14,8 +14,6 @@
   (:import
    (org.apache.commons.lang3 SystemUtils)))
 
-(def fallback-media-importers-count 1)
-
 (defn- save-pathname
   [f dest]
   (io/make-parents dest)
@@ -60,7 +58,7 @@
 
 (defn- add-media-file!
   [state record]
-  (let [fmt (str/lower-case (second (re-find #".*\.(.+?)$" (:absolute-path record))))
+  (let [fmt (str/lower-case (second (re-find #".*\.(.+?)$" (file/get-name (:absolute-path record)))))
         filename (create-image-files state (:absolute-path record) fmt)]
     (merge {:media-filename filename
             :media-format fmt
@@ -85,8 +83,8 @@
             (swap! (get-in (:state msg) [:importer :pending]) dec)
             (swap! (get-in (:state msg) [:importer :failed]) inc)
             (log/error (.getMessage e))
-            (log/error (map str (.getStackTrace e))))))
-      (recur))
+            (log/error (str/join "\n" (map str (.getStackTrace e))))))
+        (recur)))
     ch))
 
 (defn import-media-fn
@@ -95,19 +93,18 @@
   (let [proc (media-processor num-importers)]
     (fn [state record]
       (try
-        (>!! proc
-             (with-transaction [s state]
-               (->> record
-                    (db/get-survey s)
-                    (db/get-or-create-camera! s)
-                    (db/get-or-create-site! s)
-                    (db/get-or-create-survey-site! s)
-                    (db/get-or-create-trap-station! s)
-                    (db/get-or-create-trap-session! s)
-                    (db/get-or-create-trap-camera! s)
-                    (hash-map :state state :record))))
+        (>!! proc (with-transaction [s state]
+                   (->> record
+                        (db/get-survey s)
+                        (db/get-or-create-camera! s)
+                        (db/get-or-create-site! s)
+                        (db/get-or-create-survey-site! s)
+                        (db/get-or-create-trap-station! s)
+                        (db/get-or-create-trap-session! s)
+                        (db/get-or-create-trap-camera! s)
+                        (hash-map :state state :record))))
         (catch Exception e
           (swap! (get-in state [:importer :pending]) dec)
           (swap! (get-in state [:importer :failed]) inc)
           (log/error (.getMessage e))
-          (log/error (map str (.getStackTrace e))))))))
+          (log/error (str/join "\n" (map str (.getStackTrace e)))))))))

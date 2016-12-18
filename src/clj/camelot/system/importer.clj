@@ -13,6 +13,7 @@
 (defn run
   "Importer event loop."
   [config cmd-chan queue-chan]
+  ;; TODO does not actually get importers from config
   (let [import! (import/import-media-fn (or (:media-importers config) 1))]
     (try
       (go-loop []
@@ -25,8 +26,6 @@
                        nil)
             queue-chan (do
                          (swap! (get-in (:state msg) [:importer :pending]) inc)
-                         (prn (:state msg))
-                         (prn (:record msg))
                          (import! (:state msg) (:record msg)))))
         (recur))
       (catch InterruptedException e
