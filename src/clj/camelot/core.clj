@@ -7,7 +7,8 @@
    [camelot.system.http :as http]
    [com.stuartsierra.component :as component]
    [environ.core :refer [env]]
-   [clojure.tools.nrepl.server :as nrepl])
+   [clojure.tools.nrepl.server :as nrepl]
+   [camelot.system.importer :as importer])
   (:gen-class))
 
 (defonce nrepl-server (when (env :camelot-debugger)
@@ -19,13 +20,15 @@
                                           :config (state/config)
                                           :path (state/path-map)})
               :database (db/map->Database {:connection state/spec})
+              :importer (importer/->Importer)
               :app (if-let [dsvr (:dev-server options)]
                      dsvr
                      (http/map->HttpServer {:port (or (:port options)
                                                       (Integer. (or (env :camelot-port) 5341)))
                                             :cli-args (or cli-args [])})))]
     (component/system-using smap {:app {:config :config
-                                        :database :database}})))
+                                        :database :database
+                                        :importer :importer}})))
 
 (defn start-prod []
   (reset! http/system (component/start (camelot {})))

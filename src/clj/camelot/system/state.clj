@@ -293,6 +293,7 @@ Throws an IOException if the file cannot be read."
    (s/required-key :database) s/Any
    (s/required-key :app) s/Any
    (s/optional-key :figwheel) s/Any
+   (s/optional-key :importer) s/Any
    (s/optional-key :session) s/Any
    (s/optional-key :jetty) s/Any
    (s/optional-key :camera-status-active-id) s/Int})

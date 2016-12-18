@@ -34,7 +34,8 @@
    [compojure.core :refer [context defroutes DELETE GET POST PUT routes]]
    [compojure.route :as route]
    [ring.util.response :as r]
-   [camelot.util.cursorise :as cursorise]))
+   [camelot.util.cursorise :as cursorise]
+   [camelot.system.importer :as importer]))
 
 (defn- retrieve-index
   "Return a response for index.html"
@@ -281,6 +282,9 @@
            (GET "/" [] (r/response (cursorise/cursorise (merge (deref (get-in state [:config :store])) session))))
            (PUT "/" [data] (assoc (r/response (state/save-config (cursorise/decursorise data)))
                                   :session {:language (:value (:language data))})))
+
+  (context "/importer" {session :session state :system}
+           (GET "/" [] (r/response (importer/importer-state state))))
 
   (GET "/" _ (retrieve-index))
   (POST "/quit" [] (System/exit 0))
