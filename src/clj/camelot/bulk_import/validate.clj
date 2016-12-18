@@ -1,4 +1,4 @@
-(ns camelot.bulk-import.validation
+(ns camelot.bulk-import.validate
   "Validators to be ran before bulk-import."
   (:require
    [clj-time.core :as t]
@@ -113,15 +113,16 @@
 (defn list-record-problems
   "Apply tests to each record, returning all failures."
   ([state records]
-   (let [tests {:session-dates check-media-within-session-date
-                :future-timestamp check-session-end-date-not-in-future
-                :session-start-before-end check-session-start-before-end}]
+   (let [tests {::session-dates check-media-within-session-date
+                ::future-timestamp check-session-end-date-not-in-future
+                ::session-start-before-end check-session-start-before-end}]
      (list-record-problems state tests records)))
   ([state tests records]
    (filter #(= (:result %) :fail)
            (apply concat
                   (map-indexed
                    #(map (fn [[t f]] (assoc (f state %2)
+                                            :reason (tr/translate state t (+ %1 2))
                                             :test t
                                             :row (+ %1 2)))
                          tests) records)))))
@@ -129,7 +130,7 @@
 (defn list-dataset-problems
   "Validate records, returning any dataset level problems."
   [state records]
-  (let [tests {:camera-overlaps check-overlapping-camera-usage}]
+  (let [tests {::camera-overlaps check-overlapping-camera-usage}]
     (mapcat (fn [[t f]] (map #(assoc % :test t) (f state records))) tests)))
 
 (defn validate

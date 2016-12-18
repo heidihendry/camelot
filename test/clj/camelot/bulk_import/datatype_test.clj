@@ -1,5 +1,5 @@
-(ns camelot.bulk-import.datatypes-test
-  (:require [camelot.bulk-import.datatypes :as sut]
+(ns camelot.bulk-import.datatype-test
+  (:require [camelot.bulk-import.datatype :as sut]
             [clojure.test :refer :all]
             [clj-time.core :as t]))
 

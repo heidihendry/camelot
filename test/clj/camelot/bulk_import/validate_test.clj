@@ -1,5 +1,5 @@
-(ns camelot.bulk-import.validation-test
-  (:require [camelot.bulk-import.validation :as sut]
+(ns camelot.bulk-import.validate-test
+  (:require [camelot.bulk-import.validate :as sut]
             [clojure.test :refer :all]
             [clj-time.core :as t]
             [camelot.test-util.state :as state]
@@ -35,6 +35,14 @@
             (gen-state)
             {:trap-station-session-start-date start-date
              :trap-station-session-end-date end-date})))
+
+(defn list-record-problems
+  ([data]
+   (map #(select-keys % [:row :test :result])
+        (sut/list-record-problems (gen-state) data)))
+  ([tests data]
+   (map #(select-keys % [:row :test :result])
+        (sut/list-record-problems (gen-state) tests data))))
 
 (defn check-camera-overlap
   [data]
@@ -109,17 +117,17 @@
 (deftest test-list-record-problems
   (testing "list-record-problems"
     (testing "should return failing failed test for a single record"
-      (is (= (sut/list-record-problems (gen-state)
-                                       {:always-fail (fn [s r] (hash-map :result :fail))}
-                                       [{}])
+      (is (= (list-record-problems
+              {:always-fail (fn [s r] (hash-map :result :fail))}
+              [{}])
              [{:result :fail
                :test :always-fail
                :row 2}])))
 
     (testing "should return the correct row number for each entry"
-      (is (= (sut/list-record-problems (gen-state)
-                                       {:always-fail (fn [s r] (hash-map :result :fail))}
-                                       [{} {}])
+      (is (= (list-record-problems
+              {:always-fail (fn [s r] (hash-map :result :fail))}
+              [{} {}])
              [{:result :fail
                :test :always-fail
                :row 2}
@@ -128,10 +136,10 @@
                :row 3}])))
 
     (testing "should add an entry for each failure"
-      (is (= (sut/list-record-problems (gen-state)
-                                       {:always-fail (fn [s r] (hash-map :result :fail))
-                                        :always-fail2 (fn [s r] (hash-map :result :fail))}
-                                       [{}])
+      (is (= (list-record-problems
+              {:always-fail (fn [s r] (hash-map :result :fail))
+               :always-fail2 (fn [s r] (hash-map :result :fail))}
+              [{}])
              [{:result :fail
                :test :always-fail
                :row 2}
@@ -140,19 +148,18 @@
                :row 2}])))
 
     (testing "should omit all successful executions"
-      (is (= (sut/list-record-problems (gen-state)
-                                       {:always-passes (fn [s r] (hash-map :result :pass))}
-                                       [{} {}])
+      (is (= (list-record-problems
+              {:always-passes (fn [s r] (hash-map :result :pass))}
+              [{} {}])
              [])))
 
     (testing "should run default tests if no tests provided"
-      (is (= (sut/list-record-problems
-              (gen-state)
+      (is (= (list-record-problems
               [{:trap-station-session-start-date (t/date-time 2016 1 1 0 0 0)
                 :trap-station-session-end-date (t/date-time 2016 2 1 0 0 0)
                 :media-capture-timestamp (t/date-time 2016 2 2 0 0 0)}])
              [{:result :fail
-               :test :session-dates
+               :test :camelot.bulk-import.validate/session-dates
                :row 2}])))))
 
 (deftest test-overlapping-camera-usage
@@ -196,7 +203,7 @@
                    :camera-name "CAM1"}]]
         (is (= (check-camera-overlap data)
                [{:result :fail
-                 :reason "CAM1 is used in multiple sessions between 2016-02-01 and 2016-02-05"}]))))
+                 :reason "CAM1 is used in multiple sessions between 2016-02-01 and 2016-02-05."}]))))
 
     (testing "should indicate if there are multiple overlaps for a camera"
       (let [data [{:trap-station-session-start-date (t/date-time 2016 1 1)
@@ -279,6 +286,6 @@
                    :camera-name "CAM2"}]
             result (sut/validate (gen-state) data)]
         (is (= (sort (map #(:test %) result))
-               [:camera-overlaps
-                :camera-overlaps
-                :session-dates]))))))
+               [:camelot.bulk-import.validate/camera-overlaps
+                :camelot.bulk-import.validate/camera-overlaps
+                :camelot.bulk-import.validate/session-dates]))))))

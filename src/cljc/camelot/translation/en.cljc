@@ -703,8 +703,11 @@
     :help-text-step-2 "Step 2. Modify the template as you see fit, then start the import once you're ready."
     :survey-directory "Path to survey directory"}
 
-   :camelot.bulk-import.validation
-   {:camera-overlap "%s is used in multiple sessions between %s"}
+   :camelot.bulk-import.validate
+   {:camera-overlap "%s is used in multiple sessions between %s."
+    :session-dates "Media not within session dates on row: %d."
+    :future-timestamp "Session end date is in the future on row: %d."
+    :session-start-before-end "Session end date is before the session start date on row: %d."}
 
    :camelot.component.bulk-import.mapper
    {:title "Bulk Import"

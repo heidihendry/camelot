@@ -4,7 +4,7 @@
   itself."
   (:require
    [ring.util.response :as r]
-   [camelot.bulk-import.datatypes :as datatypes]
+   [camelot.bulk-import.datatype :as datatype]
    [camelot.import.dirtree :as dt]
    [camelot.import.metadata-utils :as mutil]
    [camelot.util.model :as model]
@@ -17,7 +17,8 @@
    [clojure.string :as str]
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
-   [camelot.util.file :as file])
+   [camelot.util.file :as file]
+   [camelot.bulk-import.validate :as validate])
   (:import
    (java.util.regex Pattern)))
 
@@ -191,8 +192,8 @@
 
 (defn column-compatibility
   [[title & vs]]
-  {:constraints (datatypes/possible-constraints vs)
-   :datatypes (datatypes/possible-datatypes vs)})
+  {:constraints (datatype/possible-constraints vs)
+   :datatypes (datatype/possible-datatypes vs)})
 
 (defn calculate-column-properties
   "Return a map representing the properties of each column of a vector of
@@ -241,8 +242,17 @@
    (fn [row]
      (reduce-kv (fn [acc k v]
                   (let [d (nth row (get headings v))]
-                    (assoc acc k (datatypes/deserialise k d)))) {} mappings))
+                    (assoc acc k (datatype/deserialise k d)))) {} mappings))
    file-data))
+
+(defn validate-and-import
+  "Validate a seq of record, and if valid, queue for import."
+  [state records]
+  (let [problems (validate/validate state records)]
+    (if (seq problems)
+      (map :reason problems)
+      ;; TODO queue for import
+      (sort-by :media-capture-timestamp records))))
 
 (defn import-with-mappings
   "Given file data and a series of mappings, attempt to import it."
@@ -252,4 +262,6 @@
         headings (reduce-kv #(assoc %1 %3 %2) {} (first file-data))]
     (if (seq errs)
       {:error {:validation errs}}
-      (file-data-to-record-list state (rest file-data) headings mappings))))
+      (->> mappings
+           (file-data-to-record-list state (rest file-data) headings)
+           (validate-and-import state)))))
