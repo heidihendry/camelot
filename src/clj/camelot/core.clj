@@ -20,7 +20,7 @@
                                           :config (state/config)
                                           :path (state/path-map)})
               :database (db/map->Database {:connection state/spec})
-              :importer (importer/->Importer)
+              :importer (importer/->Importer {})
               :app (if-let [dsvr (:dev-server options)]
                      dsvr
                      (http/map->HttpServer {:port (or (:port options)
@@ -28,7 +28,8 @@
                                             :cli-args (or cli-args [])})))]
     (component/system-using smap {:app {:config :config
                                         :database :database
-                                        :importer :importer}})))
+                                        :importer :importer}
+                                  :importer {:config :config}})))
 
 (defn start-prod []
   (reset! http/system (component/start (camelot {})))

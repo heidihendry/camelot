@@ -57,9 +57,9 @@
   [state :- State
    id :- s/Int]
   (some->> {:survey-id id}
-           (db/with-db-keys state -get-specific )
-           (first)
-           (survey)))
+           (db/with-db-keys state -get-specific)
+           first
+           survey))
 
 (s/defn create! :- Survey
   [state :- State

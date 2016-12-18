@@ -18,7 +18,8 @@
 (defn get-import-data
   [data]
   {:file-data (deref (:file-data data))
-   :mappings (deref (:mappings data))})
+   :mappings (deref (:mappings data))
+   :survey-id (state/get-survey-id)})
 
 (defn submit-mappings
   [data]

@@ -152,6 +152,13 @@
     (some->> res
              (db/with-db-keys state -get-alternatives))))
 
+(s/defn get-or-create-with-camera-and-session! :- TrapStationSessionCamera
+  [state :- State
+   data :- TTrapStationSessionCamera]
+  (or (get-specific-with-camera-and-session
+       state (:camera-id data) (:trap-station-session-id data))
+      (create! state data)))
+
 (s/defn get-or-create! :- TrapStationSessionCamera
   [state :- State
    data :- TTrapStationSessionCamera]

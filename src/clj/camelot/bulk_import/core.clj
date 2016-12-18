@@ -3,6 +3,7 @@
   of template generation, field mapping, validation and the actual import
   itself."
   (:require
+   [clojure.core.async :refer [>!!]]
    [ring.util.response :as r]
    [camelot.bulk-import.datatype :as datatype]
    [camelot.import.dirtree :as dt]
@@ -251,12 +252,13 @@
   (let [problems (validate/validate state records)]
     (if (seq problems)
       (map :reason problems)
-      ;; TODO queue for import
-      (sort-by :media-capture-timestamp records))))
+      (doseq [r (sort-by :media-capture-timestamp records)]
+        (>!! (get-in state [:importer :queue-chan])
+             {:state state :record r})))))
 
 (defn import-with-mappings
   "Given file data and a series of mappings, attempt to import it."
-  [state {:keys [file-data mappings]}]
+  [state {:keys [file-data mappings survey-id]}]
   (let [props (calculate-column-properties file-data)
         errs (model/check-mapping mappings props (partial tr/translate state))
         headings (reduce-kv #(assoc %1 %3 %2) {} (first file-data))]
@@ -264,4 +266,5 @@
       {:error {:validation errs}}
       (->> mappings
            (file-data-to-record-list state (rest file-data) headings)
+           (map #(merge {:survey-id survey-id} %))
            (validate-and-import state)))))

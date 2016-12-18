@@ -17,11 +17,12 @@
    (java.lang RuntimeException)
    (java.io IOException)))
 
-(def config-store (atom {}))
+(defonce config-store (atom {}))
 
 (def default-config
   "Return the default configuration."
   {:erroneous-infrared-threshold 0.2
+   :media-importers 4
    :infrared-iso-value-threshold 999
    :language :en
    :send-usage-data false
