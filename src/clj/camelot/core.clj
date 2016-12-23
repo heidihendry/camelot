@@ -20,7 +20,7 @@
                                           :config (state/config)
                                           :path (state/path-map)})
               :database (db/map->Database {:connection state/spec})
-              :importer (importer/->Importer {})
+              :importer (importer/map->Importer {})
               :app (if-let [dsvr (:dev-server options)]
                      dsvr
                      (http/map->HttpServer {:port (or (:port options)

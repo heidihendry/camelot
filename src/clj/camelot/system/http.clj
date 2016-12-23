@@ -60,5 +60,5 @@
   (stop [this]
     (when (get this :jetty)
       (.stop (get this :jetty))
-      (reset! jetty nil)
-      (assoc this :jetty nil))))
+      (reset! jetty nil))
+    (assoc this :jetty nil)))

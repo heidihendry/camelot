@@ -282,8 +282,9 @@ Throws an IOException if the file cannot be read."
     this)
 
   (stop [this]
-    (println "Stopping Config...")
-    (reset! store {})
+    (when store
+      (reset! store {}))
+    (println "Config stopped.")
     (assoc this
            :store nil
            :config nil

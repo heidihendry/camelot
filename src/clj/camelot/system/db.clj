@@ -30,5 +30,6 @@
     this)
 
   (stop [this]
-    (close connection)
+    (when connection
+      (close connection))
     (assoc this :connection nil)))
