@@ -66,29 +66,43 @@
             :media-attention-needed false}
            record)))
 
+(defn do-import
+  "Import a media file."
+  [msg]
+  (try
+    (with-transaction [s (:state msg)]
+      (->> (:record msg)
+           (add-media-file! s)
+           (db/create-media! s)
+           (db/create-sighting! s)
+           (db/create-photo! s)))
+    (assoc msg :result :complete)
+    (catch Exception e
+      (log/error (.getMessage e))
+      (log/error (str/join "\n" (map str (.getStackTrace e))))
+      (assoc msg :result :failed))))
+
+(defn add-import-result
+  "Update importer state with the latest result."
+  [state result]
+  (dosync
+   (alter (get-in state [:importer :pending]) dec)
+   (alter (get-in state [:importer result]) inc)))
+
 (defn media-processor
+  "Setup a pipeline for parallel media import and process results."
   [num-importers]
-  (let [ch (chan num-importers)]
+  (let [ch (chan)
+        result-chan (chan num-importers)]
+    (async/pipeline-blocking num-importers result-chan (map do-import) ch)
     (go-loop []
-      (let [msg (<! ch)]
-        (try
-          (->> (:record msg)
-               (add-media-file! (:state msg))
-               (db/create-media! (:state msg))
-               (db/create-sighting! (:state msg))
-               (db/create-photo! (:state msg)))
-          (swap! (get-in (:state msg) [:importer :pending]) dec)
-          (swap! (get-in (:state msg) [:importer :complete]) inc)
-          (catch Exception e
-            (swap! (get-in (:state msg) [:importer :pending]) dec)
-            (swap! (get-in (:state msg) [:importer :failed]) inc)
-            (log/error (.getMessage e))
-            (log/error (str/join "\n" (map str (.getStackTrace e))))))
-        (recur)))
+      (let [msg (<! result-chan)]
+        (add-import-result (:state msg) (:result msg)))
+      (recur))
     ch))
 
 (defn import-media-fn
-  "Import media."
+  "Setup data structure and process media import."
   [num-importers]
   (let [proc (media-processor num-importers)]
     (fn [state record]
@@ -104,7 +118,6 @@
                         (db/get-or-create-trap-camera! s)
                         (hash-map :state state :record))))
         (catch Exception e
-          (swap! (get-in state [:importer :pending]) dec)
-          (swap! (get-in state [:importer :failed]) inc)
           (log/error (.getMessage e))
-          (log/error (str/join "\n" (map str (.getStackTrace e)))))))))
+          (log/error (str/join "\n" (map str (.getStackTrace e))))
+          (add-import-result state :failed))))))

@@ -13,23 +13,24 @@
 (defn run
   "Importer event loop."
   [config cmd-chan queue-chan]
-  ;; TODO does not actually get importers from config
-  (let [import! (import/import-media-fn (or (:media-importers config) 1))]
-    (try
-      (go-loop []
-        (let [[msg ch] (alts! [cmd-chan queue-chan])]
-          (condp = ch
-            cmd-chan (condp = (:cmd msg)
-                       :stop (do (close! queue-chan)
-                                 (close! cmd-chan)
-                                 (throw (InterruptedException.)))
-                       nil)
-            queue-chan (do
-                         (swap! (get-in (:state msg) [:importer :pending]) inc)
-                         (import! (:state msg) (:record msg)))))
-        (recur))
-      (catch InterruptedException e
-        (log/info "Importer stopped.")))))
+  (go
+    (let [import! (import/import-media-fn (or (get-in config [:config :media-importers]) 1))]
+      (try
+        (loop []
+          (let [[msg ch] (alts! [cmd-chan queue-chan])]
+            (condp = ch
+              cmd-chan (condp = (:cmd msg)
+                         :stop (do (close! queue-chan)
+                                   (close! cmd-chan)
+                                   (throw (InterruptedException.)))
+                         nil)
+              queue-chan (do
+                           (dosync
+                            (alter (get-in (:state msg) [:importer :pending]) inc))
+                           (import! (:state msg) (:record msg)))))
+          (recur))
+        (catch InterruptedException e
+          (println "Importer stopped."))))))
 
 (defrecord Importer [config]
   component/Lifecycle
@@ -39,11 +40,11 @@
       (let [cmd-chan (chan)
             queue-chan (chan (async/dropping-buffer queue-buffer-size))]
         (run config cmd-chan queue-chan)
-        (log/info "Importer started.")
+        (println "Importer started.")
         (assoc this
-               :complete (atom 0)
-               :failed (atom 0)
-               :pending (atom 0)
+               :complete (ref 0)
+               :failed (ref 0)
+               :pending (ref 0)
                :cmd-chan cmd-chan
                :queue-chan queue-chan))))
 
