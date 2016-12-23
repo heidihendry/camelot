@@ -5,7 +5,17 @@
    [clj-time.format :as tf]
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
-   [camelot.util.file :as file]))
+   [camelot.util.file :as file]
+   [clojure.tools.logging :as log]))
+
+(defn read-metadata-string
+  "Read str as edn, or :error if not readable."
+  [str]
+  (when str
+    (try
+      (edn/read-string str)
+      (catch java.lang.Exception e
+        :error))))
 
 (def timestamp-formatters
   [(tf/formatter "yyyy-M-d H:m:s")
@@ -65,6 +75,14 @@
           (seq (re-matches #"^-?[0-9]+$" x)))
     true
     false))
+
+(defn could-be-readable-integer?
+  [x]
+  (let [r (read-metadata-string x)]
+    (if (or (nil? r)
+            (integer? r))
+      true
+      false)))
 
 (defn as-boolean
   [v]
@@ -174,6 +192,7 @@
           (check-possible :date could-be-date? xs)
           (check-possible :number could-be-number? xs)
           (check-possible :integer could-be-integer? xs)
+          (check-possible :readable-integer could-be-readable-integer? xs)
           (check-possible :boolean could-be-yes-no? xs)
           (check-possible :boolean could-be-zero-one? xs)
           (check-possible :boolean could-be-true-false? xs)
@@ -190,6 +209,7 @@
   (case (or (:validation-type schema)
             (:datatype schema))
     :integer edn/read-string
+    :readable-integer edn/read-string
     :number edn/read-string
     :sex as-sex
     :lifestage as-lifestage

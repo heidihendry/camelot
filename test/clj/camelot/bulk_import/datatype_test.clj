@@ -124,7 +124,20 @@
       (is (= (sut/could-be-integer? "-919.03") false)))
 
     (testing "things with letters are not integers"
-      (is (= (sut/could-be-integer? "-91a9.03") false)))))
+      (is (= (sut/could-be-integer? "-91a9.03") false))))
+
+  (testing "could-be-readable-integer?"
+    (testing "integers return true"
+      (is (= (sut/could-be-readable-integer? "1") true)))
+
+    (testing "integers cannot have floating points"
+      (is (= (sut/could-be-integer? "-919.03") false)))
+
+    (testing "units following integer is an integer"
+      (is (= (sut/could-be-readable-integer? "200 pixels") true)))
+
+    (testing "Invalid syntax is not an integer"
+      (is (= (sut/could-be-readable-integer? "{[}") false)))))
 
 (deftest test-boolean
   (testing "as-boolean"

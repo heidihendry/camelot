@@ -168,10 +168,10 @@
    :photo-orientation {:datatype :string
                        :required false
                        :order 75}
-   :photo-resolution-x {:datatype :string
+   :photo-resolution-x {:datatype :readable-integer
                         :required false
                         :order 76}
-   :photo-resolution-y {:datatype :string
+   :photo-resolution-y {:datatype :readable-integer
                         :required false
                         :order 77}})
 
@@ -232,6 +232,7 @@
   (translation-fn (case (or (:validation-type schema)
                             (:datatype schema))
                     :integer ::datatype-integer
+                    :readable-integer ::datatype-integer
                     :number ::datatype-number
                     :sex ::datatype-sex
                     :lifestage ::datatype-lifestage
