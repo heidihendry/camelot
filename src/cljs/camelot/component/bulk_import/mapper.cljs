@@ -189,7 +189,7 @@
                               (dom/div #js {:className "button-container pull-right"}
                                        (om/build cancel-button-component data)
                                        (dom/button #js {:className "btn btn-primary"
-                                        ;:disabled (if (:validation-problem data) "disabled" nil)
+                                                        :disabled (if (:validation-problem data) "disabled" nil)
                                                         :onClick #(submit-mappings data)
                                                         :title (:reason vs)}
                                                    (tr/translate :words/submit)))))))
@@ -219,7 +219,7 @@
                    model/with-absolute-path)]
         (om/update! data :validation-problem
                     (or
-                     (reduce #(let [m (get data [:mappings (first %2)])]
+                     (reduce #(let [m (get-in @data [:mappings (first %2)])]
                                 (if (and m
                                          (model/reason-mapping-invalid
                                           model/extended-schema-definitions
@@ -228,7 +228,7 @@
                                           identity))
                                   (reduced :mismatch)))
                              nil fs)
-                     (reduce #(let [m (get data [:mappings (first %2)])]
+                     (reduce #(let [m (get-in @data [:mappings (first %2)])]
                                 (if (nil? m)
                                   (reduced :missing)))
                              nil (model/required-fields fs))))))

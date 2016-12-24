@@ -242,8 +242,10 @@
   (map
    (fn [row]
      (reduce-kv (fn [acc k v]
-                  (let [d (nth row (get headings v))]
-                    (assoc acc k (datatype/deserialise k d)))) {} mappings))
+                  (if (nil? v)
+                    acc
+                    (let [d (nth row (get headings v))]
+                      (assoc acc k (datatype/deserialise k d))))) {} mappings))
    file-data))
 
 (defn validate-and-import

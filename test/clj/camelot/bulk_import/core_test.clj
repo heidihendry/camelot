@@ -83,3 +83,15 @@
                 "Something" true}]
         (is (= (sut/assign-default-mappings ps)
                {:trap-station-latitude "Camelot GPS Latitude"}))))))
+
+(deftest test-file-data-to-record-list
+  (testing "transforming file data to records"
+    (testing "mapping to null is omitted"
+      (with-redefs [camelot.bulk-import.datatype/deserialise (fn [k d] d)]
+        (is (= (sut/file-data-to-record-list (state/gen-state)
+                                             [["V1-1","V1-2","V1-3"]
+                                              ["V2-1","V2-2","V2-3"]]
+                                             {"H1" 0 "H2" 1 "H3" 2}
+                                             {:h1 "H1" :h2 nil :h3 "H3"})
+               [{:h1 "V1-1" :h3 "V1-3"}
+                {:h1 "V2-1" :h3 "V2-3"}]))))))
