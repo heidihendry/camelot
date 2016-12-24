@@ -4,6 +4,7 @@
             [camelot.util.capture :as capture]
             [camelot.component.deployment.shared :as shared]
             [camelot.component.survey.create :as create]
+            [camelot.component.progress-bar :as progress-bar]
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.state :as state]
@@ -72,22 +73,6 @@
   [owner f err]
   (display-upload-failure owner f err)
   (om/update-state! owner :failed inc))
-
-(defn- percent-of
-  [data k]
-  (* 100 (/ (get data k) (get data :total))))
-
-(defn- complete-percent
-  [data]
-  (percent-of data :complete))
-
-(defn- ignored-percent
-  [data]
-  (percent-of data :ignored))
-
-(defn- failed-percent
-  [data]
-  (percent-of data :failed))
 
 (defn- drop-file-handler
   [data owner files]
@@ -162,21 +147,8 @@
                         (dom/label nil (tr/translate ::gps-coordinates) ":")
                         " "
                         (:trap-station-latitude data) ", " (:trap-station-longitude data))
-               (when (and (get state :total)  (> (get state :total) 0))
-                 (dom/div #js {:className "progress-bar-container"
-                               :title (tr/translate ::progress-bar-title
-                                                    (get state :complete)
-                                                    (get state :failed)
-                                                    (get state :ignored))}
-                          (dom/div #js {:className "progress-bar"})
-                          (dom/div #js {:className "progress-bar-state"
-                                        :style #js {:width (str (complete-percent state) "%")}})
-                          (dom/div #js {:className "ignored-bar-state"
-                                        :style #js {:left (str (complete-percent state) "%")
-                                                    :width (str (ignored-percent state) "%")}})
-                          (dom/div #js {:className "error-bar-state"
-                                        :style #js {:left (str (- 100 (failed-percent state)) "%")
-                                                    :width (str (failed-percent state) "%")}})))
+               (om/build progress-bar/component data
+                         {:state (select-keys state [:total :ignored :complete :failed])})
                (when-not (zero? (+ (get state :ignored) (get state :failed)))
                  (dom/div #js {:className "pointer"} (tr/translate ::show-details)))))))
 

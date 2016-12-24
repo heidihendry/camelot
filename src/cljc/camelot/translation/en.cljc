@@ -603,12 +603,14 @@
     :add-camera-trap "Add Camera Trap Station"
     :edit-camera-trap "Edit Camera Trap Station"}
 
+   :camelot.component.progress-bar
+   {:progress-bar-title "%d complete, %d failed and %d ignored."}
+
    :camelot.component.deployment.recent
    {:help-text "Drag and drop media files on to a Camera Check to add them."
     :format-not-supported "'%s' is not in a supported format."
     :upload-error "error during upload"
     :gps-coordinates "GPS coordinates"
-    :progress-bar-title "%d complete, %d failed and %d ignored."
     :show-details "Show details"
     :blank-item-name "camera checks"
     :media-uploaded "Media uploaded"
@@ -758,5 +760,8 @@
     :datatype-file "the path to a file"
     :datatype-string "a string"
     :datatype-date "a date"}
+
+   :camelot.component.nav
+   {:bulk-import-status "Progress of bulk import"}
 
    :missing "[Translation missing]"})

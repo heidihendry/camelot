@@ -81,6 +81,27 @@
                                                    (:status response)
                                                    (:body response))))))))
 
+(defn get-x-opts
+  "POST state"
+  [resource {:keys [params success failure suppress-error-dialog always]}]
+  (go
+    (let [response (<! (transit-util/request
+                        http/get (misc/with-baseurl resource) params))
+          success-code (some #{(:status response)} success-status-codes)]
+      (if success-code
+        (when success (success response))
+        (do
+          (when failure (failure response))
+          (when-not suppress-error-dialog
+            (om/update! (state/display-state) :error (build-error
+                                                      "GET"
+                                                      (misc/with-baseurl resource)
+                                                      params
+                                                      (:status response)
+                                                      (:body response))))))
+      (when always
+        (always response)))))
+
 (defn delete-x
   "Make a request via DELETE."
   ([x-url cb]

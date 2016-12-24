@@ -252,9 +252,12 @@
   (let [problems (validate/validate state records)]
     (if (seq problems)
       (map :reason problems)
-      (doseq [r (sort-by :media-capture-timestamp records)]
-        (>!! (get-in state [:importer :queue-chan])
-             {:state state :record r})))))
+      (do
+        (>!! (get-in state [:importer :cmd-chan])
+             {:state state :cmd :new})
+        (doseq [r (sort-by :media-capture-timestamp records)]
+          (>!! (get-in state [:importer :queue-chan])
+               {:state state :record r}))))))
 
 (defn import-with-mappings
   "Given file data and a series of mappings, attempt to import it."

@@ -86,11 +86,6 @@ html > body {
   min-width: auto;
   margin: 0;
 }
-#navigation .navbar-nav li:last-child {
-  float: right;
-  border-right: none;
-  border-left: 1px solid #1175aa;
-}
 #navigation .nav {
   min-width: auto;
   background: #116095;
@@ -145,6 +140,11 @@ html > body {
 }
 a:hover {
   cursor: pointer;
+}
+#settings-nav {
+  float: right;
+  border-right: none;
+  border-left: 1px solid #1175aa;
 }
 #settings {
   position: fixed;
@@ -1705,8 +1705,26 @@ pre.field-input {
     width: 100vw;
     height: 100vh;
 }
-#app .prompt .hide-above {
-}
 #app .prompt-question {
     padding-top: 2rem;
+}
+#navigation li#bulk-import-progress-nav {
+    position: relative;
+    float: right;
+    color: #fafafa;
+    border-right: none;
+}
+#bulk-import-progress-nav .bulk-import-progress {
+    padding-top: 1.2rem;
+}
+
+#bulk-import-progress-nav .bulk-import-progress {
+    position: relative;
+    transition: opacity 3s ease-in-out;
+    opacity: 1;
+
+}
+#bulk-import-progress-nav .bulk-import-progress.transparent {
+    position: relative;
+    opacity: 0;
 }

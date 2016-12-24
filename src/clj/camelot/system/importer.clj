@@ -23,6 +23,11 @@
                          :stop (do (close! queue-chan)
                                    (close! cmd-chan)
                                    (throw (InterruptedException.)))
+                         :new (when (and (zero? (count (.buf queue-chan)))
+                                         (deref (get-in (:state msg) [:importer :pending])))
+                                (dosync
+                                 (ref-set (get-in (:state msg) [:importer :complete]) 0)
+                                 (ref-set (get-in (:state msg) [:importer :failed]) 0)))
                          nil)
               queue-chan (do
                            (dosync
