@@ -24,7 +24,6 @@
 
 (def image-variants
   {"thumb-" 256
-   "preview-" 768
    "" nil})
 
 (defn- store-original
