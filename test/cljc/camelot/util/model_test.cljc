@@ -51,6 +51,14 @@
         (is (= (apply sut/check-mapping ps)
                [:camelot.util.model/calculated-schema-not-available]))))
 
+    (testing "should ignore columns without a mapping"
+      (let [ps [{:test1 {:datatype :number :required true}
+                 :test2 {:datatype :string :required false}}
+                {:test1 "Column1"}
+                {"Column1" {:constraints #{:required} :datatypes #{:number}}}
+                sym-id]]
+        (is (= (apply sut/check-mapping ps) []))))
+
     (testing "should return a result for each failed field"
       (let [ps [{:test1 {:datatype :number :required true}
                  :test2 {:datatype :string :required false}}

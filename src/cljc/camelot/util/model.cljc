@@ -250,9 +250,8 @@
     (if (:global ps)
       (translation-fn (:global ps) column)
       (cond
-        ;; TODO what to do with this?
-        ;;(nil? calculated-schema)
-        ;;(translation-fn ::calculated-schema-not-available column)
+        (nil? calculated-schema)
+        (translation-fn ::calculated-schema-not-available column)
 
         (and (:required-constraint ps) (:datatype ps))
         (translation-fn ::datatype-and-required-constraint-problem
@@ -269,8 +268,8 @@
   "Validate all mappings, returning a list of invalid mappings."
   ([schemas mappings calculated-schema translation-fn]
    (let [xform (comp (map (fn [[k v]]
-                            (let [r (get calculated-schema (get mappings k))]
-                              (when r
+                            (if-let [m (get mappings k)]
+                              (let [r (get calculated-schema m)]
                                 (reason-mapping-invalid schemas k r translation-fn)))))
                      (remove nil?))]
      (sequence xform schemas)))
