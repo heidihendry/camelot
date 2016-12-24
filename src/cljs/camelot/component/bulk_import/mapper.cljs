@@ -34,7 +34,7 @@
   (om/update! data :upload-pending false)
   (om/update! data :column-properties (get-in r [:response :column-properties]))
   (om/update! data :file-data (get-in r [:response :file-data]))
-  (if (empty? (:mappings data))
+  (if (empty? (deref (:mappings data)))
     (om/update! data :mappings (get-in r [:response :default-mappings]))))
 
 (defn upload-pending-handler
@@ -262,7 +262,10 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! app :bulk-import {:mapping {}}))
+      (om/update! app :bulk-import {:mappings {}}))
+    om/IWillUnmount
+    (will-unmount [_]
+      (om/update! app :bulk-import nil))
     om/IRender
     (render [_]
       (if-let [data (:bulk-import app)]
