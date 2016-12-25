@@ -8,6 +8,7 @@
     :advanced "Advanced"
     :and-lc "and"
     :back "Back"
+    :of-lc "of"
     :cancel "Cancel"
     :continue "Continue"
     :citation "Citation"
@@ -718,6 +719,8 @@
     :import-status-dialog-title "Importing..."
     :validation-mismatch "One or more fields do not have the necessary data to satisfy the assigned mappings."
     :import-started "Bulk import has started. You can continue using Camelot while the import is underway, and view its status at any time using the menu item near the top right-hand corner, as pictured below."
+    :progress-bar-label "Import progress"
+    :estimated-time-remaining "Estimated time remaining"
     :import-failed "Bulk import failed to start. This might be a bug. Technical details of the error follow:"
     :validation-problem "Some inconsistencies have been found with data to be imported. As a result the import has been aborted. These inconsistencies are detailed below."
     :sample-ui "An example image of the UI."
@@ -769,6 +772,11 @@
     :datatype-date "a date"}
 
    :camelot.component.nav
-   {:bulk-import-status "Progress of bulk import"}
+   {:bulk-import-progress-label "Progress of bulk import"
+    :bulk-import-failures "Some records have failed to import. Click for more information."
+    :bulk-import-success "All media imported successfully."
+    :bulk-import-complete "Import complete"
+    :bulk-import-complete-with-errors "Import complete (with errors)"
+    :bulk-import-calculating "Calculating time remaining..."}
 
    :missing "[Translation missing]"})
