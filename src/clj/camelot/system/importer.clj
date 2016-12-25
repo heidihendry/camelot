@@ -14,25 +14,35 @@
   "Importer event loop."
   [config cmd-chan queue-chan]
   (go
-    (let [import! (import/import-media-fn (or (get-in config [:config :media-importers]) 1))]
+    (let [import! (import/import-media-fn
+                   (or (get-in config [:config :media-importers]) 1))]
       (try
         (loop []
           (let [[msg ch] (alts! [cmd-chan queue-chan])]
             (condp = ch
-              cmd-chan (condp = (:cmd msg)
-                         :stop (do (close! queue-chan)
-                                   (close! cmd-chan)
-                                   (throw (InterruptedException.)))
-                         :new (when (and (zero? (count (.buf queue-chan)))
-                                         (deref (get-in (:state msg) [:importer :pending])))
-                                (dosync
-                                 (ref-set (get-in (:state msg) [:importer :complete]) 0)
-                                 (ref-set (get-in (:state msg) [:importer :failed]) 0)))
-                         nil)
-              queue-chan (do
-                           (dosync
-                            (alter (get-in (:state msg) [:importer :pending]) inc))
-                           (import! (:state msg) (:record msg)))))
+
+              cmd-chan
+              (condp = (:cmd msg)
+                :stop (do (close! queue-chan)
+                          (close! cmd-chan)
+                          (throw (InterruptedException.)))
+                :new (when (and (zero? (count (.buf queue-chan)))
+                                (deref (get-in (:state msg) [:importer :pending])))
+                       (dosync
+                        (ref-set (get-in (:state msg) [:importer :complete]) 0)
+                        (ref-set (get-in (:state msg) [:importer :failed]) 0)))
+                nil)
+
+              queue-chan
+              (condp = (:type msg)
+                :delay
+                @(:delay msg)
+
+                :record
+                (do
+                  (dosync
+                   (alter (get-in (:state msg) [:importer :pending]) inc))
+                  (import! (:state msg) (:record msg))))))
           (recur))
         (catch InterruptedException e
           (println "Importer stopped."))))))

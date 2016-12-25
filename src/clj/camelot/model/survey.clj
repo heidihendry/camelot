@@ -96,3 +96,12 @@
    data :- TSurvey]
   (or (get-specific-by-name state (select-keys data [:survey-name]))
       (create! state data)))
+
+(s/defn set-bulk-import-mode! :- Survey
+  [state :- State
+   id :- s/Int
+   bulk-import-mode :- s/Bool]
+  (db/with-db-keys state -set-bulk-import-mode!
+    {:survey-id id
+     :survey-bulk-import-mode bulk-import-mode})
+  (survey (get-specific state id)))

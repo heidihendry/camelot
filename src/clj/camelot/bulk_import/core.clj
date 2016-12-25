@@ -19,7 +19,8 @@
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
    [camelot.util.file :as file]
-   [camelot.bulk-import.validate :as validate])
+   [camelot.bulk-import.validate :as validate]
+   [camelot.model.survey :as survey])
   (:import
    (java.util.regex Pattern)))
 
@@ -250,7 +251,7 @@
 
 (defn validate-and-import
   "Validate a seq of record, and if valid, queue for import."
-  [state records]
+  [state survey-id records]
   (let [problems (validate/validate state records)]
     (if (seq problems)
       (map :reason problems)
@@ -259,7 +260,14 @@
              {:state state :cmd :new})
         (doseq [r (sort-by :media-capture-timestamp records)]
           (>!! (get-in state [:importer :queue-chan])
-               {:state state :record r}))))))
+               {:state state
+                :type :record
+                :record r}))
+        (>!! (get-in state [:importer :queue-chan])
+             {:state state
+              :type :delay
+              :delay (delay (survey/set-bulk-import-mode! state survey-id false))})
+        nil))))
 
 (defn import-with-mappings
   "Given file data and a series of mappings, attempt to import it."
@@ -272,4 +280,4 @@
       (->> mappings
            (file-data-to-record-list state (rest file-data) headings)
            (map #(merge {:survey-id survey-id} %))
-           (validate-and-import state)))))
+           (validate-and-import state survey-id)))))
