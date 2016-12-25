@@ -9,6 +9,7 @@
     :and-lc "and"
     :back "Back"
     :cancel "Cancel"
+    :continue "Continue"
     :citation "Citation"
     :close "Close"
     :create "Create"
@@ -716,6 +717,12 @@
     :scanning "Preparing data for mapping..."
     :import-status-dialog-title "Importing..."
     :validation-mismatch "One or more fields do not have the necessary data to satisfy the assigned mappings."
+    :import-started "Bulk import has started. You can continue using Camelot while the import is underway, and view its status at any time using the menu item near the top right-hand corner, as pictured below."
+    :import-failed "Bulk import failed to start. This might be a bug. Technical details of the error follow:"
+    :validation-problem "Some inconsistencies have been found with data to be imported. As a result the import has been aborted. These inconsistencies are detailed below."
+    :sample-ui "An example image of the UI."
+    :initialising "Preparing to start the bulk import. Please wait."
+    :status-code "Status code"
     :validation-missing "One or more required fields do not have a mapping assigned."
     :validation-passed "Submit mappings for import."}
 

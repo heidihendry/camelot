@@ -11,9 +11,12 @@
    [camelot.nav :as nav]
    [camelot.state :as state]
    [cljs.core.async :refer [<! chan >!]]
-   [camelot.rest :as rest])
+   [camelot.rest :as rest]
+   [clojure.string :as str])
   (:require-macros
    [cljs.core.async.macros :refer [go]]))
+
+(def bulk-import-ui-sample-image "images/bulk-import-sample.png")
 
 (defn get-import-data
   [data]
@@ -26,8 +29,15 @@
   (om/update! data :show-import-status-dialog true)
   (om/update! data :import-status :initialising)
   (rest/post-x "/surveys/bulkimport/import" {:data (get-import-data data)}
-               #(om/update! data :import-status :active)
-               #(om/update! data :import-status :failed)))
+               #(if (or (nil? (:body %)) (empty? (:body %)))
+                  (om/update! data :import-status :active)
+                  (do
+                    (om/update! data :import-status :validation-problem)
+                    (om/update! data :import-status-details (:body %))))
+               #(do
+                  (om/update! data :import-status :failed)
+                  (om/update! data :import-status-details {:errors (:body %)
+                                                           :status (:status %)}))))
 
 (defn upload-success-handler
   [data r]
@@ -106,17 +116,48 @@
                                (get column-properties m)
                                tr/translate))))))))
 
+(defn error-item-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/li nil (:error data)))))
+
 (defn import-status-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (case (:import-status data)
-        :complete (dom/p nil "Import complete (enable close button)")
-        :active (dom/p nil "Import active")
-        :failed (dom/p nil "Import failed")
-        :initialising (dom/p nil "Import initialising")
-        nil (dom/p nil "Unsure what's going on")))))
+      (when (:import-status data)
+        (case (:import-status data)
+          :active
+          (dom/div nil
+                   (dom/p nil (tr/translate ::import-started))
+                   (dom/div #js {:className "bulk-import-sample-image"}
+                            (dom/img #js {:src bulk-import-ui-sample-image
+                                          :alt (tr/translate ::sample-ui)})))
+
+          :validation-problem
+          (dom/div nil
+                   (dom/p nil
+                          (tr/translate ::validation-problem))
+                   (dom/div #js {:className "bulk-import-validation-problem-list"}
+                            (dom/textarea #js {:rows "6"
+                                               :cols "42"
+                                               :className "field-input"}
+                                          (str/join "\n" (:import-status-details data)))))
+
+          :failed
+          (dom/div nil
+                   (dom/p nil (tr/translate ::import-failed))
+                   (dom/p nil
+                          (dom/label nil (tr/translate ::status-code))
+                          ": "
+                          (get-in data [:import-status-details :status]))
+                   (dom/p nil (get-in data [:import-status-details :errors])))
+
+          :initialising
+          (dom/p nil (tr/translate ::initialising)))))))
 
 (defn import-status-dialog
   [data owner]
@@ -128,12 +169,12 @@
                         :title (tr/translate ::import-status-dialog-title)
                         :body (dom/div nil (om/build import-status-component data))
                         :actions (dom/div #js {:className "button-container"}
-                                          (dom/button #js {:className "btn btn-default"
+                                          (dom/button #js {:className "btn btn-primary"
                                                            :ref "action-first"
                                                            :onClick #(do
                                                                        (om/update! data :show-import-status-dialog false)
                                                                        (om/update! data :import-status nil))}
-                                                      (tr/translate :words/cancel)))}}))))
+                                                      (tr/translate :words/continue)))}}))))
 
 (defn compare-column-schema-weight
   "Sort based on column schema weightings."

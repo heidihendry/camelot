@@ -276,7 +276,7 @@
         errs (model/check-mapping mappings props (partial tr/translate state))
         headings (reduce-kv #(assoc %1 %3 %2) {} (first file-data))]
     (if (seq errs)
-      {:error {:validation errs}}
+      {:errors errs}
       (->> mappings
            (file-data-to-record-list state (rest file-data) headings)
            (map #(merge {:survey-id survey-id} %))

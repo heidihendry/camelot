@@ -1728,3 +1728,7 @@ pre.field-input {
     position: relative;
     opacity: 0;
 }
+.bulk-import-sample-image {
+    padding-top: 2rem;
+    text-align: center;
+}
