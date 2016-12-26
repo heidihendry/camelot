@@ -194,10 +194,6 @@
   "Retrieve global application details"
   (partial get-x "/application"))
 
-(def get-albums
-  "Retrieve albums"
-  (partial get-x "/albums"))
-
 (def get-screens
   "Retrieve screens"
   (partial get-x "/screens"))
@@ -205,10 +201,6 @@
 (def get-configuration
   "Retrieve configuration"
   (partial get-x "/settings"))
-
-(def get-metadata
-  "Retrieve metadata"
-  (partial get-x "/application/metadata"))
 
 (defn get-resource
   "GET resource state"

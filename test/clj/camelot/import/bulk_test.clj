@@ -1,9 +1,27 @@
-(ns camelot.bulk-import.core-test
-  (:require [camelot.bulk-import.core :as sut]
+(ns camelot.import.bulk-test
+  (:require [camelot.import.bulk :as sut]
+            [clj-time.core :as t]
             [camelot.test-util.state :as state]
             [clojure.test :refer :all]))
 
 (def test-canonical-path identity)
+
+(deftest test-to-latlong
+  (testing "GPS parsing"
+    (testing "GPS data is interpretted sanely"
+      (let [lon "104° 5' 44.56\""
+            lon-ref "E"]
+        (is (= (sut/to-longitude lon lon-ref) 104.095711))))
+
+    (testing "Longitude west is negative"
+      (let [lon "104° 5' 44.56\""
+            lon-ref "W"]
+        (is (= (sut/to-longitude lon lon-ref) -104.095711))))
+
+    (testing "Latitude south is negative"
+      (let [lat "30° 44' 11\""
+            lat-ref "S"]
+        (is (= (sut/to-latitude lat lat-ref) -30.736389))))))
 
 (deftest test-resolve-server-directory
   (with-redefs [camelot.util.file/canonical-path camelot.util.file/get-path]
@@ -87,7 +105,7 @@
 (deftest test-file-data-to-record-list
   (testing "transforming file data to records"
     (testing "mapping to null is omitted"
-      (with-redefs [camelot.bulk-import.datatype/deserialise (fn [k d] d)]
+      (with-redefs [camelot.import.datatype/deserialise (fn [k d] d)]
         (is (= (sut/file-data-to-record-list (state/gen-state)
                                              [["V1-1","V1-2","V1-3"]
                                               ["V2-1","V2-2","V2-3"]]

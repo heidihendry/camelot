@@ -91,10 +91,7 @@
                   :generator-args {:id (if (= (get-in vs [:screen :mode]) :create)
                                          (util/get-parent-resource-id vs)
                                          (util/get-resource-id vs))}
-                  
-                  :image-resource-url "/media/photo"
-                  :metadata (let [md-schema (get-in vs [:events-ref :metadata-schema])]
-                              (and md-schema (md-schema)))}]
+                  :image-resource-url "/media/photo"}]
         (apply dom/div #js {:className "section-body"}
                (om/build-all field-component
                              (map #(vector % vs (get vs :buffer)

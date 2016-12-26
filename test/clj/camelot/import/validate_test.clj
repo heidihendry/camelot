@@ -1,5 +1,5 @@
-(ns camelot.bulk-import.validate-test
-  (:require [camelot.bulk-import.validate :as sut]
+(ns camelot.import.validate-test
+  (:require [camelot.import.validate :as sut]
             [clojure.test :refer :all]
             [clj-time.core :as t]
             [camelot.test-util.state :as state]
@@ -159,7 +159,7 @@
                 :trap-station-session-end-date (t/date-time 2016 2 1 0 0 0)
                 :media-capture-timestamp (t/date-time 2016 2 2 0 0 0)}])
              [{:result :fail
-               :test :camelot.bulk-import.validate/session-dates
+               :test :camelot.import.validate/session-dates
                :row 2}])))))
 
 (deftest test-overlapping-camera-usage
@@ -286,6 +286,6 @@
                    :camera-name "CAM2"}]
             result (sut/validate (gen-state) data)]
         (is (= (sort (map #(:test %) result))
-               [:camelot.bulk-import.validate/camera-overlaps
-                :camelot.bulk-import.validate/camera-overlaps
-                :camelot.bulk-import.validate/session-dates]))))))
+               [:camelot.import.validate/camera-overlaps
+                :camelot.import.validate/camera-overlaps
+                :camelot.import.validate/session-dates]))))))

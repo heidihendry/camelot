@@ -1,13 +1,12 @@
-(ns camelot.bulk-import.core
+(ns camelot.import.bulk
   "Provide high-level handling for bulk import support.  Bulk import consists
   of template generation, field mapping, validation and the actual import
   itself."
   (:require
    [clojure.core.async :refer [>!!]]
    [ring.util.response :as r]
-   [camelot.bulk-import.datatype :as datatype]
+   [camelot.import.datatype :as datatype]
    [camelot.import.dirtree :as dt]
-   [camelot.import.metadata-utils :as mutil]
    [camelot.util.model :as model]
    [camelot.util.config :as config]
    [camelot.translation.core :as tr]
@@ -19,8 +18,9 @@
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
    [camelot.util.file :as file]
-   [camelot.bulk-import.validate :as validate]
-   [camelot.model.survey :as survey])
+   [camelot.import.validate :as validate]
+   [camelot.model.survey :as survey]
+   [clojure.tools.logging :as log])
   (:import
    (java.util.regex Pattern)))
 
@@ -124,13 +124,65 @@
       (empty? res) root
       :else res)))
 
+(s/defn gps-parts-to-decimal :- s/Num
+  "Return the GPS parts as a decimal."
+  [parts :- [s/Num]]
+  {:pre [(= (count parts) 3)]}
+  (let [exact (+ (first parts)
+                 (/ (/ (nth parts 1) 0.6) 100)
+                 (/ (/ (nth parts 2) 0.36) 10000))]
+    (edn/read-string (format "%.6f" exact))))
+
+(s/defn gps-degrees-as-parts
+  "Return the numeric parts of a GPS location as a vector, given a string in degrees."
+  [deg]
+  (->> (str/split deg #" ")
+       (map #(str/replace % #"[^\.0-9]" ""))
+       (mapv edn/read-string)))
+
+(s/defn parse-gps :- s/Num
+  "Convert degrees string with a reference to a decimal.
+`pos-ref' is the reference direction which is positive; any other
+direction is considered negative."
+  [pos-ref :- s/Str
+   mag :- s/Str
+   mag-ref :- s/Str]
+  (let [decimal (-> mag
+                    (gps-degrees-as-parts)
+                    (gps-parts-to-decimal))]
+    (if (= mag-ref pos-ref)
+      decimal
+      (* -1 decimal))))
+
+(s/defn to-longitude :- (s/maybe s/Num)
+  "Convert longitude in degrees and a longitude reference to a decimal."
+  [lon :- (s/maybe s/Str)
+   lon-ref :- (s/maybe s/Str)]
+  (when-not (or (nil? lon) (nil? lon-ref))
+    (try (parse-gps "E" lon lon-ref)
+         (catch java.lang.Exception e
+           (do
+             (log/warn "to-longitude: Attempt to parse " lon " as GPS")
+             nil)))))
+
+(s/defn to-latitude :- (s/maybe s/Num)
+  "Convert latitude in degrees and a latitude reference to a decimal."
+  [lat :- (s/maybe s/Str)
+   lat-ref :- (s/maybe s/Str)]
+  (when-not (or (nil? lat) (nil? lat-ref))
+    (try (parse-gps "N" lat lat-ref)
+         (catch java.lang.Exception e
+           (do
+             (log/warn "to-latitude: Attempt to parse " lat " as GPS")
+             nil)))))
+
 (defn calculate-gps-latitude
   [data]
-  (mutil/to-latitude (get data "GPS Latitude") (get data "GPS Latitude Ref")))
+  (to-latitude (get data "GPS Latitude") (get data "GPS Latitude Ref")))
 
 (defn calculate-gps-longitude
   [data]
-  (mutil/to-longitude (get data "GPS Longitude") (get data "GPS Longitude Ref")))
+  (to-longitude (get data "GPS Longitude") (get data "GPS Longitude Ref")))
 
 (def calculated-columns
   {"Camelot GPS Longitude" calculate-gps-longitude

@@ -10,9 +10,11 @@
    (com.drew.metadata Metadata Directory Tag)
    (java.io File)))
 
-(def RawAlbum {java.io.File mi/ImportRawMetadata})
+(def ImportRawMetadata {s/Str s/Str})
+(def RawAlbum {java.io.File ImportRawMetadata})
 
 (def RawAlbumSet {java.io.File RawAlbum})
+
 
 (def path-component-prefix "Path Component ")
 (def absolute-path-key "Absolute Path")
@@ -82,7 +84,7 @@
   [metadata]
   (map get-tags (get-directories metadata)))
 
-(s/defn extract-file-metadata :- mi/ImportRawMetadata
+(s/defn extract-file-metadata :- ImportRawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
   [reader file]
   (or (some->> file
@@ -100,14 +102,14 @@
        (file-seq)
        (filter exif-file?)))
 
-(s/defn file-raw-metadata :- mi/ImportRawMetadata
+(s/defn file-raw-metadata :- ImportRawMetadata
   [state file]
   (let [reader #(ImageMetadataReader/readMetadata ^File %)]
     (try
       (extract-file-metadata reader file)
       (catch java.lang.Exception e {}))))
 
-(s/defn path-components :- mi/ImportRawMetadata
+(s/defn path-components :- ImportRawMetadata
   "Extract a map of components of the path, relative to the root directory."
   [state :- State
    file :- File]
@@ -117,7 +119,7 @@
          (map-indexed segfn)
          (apply merge))))
 
-(s/defn file-metadata :- mi/ImportRawMetadata
+(s/defn file-metadata :- ImportRawMetadata
   "Return a pair of the file and its raw metadata."
   [state :- State
    file :- File]
@@ -130,7 +132,7 @@
    file :- File]
   (vector file (file-metadata state file)))
 
-(s/defn directory-metadata-collection :- [mi/ImportRawMetadata]
+(s/defn directory-metadata-collection :- [ImportRawMetadata]
   [state :- State
    dir :- s/Str]
   (->> dir

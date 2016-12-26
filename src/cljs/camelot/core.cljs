@@ -5,7 +5,6 @@
             [camelot.view :as view]
             [camelot.state :as state]
             [camelot.rest :as rest]
-            [camelot.component.albums :as albums]
             [cljs.core.async :refer [<!]]
             [secretary.core :as secretary :refer-macros [defroute]])
   (:import [goog.date UtcDateTime]))
@@ -62,13 +61,10 @@
 
 (defn initialise-application
   []
-  (rest/get-metadata
-   (fn [x]
-     (om/update! (state/app-state-cursor) :metadata (:body x))
-     (rest/get-configuration
-      #(do (om/update! (state/app-state-cursor) :resources {})
-           (om/update! (state/resources-state) :settings (:body %))
-           (initialise-state))))))
+  (rest/get-configuration
+   #(do (om/update! (state/app-state-cursor) :resources {})
+        (om/update! (state/resources-state) :settings (:body %))
+        (initialise-state))))
 
 (secretary/set-config! :prefix "#")
 

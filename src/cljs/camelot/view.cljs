@@ -3,15 +3,12 @@
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [camelot.state :as state]
-            [camelot.component.albums :as albums]
-            [camelot.component.albums :as calb]
             [camelot.component.survey.core :as survey]
             [camelot.component.bulk-import.core :as bulk-import]
             [camelot.component.bulk-import.mapper :as bulk-import-mapper]
             [camelot.component.deployment.core :as deployment]
             [camelot.component.organisation :as organisation]
             [camelot.component.nav :as nav]
-            [camelot.component.import-dialog :as import]
             [camelot.util.cursorise :as cursorise]
             [smithy.core :as smithy]
             [camelot.nav :as cnav]
@@ -235,19 +232,13 @@
 
 (def events
   "Mapping of events to event functions."
-  {:settings-legacy-save (fn [d]
-                           (albums/reload-albums)
-                           (om/update! (state/resources-state) :settings
-                                (deref (get-in (state/app-state-cursor)
-                                               [:view :settings :buffer]))))
-   :settings-save (fn [d]
+  {:settings-save (fn [d]
                     (om/update! (state/resources-state) :settings
                                 (deref (get-in (state/app-state-cursor)
                                                [:view :settings :buffer]))))
    :settings-cancel #(identity 1)
    :build-generator build-generator
    :analytics-event (fn [event action] (cnav/analytics-event event action))
-   :metadata-schema #(state/metadata-schema-state)
    :sidebar-item-click (fn [vs id]
                          (cnav/analytics-event "sidebar-navigate"
                                                (util/get-resource-type-name vs))
@@ -279,11 +270,6 @@
   "Render the notification dialog"
   (om/root cnotif/notification-dialog-component state/app-state
            {:target (js/document.getElementById "notification-dialog")}))
-
-(def import-dialog
-  "Render the import dialog"
-  (om/root import/import-dialog-component state/app-state
-           {:target (js/document.getElementById "import-dialog")}))
 
 (defn generate-view
   "Render the main page content"
@@ -330,7 +316,6 @@
       (om/root f state/app-state
                {:target (js/document.getElementById "page-content")}))))
 
-(defroute "/dashboard" [] (generate-view calb/album-view-component) {})
 (defroute "/surveys" [] (page-content-view :survey :create {}))
 (defroute "/surveys/:mode/:rid" [mode rid] (page-content-view :survey (keyword mode)
                                                               {:resource-id rid}))

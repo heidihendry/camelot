@@ -1,4 +1,4 @@
-(ns camelot.bulk-import.validate
+(ns camelot.import.validate
   "Validators to be ran before bulk-import."
   (:require
    [clj-time.core :as t]

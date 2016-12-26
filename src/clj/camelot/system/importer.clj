@@ -2,7 +2,7 @@
   "Importer component."
   (:require
    [com.stuartsierra.component :as component]
-   [camelot.bulk-import.import :as import]
+   [camelot.import.core :as import]
    [clojure.core.async :refer [<! chan >! >!! alts! go-loop go close!] :as async]
    [clojure.tools.logging :as log]
    [clj-time.core :as t]))

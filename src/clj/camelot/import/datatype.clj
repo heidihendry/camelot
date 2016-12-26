@@ -1,4 +1,4 @@
-(ns camelot.bulk-import.datatype
+(ns camelot.import.datatype
   (:require
    [camelot.util.model :as model]
    [clojure.java.io :as io]

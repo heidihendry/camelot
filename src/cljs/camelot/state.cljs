@@ -19,10 +19,6 @@
   [screen]
   (om/ref-cursor (:schema (get (:screens (om/root-cursor app-state)) screen))))
 
-(defn metadata-schema-state
-  []
-  (om/ref-cursor (:metadata (om/root-cursor app-state))))
-
 (defn display-state
   []
   (om/ref-cursor (:display (om/root-cursor app-state))))
@@ -55,12 +51,6 @@
 (defn bulk-import-state
   []
   (om/ref-cursor (:bulk-import (om/root-cursor app-state))))
-
-(defn import-dialog-state
-  []
-  (when (nil? (:import-dialog (om/root-cursor app-state)))
-    (om/update! (app-state-cursor) :import-dialog {:visible false}))
-  (om/ref-cursor (:import-dialog (om/root-cursor app-state))))
 
 (defn settings
   "Return a map of application settings."

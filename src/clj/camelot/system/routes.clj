@@ -4,10 +4,7 @@
    [camelot.system.state :as state]
    [camelot.system.version :as version]
    [camelot.import.capture :as capture]
-   [camelot.import.core :as import]
-   [camelot.import.album :as album]
-   [camelot.bulk-import.core :as bulk-import]
-   [camelot.import.db :as im.db]
+   [camelot.import.bulk :as import]
    [camelot.services.species-search :as species-search]
    [camelot.model.associated-taxonomy :as ataxonomy]
    [camelot.model.camera :as camera]
@@ -118,13 +115,13 @@
                                                                             file-id (assoc state :session session)))
            (GET "/:id" [id] (crud/specific-resource survey/get-specific id (assoc state :session session)))
            (GET "/bulkimport/template" {params :params}
-                (bulk-import/metadata-template (assoc state :session session) (:dir params)))
+                (import/metadata-template (assoc state :session session) (:dir params)))
            (POST "/bulkimport/columnmap" {params :multipart-params}
                  (->> (get params "file")
-                      (bulk-import/column-map-options (assoc state :session session))
+                      (import/column-map-options (assoc state :session session))
                       r/response))
            (POST "/bulkimport/import" [data]
-                 (r/response (bulk-import/import-with-mappings (assoc state :session session) data)))
+                 (r/response (import/import-with-mappings (assoc state :session session) data)))
            (PUT "/:id" [id data] (crud/update-resource survey/update! id
                                                        survey/tsurvey data (assoc state :session session)))
            (POST "/" [data] (crud/create-resource survey/create!
@@ -207,16 +204,11 @@
            (GET "/alternatives/:id" [id] (crud/list-resources species-mass/get-all :species-mass (assoc state :session session))))
 
   (context "/application" {session :session state :system}
-           (GET "/metadata" [] (r/response (screens/get-metadata (assoc state :session session))))
            (GET "/" [] (r/response {:version (version/get-version)
                                     :nav (screens/nav-menu (assoc state :session session))})))
 
   (context "/screens" {session :session state :system}
            (GET "/" [] (r/response (screens/all-screens (assoc state :session session)))))
-
-  (context "/import" {session :session state :system}
-           (POST "/options" [data] (r/response (im.db/options state data)))
-           (POST "/media" [data] (r/response (import/media state data))))
 
   (context "/report" {session :session state :system}
            (GET "/manage/rescan" [] (do (report/refresh-reports state)
@@ -272,11 +264,6 @@
                                                                :trap-station-session id (assoc state :session session)))
            (POST "/" [data] (crud/create-resource camera-deployment/create-camera-check!
                                                   camera-deployment/tcamera-deployment data (assoc state :session session))))
-
-  (context "/albums" {session :session state :system}
-           (GET "/" [] (r/response
-                        (let [s (assoc state :session session)]
-                          (album/read-albums s (state/lookup s :root-path))))))
 
   (context "/settings" {session :session state :system}
            (GET "/" [] (r/response (cursorise/cursorise (merge (deref (get-in state [:config :store])) session))))

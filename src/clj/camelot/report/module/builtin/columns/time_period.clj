@@ -1,6 +1,5 @@
 (ns camelot.report.module.builtin.columns.time-period
   (:require
-   [camelot.import.album :as album]
    [camelot.report.module
     [column-util :as col-util]
     [core :as module]]

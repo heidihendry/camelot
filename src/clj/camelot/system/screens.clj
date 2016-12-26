@@ -2,64 +2,20 @@
   (:require
    [smithy.core :refer [defsmith] :as smithy]
    [camelot.import.util :as putil]
-   [environ.core :refer [env]]
-   [camelot.translation.core :as tr]))
+   [camelot.translation.core :as tr]
+   [clojure.string :as str]))
 
 (def smiths (atom {}))
-
-(def metadata-structure
-  "Layout of all photo metadata fields."
-  [[:location [:gps-longitude
-               :gps-longitude-ref
-               :gps-latitude
-               :gps-latitude-ref
-               :gps-altitude
-               :gps-altitude-ref
-               :sublocation
-               :city
-               :state-province
-               :country
-               :country-code
-               :map-datum]]
-   [:camera-settings [:aperture
-                      :exposure
-                      :flash
-                      :focal-length
-                      :fstop
-                      :iso
-                      :orientation
-                      :resolution-x
-                      :resolution-y]]
-   [:camera [:make
-             :model
-             :software]]
-   :datetime
-   :headline
-   :artist
-   :phase
-   :copyright
-   :description
-   :filename
-   :filesize])
 
 (defn nav-menu
   "Main navigation menu structure."
   [state]
-  (if (env :camelot-legacy-features)
-    {:menu-items [{:url "/organisation"
-                   :label (tr/translate state :application/organisation)}
-                  {:url "/library"
-                   :label (tr/translate state :application/library)}
-                  {:url "/dashboard"
-                   :label (tr/translate state :application/import)}
-                  {:function "settings"}
-                  {:function "bulk-import-progress"}]}
-    {:menu-items [{:url "/organisation"
-                   :label (tr/translate state :application/organisation)}
-                  {:url "/library"
-                   :label (tr/translate state :application/library)}
-                  {:function "settings"}
-                  {:function "bulk-import-progress"}]}))
+  {:menu-items [{:url "/organisation"
+                 :label (tr/translate state :application/organisation)}
+                {:url "/library"
+                 :label (tr/translate state :application/library)}
+                {:function "settings"}
+                {:function "bulk-import-progress"}]})
 
 (defn- translate-fn
   "Return a key translation function for the smithy build process."
@@ -481,104 +437,24 @@
                               :error {:type :event
                                       :event :survey-update-error}}}}})
 
-(if (env :camelot-legacy-features)
-  (defsmith settings smiths
-    [state]
-    {:resource {:type :settings
-                :title (tr/translate state :settings/title)
-                :endpoint "/settings"}
-     :layout [[:label (tr/translate state :settings/preferences)]
-              [:language]
-              [:label (tr/translate state :settings/survey-settings)]
-              [:project-start]
-              [:project-end]
-              [:required-fields]
-              [:surveyed-species]
-              [:night-start-hour]
-              [:night-end-hour]
-              [:sighting-independence-minutes-threshold]
-              [:infrared-iso-value-threshold]
-              [:erroneous-infrared-threshold]]
-     :schema {:erroneous-infrared-threshold {:type :percentage
-                                             :required true}
-              :infrared-iso-value-threshold {:type :number
-                                             :required true}
-              :sighting-independence-minutes-threshold {:type :number
-                                                        :required true}
-              :language {:type :select
-                         :required true
-                         :options {:en (tr/translate state :language/en)
-                                   :vn (tr/translate state :language/vn)}}
-              :night-start-hour {:type :select
-                                 :required true
-                                 :options {17 "17:00"
-                                           18 "18:00"
-                                           19 "19:00"
-                                           20 "20:00"
-                                           21 "21:00"
-                                           22 "22:00"
-                                           23 "23:00"}}
-              :night-end-hour {:type :select
-                               :required true
-                               :options {0 "0:00"
-                                         1 "1:00"
-                                         2 "2:00"
-                                         3 "3:00"
-                                         4 "4:00"
-                                         5 "5:00"
-                                         6 "6:00"
-                                         7 "7:00"
-                                         8 "8:00"}}
-              :project-start {:type :datetime
-                              :required true}
-              :project-end {:type :datetime
-                            :required true}
-              :surveyed-species {:type :list
-                                 :list-of :string}
-              :required-fields {:type :list
-                                :list-of :paths
-                                :complete-with :metadata}}
-     :states {:update {:submit {:success {:type :event
-                                          :event :settings-legacy-save}
-                                :error {:type :event
-                                        :event :settings-error}}
-                       :cancel {:type :event
-                                :event :settings-cancel}}}})
-  (defsmith settings smiths
-    [state]
-    {:resource {:type :settings
-                :title (tr/translate state :settings/title)
-                :endpoint "/settings"}
-     :layout [[:label (tr/translate state :settings/survey-settings)]
-              [:sighting-independence-minutes-threshold]
-              [:send-usage-data]]
-     :schema {:language {:type :select
-                         :required true
-                         :options {:en (tr/translate state :language/en)
-                                   :vn (tr/translate state :language/vn)}}
-              :send-usage-data {:type :boolean}
-              :sighting-independence-minutes-threshold {:type :number
-                                                        :required true}}
-     :states {:update {:submit {:success {:type :event
-                                          :event :settings-save}
-                                :error {:type :event
-                                        :event :settings-error}}
-                       :cancel {:type :event
-                                :event :settings-cancel}}}}))
-
-(defn- flatten-metadata-structure
-  "Transfor metadata structure in to a vector of paths"
-  [md]
-  (vec (reduce #(into %1 (if (= (type %2) clojure.lang.Keyword)
-                              [[%2]]
-                              (mapv (fn [v] [(first %2) v]) (second %2))))
-                   []
-                   md)))
-
-(def metadata-paths (flatten-metadata-structure metadata-structure))
-
-(defn get-metadata
-  "Return paths alongside a (translated) description of the metadata represented
-  by that path."
+(defsmith settings smiths
   [state]
-  (into {} (map #(hash-map % (putil/path-description state %)) metadata-paths)))
+  {:resource {:type :settings
+              :title (tr/translate state :settings/title)
+              :endpoint "/settings"}
+   :layout [[:label (tr/translate state :settings/survey-settings)]
+            [:sighting-independence-minutes-threshold]
+            [:send-usage-data]]
+   :schema {:language {:type :select
+                       :required true
+                       :options {:en (tr/translate state :language/en)
+                                 :vn (tr/translate state :language/vn)}}
+            :send-usage-data {:type :boolean}
+            :sighting-independence-minutes-threshold {:type :number
+                                                      :required true}}
+   :states {:update {:submit {:success {:type :event
+                                        :event :settings-save}
+                              :error {:type :event
+                                      :event :settings-error}}
+                     :cancel {:type :event
+                              :event :settings-cancel}}}})

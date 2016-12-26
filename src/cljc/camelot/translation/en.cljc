@@ -707,7 +707,7 @@
     :help-text-step-2 "Step 2. Modify the template as you see fit, then start the import once you're ready."
     :survey-directory "Path to survey directory"}
 
-   :camelot.bulk-import.validate
+   :camelot.import.validate
    {:camera-overlap "%s is used in multiple sessions between %s."
     :session-dates "Media not within session dates on row: %d."
     :future-timestamp "Session end date is in the future on row: %d."

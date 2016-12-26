@@ -1,17 +1,15 @@
 (ns camelot.import.core
   (:require
    [camelot.util.config :as config]
-   [camelot.util.db :as db]
-   [camelot.import.album :as album]
-   [camelot.import.db :as im.db]
-   [camelot.import.validation :as validation]
+   [camelot.util.db :refer [with-transaction]]
+   [camelot.import.db :as db]
    [camelot.util.file :as file]
-   [clojure.edn :as edn]
    [clojure.java.io :as io]
    [clojure.string :as str]
+   [clojure.core.async :refer [<! chan >!! go-loop close!] :as async]
    [compojure.core :refer [ANY context DELETE GET POST PUT]]
    [mikera.image.core :as image]
-   [ring.util.response :as r])
+   [clojure.tools.logging :as log])
   (:import
    (org.apache.commons.lang3 SystemUtils)))
 
@@ -25,7 +23,6 @@
 
 (def image-variants
   {"thumb-" 256
-   "preview-" 768
    "" nil})
 
 (defn- store-original
@@ -51,48 +48,80 @@
       (store-original path (str target "." extension)))))
 
 (defn create-image-files
-  [state path filename extension]
-  (dorun (map (fn [[k v]] (create-image state path filename extension k v)) image-variants)))
+  [state path extension]
+  (let [filename (str/lower-case (java.util.UUID/randomUUID))]
+    (dorun (map (fn [[k v]] (create-image state path filename extension k v))
+                image-variants))
+    filename))
 
-(defn- get-album
-  [state root-path path]
-  (get (album/read-albums state root-path) (file/->file path)))
+(defn- add-media-file!
+  [state record]
+  (let [fmt (str/lower-case (second (re-find #".*\.(.+?)$" (file/get-name (:absolute-path record)))))
+        filename (create-image-files state (:absolute-path record) fmt)]
+    (merge {:media-filename filename
+            :media-format fmt
+            :media-cameracheck false
+            :media-attention-needed false}
+           record)))
 
-(defn- create-sightings
-  [state media-id sightings]
-  (doseq [sighting sightings]
-    (when-not (re-find validation/sighting-quantity-exclusions-re (:species sighting))
-      (im.db/create-sighting! state media-id sighting))))
+(defn do-import
+  "Import a media file."
+  [msg]
+  (try
+    (with-transaction [s (:state msg)]
+      (->> (:record msg)
+           (add-media-file! s)
+           (db/create-media! s)
+           (db/create-sighting! s)
+           (db/create-photo! s)))
+    (assoc msg :result :complete
+           :absolute-path (get-in msg [:record :absolute-path]))
+    (catch Exception e
+      (log/error (.getMessage e))
+      (log/error (str/join "\n" (map str (.getStackTrace e))))
+      (assoc msg :result :failed
+             :absolute-path (get-in msg [:record :absolute-path])))))
 
-(defn- import-media-for-camera
-  [state notes full-path trap-camera photos]
-  (doseq [photo photos]
-    (let [filename (java.util.UUID/randomUUID)
-          fmt (str/lower-case (second (re-find #".*\.(.+?)$" (:filename photo))))
-          camset (:settings photo)
-          photopath (str full-path SystemUtils/FILE_SEPARATOR (:filename photo))
-          attn (some? (some #(re-find #"(?i)unidentified" (:species %)) (:sightings photo)))
-          media (im.db/create-media! state photo filename fmt notes attn trap-camera)]
-      (im.db/create-photo! state (:media-id media) camset)
-      (create-sightings state (:media-id media) (:sightings photo))
-      (create-image-files state photopath filename fmt))))
+(defn add-import-result
+  "Update importer state with the latest result."
+  [{:keys [state result absolute-path]}]
+  (dosync
+   (alter (get-in state [:importer :pending]) dec)
+   (alter (get-in state [:importer result]) inc)
+   (when (= result :failed)
+     (alter (get-in state [:importer :failed-paths]) conj absolute-path))))
 
-(defn media
-  "Import media"
-  [state {:keys [folder session-camera-id notes]}]
-  (db/with-transaction [s state]
-    (let [[_ sitename _phase cameraname] (file/rel-path-components state folder)
-          root-path (config/lookup s :root-path)
-          full-path (str root-path folder)
-          album (get-album s root-path full-path)
-          sample (second (first (:photos album)))
-          survey (im.db/get-or-create-survey! s root-path)
-          camera (im.db/get-or-create-camera! s cameraname sample)
-          trap-camera (->> (im.db/get-or-create-site! s sitename sample)
-                           (im.db/get-or-create-survey-site! s survey)
-                           (im.db/get-or-create-trap-station! s sample)
-                           (im.db/get-or-create-trap-session! s album)
-                           (im.db/get-or-create-trap-camera! s camera folder))]
-      (import-media-for-camera s notes full-path
-                               (:trap-station-session-camera-id trap-camera)
-                               (vals (:photos album))))))
+(defn media-processor
+  "Setup a pipeline for parallel media import and process results."
+  [num-importers]
+  (let [ch (chan)
+        result-chan (chan num-importers)]
+    (async/pipeline-blocking num-importers result-chan (map do-import) ch)
+    (go-loop []
+      (let [msg (<! result-chan)]
+        (add-import-result msg))
+      (recur))
+    ch))
+
+(defn import-media-fn
+  "Setup data structure and process media import."
+  [num-importers]
+  (let [proc (media-processor num-importers)]
+    (fn [state record]
+      (try
+        (>!! proc (with-transaction [s state]
+                   (->> record
+                        (db/get-survey s)
+                        (db/get-or-create-camera! s)
+                        (db/get-or-create-site! s)
+                        (db/get-or-create-survey-site! s)
+                        (db/get-or-create-trap-station! s)
+                        (db/get-or-create-trap-session! s)
+                        (db/get-or-create-trap-camera! s)
+                        (hash-map :state state :record))))
+        (catch Exception e
+          (log/error (.getMessage e))
+          (log/error (str/join "\n" (map str (.getStackTrace e))))
+          (add-import-result {:state state
+                              :result :failed
+                              :absolute-path (:absolute-path record)}))))))

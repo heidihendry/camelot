@@ -25,17 +25,6 @@
                          (into [])
                          (hash-map :value))))))
 
-(defn add-metadata-item!
-  [val data edit-key owner]
-  (when (not (empty? val))
-    (om/transact! data edit-key (fn [_]
-                                  (->> [edit-key :value]
-                                       (get-in data)
-                                       (deref)
-                                       (#(conj % val))
-                                       (into [])
-                                       (hash-map :value))))))
-
 (defn set-unvalidated-text! [e data edit-key owner]
   (om/transact! data edit-key (fn [_] (.. e -target -value))))
 
