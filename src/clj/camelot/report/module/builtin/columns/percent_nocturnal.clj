@@ -11,6 +11,7 @@
    (java.util TimeZone)))
 
 (defn- get-timezone
+  "Return a timezone from the configuration, or the default (system) timezone if unavailable."
   [state]
   (let [tz-str (config/lookup state :timezone)]
     (if tz-str
@@ -18,27 +19,21 @@
       (TimeZone/getDefault))))
 
 (defn- is-night?
+  "Predicate indicating whether the record capture time is at night for the given location."
   [state
-   {:keys [trap-station-latitude
-           trap-station-longitude
-           media-capture-timestamp]}]
-  (let [tz (get-timezone state)]
-    (when-not (or (nil? media-capture-timestamp)
-                  (nil? trap-station-longitude)
-                  (nil? trap-station-latitude))
-      (let [sunrise (sun/get-sunrise-time tz
-                     (str trap-station-latitude)
-                     (str trap-station-longitude)
-                     media-capture-timestamp)
-            sunset (sun/get-sunset-time tz
-                    (str trap-station-latitude)
-                    (str trap-station-longitude)
-                    media-capture-timestamp)]
-        (or (t/before? media-capture-timestamp sunrise)
-            (t/after? media-capture-timestamp sunset)
-            (= media-capture-timestamp sunset))))))
+   {lat :trap-station-latitude
+    lon :trap-station-longitude
+    ts :media-capture-timestamp}]
+  (when-not (some nil? [ts lat lon])
+    (let [rise-set-fn (juxt sun/get-sunrise-time sun/get-sunset-time)
+          [sunrise sunset]
+          (rise-set-fn (get-timezone state) (str lat) (str lon) ts)]
+      (or (t/before? ts sunrise)
+          (t/after? ts sunset)
+          (t/equal? ts sunset)))))
 
 (defn calculate-is-night
+  "Assoc percent-noctural flag, indicating with 'X' if at night."
   [state data]
   (map #(assoc % :percent-nocturnal (case (is-night? state %)
                                       true "X"
@@ -47,6 +42,7 @@
        data))
 
 (defn aggregate-is-night
+  "Assoc percent-nocturnal to the percentage of flagged indep. sightings."
   [state col data-group]
   (col-util/aggregate-boolean-by-independent-observations
    state col (indep/->independent-sightings state data-group)))

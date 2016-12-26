@@ -20,6 +20,30 @@
         (is (= (calculate data)
                [{:percent-nocturnal nil}]))))
 
+    (testing "should assoc to nil if longitude unavailable"
+      (let [data [{:media-capture-timestamp (t/date-time 2016 6 1)
+                   :trap-station-latitude 40.713}]]
+        (is (= (calculate data)
+               [{:media-capture-timestamp (t/date-time 2016 6 1)
+                 :trap-station-latitude 40.713
+                 :percent-nocturnal nil}]))))
+
+    (testing "should assoc to nil if latitude unavailable"
+      (let [data [{:media-capture-timestamp (t/date-time 2016 6 1)
+                   :trap-station-longitude -74.005}]]
+        (is (= (calculate data)
+               [{:media-capture-timestamp (t/date-time 2016 6 1)
+                 :trap-station-longitude -74.005
+                 :percent-nocturnal nil}]))))
+
+    (testing "should assoc to nil if media timestamp unavailable"
+      (let [data [{:trap-station-latitude 40.713
+                   :trap-station-longitude -74.005}]]
+        (is (= (calculate data)
+               [{:trap-station-latitude 40.713
+                 :trap-station-longitude -74.005
+                 :percent-nocturnal nil}]))))
+
     (testing "should assoc to 'X' if captured at night"
       (let [data [{:trap-station-longitude -74.005
                    :trap-station-latitude 40.713

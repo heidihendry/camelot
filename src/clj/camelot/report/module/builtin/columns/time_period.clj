@@ -1,8 +1,7 @@
 (ns camelot.report.module.builtin.columns.time-period
   (:require
-   [camelot.report.module
-    [column-util :as col-util]
-    [core :as module]]
+   [camelot.report.module.column-util :as col-util]
+   [camelot.report.module.core :as module]
    [clj-time.core :as t]
    [clj-time.format :as tf]))
 
