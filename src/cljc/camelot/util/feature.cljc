@@ -4,7 +4,7 @@
 
 (def default-feature-state
   "Map of feature keys and whether or not they're enabled by default."
-  {:bulk-import false})
+  {:bulk-import true})
 
 (s/defn enabled? :- s/Bool
   [config feature :- s/Keyword]
