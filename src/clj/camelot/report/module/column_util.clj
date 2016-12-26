@@ -45,29 +45,34 @@
     (nil? (get v col)) acc))
 
 (defn- aggregate-boolean*
-  [reducer group-col state col data]
+  [reducer state col data]
   (->> data
-       (group-by group-col)
-       (vals)
-       (flatten)
        (reduce (partial reducer col) {:n 0 :d 0})
        (->percentage)))
 
 (s/defn aggregate-boolean
   "Aggregate boolean fields as a percentage of records."
-  [group-col :- s/Keyword
-   state :- State
-   col :- s/Keyword
-   data :- [{s/Keyword s/Any}]]
-  (aggregate-boolean* boolean-reducer group-col state col data))
+  ([state :- State
+    col :- s/Keyword
+    data :- [{s/Keyword s/Any}]]
+   (aggregate-boolean* boolean-reducer state col data))
+  ([group-col :- s/Keyword
+    state :- State
+    col :- s/Keyword
+    data :- [{s/Keyword s/Any}]]
+   (aggregate-boolean state col data)))
 
 (s/defn aggregate-boolean-by-independent-observations
   "Aggregate boolean fields as a percentage of sighting quantities."
-  [group-col :- s/Keyword
-   state :- State
-   col :- s/Keyword
-   data :- [{s/Keyword s/Any}]]
-  (aggregate-boolean* boolean-sighting-reducer group-col state col data))
+  ([state :- State
+    col :- s/Keyword
+    data :- [{s/Keyword s/Any}]]
+   (aggregate-boolean* boolean-sighting-reducer state col data))
+  ([group-col :- s/Keyword
+    state :- State
+    col :- s/Keyword
+    data :- [{s/Keyword s/Any}]]
+   (aggregate-boolean-by-independent-observations state col data)))
 
 (s/defn aggregate-by-species
   "Numeric aggregation by species."

@@ -1,4 +1,5 @@
 (ns camelot.report.module.builtin.columns.percent-nocturnal
+  "Column and aggregation for whether a indep. obs. is nocturnal."
   (:require
    [camelot.util.sunrise-sunset :as sun]
    [camelot.report.module.core :as module]
@@ -46,9 +47,9 @@
        data))
 
 (defn aggregate-is-night
-  [state col data]
+  [state col data-group]
   (col-util/aggregate-boolean-by-independent-observations
-   :media-id state col (indep/->independent-sightings state data)))
+   state col (indep/->independent-sightings state data-group)))
 
 (module/register-column
  :percent-nocturnal
