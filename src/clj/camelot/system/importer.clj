@@ -50,7 +50,7 @@
                                     (log/warn "Tried to remove element from buffer, but buffer already empty.")))
                                 (recur))))
                           (catch Exception e
-                            (log/error (.getMessage e))))
+                            (log/error (.getMessage ^Exception e))))
                 nil)
 
               queue-chan
@@ -62,7 +62,7 @@
                   (try
                     (deref (:handler msg))
                     (catch Exception e
-                      (log/error "Finish command handler failed with error: " (.getMessage e)))))
+                      (log/error "Finish command handler failed with error: " (.getMessage ^Exception e)))))
 
                 :record
                 (do
@@ -73,7 +73,7 @@
         (catch InterruptedException e
           (println "Importer stopped."))
         (catch Exception e
-          (log/error "Importer failed with error: " (.getMessage e)))))))
+          (log/error "Importer failed with error: " (.getMessage ^Exception e)))))))
 
 (defrecord Importer [config]
   component/Lifecycle
