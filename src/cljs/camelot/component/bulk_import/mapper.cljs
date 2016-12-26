@@ -44,7 +44,7 @@
   (om/update! data :upload-pending false)
   (om/update! data :column-properties (get-in r [:response :column-properties]))
   (om/update! data :file-data (get-in r [:response :file-data]))
-  (if (empty? (deref (:mappings data)))
+  (if (or (nil? (:mappings data)) (empty? (deref (:mappings data))))
     (om/update! data :mappings (get-in r [:response :default-mappings]))))
 
 (defn upload-pending-handler
