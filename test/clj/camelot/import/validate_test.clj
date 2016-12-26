@@ -3,7 +3,8 @@
             [clojure.test :refer :all]
             [clj-time.core :as t]
             [camelot.test-util.state :as state]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.java.io :as io]))
 
 (def default-record
   {:trap-station-session-start-date (t/date-time 2016 1 1 0 0 0)
@@ -18,7 +19,9 @@
 
 (defn gen-state
   []
-  (state/gen-state {:language :en}))
+  (update-in (state/gen-state {:language :en})
+             [:config :path :media]
+             (fn [x] "/path/to/media")))
 
 (defn check-within-session-date
   [data]
@@ -268,24 +271,31 @@
 (deftest test-validate
   (testing "validation"
     (testing "should return validation errors in a dataset."
-      (let [data [{:trap-station-session-start-date (t/date-time 2016 1 1)
-                   :trap-station-session-end-date (t/date-time 2016 2 5)
-                   :media-capture-timestamp (t/date-time 2016 1 5)
-                   :camera-name "CAM1"}
-                  {:trap-station-session-start-date (t/date-time 2016 2 2)
-                   :trap-station-session-end-date (t/date-time 2016 2 5)
-                   :media-capture-timestamp (t/date-time 2016 1 5)
-                   :camera-name "CAM1"}
-                  {:trap-station-session-start-date (t/date-time 2016 2 3)
-                   :trap-station-session-end-date (t/date-time 2016 2 10)
-                   :media-capture-timestamp (t/date-time 2016 2 10)
-                   :camera-name "CAM2"}
-                  {:trap-station-session-start-date (t/date-time 2016 2 6)
-                   :media-capture-timestamp (t/date-time 2016 2 10)
-                   :trap-station-session-end-date (t/date-time 2016 2 20)
-                   :camera-name "CAM2"}]
-            result (sut/validate (gen-state) data)]
-        (is (= (sort (map #(:test %) result))
-               [:camelot.import.validate/camera-overlaps
-                :camelot.import.validate/camera-overlaps
-                :camelot.import.validate/session-dates]))))))
+      (with-redefs [camelot.util.file/length (fn [x] 1000)
+                    camelot.util.file/canonical-path (fn [x] (.getPath ^java.io.File x))
+                    camelot.util.file/fs-usable-space (fn [x] 100000)]
+        (let [data [{:trap-station-session-start-date (t/date-time 2016 1 1)
+                     :trap-station-session-end-date (t/date-time 2016 2 5)
+                     :media-capture-timestamp (t/date-time 2016 1 5)
+                     :absolute-path (io/file "/path/to/file1")
+                     :camera-name "CAM1"}
+                    {:trap-station-session-start-date (t/date-time 2016 2 2)
+                     :trap-station-session-end-date (t/date-time 2016 2 5)
+                     :media-capture-timestamp (t/date-time 2016 1 5)
+                     :absolute-path (io/file "/path/to/file1")
+                     :camera-name "CAM1"}
+                    {:trap-station-session-start-date (t/date-time 2016 2 3)
+                     :trap-station-session-end-date (t/date-time 2016 2 10)
+                     :media-capture-timestamp (t/date-time 2016 2 10)
+                     :absolute-path (io/file "/path/to/file1")
+                     :camera-name "CAM2"}
+                    {:trap-station-session-start-date (t/date-time 2016 2 6)
+                     :media-capture-timestamp (t/date-time 2016 2 10)
+                     :trap-station-session-end-date (t/date-time 2016 2 20)
+                     :absolute-path (io/file "/path/to/file1")
+                     :camera-name "CAM2"}]
+              result (sut/validate (gen-state) data)]
+          (is (= (sort (map #(:test %) result))
+                 [:camelot.import.validate/camera-overlaps
+                  :camelot.import.validate/camera-overlaps
+                  :camelot.import.validate/session-dates])))))))

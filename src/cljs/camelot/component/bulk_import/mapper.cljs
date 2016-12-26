@@ -154,7 +154,10 @@
                           (dom/label nil (tr/translate ::status-code))
                           ": "
                           (get-in data [:import-status-details :status]))
-                   (dom/p nil (get-in data [:import-status-details :errors])))
+                   (dom/textarea #js {:rows "6"
+                                      :cols "42"
+                                      :className "field-input"}
+                                 (get-in data [:import-status-details :errors])))
 
           :initialising
           (dom/p nil (tr/translate ::initialising)))))))

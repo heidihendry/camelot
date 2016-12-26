@@ -93,6 +93,11 @@
   [file]
   (.length ^File file))
 
+(defn fs-usable-space
+  "Return the number of available bytes on the volume where `file' lives."
+  [^File file]
+  (.getUsableSpace file))
+
 (defn canonical-path
   "Return the absolute, unique path to the file as a String."
   [file]

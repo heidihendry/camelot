@@ -709,6 +709,7 @@
 
    :camelot.import.validate
    {:camera-overlap "%s is used in multiple sessions between %s."
+    :filesystem-space "Import requires %d %s of disk space, but only %d %s is available."
     :session-dates "Media not within session dates on row: %d."
     :future-timestamp "Session end date is in the future on row: %d."
     :session-start-before-end "Session end date is before the session start date on row: %d."}

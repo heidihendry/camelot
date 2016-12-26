@@ -5,7 +5,14 @@
    [camelot.util.date :as date]
    [camelot.translation.core :as tr]
    [clj-time.format :as tf]
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [camelot.util.file :as file]
+   [camelot.util.config :as config]
+   [clojure.tools.logging :as log]))
+
+(def record-size-safety-threshold
+  "Disk space relative to the raw file size required to upload."
+  1.15)
 
 (defn check-media-within-session-date
   "Return a fail result if the media capture date is outside of the session dates."
@@ -113,6 +120,27 @@
        (remove #(empty? (:overlaps %)))
        (map (partial overlap-fail-with-reason state))))
 
+(defn check-filesystem-space
+  [state records]
+  (let [record-size (->> records
+                         (map :absolute-path)
+                         (map file/length)
+                         (reduce + 0))
+        avail (->> (get-in state [:config :path :media])
+                   file/->file
+                   file/canonical-path
+                   file/->file
+                   file/fs-usable-space)
+        needed (* record-size record-size-safety-threshold)]
+    (log/info (str "size: " record-size))
+    (log/info (str "avail: " avail))
+    (if (> needed avail)
+      [{:result :fail
+        :reason (tr/translate state ::filesystem-space
+                              (long (/ needed 1024 1024)) "MB"
+                              (long (/ avail 1024 1024)) "MB")}]
+      [])))
+
 (defn list-record-problems
   "Apply tests to each record, returning all failures."
   ([state records]
@@ -133,7 +161,8 @@
 (defn list-dataset-problems
   "Validate records, returning any dataset level problems."
   [state records]
-  (let [tests {::camera-overlaps check-overlapping-camera-usage}]
+  (let [tests {::camera-overlaps check-overlapping-camera-usage
+               ::filesystem-space check-filesystem-space}]
     (mapcat (fn [[t f]] (map #(assoc % :test t) (f state records))) tests)))
 
 (defn validate
