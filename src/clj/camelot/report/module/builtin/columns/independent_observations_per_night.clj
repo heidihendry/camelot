@@ -11,7 +11,7 @@
         (or (nil? nights) (zero? nights)) "-"
         :else (format "%.3f" (* 100 (double (/ obs nights)))))))
 
-(defn- calculate-independent-observations-per-night
+(defn calculate-independent-observations-per-night
   [state data]
   (map #(assoc % :independent-observations-per-night
                (get-nights-per-independent-observation %))
