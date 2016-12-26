@@ -265,8 +265,8 @@
                 :record r}))
         (>!! (get-in state [:importer :queue-chan])
              {:state state
-              :type :delay
-              :delay (delay (survey/set-bulk-import-mode! state survey-id false))})
+              :type :finish
+              :handler (delay (survey/set-bulk-import-mode! state survey-id false))})
         nil))))
 
 (defn import-with-mappings

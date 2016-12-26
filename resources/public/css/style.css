@@ -157,7 +157,7 @@ a:hover {
   height: calc(100vh - 6rem);
   top: 6rem;
   z-index: 900;
-  transition: right 0.5s ease-in-out;
+  transition: right 0.2s ease-in-out;
   border: 1px solid #999;
   box-shadow: 10px 15px 60px 1px #333;
   border-top-left-radius: 1rem;
@@ -1733,14 +1733,18 @@ pre.field-input {
     right: 0;
     color: #333;
     max-height: 0;
-    transition: all 0.3s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
     overflow: hidden;
     cursor: default;
+    opacity: 0;
+    width: 0;
+    max-height: 0;
+    box-shadow: 0px 3px 10px 1px #999;
 }
 #bulk-import-details-panel.expanded {
     width: 50rem;
     max-height: 15rem;
-    box-shadow: 0px 3px 10px 1px #999;
+    opacity: 1;
 }
 .bulk-import-sample-image {
     padding-top: 2rem;
@@ -1778,4 +1782,7 @@ pre.field-input {
 #bulk-import-details-panel .bulk-import-status.bulk-import-failure {
     color: #aa3311;
     cursor: pointer;
+}
+#bulk-import-details-panel .bulk-import-status.bulk-import-cancelled {
+    color: #aa3311;
 }

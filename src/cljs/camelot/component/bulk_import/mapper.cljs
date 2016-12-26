@@ -168,9 +168,14 @@
                 {:opts {:active-key :show-import-status-dialog
                         :title (tr/translate ::import-status-dialog-title)
                         :body (dom/div nil (om/build import-status-component data))
+                        :closable false
                         :actions (dom/div #js {:className "button-container"}
                                           (dom/button #js {:className "btn btn-primary"
                                                            :ref "action-first"
+                                                           :disabled (when (= (:import-status data) :initialising)
+                                                                       "disabled")
+                                                           :title (when (= (:import-status data) :initialising)
+                                                                    (tr/translate ::please-wait))
                                                            :onClick #(do
                                                                        (om/update! data :show-import-status-dialog false)
                                                                        (om/update! data :import-status nil))}
@@ -230,7 +235,9 @@
                               (dom/div #js {:className "button-container pull-right"}
                                        (om/build cancel-button-component data)
                                        (dom/button #js {:className "btn btn-primary"
-                                                        :disabled (if (:validation-problem data) "disabled" nil)
+                                                        :disabled (when (or (:validation-problem data)
+                                                                            (:show-import-status-dialog data))
+                                                                    "disabled")
                                                         :onClick #(submit-mappings data)
                                                         :title (:reason vs)}
                                                    (tr/translate :words/submit)))))))

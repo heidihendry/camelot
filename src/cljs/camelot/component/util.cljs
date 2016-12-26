@@ -44,7 +44,7 @@
       :else nil)))
 
 (defn prompt-component
-  [data owner {:keys [active-key title body actions]}]
+  [data owner {:keys [active-key title body actions closable]}]
   (reify
     om/IInitState
     (init-state [_]
@@ -53,7 +53,8 @@
     (did-update  [_ _ _]
       (let [focused (om/get-state owner :focused)]
         (when (and (get data active-key) (not focused))
-          (.focus (om/get-node owner "close-button"))
+          (if-let [cl (om/get-node owner "close-button")]
+            (.focus cl))
           (om/set-state! owner :focused true))
         (when (and (not (get data active-key)) focused)
           (om/set-state! owner :focused false))))
@@ -69,9 +70,10 @@
                              :onKeyDown #(when (= (.-keyCode %) escape-keycode)
                                            (om/update! data active-key false))
                              :ref "dialog"}
-                        (dom/button #js {:className "pull-right fa fa-times btn-flat"
-                                         :ref "close-button"
-                                         :onClick #(om/update! data active-key false)})
+                        (when-not (= closable false)
+                          (dom/button #js {:className "pull-right fa fa-times btn-flat"
+                                           :ref "close-button"
+                                           :onClick #(om/update! data active-key false)}))
                         (dom/div #js {:className "prompt-title"}
                                  title)
                         (dom/div #js {:className "prompt-body"}
@@ -81,4 +83,5 @@
                                  actions))
                (dom/div #js {:className "tabguard"
                              :tabIndex "0"
-                             :onFocus #(.focus (om/get-node owner "close-button"))})))))
+                             :onFocus #(if-let [cl (om/get-node owner "close-button")]
+                                         (.focus cl))})))))

@@ -295,7 +295,7 @@
     :survey-settings "Settings"
     :title "Settings"
     :erroneous-infrared-threshold.label "Erroneous Infrared Threshold"
-    :erroneous-infrared-threshold.description "Value between 0.0 and 1.0 to set the treshold for date/time error detection"
+    :erroneous-infrared-threshold.description "Value between 0.0 and 1.0 to set the threshold for date/time error detection"
     :infrared-iso-value-threshold.label "Infrared ISO Value Threshold"
     :infrared-iso-value-threshold.description "ISO value of the photos beyond which it is considered 'night'"
     :sighting-independence-minutes-threshold.label "Sighting Independence Threshold (mins)"
@@ -488,7 +488,7 @@
    {:new-camera-name-placeholder "New camera name..."
     :invalid-title "A camera name was not provided or a camera with this name already exists."
     :filter-cameras "Filter cameras..."
-    :confirm-delete "Are you sure you want to delete this camera? This will also delet any associated media."
+    :confirm-delete "Are you sure you want to delete this camera? This will also delete any associated media."
     :blank-filter-advice "You can add cameras using the input field below"
     :blank-item-name "cameras"}
 
@@ -720,11 +720,11 @@
     :validation-mismatch "One or more fields do not have the necessary data to satisfy the assigned mappings."
     :import-started "Bulk import has started. You can continue using Camelot while the import is underway, and view its status at any time using the menu item near the top right-hand corner, as pictured below."
     :progress-bar-label "Import progress"
-    :estimated-time-remaining "Estimated time remaining"
     :import-failed "Bulk import failed to start. This might be a bug. Technical details of the error follow:"
     :validation-problem "Some inconsistencies have been found with data to be imported. As a result the import has been aborted. These inconsistencies are detailed below."
     :sample-ui "An example image of the UI."
     :initialising "Preparing to start the bulk import. Please wait."
+    :please-wait "Please wait for the import to commence."
     :status-code "Status code"
     :validation-missing "One or more required fields do not have a mapping assigned."
     :validation-passed "Submit mappings for import."}
@@ -773,10 +773,13 @@
 
    :camelot.component.nav
    {:bulk-import-progress-label "Progress of bulk import"
+    :bulk-import-status "Details about a runing bulk import."
     :bulk-import-failures "Some records have failed to import. Click for more information."
     :bulk-import-success "All media imported successfully."
     :bulk-import-complete "Import complete"
     :bulk-import-complete-with-errors "Import complete (with errors)"
-    :bulk-import-calculating "Calculating time remaining..."}
+    :bulk-import-cancelled "Import cancelled"
+    :bulk-import-calculating "Calculating time remaining..."
+    :bulk-import-time-remaining "Estimated time remaining"}
 
    :missing "[Translation missing]"})

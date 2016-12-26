@@ -284,7 +284,8 @@
                                   :session {:language (:value (:language data))})))
 
   (context "/importer" {session :session state :system}
-           (GET "/" [] (r/response (importer/importer-state state))))
+           (GET "/" [] (r/response (importer/importer-state state)))
+           (POST "/cancel" [] (r/response (importer/cancel-import state))))
 
   (GET "/" _ (retrieve-index))
   (POST "/quit" [] (System/exit 0))
