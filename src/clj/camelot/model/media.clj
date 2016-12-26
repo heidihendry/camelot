@@ -143,8 +143,8 @@
 (s/defn delete!
   [state :- State
    id :- s/Num]
-  (let [fs (map #(str :media-filename "." :media-format)
-               (get-specific state id))]
+  (let [fs (map #(str (:media-filename %) "." (:media-format %))
+                (get-specific state id))]
     (db/with-db-keys state -delete! {:media-id id})
     (delete-files! state fs))
   nil)

@@ -186,7 +186,6 @@
                                                                                                      (navigate-bypassing-bulk-import)))}
                                                                      (tr/translate ::create-only))
                                                          (dom/button #js {:className "btn btn-primary"
-                                                                          :ref "action-first"
                                                                           :onClick #(create-survey data true
                                                                                                    (fn [surv-resp]
                                                                                                      (nav/analytics-event "org-survey-create" "nav-to-bulk-import")

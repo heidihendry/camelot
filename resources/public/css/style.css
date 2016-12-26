@@ -827,6 +827,20 @@ pre.field-input {
 #app .library .details .data {
     min-height: 1rem;
 }
+#app .library .details-container .details {
+    flex-grow: 1;
+}
+#app .library .details-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 16.5rem);
+}
+#app .library .media-delete-button {
+    position: relative;
+    float: right;
+    padding: 0.5rem 1rem;
+    width: auto;
+}
 #app .library label {
     font-size: 85%;
     font-weight: normal;
@@ -1687,9 +1701,13 @@ pre.field-input {
 #app .prompt-dialog .prompt-body {
     margin: 3rem 0;
 }
+
 #app .prompt-dialog .prompt-actions {
     padding-top: 1rem;
     border-top: 1px solid #ccc;
+}
+#app .prompt-dialog .prompt-actions .button-container {
+    text-align: right;
 }
 #app .btn-flat {
     background: none;

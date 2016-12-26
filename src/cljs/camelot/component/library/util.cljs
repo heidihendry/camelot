@@ -33,6 +33,12 @@
   [media-id]
   (get-in (state/library-state) [:search :results media-id]))
 
+(defn delete-with-id!
+  [media-id]
+  (om/transact! (state/library-state) [:search :results] #(dissoc % media-id))
+  (om/transact! (state/library-state) [:search-results :all-ids]
+                (fn [ms] (remove #(= media-id %) ms))))
+
 (defn load-library-callback
   [resp]
   (om/update! (state/library-state) :selected-media-id nil)

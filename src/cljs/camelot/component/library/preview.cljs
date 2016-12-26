@@ -111,7 +111,12 @@
                (dom/h4 nil (tr/translate :words/details))
                (let [selected (util/find-with-id (:selected-media-id data))]
                  (if selected
-                   (om/build mcp-details-breakdown selected)
+                   (dom/div #js {:className "details-container"}
+                            (om/build mcp-details-breakdown selected)
+                            (dom/div nil
+                                     (dom/button #js {:className "btn btn-default media-delete-button fa fa-trash"
+                                                      :onClick #(om/update! data :show-delete-media-prompt true)}
+                                                 " " (tr/translate :words/delete))))
                    (dom/div nil photo-not-selected)))))))
 
 (defn details-panel-class

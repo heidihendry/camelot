@@ -4,10 +4,12 @@
             [camelot.rest :as rest]
             [camelot.state :as state]
             [camelot.util.filter :as filter]
+            [camelot.component.util :as cutil]
             [camelot.component.library.util :as util]
             [camelot.component.library.search :as search]
             [camelot.component.library.preview :as preview]
             [camelot.component.library.collection :as collection]
+            [camelot.translation.core :as tr]
             [cljs.reader :as reader]
             [clojure.string :as str]
             [camelot.nav :as nav]))
@@ -67,6 +69,14 @@
                 (map :media-id (filter/only-matching search (deref (:search data))
                                                      (deref (:species data)))))))
 
+(defn delete-media!
+  [data id]
+  (rest/delete-x (str "/media/" id)
+                 #(do
+                    (om/update! data :show-delete-media-prompt false)
+                    (util/delete-with-id! id)
+                    (om/update! data :selected-media-id nil))))
+
 (defn library-view-component
   "Render a collection of library."
   [data owner {:keys [restricted-mode]}]
@@ -107,6 +117,22 @@
                    (if restricted-mode
                      (set! (.-tincan js/window) (partial tincan-listener lib))
                      (om/build search/search-component lib))
+                   (dom/div #js {:className "media-control-panel"}
+                            (om/build cutil/prompt-component lib
+                                      {:opts {:active-key :show-delete-media-prompt
+                                              :title (tr/translate ::delete-media-title)
+                                              :body (dom/div nil
+                                                             (dom/p #js {:className "delete-media-question"}
+                                                                    (tr/translate ::delete-media-question)))
+                                              :actions (dom/div #js {:className "button-container"}
+                                                                (dom/button #js {:className "btn btn-default"
+                                                                                 :ref "action-first"
+                                                                                 :onClick #(om/update! lib :show-delete-media-prompt false)}
+                                                                            (tr/translate :words/cancel))
+                                                                (dom/button #js {:className "btn btn-primary"
+                                                                                 :ref "action-first"
+                                                                                 :onClick #(delete-media! lib (:selected-media-id lib))}
+                                                                            (tr/translate :words/delete)))}}))
                    (dom/div #js {:className "library-body"}
                             (when (get-in lib [:search-results])
                               (om/build collection/media-collection-component lib))

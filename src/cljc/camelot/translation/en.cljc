@@ -13,6 +13,7 @@
     :continue "Continue"
     :citation "Citation"
     :close "Close"
+    :confirm "Confirm"
     :create "Create"
     :next "Next"
     :date "Date"
@@ -495,6 +496,10 @@
    :camelot.component.camera.manage
    {:validation-failure-title "Fix the errors above before submitting."
     :update-camera "Update Camera"}
+
+   :camelot.component.library.core
+   {:delete-media-question "Do you really want to delete this media?"
+    :delete-media-title "Confirm Delete"}
 
    :camelot.component.library.collection
    {:upload-advice "Add media by adding Camera Trap Stations, adding Camera Checks to those, and then Upload Media in your survey."
