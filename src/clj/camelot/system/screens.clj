@@ -1,7 +1,6 @@
 (ns camelot.system.screens
   (:require
    [smithy.core :refer [defsmith] :as smithy]
-   [camelot.import.util :as putil]
    [camelot.translation.core :as tr]
    [clojure.string :as str]))
 
