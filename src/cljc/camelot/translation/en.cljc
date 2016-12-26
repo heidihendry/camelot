@@ -24,7 +24,6 @@
     :hide "Hide"
     :import "Import"
     :in "in"
-    :not-available "N/A"
     :name "Name"
     :notes "Notes"
     :or "Or"
@@ -318,7 +317,11 @@
     :surveyed-species.label "Survey Species"
     :surveyed-species.description "A list of species included in this survey."
     :required-fields.label "Required Fields"
-    :required-fields.description "A list of the fields required to be in the metadata."}
+    :required-fields.description "A list of the fields required to be in the metadata."
+    :species-name-style-scientific "Scientific name"
+    :species-name-style-common "Common name"
+    :species-name-style.label "Species name style"
+    :species-name-style.description "Style of name to show when identifying species"}
 
    :actionmenu
    {:title "Actions"}

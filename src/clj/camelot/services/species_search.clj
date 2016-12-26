@@ -35,9 +35,9 @@
     (json/parse-string (:body r))))
 
 (defn common-name
-  [state names]
+  [state names default-name]
   (if (zero? (count names))
-    "N/A"
+    default-name
     (get (first names) "name")))
 
 (defn rank=
@@ -56,7 +56,8 @@
   (let [clsn (or (get-in result ["classification"])
                  (get-in result ["accepted_name" "classification"]))
         names (or (get-in result ["common_names"])
-                  (get-in result ["accepted_name" "common_names"]))]
+                  (get-in result ["accepted_name" "common_names"]))
+        default-name (str (get result "genus") " " (get result "species"))]
     (ataxonomy/tassociated-taxonomy
      {:taxonomy-class (classification-for clsn "Class")
       :taxonomy-order (classification-for clsn "Order")
@@ -64,7 +65,7 @@
       :taxonomy-genus (get result "genus")
       :taxonomy-species (get result "species")
       :citation (get result "bibliographic_citation")
-      :taxonomy-common-name (common-name state names)
+      :taxonomy-common-name (common-name state names default-name)
       :survey-id survey-id})))
 
 (defn get-taxonomy-for-id

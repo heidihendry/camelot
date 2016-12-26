@@ -443,11 +443,16 @@
               :endpoint "/settings"}
    :layout [[:label (tr/translate state :settings/survey-settings)]
             [:sighting-independence-minutes-threshold]
+            [:species-name-style]
             [:send-usage-data]]
    :schema {:language {:type :select
                        :required true
                        :options {:en (tr/translate state :language/en)
                                  :vn (tr/translate state :language/vn)}}
+            :species-name-style {:type :select
+                                :required true
+                                 :options {"scientific" (tr/translate state :settings/species-name-style-scientific)
+                                           "common" (tr/translate state :settings/species-name-style-common)}}
             :send-usage-data {:type :boolean}
             :sighting-independence-minutes-threshold {:type :number
                                                       :required true}}

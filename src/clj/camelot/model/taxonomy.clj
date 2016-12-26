@@ -3,7 +3,8 @@
    [schema.core :as s]
    [yesql.core :as sql]
    [camelot.system.state :refer [State]]
-   [camelot.util.db :as db]))
+   [camelot.util.db :as db]
+   [camelot.util.config :as config]))
 
 (sql/defqueries "sql/taxonomy.sql")
 
@@ -47,13 +48,15 @@
 
 (defn- add-label
   "Assoc a key for the label, which is a computed value."
-  [rec]
+  [state rec]
   (assoc rec :taxonomy-label
-         (format "%s %s" (:taxonomy-genus rec) (:taxonomy-species rec))))
+         (if (= "common" (config/lookup state :species-name-style))
+           (:taxonomy-common-name rec)
+           (format "%s %s" (:taxonomy-genus rec) (:taxonomy-species rec)))))
 
 (s/defn get-all :- [Taxonomy]
   [state :- State]
-  (map (comp taxonomy add-label)
+  (map (comp taxonomy (partial add-label state))
        (db/clj-keys (db/with-connection state -get-all))))
 
 (s/defn get-all-for-survey :- [Taxonomy]
@@ -61,7 +64,7 @@
    survey-id :- s/Int]
   (some->> {:survey-id survey-id}
            (db/with-db-keys state -get-all-for-survey)
-           (map add-label)
+           (map (partial add-label state))
            (map taxonomy)))
 
 (s/defn get-specific :- (s/maybe Taxonomy)
@@ -70,7 +73,7 @@
   (some->> {:taxonomy-id id}
            (db/with-db-keys state -get-specific)
            first
-           add-label
+           (add-label state)
            taxonomy))
 
 (s/defn get-specific-by-taxonomy :- (s/maybe Taxonomy)
@@ -79,27 +82,27 @@
   (some->> data
            (db/with-db-keys state -get-specific-by-taxonomy)
            first
-           add-label
+           (add-label state)
            taxonomy))
 
 (s/defn create! :- Taxonomy
   [state :- State
    data :- TTaxonomy]
   (let [record (db/with-db-keys state -create<! data)]
-    (taxonomy (add-label (get-specific state (int (:1 record)))))))
+    (taxonomy (add-label state (get-specific state (int (:1 record)))))))
 
 (s/defn clone! :- Taxonomy
   [state :- State
    data :- Taxonomy]
   (let [record (db/with-db-keys state -clone<! data)]
-    (taxonomy (add-label (get-specific state (int (:1 record)))))))
+    (taxonomy (add-label state (get-specific state (int (:1 record)))))))
 
 (s/defn update! :- Taxonomy
   [state :- State
    id :- s/Int
    data :- TTaxonomy]
   (db/with-db-keys state -update! (merge data {:taxonomy-id id}))
-  (taxonomy (add-label (get-specific state id))))
+  (taxonomy (add-label state (get-specific state id))))
 
 (s/defn delete!
   [state :- State

@@ -30,7 +30,9 @@
                (dom/div #js {:className "pull-right fa fa-times remove top-corner"
                              :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-title"}
-                         (:taxonomy-label data))
+                         (:taxonomy-genus data)
+                         " "
+                         (:taxonomy-species data))
                (dom/span #js {:className "menu-item-description"}
                          (when (:taxonomy-common-name data)
                            (dom/div nil

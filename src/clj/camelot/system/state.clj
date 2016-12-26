@@ -26,6 +26,7 @@
    :infrared-iso-value-threshold 999
    :language :en
    :send-usage-data false
+   :species-name-style "scientific"
    :root-path nil
    :night-end-hour 5
    :night-start-hour 21
@@ -241,8 +242,10 @@ Throws an IOException if the file cannot be read."
 (defn save-config
   "Save the configuration file.  Overwrites existing."
   [config]
-  (let [sc (serialise-dates config)]
-    (save-config-helper (assoc-root-dir sc) true)))
+  (-> config
+      serialise-dates
+      assoc-root-dir
+      (save-config-helper true)))
 
 (defn final-db-path
   []

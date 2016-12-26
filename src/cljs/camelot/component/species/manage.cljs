@@ -83,7 +83,7 @@
     (rest/post-x "/taxonomy"
                  {:data (merge {:taxonomy-genus (first segments)
                                 :taxonomy-species (second segments)
-                                :taxonomy-common-name "N/A"
+                                :taxonomy-common-name (str (first segments) " " (second segments))
                                 :survey-id (state/get-survey-id)})}
                  (partial add-taxonomy-success-handler data extch)))
   (nav/analytics-event "library-id" "taxonomy-create"))
@@ -200,6 +200,7 @@
                  (do
                    (om/transact! data :species #(conj % {:taxonomy-id (:taxonomy-id (first (:body x)))
                                                          :taxonomy-label (str (:genus taxonomy) " " (:species taxonomy))
+                                                         :taxonomy-common-name (str (:genus taxonomy) " " (:species taxonomy))
                                                          :taxonomy-species (:species taxonomy)
                                                          :taxonomy-genus (:genus taxonomy)}))))))
 

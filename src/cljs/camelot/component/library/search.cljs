@@ -415,7 +415,7 @@
     (rest/post-x "/taxonomy"
                  {:data (merge {:taxonomy-genus (first segments)
                                 :taxonomy-species (second segments)
-                                :taxonomy-common-name (tr/translate :words/not-available)}
+                                :taxonomy-common-name (str (first segments) " " (second segments))}
                                (if (and (:survey-id data) (not= (:survey-id data) -1))
                                  {:survey-id (:survey-id data)}
                                  {}))}
