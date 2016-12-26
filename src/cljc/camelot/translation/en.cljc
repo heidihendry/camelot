@@ -780,6 +780,7 @@
     :bulk-import-complete-with-errors "Import complete (with errors)"
     :bulk-import-cancelled "Import cancelled"
     :bulk-import-calculating "Calculating time remaining..."
-    :bulk-import-time-remaining "Estimated time remaining"}
+    :bulk-import-time-remaining "Estimated time remaining"
+    :bulk-import-failed-paths "The following files failed to import"}
 
    :missing "[Translation missing]"})

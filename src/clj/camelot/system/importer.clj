@@ -28,13 +28,14 @@
                           (close! cmd-chan)
                           (throw (InterruptedException.)))
                 :new (when (and (zero? (count (.buf queue-chan)))
-                                (deref (get-in (:state msg) [:importer :pending])))
+                                (zero? (deref (get-in (:state msg) [:importer :pending]))))
                        (dosync
                         (ref-set (get-in (:state msg) [:importer :start-time]) (t/now))
                         (ref-set (get-in (:state msg) [:importer :end-time]) nil)
                         (ref-set (get-in (:state msg) [:importer :complete]) 0)
                         (ref-set (get-in (:state msg) [:importer :ignored]) 0)
-                        (ref-set (get-in (:state msg) [:importer :failed]) 0)))
+                        (ref-set (get-in (:state msg) [:importer :failed]) 0)
+                        (ref-set (get-in (:state msg) [:importer :failed-paths]) [])))
                 :cancel (try
                           (let [b (.buf queue-chan)]
                             (when-not (zero? (count b))
@@ -88,6 +89,7 @@
                :failed (ref 0)
                :ignored (ref 0)
                :pending (ref 0)
+               :failed-paths (ref [])
                :start-time (ref nil)
                :end-time (ref nil)
                :cmd-chan cmd-chan
@@ -101,6 +103,7 @@
            :failed nil
            :ignored nil
            :pending nil
+           :failed-paths []
            :cmd-chan nil
            :queue-chan nil)))
 
@@ -113,6 +116,7 @@
             :ignored @(get-in state [:importer :ignored])
             :queued (count (.buf (get-in state [:importer :queue-chan])))}
    :start-time @(get-in state [:importer :start-time])
+   :failed-paths @(get-in state [:importer :failed-paths])
    :end-time (or @(get-in state [:importer :end-time])
                  (t/now))})
 

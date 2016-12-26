@@ -6,7 +6,8 @@
             [cljs.core.async :refer [<! chan >! timeout]]
             [camelot.rest :as rest]
             [camelot.translation.core :as tr]
-            [goog.date.duration :as duration])
+            [goog.date.duration :as duration]
+            [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 (def bulk-import-refresh-long-timeout 5000)
@@ -147,7 +148,15 @@
                               (dom/div nil
                                        (dom/label #js {:className "field-label"}
                                                   (tr/translate ::bulk-import-time-remaining))
-                                       (dom/p nil (time-remaining-estimate data progress)))))))))))
+                                       (dom/p nil (time-remaining-estimate data progress))))
+
+                            (when (pos-int? (get-in data [:import-status :counts :failed]))
+                              (dom/div nil
+                                       (dom/label nil (tr/translate ::bulk-import-failed-paths))
+                                       (dom/textarea #js {:rows "8"
+                                                          :style #js {:width "100%"}}
+                                                     (str/join "\n"
+                                                               (get-in data [:import-status :failed-paths]))))))))))))
 
 (defn bulk-import-progress-component
   "Display the bulk import status, if available."

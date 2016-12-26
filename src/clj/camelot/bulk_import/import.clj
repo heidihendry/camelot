@@ -75,18 +75,22 @@
            (db/create-media! s)
            (db/create-sighting! s)
            (db/create-photo! s)))
-    (assoc msg :result :complete)
+    (assoc msg :result :complete
+           :absolute-path (get-in msg [:record :absolute-path]))
     (catch Exception e
       (log/error (.getMessage e))
       (log/error (str/join "\n" (map str (.getStackTrace e))))
-      (assoc msg :result :failed))))
+      (assoc msg :result :failed
+             :absolute-path (get-in msg [:record :absolute-path])))))
 
 (defn add-import-result
   "Update importer state with the latest result."
-  [state result]
+  [{:keys [state result absolute-path]}]
   (dosync
    (alter (get-in state [:importer :pending]) dec)
-   (alter (get-in state [:importer result]) inc)))
+   (alter (get-in state [:importer result]) inc)
+   (when (= result :failed)
+     (alter (get-in state [:importer :failed-paths]) conj absolute-path))))
 
 (defn media-processor
   "Setup a pipeline for parallel media import and process results."
@@ -96,7 +100,7 @@
     (async/pipeline-blocking num-importers result-chan (map do-import) ch)
     (go-loop []
       (let [msg (<! result-chan)]
-        (add-import-result (:state msg) (:result msg)))
+        (add-import-result msg))
       (recur))
     ch))
 
@@ -119,4 +123,6 @@
         (catch Exception e
           (log/error (.getMessage e))
           (log/error (str/join "\n" (map str (.getStackTrace e))))
-          (add-import-result state :failed))))))
+          (add-import-result {:state state
+                              :result :failed
+                              :absolute-path (:absolute-path record)}))))))

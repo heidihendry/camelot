@@ -1732,18 +1732,15 @@ pre.field-input {
     top: 6rem;
     right: 0;
     color: #333;
-    max-height: 0;
     transition: opacity 0.1s ease-in-out;
     overflow: hidden;
     cursor: default;
     opacity: 0;
     width: 0;
-    max-height: 0;
     box-shadow: 0px 3px 10px 1px #999;
 }
 #bulk-import-details-panel.expanded {
     width: 50rem;
-    max-height: 15rem;
     opacity: 1;
 }
 .bulk-import-sample-image {
@@ -1781,7 +1778,6 @@ pre.field-input {
 }
 #bulk-import-details-panel .bulk-import-status.bulk-import-failure {
     color: #aa3311;
-    cursor: pointer;
 }
 #bulk-import-details-panel .bulk-import-status.bulk-import-cancelled {
     color: #aa3311;
