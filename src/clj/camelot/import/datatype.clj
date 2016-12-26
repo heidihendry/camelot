@@ -92,17 +92,17 @@
       true
       false)))
 
-(defn- could-be-yes-no?
+(defn could-be-yes-no?
   [x]
   (or (empty? x)
       (seq (re-matches #"^(?i)y(es)?|n(o)?$" x))))
 
-(defn- could-be-zero-one?
+(defn could-be-zero-one?
   [x]
   (or (empty? x)
       (seq (re-matches #"0|1" x))))
 
-(defn- could-be-true-false?
+(defn could-be-true-false?
   [x]
   (or (empty? x)
       (seq (re-matches #"^(?i)T(rue)?|F(alse)?$" x))))
@@ -174,57 +174,64 @@
   [x]
   (if (seq x) true false))
 
-(defn check-possible
-  [token checkfn xs]
-  (when (every? checkfn xs)
-    token))
+(def constraint-check-fns
+  "Mapping between constraint token and its predicate"
+  {:required could-be-required?})
+
+(def datatype-check-fns
+  "Mapping between the datatype token and its predicate."
+  {:timestamp could-be-timestamp?
+   :date could-be-date?
+   :number could-be-number?
+   :integer could-be-integer?
+   :readable-integer could-be-readable-integer?
+   :boolean could-be-boolean?
+   :latitude could-be-latitude?
+   :longitude could-be-longitude?
+   :sex could-be-sex?
+   :lifestage could-be-lifestage?
+   :file could-be-file?
+   :string (constantly true)})
+
+(defn matches-all
+  "Given a mapping of tokens to predicates, return the set of tokens which all
+  items in a list are true."
+  [check-fns xs]
+  (disj (->> check-fns
+             (map (fn [[r cf]] (when (every? cf xs) r)))
+             set)
+        nil))
 
 (defn possible-constraints
+  "Return set of constrainst which every member of the input satisfies."
   [xs]
-  (disj (set
-         [(check-possible :required could-be-required? xs)])
-        nil))
+  (matches-all constraint-check-fns xs))
 
 (defn possible-datatypes
+  "Return set of datatypes which every member of the input satisfies."
   [xs]
-  (disj (set
-         [(check-possible :timestamp could-be-timestamp? xs)
-          (check-possible :date could-be-date? xs)
-          (check-possible :number could-be-number? xs)
-          (check-possible :integer could-be-integer? xs)
-          (check-possible :readable-integer could-be-readable-integer? xs)
-          (check-possible :boolean could-be-yes-no? xs)
-          (check-possible :boolean could-be-zero-one? xs)
-          (check-possible :boolean could-be-true-false? xs)
-          (check-possible :latitude could-be-latitude? xs)
-          (check-possible :longitude could-be-longitude? xs)
-          (check-possible :sex could-be-sex? xs)
-          (check-possible :lifestage could-be-lifestage? xs)
-          (check-possible :file could-be-file? xs)
-          :string])
-        nil))
+  (matches-all datatype-check-fns xs))
 
-(defn deserialiser
-  [schema]
-  (case (or (:validation-type schema)
-            (:datatype schema))
-    :integer edn/read-string
-    :readable-integer edn/read-string
-    :number edn/read-string
-    :sex as-sex
-    :lifestage as-lifestage
-    :timestamp as-datetime
-    :date as-date
-    :longitude edn/read-string
-    :latitude edn/read-string
-    :boolean as-boolean
-    :file io/file
-    :string identity))
+(def deserialisers
+  "Mapping between effective datatypes and its deserialisation function."
+  {:integer edn/read-string
+   :readable-integer edn/read-string
+   :number edn/read-string
+   :sex as-sex
+   :lifestage as-lifestage
+   :timestamp as-datetime
+   :date as-date
+   :longitude edn/read-string
+   :latitude edn/read-string
+   :boolean as-boolean
+   :file io/file})
 
 (defn deserialise
+  "Deserialise a string given its field and (optionally) given a map of schemas."
   ([schemas field str-value]
    (if-let [s (get schemas field)]
-     (let [f (deserialiser s)]
-       (f str-value))))
+     (if-let [f (get deserialisers (model/effective-datatype s))]
+       (f str-value)
+       str-value)))
   ([field str-value]
    (deserialise model/all-mappable-fields field str-value)))

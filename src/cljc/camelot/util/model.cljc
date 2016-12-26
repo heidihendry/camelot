@@ -1,5 +1,5 @@
 (ns camelot.util.model
-)
+  )
 
 (def schema-definitions
   {:camera-id {:datatype :integer
@@ -276,5 +276,10 @@
   ([mappings calculated-schema translation-fn]
    (check-mapping all-mappable-fields
                   mappings calculated-schema translation-fn)))
+
+(defn effective-datatype
+  "Return the effective datatype given the schema."
+  [schema]
+  (or (:validation-type schema) (:datatype schema)))
 
 (def fields (keys schema-definitions))
