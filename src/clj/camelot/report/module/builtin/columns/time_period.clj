@@ -5,21 +5,25 @@
    [clj-time.core :as t]
    [clj-time.format :as tf]))
 
+(def month-formatter (tf/formatter "YYYY/MM"))
+
 (defn before-reducer
-  [a b]
-  (cond (nil? a) b
-        (nil? b) a
-        (pos? (compare a b)) b
-        :else a))
+  "Reducer returning the earliest date-time."
+  ([] nil)
+  ([a b]
+   (cond (nil? a) b
+         (nil? b) a
+         (pos? (compare a b)) b
+         :else a)))
 
 (defn after-reducer
-  [a b]
-  (cond (nil? a) b
-        (nil? b) a
-        (neg? (compare a b)) b
-        :else a))
-
-(def month-formatter (tf/formatter "YYYY/MM"))
+  "Reducer returning the latest date-time."
+  ([] nil)
+  ([a b]
+   (cond (nil? a) b
+         (nil? b) a
+         (neg? (compare a b)) b
+         :else a)))
 
 (defn date->period
   [from-col to-col state data]

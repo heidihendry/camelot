@@ -1,5 +1,5 @@
 (ns camelot.util.cursorise
-  )
+  "Transform map leaves to and from Om-cursor-friendly' structures.")
 
 (defn decursorise
   "Remove :value keys used for Om cursors to leaves from the configuration data."

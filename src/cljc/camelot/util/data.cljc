@@ -1,4 +1,5 @@
 (ns camelot.util.data
+  "Generic data transformation utils."
   (:require
    [clojure.string :as str]))
 
