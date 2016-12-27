@@ -718,9 +718,10 @@
    :camelot.import.validate
    {:camera-overlap "%s is used in multiple sessions between %s."
     :filesystem-space "Import requires %d %s of disk space, but only %d %s is available."
-    :session-dates "Media not within session dates on row: %d."
-    :future-timestamp "Session end date is in the future on row: %d."
-    :session-start-before-end "Session end date is before the session start date on row: %d."}
+    :session-dates "Media not within session dates. CSV row: %d."
+    :check-sighting-assignment "A sighting should be created, but not all fields have a value on. CSV row: %d."
+    :future-timestamp "Session end date is in the future.  CSV row: %d."
+    :session-start-before-end "Session end date is before the session start date. CSV row: %d."}
 
    :camelot.component.bulk-import.mapper
    {:title "Bulk Import"

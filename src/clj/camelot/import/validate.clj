@@ -50,6 +50,18 @@
     {:result :fail}
     {:result :pass}))
 
+(defn check-sighting-assignment
+  "Return failure result if any of sighting-quantity or taxonomy species/genus set, but not all."
+  [state record]
+  (let [s-vals (map #(get record %) [:sighting-quantity
+                                     :taxonomy-species
+                                     :taxonomy-genus
+                                     :taxonomy-common-name])]
+    (if (and (some? (some nil? s-vals))
+             (not (every? nil? s-vals)))
+      {:result :fail}
+      {:result :pass})))
+
 (defn overlap-reducer
   "Collate overlapping dates for a camera."
   [acc n]
@@ -132,8 +144,6 @@
                    file/->file
                    file/fs-usable-space)
         needed (* record-size record-size-safety-threshold)]
-    (log/info (str "size: " record-size))
-    (log/info (str "avail: " avail))
     (if (> needed avail)
       [{:result :fail
         :reason (tr/translate state ::filesystem-space
@@ -146,7 +156,8 @@
   ([state records]
    (let [tests {::session-dates check-media-within-session-date
                 ::future-timestamp check-session-end-date-not-in-future
-                ::session-start-before-end check-session-start-before-end}]
+                ::session-start-before-end check-session-start-before-end
+                ::check-sighting-assignment check-sighting-assignment}]
      (list-record-problems state tests records)))
   ([state tests records]
    (filter #(= (:result %) :fail)

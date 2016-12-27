@@ -39,6 +39,10 @@
             {:trap-station-session-start-date start-date
              :trap-station-session-end-date end-date})))
 
+(defn check-sighting-assignment
+  [data]
+  (:result (sut/check-sighting-assignment (gen-state) data)))
+
 (defn list-record-problems
   ([data]
    (map #(select-keys % [:row :test :result])
@@ -116,6 +120,42 @@
       (is (= (check-start-before-end (t/date-time 2016 1 1 9 35 0)
                                      (t/date-time 2016 1 1 9 30 0))
              :fail)))))
+
+(deftest test-check-sighting-assignment
+  (testing "check-sighting-assignment"
+    (testing "Should pass if each required sighting field given"
+      (is (= (check-sighting-assignment {:sighting-quantity 1
+                                         :taxonomy-species "Species"
+                                         :taxonomy-genus "Genus"
+                                         :taxonomy-common-name "Common name"})
+             :pass)))
+
+    (testing "Should fail if quantity missing"
+      (is (= (check-sighting-assignment {:taxonomy-species "Species"
+                                         :taxonomy-genus "Genus"
+                                         :taxonomy-common-name "Common name"})
+             :fail)))
+
+    (testing "Should fail if taxonomy-species missing"
+      (is (= (check-sighting-assignment {:sighting-quantity 1
+                                         :taxonomy-genus "Genus"
+                                         :taxonomy-common-name "Common name"})
+             :fail)))
+
+    (testing "Should fail if taxonomy-genus missing"
+      (is (= (check-sighting-assignment {:sighting-quantity 1
+                                         :taxonomy-species "Species"
+                                         :taxonomy-common-name "Common name"})
+             :fail)))
+
+    (testing "Should fail if common name missing"
+      (is (= (check-sighting-assignment {:sighting-quantity 1
+                                         :taxonomy-species "Species"
+                                         :taxonomy-genus "Genus"})
+             :fail)))
+
+    (testing "Should pass if no sighting fields provided"
+      (is (= (check-sighting-assignment {}) :pass)))))
 
 (deftest test-list-record-problems
   (testing "list-record-problems"

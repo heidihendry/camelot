@@ -13,13 +13,13 @@
 
 (defn run
   "Importer event loop."
-  [config cmd-chan queue-chan]
+  [config cmd-chan queue-chan async-chan]
   (go
     (let [import! (import/import-media-fn
                    (or (get-in config [:config :media-importers]) 1))]
       (try
         (loop []
-          (let [[msg ch] (alts! [cmd-chan queue-chan])]
+          (let [[msg ch] (alts! [cmd-chan queue-chan async-chan])]
             (condp = ch
 
               cmd-chan
@@ -53,6 +53,12 @@
                             (log/error (.getMessage ^Exception e))))
                 nil)
 
+              async-chan
+              (try
+                (deref (:handler msg))
+                (catch Exception e
+                  (log/error "Async handler failed with error: " (.getMessage ^Exception e))))
+
               queue-chan
               (condp = (:type msg)
                 :finish
@@ -81,8 +87,9 @@
     (if (:cmd-chan this)
       this
       (let [cmd-chan (chan)
-            queue-chan (chan (async/dropping-buffer queue-buffer-size))]
-        (run config cmd-chan queue-chan)
+            queue-chan (chan (async/dropping-buffer queue-buffer-size))
+            async-chan (chan (async/dropping-buffer queue-buffer-size))]
+        (run config cmd-chan queue-chan async-chan)
         (println "Importer started.")
         (assoc this
                :complete (ref 0)
@@ -93,7 +100,8 @@
                :start-time (ref nil)
                :end-time (ref nil)
                :cmd-chan cmd-chan
-               :queue-chan queue-chan))))
+               :queue-chan queue-chan
+               :async-chan async-chan))))
 
   (stop [this]
     (when (:cmd-chan this)
@@ -103,8 +111,11 @@
            :failed nil
            :ignored nil
            :pending nil
+           :start-time nil
+           :end-time nil
            :failed-paths []
            :cmd-chan nil
+           :async-chan nil
            :queue-chan nil)))
 
 (defn importer-state

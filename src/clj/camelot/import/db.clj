@@ -12,10 +12,14 @@
    [camelot.model.site :as site]
    [camelot.model.camera :as camera]
    [camelot.model.camera-status :as camera-status]
+   [clojure.core.async :refer [>!!]]
    [clojure.string :as str]
    [camelot.util.config :as config]
    [clojure.edn :as edn]
-   [clojure.tools.logging :as log]))
+   [clojure.tools.logging :as log]
+   [camelot.util.data :as data]
+   [camelot.model.survey-taxonomy :as survey-taxonomy]
+   [camelot.util.db :as db]))
 
 (defn get-survey
   [state record]
@@ -72,6 +76,13 @@
        (taxonomy/get-or-create! state)
        (merge record)))
 
+(defn get-or-create-survey-taxonomy!
+  [state record]
+  (->> record
+       survey-taxonomy/tsurvey-taxonomy
+       (survey-taxonomy/get-or-create! state)
+       (merge record)))
+
 (defn create-media!
   [state record]
   (->> record
@@ -91,12 +102,16 @@
 
 (defn create-sighting!
   [state record]
-  (if (and (:taxonomy-species record) (:taxonomy-genus record))
-    (let [taxonomy (get-or-create-taxonomy! state record)]
-      (if (:sighting-quantity record)
-        (->> record
-             sighting/tsighting
-             (sighting/create! state)
-             (merge record))
-        record))
+  (if (data/nat? (:sighting-quantity record))
+    (let [taxonomy (get-or-create-taxonomy! state record)
+          rec (assoc record :taxonomy-id (:taxonomy-id taxonomy))]
+      (>!! (get-in state [:importer :async-chan])
+           {:handler (delay (do
+                              (db/async-with-transaction
+                               [s state]
+                               (get-or-create-survey-taxonomy! s rec))))})
+      (->> rec
+           sighting/tsighting
+           (sighting/create! state)
+           (merge record)))
     record))

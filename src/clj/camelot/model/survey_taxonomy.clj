@@ -81,6 +81,12 @@
   (let [record (db/with-db-keys state -create<! data)]
     (survey-taxonomy (get-specific state (int (:1 record))))))
 
+(s/defn get-or-create! :- SurveyTaxonomy
+  [state :- State
+   data :- TSurveyTaxonomy]
+  (or (get-specific-by-relations state (:survey-id data) (:taxonomy-id data))
+      (create! state data)))
+
 (s/defn delete!
   [state :- State
    id :- s/Int]

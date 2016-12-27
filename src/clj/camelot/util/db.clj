@@ -8,8 +8,20 @@
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]
   `(jdbc/with-db-transaction [tx# (get-in ~state [:database :connection])]
-     (let [~bind (assoc-in ~state [:database :connection] tx#)]
+     (let [~bind (assoc-in (assoc-in ~state [:database :default-connection]
+                                     (get-in ~state [:database :connection]))
+                           [:database :connection] tx#)]
        ~@body)))
+
+(defmacro async-with-transaction
+  "Run `body' with a new transaction, created from the default connection.
+
+Intended for async operations which are already running within a transaction."
+  [[bind state] & body]
+  `(jdbc/with-db-transaction [tx# (get-in ~state [:database :connection])]
+     (let [~bind (assoc-in ~state [:database :connection]
+                         (get-in ~state [:database :default-connection]))]
+     ~@body)))
 
 (defn- clj-key
   "Reducer for translating from database types.
