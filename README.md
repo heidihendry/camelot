@@ -258,6 +258,11 @@ If you need to know which species have already identified in a photo, these can 
 
 The identification details entered will be applied to all photos currently selected.
 
+#### Removing photos
+**Coming in Camelot 1.1.0**
+
+The currently viewed photo, if no longer required, can be removed via the Delete button located at the bottom of the Details sidebar.
+
 #### Searching
 
 ![](doc/screenshot/library-search-bar.png)
@@ -326,11 +331,12 @@ With the Media Collection panel focused (**Control + m**):
 
 ### Settings
 
-In the top right hand corner of the main navigation is the toggle to show the settings menu.  The settings menu in Camelot currently provides two options:
+In the top right hand corner of the main navigation is the toggle to show the settings menu.  The settings menu in Camelot provides several options:
 
 ![](doc/screenshot/settings.png)
 
-* **Sighting Independence Threshold**: Camelot performs sighting independence checks on some reports.  This setting controls the duration within which photos of the same species (and, if known, the same sex and life-stage) are considered dependent in those reports.
+* **Sighting Independence Threshold**: Camelot performs sighting independence checks on some reports.  This setting controls the duration within which photos of the same species (and, if known, the same sex and life-stage) are considered dependent in those reports.  Default is 20 minutes.
+* **Species name style**: *coming in 1.1.0* whether species scientific or common names should be shown by default.  Default is scientific names.
 * **Send anonymous usage data**: Enabled this option will provide data about how you use Camelot back to the Camelot Project. This data is anonymous and is used only for the purpose of improving Camelot. It is disabled by default, though if you have the consent of others using your Camelot instance, please consider enabling this.
 
 ### Reports
@@ -436,7 +442,7 @@ First, every mappable field in Camelot must have its own column in the CSV.  For
 * **Path name**: (e.g., *Absolute path*) Must be a path name to a readable file.
 * **Integer**: (e.g., *Sighting quantity*) Must be an integer.
 
-Camelot has two sections of fields: those which are required, and those which are optional.  For a required field, every cell in the mapped column must have a valid value.  For an optional column, some cells may be blank (though non-blank cells must be valid for that field type).
+The mapping screen offers a separate section for required and optional of fields.  For a required field, every cell in the mapped column must have a valid value.  For an optional column, some cells may be blank (though non-blank cells must be valid for that field type).
 
 ##### Bulk Import when running Camelot in a client/server model
 
