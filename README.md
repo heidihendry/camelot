@@ -80,7 +80,9 @@ The left hand side is the current survey configuration.  You can give a survey a
 
 ![](doc/screenshot/survey-create.png)
 
-Once ready, click "Create Survey".  At this stage you will be prompted asking whether you already have the data available for the survey to do a Bulk Import.  If you have already collected all of the media for this survey, you may wish to select "Create and import".  Refer to [Bulk Import](#bulk-import) for more information for Bulk Imports.
+Once ready, click "Create Survey".
+
+**Camelot 1.1.0 onwards** At this stage you will be prompted asking whether you already have the data available for the survey to do a Bulk Import.  If you have already collected all of the media for this survey, you may wish to select "Create and import".  Refer to [Bulk Import](#bulk-import) for more information.
 
 ![](doc/screenshot/survey-bulk-import-prompt.png)
 
@@ -420,17 +422,15 @@ A Bulk Import in Camelot provides a means to import a survey's worth of data at 
 
 #### Step 1: Creating a CSV
 
-The first thing to know is that a Bulk Import is a 2-step process, with the first step being to create a CSV.  If you already have all of the data for every media file, you can move straight to the next step.  However Camelot is a tool for data management, which usually means the data, well, may not quite be managed yet.  But that's okay.  A common source of data is one of, or a combination of spreadsheets and image tags.  Camelot tries to make both of these scenarios easy to manage.
+The first thing to know is that a Bulk Import is a 2-step process, with the first step being to create a CSV.  If you already have all of the data for every media file, you can move straight to the next step.  However Camelot is a tool for data management, which usually means the data, well, may not be quite managed yet.  But that's okay.  A common source of data is one of, or a combination of, spreadsheets, folder names and image tags, and so the focus of Step 1 is collating the latter two pieces of information into a spreadsheet where you can use your spreadsheet prowess to fill in the blanks.
 
-Step 1 is pretty simple: you give Camelot a folder path (which can be copied out of the address bar in Windows Explorer or Finder on OSX), and it gives you back a CSV file as a download.  The CSV file contains a row for every image, and columns for the file's location, the file metadata, and folder names (labelled `Path Component 1-n`).
+In Step 1, you will enter the path to a folder containing all of the images for a single survey (this path can be copied out of the address bar in Windows Explorer or Finder on OSX). Camelot will take a moment to scan this directory and give you back a CSV file as a download.  The CSV file contains a row for every image, and columns for the file's location, the file metadata, and folder names (labelled `Path Component 1-n`).
 
-This process often results in a CSV containing hundreds of columns and tens of thousands of rows, and so can take some time to generate.  You can take this CSV and move on to Step 2.  It may be that there is yet some additional data that needs to be added to the CSV, though Camelot will indicate what data is required and if there are any mismatches.  If adding data manually, see below for the nitty-gritty about the input formats Camelot caters for.
+The resulting CSV often contains hundreds of columns and tens of thousands of rows, and so can take some time to generate.  You can take this CSV and move on to Step 2.  It may be that there is yet some additional data that needs to be added to the CSV, though in the Step 2 Camelot will indicate the data is required, if there are any mismatches.  If adding data manually, see below for the nitty-gritty about what Camelot expects from the data.
 
 ##### Data expectations
 
-Depending on how much data can be gleamed from the aforementioned sources, there may be additional data you need to add in to this CSV manually before it can be uploaded.  This might include the Site Name, Camera Name, Trap Station Name, GPS Longitude and Latitude and session start and end dates.
-
-It may also be that some data from other sources is not comprehensive, and needs to be manually added to in some places.  This is the guide to *how* that data should be represented in the CSV.
+Depending on how much data can be gleamed from the aforementioned sources, there may be additional data you need to add in to this CSV manually before it can be uploaded.  This might include the Site Name, Camera Name, Trap Station Name, GPS Longitude and Latitude and session start and end dates.  This is the guide to *how* that data should be represented in the CSV.
 
 First, every mappable field in Camelot must have its own column in the CSV.  For example, Camelot's session start and end dates cannot be represented by a single column which contains a date range.  It must be represented by two columns.  The exact format of the different types of data are below:
 
@@ -442,7 +442,7 @@ First, every mappable field in Camelot must have its own column in the CSV.  For
 * **Path name**: (e.g., *Absolute path*) Must be a path name to a readable file.
 * **Integer**: (e.g., *Sighting quantity*) Must be an integer.
 
-The mapping screen offers a separate section for required and optional of fields.  For a required field, every cell in the mapped column must have a valid value.  For an optional column, some cells may be blank (though non-blank cells must be valid for that field type).
+The mapping screen in Step 2 offers a separate section for required and optional of fields.  For a required field, every cell in the mapped column must have a valid value.  For an optional column, some cells may be blank (though non-blank cells must be valid for that field type).
 
 ##### Bulk Import when running Camelot in a client/server model
 
