@@ -565,14 +565,55 @@
                         :sighting-quantity 1}]
             state (gen-state-helper config)]
         (is (= (sut/extract-independent-sightings state sightings) '({:species-id 1
-                                                                      :count 1})))))))
+                                                                      :count 1})))))
+
+    (testing "Copes with species ID without a sighting quantity"
+      (let [sightings [{:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                        :taxonomy-id 3
+                        :trap-station-session-id 1
+                        :media-id 1}
+                       {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                        :taxonomy-id 1
+                        :taxonomy-genus "Yellow"
+                        :taxonomy-species "Spotted Housecat"
+                        :sighting-lifestage "Juvenile"
+                        :sighting-sex "F"
+                        :sighting-quantity 1}]
+            state (gen-state-helper config)]
+        (is (= (sut/extract-independent-sightings state sightings)
+               '({:species-id 1 :count 1})))))
+
+    (testing "Copes with sighting quantity without a taxonomy ID"
+      (let [sightings [{:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                        :sighting-quantity 1
+                        :trap-station-session-id 1
+                        :media-id 1}
+                       {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                        :taxonomy-id 1
+                        :taxonomy-genus "Yellow"
+                        :taxonomy-species "Spotted Housecat"
+                        :sighting-lifestage "Juvenile"
+                        :sighting-sex "F"
+                        :sighting-quantity 1}]
+            state (gen-state-helper config)]
+        (is (= (sut/extract-independent-sightings state sightings)
+               '({:species-id 1 :count 1})))))))
 
 (deftest test-->independent-sightings
   (testing "Sighting independence"
     (testing "Records without sightings are excluded"
       (let [record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                    :trap-station-session-id 1
                     :taxonomy-id nil
                     :sighting-quantity nil
+                    :media-id 1}
+            state (gen-state-helper config)]
+        (is (= (sut/->independent-sightings state record) []))))
+
+    (testing "Copes with species ID without a sighting quantity"
+      (let [record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                    :taxonomy-id 1
+                    :trap-station-session-id 1
                     :media-id 1}
             state (gen-state-helper config)]
         (is (= (sut/->independent-sightings state record) []))))

@@ -4,26 +4,26 @@
     [column-util :as col-util]
     [core :as module]]))
 
-(defn- presense-flag
+(defn- presence-flag
   [v]
   (if (zero? v)
     ""
     "X"))
 
-(defn- aggregate-presense-absence
+(defn aggregate-presence-absence
   [state col data]
   (->> data
        (col-util/aggregate-by-trap-station-session state :independent-observations)
-       (presense-flag)))
+       (presence-flag)))
 
-(defn- calculate-presence-absence
+(defn calculate-presence-absence
   [state data]
   (->> data
        (col-util/calculate-independent-observations state)
        (map #(assoc % :presence-absence
-                    (presense-flag (:independent-observations %))))))
+                    (presence-flag (:independent-observations %))))))
 
 (module/register-column
  :presence-absence
  {:calculate calculate-presence-absence
-  :aggregate aggregate-presense-absence})
+  :aggregate aggregate-presence-absence})

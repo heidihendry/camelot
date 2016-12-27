@@ -77,11 +77,13 @@
         species (:taxonomy-id this-sighting)
         previous-sighting (first-dependent-sighting this-sighting (get acc species))
         known-sightings (get acc species)]
-    (assoc acc species
-           (if previous-sighting
-             (update-sighting (remove #(= previous-sighting %) known-sightings)
-                              previous-sighting this-sighting)
-             (add-sighting state known-sightings this-sighting)))))
+    (if (nil? species)
+      acc
+      (assoc acc species
+             (if previous-sighting
+               (update-sighting (remove #(= previous-sighting %) known-sightings)
+                                previous-sighting this-sighting)
+               (add-sighting state known-sightings this-sighting))))))
 
 (s/defn datetime-comparison :- s/Bool
   "Predicate for whether photo-a is prior to photo-b.
@@ -119,5 +121,9 @@
   "Extract the sightings, accounting for the independence threshold, for an album."
   [state sightings]
   (let [total-spp (fn [[spp data]] {:species-id spp
-                                    :count (reduce + 0 (map :sighting-quantity data))})]
-    (map total-spp (independent-sightings-by-species state sightings))))
+                                    :count (reduce + 0 (map #(or (:sighting-quantity %) 0)
+                                                            data))})]
+    (->> sightings
+         (independent-sightings-by-species state)
+         (map total-spp)
+         (remove #(zero? (:count %))))))
