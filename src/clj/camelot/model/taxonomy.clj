@@ -50,7 +50,7 @@
   "Assoc a key for the label, which is a computed value."
   [state rec]
   (assoc rec :taxonomy-label
-         (if (= "common" (config/lookup state :species-name-style))
+         (if (= :common-name (config/lookup state :species-name-style))
            (:taxonomy-common-name rec)
            (format "%s %s" (:taxonomy-genus rec) (:taxonomy-species rec)))))
 

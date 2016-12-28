@@ -451,8 +451,8 @@
                                  :vn (tr/translate state :language/vn)}}
             :species-name-style {:type :select
                                 :required true
-                                 :options {"scientific" (tr/translate state :settings/species-name-style-scientific)
-                                           "common" (tr/translate state :settings/species-name-style-common)}}
+                                 :options {:scientific (tr/translate state :settings/species-name-style-scientific)
+                                           :common-name (tr/translate state :settings/species-name-style-common)}}
             :send-usage-data {:type :boolean}
             :sighting-independence-minutes-threshold {:type :number
                                                       :required true}}

@@ -24,7 +24,7 @@
   {:media-importers 4
    :language :en
    :send-usage-data false
-   :species-name-style "scientific"
+   :species-name-style :scientific
    :root-path nil
    :timezone nil
    :sighting-independence-minutes-threshold 30})
