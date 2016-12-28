@@ -6,7 +6,8 @@
    [camelot.system.state :refer [State]]
    [yesql.core :as sql]
    [clj-time.core :as t]
-   [camelot.model.media :as media]))
+   [camelot.model.media :as media]
+   [camelot.translation.core :as tr]))
 
 (sql/defqueries "sql/trap-station-sessions.sql")
 
@@ -46,16 +47,19 @@
 (def date-formatter (tf/formatter "yyyy-MM-dd"))
 
 (defn- build-label
-  [start end]
-  (let [sp (tf/unparse date-formatter start)
-        ep (tf/unparse date-formatter end)]
-    (format "%s to %s" sp ep)))
+  [state start end]
+  (let [sp (tf/unparse date-formatter start)]
+    (if end
+      (let [ep (tf/unparse date-formatter end)]
+        (tr/translate state ::trap-station-session-closed-label sp ep))
+      (tr/translate state ::trap-station-session-ongoing-label sp))))
 
 (defn- add-label
   "Assoc a key for the label, which is a computed value."
-  [rec]
+  [state rec]
   (assoc rec :trap-station-session-label
-         (build-label (:trap-station-session-start-date rec)
+         (build-label state
+                      (:trap-station-session-start-date rec)
                       (:trap-station-session-end-date rec))))
 
 (s/defn get-all :- [TrapStationSession]
@@ -63,7 +67,7 @@
    id :- s/Int]
   (->> {:trap-station-id id}
        (db/with-db-keys state -get-all)
-       (map add-label)
+       (map #(add-label state %))
        (map trap-station-session)))
 
 (s/defn get-specific :- TrapStationSession
@@ -72,7 +76,7 @@
   (some->> {:trap-station-session-id id}
            (db/with-db-keys state -get-specific)
            (first)
-           (add-label)
+           (add-label state)
            (trap-station-session)))
 
 (defn get-active
@@ -95,7 +99,7 @@
   (some->> data
            (db/with-db-keys state -get-specific-by-dates)
            (first)
-           (add-label)
+           (add-label state)
            (trap-station-session)))
 
 (s/defn get-specific-by-trap-station-session-camera-id :- (s/maybe TrapStationSession)

@@ -16,11 +16,10 @@
   ([state status]
    (tr/translate state (keyword status))))
 
-(defn- translate-statuses
+(defn translate-statuses
   "Translate the description of camera statuses."
   [state statuses]
-  (map #(update % :camera-status-description
-                (partial translate-status state))
+  (map #(update % :camera-status-description (partial translate-status state))
        statuses))
 
 (s/defrecord TCameraStatus
@@ -50,7 +49,7 @@
   "Retrieve, translate and return all available camera statuses."
   [state :- State]
   (->> (db/with-connection state -get-all)
-       (db/clj-keys)
+       db/clj-keys
        (translate-statuses state)
        (map camera-status)))
 

@@ -793,4 +793,8 @@
     :bulk-import-time-remaining "Estimated time remaining"
     :bulk-import-failed-paths "The following files failed to import"}
 
+   :camelot.model.trap-station-session
+   {:trap-station-session-closed-label "%s to %s"
+    :trap-station-session-ongoing-label "%s and ongoing"}
+
    :missing "[Translation missing]"})
