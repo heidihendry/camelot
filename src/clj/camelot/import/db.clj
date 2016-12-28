@@ -71,17 +71,21 @@
 
 (defn get-or-create-taxonomy!
   [state record]
-  (->> record
-       taxonomy/ttaxonomy
-       (taxonomy/get-or-create! state)
-       (merge record)))
+  (if (and (:taxonomy-species record) (:taxonomy-genus record))
+    (->> record
+         taxonomy/ttaxonomy
+         (taxonomy/get-or-create! state)
+         (merge record))
+    record))
 
 (defn get-or-create-survey-taxonomy!
   [state record]
-  (->> record
-       survey-taxonomy/tsurvey-taxonomy
-       (survey-taxonomy/get-or-create! state)
-       (merge record)))
+  (if (and (:taxonomy-id record) (:survey-id record))
+    (->> record
+         survey-taxonomy/tsurvey-taxonomy
+         (survey-taxonomy/get-or-create! state)
+         (merge record))
+    record))
 
 (defn create-media!
   [state record]
