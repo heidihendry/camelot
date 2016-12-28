@@ -21,22 +21,13 @@
 
 (def default-config
   "Return the default configuration."
-  {:erroneous-infrared-threshold 0.2
-   :media-importers 4
-   :infrared-iso-value-threshold 999
+  {:media-importers 4
    :language :en
    :send-usage-data false
    :species-name-style "scientific"
    :root-path nil
-   :night-end-hour 5
-   :night-start-hour 21
-   :project-start (tc/to-long (t/now))
-   :project-end (tc/to-long (t/now))
-   :sighting-independence-minutes-threshold 30
-   :surveyed-species []
-   :required-fields [[:headline] [:artist] [:phase] [:copyright]
-                     [:location :gps-longitude] [:location :gps-latitude]
-                     [:datetime] [:filename]]})
+   :timezone nil
+   :sighting-independence-minutes-threshold 30})
 
 (def db-name "Database")
 (def media-directory-name "Media")
