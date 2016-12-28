@@ -110,15 +110,18 @@
     (fn [state record]
       (try
         (>!! proc (with-transaction [s state]
-                   (->> record
-                        (db/get-survey s)
-                        (db/get-or-create-camera! s)
-                        (db/get-or-create-site! s)
-                        (db/get-or-create-survey-site! s)
-                        (db/get-or-create-trap-station! s)
-                        (db/get-or-create-trap-session! s)
-                        (db/get-or-create-trap-camera! s)
-                        (hash-map :state state :record))))
+                    (let [r (->> record
+                                 (db/get-survey s)
+                                 (db/get-or-create-camera! s)
+                                 (db/get-or-create-site! s)
+                                 (db/get-or-create-survey-site! s)
+                                 (db/get-or-create-trap-station! s)
+                                 (db/get-or-create-trap-session! s)
+                                 (db/get-or-create-trap-camera! s)
+                                 (db/get-or-create-taxonomy! s)
+                                 (db/get-or-create-survey-taxonomy! s)
+                                 (hash-map :state state :record))]
+                      r)))
         (catch Exception e
           (log/error (.getMessage e))
           (log/error (str/join "\n" (map str (.getStackTrace e))))

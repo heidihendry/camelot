@@ -102,16 +102,10 @@
 
 (defn create-sighting!
   [state record]
-  (if (data/nat? (:sighting-quantity record))
-    (let [taxonomy (get-or-create-taxonomy! state record)
-          rec (assoc record :taxonomy-id (:taxonomy-id taxonomy))]
-      (>!! (get-in state [:importer :async-chan])
-           {:handler (delay (do
-                              (db/async-with-transaction
-                               [s state]
-                               (get-or-create-survey-taxonomy! s rec))))})
-      (->> rec
-           sighting/tsighting
-           (sighting/create! state)
-           (merge record)))
+  (if (and (data/nat? (:sighting-quantity record))
+           (data/nat? (:taxonomy-id record)))
+    (->> record
+         sighting/tsighting
+         (sighting/create! state)
+         (merge record))
     record))
