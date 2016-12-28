@@ -86,7 +86,10 @@
 
     (testing "understands YYYY-DDD"
       (is (= (sut/as-date "2016-112")
-             (t/date-time 2016 4 21)))))
+             (t/date-time 2016 4 21))))
+
+    (testing "understands yyyy:mm:dd HH:MM:SS"
+      (is (sut/as-date "2014:03:01 01:09:02"))))
 
   (testing "could-be-date?"
     (testing "understands yyyy/mm/dd HH:MM:SS"
