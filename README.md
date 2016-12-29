@@ -57,8 +57,10 @@ http://localhost:5341/
 If running Camelot on a server, you can instead use:
 
 ```
-java -jar /path/to/camelot-<version>.jar
+java -jar /path/to/camelot-<version>.jar -server
 ```
+
+See [Use from multiple computers](#use-from-multiple-computers) for more information.
 
 ## User guide
 
@@ -556,7 +558,25 @@ Here's a step-by-step process on how you might go about fixing that:
 11. Assign the camera unassigned from Problem Trap Station 2 to complete the swap.
 12. Finally, Organisation -> Cameras -> Remove "Temporary" to clean up the temporary camera.
 
-#### Parting advice
+### Use from multiple computers
+
+To use Camelot on multiple computers, the approach is to run Camelot on one computer, and then connect to that computer over the network from all other computers needing to use it.  That is to say, Camelot itself is only ever running on one computer, and other computers merely access Camelot over the network.  This is called a Client/Server model.
+
+When Camelot is started from a command line prompt, it will display a message like:
+
+```
+You might be able to connect to it from the following addresses:
+  - http://192.168.1.100:5341/
+  - http://localhost.localdomain:5341/
+```
+
+These addresses will change for each computer network Camelot is used on.  Alternatively, you can get the hostname or IP Address of your computer manually (the process to do this is specific to each operating system & outside the scope of this guide) and appending ":5341".
+
+In either case, Camelot can be accessed by inputting the network address into the web browser into another computer on the network.
+
+Using a similar approach, Camelot can be accessed remotely over the Internet.  This often necessitates use of a VPN or similar (configuring a VPN Server is also outside of the scope of this guide and may require professional IT services to set up).
+
+### Parting advice
 
 Camelot tries hard to keep workflows simple and logical, though inevitably there'll times where you really need to get your hands on the data to make things right.  Camelot provides for both scenarios, but do not be complacent when using the advanced menus -- Camelot will (deliberately) not help you.
 
