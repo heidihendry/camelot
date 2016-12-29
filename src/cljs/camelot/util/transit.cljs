@@ -1,7 +1,7 @@
 (ns camelot.util.transit
   "Transit helpers."
   (:require [cognitect.transit :as transit])
-  (:import [goog.date DateTime]))
+  (:import [goog.date UtcDateTime]))
 
 (def transit-file-reader identity)
 
@@ -14,7 +14,7 @@
 (defn- transit-date-reader
   "Transit date/time reader"
   [s]
-  (DateTime.fromTimestamp s))
+  (UtcDateTime.fromTimestamp s))
 
 (def transit-read-handlers
   "Transit readers"
@@ -23,7 +23,7 @@
 
 (def transit-write-handlers
   "Transite writers"
-  {DateTime transit-date-writer})
+  {UtcDateTime transit-date-writer})
 
 (defn- request
   "Make a GET or POST request."

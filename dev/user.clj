@@ -22,6 +22,10 @@
   [state]
   (camelot.system.db-migrate/migrate (get-in state [:database :connection])))
 
+(defn rollback
+  [state]
+  (camelot.system.db-migrate/rollback (get-in state [:database :connection])))
+
 (defn runprod []
   (camelot.core/start-prod))
 
@@ -47,3 +51,6 @@
 (defn stop []
   (swap! http/system component/stop)
   nil)
+
+(defn state []
+  @http/system)

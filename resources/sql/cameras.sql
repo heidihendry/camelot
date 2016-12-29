@@ -1,12 +1,12 @@
 -- name: -create<!
 INSERT INTO camera (camera_name, camera_created, camera_updated, camera_status_id,
                   camera_make, camera_model, camera_notes)
-VALUES (:camera_name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :camera_status_id,
+VALUES (:camera_name, :current_timestamp, :current_timestamp, :camera_status_id,
         :camera_make, :camera_model, :camera_notes)
 
 -- name: -update!
 UPDATE camera
-SET camera_updated = CURRENT_TIMESTAMP,
+SET camera_updated = :current_timestamp,
     camera_name = :camera_name,
     camera_make = :camera_make,
     camera_model = :camera_model,
@@ -48,5 +48,5 @@ WHERE camera_status_description = 'camera-status/available'
 -- name: -set-camera-status!
 UPDATE camera
        SET camera_status_id = :camera_status_id,
-           camera_updated = CURRENT_TIMESTAMP
+           camera_updated = :current_timestamp
 WHERE camera_id = :camera_id

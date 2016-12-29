@@ -2,13 +2,13 @@
 INSERT INTO trap_station_session (trap_station_id, trap_station_session_created,
        trap_station_session_updated, trap_station_session_start_date,
        trap_station_session_end_date, trap_station_session_notes)
-VALUES (:trap_station_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+VALUES (:trap_station_id, :current_timestamp, :current_timestamp,
        :trap_station_session_start_date, :trap_station_session_end_date,
        :trap_station_session_notes)
 
 -- name: -update!
 UPDATE trap_station_session
-SET trap_station_session_updated = CURRENT_TIMESTAMP,
+SET trap_station_session_updated = :current_timestamp,
     trap_station_id = :trap_station_id,
     trap_station_session_start_date = :trap_station_session_start_date,
     trap_station_session_end_date = :trap_station_session_end_date,
@@ -67,6 +67,6 @@ WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 -- name: -set-session-end-date!
 UPDATE trap_station_session
        SET trap_station_session_end_date = :trap_station_session_end_date,
-           trap_station_session_updated = CURRENT_TIMESTAMP
+           trap_station_session_updated = :current_timestamp
 WHERE trap_station_session_id = :trap_station_session_id
       AND trap_station_session_end_date IS NULL

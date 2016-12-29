@@ -5,7 +5,7 @@
             [clojure.string :as string]
             [om-datepicker.components :refer [datepicker]]
             [camelot.rest :as rest]
-            [camelot.util.misc :as misc])
+            [camelot.translation.core :as tr])
   (:import [goog.date UtcDateTime]
            [goog.i18n DateTimeFormat]))
 
@@ -146,10 +146,11 @@
             (let [df (DateTimeFormat. "EEE, dd LLL yyyy")
                   tf (DateTimeFormat. "HH:mm:ss")]
               (dom/div nil
-                       (.format tf (misc/->utc (get-in buf [k :value]))) " on "
-                       (.format df (misc/->utc (get-in buf [k :value])))))
+                       (.format tf (UtcDateTime. (get-in buf [k :value])))
+                       " " (tr/translate :words/on-lc) " "
+                       (.format df (UtcDateTime. (get-in buf [k :value])))))
             (let [df (DateTimeFormat. "EEE, dd LLL yyyy")]
-              (dom/div nil (.format df (misc/->utc (get-in buf [k :value])))))))
+              (dom/div nil (.format df (UtcDateTime. (get-in buf [k :value])))))))
         (when (get buf k)
           (om/build datepicker (get buf k)))))))
 
@@ -221,10 +222,9 @@
     om/IWillMount
     (will-mount [_]
       (when (nil? (get buf k))
-        (om/update! buf k {:value nil})))
+        (om/update! buf k {:value false})))
     om/IRender
     (render [_]
-      (prn (get-in buf [k :value]))
       (dom/input #js {:type "checkbox" :className "field-input-checkbox"
                       :disabled (:disabled opts)
                       :onChange #(state/set-flag! % (k buf) :value owner)

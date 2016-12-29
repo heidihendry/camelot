@@ -108,8 +108,8 @@
        dep-util/assoc-cameras
        (group-by :trap-station-id)
        vals
-       (map #(sort-by :trap-station-session-id %))
-       (map last)
+       (map #(sort-by :trap-station-session-id > %))
+       (map first)
        (mapv deployment)))
 
 (s/defn get-specific :- (s/maybe Deployment)

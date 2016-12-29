@@ -2,7 +2,9 @@
   (:require
    [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
-   [clj-time.coerce :as tc]))
+   [clj-time.core :as t]
+   [clj-time.coerce :as tc]
+   [clojure.tools.logging :as log]))
 
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
@@ -28,8 +30,9 @@ Intended for async operations which are already running within a transaction."
   Translates table column names and SQL data types."
   [acc k v]
   (assoc acc (keyword (str/replace (name k) #"_" "-"))
-         (if (instance? java.sql.Timestamp v)
-           (tc/from-sql-time v)
+         (if (and (re-find #"_(date|timestamp|created|updated)$" (name k))
+                  v)
+           (tc/from-long v)
            v)))
 
 (defn clj-keys
@@ -47,13 +50,14 @@ Intended for async operations which are already running within a transaction."
   [acc k v]
   (assoc acc (keyword (str/replace (name k) #"-" "_"))
          (if (instance? org.joda.time.DateTime v)
-           (tc/to-sql-time v)
+           (tc/to-long v)
            v)))
 
 (defn db-keys
   "Translate data into database-suitable types."
   [data]
-  (reduce-kv db-key {} data))
+  (assoc (reduce-kv db-key {} data)
+         :current_timestamp (tc/to-long (t/now))))
 
 (defn with-connection
   "Run a query with the given connection, if any."

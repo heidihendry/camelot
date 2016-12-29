@@ -1,7 +1,7 @@
 -- name: -create<!
 INSERT INTO species (species_created, species_updated, species_scientific_name,
        species_common_name, species_notes)
-VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :species_scientific_name,
+VALUES (:current_timestamp, :current_timestamp, :species_scientific_name,
        :species_common_name, :species_notes)
 
 -- name: -get-specific
@@ -23,7 +23,7 @@ FROM species
 
 -- name: -update!
 UPDATE species
-SET species_updated = CURRENT_TIMESTAMP,
+SET species_updated = :current_timestamp,
     species_scientific_name = :species_scientific_name,
     species_common_name = :species_common_name,
     species_notes = :species_notes

@@ -1,11 +1,11 @@
 -- name: -create<!
 INSERT INTO trap_station_session_camera (trap_station_session_id, trap_station_session_camera_created, trap_station_session_camera_updated, camera_id, trap_station_session_camera_import_path, trap_station_session_camera_media_unrecoverable)
-VALUES (:trap_station_session_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :camera_id, :trap_station_session_camera_import_path,
+VALUES (:trap_station_session_id, :current_timestamp, :current_timestamp, :camera_id, :trap_station_session_camera_import_path,
         :trap_station_session_camera_media_unrecoverable)
 
 -- name: -update!
 UPDATE trap_station_session_camera
-SET trap_station_session_camera_updated = CURRENT_TIMESTAMP,
+SET trap_station_session_camera_updated = :current_timestamp,
     camera_id = :camera_id,
     trap_station_session_id = :trap_station_session_id,
     trap_station_session_camera_import_path = :trap_station_session_camera_import_path,
@@ -59,5 +59,5 @@ WHERE camera_status_description = 'camera-status/available' OR camera_id = :came
 -- name: -update-media-unrecoverable!
 UPDATE trap_station_session_camera
 SET trap_station_session_camera_media_unrecoverable = :trap_station_session_camera_media_unrecoverable,
-    trap_station_session_camera_updated = CURRENT_TIMESTAMP
+    trap_station_session_camera_updated = :current_timestamp
 WHERE trap_station_session_id = :trap_station_session_id AND camera_id = :camera_id

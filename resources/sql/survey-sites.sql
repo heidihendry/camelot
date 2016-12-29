@@ -1,10 +1,10 @@
 -- name: -create<!
 INSERT INTO survey_site (survey_id, survey_site_created, survey_site_updated, site_id)
-VALUES (:survey_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :site_id)
+VALUES (:survey_id, :current_timestamp, :current_timestamp, :site_id)
 
 -- name: -update!
 UPDATE survey_site
-SET survey_site_updated = CURRENT_TIMESTAMP,
+SET survey_site_updated = :current_timestamp,
     site_id = :site_id,
     survey_id = :survey_id
 WHERE survey_site_id = :survey_site_id

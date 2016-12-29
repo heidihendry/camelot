@@ -2,7 +2,7 @@
 INSERT INTO taxonomy (taxonomy_created, taxonomy_updated, taxonomy_class, taxonomy_order,
        taxonomy_family, taxonomy_genus, taxonomy_species, taxonomy_common_name,
        species_mass_id, taxonomy_notes)
-VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :taxonomy_class, :taxonomy_order,
+VALUES (:current_timestamp, :current_timestamp, :taxonomy_class, :taxonomy_order,
        :taxonomy_family, :taxonomy_genus, :taxonomy_species, :taxonomy_common_name,
        :species_mass_id, :taxonomy_notes)
 
@@ -45,7 +45,7 @@ WHERE survey_id = :survey_id
 
 -- name: -update!
 UPDATE taxonomy
-SET taxonomy_updated = CURRENT_TIMESTAMP,
+SET taxonomy_updated = :current_timestamp,
     taxonomy_class = :taxonomy_class,
     taxonomy_order = :taxonomy_order,
     taxonomy_family = :taxonomy_family,

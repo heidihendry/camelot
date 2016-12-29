@@ -35,27 +35,35 @@
     (testing "Converts from SQL Timestamps"
       (let [date (t/date-time 2015 10 10 1 1 5)
             date-long (tc/to-long date)
-            data {:column_name (java.sql.Timestamp. date-long)}]
-        (is (= (sut/clj-keys data) {:column-name date}))))))
+            data {:column_timestamp date-long}]
+        (is (= (sut/clj-keys data) {:column-timestamp date}))))))
 
 (deftest test-db-keys
   (testing "Converting to database types"
     (testing "Converts columns in a single record"
       (let [data {:column-name "MyData"}
             state (state/gen-state)]
-        (is (= (sut/db-keys data) {:column_name "MyData"}))))
+        (is (= (select-keys (sut/db-keys data) [:column_name]) {:column_name "MyData"}))))
 
     (testing "Returns an empty hash when passed nil"
       (let [data nil
             state (state/gen-state)]
-        (is (= (sut/db-keys data) {}))))
+        (is (= (dissoc (sut/db-keys data) :current_timestamp) {}))))
 
     (testing "Converts to SQL Timestamps"
       (let [date (t/date-time 2015 10 10 1 1 5)
             date-long (tc/to-long date)
-            data {:column-name date}
+            data {:column-timestamp date}
             state (state/gen-state)]
-        (is (= (sut/db-keys data) {:column_name (java.sql.Timestamp. date-long)}))))))
+        (is (= (dissoc (sut/db-keys data) :current_timestamp)
+               {:column_timestamp date-long}))))
+
+    (testing "Provides current timestamp"
+      (let [date (t/date-time 2015 10 10 1 1 5)
+            date-long (tc/to-long date)
+            data {:column-timestamp date}
+            state (state/gen-state)]
+        (is (contains? (sut/db-keys data) :current_timestamp))))))
 
 (deftest test-with-db-keys
   (testing "Converting between database types"
@@ -63,4 +71,5 @@
       (let [fn (fn [a c] (update a :column_name inc))
             data {:column-name 5}
             state (state/gen-state)]
-        (is (= (sut/with-db-keys state fn data) {:column-name 6}))))))
+        (is (= (dissoc (sut/with-db-keys state fn data) :current-timestamp)
+               {:column-name 6}))))))

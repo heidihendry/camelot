@@ -1,12 +1,12 @@
 -- name: -create<!
 INSERT INTO site (site_name, site_created, site_updated, site_sublocation,
                   site_city, site_state_province, site_country, site_area, site_notes)
-VALUES (:site_name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :site_sublocation,
+VALUES (:site_name, :current_timestamp, :current_timestamp, :site_sublocation,
         :site_city, :site_state_province, :site_country, :site_area, :site_notes)
 
 -- name: -update!
 UPDATE site
-SET site_updated = CURRENT_TIMESTAMP,
+SET site_updated = :current_timestamp,
     site_name = :site_name,
     site_sublocation = :site_sublocation,
     site_city = :site_city,

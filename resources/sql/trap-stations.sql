@@ -6,7 +6,7 @@ INSERT INTO trap_station (survey_site_id, trap_station_created, trap_station_upd
                           trap_station_distance_to_road,
                           trap_station_distance_to_river,
                           trap_station_distance_to_settlement)
-VALUES (:survey_site_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :trap_station_name,
+VALUES (:survey_site_id, :current_timestamp, :current_timestamp, :trap_station_name,
        :trap_station_longitude, :trap_station_latitude, :trap_station_altitude,
        :trap_station_notes, :trap_station_distance_above_ground,
        :trap_station_distance_to_road, :trap_station_distance_to_river,
@@ -14,7 +14,7 @@ VALUES (:survey_site_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :trap_station_nam
 
 -- name: -update!
 UPDATE trap_station
-SET trap_station_updated = CURRENT_TIMESTAMP,
+SET trap_station_updated = :current_timestamp,
     survey_site_id = :survey_site_id,
     trap_station_name = :trap_station_name,
     trap_station_longitude = :trap_station_longitude,

@@ -2,7 +2,7 @@
 INSERT INTO survey_taxonomy (survey_taxonomy_created,
        survey_taxonomy_updated, survey_id, taxonomy_id)
        VALUES
-       (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :survey_id, :taxonomy_id)
+       (:current_timestamp, :current_timestamp, :survey_id, :taxonomy_id)
 
 -- name: -get-all
 SELECT survey_id, taxonomy_id, survey_taxonomy_created,

@@ -1,7 +1,7 @@
 -- name: -create<!
 INSERT INTO sighting (sighting_created, sighting_updated, sighting_quantity,
        sighting_lifestage, sighting_sex, taxonomy_id, media_id)
-VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :sighting_quantity, :sighting_lifestage,
+VALUES (:current_timestamp, :current_timestamp, :sighting_quantity, :sighting_lifestage,
        :sighting_sex, :taxonomy_id, :media_id)
 
 -- name: -get-specific
@@ -22,7 +22,7 @@ WHERE media_id = :media_id
 
 -- name: -update!
 UPDATE sighting
-SET sighting_updated = CURRENT_TIMESTAMP,
+SET sighting_updated = :current_timestamp,
     sighting_quantity = :sighting_quantity,
     sighting_lifestage = :sighting_lifestage,
     sighting_sex = :sighting_sex,

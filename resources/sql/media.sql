@@ -3,7 +3,7 @@ INSERT INTO media (media_created, media_updated, media_filename,
        media_notes, media_cameracheck, media_attention_needed,
        media_processed, media_capture_timestamp, media_reference_quality,
        trap_station_session_camera_id, media_format)
-VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :media_filename,
+VALUES (:current_timestamp, :current_timestamp, :media_filename,
        :media_notes, :media_cameracheck, :media_attention_needed,
        :media_processed, :media_capture_timestamp, :media_reference_quality,
        :trap_station_session_camera_id, :media_format)
@@ -84,7 +84,7 @@ WHERE trap_station_session_camera_id = :trap_station_session_camera_id
 
 -- name: -update!
 UPDATE media
-SET media_updated = CURRENT_TIMESTAMP,
+SET media_updated = :current_timestamp,
     media_capture_timestamp = :media_capture_timestamp,
     media_notes = :media_notes,
     media_format = :media_format,

@@ -9,6 +9,7 @@
     :and-lc "and"
     :back "Back"
     :of-lc "of"
+    :on-lc "on"
     :cancel "Cancel"
     :continue "Continue"
     :citation "Citation"

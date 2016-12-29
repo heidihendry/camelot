@@ -3,7 +3,7 @@ INSERT INTO photo (photo_created, photo_updated, photo_iso_setting,
        photo_exposure_value, photo_flash_setting,
        photo_focal_length, photo_fnumber_setting, photo_orientation,
        photo_resolution_x, photo_resolution_y, media_id)
-VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :photo_iso_setting,
+VALUES (:current_timestamp, :current_timestamp, :photo_iso_setting,
        :photo_exposure_value, :photo_flash_setting,
        :photo_focal_length, :photo_fnumber_setting, :photo_orientation,
        :photo_resolution_x, :photo_resolution_y, :media_id)
@@ -26,7 +26,7 @@ WHERE media_id = :media_id
 
 -- name: -update!
 UPDATE photo
-SET photo_updated = CURRENT_TIMESTAMP,
+SET photo_updated = :current_timestamp,
     photo_iso_setting = :photo_iso_setting,
     photo_exposure_value = :photo_exposure_value,
     photo_flash_setting = :photo_flash_setting,
