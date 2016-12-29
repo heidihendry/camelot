@@ -27,7 +27,7 @@
 (defn filestore-survey-directory
   "Return the path to the survey's filestore directory."
   [state survey-id]
-  (io/file (get-in state [:config :path :filestore]) (str survey-id)))
+  (io/file (get-in state [:config :path :filestore-base]) (str survey-id)))
 
 (defn filestore-file-path
   "Return the path to a file in the survey's filestore directory."

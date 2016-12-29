@@ -85,8 +85,8 @@
   (if-let [r (get-specific state file-id)]
     (let [fs (filesystem/filestore-file-path state (:survey-id r)
                                              (:survey-file-name r))]
-      (io/delete-file fs)
-      (db/with-db-keys state -delete! {:survey-file-id file-id}))))
+      (db/with-db-keys state -delete! {:survey-file-id file-id})
+      (io/delete-file fs))))
 
 (s/defn upload!
   [state :- State
