@@ -83,7 +83,6 @@
       (let [cmd-chan (chan)
             queue-chan (chan (async/dropping-buffer queue-buffer-size))]
         (run config cmd-chan queue-chan)
-        (println "Importer started.")
         (assoc this
                :complete (ref 0)
                :failed (ref 0)
