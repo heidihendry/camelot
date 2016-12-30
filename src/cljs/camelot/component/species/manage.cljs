@@ -206,7 +206,6 @@
 
 (defn add-species-to-survey
   [data taxonomy-id]
-  (prn (get-in data [:known-species]))
   (if-let [t (get-in data [:known-species taxonomy-id])]
     (rest/post-x "/taxonomy"
                  {:data (assoc (select-keys t [:taxonomy-id :taxonomy-species :taxonomy-genus])

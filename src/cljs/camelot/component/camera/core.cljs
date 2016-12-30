@@ -24,7 +24,6 @@
 
 (defn add-success-handler
   [data resp]
-  (prn resp)
   (om/transact! data :list #(conj % (cursorise/decursorise (:body resp))))
   (om/update! data :new-camera-name nil))
 

@@ -122,7 +122,6 @@
                                 (drop-file-handler data owner fs))))))
     om/IRenderState
     (render-state [_ state]
-      (prn state)
       (dom/div #js {:className "menu-item detailed dynamic no-click"
                     :onClick #(om/update! (state/display-state) [:notification :info] (:errors state))}
                (dom/div #js {:className "pull-right fa fa-times remove top-corner"
