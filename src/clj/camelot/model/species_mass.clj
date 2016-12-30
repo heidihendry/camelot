@@ -23,7 +23,7 @@
      species-mass-label :- s/Str]
   {s/Any s/Any})
 
-(def species-mass SpeciesMass)
+(def species-mass map->SpeciesMass)
 
 (s/defn get-all :- [SpeciesMass]
   "Retrieve, translate and return all species mass brackets."
