@@ -14,7 +14,7 @@
             [clojure.string :as str]
             [camelot.nav :as nav]))
 
-(defn print-key
+(defn key-handler
   [e]
   (cond
     ;; ctrl+right
@@ -42,7 +42,7 @@
         (.preventDefault e))
 
     ;; ctrl+m
-    (and (>= (.-keyCode e) 77) (.-ctrlKey e))
+    (and (= (.-keyCode e) 77) (.-ctrlKey e))
     (do (.focus (.getElementById js/document "media-collection-container"))
         (nav/analytics-event "library-key" "C-m")
         (.preventDefault e))
@@ -112,7 +112,7 @@
       (let [lib (:library data)]
         (if (get-in lib [:search :results])
           (dom/div #js {:className (str "library" (if restricted-mode " restricted-mode" ""))
-                        :onKeyDown print-key
+                        :onKeyDown key-handler
                         :tabIndex 0}
                    (if restricted-mode
                      (set! (.-tincan js/window) (partial tincan-listener lib))
