@@ -20,7 +20,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className (str "menu-item"
-                                    (if (:active data) " active" ""))
+                                    (if (= (:concept data) (:active state)) " active" ""))
                     :onClick #(do
                                 (go (>! (:active-chan state) (:concept data)))
                                 (nav/analytics-event "organisation"
@@ -41,8 +41,6 @@
           (loop []
             (let [r (<! chan)]
               (om/update! data :active r)
-              (doseq [m (:menu data)]
-                (om/update! m :active (= (:concept m) r)))
               (recur))))))
     om/IRenderState
     (render-state [_ state]
@@ -50,7 +48,7 @@
                (om/build-all concept-item-component
                              (:menu data)
                              {:key :concept
-                              :init-state state})))))
+                              :state (assoc state :active (:active data))})))))
 
 (defn not-implemented
   [data owner]
@@ -85,8 +83,7 @@
     om/IWillMount
     (will-mount [_]
       (om/update! data {:menu [{:concept :survey
-                                :name (tr/translate ::surveys)
-                                :active true}
+                                :name (tr/translate ::surveys)}
                                {:concept :site
                                 :name (tr/translate ::sites)}
                                {:concept :camera

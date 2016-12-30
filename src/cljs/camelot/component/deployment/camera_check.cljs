@@ -119,11 +119,10 @@
     (will-mount [_]
       (om/update! data [:data :validation-problem] {:value false})
       (om/update! data [:data :primary-camera-original-id] (deref (get-in data [:data :primary-camera-id])))
-      (om/update! data [:data :secondary-camera-original-id] (deref (get-in data [:data :secondary-camera-id])))
-      (om/update! data :can-edit (shared/can-edit? data)))
-    om/IRender
-    (render [_]
-      (if (or (nil? (:can-edit data)) (:can-edit data))
+      (om/update! data [:data :secondary-camera-original-id] (deref (get-in data [:data :secondary-camera-id]))))
+    om/IRenderState
+    (render-state [_ state]
+      (if (:can-edit? state)
         (let [data (:data data)]
           (om/update! data :validation-problem {:value false})
           (let [sess-end (get-in data [:trap-station-session-end-date :value])]

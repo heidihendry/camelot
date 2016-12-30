@@ -21,7 +21,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className (str "menu-item"
-                                    (if (:active data) " active" ""))
+                                    (if (= (:action data) (:active state)) " active" ""))
                     :onClick #(do
                                 (go (>! (:active-chan state) (:action data)))
                                 (nav/analytics-event "survey"
@@ -42,8 +42,6 @@
           (loop []
             (let [r (<! chan)]
               (om/update! data :active r)
-              (doseq [m (:menu data)]
-                (om/update! m :active (= (:action m) r)))
               (recur))))))
     om/IRenderState
     (render-state [_ state]
@@ -54,7 +52,7 @@
                                           true
                                           (:condition %)) (:menu data))
                                {:key :action
-                                :init-state state}))))))
+                                :state (assoc state :active (:active data))}))))))
 
 (defn survey-section-containers-component
   [data owner]

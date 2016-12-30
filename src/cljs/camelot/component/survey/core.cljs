@@ -112,17 +112,16 @@
                            :name (tr/translate ::files)}]
                    :active :deployment
                    :species {}})
+
       (om/transact! app [:survey-page-state :menu]
                     (fn [d]
-                      (let [m (first (filter #(if (nil? (:condition %))
-                                                true
-                                                (:condition %)) d))]
-                        (vec (conj (remove #{m} d)
-                                   (assoc m :active true))))))
+                      (vec (filter #(if (nil? (:condition %))
+                                      true
+                                      (:condition %)) d))))
+
       (om/transact! app [:survey-page-state]
                     (fn [d]
                       (assoc d :active (->> (:menu d)
-                                            (filter #(:active %))
                                             first
                                             :action)))))
     om/IRender

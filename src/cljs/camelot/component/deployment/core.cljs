@@ -35,7 +35,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className (str "menu-item"
-                                    (if (:active data) " active" ""))
+                                    (if (= (:action data) (:active state)) " active" ""))
                     :onClick #(do
                                 (go (>! (:active-chan state) (:action data)))
                                 (nav/analytics-event "deployment"
@@ -57,8 +57,6 @@
           (loop []
             (let [r (<! chan)]
               (om/update! data :active r)
-              (doseq [m (:menu data)]
-                (om/update! m :active (= (:action m) r)))
               (recur))))))
     om/IRenderState
     (render-state [_ state]
@@ -67,7 +65,7 @@
                         (om/build-all action-item-component
                                       (:menu data)
                                       {:key :action
-                                       :init-state state}))))))
+                                       :state (assoc state :active (:active data))}))))))
 
 (defn read-only-field-component
   [data owner]
@@ -118,24 +116,26 @@
                                                            (get-in data [:data :trap-station-id :value])))
                                             (nav/analytics-event "org-survey" "advanced-click"))}
                            (tr/translate :words/advanced))))))
-
 (defn deployment-section-containers-component
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:can-edit? (shared/can-edit? data)})
     om/IWillMount
     (will-mount [_]
       (when-not (shared/can-edit? data)
-        (om/update! data :active :details)
-        (dorun (map #(om/update! % :active (= (:action %) :details)) (:menu data)))))
-    om/IRender
-    (render [_]
+        (om/update! data :active :details)))
+    om/IRenderState
+    (render-state [_ state]
       (dom/div nil
                (dom/div #js {:className "section-container"}
                         (om/build action-menu-component data))
                (dom/div #js {:className "section-container"}
                         (case (:active data)
                           :details (om/build deployment-selected-details-component data)
-                          :check (om/build camera-check/record-camera-check-component data)
+                          :check (om/build camera-check/record-camera-check-component data
+                                           {:state state})
                           nil))))))
 
 (defn edit-view-component
@@ -165,8 +165,7 @@
                   #(om/update! app :page-state {:data (merge (:body %)
                                                              {:validation-problem {:value false}})
                                                 :menu [{:action :check
-                                                        :name (tr/translate ::record-camera-check)
-                                                        :active true}
+                                                        :name (tr/translate ::record-camera-check)}
                                                        {:action :details
                                                         :name (tr/translate :words/details)}]
                                                 :active :check})))
