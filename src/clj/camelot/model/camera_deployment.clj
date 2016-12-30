@@ -116,7 +116,8 @@
        (map (partial get-uploaded-status state))
        (map camera-deployment)))
 
-(defn- valid-camera-check?
+(defn valid-camera-check?
+  "Predicate returning false if the camera check is invalid. True otherwise."
   [data]
   (and (not= (get data (dep-util/camera-id-key :primary))
              (get data (dep-util/camera-id-key :secondary)))
@@ -133,4 +134,3 @@
       (trap-station-session/set-session-end-date! s d)
       (update-used-cameras! s d)
       (maybe-create-new-session-and-cameras! s d))))
-
