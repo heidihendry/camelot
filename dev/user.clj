@@ -52,5 +52,10 @@
   (swap! http/system component/stop)
   nil)
 
+(defn restart
+  []
+  (stop)
+  (start))
+
 (defn state []
   @http/system)
