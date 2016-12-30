@@ -15,7 +15,8 @@
 (s/defrecord TSurveyFile
     [survey-id :- s/Int
      survey-file-name :- s/Str
-     survey-file-size :- s/Int])
+     survey-file-size :- s/Int]
+  {s/Any s/Any})
 
 (s/defrecord SurveyFile
     [survey-id :- s/Int
@@ -23,19 +24,11 @@
      survey-file-name :- s/Str
      survey-file-size :- s/Int
      survey-file-created :- org.joda.time.DateTime
-     survey-file-updated :- org.joda.time.DateTime])
+     survey-file-updated :- org.joda.time.DateTime]
+  {s/Any s/Any})
 
-(s/defn survey-file :- SurveyFile
-  [{:keys [survey-id survey-file-id survey-file-name
-           survey-file-size survey-file-created
-           survey-file-updated]}]
-  (->SurveyFile survey-id survey-file-id survey-file-name
-                survey-file-size survey-file-created
-                survey-file-updated))
-
-(s/defn tsurvey-file :- TSurveyFile
-  [{:keys [survey-id survey-file-name survey-file-size]}]
-  (->TSurveyFile survey-id survey-file-name survey-file-size))
+(def survey-file map->SurveyFile)
+(def tsurvey-file map->TSurveyFile)
 
 (s/defn get-all :- [SurveyFile]
   "Retrieve all available files for the given survey."

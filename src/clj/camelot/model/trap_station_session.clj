@@ -15,7 +15,8 @@
     [trap-station-id :- s/Int
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- (s/maybe org.joda.time.DateTime)
-     trap-station-session-notes :- (s/maybe s/Str)])
+     trap-station-session-notes :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
 (s/defrecord TrapStationSession
     [trap-station-session-id :- s/Int
@@ -25,24 +26,11 @@
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- (s/maybe org.joda.time.DateTime)
      trap-station-session-notes :- (s/maybe s/Str)
-     trap-station-session-label :- (s/maybe s/Str)])
+     trap-station-session-label :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
-(s/defn trap-station-session :- TrapStationSession
-  [{:keys [trap-station-session-id trap-station-session-created
-           trap-station-session-updated trap-station-id
-           trap-station-session-start-date trap-station-session-end-date
-           trap-station-session-label trap-station-session-notes]}]
-  (->TrapStationSession trap-station-session-id trap-station-session-created
-           trap-station-session-updated trap-station-id
-           trap-station-session-start-date trap-station-session-end-date
-           trap-station-session-notes trap-station-session-label))
-
-(s/defn ttrap-station-session :- TTrapStationSession
-  [{:keys [trap-station-id trap-station-session-start-date
-           trap-station-session-end-date trap-station-session-notes]}]
-  (->TTrapStationSession trap-station-id trap-station-session-start-date
-                        trap-station-session-end-date
-                        trap-station-session-notes))
+(def trap-station-session map->TrapStationSession)
+(def ttrap-station-session map->TTrapStationSession)
 
 (def date-formatter (tf/formatter "yyyy-MM-dd"))
 

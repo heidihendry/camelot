@@ -17,7 +17,8 @@
      photo-orientation :- (s/maybe s/Str)
      photo-resolution-x :- s/Int
      photo-resolution-y :- s/Int
-     media-id :- s/Int])
+     media-id :- s/Int]
+  {s/Any s/Any})
 
 (s/defrecord Photo
     [photo-id :- s/Int
@@ -31,25 +32,11 @@
      photo-orientation :- (s/maybe s/Str)
      photo-resolution-x :- s/Int
      photo-resolution-y :- s/Int
-     media-id :- s/Int])
+     media-id :- s/Int]
+  {s/Any s/Any})
 
-(s/defn tphoto :- TPhoto
-  [{:keys [photo-iso-setting photo-exposure-value photo-flash-setting
-           photo-focal-length photo-fnumber-setting photo-orientation
-           photo-resolution-x photo-resolution-y media-id]}]
-  (->TPhoto photo-iso-setting photo-exposure-value photo-flash-setting
-            photo-focal-length photo-fnumber-setting photo-orientation
-            photo-resolution-x photo-resolution-y media-id))
-
-(s/defn photo :- Photo
-  [{:keys [photo-id photo-created photo-updated photo-iso-setting
-           photo-exposure-value photo-flash-setting photo-focal-length
-           photo-fnumber-setting photo-orientation photo-resolution-x
-           photo-resolution-y media-id]}]
-  (->Photo photo-id photo-created photo-updated photo-iso-setting
-           photo-exposure-value photo-flash-setting photo-focal-length
-           photo-fnumber-setting photo-orientation photo-resolution-x
-           photo-resolution-y media-id))
+(def photo map->Photo)
+(def tphoto map->TPhoto)
 
 (s/defn get-all :- [Photo]
   [state :- State

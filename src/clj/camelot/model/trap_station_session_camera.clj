@@ -17,41 +17,27 @@
      trap-station-session-id :- s/Int
      trap-station-session-camera-media-unrecoverable :- s/Bool
      trap-station-session-camera-import-path :- (s/maybe s/Str)
-     camera-name :- (s/maybe s/Str)])
+     camera-name :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
 (s/defrecord TTrapStationSessionCamera
     [camera-id :- s/Int
      trap-station-session-id :- s/Int
      trap-station-session-camera-media-unrecoverable :- s/Bool
-     trap-station-session-camera-import-path :- (s/maybe s/Str)])
+     trap-station-session-camera-import-path :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
-(s/defn trap-station-session-camera :- TrapStationSessionCamera
-  [{:keys [trap-station-session-camera-id
-           trap-station-session-camera-created
-           trap-station-session-camera-updated
-           camera-id
-           trap-station-session-id
-           trap-station-session-camera-media-unrecoverable
-           trap-station-session-camera-import-path
-           camera-name]}]
-  (->TrapStationSessionCamera trap-station-session-camera-id
-                              trap-station-session-camera-created
-                              trap-station-session-camera-updated
-                              camera-id
-                              trap-station-session-id
-                              (or trap-station-session-camera-media-unrecoverable false)
-                              trap-station-session-camera-import-path
-                              camera-name))
+(defn trap-station-session-camera
+  [ks]
+  (map->TrapStationSessionCamera
+   (update ks :trap-station-session-camera-media-unrecoverable
+           #(or % false))))
 
-(s/defn ttrap-station-session-camera :- TTrapStationSessionCamera
-  [{:keys [camera-id
-           trap-station-session-id
-           trap-station-session-camera-media-unrecoverable
-           trap-station-session-camera-import-path]}]
-  (->TTrapStationSessionCamera camera-id
-                               trap-station-session-id
-                               (or trap-station-session-camera-media-unrecoverable false)
-                               trap-station-session-camera-import-path))
+(defn ttrap-station-session-camera
+  [ks]
+  (map->TTrapStationSessionCamera
+   (update ks :trap-station-session-camera-media-unrecoverable
+           #(or % false))))
 
 (s/defn get-all :- [TrapStationSessionCamera]
   [state :- State

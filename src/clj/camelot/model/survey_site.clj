@@ -11,7 +11,8 @@
 (s/defrecord TSurveySite
     [survey-id :- s/Int
      site-id :- s/Int
-     site-name :- (s/maybe s/Str)])
+     site-name :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
 (s/defrecord SurveySite
     [survey-site-id :- s/Int
@@ -19,17 +20,11 @@
      survey-site-updated :- org.joda.time.DateTime
      survey-id :- s/Int
      site-id :- s/Int
-     site-name :- (s/maybe s/Str)])
+     site-name :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
-(s/defn tsurvey-site :- TSurveySite
-  [{:keys [survey-id site-id site-name]}]
-  (->TSurveySite survey-id site-id site-name))
-
-(s/defn survey-site :- SurveySite
-  [{:keys [survey-site-id survey-site-created survey-site-updated survey-id
-           site-id site-name]}]
-  (->SurveySite survey-site-id survey-site-created survey-site-updated
-                survey-id site-id site-name))
+(def survey-site map->SurveySite)
+(def tsurvey-site map->TSurveySite)
 
 (s/defn get-all :- [SurveySite]
   [state :- State

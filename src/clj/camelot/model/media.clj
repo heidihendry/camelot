@@ -23,7 +23,8 @@
      media-processed :- (s/maybe s/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
      media-reference-quality :- (s/maybe s/Bool)
-     trap-station-session-camera-id :- s/Int])
+     trap-station-session-camera-id :- s/Int]
+  {s/Any s/Any})
 
 (s/defrecord Media
     [media-id :- s/Int
@@ -38,24 +39,17 @@
      media-capture-timestamp :- org.joda.time.DateTime
      media-reference-quality :- s/Bool
      trap-station-session-camera-id :- s/Int
-     media-capture-timestamp-label :- s/Str])
+     media-capture-timestamp-label :- s/Str]
+  {s/Any s/Any})
 
-(s/defn tmedia
-  [{:keys [media-filename media-format media-notes media-cameracheck
-           media-attention-needed media-processed media-capture-timestamp
-           media-reference-quality trap-station-session-camera-id]}]
-  (->TMedia media-filename media-format media-notes media-cameracheck
-            media-attention-needed media-processed media-capture-timestamp
-            (or media-reference-quality false) trap-station-session-camera-id))
+(defn tmedia
+  [ks]
+  (map->TMedia (update ks :media-reference-quality #(or % false))))
 
-(s/defn media
-  [{:keys [media-id media-created media-updated media-filename media-format
-           media-notes media-cameracheck media-attention-needed media-processed
-           media-reference-quality media-capture-timestamp trap-station-session-camera-id]}]
-  (->Media media-id media-created media-updated media-filename media-format
-           media-notes media-cameracheck media-attention-needed media-processed
-           media-capture-timestamp media-reference-quality trap-station-session-camera-id
-           (tf/unparse (tf/formatters :mysql) media-capture-timestamp)))
+(defn media
+  [ks]
+  (map->Media (assoc ks :media-capture-timestamp-label
+                     (tf/unparse (tf/formatters :mysql) (:media-capture-timestamp ks)))))
 
 (s/defn get-all :- [Media]
   [state :- State

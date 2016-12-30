@@ -15,7 +15,8 @@
      camera-make :- (s/maybe s/Str)
      camera-model :- (s/maybe s/Str)
      camera-notes :- (s/maybe s/Str)
-     camera-status-id :- s/Num])
+     camera-status-id :- s/Num]
+  {s/Any s/Any})
 
 (s/defrecord Camera
     [camera-id :- s/Num
@@ -26,21 +27,13 @@
      camera-model :- (s/maybe s/Str)
      camera-notes :- (s/maybe s/Str)
      camera-status-id :- s/Num
-     camera-status-description :- s/Str])
+     camera-status-description :- s/Str]
+  {s/Any s/Any})
 
-(s/defn camera :- Camera
-  [{:keys [camera-id camera-created camera-updated camera-name
-           camera-make camera-model camera-notes camera-status-id
-           camera-status-description]}]
-  (->Camera camera-id camera-created camera-updated camera-name
-            camera-make camera-model camera-notes camera-status-id
-            camera-status-description))
-
-(s/defn tcamera :- TCamera
-  [{:keys [camera-name camera-make camera-model camera-notes
-           camera-status-id]}]
-  (->TCamera camera-name camera-make camera-model camera-notes
-             (or camera-status-id 1)))
+(def camera map->Camera)
+(defn tcamera
+  [ks]
+  (map->TCamera (update ks :camera-status-id #(or % 1))))
 
 (s/defn to-camera :- Camera
   [state record]

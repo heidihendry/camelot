@@ -35,7 +35,8 @@
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-notes :- (s/maybe s/Str)
      primary-camera-id :- s/Int
-     secondary-camera-id :- (s/maybe s/Int)])
+     secondary-camera-id :- (s/maybe s/Int)]
+  {s/Any s/Any})
 
 (s/defrecord Deployment
     [trap-station-session-id :- s/Int
@@ -61,44 +62,11 @@
      primary-camera-status-id :- s/Int
      secondary-camera-id :- (s/maybe s/Num)
      secondary-camera-name :- (s/maybe s/Str)
-     secondary-camera-status-id :- (s/maybe s/Int)])
+     secondary-camera-status-id :- (s/maybe s/Int)]
+  {s/Any s/Any})
 
-(s/defn tdeployment
-  [{:keys [survey-id site-id trap-station-name trap-station-longitude trap-station-latitude
-           trap-station-altitude
-           trap-station-distance-above-ground trap-station-distance-to-river
-           trap-station-distance-to-road trap-station-distance-to-settlement
-           trap-station-session-start-date trap-station-session-end-date trap-station-notes
-           primary-camera-id secondary-camera-id]}]
-  (->TDeployment survey-id site-id trap-station-name trap-station-longitude
-                 trap-station-latitude trap-station-altitude
-                 trap-station-distance-above-ground trap-station-distance-to-river
-                 trap-station-distance-to-road trap-station-distance-to-settlement
-                 trap-station-session-start-date trap-station-notes primary-camera-id
-                 secondary-camera-id))
-
-(s/defn deployment
-  [{:keys [trap-station-session-id trap-station-session-created
-           trap-station-session-updated trap-station-id trap-station-name
-           site-id survey-site-id site-name trap-station-longitude
-           trap-station-latitude trap-station-altitude
-           trap-station-distance-above-ground trap-station-distance-to-river
-           trap-station-distance-to-road trap-station-distance-to-settlement
-           trap-station-notes trap-station-session-start-date
-           trap-station-session-end-date primary-camera-id
-           primary-camera-name primary-camera-status-id secondary-camera-id
-           secondary-camera-name secondary-camera-status-id]}]
-  (->Deployment trap-station-session-id trap-station-session-created
-                trap-station-session-updated trap-station-id
-                trap-station-name site-id survey-site-id site-name
-                trap-station-longitude trap-station-latitude
-                trap-station-altitude
-                trap-station-distance-above-ground trap-station-distance-to-river
-                trap-station-distance-to-road trap-station-distance-to-settlement
-                trap-station-notes trap-station-session-start-date trap-station-session-end-date
-                primary-camera-id primary-camera-name primary-camera-status-id
-                secondary-camera-id secondary-camera-name
-                secondary-camera-status-id))
+(def deployment map->Deployment)
+(def tdeployment map->TDeployment)
 
 (s/defn get-all :- [Deployment]
   [state :- State

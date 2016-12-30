@@ -44,26 +44,15 @@
      survey-name :- s/Str
      site-id :- s/Int
      site-name :- s/Str
-     sightings :- [Sighting]])
+     sightings :- [Sighting]]
+  {s/Any s/Any})
 
-(s/defn library-record
-  [{:keys [media-id media-created media-updated media-filename media-format
-           media-uri media-cameracheck media-attention-needed media-processed
-           media-reference-quality media-capture-timestamp trap-station-session-camera-id
-           trap-station-session-id trap-station-id trap-station-name
-           trap-station-longitude trap-station-latitude site-sublocation
-           site-city site-state-province site-country camera-id camera-name
-           camera-make camera-model survey-site-id survey-id survey-name
-           site-id site-name sightings]}]
-  (->LibraryRecord media-id media-created media-updated media-filename
-                   media-format media-uri media-cameracheck
-                   media-attention-needed (or media-processed false) (or media-reference-quality false)
-                   media-capture-timestamp trap-station-session-camera-id
-                   trap-station-session-id trap-station-id trap-station-name
-                   trap-station-longitude trap-station-latitude
-                   site-sublocation site-city site-state-province site-country camera-id
-                   camera-name camera-make camera-model survey-site-id survey-id
-                   survey-name site-id site-name (or sightings [])))
+(defn library-record
+  [ks]
+  (map->LibraryRecord (-> ks
+                          (update :media-processed #(or % false))
+                          (update :media-reference-quality #(or % false))
+                          (update :sightings #(or % [])))))
 
 (defn- all-media
   [state]

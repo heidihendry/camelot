@@ -41,7 +41,8 @@
      secondary-camera-name :- (s/maybe s/Str)
      secondary-camera-original-id :- (s/maybe s/Int)
      secondary-camera-status-id :- (s/maybe s/Int)
-     secondary-camera-media-unrecoverable :- (s/maybe s/Bool)])
+     secondary-camera-media-unrecoverable :- (s/maybe s/Bool)]
+  {s/Any s/Any})
 
 (s/defrecord CameraDeployment
     [trap-station-session-id :- s/Int
@@ -67,59 +68,11 @@
      camera-id :- s/Int
      camera-name :- s/Str
      camera-status-id :- s/Int
-     has-uploaded-media :- s/Bool])
+     has-uploaded-media :- s/Bool]
+  {s/Any s/Any})
 
-(s/defn camera-deployment
-  [{:keys [trap-station-session-id trap-station-session-created
-           trap-station-session-updated trap-station-id trap-station-name
-           site-id survey-site-id site-name trap-station-longitude
-           trap-station-latitude trap-station-altitude
-           trap-station-distance-above-ground trap-station-distance-to-river
-           trap-station-distance-to-road trap-station-distance-to-settlement
-           trap-station-notes
-           trap-station-session-start-date trap-station-session-end-date
-           trap-station-session-camera-id
-           trap-station-session-camera-media-unrecoverable
-           camera-id camera-name camera-status-id has-uploaded-media]}]
-  (->CameraDeployment trap-station-session-id trap-station-session-created
-                      trap-station-session-updated trap-station-id
-                      trap-station-name site-id survey-site-id site-name
-                      trap-station-longitude trap-station-latitude
-                      trap-station-altitude
-                      trap-station-distance-above-ground trap-station-distance-to-river
-                      trap-station-distance-to-road trap-station-distance-to-settlement
-                      trap-station-notes
-                      trap-station-session-start-date trap-station-session-end-date
-                      trap-station-session-camera-id
-                      trap-station-session-camera-media-unrecoverable
-                      camera-id camera-name camera-status-id has-uploaded-media))
-
-(s/defn tcamera-deployment
-  [{:keys [trap-station-session-id trap-station-name site-id trap-station-id
-           trap-station-longitude trap-station-latitude trap-station-altitude
-           trap-station-distance-above-ground trap-station-distance-to-river
-           trap-station-distance-to-road trap-station-distance-to-settlement
-           trap-station-notes trap-station-session-start-date
-           trap-station-session-end-date primary-camera-id primary-camera-name
-           primary-camera-original-id
-           primary-camera-status-id primary-camera-media-unrecoverable
-           secondary-camera-id secondary-camera-name
-           secondary-camera-original-id
-           secondary-camera-status-id secondary-camera-media-unrecoverable]}]
-  (->TCameraDeployment trap-station-session-id trap-station-name site-id trap-station-id
-                       trap-station-longitude trap-station-latitude
-                       trap-station-altitude
-                       trap-station-distance-above-ground trap-station-distance-to-river
-                       trap-station-distance-to-road trap-station-distance-to-settlement
-                       trap-station-notes
-                       trap-station-session-start-date trap-station-session-end-date
-                       primary-camera-id primary-camera-name
-                       primary-camera-original-id primary-camera-status-id
-                       primary-camera-media-unrecoverable
-                       secondary-camera-id secondary-camera-name
-                       secondary-camera-original-id
-                       secondary-camera-status-id
-                       secondary-camera-media-unrecoverable))
+(def camera-deployment map->CameraDeployment)
+(def tcamera-deployment map->TCameraDeployment)
 
 (s/defn update-used-cameras!
   "Update the status of cameras and the media recoverability flag."

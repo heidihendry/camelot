@@ -1,4 +1,5 @@
 (ns camelot.model.associated-taxonomy
+  "Model to associate survey with taxonomy details."
   (:require
    [camelot.model.taxonomy :as taxonomy]
    [camelot.system.state :refer [State]]
@@ -18,15 +19,10 @@
      taxonomy-common-name :- (s/maybe s/Str)
      species-mass-id :- (s/maybe s/Int)
      taxonomy-notes :- (s/maybe s/Str)
-     survey-id :- (s/maybe s/Int)])
+     survey-id :- (s/maybe s/Int)]
+  {s/Any s/Any})
 
 (def tassociated-taxonomy map->TAssociatedTaxonomy)
-
-(s/defn get-or-create-taxonomy :- Taxonomy
-  [state :- State
-   taxdata :- TTaxonomy]
-  (or (taxonomy/get-specific-by-taxonomy state taxdata)
-      (taxonomy/create! state taxdata)))
 
 (s/defn ensure-associated
   [state :- State
@@ -39,10 +35,11 @@
         (survey-taxonomy/create! state tst))))
 
 (s/defn create!
+  "Associate taxonomy with a survey, or, if not specified, all surveys."
   [state :- State
    taxdata :- TAssociatedTaxonomy]
   (db/with-transaction [s state]
-    (let [t (get-or-create-taxonomy s (taxonomy/ttaxonomy taxdata))
+    (let [t (taxonomy/get-or-create! s (taxonomy/ttaxonomy taxdata))
           sid (:survey-id taxdata)]
       (if sid
         (ensure-associated s sid (:taxonomy-id t))

@@ -18,7 +18,8 @@
      survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
      survey-notes :- (s/maybe s/Str)
-     survey-bulk-import-mode :- (s/maybe s/Bool)])
+     survey-bulk-import-mode :- (s/maybe s/Bool)]
+  {s/Any s/Any})
 
 (s/defrecord Survey
     [survey-id :- s/Int
@@ -29,25 +30,18 @@
      survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
      survey-notes :- (s/maybe s/Str)
-     survey-bulk-import-mode :- (s/maybe s/Bool)])
+     survey-bulk-import-mode :- (s/maybe s/Bool)]
+  {s/Any s/Any})
 
-(s/defn survey :- Survey
-  [{:keys [survey-id survey-created survey-updated survey-name
-           survey-sighting-independence-threshold
-           survey-directory survey-sampling-point-density
-           survey-notes survey-bulk-import-mode]}]
-  (->Survey survey-id survey-created survey-updated survey-name
-            survey-sighting-independence-threshold survey-directory
-            survey-sampling-point-density survey-notes
-            (or survey-bulk-import-mode false)))
+(defn survey
+  [ks]
+  (map->Survey (update ks :survey-bulk-import-mode #(or % false))))
 
-(s/defn tsurvey :- TSurvey
-  [{:keys [survey-name survey-sighting-independence-threshold survey-directory
-           survey-sampling-point-density
-           survey-notes survey-bulk-import-mode]}]
-  (->TSurvey survey-name (or survey-sighting-independence-threshold 20)
-             survey-directory survey-sampling-point-density survey-notes
-             (or survey-bulk-import-mode false)))
+(defn tsurvey
+  [ks]
+  (map->TSurvey (-> ks
+                    (update :survey-bulk-import-mode #(or % false))
+                    (update :survey-sighting-independence-threshold #(or % 20)))))
 
 (s/defn get-all :- [Survey]
   [state :- State]

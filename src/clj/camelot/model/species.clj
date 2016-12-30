@@ -11,7 +11,8 @@
 (s/defrecord TSpecies
     [species-scientific-name :- s/Str
      species-common-name :- s/Str
-     species-notes :- (s/maybe s/Str)])
+     species-notes :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
 (s/defrecord Species
     [species-id :- s/Int
@@ -19,17 +20,11 @@
      species-updated :- org.joda.time.DateTime
      species-scientific-name :- s/Str
      species-common-name :- s/Str
-     species-notes :- (s/maybe s/Str)])
+     species-notes :- (s/maybe s/Str)]
+  {s/Any s/Any})
 
-(s/defn tspecies :- TSpecies
-  [{:keys [species-scientific-name species-common-name species-notes]}]
-  (->TSpecies species-scientific-name species-common-name species-notes))
-
-(s/defn species :- Species
-  [{:keys [species-id species-created species-updated species-scientific-name
-           species-common-name species-notes]}]
-  (->Species species-id species-created species-updated species-scientific-name
-             species-common-name species-notes))
+(def species map->Species)
+(def tspecies map->TSpecies)
 
 (s/defn get-all :- [Species]
   [state :- State]

@@ -20,7 +20,8 @@
      sighting-lifestage :- (s/maybe s/Str)
      sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- s/Int
-     media-id :- s/Int])
+     media-id :- s/Int]
+  {s/Any s/Any})
 
 (s/defrecord Sighting
     [sighting-id :- s/Int
@@ -31,7 +32,8 @@
      sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- (s/maybe s/Int)
      media-id :- s/Int
-     sighting-label :- s/Str])
+     sighting-label :- s/Str]
+  {s/Any s/Any})
 
 (s/defn sighting :- Sighting
   [{:keys [sighting-id sighting-created sighting-updated sighting-quantity

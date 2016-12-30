@@ -20,13 +20,10 @@
     [species-mass-id :- s/Num
      species-mass-start :- s/Int
      species-mass-end :- s/Int
-     species-mass-label :- s/Str])
+     species-mass-label :- s/Str]
+  {s/Any s/Any})
 
-(s/defn species-mass :- SpeciesMass
-  [{:keys [species-mass-id species-mass-start
-           species-mass-end species-mass-label]}]
-  (->SpeciesMass species-mass-id species-mass-start
-                 species-mass-end species-mass-label))
+(def species-mass SpeciesMass)
 
 (s/defn get-all :- [SpeciesMass]
   "Retrieve, translate and return all species mass brackets."

@@ -25,25 +25,18 @@
 (s/defrecord TCameraStatus
     [camera-status-is-deployed :- s/Bool
      camera-status-is-terminated :- s/Bool
-     camera-status-description :- s/Str])
+     camera-status-description :- s/Str]
+  {s/Any s/Any})
 
 (s/defrecord CameraStatus
     [camera-status-id :- s/Num
      camera-status-is-deployed :- s/Bool
      camera-status-is-terminated :- s/Bool
-     camera-status-description :- s/Str])
+     camera-status-description :- s/Str]
+  {s/Any s/Any})
 
-(s/defn camera-status :- CameraStatus
-  [{:keys [camera-status-id camera-status-is-deployed
-           camera-status-is-terminated camera-status-description]}]
-  (->CameraStatus camera-status-id camera-status-is-deployed
-                  camera-status-is-terminated camera-status-description))
-
-(s/defn tcamera-status :- TCameraStatus
-  [{:keys [camera-status-is-deployed camera-status-is-terminated
-           camera-status-description]}]
-  (->TCameraStatus camera-status-is-deployed camera-status-is-terminated
-                   camera-status-description))
+(def camera-status map->CameraStatus)
+(def tcamera-status map->TCameraStatus)
 
 (s/defn get-all :- [CameraStatus]
   "Retrieve, translate and return all available camera statuses."

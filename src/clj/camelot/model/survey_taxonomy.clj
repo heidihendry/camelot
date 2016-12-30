@@ -13,24 +13,19 @@
 
 (s/defrecord TSurveyTaxonomy
     [survey-id :- s/Int
-     taxonomy-id :- s/Int])
+     taxonomy-id :- s/Int]
+  {s/Any s/Any})
 
 (s/defrecord SurveyTaxonomy
     [survey-taxonomy-id :-  s/Int
      survey-taxonomy-created :- org.joda.time.DateTime
      survey-taxonomy-updated :- org.joda.time.DateTime
      survey-id :- s/Int
-     taxonomy-id :- s/Int])
+     taxonomy-id :- s/Int]
+  {s/Any s/Any})
 
-(s/defn survey-taxonomy :- SurveyTaxonomy
-  [{:keys [survey-taxonomy-id survey-taxonomy-created
-           survey-taxonomy-updated survey-id taxonomy-id]}]
-  (->SurveyTaxonomy survey-taxonomy-id survey-taxonomy-created
-                    survey-taxonomy-updated survey-id taxonomy-id))
-
-(s/defn tsurvey-taxonomy :- TSurveyTaxonomy
-  [{:keys [survey-id taxonomy-id]}]
-  (->TSurveyTaxonomy survey-id taxonomy-id))
+(def survey-taxonomy map->SurveyTaxonomy)
+(def tsurvey-taxonomy map->TSurveyTaxonomy)
 
 (s/defn get-all :- [SurveyTaxonomy]
   "Retrieve all available survey taxonomies."
