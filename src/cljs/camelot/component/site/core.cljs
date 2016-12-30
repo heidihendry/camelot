@@ -77,12 +77,12 @@
                          (:site-name data))
                (dom/span #js {:className "menu-item-description"}
                          (when-not (empty? (:site-sublocation data))
-                           (dom/span nil
+                           (dom/div nil
                                      (dom/label nil (tr/translate :site/site-sublocation.label) ":")
                                      " "
-                                     (:site-sublocation data) ", "))
+                                     (:site-sublocation data)))
                          (when-not (empty? (:site-state-province data))
-                           (dom/span nil
+                           (dom/div nil
                                      (dom/label nil
                                                 (tr/translate :site/site-state-province.label) ":")
                                      " "
