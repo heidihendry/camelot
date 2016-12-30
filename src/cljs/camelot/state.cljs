@@ -55,6 +55,6 @@
 (defn settings
   "Return a map of application settings."
   []
-  (some-> (get (resources-state) :settings)
+  (some-> (:settings (resources-state))
           deref
           cursorise/decursorise))

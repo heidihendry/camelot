@@ -82,15 +82,16 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (om/update! data {:menu [{:concept :survey
-                                :name (tr/translate ::surveys)}
-                               {:concept :site
-                                :name (tr/translate ::sites)}
-                               {:concept :camera
-                                :name (tr/translate ::cameras)}
-                               {:concept :report
-                                :name (tr/translate ::reports)}]})
-      (om/update! data :active :survey)
+      (om/update! data :menu [{:concept :survey
+                               :name (tr/translate ::surveys)}
+                              {:concept :site
+                               :name (tr/translate ::sites)}
+                              {:concept :camera
+                               :name (tr/translate ::cameras)}
+                              {:concept :report
+                               :name (tr/translate ::reports)}])
+      (when (nil? (:active @data))
+        (om/update! data :active :survey))
       (om/update! data :camera {})
       (om/update! data :site {})
       (om/update! data :report {})
@@ -118,11 +119,8 @@
     om/IWillMount
     (will-mount [_]
       (om/update! app :selected-survey nil)
-      (om/update! app :organisation {}))
-
-    om/IWillUnmount
-    (will-unmount [_]
-      (om/update! app :organisation {}))
+      (when-not (:organisation app)
+        (om/update! app :organisation {})))
 
     om/IRender
     (render [_]
