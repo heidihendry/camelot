@@ -798,4 +798,9 @@
    {:trap-station-session-closed-label "%s to %s"
     :trap-station-session-ongoing-label "%s and ongoing"}
 
+   :camelot.import.template
+   {:directory-not-found "%s: Directory not found"
+    :directory-not-readable "%s: directory not readable"
+    :no-media-found "%s: no media found"}
+
    :missing "[Translation missing]"})

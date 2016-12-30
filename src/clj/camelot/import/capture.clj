@@ -1,4 +1,5 @@
 (ns camelot.import.capture
+  "Camera check capture import."
   (:require
    [schema.core :as s]
    [camelot.util.capture :as capture]
@@ -6,7 +7,7 @@
    [camelot.import.dirtree :as dt]
    [camelot.import.metadata-utils :as mutil]
    [camelot.util.db :as db]
-   [camelot.import.core :as import]
+   [camelot.import.image :as image]
    [camelot.model.media :as media]
    [camelot.model.photo :as photo]
    [camelot.model.trap-station-session :as trap-station-session]
@@ -37,16 +38,14 @@
        (dt/file-raw-metadata state)
        (mutil/parse state)))
 
-(defn- -create-record!
-  [state session-camera-id photo filename fmt]
-  (let [media (create-media! state photo filename fmt session-camera-id)]
-    (photo/create! state
-                   (photo/tphoto (assoc photo :media-id (:media-id media))))))
-
-(s/defn create-record!
+(defn create-record!
   [state session-camera-id fmt photo filename]
   (db/with-transaction [s state]
-    (-create-record! state session-camera-id photo filename fmt)))
+    (let [media (create-media! state photo filename fmt session-camera-id)]
+      (->> (:media-id media)
+           (assoc photo :media-id)
+           photo/tphoto
+           (photo/create! state)))))
 
 (s/defn invalid-session-date? :- s/Bool
   [sess :- TrapStationSession
@@ -58,7 +57,7 @@
 (defn create-media
   [state content-type tempfile size session-camera-id photo]
   (let [fmt (get capture/image-mimes content-type)
-        filename (import/create-image-files state tempfile fmt)]
+        filename (image/create-image-files state tempfile fmt)]
     (create-record! state session-camera-id fmt photo filename)))
 
 (s/defn import-capture!

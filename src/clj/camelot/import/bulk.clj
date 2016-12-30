@@ -1,293 +1,83 @@
 (ns camelot.import.bulk
-  "Provide high-level handling for bulk import support.  Bulk import consists
-  of template generation, field mapping, validation and the actual import
-  itself."
+  "Machinery for importing media via bulk import."
   (:require
-   [clojure.core.async :refer [>!!]]
-   [ring.util.response :as r]
+   [clojure.core.async :refer [<! >!! chan go-loop] :as async]
+   [camelot.util.db :refer [with-transaction]]
+   [camelot.import.db :as db]
    [camelot.import.datatype :as datatype]
-   [camelot.import.dirtree :as dt]
    [camelot.util.model :as model]
-   [camelot.util.config :as config]
    [camelot.translation.core :as tr]
-   [clojure.data.csv :as csv]
-   [clj-time.format :as tf]
-   [clj-time.local :as tl]
-   [schema.core :as s]
-   [clojure.string :as str]
-   [clojure.edn :as edn]
-   [camelot.util.trap-station :as trap]
-   [camelot.util.file :as file]
    [camelot.import.validate :as validate]
+   [camelot.import.template :as template]
    [camelot.model.survey :as survey]
-   [clojure.tools.logging :as log])
-  (:import
-   (java.util.regex Pattern)))
+   [clojure.tools.logging :as log]
+   [camelot.import.image :as image]
+   [clojure.string :as str]))
 
-(def time-formatter (tf/formatter-local "yyyy-MM-dd_HHmm"))
-(def default-column-mappings
-  {:trap-station-latitude "Camelot GPS Latitude"
-   :trap-station-longitude "Camelot GPS Longitude"
-   :media-capture-timestamp "Date/Time"
-   :camera-make "Make"
-   :camera-model "Model"
-   :trap-station-altitude "GPS Altitude"
-   :site-country "Country/Primary Location Name"
-   :site-state-province "Province/State"
-   :site-city "City"
-   :site-sublocation "Sub-location"
-   :photo-fnumber-setting "Aperture Value"
-   :photo-exposure-value "Exposure Bias Value"
-   :photo-flash-setting "Flash"
-   :photo-focal-setting "Focal Length"
-   :photo-iso-setting "ISO Speed Ratings"
-   :photo-orientation "Orientation"
-   :photo-resolution-x "Image Height"
-   :photo-resolution-y "Image Width"})
+(defn do-import
+  "Import a media file."
+  [msg]
+  (try
+    (with-transaction [s (:state msg)]
+      (->> (:record msg)
+           (image/add-media-file! s)
+           (db/create-media! s)
+           (db/create-sighting! s)
+           (db/create-photo! s)))
+    (assoc msg :result :complete
+           :absolute-path (get-in msg [:record :absolute-path]))
+    (catch Exception e
+      (log/error (.getMessage e))
+      (log/error (str/join "\n" (map str (.getStackTrace e))))
+      (assoc msg :result :failed
+             :absolute-path (get-in msg [:record :absolute-path])))))
 
-(s/defn relative-path? :- s/Bool
-  [dir :- s/Str]
-  (nil? (re-find #"^(/|[A-Z]:)" dir)))
+(defn add-import-result
+  "Update importer state with the latest result."
+  [{:keys [state result absolute-path]}]
+  (dosync
+   (alter (get-in state [:importer :pending]) dec)
+   (alter (get-in state [:importer result]) inc)
+   (when (= result :failed)
+     (alter (get-in state [:importer :failed-paths]) conj absolute-path))))
 
-(defn detect-separator
-  [path]
-  (cond
-    (nil? path) (file/path-separator)
-    (re-find #"^[A-Z]:(?:\\|$)" path) "\\"
-    (and (re-find #"\\" path) (relative-path? path)) "\\"
-    :else "/"))
+(defn media-processor
+  "Setup a pipeline for parallel media import and process results."
+  [num-importers]
+  (let [ch (chan)
+        result-chan (chan num-importers)]
+    (async/pipeline-blocking num-importers result-chan (map do-import) ch)
+    (go-loop []
+      (let [msg (<! result-chan)]
+        (add-import-result msg))
+      (recur))
+    ch))
 
-(defn resolve-absolute-server-directory
-  "Resolve a client directory, unifying it with the configured server directory, if possible."
-  [server-base-dir client-dir]
-  (let [svr-sep (detect-separator server-base-dir)
-        svr-path (clojure.string/split (or server-base-dir "")
-                                       (re-pattern (str "\\" svr-sep)))]
-    (->> client-dir
-         detect-separator
-         (str "\\")
-         re-pattern
-         (clojure.string/split client-dir)
-         (drop-while #(not= % (last svr-path)))
-         rest
-         (apply conj svr-path)
-         (str/join svr-sep))))
-
-(defn resolve-relative-server-directory
-  "Resolve a directory relative to the configured server directory, if any."
-  [server-base-dir client-dir]
-  (let [svr-sep (detect-separator server-base-dir)
-        svr-path (clojure.string/split (or server-base-dir "")
-                                       (re-pattern (str "\\" svr-sep)))]
-    (->> client-dir
-         detect-separator
-         (str "\\")
-         re-pattern
-         (clojure.string/split client-dir)
-         (apply conj svr-path)
-         (str/join svr-sep))))
-
-(defn strategic-directory-resolver
-  "Resolve a directory, either relative to the base-dir or absolutely."
-  [server-base-dir client-dir]
-  (let [f (if (and (relative-path? client-dir) (not (nil? server-base-dir)))
-            resolve-relative-server-directory
-            resolve-absolute-server-directory)]
-    (f server-base-dir client-dir)))
-
-(defn ^String re-quote
-  [^String s]
-  (Pattern/quote ^String s))
-
-(defn resolve-server-directory
-  "Resolve the directory, defaulting to the root path should the client attempt to escape it."
-  [server-base-dir client-dir]
-  (if server-base-dir
-    (let [f-can (file/canonical-path (file/->file (strategic-directory-resolver server-base-dir client-dir)))
-          s-can (file/canonical-path (file/->file server-base-dir))]
-      (if (re-find (re-pattern (str "^" (re-quote s-can))) f-can)
-        f-can
-        (do
-          (prn s-can)
-          (prn f-can)
-          s-can)))
-    client-dir))
-
-(defn resolve-directory
-  "Resolve a corresponding server directory for a given 'client' directory."
-  [state client-dir]
-  {:pre [(not (nil? client-dir))]}
-  (let [root (config/lookup state :root-path)
-        res (resolve-server-directory root client-dir)]
-    (cond
-      (and (empty? res) (nil? root)) client-dir
-      (empty? res) root
-      :else res)))
-
-(s/defn gps-parts-to-decimal :- s/Num
-  "Return the GPS parts as a decimal."
-  [parts :- [s/Num]]
-  {:pre [(= (count parts) 3)]}
-  (let [exact (+ (first parts)
-                 (/ (/ (nth parts 1) 0.6) 100)
-                 (/ (/ (nth parts 2) 0.36) 10000))]
-    (edn/read-string (format "%.6f" exact))))
-
-(s/defn gps-degrees-as-parts
-  "Return the numeric parts of a GPS location as a vector, given a string in degrees."
-  [deg]
-  (->> (str/split deg #" ")
-       (map #(str/replace % #"[^\.0-9]" ""))
-       (mapv edn/read-string)))
-
-(s/defn parse-gps :- s/Num
-  "Convert degrees string with a reference to a decimal.
-`pos-ref' is the reference direction which is positive; any other
-direction is considered negative."
-  [pos-ref :- s/Str
-   mag :- s/Str
-   mag-ref :- s/Str]
-  (let [decimal (-> mag
-                    (gps-degrees-as-parts)
-                    (gps-parts-to-decimal))]
-    (if (= mag-ref pos-ref)
-      decimal
-      (* -1 decimal))))
-
-(s/defn to-longitude :- (s/maybe s/Num)
-  "Convert longitude in degrees and a longitude reference to a decimal."
-  [lon :- (s/maybe s/Str)
-   lon-ref :- (s/maybe s/Str)]
-  (when-not (or (nil? lon) (nil? lon-ref))
-    (try (parse-gps "E" lon lon-ref)
-         (catch java.lang.Exception e
-           (do
-             (log/warn "to-longitude: Attempt to parse " lon " as GPS")
-             nil)))))
-
-(s/defn to-latitude :- (s/maybe s/Num)
-  "Convert latitude in degrees and a latitude reference to a decimal."
-  [lat :- (s/maybe s/Str)
-   lat-ref :- (s/maybe s/Str)]
-  (when-not (or (nil? lat) (nil? lat-ref))
-    (try (parse-gps "N" lat lat-ref)
-         (catch java.lang.Exception e
-           (do
-             (log/warn "to-latitude: Attempt to parse " lat " as GPS")
-             nil)))))
-
-(defn calculate-gps-latitude
-  [data]
-  (to-latitude (get data "GPS Latitude") (get data "GPS Latitude Ref")))
-
-(defn calculate-gps-longitude
-  [data]
-  (to-longitude (get data "GPS Longitude") (get data "GPS Longitude Ref")))
-
-(def calculated-columns
-  {"Camelot GPS Longitude" calculate-gps-longitude
-   "Camelot GPS Latitude" calculate-gps-latitude})
-(def calculated-column-names (set (keys calculated-columns)))
-
-(defn- to-csv-string
-  "Return data as a CSV string."
-  [data]
-  (with-open [io-str (java.io.StringWriter.)]
-    (csv/write-csv io-str data)
-    (str io-str)))
-
-(defn calculate-key-value
-  [data k]
-  (if-let [cfn (calculated-columns k)]
-    (cfn data)
-    (get data k)))
-
-(defn all-keys
-  [data]
-  (sort (into calculated-column-names (flatten (map keys data)))))
-
-(defn standardise-metadata
-  [ks data]
-  (map (fn [r] (reduce #(conj %1 (calculate-key-value r %2)) [] ks)) data))
-
-(defn ->data-table
-  [data]
-  (let [ks (all-keys data)]
-    (cons ks (standardise-metadata ks data))))
-
-(defn generate-template
-  [state client-dir]
-  (->> (resolve-directory state client-dir)
-       (dt/directory-metadata-collection state)
-       ->data-table))
-
-(defn- content-disposition
-  []
-  (format "attachment; filename=\"bulk-import-template_%s.csv\""
-          (tf/unparse time-formatter (tl/local-now))))
-
-(defn metadata-template
-  "Respond with the template as a CSV."
-  [state client-dir]
-  (let [data (to-csv-string (generate-template state client-dir))]
-    (-> (r/response data)
-        (r/content-type "text/csv; charset=utf-8")
-        (r/header "Content-Length" (count data))
-        (r/header "Content-Disposition"
-                  (content-disposition)))))
-
-(defn transpose
-  [m]
-  (apply map list m))
-
-(defn mappable-fields
-  []
-  (remove #(-> % second :unmappable) model/schema-definitions))
-
-(defn column-compatibility
-  [[title & vs]]
-  {:constraints (datatype/possible-constraints vs)
-   :datatypes (datatype/possible-datatypes vs)})
-
-(defn calculate-column-properties
-  "Return a map representing the properties of each column of a vector of
-  vectors."
-  [data]
-  (reduce #(assoc %1 (first %2) (column-compatibility (rest %2)))
-                      {}
-                      (transpose data)))
-
-(defmacro cond-column->
-  [testfn initexpr mapping]
-  (let [m# (fn [x#] (list `(~testfn (second ~x#))
-                          `(assoc (first ~x#) (second ~x#))))]
-    `(cond-> ~initexpr
-       ~@(mapcat m# (eval mapping)))))
-
-(defn assign-default-mappings
-  [props]
-  (cond-column->
-   #(get props %) {}
-   default-column-mappings))
-
-(defn column-map-options
-  [state
-   {:keys [tempfile :- s/Str
-           content-type :- s/Str
-           size :- s/Int]}]
-  (cond
-    (not= content-type "text/csv")
-    (throw (RuntimeException. "File format must be a CSV."))
-
-    (zero? size)
-    (throw (RuntimeException. "CSV must not be empty")))
-
-  (let [data (csv/read-csv (slurp tempfile))
-        props (calculate-column-properties data)]
-    {:default-mappings (assoc (assign-default-mappings props)
-                              :absolute-path "Absolute Path")
-     :column-properties props
-     :file-data data}))
+(defn import-media-fn
+  "Setup data structure and process media import."
+  [num-importers]
+  (let [proc (media-processor num-importers)]
+    (fn [state record]
+      (try
+        (>!! proc (with-transaction [s state]
+                    (let [r (->> record
+                                 (db/get-survey s)
+                                 (db/get-or-create-camera! s)
+                                 (db/get-or-create-site! s)
+                                 (db/get-or-create-survey-site! s)
+                                 (db/get-or-create-trap-station! s)
+                                 (db/get-or-create-trap-session! s)
+                                 (db/get-or-create-trap-camera! s)
+                                 (db/get-or-create-taxonomy! s)
+                                 (db/get-or-create-survey-taxonomy! s)
+                                 (hash-map :state state :record))]
+                      r)))
+        (catch Exception e
+          (log/error (.getMessage e))
+          (log/error (str/join "\n" (map str (.getStackTrace e))))
+          (add-import-result {:state state
+                              :result :failed
+                              :absolute-path (:absolute-path record)}))))))
 
 (defn file-data-to-record-list
   "Return a vector of maps, where each map contains all data for a record."
@@ -324,7 +114,7 @@ direction is considered negative."
 (defn import-with-mappings
   "Given file data and a series of mappings, attempt to import it."
   [state {:keys [file-data mappings survey-id]}]
-  (let [props (calculate-column-properties file-data)
+  (let [props (template/calculate-column-properties file-data)
         errs (model/check-mapping mappings props (partial tr/translate state))
         headings (reduce-kv #(assoc %1 %3 %2) {} (first file-data))]
     (if (seq errs)

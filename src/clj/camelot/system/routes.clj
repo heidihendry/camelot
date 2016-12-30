@@ -4,7 +4,8 @@
    [camelot.system.state :as state]
    [camelot.system.version :as version]
    [camelot.import.capture :as capture]
-   [camelot.import.bulk :as import]
+   [camelot.import.bulk :as bulk]
+   [camelot.import.template :as template]
    [camelot.services.species-search :as species-search]
    [camelot.model.associated-taxonomy :as ataxonomy]
    [camelot.model.camera :as camera]
@@ -115,13 +116,13 @@
                                                                             file-id (assoc state :session session)))
            (GET "/:id" [id] (crud/specific-resource survey/get-specific id (assoc state :session session)))
            (GET "/bulkimport/template" {params :params}
-                (import/metadata-template (assoc state :session session) (:dir params)))
+                (template/metadata-template (assoc state :session session) (:dir params)))
            (POST "/bulkimport/columnmap" {params :multipart-params}
                  (->> (get params "file")
-                      (import/column-map-options (assoc state :session session))
+                      (template/column-map-options (assoc state :session session))
                       r/response))
            (POST "/bulkimport/import" [data]
-                 (r/response (import/import-with-mappings (assoc state :session session) data)))
+                 (r/response (bulk/import-with-mappings (assoc state :session session) data)))
            (PUT "/:id" [id data] (crud/update-resource survey/update! id
                                                        survey/tsurvey data (assoc state :session session)))
            (POST "/" [data] (crud/create-resource survey/create!

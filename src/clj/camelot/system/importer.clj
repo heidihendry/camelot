@@ -2,7 +2,7 @@
   "Importer component."
   (:require
    [com.stuartsierra.component :as component]
-   [camelot.import.core :as import]
+   [camelot.import.bulk :as bulk]
    [clojure.core.async :refer [<! chan >! >!! alts! go-loop go close!] :as async]
    [clojure.tools.logging :as log]
    [clj-time.core :as t]))
@@ -15,7 +15,7 @@
   "Importer event loop."
   [config cmd-chan queue-chan]
   (go
-    (let [import! (import/import-media-fn
+    (let [import! (bulk/import-media-fn
                    (or (get-in config [:config :media-importers]) 1))]
       (try
         (loop []
