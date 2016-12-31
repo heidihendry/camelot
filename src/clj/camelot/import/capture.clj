@@ -18,6 +18,7 @@
    (camelot.model.trap_station_session TrapStationSession)))
 
 (defn create-media!
+  "Create media record."
   [state photo filename fmt trap-camera-id]
   (media/create!
    state
@@ -33,12 +34,12 @@
      :trap-station-session-camera-id trap-camera-id})))
 
 (s/defn read-photo
+  "Read and standardise file metadata."
   [state tempfile]
-  (->> tempfile
-       (dt/file-raw-metadata state)
-       (mutil/parse state)))
+  (mutil/parse state (dt/file-raw-metadata state tempfile)))
 
 (defn create-record!
+  "Create the media and photo records."
   [state session-camera-id fmt photo filename]
   (db/with-transaction [s state]
     (let [media (create-media! state photo filename fmt session-camera-id)]
@@ -47,14 +48,19 @@
            photo/tphoto
            (photo/create! state)))))
 
-(s/defn invalid-session-date? :- s/Bool
-  [sess :- TrapStationSession
-   date :- org.joda.time.DateTime]
-  (or (nil? date)
-      (t/after? date (t/plus (:trap-station-session-end-date sess) (t/days 1)))
-      (t/before? date (:trap-station-session-start-date sess))))
+(s/defn valid-session-date? :- s/Bool
+  "Predicate returning true if given date lies between session start and end dates. False otherwise.
 
-(defn create-media
+24-hour tolerence on session end date applies."
+  [sess :- TrapStationSession
+   date :- (s/maybe org.joda.time.DateTime)]
+  (not (or (nil? date)
+           (t/before? date (:trap-station-session-start-date sess))
+           (t/after? date (t/plus (:trap-station-session-end-date sess)
+                                  (t/days 1))))))
+
+(defn create-media!
+  "Create a set of images and DB records for the input."
   [state content-type tempfile size session-camera-id photo]
   (let [fmt (get capture/image-mimes content-type)
         filename (image/create-image-files state tempfile fmt)]
@@ -69,7 +75,6 @@
   (let [sess (trap-station-session/get-specific-by-trap-station-session-camera-id
               state session-camera-id)
         photo (read-photo state tempfile)]
-    (if (or (nil? photo)
-            (invalid-session-date? sess (:datetime photo)))
+    (if (or (nil? photo) (not (valid-session-date? sess (:datetime photo))))
       {:error (tr/translate state ::timestamp-outside-range)}
-      (create-media state content-type tempfile size session-camera-id photo))))
+      (create-media! state content-type tempfile size session-camera-id photo))))
