@@ -31,7 +31,7 @@
    :photo-fnumber-setting "Aperture Value"
    :photo-exposure-value "Exposure Bias Value"
    :photo-flash-setting "Flash"
-   :photo-focal-setting "Focal Length"
+   :photo-focal-length "Focal Length"
    :photo-iso-setting "ISO Speed Ratings"
    :photo-orientation "Orientation"
    :photo-resolution-x "Image Height"

@@ -8,18 +8,18 @@
    :camera-make {:datatype :string
                  :max-length 31
                  :required false
-                 :order 21}
+                 :order 20}
    :camera-model {:datatype :string
                   :max-length 31
                   :required false
-                  :order 20}
+                  :order 21}
    :camera-name {:datatype :string
                  :max-length 31
                  :required true
                  :order 10}
    :camera-notes {:datatype :string
                   :required false
-                  :order 11}
+                  :order 22}
    :media-attention-needed {:datatype :boolean
                             :required false
                             :order 80}
@@ -114,10 +114,6 @@
    :survey-site-id {:datatype :integer
                     :required true
                     :unmappable true}
-   :taxonomy-class {:datatype :string
-                    :max-length 255
-                    :required false
-                    :order 64}
    :taxonomy-created {:datatype :timestamp
                       :required true
                       :unmappable true}
@@ -142,10 +138,14 @@
    :taxonomy-notes {:datatype :string
                     :required false
                     :order 66}
-   :taxonomy-order {:datatype :string
+   :taxonomy-class {:datatype :string
                     :max-length 255
                     :required false
                     :order 65}
+   :taxonomy-order {:datatype :string
+                    :max-length 255
+                    :required false
+                    :order 64}
    :taxonomy-species {:datatype :string
                       :max-length 255
                       :required false

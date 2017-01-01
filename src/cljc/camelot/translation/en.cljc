@@ -434,7 +434,7 @@
     :photo-iso-setting "Photo ISO Setting"
     :photo-exposure-value "Photo Exposure Value"
     :photo-flash-setting "Photo Flash Setting"
-    :photo-focal-length.label "Focal length"
+    :photo-focal-length "Photo Focal length"
     :photo-fnumber-setting "Photo F-Number Setting"
     :photo-orientation "Photo Orientation"
     :photo-resolution-x "Photo X Resolution (pixels)"
