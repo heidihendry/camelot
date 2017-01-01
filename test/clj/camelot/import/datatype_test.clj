@@ -514,3 +514,14 @@
 
     (testing "should return nil if given a field for which it does not have a schema"
       (is (nil? (sut/deserialise :bad-field "2016-04-21 10:10:10"))))))
+
+(deftest test-max-length
+  (testing "max-length"
+    (testing "should return zero for empty list"
+      (is (zero? (sut/max-length []))))
+
+    (testing "should return string length of item in 1-element list"
+      (is (= (sut/max-length ["hi"]) 2)))
+
+    (testing "should return longest length of 2-element list"
+      (is (= (sut/max-length ["hi" "world"]) 5)))))

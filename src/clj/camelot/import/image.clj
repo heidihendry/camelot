@@ -7,14 +7,17 @@
    [mikera.image.core :as image]
    [clojure.tools.logging :as log])
   (:import
-   (org.apache.commons.lang3 SystemUtils)))
+   (org.apache.commons.lang3 SystemUtils)
+   (java.util UUID)
+   (java.io IOException)
+   (java.awt.image BufferedImage)))
 
 (defn- save-pathname
   [f dest]
   (io/make-parents dest)
   (let [d (file/->file dest)]
     (if (file/exists? d)
-      (throw (java.io.IOException. (format "copy-pathname: file '%s' already exists", dest)))
+      (throw (IOException. (format "copy-pathname: file '%s' already exists", dest)))
       (f dest))))
 
 (def image-variants
@@ -26,7 +29,7 @@
   (save-pathname #(io/copy (file/->file src) (file/->file %)) dest))
 
 (defn- store-variant
-  [^java.awt.image.BufferedImage image dest]
+  [^BufferedImage image dest]
   (save-pathname #(image/save image % :quality 0.7 :progressive false) dest))
 
 (defn- create-variant
@@ -45,7 +48,7 @@
 
 (defn create-image-files
   [state path extension]
-  (let [filename (str/lower-case (java.util.UUID/randomUUID))]
+  (let [filename (str/lower-case (UUID/randomUUID))]
     (dorun (map (fn [[k v]] (create-image state path filename extension k v))
                 image-variants))
     filename))

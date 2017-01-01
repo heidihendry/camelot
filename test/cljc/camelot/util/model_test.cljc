@@ -68,4 +68,29 @@
                 sym-id]]
         (is (= (apply sut/check-mapping ps)
                [:camelot.util.model/calculated-schema-not-available
-                :camelot.util.model/datatype-problem-only]))))))
+                :camelot.util.model/datatype-problem-only]))))
+
+    (testing "should flag max-length problem if it exceeds restriction."
+      (let [ps [{:test1 {:datatype :string :max-length 5 :required false}}
+                {:test1 "Column1"}
+                {"Column1" {:constraints #{} :datatypes #{:string}
+                            :max-length 10}}
+                sym-id]]
+        (is (= (apply sut/check-mapping ps)
+               [:camelot.util.model/max-length-problem]))))
+
+    (testing "should not flag max-length problem if not restricted."
+      (let [ps [{:test1 {:datatype :string :required false}}
+                {:test1 "Column1"}
+                {"Column1" {:constraints #{} :datatypes #{:string}
+                            :max-length 10}}
+                sym-id]]
+        (is (= (apply sut/check-mapping ps) []))))
+
+    (testing "should not flag max-length problem if limit not exceeded."
+      (let [ps [{:test1 {:datatype :string :max-length 10 :required false}}
+                {:test1 "Column1"}
+                {"Column1" {:constraints #{} :datatypes #{:string}
+                            :max-length 10}}
+                sym-id]]
+        (is (= (apply sut/check-mapping ps) []))))))

@@ -6,14 +6,20 @@
                :required true
                :unmappable true}
    :camera-make {:datatype :string
+                 :max-length 31
                  :required false
                  :order 21}
    :camera-model {:datatype :string
+                  :max-length 31
                   :required false
                   :order 20}
    :camera-name {:datatype :string
+                 :max-length 31
                  :required true
                  :order 10}
+   :camera-notes {:datatype :string
+                  :required false
+                  :order 11}
    :media-attention-needed {:datatype :boolean
                             :required false
                             :order 80}
@@ -44,6 +50,10 @@
    :media-uri {:datatype :string
                :required false
                :unmappable true}
+   :media-notes {:datatype :string
+                 :required false
+                 :order 82
+                 :unmappable true}
    :sighting-id {:datatype :integer
                  :required true
                  :unmappable true}
@@ -71,39 +81,56 @@
              :required true
              :unmappable true}
    :site-name {:datatype :string
+               :max-length 127
                :required true
                :order 3}
    :site-sublocation {:datatype :string
+                      :max-length 127
                       :required false
                       :order 4}
    :site-state-province {:datatype :string
+                         :max-length 127
                          :required false
                          :order 6}
    :site-country {:datatype :string
+                  :max-length 127
                   :required false
                   :order 7}
+   :site-area {:datatype :number
+               :required false
+               :order 8}
+   :site-notes {:datatype :string
+                :required false
+                :order 9}
    :survey-id {:datatype :integer
                :required true
                :unmappable true}
    :survey-name {:datatype :string
                  :required true
                  :unmappable true}
+   :survey-notes {:datatype :string
+                  :required true
+                  :unmappable true}
    :survey-site-id {:datatype :integer
                     :required true
                     :unmappable true}
    :taxonomy-class {:datatype :string
+                    :max-length 255
                     :required false
                     :order 64}
    :taxonomy-created {:datatype :timestamp
                       :required true
                       :unmappable true}
    :taxonomy-common-name {:datatype :string
+                          :max-length 255
                           :required false
                           :order 60}
    :taxonomy-family {:datatype :string
+                     :max-length 255
                      :required false
                      :order 63}
    :taxonomy-genus {:datatype :string
+                    :max-length 255
                     :required false
                     :order 62}
    :taxonomy-id {:datatype :integer
@@ -116,13 +143,24 @@
                     :required false
                     :order 66}
    :taxonomy-order {:datatype :string
+                    :max-length 255
                     :required false
                     :order 65}
    :taxonomy-species {:datatype :string
+                      :max-length 255
                       :required false
                       :order 61}
    :taxonomy-updated {:datatype :timestamp
                       :required true
+                      :unmappable true}
+   :species-mass-id {:datatype :integer
+                     :required false
+                     :unmappable true}
+   :species-mass-start {:datatype :number
+                        :required false
+                        :unmappable true}
+   :species-mass-end {:datatype :number
+                      :required false
                       :unmappable true}
    :trap-station-id {:datatype :integer
                      :required true
@@ -135,7 +173,14 @@
                             :validation-type :longitude
                             :required true
                             :order 31}
+   :trap-station-altitude {:datatype :readable-integer
+                           :required false
+                           :order 16}
+   :trap-station-notes {:datatype :string
+                           :required false
+                           :order 17}
    :trap-station-name {:datatype :string
+                       :max-length 255
                        :required true
                        :order 15}
    :trap-station-session-camera-id {:datatype :integer
@@ -151,21 +196,25 @@
                                    :required true
                                    :order 22}
    :photo-fnumber-setting {:datatype :string
+                           :max-length 15
                            :required false
                            :order 70}
    :photo-exposure-value {:datatype :string
                           :required false
                           :order 71}
    :photo-flash-setting {:datatype :string
+                         :max-length 255
                          :required false
                          :order 72}
-   :photo-focal-setting {:datatype :string
-                         :required false
-                         :order 73}
+   :photo-focal-length {:datatype :string
+                        :max-length 15
+                        :required false
+                        :order 73}
    :photo-iso-setting {:datatype :integer
                        :required false
                        :order 74}
    :photo-orientation {:datatype :string
+                       :max-length 127
                        :required false
                        :order 75}
    :photo-resolution-x {:datatype :readable-integer
@@ -218,13 +267,23 @@
     (assoc results :required-constraint true)
     results))
 
+(defn maybe-max-length-problem
+  [schema calculated-constraints results]
+  (if (and (number? (:max-length schema))
+           (number? (:max-length calculated-constraints))
+           (> (:max-length calculated-constraints)
+              (:max-length schema)))
+    (assoc results :max-length (:max-length schema))
+    results))
+
 (defn mapping-validation-problems
   [schemas column calculated-schema]
   (let [s (get schemas column)]
     (if s
       (->> {}
            (maybe-datatype-problem s calculated-schema)
-           (maybe-required-constraint-problem s calculated-schema))
+           (maybe-required-constraint-problem s calculated-schema)
+           (maybe-max-length-problem s calculated-schema))
       {:global ::schema-not-found})))
 
 (defn describe-datatype
@@ -257,12 +316,17 @@
         (translation-fn ::datatype-and-required-constraint-problem
                         (describe-datatype  (:datatype ps) translation-fn))
 
-        (and (:datatype ps))
+        (:datatype ps)
         (translation-fn ::datatype-problem-only
                         (describe-datatype (:datatype ps) translation-fn))
 
-        (and (:required-constraint ps))
-        (translation-fn ::required-constraint-problem-only)))))
+        (:required-constraint ps)
+        (translation-fn ::required-constraint-problem-only)
+
+        (:max-length ps)
+        (translation-fn ::max-length-problem
+                        (:max-length ps)
+                        (:max-length calculated-schema))))))
 
 (defn check-mapping
   "Validate all mappings, returning a list of invalid mappings."

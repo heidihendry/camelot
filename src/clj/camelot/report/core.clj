@@ -12,66 +12,12 @@
    [clojure.set :as set]
    [ring.util.response :as r]
    [schema.core :as s]
-   [yesql.core :as sql])
-  (:import (clojure.lang IFn)))
+   [yesql.core :as sql]
+   [camelot.util.model :as model])
+  (:import
+   (clojure.lang IFn)))
 
 (sql/defqueries "sql/reports.sql")
-
-(def all-columns
-  [:survey-id
-   :survey-name
-   :survey-directory
-   :survey-notes
-   :site-id
-   :site-name
-   :site-sublocation
-   :site-city
-   :site-state-province
-   :site-country
-   :site-area
-   :site-notes
-   :survey-site-id
-   :taxonomy-id
-   :taxonomy-species
-   :taxonomy-genus
-   :taxonomy-family
-   :taxonomy-order
-   :taxonomy-class
-   :taxonomy-common-name
-   :taxonomy-notes
-   :species-mass-id
-   :species-mass-start
-   :species-mass-end
-   :camera-id
-   :camera-name
-   :camera-make
-   :camera-model
-   :camera-notes
-   :trap-station-id
-   :trap-station-name
-   :trap-station-longitude
-   :trap-station-latitude
-   :trap-station-altitude
-   :trap-station-notes
-   :trap-station-session-start-date
-   :trap-station-session-end-date
-   :trap-station-session-id
-   :trap-station-session-camera-id
-   :media-id
-   :media-capture-timestamp
-   :media-filename
-   :media-format
-   :media-notes
-   :sighting-quantity
-   :sighting-sex
-   :sighting-lifestage
-   :photo-iso-setting
-   :photo-exposure-value
-   :photo-flash-setting
-   :photo-fnumber-setting
-   :photo-orientation
-   :photo-resolution-x
-   :photo-resolution-y])
 
 (defn- get-all-by-survey
   [state]
@@ -285,7 +231,7 @@
   [state params column-title-fn data]
   (let [d (generate-report state params data)
         cols (if (all-cols? (:columns params))
-               all-columns
+               (map first model/schema-definitions)
                (:columns params))]
     (if (:function params)
       (to-csv-string d)

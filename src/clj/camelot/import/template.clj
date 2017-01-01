@@ -42,8 +42,8 @@
   [parts :- [s/Num]]
   {:pre [(= (count parts) 3)]}
   (let [exact (+ (first parts)
-                 (/ (/ (nth parts 1) 0.6) 100)
-                 (/ (/ (nth parts 2) 0.36) 10000))]
+                 (/ (nth parts 1) 0.6 100)
+                 (/ (nth parts 2) 0.36 10000))]
     (edn/read-string (format "%.6f" exact))))
 
 (s/defn gps-degrees-as-parts
@@ -61,8 +61,8 @@ direction is considered negative."
    mag :- s/Str
    mag-ref :- s/Str]
   (let [decimal (-> mag
-                    (gps-degrees-as-parts)
-                    (gps-parts-to-decimal))]
+                    gps-degrees-as-parts
+                    gps-parts-to-decimal)]
     (if (= mag-ref pos-ref)
       decimal
       (* -1 decimal))))
@@ -172,6 +172,7 @@ direction is considered negative."
 (defn column-compatibility
   [[title & vs]]
   {:constraints (datatype/possible-constraints vs)
+   :max-length (datatype/max-length vs)
    :datatypes (datatype/possible-datatypes vs)})
 
 (defn calculate-column-properties

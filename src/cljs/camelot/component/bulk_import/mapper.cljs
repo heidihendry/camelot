@@ -275,7 +275,7 @@
                                          (model/reason-mapping-invalid
                                           model/extended-schema-definitions
                                           (first %2)
-                                          (get-in data [:column-properties m])
+                                          (get-in @data [:column-properties m])
                                           identity))
                                   (reduced :mismatch)))
                              nil fs)

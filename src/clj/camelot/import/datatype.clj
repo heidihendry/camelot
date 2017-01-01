@@ -238,7 +238,7 @@
         nil))
 
 (defn possible-constraints
-  "Return set of constrainst which every member of the input satisfies."
+  "Return set of constraints which every member of the input satisfies."
   [xs]
   (matches-all constraint-check-fns xs))
 
@@ -246,6 +246,11 @@
   "Return set of datatypes which every member of the input satisfies."
   [xs]
   (matches-all datatype-check-fns xs))
+
+(defn max-length
+  "Return maximum string length of the column."
+  [xs]
+  (reduce #(max %1 (count %2)) 0 xs))
 
 (def deserialisers
   "Mapping between effective datatypes and its deserialisation function."
