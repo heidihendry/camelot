@@ -22,3 +22,5 @@ if [ $? -ne 0 ]; then
    $LEIN clean
 fi
 $(dirname $0)/build.sh
+
+$LEIN run
