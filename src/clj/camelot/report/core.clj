@@ -209,9 +209,8 @@
   (map (partial as-dashed-row state cols) data))
 
 (defn- as-rows
-  [state params data]
-  (let [cols (:columns params)]
-    (map (partial as-row state cols) data)))
+  [state cols data]
+  (map (partial as-row state cols) data))
 
 (defn- to-csv-string
   "Return data as a CSV string."
@@ -226,17 +225,25 @@
     (title-fn state)
     {}))
 
+(defn stylise-output
+  "Update data with global stylisation changes."
+  [state params cols data]
+  (if (get-in params [:options :leave-blank-fields-empty])
+    (as-rows state cols data)
+    (as-dashed-rows state cols data)))
+
 (defn- exportable-report
   "Generate a report as a CSV."
   [state params column-title-fn data]
   (let [d (generate-report state params data)
         cols (if (all-cols? (:columns params))
-               (map first model/schema-definitions)
+               (map first (remove #(get (second %) :export-excluded)
+                                  model/extended-schema-definitions))
                (:columns params))]
     (if (:function params)
       (to-csv-string d)
       (->> d
-           (as-dashed-rows state cols)
+           (stylise-output state params cols)
            (cons-headings state cols (custom-titles state column-title-fn))
            (to-csv-string)))))
 
@@ -251,7 +258,7 @@
         conf ((:output report) state configuration)]
     (->> data
          (generate-report state conf)
-         (as-rows state conf))))
+         (as-rows state (:columns conf)))))
 
 (s/defn csv-report
   "Produce the report as a CSV."

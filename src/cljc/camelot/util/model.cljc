@@ -19,7 +19,8 @@
                  :order 10}
    :camera-notes {:datatype :string
                   :required false
-                  :order 22}
+                  :order 22
+                  :export-excluded true}
    :media-attention-needed {:datatype :boolean
                             :required false
                             :order 80}
@@ -53,7 +54,8 @@
    :media-notes {:datatype :string
                  :required false
                  :order 82
-                 :unmappable true}
+                 :unmappable true
+                 :export-excluded true}
    :sighting-id {:datatype :integer
                  :required true
                  :unmappable true}
@@ -101,7 +103,8 @@
                :order 8}
    :site-notes {:datatype :string
                 :required false
-                :order 9}
+                :order 9
+                :export-excluded true}
    :survey-id {:datatype :integer
                :required true
                :unmappable true}
@@ -110,7 +113,8 @@
                  :unmappable true}
    :survey-notes {:datatype :string
                   :required true
-                  :unmappable true}
+                  :unmappable true
+                  :export-excluded true}
    :survey-site-id {:datatype :integer
                     :required true
                     :unmappable true}
@@ -137,7 +141,8 @@
                     :unmappable true}
    :taxonomy-notes {:datatype :string
                     :required false
-                    :order 66}
+                    :order 66
+                    :export-excluded true}
    :taxonomy-class {:datatype :string
                     :max-length 255
                     :required false
@@ -177,8 +182,9 @@
                            :required false
                            :order 16}
    :trap-station-notes {:datatype :string
-                           :required false
-                           :order 17}
+                        :required false
+                        :order 17
+                        :export-excluded true}
    :trap-station-name {:datatype :string
                        :max-length 255
                        :required true
