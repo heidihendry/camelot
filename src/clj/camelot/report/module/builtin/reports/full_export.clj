@@ -23,6 +23,10 @@
   {:resource {}
    :layout []})
 
+(defn column-titles
+  [state]
+  camelot.import.template/default-column-mappings)
+
 (module/register-report
  :full-export
  {:file-prefix "full-export"
@@ -31,4 +35,5 @@
   :output report-output
   :form form-smith
   :by :all
-  :for :survey})
+  :for :survey
+  :column-title-fn column-titles})

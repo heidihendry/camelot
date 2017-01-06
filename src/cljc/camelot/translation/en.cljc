@@ -358,7 +358,7 @@
    :default-config-created "A default configuration has been created in '%s'"
 
    :report
-   {:absolute-path "Absolute Path"
+   {:absolute-path "Absolute path to image file"
     :nights-elapsed "Nights Elapsed"
     :total-nights "Nights Elapsed"
     :independent-observations "Independent Observations"
