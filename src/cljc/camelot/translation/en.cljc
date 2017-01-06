@@ -460,6 +460,10 @@
    {:title "Full Export"
     :description "Export of data in Camelot, with one row per unique record."}
 
+   :camelot.report.module.builtin.reports.survey-export
+   {:title "Survey Export"
+    :description "Export of data from a survey in Camelot, with one row per unique record."}
+
    :camelot.report.module.builtin.reports.raw-data-export
    {:title "Raw Data Export"
     :description "Details about each uploaded capture."}

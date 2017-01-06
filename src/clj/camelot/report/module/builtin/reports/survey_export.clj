@@ -1,4 +1,4 @@
-(ns camelot.report.module.builtin.reports.full-export
+(ns camelot.report.module.builtin.reports.survey-export
   (:require
    [camelot.report.module.core :as module]
    [clj-time.format :as tf]
@@ -7,9 +7,10 @@
    (org.apache.commons.lang3 SystemUtils)))
 
 (defn report-output
-  [state {:keys []}]
+  [state {:keys [survey-id]}]
   {:columns [:all]
-   :filters [#(not (nil? (:media-id %)))]
+   :filters [#(not (nil? (:media-id %)))
+             #(= (:survey-id %) survey-id)]
    :transforms [#(assoc % :absolute-path
                         (str (get-in state [:config :path :media])
                              SystemUtils/FILE_SEPARATOR
@@ -19,15 +20,23 @@
 (defn form-smith
   [state]
   {:resource {}
-   :layout []})
+   :layout [[:survey-id]]
+   :schema {:survey-id
+            {:label (tr/translate state :survey/title)
+             :description (tr/translate state :survey/report-description)
+             :schema {:type :select
+                      :required true
+                      :get-options {:url "/surveys"
+                                    :label :survey-name
+                                    :value :survey-id}}}}})
 
 (defn column-titles
   [state]
   camelot.import.template/default-column-mappings)
 
 (module/register-report
- :full-export
- {:file-prefix "full-export"
+ :survey-export
+ {:file-prefix "survey-export"
   :title ::title
   :description ::description
   :output report-output

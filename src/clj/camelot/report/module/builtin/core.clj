@@ -15,6 +15,7 @@
     species-sighting-time-deltas]
    [camelot.report.module.builtin.reports
     full-export
+    survey-export
     raw-data-export
     species-statistics
     summary-statistics
