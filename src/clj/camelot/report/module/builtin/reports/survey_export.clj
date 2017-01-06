@@ -1,6 +1,7 @@
 (ns camelot.report.module.builtin.reports.survey-export
   (:require
    [camelot.report.module.core :as module]
+   [camelot.import.template :as template]
    [clj-time.format :as tf]
    [camelot.translation.core :as tr])
   (:import
@@ -32,7 +33,7 @@
 
 (defn column-titles
   [state]
-  camelot.import.template/default-column-mappings)
+  template/default-column-mappings)
 
 (module/register-report
  :survey-export
