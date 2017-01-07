@@ -23,6 +23,12 @@
               (dom/td nil (dom/button #js {:className "btn btn-default"}
                                       (tr/translate :words/remove)))))))
 
+(defn survey-data-existed?
+  []
+  (if (seq (get-in (state/app-state-cursor) [:organisation :survey :list]))
+    true
+    false))
+
 (defn survey-species-list
   [data owner]
   (reify
@@ -58,20 +64,20 @@
 
 (defn navigate-bypassing-bulk-import
   "Navigate back to the organisation top-level page."
-  []
-  (if (seq (get-in (state/app-state-cursor) [:survey :list]))
+  [data resp]
+  (if (:survey-data-existed? data)
     (nav/nav! "/organisation")
     (.reload js/location)))
 
 (defn create-survey-success-handler
   [data nextaction resp]
   (let [survey-id (get-in resp [:body :survey-id :value])]
-    (om/transact! (state/app-state-cursor) [:survey :list] #(conj % (cursorise/decursorise (:body resp))))
+    (om/transact! (state/app-state-cursor) [:organisation :survey :list] #(conj % (cursorise/decursorise (:body resp))))
     (om/update! data :survey-id survey-id)
     (rest/post-x-opts "/species/create"
                       {:species (deref (:species data))
                        :survey-id survey-id}
-                      {:success #(nextaction resp)
+                      {:success #(nextaction data resp)
                        :always #(om/update! data :submitting-form false)})))
 
 (defn create-survey
@@ -116,7 +122,7 @@
                           (tr/translate ::expected-species))
                (om/build survey-species-list data)
                (dom/div #js {:className "button-container"}
-                        (when (seq (get-in (state/app-state-cursor) [:survey :list]))
+                        (when (survey-data-existed?)
                           (dom/button #js {:className "btn btn-default"
                                            :onClick #(do
                                                        (nav/nav! "/organisation")
@@ -125,6 +131,7 @@
                         (dom/button #js {:className "btn btn-primary"
                                          :onClick #(do
                                                      (nav/analytics-event "org-survey-create" "submit-next-click")
+                                                     (om/update! data :survey-data-existed? (survey-data-existed?))
                                                      (if (feature/enabled? (state/settings) :bulk-import)
                                                        (om/update! data :show-bulk-import-prompt true)
                                                        (create-survey data false navigate-bypassing-bulk-import)))
@@ -181,13 +188,13 @@
                                                          (dom/button #js {:className "btn btn-default"
                                                                           :ref "action-first"
                                                                           :onClick #(create-survey data false
-                                                                                                   (fn [surv-resp]
+                                                                                                   (fn [data surv-resp]
                                                                                                      (nav/analytics-event "org-survey-create" "skip-bulk-import")
-                                                                                                     (navigate-bypassing-bulk-import)))}
+                                                                                                     (navigate-bypassing-bulk-import data surv-resp)))}
                                                                      (tr/translate ::create-only))
-                                                         (dom/button #js {:className "btn btn-primary"
+                                                         (dom/button #js {:className "btn btn-default"
                                                                           :onClick #(create-survey data true
-                                                                                                   (fn [surv-resp]
+                                                                                                   (fn [data surv-resp]
                                                                                                      (nav/analytics-event "org-survey-create" "nav-to-bulk-import")
                                                                                                      (nav/nav! (str "/" (get-in surv-resp [:body :survey-id :value])
                                                                                                                     "/bulk-import"))))}

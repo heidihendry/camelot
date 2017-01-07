@@ -12,7 +12,7 @@
 
 (defn get-survey-details
   []
-  (->> (get-in (state/app-state-cursor) [:survey :list])
+  (->> (get-in (state/app-state-cursor) [:organisation :survey :list])
        (filter #(= (get % :survey-id) (state/get-survey-id)))
        first))
 
