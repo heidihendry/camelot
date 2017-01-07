@@ -154,6 +154,20 @@
                                          :taxonomy-genus "Genus"})
              :fail)))
 
+    (testing "Empty string should be treated as missing"
+      (is (= (check-sighting-assignment {:sighting-quantity 1
+                                         :taxonomy-species ""
+                                         :taxonomy-genus "Genus"
+                                         :taxonomy-common-name "Common name"})
+             :fail)))
+
+    (testing "All fields are allowed to be blank or nil"
+      (is (= (check-sighting-assignment {:sighting-quantity nil
+                                         :taxonomy-species ""
+                                         :taxonomy-genus ""
+                                         :taxonomy-common-name ""})
+             :pass)))
+
     (testing "Should pass if no sighting fields provided"
       (is (= (check-sighting-assignment {}) :pass)))))
 

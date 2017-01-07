@@ -14,7 +14,7 @@
    :transforms [#(assoc % :absolute-path
                         (str (get-in state [:config :path :media])
                              SystemUtils/FILE_SEPARATOR
-                             (:media-filename %)))]
+                             (:media-filename %) "." (:media-format %)))]
    :options {:leave-blank-fields-empty true}})
 
 (defn form-smith
@@ -24,7 +24,7 @@
 
 (defn column-titles
   [state]
-  template/default-column-mappings)
+  (assoc template/default-column-mappings :absolute-path "Absolute Path"))
 
 (module/register-report
  :full-export

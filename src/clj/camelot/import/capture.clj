@@ -59,7 +59,7 @@
            (t/after? date (t/plus (:trap-station-session-end-date sess)
                                   (t/days 1))))))
 
-(defn create-media!
+(defn create-media-and-image!
   "Create a set of images and DB records for the input."
   [state content-type tempfile size session-camera-id photo]
   (let [fmt (get capture/image-mimes content-type)
@@ -77,4 +77,4 @@
         photo (read-photo state tempfile)]
     (if (or (nil? photo) (not (valid-session-date? sess (:datetime photo))))
       {:error (tr/translate state ::timestamp-outside-range)}
-      (create-media! state content-type tempfile size session-camera-id photo))))
+      (create-media-and-image! state content-type tempfile size session-camera-id photo))))

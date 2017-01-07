@@ -50,6 +50,13 @@
     {:result :fail}
     {:result :pass}))
 
+(defn scalar-nil-or-empty?
+  "Predicate returning true if the value is nil or an empty string. False otherwise."
+  [x]
+  (if (string? x)
+    (empty? x)
+    (nil? x)))
+
 (defn check-sighting-assignment
   "Return failure result if any of sighting-quantity or taxonomy species/genus set, but not all."
   [state record]
@@ -57,8 +64,8 @@
                                      :taxonomy-species
                                      :taxonomy-genus
                                      :taxonomy-common-name])]
-    (if (and (some? (some nil? s-vals))
-             (not (every? nil? s-vals)))
+    (if (and (some? (some scalar-nil-or-empty? s-vals))
+             (not (every? scalar-nil-or-empty? s-vals)))
       {:result :fail}
       {:result :pass})))
 
