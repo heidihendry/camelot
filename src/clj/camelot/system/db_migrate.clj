@@ -38,6 +38,42 @@
         :up   (mapv slurp up)
         :down (mapv slurp down)}))))
 
+(defn- tx-execute-sql! [db-spec statements]
+  (jdbc/with-db-transaction [tx db-spec]
+    (doseq [s statements]
+      (jdbc/execute! tx [s]))))
+
+(defrecord TxSqlMigration [id up down]
+  rtp/Migration
+  (id [_] id)
+  (run-up!   [_ db] (tx-execute-sql! (:db-spec db) up))
+  (run-down! [_ db] (tx-execute-sql! (:db-spec db) down)))
+
+(alter-meta! #'->TxSqlMigration assoc :no-doc true)
+(alter-meta! #'map->TxSqlMigration assoc :no-doc true)
+
+(defn tx-sql-migration
+  "Create a Ragtime migration from a map with a unique :id, and :up and :down
+  keys that map to ordered collection of SQL strings."
+  [migration-map]
+  (map->TxSqlMigration migration-map))
+
+(defn- sql-file-parts [file]
+  (rest (re-matches #"(.*?)\.(up|down)(?:\.(\d+))?\.sql" (str file))))
+
+(defn- read-sql [file]
+  (str/split (slurp file) #"(?m)\n\s*--;;\s*\n"))
+
+(defmethod load-files ".sql" [files]
+  (for [[id files] (->> files
+                        (group-by (comp first sql-file-parts))
+                        (sort-by key))]
+    (let [{:strs [up down]} (group-by (comp second sql-file-parts) files)]
+      (tx-sql-migration
+       {:id   (-resource-basename id)
+        :up   (vec (mapcat read-sql (sort-by str up)))
+        :down (vec (mapcat read-sql (sort-by str down)))}))))
+
 (defn ragtime-config
   "Ragtime configuration"
   [connection]
