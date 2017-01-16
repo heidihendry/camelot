@@ -651,6 +651,8 @@ This section describes the data within Camelot.
 
 ### Bulk Import default mapping column
 
+By using the Default Column Names in a CSV for a Bulk Import, Camelot will automatically establish the mapping to the correct field.
+
 | Field | Default Column Name |
 | :---- | :------------------ |
 | camera-make | Make |
@@ -695,6 +697,8 @@ This section describes the data within Camelot.
 | trap-station-session-start-date | Session Start Date |
 
 ### Library filter field shorthands
+
+The library supports filtering on the vast majority of fields in Camelot.  Some of these fields are more useful for filtering on than others and so have shorthands.  Below is each of the shorthands and the field they are associated with.
 
 | Shorthand | Associated Field |
 | :---- | :------------------ |
