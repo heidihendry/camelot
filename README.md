@@ -440,7 +440,7 @@ First, every mappable field in Camelot must have its own column in the CSV.  For
 * **Boolean fields** (e.g., *Media processed*): any of 'Yes/No', 'Y/N', 'True/False', 'T/F' or '1/0'.  Not case-sensitive.  Representations may be mixed.
 * **Sighting Lifestage**: 'Adult/Juvenile' or 'A/J'. Not case-sensitive.  Representations may be mixed.
 * **Sighting Sex**: 'Male/Female' or 'M/F'. Not case-sensitive.  Representations may be mixed.
-* **Dates & Times**: Camelot is forgiving about Date and Time formats (though the author recommends `YYYY-MM-DD hh:mm:ss`).  Note that `DD/MM/YYYY` or `MM/DD/YYYY` are not permitted due to room for ambiguity.
+* **Dates & Times**: Camelot is forgiving about Date and Time formats (though the author recommends `YYYY-MM-DD hh:mm:ss`).  Note that `DD/MM/YYYY` or `MM/DD/YYYY` are not permitted due to room for ambiguity.  Be aware that spreadsheet software may default to using these date formats.
 * **Path name**: (e.g., *Absolute path*) Must be a path name to a readable file.
 * **Integer**: (e.g., *Sighting quantity*) Must be an integer.
 

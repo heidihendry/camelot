@@ -1,4 +1,19 @@
 ## ChangeLog
+### 1.1.0 (upcoming)
+#### Enhancements
+* Add Bulk Import functionality: the ability to prepare and import all data for a survey at once.
+* New report: Survey Export
+* The last selected item in a menu will now be preserved when navigating back to that menu.
+* Add the ability to delete media from the Library details panel.
+* Add a settings option to change between listing species via scientific names and common names.
+
+#### Fixes
+* Prevent browser caching from causing strange incompatibilities after a version upgrade.
+* Fix problem where Camelot database may need manual repair should the initial setup or a version upgrade be interrupted.
+* Fix a bug which may prevent the currently selected item in menus from highlighting.
+* Fix a bug which prevented some browser shortcut keys being used while in the library.
+* No longer creates an additional downscaled copy of an image for preview.
+
 ### 1.0.2 (2016-11-13)
 #### Enhancements
 * Add display of the current Camelot version at startup.
