@@ -84,7 +84,7 @@ The left hand side is the current survey configuration.  You can give a survey a
 
 Once ready, click "Create Survey".
 
-**Camelot 1.1.0 onwards** At this stage you will be prompted asking whether you already have the data available for the survey to do a Bulk Import.  If you have already collected all of the media for this survey, you may wish to select "Create and import".  Refer to [Bulk Import](#bulk-import) for more information.
+**New in Camelot 1.1.0** At this stage you will be prompted asking whether you already have the data available for the survey to do a Bulk Import.  If you have already collected all of the media for this survey, you may wish to select "Create and import".  Refer to [Bulk Import](#bulk-import) for more information.
 
 ![](doc/screenshot/survey-bulk-import-prompt.png)
 
@@ -263,7 +263,7 @@ If you need to know which species have already identified in a photo, these can 
 The identification details entered will be applied to all photos currently selected.
 
 #### Removing photos
-**Coming in Camelot 1.1.0**
+**New in Camelot 1.1.0**
 
 The currently viewed photo, if no longer required, can be removed via the Delete button located at the bottom of the Details sidebar.
 
@@ -340,7 +340,7 @@ In the top right hand corner of the main navigation is the toggle to show the se
 ![](doc/screenshot/settings.png)
 
 * **Sighting Independence Threshold**: Camelot performs sighting independence checks on some reports.  This setting controls the duration within which photos of the same species (and, if known, the same sex and life-stage) are considered dependent in those reports.  Default is 30 minutes.
-* **Species name style**: *coming in 1.1.0* whether species scientific or common names should be shown by default.  Default is scientific names.
+* **Species name style**: *New in Camelot 1.1.0* whether species scientific or common names should be shown by default.  Default is scientific names.
 * **Send anonymous usage data**: Enabled this option will provide data about how you use Camelot back to the Camelot Project. This data is anonymous and is used only for the purpose of improving Camelot. It is disabled by default, though if you have the consent of others using your Camelot instance, please consider enabling this.
 
 ### Reports
@@ -416,7 +416,7 @@ The calculation of this value is then:
 `100 * Independent Observations / Nights`
 
 ### Bulk Import
-**coming in version 1.1.0**
+**New in Camelot 1.1.0**
 
 A Bulk Import in Camelot provides a means to import a survey's worth of data at once. You're not left to your own devices when it comes to preparing the data for import though, nor is it (entirely) on your shoulders to make sure the data is correct -- Camelot will do its utmost to help you with the import.  This also means that there's a few things to know about when it comes to bulk import!
 
