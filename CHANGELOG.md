@@ -12,6 +12,7 @@
 * Fix problem where Camelot database may need manual repair should the initial setup or a version upgrade be interrupted.
 * Fix a bug which may prevent the currently selected item in menus from highlighting.
 * Fix a bug which prevented some browser shortcut keys being used while in the library.
+* Fix inconsistencies in date and time display, where the current timezone may spuriously offset the actual time.
 * No longer creates an additional downscaled copy of an image for preview.
 
 ### 1.0.2 (2016-11-13)
