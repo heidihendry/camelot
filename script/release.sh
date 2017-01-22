@@ -5,6 +5,7 @@ set -e
 PROJECT_NAME="camelot"
 PROJECT_FILE="project.clj"
 README_FILE="README.md"
+GETTING_STARTED_DOC="doc/gettingstarted.rst"
 HTML_FILE="resources/public/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
@@ -17,6 +18,7 @@ sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"$/${PROJECT
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${README_FILE}
 sed -i "s/\([0-9]\+\.[0-9]\+\.[0-9]\+\)\]/${released_version}\]/" ${README_FILE}
+sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${GETTING_STARTED_DOC}
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).jar/${PROJECT_NAME}-${released_version}.jar/" ${BATCH_FILE}
 sed -i "s/\\?v=\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT/?v=${released_version}/" ${HTML_FILE}
 git commit -a -m "Version bump: $released_version"
