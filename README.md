@@ -71,22 +71,22 @@ If there's any question you might have that remains unanswered by the documentat
 https://groups.google.com/forum/#!forum/camelot-project
 
 ## Feature tour and gallery
-
+### Manage and report across multiple surveys from the Your Organisation page
 ![](doc/screenshot/your-organisation.png)
-Manage and report across multiple surveys from the Your Organisation page.
 
+### Beautiful interface to perform identification fast
 ![](doc/screenshot/library.png)
-A beautiful and efficient interface for performing identification quickly.
 
+### Record camera sessions with ease
 ![](doc/screenshot/camera-check-add.png)
-Record camera sessions with ease.
 
+### Bulk importer to enter existing data fast
 ![](doc/screenshot/bulk-import-status.png)
-The bulk import is a powerful and fast way of getting existing data into Camelot.
 
+### Fine-grained control of your data when you need it
 ![](doc/screenshot/advanced-menu.png)
-Get fine-grained control of your data when you need it.
 
+### And more...
 See the [user guide](http://camelot-project.readthedocs.io/en/latest/userguide.html) to learn more about what Camelot can offer.
 
 ## License
