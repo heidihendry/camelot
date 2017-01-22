@@ -18,19 +18,34 @@ You can download Camelot using the "latest version" link above. See [Getting sta
 
 ## Feature tour and gallery
 ### Manage and report across multiple surveys from the Your Organisation page
+
 ![](doc/screenshot/your-organisation.png)
 
-### Beautiful interface to perform identification fast
+&nbsp;
+
+### Speed up identification with a beautiful and efficient interface
+
 ![](doc/screenshot/library.png)
 
+&nbsp;
+
 ### Record camera sessions with ease
+
 ![](doc/screenshot/camera-check-add.png)
 
-### Bulk importer to enter existing data fast
+&nbsp;
+
+### Input existing data quickly with the Bulk Importer
+
 ![](doc/screenshot/bulk-import-status.png)
 
-### Fine-grained control of your data when you need it
+&nbsp;
+
+### Get fine-grained control of your data when you need it
+
 ![](doc/screenshot/advanced-menu.png)
+
+&nbsp;
 
 ### And more...
 See the [documentation](http://camelot-project.readthedocs.io/en/latest/) to learn more about what Camelot can offer.
