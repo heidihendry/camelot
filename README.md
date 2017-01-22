@@ -33,11 +33,11 @@ You can download Camelot using the "latest version" link above. See [Getting sta
 ![](doc/screenshot/advanced-menu.png)
 
 ### And more...
-See the [user guide](http://camelot-project.readthedocs.io/en/latest/userguide.html) to learn more about what Camelot can offer.
+See the [documentation](http://camelot-project.readthedocs.io/en/latest/) to learn more about what Camelot can offer.
 
 ## Getting help
 
-Camelot has a [detailed user guide](http://camelot-project.readthedocs.io/en/latest/userguide.html), [administration guide](http://camelot-project.readthedocs.io/en/latest/userguide.html) and much more on the [documentation website](http://camelot-project.readthedocs.io/en/latest).
+Camelot has a detailed [documentation website](http://camelot-project.readthedocs.io/en/latest) should you need clarification on any part of Camelot. Everything from [installation](http://camelot-project.readthedocs.io/en/latest/gettingstarted.html), to [usage](http://camelot-project.readthedocs.io/en/latest/survey.html) and to [administration](http://camelot-project.readthedocs.io/en/latest/administration.html) is covered there.
 
 If there's any question you might have that remains unanswered by the documentation, or if you want to stay up-to-date with announcements of new releases, please join the Google Group:
 
