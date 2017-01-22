@@ -7,8 +7,15 @@ Camelot Documentation
 
    introduction
    gettingstarted
-   userguide
-   community
+   terminology
+   survey
+   yourorganisation
+   surveymanagement
+   library
+   settings
+   reports
+   bulkimport
+   advancedmenu
+   network
    administration
-   license
-   acknowledgements
+   misc

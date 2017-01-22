@@ -55,5 +55,4 @@ If running Camelot on a server, you can instead use:
 
     java -jar /path/to/camelot-<version>.jar -server
 
-See `Use from multiple computers <userguide.html#use-from-multiple-computers>`__ for
-more information.
+See the section on 'Networked usage' for more information.
