@@ -13,8 +13,8 @@ Locations
 Windows
 ^^^^^^^
 
--  **Data**: %LOCALAPPDATA%:raw-latex:`\camelot`
--  **Config**: %APPDATA%:raw-latex:`\camelot`
+-  **Data**: %LOCALAPPDATA%`\\camelot`
+-  **Config**: %APPDATA%`\\camelot`
 
 OSX
 ^^^
