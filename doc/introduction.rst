@@ -19,4 +19,4 @@ Camelot:
 -  Runs on Windows, OSX and Linux
 -  Is easy to start using
 
-Camelot is Open Source Software.  You can find its project page `here <https://gitlab.com/camelot-project/camelot>`__
+You can Camelots project page `here <https://gitlab.com/camelot-project/camelot>`__
