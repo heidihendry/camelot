@@ -13,8 +13,8 @@ Locations
 Windows
 ^^^^^^^
 
--  **Data**: %LOCALAPPDATA%`\\camelot`
--  **Config**: %APPDATA%`\\camelot`
+-  **Data**: %LOCALAPPDATA%\\camelot
+-  **Config**: %APPDATA%\\camelot
 
 OSX
 ^^^
