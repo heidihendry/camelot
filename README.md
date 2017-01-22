@@ -14,53 +14,7 @@ Camelot:
 * Runs on Windows, OSX and Linux
 * Is easy to start using
 
-## Prerequisites
-
-### Java runtime
-
-Camelot requires Java 8u91 (on later) to be installed on the system it will run on before it can be used.
-
-Java can be downloaded here: http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-If using OSX, you will need to install the "JDK".  For Windows and Linux, you can install either the "JRE" or the "JDK".
-
-### Web browser
-
-Camelot supports the latest versions of the following browsers:
-
-* Chrome
-* Firefox
-* Edge
-* Safari
-* Internet Explorer 11
-
-## Getting started
-
-### Installation
-
-Download the [latest version of Camelot](http://camelot.bitpattern.com.au/release/camelot-1.1.0.zip).
-
-Unzip the archive.  To run Camelot:
-
-**Windows**: Double click `camelot-desktop.bat`
-
-**OSX**: Double click `camelot-desktop.command`
-
-**Linux**: Double click `camelot-desktop.sh`
-
-After 10 seconds, Camelot should appear in a new tab in your web browser.  If Camelot doesn't open automatically, you can access it via your web browser by browsing to:
-
-```
-http://localhost:5341/
-```
-
-If running Camelot on a server, you can instead use:
-
-```
-java -jar /path/to/camelot-<version>.jar -server
-```
-
-See [Use from multiple computers](#use-from-multiple-computers) for more information.
+You can download Camelot using the "latest version" link above. See [Getting started with Camelot](http://camelot-project.readthedocs.io/en/latest/gettingstarted.html) for how to get things up and running.
 
 ## Getting help
 
