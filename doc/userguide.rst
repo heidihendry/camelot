@@ -771,7 +771,7 @@ server and restart Camelot.
 This is a somewhat complex topic. If there are any questions about Bulk
 Import in relation to running Camelot in a system where separate
 'client' computers may perform a bulk import, please
-`ask <#the-community>`__.
+`ask <community.html#the-community>`__.
 
 Step 2: Columns mapping and import
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
