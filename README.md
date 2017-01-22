@@ -16,14 +16,6 @@ Camelot:
 
 You can download Camelot using the "latest version" link above. See [Getting started with Camelot](http://camelot-project.readthedocs.io/en/latest/gettingstarted.html) for how to get things up and running.
 
-## Getting help
-
-Camelot has a [detailed user guide](http://camelot-project.readthedocs.io/en/latest/userguide.html), [administration guide](http://camelot-project.readthedocs.io/en/latest/userguide.html) and much more on the [documentation website](http://camelot-project.readthedocs.io/en/latest).
-
-If there's any question you might have that remains unanswered by the documentation, or if you want to stay up-to-date with announcements of new releases, please join the Google Group:
-
-https://groups.google.com/forum/#!forum/camelot-project
-
 ## Feature tour and gallery
 ### Manage and report across multiple surveys from the Your Organisation page
 ![](doc/screenshot/your-organisation.png)
@@ -42,6 +34,14 @@ https://groups.google.com/forum/#!forum/camelot-project
 
 ### And more...
 See the [user guide](http://camelot-project.readthedocs.io/en/latest/userguide.html) to learn more about what Camelot can offer.
+
+## Getting help
+
+Camelot has a [detailed user guide](http://camelot-project.readthedocs.io/en/latest/userguide.html), [administration guide](http://camelot-project.readthedocs.io/en/latest/userguide.html) and much more on the [documentation website](http://camelot-project.readthedocs.io/en/latest).
+
+If there's any question you might have that remains unanswered by the documentation, or if you want to stay up-to-date with announcements of new releases, please join the Google Group:
+
+https://groups.google.com/forum/#!forum/camelot-project
 
 ## License
 
