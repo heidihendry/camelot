@@ -39,7 +39,7 @@ See the [documentation](http://camelot-project.readthedocs.io/en/latest/) to lea
 
 Camelot has a detailed [documentation website](http://camelot-project.readthedocs.io/en/latest) should you need clarification on any part of Camelot. Everything from [installation](http://camelot-project.readthedocs.io/en/latest/gettingstarted.html), to [usage](http://camelot-project.readthedocs.io/en/latest/survey.html) and to [administration](http://camelot-project.readthedocs.io/en/latest/administration.html) is covered there.
 
-If there's any question you might have that remains unanswered by the documentation, or if you want to stay up-to-date with announcements of new releases, please join the Google Group:
+If there's any question you might have that remains unanswered by the documentation, or if you want to stay up-to-date with the latest announcements, please join the Google Group:
 
 https://groups.google.com/forum/#!forum/camelot-project
 
