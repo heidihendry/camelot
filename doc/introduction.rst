@@ -18,3 +18,5 @@ Camelot:
 -  Lets multiple people use it at the same time
 -  Runs on Windows, OSX and Linux
 -  Is easy to start using
+
+Camelot is Open Source Software.  You can find its project page `here <https://gitlab.com/camelot-project/camelot>`__
