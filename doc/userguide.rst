@@ -1,89 +1,3 @@
-=======
-Camelot
-=======
-
-Introduction
-============
-
-Camelot is open-source camera trapping software for wildlife researchers
-and conservationists.
-
-The latest version of Camelot is:
-**`1.1.0 <http://camelot.bitpattern.com.au/release/camelot-1.1.0.zip>`__**
-
-Camelot:
-
--  Makes classifying camera trap photos quick and easy
--  Keeps track of camera trap, camera and species data
--  Gives you a head start on data analysis
--  Plays nicely with other camera trap software, such as
-   `CamtrapR <https://cran.r-project.org/web/packages/camtrapR/index.html>`__
-   and
-   `PRESENCE <http://www.mbr-pwrc.usgs.gov/software/doc/presence/presence.html>`__
--  Lets multiple people use it at the same time
--  Runs on Windows, OSX and Linux
--  Is easy to start using
-
-Prerequisites
--------------
-
-Java Runtime
-~~~~~~~~~~~~
-
-Camelot requires Java 8u91 (on later) to be installed on the system it
-will run on before it can be used.
-
-Java can be downloaded here:
-http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-If using OSX, you will need to install the "JDK". For Windows and Linux,
-you can install either the "JRE" or the "JDK".
-
-Web browser
-~~~~~~~~~~~
-
-Camelot supports the latest versions of the following browsers:
-
--  Chrome
--  Firefox
--  Edge
--  Safari
--  Internet Explorer 11
-
-Getting Started
----------------
-
-Installation
-~~~~~~~~~~~~
-
-Download the `latest version of
-Camelot <http://camelot.bitpattern.com.au/release/camelot-1.1.0.zip>`__.
-
-Unzip the archive. To run Camelot:
-
-**Windows**: Double click ``camelot-desktop.bat``
-
-**OSX**: Double click ``camelot-desktop.command``
-
-**Linux**: Double click ``camelot-desktop.sh``
-
-After 10 seconds, Camelot should appear in a new tab in your web
-browser. If Camelot doesn't open automatically, you can access it via
-your web browser by browsing to:
-
-::
-
-    http://localhost:5341/
-
-If running Camelot on a server, you can instead use:
-
-::
-
-    java -jar /path/to/camelot-<version>.jar -server
-
-See `Use from multiple computers <#use-from-multiple-computers>`__ for
-more information.
-
 User guide
 ----------
 
@@ -117,7 +31,7 @@ right-hand panel. Behind the scenes, Camelot will automatically set
 additional details about the species, including its family and common
 name.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/survey-create.png
+.. figure:: screenshot/survey-create.png
    :alt: 
 
 Once ready, click "Create Survey".
@@ -128,7 +42,7 @@ Import. If you have already collected all of the media for this survey,
 you may wish to select "Create and import". Refer to `Bulk
 Import <#bulk-import>`__ for more information.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/survey-bulk-import-prompt.png
+.. figure:: screenshot/survey-bulk-import-prompt.png
    :alt: 
 
 The ordering of sections in this guide will assume you choose "Create
@@ -147,7 +61,7 @@ for some more sophisticated, *longitudinal* reports, where data is not
 only able to be analysed by survey, but also across multiple surveys.
 For the same reason, reports live in this menu too.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/your-organisation.png
+.. figure:: screenshot/your-organisation.png
    :alt: 
 
 Each concept can be selected from the menu on the left, and then a
@@ -173,7 +87,7 @@ on the entry for that site in the list to access all the details.
 Adding details to a site is just a matter of filling in the fields and
 clicking "Update".
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/site-edit.png
+.. figure:: screenshot/site-edit.png
    :alt: 
 
 Cameras
@@ -233,7 +147,7 @@ don't be concerned about the distinction between "primary" and
 "secondary" cameras: Camelot is a fair master and treats both cameras
 equally.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/camera-trap-add.png
+.. figure:: screenshot/camera-trap-add.png
    :alt: 
 
 Once you're happy with all of the essential details, click "Next". You
@@ -253,7 +167,7 @@ traps which are no longer active in the field being marked as
 "Finalised". Each of these cameras can be clicked on to view its
 details, or if not finalised, to record details about a *camera check*.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/camera-trap-manage.png
+.. figure:: screenshot/camera-trap-manage.png
    :alt: 
 
 So that's a piece of terminology which has not been introduced until
@@ -269,7 +183,7 @@ requires 3 pieces of data:
 -  What happened with the "primary" camera?
 -  What happened with the "secondary" camera?
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/camera-check-add.png
+.. figure:: screenshot/camera-check-add.png
    :alt: 
 
 Camelot facilitates the following scenarios, for each of the cameras:
@@ -322,7 +236,7 @@ submitted a camera check, for that camera, and we said we had "recovered
 the media". (If this is all double-dutch to you, see the section on
 "Managing Camera Trap Stations" above.)
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/media-upload.png
+.. figure:: screenshot/media-upload.png
    :alt: 
 
 To upload the media, it's as simple as opening your file browser,
@@ -360,7 +274,7 @@ identification dropdown for a survey. If photos in the survey have
 already been identified with this species, they will still be, and as
 such these species will also appear on reports for the survey.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/species-manage.png
+.. figure:: screenshot/species-manage.png
    :alt: 
 
 To add a species, there's a bit more involved. Camelot gives 3 different
@@ -400,7 +314,7 @@ Viewing photos
 
 The "viewing" portion of the library consists of 3 main parts:
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/library.png
+.. figure:: screenshot/library.png
    :alt: 
 
 1. A photo can be *selected* by clicking on the photo on the "media
@@ -436,7 +350,7 @@ Flagging photos
 
 A flag is one of the four icons towards the top right of the library:
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/library-flags.png
+.. figure:: screenshot/library-flags.png
    :alt: 
 
 From left to right these are:
@@ -468,7 +382,7 @@ the quantity if necessary, specify other identifiable details from the
 appropriate drop down and click "Submit". The identification bar will
 disappear and the photo will automatically be marked as "Processed".
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/library-identify.png
+.. figure:: screenshot/library-identify.png
    :alt: 
 
 Sometimes you'll come across a species you didn't expect to see in a
@@ -497,7 +411,7 @@ the Delete button located at the bottom of the Details sidebar.
 Searching
 ^^^^^^^^^
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/library-search-bar.png
+.. figure:: screenshot/library-search-bar.png
    :alt: 
 
 The search bar will change the photos shown in the media collection to
@@ -518,7 +432,7 @@ start typing:
 
     site-s
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/library-search.png
+.. figure:: screenshot/library-search.png
    :alt: 
 
 At this point you should see completions below the input field for
@@ -605,7 +519,7 @@ In the top right hand corner of the main navigation is the toggle to
 show the settings menu. The settings menu in Camelot provides several
 options:
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/settings.png
+.. figure:: screenshot/settings.png
    :alt: 
 
 -  **Sighting Independence Threshold**: Camelot performs sighting
@@ -766,7 +680,7 @@ shoulders to make sure the data is correct -- Camelot will do its utmost
 to help you with the import. This also means that there's a few things
 to know about when it comes to bulk import!
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/bulk-import-steps.png
+.. figure:: screenshot/bulk-import-steps.png
    :alt: 
 
 Step 1: Creating a CSV
@@ -865,7 +779,7 @@ Step 2: Columns mapping and import
 The next step is uploading the CSV and assigning columns mappings from
 the CSV to fields in Camelot.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/bulk-import-mapper.png
+.. figure:: screenshot/bulk-import-mapper.png
    :alt: 
 
 Use the file selector to choose the CSV. Camelot will take a moment to
@@ -876,7 +790,7 @@ If there is a problem, an error describing why the column isn't valid
 for the field will be presented. This may be useful for working out what
 corrections may be needed to the CSV before it can be uploaded.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/bulk-import-mapper-error.png
+.. figure:: screenshot/bulk-import-mapper-error.png
    :alt: 
 
 Should you find that corrections to the CSV need to be made, make the
@@ -887,7 +801,7 @@ again against the new CSV data.
 Once the mapping configuration is valid, you will be able to submit the
 data for final verification and to start the import.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/bulk-import-mapper-submit.png
+.. figure:: screenshot/bulk-import-mapper-submit.png
    :alt: 
 
 Status of a Bulk Import
@@ -901,7 +815,7 @@ right-hand corner of the screen. You can hover over this for more detail
 about the upload status, including time estimates and details of any
 errors.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/bulk-import-status.png
+.. figure:: screenshot/bulk-import-status.png
    :alt: 
 
 A running import can also be cancelled from this status pop-up using the
@@ -918,7 +832,7 @@ Advanced menu
 Occasionally in Camelot you may find "Advanced" buttons, like this one
 in the Surveys menu:
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/advanced-button.png
+.. figure:: screenshot/advanced-button.png
    :alt: 
 
 You might want an Advanced menu should you find an unusual scenario
@@ -928,7 +842,7 @@ between it and a nearby trap station had been mixed up. As there are
 many unusual scenarios just like this, Camelot caters for them with a
 series screens which give fine-grained control over the data.
 
-.. figure:: https://gitlab.com/camelot-project/camelot/blob/master/doc/screenshot/advanced-menu.png
+.. figure:: screenshot/advanced-menu.png
    :alt: 
 
 An advanced menu screen is specific to one type of data. In the above,
@@ -1074,572 +988,3 @@ immediately before or after are updated too. Camera changed? Make sure
 you update the status of the cameras. If you're ever unsure about the
 right way to handle a situation, feel free to get in touch via the
 Google Group.
-
-Fields and data
----------------
-
-This section describes the data within Camelot.
-
-Data Dictionary
-~~~~~~~~~~~~~~~
-
-+-----------+---------------+--------------+-------------+--------------+
-| Field     | Description   | Datatype     | Required?   | Importable?  |
-+===========+===============+==============+=============+==============+
-| survey-id | Unique ID of  | Integer      | Yes         | No           |
-|           | the survey    |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| survey-na | (Unique) name | String       | Yes         | No           |
-| me        | for the       |              |             |              |
-|           | survey        |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| survey-no | Survey        | String       | Yes         | No           |
-| tes       | description   |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-id   | Unique ID of  | Integer      | Yes         | No           |
-|           | the site      |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-name | Name for the  | String       | Yes         | Yes          |
-|           | site          |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-subl | Name by which | String       | No          | Yes          |
-| ocation   | the area is   |              |             |              |
-|           | known         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-city | City or       | String       | No          | Yes          |
-|           | nearest city  |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-stat | State/Provinc | String       | No          | Yes          |
-| e-provinc | e             |              |             |              |
-| e         | of the site   |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-coun | Country or    | String       | No          | Yes          |
-| try       | nearest       |              |             |              |
-|           | country to    |              |             |              |
-|           | the site      |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-area | Approximate   | Decimal      | No          | Yes          |
-|           | area covered  |              |             |              |
-|           | by the site,  |              |             |              |
-|           | in km^2       |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| site-note | Site          | String       | Yes         | No           |
-| s         | description   |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| survey-si | Unique ID of  | Integer      | Yes         | No           |
-| te-id     | the           |              |             |              |
-|           | association   |              |             |              |
-|           | between a     |              |             |              |
-|           | survey a      |              |             |              |
-|           | site.         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Unique ID of  | Integer      | Yes         | No           |
-| ion-id    | the Trap      |              |             |              |
-|           | Station       |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Name of the   | String       | Yes         | Yes          |
-| ion-name  | Trap Station  |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Latitude of   | Decimal (6   | Yes         | Yes          |
-| ion-latit | the trap      | d.p.         |             |              |
-| ude       | station, as a | precision)   |             |              |
-|           | decimal       |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Longitude of  | Decimal (6   | Yes         | Yes          |
-| ion-longi | the trap      | d.p.         |             |              |
-| tude      | station, as a | precision)   |             |              |
-|           | decimal       |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Altitude of   | Integer      | No          | Yes          |
-| ion-altit | the trap      |              |             |              |
-| ude       | station, in   |              |             |              |
-|           | meters        |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Unique ID of  | Integer      | Yes         | No           |
-| ion-sessi | the session   |              |             |              |
-| on-id     |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Start of the  | Timestamp    | Yes         | Yes          |
-| ion-sessi | session       |              |             |              |
-| on-start- |               |              |             |              |
-| date      |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | End of the    | Timestamp    | Yes         | Yes          |
-| ion-sessi | session       |              |             |              |
-| on-end-da |               |              |             |              |
-| te        |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| trap-stat | Unique ID of  | Integer      | Yes         | No           |
-| ion-sessi | the camera    |              |             |              |
-| on-camera | for a session |              |             |              |
-| -id       |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| camera-id | Unique ID of  | Integer      | Yes         | No           |
-|           | the camera    |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| camera-na | (Unique) name | String       | Yes         | Yes          |
-| me        | of the camera |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| camera-ma | Make of the   | String       | No          | Yes          |
-| ke        | camera        |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| camera-mo | Model of the  | String       | No          | Yes          |
-| del       | camera        |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| camera-no | Description   | String       | No          | Yes          |
-| tes       | of the camera |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-id  | Unique ID of  | Integer      | Yes         | No           |
-|           | the media     |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-cap | Time the      | Timestamp    | Yes         | Yes          |
-| ture-time | image was     |              |             |              |
-| stamp     | captured      |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-cam | Flag          | Boolean      | No          | Yes          |
-| eracheck  | indicating    |              |             |              |
-|           | whether the   |              |             |              |
-|           | media was a   |              |             |              |
-|           | camera check  |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-pro | Flag          | Boolean      | No          | Yes          |
-| cessed    | indicating    |              |             |              |
-|           | whether       |              |             |              |
-|           | processing of |              |             |              |
-|           | the media is  |              |             |              |
-|           | complete      |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-att | Flag          | Boolean      | No          | Yes          |
-| ention-ne | indicating    |              |             |              |
-| eded      | whether the   |              |             |              |
-|           | media has     |              |             |              |
-|           | been checked  |              |             |              |
-|           | and needs     |              |             |              |
-|           | further       |              |             |              |
-|           | attention     |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-fil | Base filename | String       | Yes         | No           |
-| ename     | for the media |              |             |              |
-|           | in Camelot    |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-for | File format   | String       | Yes         | No           |
-| mat       | of the        |              |             |              |
-|           | original      |              |             |              |
-|           | media         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| media-not | Notes about   | String       | No          | No           |
-| es        | the media     |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| sighting- | Unique ID of  | Integer      | Yes         | No           |
-| id        | the sighting  |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| sighting- | Number of a   | Integer      | Yes         | Yes          |
-| quantity  | species in    |              |             |              |
-|           | the media     |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| sighting- | Sex of the    | String       | No          | Yes          |
-| sex       | species       | ('M'/'F'/'un |             |              |
-|           |               | identified') |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| sighting- | Life-stage of | String       | No          | Yes          |
-| lifestage | the species   | ('Adult'/'Ju |             |              |
-|           |               | venile'/'uni |             |              |
-|           |               | dentified')  |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Unique ID of  | Integer      | Yes         | No           |
-| id        | a species     |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Species name  | String       | Yes         | Yes          |
-| species   |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Genus name    | String       | Yes         | Yes          |
-| genus     |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Family name   | String       | No          | Yes          |
-| family    |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Order name    | String       | No          | Yes          |
-| order     |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Class name    | String       | No          | Yes          |
-| class     |               |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Common name   | String       | Yes         | Yes          |
-| common-na | of the        |              |             |              |
-| me        | species       |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| taxonomy- | Notes about   | String       | No          | Yes          |
-| notes     | the species   |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| species-m | ID of the     | Integer      | Yes         | No           |
-| ass-id    | species mass  |              |             |              |
-|           | bracket       |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| species-m | Start of the  | Decimal      | Yes         | No           |
-| ass-start | mass bracket  |              |             |              |
-|           | (kg)          |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| species-m | End of the    | Decimal      | Yes         | No           |
-| ass-end   | mass bracket  |              |             |              |
-|           | (kg)          |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-id  | Unique ID of  | Integer      | Yes         | No           |
-|           | the photo     |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-fnu | F-stop        | String       | No          | Yes          |
-| mber-sett | setting when  |              |             |              |
-| ing       | the photo was |              |             |              |
-|           | taken         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-exp | Exposure      | String       | No          | Yes          |
-| osure-val | setting when  |              |             |              |
-| ue        | the photo was |              |             |              |
-|           | taken         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-fla | Whether the   | String       | No          | Yes          |
-| sh-settin | flash was     |              |             |              |
-| g         | triggered     |              |             |              |
-|           | when taking   |              |             |              |
-|           | the photo     |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-foc | The focal     | String       | No          | Yes          |
-| al-length | length when   |              |             |              |
-|           | the photo was |              |             |              |
-|           | taken         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-iso | The ISO       | String       | No          | Yes          |
-| -setting  | setting when  |              |             |              |
-|           | the photo was |              |             |              |
-|           | taken         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-ori | The camera    | String       | No          | Yes          |
-| entation  | orientation   |              |             |              |
-|           | when the      |              |             |              |
-|           | photo was     |              |             |              |
-|           | taken         |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-res | The width of  | Integer      | No          | Yes          |
-| olution-x | the image, in |              |             |              |
-|           | pixels        |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-| photo-res | The height of | Integer      | No          | Yes          |
-| olution-y | the image, in |              |             |              |
-|           | pixels        |              |             |              |
-+-----------+---------------+--------------+-------------+--------------+
-
-Bulk Import default mapping column
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-By using the Default Column Names in a CSV for a Bulk Import, Camelot
-will automatically establish the mapping to the correct field.
-
-+-----------------------------------+---------------------------------+
-| Field                             | Default Column Name             |
-+===================================+=================================+
-| camera-make                       | Make                            |
-+-----------------------------------+---------------------------------+
-| camera-model                      | Model                           |
-+-----------------------------------+---------------------------------+
-| camera-name                       | Camera Name                     |
-+-----------------------------------+---------------------------------+
-| camera-notes                      | Camera Notes                    |
-+-----------------------------------+---------------------------------+
-| media-attention-needed            | Attention Needed Flag           |
-+-----------------------------------+---------------------------------+
-| media-cameracheck                 | Camera Check Flag               |
-+-----------------------------------+---------------------------------+
-| media-capture-timestamp           | Date/Time                       |
-+-----------------------------------+---------------------------------+
-| media-processed                   | Media Processed Flag            |
-+-----------------------------------+---------------------------------+
-| photo-exposure-value              | Exposure Bias Value             |
-+-----------------------------------+---------------------------------+
-| photo-flash-setting               | Flash                           |
-+-----------------------------------+---------------------------------+
-| photo-fnumber-setting             | Aperture Value                  |
-+-----------------------------------+---------------------------------+
-| photo-focal-length                | Focal Length                    |
-+-----------------------------------+---------------------------------+
-| photo-iso-setting                 | ISO Speed Ratings               |
-+-----------------------------------+---------------------------------+
-| photo-orientation                 | Orientation                     |
-+-----------------------------------+---------------------------------+
-| photo-resolution-x                | Image Height                    |
-+-----------------------------------+---------------------------------+
-| photo-resolution-y                | Image Width                     |
-+-----------------------------------+---------------------------------+
-| sighting-lifestage                | Sighting Life Stage             |
-+-----------------------------------+---------------------------------+
-| sighting-quantity                 | Sighting Quantity               |
-+-----------------------------------+---------------------------------+
-| sighting-sex                      | Sighting Sex                    |
-+-----------------------------------+---------------------------------+
-| site-area                         | Site Area (km2)                 |
-+-----------------------------------+---------------------------------+
-| site-city                         | City                            |
-+-----------------------------------+---------------------------------+
-| site-country                      | Country/Primary Location Name   |
-+-----------------------------------+---------------------------------+
-| site-name                         | Site Name                       |
-+-----------------------------------+---------------------------------+
-| site-notes                        | Site Notes                      |
-+-----------------------------------+---------------------------------+
-| site-state-province               | Province/State                  |
-+-----------------------------------+---------------------------------+
-| site-sublocation                  | Sub-location                    |
-+-----------------------------------+---------------------------------+
-| taxonomy-class                    | Class                           |
-+-----------------------------------+---------------------------------+
-| taxonomy-common-name              | Species Common Name             |
-+-----------------------------------+---------------------------------+
-| taxonomy-family                   | Family                          |
-+-----------------------------------+---------------------------------+
-| taxonomy-genus                    | Genus                           |
-+-----------------------------------+---------------------------------+
-| taxonomy-notes                    | Species Notes                   |
-+-----------------------------------+---------------------------------+
-| taxonomy-order                    | Order                           |
-+-----------------------------------+---------------------------------+
-| taxonomy-species                  | Species                         |
-+-----------------------------------+---------------------------------+
-| trap-station-altitude             | GPS Altitude                    |
-+-----------------------------------+---------------------------------+
-| trap-station-latitude             | Camelot GPS Latitude            |
-+-----------------------------------+---------------------------------+
-| trap-station-longitude            | Camelot GPS Longitude           |
-+-----------------------------------+---------------------------------+
-| trap-station-name                 | Trap Station Name               |
-+-----------------------------------+---------------------------------+
-| trap-station-notes                | Trap Station Notes              |
-+-----------------------------------+---------------------------------+
-| trap-station-session-end-date     | Session End Date                |
-+-----------------------------------+---------------------------------+
-| trap-station-session-start-date   | Session Start Date              |
-+-----------------------------------+---------------------------------+
-
-Library filter field shorthands
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The library supports filtering on the vast majority of fields in
-Camelot. Some of these fields are more useful for filtering on than
-others and so have shorthands. Below is each of the shorthands and the
-field they are associated with.
-
-+---------------------+---------------------------+
-| Shorthand           | Associated Field          |
-+=====================+===========================+
-| camera              | camera-name               |
-+---------------------+---------------------------+
-| city                | site-city                 |
-+---------------------+---------------------------+
-| class               | taxonomy-class            |
-+---------------------+---------------------------+
-| common              | taxonomy-common-name      |
-+---------------------+---------------------------+
-| family              | taxonomy-family           |
-+---------------------+---------------------------+
-| flagged             | media-attention-needed    |
-+---------------------+---------------------------+
-| genus               | taxonomy-genus            |
-+---------------------+---------------------------+
-| lat                 | trap-station-latitude     |
-+---------------------+---------------------------+
-| loc                 | site-sublocation          |
-+---------------------+---------------------------+
-| long                | trap-station-longitude    |
-+---------------------+---------------------------+
-| make                | camera-make               |
-+---------------------+---------------------------+
-| model               | camera-model              |
-+---------------------+---------------------------+
-| order               | taxonomy-order            |
-+---------------------+---------------------------+
-| processed           | media-processed           |
-+---------------------+---------------------------+
-| reference-quality   | media-reference-quality   |
-+---------------------+---------------------------+
-| site                | site-name                 |
-+---------------------+---------------------------+
-| species             | taxonomy-label            |
-+---------------------+---------------------------+
-| testfire            | media-cameracheck         |
-+---------------------+---------------------------+
-| trap                | trap-station-name         |
-+---------------------+---------------------------+
-| trapid              | trap-station-id           |
-+---------------------+---------------------------+
-
-The Community
--------------
-
-To keep up to date with any new releases, or if you have any questions
-that haven't been answered here, please join the Google Group:
-
-https://groups.google.com/forum/#!forum/camelot-project
-
-Administration and advanced configuration
------------------------------------------
-
-*This section is not for the faint-of-heart, and intended for people
-with strong IT knowledge.*
-
-Camelot has two directories: one for configuration, and one for data
-storage. The location of these directories depends on the OS.
-
-Locations
-~~~~~~~~~
-
-Windows
-^^^^^^^
-
--  **Data**: %LOCALAPPDATA%:raw-latex:`\camelot`
--  **Config**: %APPDATA%:raw-latex:`\camelot`
-
-OSX
-^^^
-
--  **Data**: $HOME/Library/Application Support/camelot
--  **Config**: $HOME/Library/Preferences/camelot
-
-Linux
-^^^^^
-
--  **Data**: $HOME/.local/share/camelot
--  **Config**: $HOME/.config/camelot
-
-Data Directory
-~~~~~~~~~~~~~~
-
-The data directory will contain three subdirectories: ``Database``,
-``Media`` and ``FileStore``. Database is an Apache Derby database.
-Imported media is not stored in the database, but in the ``Media``
-folder. Finally, the ``FileStore`` contains files for the Survey's
-"Related files" feature.
-
-A custom data directory can be set using the ``CAMELOT_DATADIR``
-environment variable. The Database and Media directories will be created
-(if necessary) and stored within that nominated directory. If
-``CAMELOT_DATADIR`` is not set, Camelot will fall-back to using the
-standard locations (as above).
-
-Each of the ``Database``, ``Media`` and ``FileStore`` directories should
-be backed up routinely.
-
-Config Directory
-~~~~~~~~~~~~~~~~
-
-config.clj
-^^^^^^^^^^
-
-``config.clj`` is the global camelot configuration file. Some values in
-this file can be set via the Settings menu in Camelot, while others may
-be internal or legacy settings. Care should be taken if editing this
-file manually.\ ``config.clj`` is the global camelot configuration file.
-All configuration values available in this can also be set through the
-settings panel in the UI.
-
-Custom Reports
-~~~~~~~~~~~~~~
-
-Custom reports and column definitions for reports can be registered by
-creating a *reports module*. A reports module can also override existing
-reports and columns.
-
-Reports modules are Clojure files (``.clj`` extension) and are stored
-under the ``modules`` subdirectory of Camelot's config directory
-(described above).
-
-All modules in this directory will be loaded before each report is ran.
-
-Here's an example module to create and register a custom column, and a
-custom report using that column.
-
-.. code:: clojure
-
-    (ns custom.camelot.module.custom_column
-      (:require [camelot.report.module.core :as module]))
-
-    (defn custom-column
-      [state data]
-      (map #(assoc % :custom-column
-                   (if (:survey-id %)
-                     "YES"
-                     "NO"))
-           data))
-
-    (module/register-column
-     :custom-column
-     {:calculate custom-column
-      :heading "Custom Column"})
-
-    (defn report-configuration
-      [state {:keys [survey-id]}]
-      {:columns [:media-id
-                 :taxonomy-label
-                 :trap-station-longitude
-                 :trap-station-latitude
-                 :custom-column]
-       :aggregate-on [:independent-observations
-                      :nights-elapsed]
-       :filters [#(:trap-station-longitude %)
-                 #(:trap-station-latitude %)
-                 #(:species-scientific-name %)
-                 #(= (:survey-id %) survey-id)]
-       :order-by [:species-scientific-name
-                  :trap-station-longitude
-                  :trap-station-latitude]})
-
-    ;; The design of the configuration page for the report.
-    (def form-smith
-      {:resource {}
-       :layout [[:survey-id]]
-       :schema {:survey-id
-                {:label "Survey"
-                 :description "The survey to report on"
-                 :schema {:type :select
-                          :required true
-                          :get-options {:url "/surveys"
-                                        :label :survey-name
-                                        :value :survey-id}}}}})
-
-    (module/register-report
-     :custom-report
-     {:file-prefix "cool custom report"
-      :output report-configuration
-      :title "Cool Custom Report"
-      :description "A very cool report"
-      :form form-smith
-      :by :species
-      :for :survey})
-
-Camelot will treat your field differently when it comes to generating
-the report, depending on how it the field is named.
-
--  Fields ending in "-id" are converted to Java Longs.
--  Fields ending in "-date" are converted to Joda Dates.
--  Fields ending in "-float" are converted to Java Floats.
--  Fields ending in "-num" are converted to a suitable type. Check the
-   ``edn/read-string`` documentation for details.
-
-For more module examples, check out Camelot's `built-in reports and
-columns <https://gitlab.com/camelot-project/camelot/tree/master/src/clj/camelot/report/module/builtin/?at=master>`__
-
-License
--------
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
-
-Acknowledgements
-----------------
-
-Camelot was developed in consultation with Fauna & Flora International -
-Vietnam programme. Input into design was provided by Heidi Hendry, Data
-Scientist, & Dr Benjamin Rawson, Country Director, of Fauna & Flora
-International - Vietnam.
-
-With thanks to the Fauna & Flora International camera trappers in
-Myanmar and Indonesia, especially Wido Albert, Grant Cornette, and
-Patrick Oswald for detailed feedback about usability and preferred
-report outputs. And further thanks to all the Fauna & Flora
-International Camelot Beta Testers for their support and feedback.
