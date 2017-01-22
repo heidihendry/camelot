@@ -8,7 +8,6 @@ Camelot Documentation
    introduction
    gettingstarted
    userguide
-   data
    community
    administration
    license
