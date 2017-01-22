@@ -128,7 +128,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Camelot.tex', 'Camelot Documentation',
-     'Bit Pattern', 'manual'),
+     '', 'manual'),
 ]
 
 
