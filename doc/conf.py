@@ -55,7 +55,7 @@ author = 'Chris Mann'
 # built documents.
 #
 # The short X.Y version.
-version = '1.1.0'
+version = '1.1'
 # The full version, including alpha/beta/rc tags.
 release = '1.1.0'
 
@@ -108,11 +108,11 @@ htmlhelp_basename = 'Camelotdoc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
-    # 'papersize': 'letterpaper',
+    'papersize': 'a4paper',
 
     # The font size ('10pt', '11pt' or '12pt').
     #
-    # 'pointsize': '10pt',
+    'pointsize': '11pt',
 
     # Additional stuff for the LaTeX preamble.
     #
@@ -128,7 +128,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Camelot.tex', 'Camelot Documentation',
-     'Chris Mann', 'manual'),
+     'Bit Pattern', 'manual'),
 ]
 
 
