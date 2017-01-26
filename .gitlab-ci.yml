@@ -6,9 +6,12 @@ before_script:
   - mkdir ~/.ssh
   - chmod 700 ~/.ssh
   - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
-
+  - mkdir -p ~/bin
+  - curl -fsSLo ~/bin/boot https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh
+  - chmod 755 ~/bin/boot
+  - export PATH="$HOME/bin:${PATH}"
 build:
-  image: adzerk/boot-clj
+  image: clojure
   script:
     - sh -c "boot -h || exit 0"
     - script/test-full.sh
