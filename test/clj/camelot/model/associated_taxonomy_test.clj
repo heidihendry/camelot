@@ -44,7 +44,7 @@
                       taxonomy/get-or-create! (fn [& args] {:taxonomy-id 1})
                       survey/get-all (fn [s] [{:survey-id 1} {:survey-id 2}])]
           (create! {:taxonomy-species "spp" :survey-id 1})
-          (is (= @result) []))))
+          (is (= @result [])))))
 
     (testing "Does not create an association for any survey should all associations exist."
       (let [result (atom [])]
@@ -54,4 +54,4 @@
                       taxonomy/get-or-create! (fn [& args] {:taxonomy-id 1})
                       survey/get-all (fn [s] [{:survey-id 1} {:survey-id 2}])]
           (create! {:taxonomy-species "spp"})
-          (is (= @result) []))))))
+          (is (= @result [])))))))

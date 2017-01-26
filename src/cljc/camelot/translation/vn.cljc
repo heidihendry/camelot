@@ -1,4 +1,3 @@
-(ns camelot.translation.vn
-  )
+(ns camelot.translation.vn)
 
 (def t-vn {})

@@ -1,0 +1,2 @@
+{:require  [camelot.core]
+ :compiler-options {}}

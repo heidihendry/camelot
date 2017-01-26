@@ -1,5 +1,5 @@
 before_script:
-  - export LEIN_ROOT=1
+  - export BOOT_AS_ROOT='yes'
   - apt-get update -y
   - apt-get install nodejs nodejs-legacy npm curl -y
   - npm install -g phantomjs-prebuilt
@@ -8,16 +8,12 @@ before_script:
   - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
 
 build:
-  image: clojure
+  image: adzerk/boot-clj
   script:
-    - sh -c "lein deps || lein deps || exit 0"
-    - script/clean-build.sh
-    - lein with-profiles +test test
-    - lein doo phantom test once
+    - sh -c "boot -h || exit 0"
+    - script/test-full.sh
     - script/setup-testdata.sh
-    - script/test-runtime.sh
     - CAMELOT_DATADIR="testdata" script/test-runtime.sh
-    - script/prepare-snapshot.sh
     - mkdir -p "camelot-${CI_BUILD_REF_NAME}/"
     - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.bat script/bin/camelot-desktop.command "camelot-${CI_BUILD_REF_NAME}/"
   artifacts:

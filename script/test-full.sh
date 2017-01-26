@@ -2,36 +2,19 @@
 
 set -e
 
-PROJECT_NAME="camelot"
-PROJECT_FILE="project.clj"
-
 echo "Checking binaries in \$PATH... "
-which gdrive &> /dev/null
-which lein &> /dev/null
-which git &> /dev/null
-which sed &> /dev/null
-
-echo "Cleaning... "
-lein clean
-
-echo "Checking code... "
-lein check
-
-echo "Compiling... "
-#lein with-profiles -dev,+production compile
-#lein with-profiles -dev,+uberjar cljsbuild once
-# Using uberjar over compile due to bug in Lein 2.6.1
-# https://github.com/technomancy/leiningen/issues/2096
-lein with-profiles -dev,-user,+uberjar uberjar
+which boot &> /dev/null
 
 echo "Running tests... "
-lein with-profiles +test test
-lein doo phantom test once
+boot check
+
+echo "Compiling... "
+boot build
 
 echo "Running camelot and ensuring it responds... "
 java -jar target/camelot.jar &
 PID=$!
-sleep 20
+sleep 45
 # Ensure process is still running
 ps -p $PID
 # Check the compiled JS is served
