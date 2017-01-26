@@ -30,6 +30,7 @@
     [org.clojure/clojurescript "1.9.229"]
     [org.clojure/core.async "0.2.391"]
     [org.clojure/data.csv "0.1.3"]
+    [org.clojure/math.combinatorics "0.1.4"]
     [org.clojure/java.jdbc "0.4.2"]
     [org.clojure/tools.nrepl "0.2.12"]
     [org.omcljs/om "1.0.0-alpha32" :exclusions [com.cognitect/transit-cljs cljsjs/react]]
