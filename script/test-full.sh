@@ -5,11 +5,11 @@ set -e
 echo "Checking binaries in \$PATH... "
 which boot &> /dev/null
 
-echo "Running tests... "
-boot check
-
 echo "Compiling... "
 boot build
+
+echo "Running tests... "
+boot check
 
 echo "Running camelot and ensuring it responds... "
 java -jar target/camelot.jar &
