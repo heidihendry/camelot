@@ -32,7 +32,7 @@ LEFT JOIN survey_site USING (survey_site_id)
 LEFT JOIN camera USING (camera_id)
 LEFT JOIN site USING (site_id)
 LEFT JOIN camera_status USING (camera_status_id)
-WHERE survey_id = :survey_id AND camera_id IS NOT NULL
+WHERE survey_id = :survey_id
 
 -- name: -get-uploadable
 SELECT trap_station_session_id, trap_station_session_created,

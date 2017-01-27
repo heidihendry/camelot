@@ -57,9 +57,9 @@
      trap-station-notes :- (s/maybe s/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- (s/maybe org.joda.time.DateTime)
-     primary-camera-id :- s/Int
-     primary-camera-name :- s/Str
-     primary-camera-status-id :- s/Int
+     primary-camera-id :- (s/maybe s/Int)
+     primary-camera-name :- (s/maybe s/Str)
+     primary-camera-status-id :- (s/maybe s/Int)
      secondary-camera-id :- (s/maybe s/Num)
      secondary-camera-name :- (s/maybe s/Str)
      secondary-camera-status-id :- (s/maybe s/Int)]

@@ -203,7 +203,8 @@
                                                           (:trap-station-session-id data))))}
                (dom/div #js {:className "pull-right fa fa-times remove top-corner"
                              :onClick (partial delete state data)})
-               (when (:trap-station-session-end-date data)
+               (when (or (:trap-station-session-end-date data)
+                         (nil? (:primary-camera-id data)))
                  (dom/span #js {:className "status pull-right"}
                            (tr/translate ::finalised)))
                (dom/span #js {:className "menu-item-title"}

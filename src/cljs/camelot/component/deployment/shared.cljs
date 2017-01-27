@@ -8,7 +8,8 @@
 
 (defn can-edit?
   [data]
-  (nil? (-> data :data :trap-station-session-end-date :value)))
+  (and (nil? (-> data :data :trap-station-session-end-date :value))
+       (-> data :data :primary-camera-id :value)))
 
 (defn datetime-in-future?
   "Predicate indicating whether the datetime is in the future.  False if datetime is nil."
