@@ -142,5 +142,8 @@ the report, depending on how it the field is named.
 -  Fields ending in "-num" are converted to a suitable type. Check the
    ``edn/read-string`` documentation for details.
 
-For more module examples, check out Camelot's `built-in reports and
-columns <https://gitlab.com/camelot-project/camelot/tree/master/src/clj/camelot/report/module/builtin/?at=master>`__
+For more module examples, check out Camelot's |builtin_link|.
+
+.. |builtin_link| raw:: html
+
+   <a href="https://gitlab.com/camelot-project/camelot/tree/master/src/clj/camelot/report/module/builtin/?at=master" target="_blank">built-in reports and columns</a>

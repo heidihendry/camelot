@@ -111,12 +111,15 @@ night".
 
 Night is determined as a time after sunset and before sunrise, given a
 particular set of GPS coordinates and on a particular day using the
-sunrise and sunset times as calculated by `an algorithm published by the
-Nautical Almanac
-Office <http://williams.best.vwh.net/sunrise_sunset_algorithm.htm>`__.
+sunrise and sunset times as calculated by |alamac_link|.
+
 This algorithm does not attempt to account for atmospheric or
 geographical features, though will typically be accurate to within
 several minutes of the actual sunrise and sunset times.
+
+.. |alamac_link| raw:: html
+
+   <a href="http://williams.best.vwh.net/sunrise_sunset_algorithm.htm" target="_blank">an algorithm published by the Nautical Almanac Office</a>
 
 Abundance Index
 ~~~~~~~~~~~~~~~
