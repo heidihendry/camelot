@@ -51,9 +51,8 @@
   (map->Media (assoc ks :media-capture-timestamp-label
                      (tf/unparse (tf/formatters :mysql) (:media-capture-timestamp ks)))))
 
-(s/defn get-all :- [Media]
-  [state :- State
-   id :- s/Int]
+(s/defn get-all
+  [state id]
   (map media (db/with-db-keys state -get-all {:trap-station-session-camera-id id})))
 
 (s/defn get-all* :- [Media]
@@ -111,9 +110,8 @@
            first
            media))
 
-(s/defn create! :- Media
-  [state :- State
-   data :- TMedia]
+(defn create!
+  [state data]
   (let [record (db/with-db-keys state -create<! data)]
     (media (get-specific state (int (:1 record))))))
 

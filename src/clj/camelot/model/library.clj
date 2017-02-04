@@ -4,48 +4,54 @@
    [schema.core :as s]
    [yesql.core :as sql]
    [camelot.util.db :as db]
+   [camelot.library.filter :as filter]
    [camelot.model.sighting :as sighting]
    [camelot.model.media :as media]
    [camelot.system.state :refer [State]]
-   [camelot.util.trap-station :as util.ts])
+   [camelot.util.trap-station :as util.ts]
+   [camelot.model.taxonomy :as taxonomy])
   (:import
    (camelot.model.sighting Sighting)))
 
 (sql/defqueries "sql/library.sql")
 
-(s/defrecord LibraryRecord
-    [media-id :- s/Int
-     media-created :- org.joda.time.DateTime
-     media-updated :- org.joda.time.DateTime
-     media-filename :- s/Str
-     media-format :- s/Str
-     media-uri :- s/Str
-     media-cameracheck :- s/Bool
-     media-attention-needed :- s/Bool
-     media-processed :- s/Bool
-     media-reference-quality :- s/Bool
-     media-capture-timestamp :- org.joda.time.DateTime
-     trap-station-session-camera-id :- s/Int
-     trap-station-session-id :- s/Int
-     trap-station-id :- s/Int
-     trap-station-name :- s/Str
-     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
-     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
-     site-sublocation :- (s/maybe s/Str)
-     site-city :- (s/maybe s/Str)
-     site-state-province :- (s/maybe s/Str)
-     site-country :- (s/maybe s/Str)
-     camera-id :- s/Int
-     camera-name :- s/Str
-     camera-make :- (s/maybe s/Str)
-     camera-model :- (s/maybe s/Str)
-     survey-site-id :- s/Int
-     survey-id :- s/Int
-     survey-name :- s/Str
-     site-id :- s/Int
-     site-name :- s/Str
-     sightings :- [Sighting]]
-  {s/Any s/Any})
+(def max-result-records 2000)
+
+(defrecord LibraryRecord
+    [media-id
+     media-created
+     media-updated
+     media-filename
+     media-format
+     media-uri
+     media-cameracheck
+     media-attention-needed
+     media-processed
+     media-reference-quality
+     media-capture-timestamp
+     trap-station-session-camera-id
+     sightings])
+
+(defrecord LibraryMetadata
+    [trap-station-session-camera-id
+     trap-station-session-id
+     trap-station-id
+     trap-station-name
+     trap-station-longitude
+     trap-station-latitude
+     site-sublocation
+     site-city
+     site-state-province
+     site-country
+     camera-id
+     camera-name
+     camera-make
+     camera-model
+     survey-site-id
+     survey-id
+     survey-name
+     site-id
+     site-name])
 
 (defn library-record
   [ks]
@@ -54,41 +60,80 @@
                           (update :media-reference-quality #(or % false))
                           (update :sightings #(or % [])))))
 
-(defn- all-media
+(defn build-library-metadata
   [state]
-  (db/with-db-keys state -all-media {}))
+  (->> (db/with-db-keys state -hierarchy-data {})
+       (group-by :trap-station-session-camera-id)
+       (map (fn [[k v]] (vector k (map->LibraryMetadata (first v)))))
+       (into {})))
+
+(defn add-in-metadata
+  [state records]
+  (let [md (build-library-metadata state)]
+    (map #(merge (get md (:trap-station-session-camera-id %)) %)
+         records)))
+
+(defn filtered-media
+  [state records {:keys [search start-from]}]
+  (let [spps (reduce #(assoc %1 (:taxonomy-id %2) %2) {} (taxonomy/get-all state))
+        matches (filter/only-matching search spps (add-in-metadata state records))
+        rs (->> matches
+                (drop (or start-from 0))
+                (take max-result-records))]
+    {:total (count matches)
+     :results (map #(select-keys % [:media-id
+                                    :media-created
+                                    :media-updated
+                                    :media-filename
+                                    :media-format
+                                    :media-uri
+                                    :media-cameracheck
+                                    :media-attention-needed
+                                    :media-processed
+                                    :media-reference-quality
+                                    :media-capture-timestamp
+                                    :trap-station-session-camera-id
+                                    :sightings]) rs)}))
+
+(defn all-media
+  [state opts]
+  (filtered-media state
+                  (db/with-db-keys state -all-media {})
+                  opts))
 
 (defn- all-media-for-survey
-  [state survey-id]
-  (db/with-db-keys state -all-media-for-survey {:survey-id survey-id}))
+  [state survey-id opts]
+  (filtered-media state
+                  (db/with-db-keys state -all-media-for-survey {:survey-id survey-id})
+                  opts))
 
-(s/defn build-records :- [LibraryRecord]
+(s/defn build-records
   [state sightings media]
   (let [media-sightings (group-by :media-id sightings)
         media-uri #(format "/media/photo/%s" (:media-filename %))
         sightings-for #(get media-sightings (:media-id %))]
-    (sort-by
-     (juxt
-      :trap-station-id
-      :camera-id
-      :trap-station-session-start-date
-      :trap-station-session-id
-      :media-capture-timestamp)
-     (map #(library-record (assoc %
-                                  :sightings (vec (sightings-for %))
-                                  :media-uri (media-uri %)))
-          media))))
+    (map #(assoc %
+                 :sightings (vec (sightings-for %))
+                 :media-uri (media-uri %))
+         media)))
 
-(s/defn build-library :- [LibraryRecord]
-  [state]
-  (db/with-transaction [s state]
-    (build-records s (sighting/get-all* s) (all-media s))))
+(s/defn build-library
+  ([state opts]
+   (db/with-transaction [s state]
+     (let [{results :results total :total} (all-media s opts)]
+       {:total total
+        :results (build-records s (sighting/get-all* s) results)})))
+  ([state]
+   (build-library state {})))
 
-(s/defn build-library-for-survey :- [LibraryRecord]
-  [state :- State
-   id :- s/Int]
-  (db/with-transaction [s state]
-    (build-records s (sighting/get-all* s) (all-media-for-survey s id))))
+(s/defn build-library-for-survey
+  ([state id opts]
+   (db/with-transaction [s state]
+     (let [{results :results total :total} (all-media-for-survey s id opts)]
+       {:total total
+        :results (build-records s (sighting/get-all* s) results)})))
+  ([state id]
+   (build-library-for-survey state id {})))
 
 (s/defn update-bulk-media-flags
   [state :- State

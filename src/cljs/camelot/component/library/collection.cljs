@@ -5,7 +5,8 @@
             [camelot.state :as state]
             [om.core :as om]
             [camelot.nav :as nav]
-            [camelot.translation.core :as tr]))
+            [camelot.translation.core :as tr]
+            [clojure.string :as str]))
 
 (def collection-columns 3)
 
@@ -207,12 +208,24 @@
     page
     (inc page)))
 
+(defn thousands-sep
+  [n]
+  (->> n
+       str
+       seq
+       reverse
+       (partition 3 3 nil)
+       reverse
+       (map #(apply str (reverse %)))
+       (clojure.string/join ",")
+       (apply str)))
+
 (defn pagination-component
   [data owner]
   (reify
     om/IRender
     (render [_]
-      (let [match-count (count (get-in data [:search-results :all-ids]))]
+      (let [match-count (get-in data [:search-results :total-matches])]
         (dom/div #js {:className "pagination-nav"}
                  (dom/button #js {:className "fa fa-2x fa-angle-left btn btn-default"
                                   :disabled (if (or (get-in data [:search :identify-selected])
@@ -223,11 +236,11 @@
                                                 (om/transact! data [:search :page] prev-page)
                                                 (nav/analytics-event "library-collection" "prev-page-click"))})
                  (dom/div #js {:className "describe-pagination"}
-                          (str (+ (- (* util/page-size (get-in data [:search :page])) util/page-size) 1)
+                          (str (thousands-sep (+ (- (* util/page-size (get-in data [:search :page])) util/page-size) 1))
                                " - "
-                               (min (* util/page-size (get-in data [:search :page])) match-count)
+                               (thousands-sep (min (* util/page-size (get-in data [:search :page])) match-count))
                                " of "
-                               match-count))
+                               (thousands-sep match-count)))
                  (dom/button #js {:className "fa fa-2x fa-angle-right btn btn-default"
                                   :disabled (if (or (get-in data [:search :identify-selected])
                                                     (>= (* util/page-size (get-in data [:search :page])) match-count))

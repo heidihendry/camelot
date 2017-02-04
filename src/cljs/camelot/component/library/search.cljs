@@ -1,11 +1,11 @@
 (ns camelot.component.library.search
   (:require [om.dom :as dom]
             [om.core :as om]
-            [camelot.util.filter :as filter]
             [camelot.component.library.util :as util]
             [camelot.state :as state]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
+            [camelot.util.filter :as filter]
             [typeahead.core :as typeahead]
             [clojure.string :as str]
             [cljs.core.async :refer [<! chan >! timeout sliding-buffer]]
@@ -584,11 +584,11 @@
 
 (defn search
   [data search records]
-  (let [match-ids (map :media-id (filter/only-matching (:terms search)
-                                                       (assoc search :results records)
-                                                       (:species data)))]
-    (om/update! (:search-results data) :all-ids
-                (filter (set match-ids) (:ordered-ids search)))))
+  (let [start (* (dec (:page search)) util/page-size)
+        terms (filter/append-subfilters (:terms search) (deref (:search data)))]
+    (if-let [survey-id (get-in @data [:search :survey-id])]
+      (util/load-library-search survey-id terms start)
+      (util/load-library-search terms start))))
 
 (defn search-component
   [data owner]

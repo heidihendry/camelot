@@ -227,10 +227,21 @@
 
   (context "/library" {session :session state :system}
            (GET "/" [] (r/response (library/build-library (assoc state :session session))))
+           (POST "/" [data]
+                 (r/response (library/build-library (assoc state :session session)
+                                                    data)))
+           (GET "/metadata" [] (r/response (library/build-library-metadata
+                                            (assoc state :session session))))
            (GET "/:id" [id] (r/response (library/build-library-for-survey (assoc state :session session)
                                                                           (edn/read-string id))))
+           (POST "/:id" [id data]
+                 (r/response (library/build-library-for-survey
+                              (assoc state :session session)
+                              (edn/read-string id)
+                              data)))
            (POST "/media/flags" [data] (r/response (library/update-bulk-media-flags
-                                                    (assoc state :session session) data)))
+                                                    (assoc state :session session)
+                                                    data)))
            (PUT "/identify" [data] (r/response (library/identify (assoc state :session session)
                                                                  data))))
   (context "/species" {session :session state :system}

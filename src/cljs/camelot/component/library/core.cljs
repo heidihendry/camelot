@@ -64,10 +64,7 @@
   (let [search (aget opts "search")
         reload (aget opts "reload")]
     (when reload
-      (util/load-library))
-    (om/update! (:search-results data) :all-ids
-                (map :media-id (filter/only-matching search (deref (:search data))
-                                                     (deref (:species data)))))))
+      (util/load-library-search search 0))))
 
 (defn delete-media!
   [data id]

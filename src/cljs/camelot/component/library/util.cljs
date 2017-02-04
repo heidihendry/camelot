@@ -40,16 +40,19 @@
                 (fn [ms] (remove #(= media-id %) ms))))
 
 (defn load-library-callback
-  [resp]
-  (om/update! (state/library-state) :selected-media-id nil)
-  (om/update! (get (state/library-state) :search) :results
-              (reduce (fn [acc v] (assoc acc (:media-id v) v)) {}
-                      (:body resp)))
-  (let [mid (mapv :media-id (:body resp))]
-    (om/update! (get (state/library-state) :search) :ordered-ids mid)
-    (om/update! (get (state/library-state) :search-results) :all-ids mid))
-  (om/update! (:search (state/library-state)) :page 1)
-  (om/update! (:search (state/library-state)) :dirty-state true))
+  [md resp]
+  (let [{results :results total :total} (:body resp)]
+    (om/update! (state/library-state) :selected-media-id nil)
+    (om/update! (get (state/library-state) :search) :results
+                (reduce (fn [acc v] (assoc acc (:media-id v) v)) {}
+                        (map #(merge (get md (:trap-station-session-camera-id %))
+                                     %)
+                             results)))
+    (om/update! (state/library-state) [:search-results :total-matches] total)
+    (let [mid (mapv :media-id results)]
+      (om/update! (get (state/library-state) :search) :ordered-ids mid)
+      (om/update! (get (state/library-state) :search-results) :all-ids mid))
+    (om/update! (:search (state/library-state)) :page 1)))
 
 (defn get-media-flags
   [rec]
@@ -128,9 +131,29 @@
 
 (defn load-library
   ([]
-   (rest/get-x "/library" load-library-callback))
+   (rest/get-x "/library/metadata"
+               (fn [md]
+                 (rest/get-x "/library" (partial load-library-callback (:body md))))))
   ([survey-id]
-   (rest/get-x (str "/library/" survey-id) load-library-callback)))
+   (rest/get-x "/library/metadata"
+               (fn [md]
+                 (rest/get-x (str "/library/" survey-id)
+                             (partial load-library-callback (:body md)))))))
+
+(defn load-library-search
+  ([search start-from]
+   (rest/get-x "/library/metadata"
+               (fn [md]
+                 (rest/post-x "/library" {:data {:search search
+                                                 :start-from (or start-from 0)}}
+                              (partial load-library-callback (:body md))))))
+  ([survey-id search start-from]
+   (rest/get-x "/library/metadata"
+               (fn [md]
+                 (rest/post-x (str "/library/" survey-id)
+                              {:data {:search search
+                                      :start-from (or start-from 0)}}
+                              (partial load-library-callback (:body md)))))))
 
 (defn load-taxonomies
   ([]

@@ -1,39 +1,18 @@
-(ns camelot.util.filter
+(ns camelot.library.filter
   "Record filtering and filter expressions."
-  (:require [clojure.string :as str]
-            [camelot.util.model :as model]))
-
-(def field-keys
-  {"species" :taxonomy-label
-   "genus" :taxonomy-genus
-   "family" :taxonomy-family
-   "order" :taxonomy-order
-   "class" :taxonomy-class
-   "common" :taxonomy-common-name
-   "site" :site-name
-   "camera" :camera-name
-   "loc" :site-sublocation
-   "trap" :trap-station-name
-   "long" :trap-station-longitude
-   "lat" :trap-station-latitude
-   "model" :camera-model
-   "make" :camera-make
-   "trapid" :trap-station-id
-   "flagged" :media-attention-needed
-   "processed" :media-processed
-   "testfire" :media-cameracheck
-   "reference-quality" :media-reference-quality
-   "city" :site-city})
-
-(def model-fields
-  (mapv name model/fields))
+  (:require
+   [clojure.string :as str]
+   [clojure.edn :as edn]
+   [camelot.util.filter :as futil])
+  (:import
+   (java.lang String Boolean)))
 
 (def exact-matches-needed
   #{:sighting-sex :sighting-lifestage})
 
 (defn field-key-lookup
   [f]
-  (or (get field-keys f) (keyword f)))
+  (or (get futil/field-keys f) (keyword f)))
 
 (defn nil->empty
   [v]
@@ -43,7 +22,7 @@
 
 (defn substring?
   [s sub]
-  (if (not= (.indexOf (str/lower-case (.toString (nil->empty s))) sub) -1)
+  (if (not= (.indexOf (str/lower-case (str (nil->empty s))) sub) -1)
     true
     false))
 
@@ -66,7 +45,7 @@
   [search species sightings]
   (let [[f s] (str/split search #":")]
     (if (re-find #"\-id$" (name (field-key-lookup f)))
-      (some? (some #(= (get % (field-key-lookup f)) (js/parseInt s))
+      (some? (some #(= (get % (field-key-lookup f)) (edn/read-string s))
                    sightings))
       (some #(if (= s "*")
                (not (nil? (get % (field-key-lookup f))))
@@ -79,8 +58,8 @@
 (defn record-string-search
   [search species records]
   (some #(cond
-           (= (type %) js/String) (substring? (.toString %) search)
-           (= (type %) js/Boolean) (= (.toString %) search))
+           (= (type %) String) (substring? (str %) search)
+           (= (type %) Boolean) (= (str %) search))
         (mapcat vals records)))
 
 (defn record-matches
@@ -104,35 +83,13 @@
     true
     (disjunctive-terms search species record)))
 
-(defn append-to-strings
-  [ss append]
-  (map #(str % append) ss))
-
-(defn non-empty-list
-  [s]
-  (if (empty? s)
-    [""]
-    s))
-
-(defn append-subfilters
-  [s search-conf]
-  (-> s
-      (str/split #"\|")
-      (non-empty-list)
-      (append-to-strings (if (:unprocessed-only search-conf) " processed:false" ""))
-      (append-to-strings (if (and (:trap-station-id search-conf)
-                                  (> (:trap-station-id search-conf) -1))
-                           (str " trapid:" (:trap-station-id search-conf))
-                           ""))
-      (#(str/join "|" %))))
-
 (defn format-reducer
   [acc c]
   (cond
-    (and (= c " ") (not (:quoted acc)))
+    (and (= c \ ) (not (:quoted acc)))
     (update acc :result #(conj % "+++"))
 
-    (= c "\"")
+    (= c \")
     (update acc :quoted not)
 
     :else
@@ -145,10 +102,8 @@
                                               (seq terms))))))
 
 (defn only-matching
-  [terms data species]
-  (let [t (format-terms terms)]
-    (filter
-     #(matches-search? (format-terms (append-subfilters (or t "") data))
-                       species
-                       %)
-     (vals (:results data)))))
+  [terms species records]
+  (if (empty? terms)
+    records
+    (let [t (format-terms terms)]
+      (filter #(matches-search? t species %) records))))
