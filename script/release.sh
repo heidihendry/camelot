@@ -8,8 +8,6 @@ README_FILE="README.md"
 HTML_FILE="resources/public/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
-echo "Switching to master and making sure it's clean..."
-git checkout master
 git status | grep -q 'branch is up-to-date'
 
 echo "Bumping release version... "
