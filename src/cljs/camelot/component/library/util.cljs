@@ -77,16 +77,16 @@
   (om/update! (state/library-state) [:search :show-select-count-override] true)
   (.setTimeout js/window hide-select-message 1600))
 
-(defn set-flag-state
-  [flag-key flag-state]
+(defn set-flag-states
+  [flag-state-map]
   (let [selected (all-media-selected)]
     (rest/post-resource "/library/media/flags"
-                        {:data (mapv #(assoc (get-media-flags %)
-                                             flag-key flag-state)
+                        {:data (mapv #(merge (get-media-flags %)
+                                             flag-state-map)
                                      selected)}
                         (fn []
                           (doall (map
-                                  #(om/update! % flag-key flag-state)
+                                  #(doall (map (fn [[k v]] (om/update! % k v)) (vec flag-state-map)))
                                   selected))))))
 
 (defn set-attention-needed
@@ -96,9 +96,11 @@
                 (tr/translate ::flagged)
                 (tr/translate ::unflagged)))
   (show-select-message)
-  (set-flag-state :media-attention-needed flag-state)
-  (when flag-state
-    (set-flag-state :media-processed false)))
+  (let [calc-state (if flag-state
+                     {:media-attention-needed flag-state
+                      :media-processed false}
+                     {:media-attention-needed flag-state})]
+    (set-flag-states calc-state)))
 
 (defn set-reference-quality
   [flag-state]
@@ -107,7 +109,7 @@
                                     (tr/translate ::reference-quality)
                                     (tr/translate ::ordinary-quality)))
   (show-select-message)
-  (set-flag-state :media-reference-quality flag-state))
+  (set-flag-states {:media-reference-quality flag-state}))
 
 (defn set-processed
   [flag-state]
@@ -116,7 +118,7 @@
                 (tr/translate ::processed)
                 (tr/translate ::unprocessed)))
   (show-select-message)
-  (set-flag-state :media-processed flag-state))
+  (set-flag-states {:media-processed flag-state}))
 
 (defn set-cameracheck
   [flag-state]
@@ -125,9 +127,10 @@
                 (tr/translate ::test-fires)
                 (tr/translate ::not-test-fires)))
   (show-select-message)
-  (set-flag-state :media-cameracheck flag-state)
-  (when flag-state
-    (set-flag-state :media-processed true)))
+  (set-flag-states (if flag-state
+                     {:media-cameracheck true
+                      :media-processed true}
+                     {:media-cameracheck false})))
 
 (defn load-library
   ([]

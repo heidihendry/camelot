@@ -156,10 +156,11 @@
 
 (s/defn update-media-flags!
   [state :- State
-   {:keys [media-id media-attention-needed media-processed media-reference-quality]}]
+   {:keys [media-id media-attention-needed media-processed media-reference-quality media-cameracheck]}]
   (db/with-db-keys state -update-media-flags! {:media-id media-id
                                                :media-reference-quality (or media-reference-quality false)
                                                :media-attention-needed media-attention-needed
+                                               :media-cameracheck (or media-cameracheck false)
                                                :media-processed media-processed}))
 
 (s/defn read-media-file :- java.io.BufferedInputStream
