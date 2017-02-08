@@ -58,6 +58,8 @@
   [rec]
   (select-keys rec [:media-id
                     :media-attention-needed
+                    :media-cameracheck
+                    :media-reference-quality
                     :media-processed]))
 
 (defn hide-select-message
