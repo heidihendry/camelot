@@ -112,7 +112,8 @@ WHERE media_filename = :media_filename
 UPDATE media
 SET media_attention_needed = :media_attention_needed,
     media_processed = :media_processed,
-    media_reference_quality = :media_reference_quality
+    media_reference_quality = :media_reference_quality,
+    media_cameracheck = :media_cameracheck
 WHERE media_id = :media_id
 
 -- name: -update-processed-flag!
