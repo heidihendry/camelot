@@ -199,12 +199,12 @@ With the Media Collection panel focused (**Control + m**):
 
 -  **Control + a**: Select all media (or select none, if all are
    selected)
--  **f** flag the currently selected media
--  **g** mark the currently selected media as processed
--  **r** mark the currently selected media as being of reference quality
--  **c** mark the currently selected media as a camera-check (i.e.,
+-  **f**: Flag the currently selected media
+-  **g**: Mark the currently selected media as processed
+-  **r**: Mark the currently selected media as being of reference quality
+-  **c**: Mark the currently selected media as a camera-check (i.e.,
    test-fire of the camera)
--  hold **shift** + **arrow keys** to include media in a range, starting from the last selected image.
--  hold **ctrl** + **arrow keys** to toggle the next image in that direction in the current selection.
+-  **Shift** + **Arrow key** to include media in a range, starting from the last selected image.
+-  **Control** + **Arrow key** to toggle the next image in that direction in the current selection.
 
-Holding **shift** or **ctrl** and clicking an image with the mouse will perform the equivalent behaviour.
+Holding **Shift** or **Control** and clicking an image with the mouse will perform the equivalent behaviour.
