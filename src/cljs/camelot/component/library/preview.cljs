@@ -116,10 +116,13 @@
                  (if selected
                    (dom/div #js {:className "details-container"}
                             (om/build mcp-details-breakdown selected)
-                            (dom/div nil
-                                     (dom/button #js {:className "btn btn-default media-delete-button fa fa-trash"
-                                                      :onClick #(om/update! data :show-delete-media-prompt true)}
-                                                 " " (tr/translate :words/delete))))
+                            (dom/div #js {:className "selection-delete"}
+                                     (dom/div #js {:onClick #(om/update! data :show-delete-media-prompt true)}
+                                              (dom/span #js {:className "preview-delete-button fa fa-trash"})
+                                              (tr/translate ::delete-media))
+                                     (dom/div #js {:onClick #(om/update! data :show-delete-sightings-prompt true)}
+                                              (dom/span #js {:className "preview-delete-button fa fa-trash"})
+                                              (tr/translate ::delete-sightings))))
                    (dom/div nil photo-not-selected)))))))
 
 (defn details-panel-class

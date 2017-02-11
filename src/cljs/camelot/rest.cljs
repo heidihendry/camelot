@@ -116,6 +116,20 @@
                                                    "DELETE"
                                                    (misc/with-baseurl x-url)
                                                    (:status response)
+                                                   (:body response)))))))
+  ([x-url params cb]
+   (go
+     (let [response (<! (transit-util/request
+                         http/delete (misc/with-baseurl x-url) params))
+           success (some #{(:status response)} success-status-codes)]
+       (if success
+         (when cb
+           (cb response))
+         (om/update! (state/display-state) :error (build-error
+                                                   "DELETE"
+                                                   (misc/with-baseurl x-url)
+                                                   params
+                                                   (:status response)
                                                    (:body response))))))))
 
 (defn post-x-opts

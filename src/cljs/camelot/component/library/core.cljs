@@ -67,12 +67,21 @@
       (util/load-library-search data search 0))))
 
 (defn delete-media!
-  [data id]
-  (rest/delete-x (str "/media/" id)
+  [data ids]
+  (rest/delete-x "/media"
+                 {:data {:media-ids ids}}
                  #(do
                     (om/update! data :show-delete-media-prompt false)
-                    (util/delete-with-id! id)
+                    (dorun (map util/delete-with-id! ids))
                     (om/update! data :selected-media-id nil))))
+
+(defn delete-sightings!
+  [data media-ids]
+  (rest/delete-x "/sightings/media"
+                 {:data {:media-ids media-ids}}
+                 #(do
+                    (om/update! data :show-delete-sightings-prompt false)
+                    (dorun (map util/delete-sightings-from-media-with-id! media-ids)))))
 
 (defn library-view-component
   "Render a collection of library."
@@ -113,21 +122,42 @@
                      (set! (.-tincan js/window) (partial tincan-listener lib))
                      (om/build search/search-component lib))
                    (dom/div #js {:className "media-control-panel"}
-                            (om/build cutil/prompt-component lib
-                                      {:opts {:active-key :show-delete-media-prompt
-                                              :title (tr/translate ::delete-media-title)
-                                              :body (dom/div nil
-                                                             (dom/p #js {:className "delete-media-question"}
-                                                                    (tr/translate ::delete-media-question)))
-                                              :actions (dom/div #js {:className "button-container"}
-                                                                (dom/button #js {:className "btn btn-default"
-                                                                                 :ref "action-first"
-                                                                                 :onClick #(om/update! lib :show-delete-media-prompt false)}
-                                                                            (tr/translate :words/cancel))
-                                                                (dom/button #js {:className "btn btn-primary"
-                                                                                 :ref "action-first"
-                                                                                 :onClick #(delete-media! lib (:selected-media-id lib))}
-                                                                            (tr/translate :words/delete)))}}))
+                            (let [media-ids (map :media-id (util/all-media-selected lib))]
+                              (dom/div nil
+                                       (om/build cutil/prompt-component lib
+                                                 {:opts {:active-key :show-delete-media-prompt
+                                                         :title (tr/translate ::delete-media-title)
+                                                         :body (dom/div nil
+                                                                        (dom/p #js {:className "delete-media-question"}
+                                                                               (tr/translate ::delete-media-question))
+                                                                        (dom/p nil (tr/translate ::media-select-count
+                                                                                                 (count media-ids))))
+                                                         :actions (dom/div #js {:className "button-container"}
+                                                                           (dom/button #js {:className "btn btn-default"
+                                                                                            :ref "action-first"
+                                                                                            :onClick #(om/update! lib :show-delete-media-prompt false)}
+                                                                                       (tr/translate :words/cancel))
+                                                                           (dom/button #js {:className "btn btn-primary"
+                                                                                            :ref "action-first"
+                                                                                            :onClick #(delete-media! lib media-ids)}
+                                                                                       (tr/translate :words/delete)))}})
+                                       (om/build cutil/prompt-component lib
+                                                 {:opts {:active-key :show-delete-sightings-prompt
+                                                         :title (tr/translate ::delete-sightings-title)
+                                                         :body (dom/div nil
+                                                                        (dom/p #js {:className "delete-sightings-question"}
+                                                                               (tr/translate ::delete-sightings-question))
+                                                                        (dom/p nil (tr/translate ::sighting-select-count
+                                                                                                 (count (mapcat :sightings (util/all-media-selected lib))))))
+                                                         :actions (dom/div #js {:className "button-container"}
+                                                                           (dom/button #js {:className "btn btn-default"
+                                                                                            :ref "action-first"
+                                                                                            :onClick #(om/update! lib :show-delete-sightings-prompt false)}
+                                                                                       (tr/translate :words/cancel))
+                                                                           (dom/button #js {:className "btn btn-primary"
+                                                                                            :ref "action-first"
+                                                                                            :onClick #(delete-sightings! lib media-ids)}
+                                                                                       (tr/translate :words/delete)))}}))))
                    (dom/div #js {:className "library-body"}
                             (when (get-in lib [:search-results])
                               (om/build collection/media-collection-component lib))

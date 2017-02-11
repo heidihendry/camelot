@@ -739,6 +739,9 @@ pre.field-input {
     cursor: pointer;
     float: right;
 }
+.library .remove-sighting:hover {
+    color: #aa3311;
+}
 .library .sighting-extra-details {
     margin-left: 2rem;
     color: #333;
@@ -835,11 +838,20 @@ pre.field-input {
     flex-direction: column;
     height: calc(100vh - 16.5rem);
 }
-#app .library .media-delete-button {
-    position: relative;
+#app .library .selection-delete {
+    font-size: 80%;
+    text-align: right;
+}
+#app .library .preview-delete-button {
     float: right;
-    padding: 0.5rem 1rem;
+    position: relative;
+    padding-left: 0.5rem;
+    padding-top: 0.3rem;
     width: auto;
+}
+#app .library .preview-delete-button:hover {
+    cursor: pointer;
+    color: #aa3311;
 }
 #app .library label {
     font-size: 85%;

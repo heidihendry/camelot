@@ -515,8 +515,12 @@
     :update-camera "Update Camera"}
 
    :camelot.component.library.core
-   {:delete-media-question "Do you really want to delete this media?"
-    :delete-media-title "Confirm Delete"}
+   {:delete-media-question "Do you really want to delete all selected media?"
+    :delete-media-title "Confirm Delete"
+    :delete-sightings-question "Do you really want to delete all sightings from all selected media?"
+    :delete-sightings-title "Confirm Delete"
+    :media-select-count "There are %d items in the current selection which will be deleted."
+    :sighting-select-count "There are %d sightings in the current selection which will be deleted."}
 
    :camelot.component.library.collection
    {:upload-advice "Add media by adding Camera Trap Stations, adding Camera Checks to those, and then Upload Media in your survey."
@@ -543,7 +547,9 @@
    :camelot.component.library.preview
    {:photo-not-selected "Photo not selected"
     :species-not-in-survey "[Species not in this survey]"
-    :sightings "Sightings"}
+    :sightings "Sightings"
+    :delete-media "Delete selected media"
+    :delete-sightings "Delete sightings from selected media"}
 
    :camelot.component.library.search
    {:reference-window-button-text "Reference window"

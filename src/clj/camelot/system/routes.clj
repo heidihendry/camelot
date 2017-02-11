@@ -150,6 +150,8 @@
            (GET "/alternatives/:id" [id] (crud/list-available sighting/get-alternatives id (assoc state :session session)))
            (POST "/" [data] (crud/create-resource sighting/create!
                                                   sighting/tsighting data (assoc state :session session)))
+           (DELETE "/media" [data] (r/response (sighting/delete-with-media-ids! (assoc state :session session)
+                                                                                (:media-ids data))))
            (DELETE "/:id" [id] (crud/delete-resource sighting/delete! id (assoc state :session session))))
 
   (context "/camera-statuses" {session :session state :system}
@@ -162,6 +164,9 @@
            (PUT "/:id" [id data] (crud/update-resource media/update! id media/tmedia data (assoc state :session session)))
            (POST "/" [data] (crud/create-resource media/create!
                                                   media/tmedia data (assoc state :session session)))
+           (DELETE "/" [data] (r/response (media/delete-with-ids!
+                                           (assoc state :session session)
+                                           (:media-ids data))))
            (DELETE "/:id" [id] (crud/delete-resource media/delete! id (assoc state :session session)))
            (GET "/photo/:filename" [filename] (let [style :original]
                                                 {:status 200

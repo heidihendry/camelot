@@ -141,6 +141,12 @@
     (delete-files! state fs))
   nil)
 
+(s/defn delete-with-ids!
+  [state :- State
+   media-ids]
+  (dorun (map (partial delete! state) media-ids))
+  nil)
+
 (s/defn update-processed-flag!
   [state :- State
    {:keys [media-id media-processed]}]

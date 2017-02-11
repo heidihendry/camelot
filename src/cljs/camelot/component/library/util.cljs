@@ -43,6 +43,11 @@
   (om/transact! (state/library-state) [:search :ordered-ids]
                 (fn [ms] (vec (remove #(= media-id %) ms)))))
 
+(defn delete-sightings-from-media-with-id!
+  [media-id]
+  (om/update! (find-with-id (state/library-state) media-id)
+              :sightings []))
+
 (defn hydrate-media
   [data media md & [cb]]
   (rest/post-x "/library/hydrate" {:data {:media-ids media}}

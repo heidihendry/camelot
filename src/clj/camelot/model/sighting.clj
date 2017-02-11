@@ -85,6 +85,14 @@
    id :- s/Int]
   (db/with-db-keys state -delete! {:sighting-id id}))
 
+(s/defn delete-with-media-ids!
+  [state :- State
+   media-ids]
+  (->> media-ids
+       (mapcat (partial get-all state))
+       (map :sighting-id)
+       (map (partial delete! state))))
+
 (s/defn get-available
   [state :- State
    id :- s/Int]
