@@ -190,8 +190,8 @@ number of keyboard shortcuts:
 -  **Control + m**: Focus the media collection panel
 -  **Control + d**: Toggle the details panel
 -  **Control + i**: Open the identify panel
--  **Shift + &lt;**: Go to the previous page of media
--  **Shift + &gt;**: Go to the next page of media
+-  **Shift + <**: Go to the previous page of media
+-  **Shift + >**: Go to the next page of media
 -  **Control + f**: Focus the filter text input
 -  **Alt + f**: Reapply the current filter
 
