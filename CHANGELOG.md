@@ -3,6 +3,8 @@
 #### Enhancements
 * Library is now much more responsive for large (100k+ images) datasets, and able to support much larger datasets.
 * Improve media selection shortcuts in the library, which includes support for selecting ranges of images with the mouse, while holding the shift key.
+* Add ability to delete all selected media in the library
+* Add ability to delete all sightings across selected media in the library
 
 #### Fixes
 * Fix template generation for bulk import where `:root-path` is unset in `config.clj`.
