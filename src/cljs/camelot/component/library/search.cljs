@@ -31,7 +31,7 @@
                                                     :sex (if (unidentified? sex) nil sex)
                                                     :species spp}}
                                                   {:media
-                                                   (map :media-id all-selected)})}
+                                                   (mapv :media-id all-selected)})}
                 (fn [resp]
                   (dorun (map #(do (om/update! (second %)
                                                :sightings
@@ -188,18 +188,18 @@
     (render [_]
       (dom/select #js {:className "survey-select field-input"
                        :title (tr/translate ::filter-survey-title)
-                       :value (:survey-id data)
+                       :value (or (:survey-id data) "")
                        :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                     (om/update! data :survey-id (.. % -target -value))
                                     (if (> sid -1)
                                       (do
-                                        (util/load-taxonomies sid)
-                                        (util/load-library sid)
-                                        (util/load-trap-stations sid))
+                                        (util/load-taxonomies data sid)
+                                        (util/load-library data sid)
+                                        (util/load-trap-stations data sid))
                                       (do
-                                        (util/load-taxonomies)
-                                        (util/load-library)
-                                        (util/load-trap-stations)))
+                                        (util/load-taxonomies data)
+                                        (util/load-library data)
+                                        (util/load-trap-stations data)))
                                     (nav/analytics-event "library-search" "survey-select-change"))}
                   (om/build-all survey-option-component
                                 (cons {:survey-id -1 :survey-name
@@ -298,7 +298,7 @@
     (render-state [_ state]
       (dom/span nil
                (dom/select #js {:className "trap-station-select field-input"
-                                :value (:trap-station-id data)
+                                :value (or (:trap-station-id data) "")
                                 :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                              (om/update! (:search data) :trap-station-id sid)
                                              (go (>! (:search-chan state) {:search (assoc (deref (:search data))
@@ -319,14 +319,14 @@
       (dom/div #js {:className "checkbox-container"}
                 (dom/label nil (:label state))
                 (dom/input #js {:type "checkbox"
-                               :value (get-in data [:search (:key state)])
-                               :onChange #(do (om/update! (:search (state/library-state))
-                                                          (:key state) (.. % -target -checked))
-                                              (go (>! (:search-chan state) {:search (assoc (deref (:search data))
-                                                                                           (:key state) (.. % -target -checked))}))
-                                              (nav/analytics-event "library-search"
-                                                                   (str (str/lower-case (:label state)) "-checkbox-change")))
-                               :className "field-input"})))))
+                                :value (or (get-in data [:search (:key state)]) "")
+                                :onChange #(do (om/update! (:search (state/library-state))
+                                                           (:key state) (.. % -target -checked))
+                                               (go (>! (:search-chan state) {:search (assoc (deref (:search data))
+                                                                                            (:key state) (.. % -target -checked))}))
+                                               (nav/analytics-event "library-search"
+                                                                    (str (str/lower-case (:label state)) "-checkbox-change")))
+                                :className "field-input"})))))
 
 (defn media-flag-component
   [data owner]
@@ -433,7 +433,7 @@
                   (dom/input #js {:className "field-input inline long-input"
                                   :autoFocus "autofocus"
                                   :placeholder (tr/translate ::taxonomy-add-placeholder)
-                                  :value (get-in data [:new-species-name])
+                                  :value (or (get-in data [:new-species-name]) "")
                                   :onChange #(om/update! data :new-species-name
                                                          (.. % -target -value))})
                   (if (empty? (:new-species-name data))
@@ -458,7 +458,7 @@
         (om/build add-taxonomy-component data)
         (dom/select #js {:className "field-input auto-input"
                          :id "identify-species-select"
-                         :value (get-in data [:identification :species])
+                         :value (or (get-in data [:identification :species]) "")
                          :onChange #(let [v (.. % -target -value)]
                                       (if (= v "create")
                                         (do
@@ -491,7 +491,7 @@
     om/IRender
     (render [_]
       (dom/select #js {:className "field-input auto-input"
-                       :value (get-in data [:identification :lifestage])
+                       :value (or (get-in data [:identification :lifestage]) "")
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :lifestage v)
                                     (om/update! (:identification data) :dirty-state true))}
@@ -510,7 +510,7 @@
     om/IRender
     (render [_]
       (dom/select #js {:className "field-input auto-input"
-                       :value (get-in data [:identification :sex])
+                       :value (or (get-in data [:identification :sex]) "")
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :sex v)
                                     (om/update! (:identification data) :dirty-state true))}
@@ -536,7 +536,7 @@
                           (dom/label nil (tr/translate :sighting/sighting-quantity.label))
                           (dom/input #js {:type "number"
                                           :className "field-input short-input"
-                                          :value (get-in data [:identification :quantity])
+                                          :value (or (get-in data [:identification :quantity]) "")
                                           :onChange #(do
                                                        (om/update! (:identification data) :quantity
                                                                    (cljs.reader/read-string (.. % -target -value)))
@@ -583,12 +583,11 @@
                                     {:state {:has-selected has-selected}})))))))
 
 (defn search
-  [data search records]
-  (let [start (* (dec (:page search)) util/page-size)
-        terms (filter/append-subfilters (:terms search) (deref (:search data)))]
+  [data search]
+  (let [terms (filter/append-subfilters (:terms search) (deref (:search data)))]
     (if-let [survey-id (get-in @data [:search :survey-id])]
-      (util/load-library-search survey-id terms start)
-      (util/load-library-search terms start))))
+      (util/load-library-search data survey-id terms)
+      (util/load-library-search data terms))))
 
 (defn search-component
   [data owner]
@@ -606,7 +605,7 @@
           (let [ch (om/get-state owner :search-chan)
                 r (<! ch)]
             (om/update! (:search data) :dirty-state false)
-            (search data (:search r) (get-in r [:search :results]))
+            (search data (:search r))
             (om/update! (:search data) :page 1)
             (recur)))))
     om/IRenderState

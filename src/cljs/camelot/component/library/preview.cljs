@@ -13,8 +13,8 @@
 (def photo-not-selected (tr/translate ::photo-not-selected))
 
 (defn remove-sighting
-  [sighting-id]
-  (let [selected (util/find-with-id (:selected-media-id (state/library-state)))]
+  [data sighting-id]
+  (let [selected (util/find-with-id data (:selected-media-id (state/library-state)))]
     (om/update! selected :sightings
                 (filterv (fn [s] (not= sighting-id (:sighting-id s)))
                          (:sightings selected)))
@@ -43,11 +43,11 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div {:className "data"}
+      (dom/div #js {:className "data"}
                (if (> (:sighting-id sighting) -1)
                  (dom/div #js {:className "fa fa-trash remove-sighting"
                                :onClick #(do
-                                           (remove-sighting (:sighting-id sighting))
+                                           (remove-sighting (state/library-state) (:sighting-id sighting))
                                            (nav/analytics-event "library-preview" "delete-sighting"))}))
                (:sighting-quantity sighting) "x "
                (or (:taxonomy-label (get (:species (state/library-state))
@@ -69,11 +69,11 @@
 (defn mcp-detail
   [data owner]
   (reify
-    om/IRenderState
-    (render-state [_ state]
+    om/IRender
+    (render [_]
       (dom/div nil
-               (dom/label nil (:label state))
-               (dom/div #js {:className "data"} (or (get data (:key state)) "-"))))))
+               (dom/label nil (:label data))
+               (dom/div #js {:className "data"} (or (get (:data data) (:key data)) "-"))))))
 
 (defn mcp-details-breakdown
   [data owner]
@@ -81,22 +81,26 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "details"}
-               (map #(om/build mcp-detail data {:init-state %})
-                    [{:key :trap-station-latitude :label (tr/translate :trap-station/trap-station-latitude.label)}
-                     {:key :trap-station-longitude :label (tr/translate :trap-station/trap-station-longitude.label)}
-                     {:key :trap-station-name :label (tr/translate :trap-station/trap-station-name.label)}
-                     {:key :site-sublocation :label (tr/translate :site/site-sublocation.label)}
-                     {:key :site-name :label (tr/translate :site/site-name.label)}
-                     {:key :camera-name :label (tr/translate :camera/camera-name.label)}])
+               (om/build-all mcp-detail (map #(merge {:data data} %)
+                                             [{:key :trap-station-latitude :label (tr/translate :trap-station/trap-station-latitude.label)}
+                                              {:key :trap-station-longitude :label (tr/translate :trap-station/trap-station-longitude.label)}
+                                              {:key :trap-station-name :label (tr/translate :trap-station/trap-station-name.label)}
+                                              {:key :site-sublocation :label (tr/translate :site/site-sublocation.label)}
+                                              {:key :site-name :label (tr/translate :site/site-name.label)}
+                                              {:key :camera-name :label (tr/translate :camera/camera-name.label)}])
+                             {:key :key})
                (dom/div nil
                         (dom/label nil (tr/translate :media/media-capture-timestamp.label))
                         (let [df (DateTimeFormat. "HH:mm:ss EEE, dd LLL yyyy")]
-                          (dom/div {:className "data"}
-                                   (.format df (:media-capture-timestamp data)))))
+                          (dom/div #js {:className "data"}
+                                   (if-let [ts (:media-capture-timestamp data)]
+                                     (.format df ts)
+                                     "-"))))
                (dom/div nil
-                        (dom/label nil (tr/translate ::sightings))
-                        (om/build-all mcp-details-sightings (:sightings data)
-                                      {:key :sighting-id}))))))
+                        (when (seq (:sightings data))
+                          (dom/label nil (tr/translate ::sightings))
+                          (om/build-all mcp-details-sightings (:sightings data)
+                                        {:key :sighting-id})))))))
 
 (defn mcp-details
   [data owner]
@@ -108,7 +112,7 @@
                              :onClick #(do (om/transact! data :show-media-details not)
                                            (nav/analytics-event "library-preview" "close-details-click"))})
                (dom/h4 nil (tr/translate :words/details))
-               (let [selected (util/find-with-id (:selected-media-id data))]
+               (let [selected (util/find-with-id data (:selected-media-id data))]
                  (if selected
                    (dom/div #js {:className "details-container"}
                             (om/build mcp-details-breakdown selected)
@@ -151,7 +155,7 @@
   (reify
     om/IRender
     (render [_]
-      (let [media (util/find-with-id (:selected-media-id data))]
+      (let [media (util/find-with-id data (:selected-media-id data))]
         (dom/div #js {:className "media-control-panel"}
                  (om/build media-details-panel-component data)
                  (dom/div #js {:className "mcp-container"}

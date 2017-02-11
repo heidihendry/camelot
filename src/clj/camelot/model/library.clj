@@ -74,38 +74,20 @@
          records)))
 
 (defn filtered-media
-  [state records {:keys [search start-from]}]
+  [state records {:keys [search]}]
   (let [spps (reduce #(assoc %1 (:taxonomy-id %2) %2) {} (taxonomy/get-all state))
-        matches (filter/only-matching search spps (add-in-metadata state records))
-        rs (->> matches
-                (drop (or start-from 0))
-                (take max-result-records))]
-    {:total (count matches)
-     :results (map #(select-keys % [:media-id
-                                    :media-created
-                                    :media-updated
-                                    :media-filename
-                                    :media-format
-                                    :media-uri
-                                    :media-cameracheck
-                                    :media-attention-needed
-                                    :media-processed
-                                    :media-reference-quality
-                                    :media-capture-timestamp
-                                    :trap-station-session-camera-id
-                                    :sightings]) rs)}))
+        matches (filter/only-matching search spps (add-in-metadata state records))]
+    (map #(:media-id %) matches)))
 
-(defn all-media
-  [state opts]
-  (filtered-media state
-                  (db/with-db-keys state -all-media {})
-                  opts))
-
-(defn- all-media-for-survey
-  [state survey-id opts]
-  (filtered-media state
-                  (db/with-db-keys state -all-media-for-survey {:survey-id survey-id})
-                  opts))
+(defn search-media
+  ([state search]
+   (filtered-media state
+                   (db/with-db-keys state -all-media {})
+                   search))
+  ([state survey-id search]
+   (filtered-media state
+                   (db/with-db-keys state -all-media-for-survey {:survey-id survey-id})
+                   search)))
 
 (s/defn build-records
   [state sightings media]
@@ -117,23 +99,11 @@
                  :media-uri (media-uri %))
          media)))
 
-(s/defn build-library
-  ([state opts]
-   (db/with-transaction [s state]
-     (let [{results :results total :total} (all-media s opts)]
-       {:total total
-        :results (build-records s (sighting/get-all* s) results)})))
-  ([state]
-   (build-library state {})))
-
-(s/defn build-library-for-survey
-  ([state id opts]
-   (db/with-transaction [s state]
-     (let [{results :results total :total} (all-media-for-survey s id opts)]
-       {:total total
-        :results (build-records s (sighting/get-all* s) results)})))
-  ([state id]
-   (build-library-for-survey state id {})))
+(s/defn hydrate-media
+  [state ids]
+  (->> ids
+       (map #(media/get-specific state %))
+       (build-records state (sighting/get-all* state))))
 
 (s/defn update-bulk-media-flags
   [state :- State

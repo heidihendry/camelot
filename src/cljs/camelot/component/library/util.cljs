@@ -9,50 +9,63 @@
 
 (defn get-matching
   [data]
-  (let [search (:search data)]
-    (map #(get-in search [:results %]) (get-in data [:search-results :all-ids]))))
+  (mapv #(get-in data [:records %])
+        (get-in data [:search :ordered-ids])))
 
 (defn media-ids-on-page
   [data]
-  (->> (get-in data [:search-results :all-ids])
+  (->> (get-in data [:search :ordered-ids])
        (drop (* (- (get-in data [:search :page]) 1) page-size))
        (take page-size)))
 
 (defn media-on-page
   ([data]
-   (mapv #(get-in data [:search :results %]) (media-ids-on-page data)))
+   (mapv #(get-in data [:records %]) (media-ids-on-page data)))
   ([]
    (let [data (state/library-state)]
      (media-on-page data))))
 
 (defn all-media-selected
-  []
-  (filter :selected (media-on-page (state/library-state))))
+  ([data]
+   (filter :selected (media-on-page data)))
+  ([]
+   (all-media-selected (state/library-state))))
 
 (defn find-with-id
-  [media-id]
-  (get-in (state/library-state) [:search :results media-id]))
+  [data media-id]
+  (get-in data [:records media-id]))
 
 (defn delete-with-id!
   [media-id]
-  (om/transact! (state/library-state) [:search :results] #(dissoc % media-id))
-  (om/transact! (state/library-state) [:search-results :all-ids]
-                (fn [ms] (remove #(= media-id %) ms))))
+  (om/transact! (state/library-state) :records #(dissoc % media-id))
+  (om/transact! (state/library-state) [:search :ordered-ids]
+                (fn [ms] (vec (remove #(= media-id %) ms)))))
+
+(defn hydrate-media
+  [data media md & [cb]]
+  (rest/post-x "/library/hydrate" {:data {:media-ids media}}
+               #(do
+                  (om/update! data :records
+                                (->> (:body %)
+                                     (reduce (fn [acc x]
+                                               (assoc acc (:media-id x)
+                                                      (merge (get md (:trap-station-session-camera-id x)) x)
+                                                      :selected false))
+                                             {})))
+                  (when cb
+                    (cb data)))))
 
 (defn load-library-callback
-  [md resp]
-  (let [{results :results total :total} (:body resp)]
-    (om/update! (state/library-state) :selected-media-id nil)
-    (om/update! (get (state/library-state) :search) :results
-                (reduce (fn [acc v] (assoc acc (:media-id v) v)) {}
-                        (map #(merge (get md (:trap-station-session-camera-id %))
-                                     %)
-                             results)))
-    (om/update! (state/library-state) [:search-results :total-matches] total)
-    (let [mid (mapv :media-id results)]
-      (om/update! (get (state/library-state) :search) :ordered-ids mid)
-      (om/update! (get (state/library-state) :search-results) :all-ids mid))
-    (om/update! (:search (state/library-state)) :page 1)))
+  [data md resp]
+  (let [media-ids (:body resp)]
+    (hydrate-media data
+                   (take page-size media-ids)
+                   md
+                   #(do
+                      (om/update! % :selected-media-id nil)
+                      (om/update! % :metadata md)
+                      (om/update! (:search %) :ordered-ids (vec media-ids))
+                      (om/update! (:search %) :page 1)))))
 
 (defn get-media-flags
   [rec]
@@ -135,60 +148,60 @@
                      {:media-cameracheck false})))
 
 (defn load-library
-  ([]
+  ([data]
    (rest/get-x "/library/metadata"
                (fn [md]
-                 (rest/get-x "/library" (partial load-library-callback (:body md))))))
-  ([survey-id]
+                 (rest/get-x "/library" (partial load-library-callback data (:body md))))))
+  ([data survey-id]
    (rest/get-x "/library/metadata"
                (fn [md]
                  (rest/get-x (str "/library/" survey-id)
-                             (partial load-library-callback (:body md)))))))
+                             (partial load-library-callback data (:body md)))))))
 
 (defn load-library-search
-  ([search start-from]
+  ([data search]
    (rest/get-x "/library/metadata"
                (fn [md]
-                 (rest/post-x "/library" {:data {:search search
-                                                 :start-from (or start-from 0)}}
-                              (partial load-library-callback (:body md))))))
-  ([survey-id search start-from]
+                 (rest/post-x "/library" {:data {:search search}}
+                              (partial load-library-callback data (:body md))))))
+  ([data survey-id search]
    (rest/get-x "/library/metadata"
                (fn [md]
                  (rest/post-x (str "/library/" survey-id)
-                              {:data {:search search
-                                      :start-from (or start-from 0)}}
-                              (partial load-library-callback (:body md)))))))
+                              {:data {:search search}}
+                              (partial load-library-callback data (:body md)))))))
 
 (defn load-taxonomies
-  ([]
+  ([data]
    (rest/get-x "/taxonomy"
                (fn [resp]
-                 (om/update! (state/library-state) :species
+                 (om/update! data :species
                              (into {}
                                    (map #(hash-map (get % :taxonomy-id) %)
                                         (:body resp)))))))
-  ([survey-id]
+  ([data survey-id]
    (rest/get-x (str "/taxonomy/survey/" survey-id)
                (fn [resp]
-                 (om/update! (state/library-state) :species
+                 (om/update! data :species
                              (into {}
                                    (map #(hash-map (get % :taxonomy-id) %)
                                         (:body resp))))))))
 
 (defn load-trap-stations
-  ([]
+  ([data]
    (rest/get-x "/trap-stations"
                (fn [resp]
-                 (om/update! (state/library-state) :trap-stations (:body resp)))))
-  ([survey-id]
+                 (om/update! data :trap-stations (:body resp)))))
+  ([data survey-id]
    (rest/get-x (str "/trap-stations/survey/" survey-id)
                (fn [resp]
-                 (om/update! (state/library-state) :trap-stations (:body resp))))))
+                 (om/update! data :trap-stations (:body resp))))))
 
 (defn deselect-all
-  []
-  (dorun (map #(om/update! % :selected false) (all-media-selected))))
+  ([data]
+   (dorun (map #(om/update! % :selected false) (all-media-selected data))))
+  ([]
+   (dorun (map #(om/update! % :selected false) (all-media-selected)))))
 
 (defn select-all
   []
@@ -209,20 +222,21 @@
   (deselect-all))
 
 (defn toggle-select-image
-  [data ctrl]
-  (if (and ctrl (:selected data))
-    (do
-      (om/update! (state/library-state) :selected-media-id
-                  (:media-id (first (all-media-selected))))
-      (if (= (:media-id data) (:anchor-media-id (state/library-state)))
-        (om/update! (state/library-state) :anchor-media-id nil)
-        (om/update! (state/library-state) :anchor-media-id (:media-id data))))
-    (do
-      (om/update! (state/library-state) :anchor-media-id (:media-id data))
-      (om/update! (state/library-state) :selected-media-id (:media-id data))))
-  (when (not ctrl)
-    (deselect-all))
-  (om/transact! data :selected not)
-  (om/update! (:search (state/library-state)) :show-select-action
-              (tr/translate ::selected))
-  (show-select-message))
+  [media-id ctrl]
+  (let [data (find-with-id (state/library-state) media-id)]
+    (if (and ctrl (:selected data))
+      (do
+        (om/update! (state/library-state) :selected-media-id
+                    (:media-id (first (all-media-selected))))
+        (if (= (:media-id data) (:anchor-media-id (state/library-state)))
+          (om/update! (state/library-state) :anchor-media-id nil)
+          (om/update! (state/library-state) :anchor-media-id (:media-id data))))
+      (do
+        (om/update! (state/library-state) :anchor-media-id (:media-id data))
+        (om/update! (state/library-state) :selected-media-id (:media-id data))))
+    (when (not ctrl)
+      (deselect-all))
+    (om/transact! data :selected not)
+    (om/update! (:search (state/library-state)) :show-select-action
+                (tr/translate ::selected))
+    (show-select-message)))

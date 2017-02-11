@@ -91,14 +91,14 @@
                                     (drop first-idx)
                                     (take (inc (- last-idx first-idx)))
                                     (map second)
-                                    (map util/find-with-id))]
-            (util/deselect-all)
+                                    (map (partial util/find-with-id data)))]
+            (util/deselect-all data)
             (dorun (map #(om/update! % :selected true) media-in-range))
             (om/update! data :selected-media-id (second (nth media-idxs new-endpoint)))
             (util/show-select-message))
           (let [id (second (nth media-idxs new-endpoint))]
-            (util/deselect-all)
-            (om/update! (util/find-with-id id) :selected true)
+            (util/deselect-all data)
+            (om/update! (util/find-with-id data id) :selected true)
             (om/update! data :selected-media-id id)
             (om/update! data :anchor-media-id id)))))))
 
@@ -120,7 +120,7 @@
       (dom/div #js {:className "media-item"}
                (dom/div #js {:className (media-thumb-class data)}
                         (dom/img #js {:onMouseDown #(do
-                                                      (util/toggle-select-image data (.. % -ctrlKey))
+                                                      (util/toggle-select-image (:media-id data) (.. % -ctrlKey))
                                                       (nav/analytics-event "library-collection" "select-media"))
                                       :src (str (get-in data [:media-uri]) "/thumb")}))
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
@@ -180,33 +180,65 @@
         (set! (.-scrollTop node) (calculate-scroll-update data node))))
     om/IRender
     (render [_]
-      (let [ms (util/media-on-page)]
+      (if-let [ms (util/media-on-page data)]
+        (do
+          (dom/div #js {:id "media-collection-container"
+                        :className "media-collection-container"
+                        :tabIndex 1}
+                   (cond
+                     (empty? (:records (state/library-state)))
+                     (om/build media-tips-component data)
+
+                     (empty? ms)
+                     (om/build filter-blank-component data)
+
+                     :else (dom/div #js {:className "media-item-wrapper"}
+                                    (when (seq (:records data))
+                                      (om/build-all media-item-component
+                                                    (util/media-on-page data)
+                                                    {:key :media-id}))))))
         (dom/div #js {:id "media-collection-container"
                       :className "media-collection-container"
-                      :tabIndex 1}
-                 (cond
-                   (empty? (get-in (state/library-state) [:search :results]))
-                   (om/build media-tips-component data)
+                      :tabIndex 1})))))
 
-                   (empty? ms)
-                   (om/build filter-blank-component data)
+(defn indices-for-page
+  [pp match-count]
+  {:start (* util/page-size (dec pp))
+   :end (dec (min (* util/page-size pp) match-count))})
 
-                   :else (dom/div #js {:className "media-item-wrapper"}
-                                  (om/build-all media-item-component ms
-                                                {:key :media-id}))))))))
+(defn hydrate-for-page
+  [data pp match-count cb]
+  (let [idxs (indices-for-page pp match-count)]
+    (util/hydrate-media data
+                        (->> (get-in data [:search :ordered-ids])
+                             (drop (:start idxs))
+                             (take util/page-size))
+                        (:metadata @data)
+                        cb)))
 
 (defn prev-page
-  [page]
-  (if (= page 1)
-    page
-    (do
-      (dec page))))
+  [data match-count]
+  (let [page (get-in data [:search :page])
+        newpage (if (= page 1)
+                  page
+                  (dec page))]
+    (when-not (= page newpage)
+      (hydrate-for-page data newpage match-count
+                        #(do (om/update! % [:search :page] newpage)
+                             (om/update! % :selected-media-id nil)
+                             (util/deselect-all %))))))
 
 (defn next-page
-  [matches page]
-  (if (= (.ceil js/Math (/ matches util/page-size)) page)
-    page
-    (inc page)))
+  [data match-count]
+  (let [page (get-in data [:search :page])
+        newpage (if (= (.ceil js/Math (/ match-count util/page-size)) page)
+                  page
+                  (inc page))]
+    (when-not (= page newpage)
+      (hydrate-for-page data newpage match-count
+                        #(do (om/update! % [:search :page] newpage)
+                             (om/update! % :selected-media-id nil)
+                             (util/deselect-all %))))))
 
 (defn thousands-sep
   [n]
@@ -225,29 +257,28 @@
   (reify
     om/IRender
     (render [_]
-      (let [match-count (get-in data [:search-results :total-matches])]
+      (let [match-count (count (get-in data [:search :ordered-ids]))]
         (dom/div #js {:className "pagination-nav"}
                  (dom/button #js {:className "fa fa-2x fa-angle-left btn btn-default"
                                   :disabled (if (or (get-in data [:search :identify-selected])
                                                     (= (- (* util/page-size (get-in data [:search :page])) util/page-size) 0))
                                               "disabled" "")
                                   :id "prev-page"
-                                  :onClick #(do (util/deselect-all)
-                                                (om/transact! data [:search :page] prev-page)
+                                  :onClick #(do (prev-page (state/library-state) match-count)
                                                 (nav/analytics-event "library-collection" "prev-page-click"))})
-                 (dom/div #js {:className "describe-pagination"}
-                          (str (thousands-sep (+ (- (* util/page-size (get-in data [:search :page])) util/page-size) 1))
-                               " - "
-                               (thousands-sep (min (* util/page-size (get-in data [:search :page])) match-count))
-                               " of "
-                               (thousands-sep match-count)))
+                 (let [idxs (indices-for-page (get-in data [:search :page]) match-count)]
+                   (dom/div #js {:className "describe-pagination"}
+                            (str (thousands-sep (inc (:start idxs)))
+                                 " - "
+                                 (thousands-sep (inc (:end idxs)))
+                                 " of "
+                                 (thousands-sep match-count))))
                  (dom/button #js {:className "fa fa-2x fa-angle-right btn btn-default"
                                   :disabled (if (or (get-in data [:search :identify-selected])
                                                     (>= (* util/page-size (get-in data [:search :page])) match-count))
                                               "disabled" "")
                                   :id "next-page"
-                                  :onClick #(do (util/deselect-all)
-                                                (om/transact! data [:search :page] (partial next-page match-count))
+                                  :onClick #(do (next-page (state/library-state) match-count)
                                                 (nav/analytics-event "library-collection" "next-page-click"))}))))))
 
 (defn select-button-components

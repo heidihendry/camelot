@@ -64,7 +64,7 @@
   (let [search (aget opts "search")
         reload (aget opts "reload")]
     (when reload
-      (util/load-library-search search 0))))
+      (util/load-library-search data search 0))))
 
 (defn delete-media!
   [data id]
@@ -78,36 +78,34 @@
   "Render a collection of library."
   [data owner {:keys [restricted-mode]}]
   (reify
-    om/IWillMount
-    (will-mount [_]
-      (om/update! data [:library :search] {}))
     om/IDidMount
     (did-mount [_]
       (when restricted-mode
         (om/update! (state/app-state-cursor) :restricted-mode true))
-      (om/update! (get-in data [:library :search]) :page 1)
-      (om/update! (:library data) :search-results {})
-      (om/update! (:library data) :survey-id (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
-      (om/update! (get-in data [:library :search]) :show-select-count 0)
-      (om/update! (get-in data [:library]) :identification {:quantity 1})
+      (om/update! data [:library :search] {})
+      (om/update! data [:library :search :page] 1)
+      (om/update! data [:library :survey-id] (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
+      (om/update! data [:library :search :show-select-count] 0)
+      (om/update! data [:library :identification] {:quantity 1})
       (rest/get-x "/surveys"
                   (fn [resp]
                     (om/update! (get data :library) :surveys (:body resp))))
 
-      (let [sid (get-in (state/app-state-cursor) [:selected-survey :survey-id :value])]
+      (let [sid (get-in (state/app-state-cursor)
+                        [:selected-survey :survey-id :value])]
         (if sid
           (do
-            (util/load-taxonomies sid)
-            (util/load-trap-stations sid)
-            (util/load-library sid))
+            (util/load-taxonomies (:library data) sid)
+            (util/load-trap-stations (:library data) sid)
+            (util/load-library (:library data) sid))
           (do
-            (util/load-taxonomies)
-            (util/load-trap-stations)
-            (util/load-library)))))
+            (util/load-taxonomies (:library data))
+            (util/load-trap-stations (:library data))
+            (util/load-library (:library data))))))
     om/IRender
     (render [_]
       (let [lib (:library data)]
-        (if (get-in lib [:search :results])
+        (if (seq (get-in lib [:search :ordered-ids]))
           (dom/div #js {:className (str "library" (if restricted-mode " restricted-mode" ""))
                         :onKeyDown key-handler
                         :tabIndex 0}
