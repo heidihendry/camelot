@@ -188,7 +188,7 @@
     (render [_]
       (dom/select #js {:className "survey-select field-input"
                        :title (tr/translate ::filter-survey-title)
-                       :value (or (:survey-id data) "")
+                       :value (:survey-id data)
                        :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                     (om/update! data :survey-id (.. % -target -value))
                                     (if (> sid -1)
@@ -298,7 +298,7 @@
     (render-state [_ state]
       (dom/span nil
                (dom/select #js {:className "trap-station-select field-input"
-                                :value (or (:trap-station-id data) "")
+                                :value (:trap-station-id data)
                                 :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                              (om/update! (:search data) :trap-station-id sid)
                                              (go (>! (:search-chan state) {:search (assoc (deref (:search data))
@@ -319,7 +319,7 @@
       (dom/div #js {:className "checkbox-container"}
                 (dom/label nil (:label state))
                 (dom/input #js {:type "checkbox"
-                                :value (or (get-in data [:search (:key state)]) "")
+                                :value (get-in data [:search (:key state)])
                                 :onChange #(do (om/update! (:search (state/library-state))
                                                            (:key state) (.. % -target -checked))
                                                (go (>! (:search-chan state) {:search (assoc (deref (:search data))
@@ -433,7 +433,7 @@
                   (dom/input #js {:className "field-input inline long-input"
                                   :autoFocus "autofocus"
                                   :placeholder (tr/translate ::taxonomy-add-placeholder)
-                                  :value (or (get-in data [:new-species-name]) "")
+                                  :value (get-in data [:new-species-name])
                                   :onChange #(om/update! data :new-species-name
                                                          (.. % -target -value))})
                   (if (empty? (:new-species-name data))
@@ -458,7 +458,7 @@
         (om/build add-taxonomy-component data)
         (dom/select #js {:className "field-input auto-input"
                          :id "identify-species-select"
-                         :value (or (get-in data [:identification :species]) "")
+                         :value (get-in data [:identification :species])
                          :onChange #(let [v (.. % -target -value)]
                                       (if (= v "create")
                                         (do
@@ -491,7 +491,7 @@
     om/IRender
     (render [_]
       (dom/select #js {:className "field-input auto-input"
-                       :value (or (get-in data [:identification :lifestage]) "")
+                       :value (get-in data [:identification :lifestage])
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :lifestage v)
                                     (om/update! (:identification data) :dirty-state true))}
@@ -510,7 +510,7 @@
     om/IRender
     (render [_]
       (dom/select #js {:className "field-input auto-input"
-                       :value (or (get-in data [:identification :sex]) "")
+                       :value (get-in data [:identification :sex])
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :sex v)
                                     (om/update! (:identification data) :dirty-state true))}
@@ -536,7 +536,7 @@
                           (dom/label nil (tr/translate :sighting/sighting-quantity.label))
                           (dom/input #js {:type "number"
                                           :className "field-input short-input"
-                                          :value (or (get-in data [:identification :quantity]) "")
+                                          :value (get-in data [:identification :quantity])
                                           :onChange #(do
                                                        (om/update! (:identification data) :quantity
                                                                    (cljs.reader/read-string (.. % -target -value)))
