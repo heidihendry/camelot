@@ -190,15 +190,13 @@ number of keyboard shortcuts:
 -  **Control + m**: Focus the media collection panel
 -  **Control + d**: Toggle the details panel
 -  **Control + i**: Open the identify panel
--  **Control + Left arrow**: Go to the previous page of media
--  **Control + Right arrow**: Go to the next page of media
+-  **Shift + &lt;**: Go to the previous page of media
+-  **Shift + &gt;**: Go to the next page of media
 -  **Control + f**: Focus the filter text input
 -  **Alt + f**: Reapply the current filter
 
 With the Media Collection panel focused (**Control + m**):
 
--  **"wasd"** and **Arrow keys** can be used to select the next media in
-   that direction.
 -  **Control + a**: Select all media (or select none, if all are
    selected)
 -  **f** flag the currently selected media
@@ -206,5 +204,7 @@ With the Media Collection panel focused (**Control + m**):
 -  **r** mark the currently selected media as being of reference quality
 -  **c** mark the currently selected media as a camera-check (i.e.,
    test-fire of the camera)
--  hold **shift** + **"wasd"** OR **arrow keys** to include more media,
-   keeping the existing selection.
+-  hold **shift** + **arrow keys** to include media in a range, starting from the last selected image.
+-  hold **ctrl** + **arrow keys** to toggle the next image in that direction in the current selection.
+
+Holding **shift** or **ctrl** and clicking an image with the mouse will perform the equivalent behaviour.

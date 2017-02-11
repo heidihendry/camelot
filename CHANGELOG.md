@@ -1,5 +1,17 @@
 ## ChangeLog
-### 1.1.0 (upcoming)
+### 1.1.2
+#### Enhancements
+* Library is now much more responsive for large (100k+ images) datasets, and able to support much larger datasets.
+* Improve media selection shortcuts in the library, which includes support for selecting ranges of images with the mouse, while holding the shift key.
+
+#### Fixes
+* Fix template generation for bulk import where `:root-path` is unset in `config.clj`.
+
+### 1.1.1
+#### Fixes
+* Fixes a bug where changes to the Camera Check, Reference Quality and Attention Needed flags would not be saved.
+
+### 1.1.0
 #### Enhancements
 * Add Bulk Import functionality: the ability to prepare and import all data for a survey at once.
 * New report: Survey Export

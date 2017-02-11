@@ -17,16 +17,16 @@
 (defn key-handler
   [e]
   (cond
-    ;; ctrl+right
-    (and (= (.-keyCode e) 39) (.-ctrlKey e))
+    ;; >
+    (and (= (.-keyCode e) 190) (.-shiftKey e))
     (do (.click (.getElementById js/document "next-page"))
-        (nav/analytics-event "library-key" "C-<right>")
+        (nav/analytics-event "library-key" ">")
         (.preventDefault e))
 
-    ;; ctrl+left
-    (and (= (.-keyCode e) 37) (.-ctrlKey e))
+    ;; <
+    (and (= (.-keyCode e) 188) (.-shiftKey e))
     (do (.click (.getElementById js/document "prev-page"))
-        (nav/analytics-event "library-key" "C-<left>")
+        (nav/analytics-event "library-key" "<")
         (.preventDefault e))
 
     ;; ctrl+f

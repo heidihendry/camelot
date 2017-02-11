@@ -8,47 +8,6 @@
             [camelot.translation.core :as tr]
             [clojure.string :as str]))
 
-(def collection-columns 3)
-
-(defn updated-select-position
-  [media-ids e idx]
-  (if (.-ctrlKey e)
-    nil
-    (if (nil? idx)
-      0
-      (case (.-keyCode e)
-        37 (do (.preventDefault e)
-               (nav/analytics-event "library-key" "<left>")
-               (max (- idx 1) 0))
-        38 (do (.preventDefault e)
-               (nav/analytics-event "library-key" "<up>")
-               (if (< idx 3) idx (- idx 3)))
-        39 (do (.preventDefault e)
-               (nav/analytics-event "library-key" "<right>")
-               (min (+ idx 1) (dec (count media-ids))))
-        40 (do (.preventDefault e)
-               (nav/analytics-event "library-key" "<down>")
-               (if (= (.floor js/Math (/ (count media-ids) collection-columns))
-                      (.floor js/Math (/ idx collection-columns)))
-                 idx
-                 (min (+ idx 3) (dec (count media-ids)))))
-        65 (do
-             (nav/analytics-event "library-key" "a")
-             (max (- idx 1) 0))
-        87 (do
-             (nav/analytics-event "library-key" "w")
-             (if (< idx 3) idx (- idx 3)))
-        68 (do
-             (nav/analytics-event "library-key" "s")
-             (min (+ idx 1) (dec (count media-ids))))
-        83 (do
-             (nav/analytics-event "library-key" "d")
-             (if (= (.floor js/Math (/ (count media-ids) collection-columns))
-                    (.floor js/Math (/ idx collection-columns)))
-               idx
-               (min (+ idx 3) (dec (count media-ids)))))
-        nil))))
-
 (defn handle-key-event
   [data e]
   (cond
@@ -79,28 +38,7 @@
       (nav/analytics-event "library-key" "C-a"))
 
     :else
-    (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
-          endpoint-idx (ffirst (filter #(= (:selected-media-id data) (second %)) media-idxs))
-          new-endpoint (updated-select-position media-idxs e endpoint-idx)]
-      (when new-endpoint
-        (if (and (.-shiftKey e) (:anchor-media-id data))
-          (let [anchor-idx (ffirst (filter #(= (:anchor-media-id data) (second %)) media-idxs))
-                first-idx (min anchor-idx new-endpoint)
-                last-idx (max anchor-idx new-endpoint)
-                media-in-range (->> media-idxs
-                                    (drop first-idx)
-                                    (take (inc (- last-idx first-idx)))
-                                    (map second)
-                                    (map (partial util/find-with-id data)))]
-            (util/deselect-all data)
-            (dorun (map #(om/update! % :selected true) media-in-range))
-            (om/update! data :selected-media-id (second (nth media-idxs new-endpoint)))
-            (util/show-select-message))
-          (let [id (second (nth media-idxs new-endpoint))]
-            (util/deselect-all data)
-            (om/update! (util/find-with-id data id) :selected true)
-            (om/update! data :selected-media-id id)
-            (om/update! data :anchor-media-id id)))))))
+    (util/keyboard-select-media data e)))
 
 (defn- media-thumb-class
   [data]
@@ -120,7 +58,7 @@
       (dom/div #js {:className "media-item"}
                (dom/div #js {:className (media-thumb-class data)}
                         (dom/img #js {:onMouseDown #(do
-                                                      (util/toggle-select-image (:media-id data) (.. % -ctrlKey))
+                                                      (util/toggle-select-image (:media-id data) %)
                                                       (nav/analytics-event "library-collection" "select-media"))
                                       :src (str (get-in data [:media-uri]) "/thumb")}))
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
@@ -133,8 +71,8 @@
   [data node]
   (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
         cur (ffirst (filter #(= (:selected-media-id data) (second %)) media-idxs))
-        row (.floor js/Math (/ cur collection-columns))
-        max-row (/ (count media-idxs) collection-columns)
+        row (.floor js/Math (/ cur util/collection-columns))
+        max-row (/ (count media-idxs) util/collection-columns)
         doc-height (.-scrollHeight node)
         top (.-scrollTop node)
         elt-height (.-clientHeight node)

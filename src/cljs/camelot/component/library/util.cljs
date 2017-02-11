@@ -1,10 +1,12 @@
 (ns camelot.component.library.util
   (:require [camelot.state :as state]
             [om.core :as om]
+            [camelot.nav :as nav]
             [camelot.rest :as rest]
             [camelot.util.filter :as filter]
             [camelot.translation.core :as tr]))
 
+(def collection-columns 3)
 (def page-size 50)
 
 (defn get-matching
@@ -221,22 +223,75 @@
   (show-select-message)
   (deselect-all))
 
+(defn updated-select-position
+  [media-ids e idx]
+  (if (nil? idx)
+    0
+    (case (.-keyCode e)
+      37 (do (.preventDefault e)
+             (nav/analytics-event "library-key" "<left>")
+             (max (- idx 1) 0))
+      38 (do (.preventDefault e)
+             (nav/analytics-event "library-key" "<up>")
+             (if (< idx 3) idx (- idx 3)))
+      39 (do (.preventDefault e)
+             (nav/analytics-event "library-key" "<right>")
+             (min (+ idx 1) (dec (count media-ids))))
+      40 (do (.preventDefault e)
+             (nav/analytics-event "library-key" "<down>")
+             (if (= (.floor js/Math (/ (count media-ids) collection-columns))
+                    (.floor js/Math (/ idx collection-columns)))
+               idx
+               (min (+ idx 3) (dec (count media-ids)))))
+      nil)))
+
+(defn apply-selection-range
+  [data media-idxs new-endpoint shift ctrl]
+  (if (and shift (:anchor-media-id data))
+        (let [anchor-idx (ffirst (filter #(= (:anchor-media-id data) (second %)) media-idxs))
+              first-idx (min anchor-idx new-endpoint)
+              last-idx (max anchor-idx new-endpoint)
+              media-in-range (->> media-idxs
+                                  (drop first-idx)
+                                  (take (inc (- last-idx first-idx)))
+                                  (map second)
+                                  (map (partial find-with-id data)))]
+          (deselect-all data)
+          (dorun (map #(om/update! % :selected true) media-in-range))
+          (om/update! data :selected-media-id (second (nth media-idxs new-endpoint)))
+          (om/update! (:search (state/library-state)) :show-select-action (tr/translate ::selected))
+          (show-select-message))
+        (let [id (second (nth media-idxs new-endpoint))]
+          (when-not ctrl
+            (deselect-all data))
+          (if ctrl
+            (om/transact! (find-with-id data id) :selected not)
+            (om/update! (find-with-id data id) :selected true))
+          (om/update! data :selected-media-id id)
+          (om/update! data :anchor-media-id id))))
+
+(defn movement?
+  [evt]
+  (some? (some #{(.-keyCode evt)}
+               [37 38 39 40 65 87 68 83])))
+
+(defn keyboard-select-media
+  [data evt]
+  (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (media-ids-on-page data)))
+        endpoint-idx (ffirst (filter #(= (:selected-media-id data) (second %)) media-idxs))
+        new-endpoint (updated-select-position media-idxs evt endpoint-idx)]
+    (when (and (movement? evt) new-endpoint)
+      (apply-selection-range data media-idxs new-endpoint
+                             (.-shiftKey evt) (.-ctrlKey evt)))))
+
+(defn mouse-select-media
+  [data media-id shift ctrl]
+  (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (media-ids-on-page data)))
+        new-endpoint (ffirst (filter #(= media-id (second %)) media-idxs))]
+    (when new-endpoint
+      (apply-selection-range data media-idxs new-endpoint shift ctrl))))
+
 (defn toggle-select-image
-  [media-id ctrl]
-  (let [data (find-with-id (state/library-state) media-id)]
-    (if (and ctrl (:selected data))
-      (do
-        (om/update! (state/library-state) :selected-media-id
-                    (:media-id (first (all-media-selected))))
-        (if (= (:media-id data) (:anchor-media-id (state/library-state)))
-          (om/update! (state/library-state) :anchor-media-id nil)
-          (om/update! (state/library-state) :anchor-media-id (:media-id data))))
-      (do
-        (om/update! (state/library-state) :anchor-media-id (:media-id data))
-        (om/update! (state/library-state) :selected-media-id (:media-id data))))
-    (when (not ctrl)
-      (deselect-all))
-    (om/transact! data :selected not)
-    (om/update! (:search (state/library-state)) :show-select-action
-                (tr/translate ::selected))
-    (show-select-message)))
+  [media-id evt]
+  (mouse-select-media (state/library-state) media-id
+                      (.-shiftKey evt) (.-ctrlKey evt)))
