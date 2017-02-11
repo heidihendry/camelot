@@ -135,6 +135,8 @@
   "Return the relative path to `file' as a list of strings, each string representing a component of the path."
   [state file]
   (let [store (get-in state [:config :store])
-        rp (canonical-path (io/file (:root-path @store)))]
-    (str/split (subs (canonical-path file) (inc (count rp)))
+        crp (if-let [rp (:root-path @store)]
+              (canonical-path (io/file rp))
+              "")]
+    (str/split (subs (canonical-path file) (inc (count crp)))
                (path-separator-re))))
