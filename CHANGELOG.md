@@ -11,7 +11,7 @@
 #### Fixes
 * Fix template generation for bulk import where `:root-path` is unset in `config.clj`.
 
-### 1.1.1 (2017-01-08)
+### 1.1.1 (2017-02-08)
 #### Fixes
 * Fixes a bug where changes to the Camera Check, Reference Quality and Attention Needed flags would not be saved.
 
