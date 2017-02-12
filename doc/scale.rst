@@ -1,8 +1,7 @@
 Working with large datasets
 ---------------------------
 
-*Foreword: the below applies to versions of Camelot beyond 1.1.1. Significant
- performance improvements have been made since this release.*
+*Foreword: the below applies to versions of Camelot beyond 1.1.1. Significant performance improvements have been made since this release.*
 
 You'll have noticed in setting up Camelot, that you probably did not need to
 provision servers, configure relational databases, network equipment and so
@@ -71,9 +70,7 @@ important to note USB HDDs may use this filesystem as default.
 Memory
 ^^^^^^
 
-*This ignores restrictions on addressable memory imposed by 32-bit operating
- systems. The authors recommend ensuring you are NOT using a 32-bit operating
- system on the machine Camelot runs on.*
+*This ignores restrictions on addressable memory imposed by 32-bit operating systems. The authors recommend ensuring you are NOT using a 32-bit operating system on the machine Camelot runs on.*
 
 Memory is a very difficult consideration to judge. Generally speaking, while
 there is sufficient memory, it has little impact upon performance. However
@@ -125,8 +122,8 @@ please do reach out via the |group_link|.
 Client machines
 ~~~~~~~~~~~~~~~
 
-*This section applies to client machines: those connecting to a Camelot
- server, which do not run a copy of Camelot themselves.*
+This section applies to client machines: those connecting to a Camelot server,
+which do not run a copy of Camelot themselves.
 
 Generally speaking, any computer able to achieve an acceptable degree of
 responsiveness should be a fine candidate for accessing Camelot running on a
