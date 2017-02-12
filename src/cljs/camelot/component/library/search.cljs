@@ -78,6 +78,7 @@
       (dom/button #js {:className "fa fa-search btn search"
                        :title (tr/translate ::filter-button-title)
                        :id "apply-filter"
+                       :disabled (if (:inprogress data) "disabled" "")
                        :onClick #(do (go (>! (:search-chan state) {:search (deref data)}))
                                      (nav/analytics-event "library-search" "forced-refresh-click"))}))))
 
@@ -179,27 +180,34 @@
                                        :id "filter"
                                        :onChange #(om/update! data :terms %)
                                        :onKeyDown (partial select-media-collection-container state data)}
-                        :multi-term true}}))))
+                        :multi-term true}
+                 :state {:disabled (:inprogress data)}}))))
 
 (defn filter-survey-component
   [data owner]
   (reify
-    om/IRender
-    (render [_]
+    om/IRenderState
+    (render-state [_ state]
       (dom/select #js {:className "survey-select field-input"
                        :title (tr/translate ::filter-survey-title)
                        :value (:survey-id data)
+                       :disabled (if (get-in data [:search :inprogress]) "disabled" "")
                        :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
-                                    (om/update! data :survey-id (.. % -target -value))
+                                    (om/update! data [:search :survey-id] sid)
+                                    (om/update! data [:search :trap-station-id] -1)
                                     (if (> sid -1)
                                       (do
                                         (util/load-taxonomies data sid)
-                                        (util/load-library data sid)
-                                        (util/load-trap-stations data sid))
+                                        (util/load-trap-stations data sid)
+                                        (go (>! (:search-chan state) {:search (assoc (:search @data)
+                                                                                     :survey-id sid
+                                                                                     :trap-station-id nil)})))
                                       (do
                                         (util/load-taxonomies data)
-                                        (util/load-library data)
-                                        (util/load-trap-stations data)))
+                                        (util/load-trap-stations data)
+                                        (go (>! (:search-chan state) {:search (assoc (:search @data)
+                                                                                     :survey-id sid
+                                                                                     :trap-station-id nil)}))))
                                     (nav/analytics-event "library-search" "survey-select-change"))}
                   (om/build-all survey-option-component
                                 (cons {:survey-id -1 :survey-name
@@ -298,7 +306,8 @@
     (render-state [_ state]
       (dom/span nil
                (dom/select #js {:className "trap-station-select field-input"
-                                :value (:trap-station-id data)
+                                :value (get-in data [:search :trap-station-id])
+                                :disabled (if (get-in data [:search :inprogress]) "disabled" "")
                                 :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                              (om/update! (:search data) :trap-station-id sid)
                                              (go (>! (:search-chan state) {:search (assoc (deref (:search data))
@@ -320,6 +329,7 @@
                 (dom/label nil (:label state))
                 (dom/input #js {:type "checkbox"
                                 :value (get-in data [:search (:key state)])
+                                :disabled (if (get-in data [:search :inprogress]) "disabled" "")
                                 :onChange #(do (om/update! (:search (state/library-state))
                                                            (:key state) (.. % -target -checked))
                                                (go (>! (:search-chan state) {:search (assoc (deref (:search data))
@@ -585,7 +595,8 @@
 (defn search
   [data search]
   (let [terms (filter/append-subfilters (:terms search) (deref (:search data)))]
-    (if-let [survey-id (get-in @data [:search :survey-id])]
+    (if-let [survey-id (or (:survey-id search)
+                           (get-in @data [:search :survey-id]))]
       (util/load-library-search data survey-id terms)
       (util/load-library-search data terms))))
 

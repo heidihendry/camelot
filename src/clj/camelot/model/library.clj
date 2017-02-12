@@ -83,11 +83,11 @@
   ([state search]
    (filtered-media state
                    (db/with-db-keys state -all-media {})
-                   search))
+                   {:search search}))
   ([state survey-id search]
    (filtered-media state
                    (db/with-db-keys state -all-media-for-survey {:survey-id survey-id})
-                   search)))
+                   {:search search})))
 
 (s/defn build-records
   [state sightings media]

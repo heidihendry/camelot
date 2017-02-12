@@ -114,7 +114,7 @@
     om/IRender
     (render [_]
       (let [lib (:library data)]
-        (if (seq (get-in lib [:search :ordered-ids]))
+        (if (not (nil? (get-in lib [:search :ordered-ids])))
           (dom/div #js {:className (str "library" (if restricted-mode " restricted-mode" ""))
                         :onKeyDown key-handler
                         :tabIndex 0}

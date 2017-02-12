@@ -167,16 +167,22 @@
 
 (defn load-library-search
   ([data search]
+   (om/update! data [:search :inprogress] true)
    (rest/get-x "/library/metadata"
                (fn [md]
                  (rest/post-x "/library" {:data {:search search}}
-                              (partial load-library-callback data (:body md))))))
+                              (fn [resp]
+                                (load-library-callback data (:body md) resp)
+                                (om/update! data [:search :inprogress] false))))))
   ([data survey-id search]
+   (om/update! data [:search :inprogress] true)
    (rest/get-x "/library/metadata"
                (fn [md]
                  (rest/post-x (str "/library/" survey-id)
                               {:data {:search search}}
-                              (partial load-library-callback data (:body md)))))))
+                              (fn [resp]
+                                (load-library-callback data (:body md) resp)
+                                (om/update! data [:search :inprogress] false)))))))
 
 (defn load-taxonomies
   ([data]

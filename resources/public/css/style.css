@@ -1616,6 +1616,17 @@ pre.field-input {
 #app .typeahead {
     display: inline-block;
 }
+#app .typeahead-spinner {
+    position: relative;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    max-height: 0;
+    max-width: 0;
+    top: -0.2rem;
+    left: -2.4rem;
+    overflow: visible;
+}
 #app .typeahead-menu {
     background: white;
     position: absolute;
