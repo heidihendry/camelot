@@ -97,7 +97,7 @@ consistency).  The invocation would look as follows:
 
 .. code:: shell
 
-  java -Xms6g -Xmx6g -server -jar target/camelot.jar
+  java -Xms6g -Xmx6g -server -jar path/to/camelot.jar
 
 The above will set the initial heap size (``Xms``) and the maximum heap size
 (``Xmx``) to 6GB. It will also ensure the Java Hotspot is tuned for server
