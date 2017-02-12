@@ -61,14 +61,6 @@ A mechanism for storing the ``Database`` and ``Media`` directories on separate
 filesystems is not provided by Camelot directly.  It is however possible on
 most Operating Systems with some technical trickery.
 
-Another very important aspect of Camelot's ability to scale is the filesystem
-used to store media.  Camelot stores all media in a single directory (the
-``Media`` directory), thus may hit upon limitations in older filesystems. In
-particular **do not use FAT32** for Camelot's ``Media`` directory: this
-supports only 65,534 files in one directory.  While FAT32 is little-used on
-computers themselves, it is important to note USB HDDs may use this filesystem
-as default.
-
 Memory
 ^^^^^^
 

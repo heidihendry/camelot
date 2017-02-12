@@ -177,7 +177,7 @@
     (if-let [media (get-specific-by-filename state filename)]
       (io/input-stream
        (if (= variant :original)
-         (io/file (str mpath SystemUtils/FILE_SEPARATOR
-                       filename "." (:media-format media)))
-         (io/file (str mpath SystemUtils/FILE_SEPARATOR
-                       (name variant) "-" filename ".png")))))))
+         (io/file mpath (apply str (take 2 filename))
+                  (str filename "." (:media-format media)))
+         (io/file mpath (apply str (take 2 filename))
+                  (str (name variant) "-" filename ".png")))))))

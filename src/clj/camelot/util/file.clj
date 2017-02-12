@@ -128,8 +128,10 @@
 
 (defn ^File ->file
   "Return a File object from `path`."
-  [path]
-  (io/file path))
+  ([path]
+   (io/file path))
+  ([parent child]
+   (io/file parent child)))
 
 (defn rel-path-components
   "Return the relative path to `file' as a list of strings, each string representing a component of the path."
