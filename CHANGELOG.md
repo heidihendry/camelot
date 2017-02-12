@@ -11,11 +11,11 @@
 #### Fixes
 * Fix template generation for bulk import where `:root-path` is unset in `config.clj`.
 
-### 1.1.1
+### 1.1.1 (2017-01-08)
 #### Fixes
 * Fixes a bug where changes to the Camera Check, Reference Quality and Attention Needed flags would not be saved.
 
-### 1.1.0
+### 1.1.0 (2017-01-17)
 #### Enhancements
 * Add Bulk Import functionality: the ability to prepare and import all data for a survey at once.
 * New report: Survey Export
