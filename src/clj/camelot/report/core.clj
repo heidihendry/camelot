@@ -6,6 +6,19 @@
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
    [camelot.translation.core :as tr]
+   [camelot.model.camera :as camera]
+   [camelot.model.camera-status :as camera-status]
+   [camelot.model.media :as media]
+   [camelot.model.photo :as photo]
+   [camelot.model.sighting :as sighting]
+   [camelot.model.site :as site]
+   [camelot.model.taxonomy :as taxonomy]
+   [camelot.model.species-mass :as species-mass]
+   [camelot.model.survey :as survey]
+   [camelot.model.survey-site :as survey-site]
+   [camelot.model.trap-station :as trap-station]
+   [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
    [clj-time.local :as tl]
    [clj-time.format :as tf]
    [clojure.data.csv :as csv]
@@ -17,40 +30,82 @@
   (:import
    (clojure.lang IFn)))
 
-(sql/defqueries "sql/reports.sql")
+(def data-definitions
+  {:media-id [media/get-all* [:trap-station-session-camera-id] [:sighting-id :photo-id]]
+   :sighting-id [sighting/get-all* [:taxonomy-id] [:media-id]]
+   :taxonomy-id [taxonomy/get-all [:species-mass-id] [:sighting-id]]
+   :photo-id [photo/get-all* [] [:media-id]]
+   :trap-station-session-camera-id [trap-station-session-camera/get-all* [:trap-station-session-id :camera-id] [:media-id]]
+   :camera-id [camera/get-all [:camera-status-id] [:trap-station-session-camera-id]]
+   :trap-station-session-id [trap-station-session/get-all* [:trap-station-id] [:trap-station-session-camera-id]]
+   :trap-station-id [trap-station/get-all* [:site-id] [:trap-station-session-id]]
+   :survey-site-id [survey-site/get-all* [:survey-id :site-id] []]
+   :species-mass-id [species-mass/get-all [] [:taxonomy-id]]
+   :camera-status-id [camera-status/get-all [] [:camera-id]]
+   :site-id [site/get-all [] [:survey-site-id :trap-station-id]]
+   :survey-id [survey/get-all [] [:survey-site-id]]})
 
-(defn- get-all-by-survey
-  [state]
-  (db/clj-keys (db/with-connection state -get-all-by-survey)))
+(defn known-dep?
+  [acc dep]
+  (some? (some #{(first dep)} (map first acc))))
 
-(defn- get-all-by-taxonomy
-  [state]
-  (db/clj-keys (db/with-connection state -get-all-by-taxonomy)))
+(defn resolution-order
+  [data by]
+  ((fn [acc deps rdeps]
+     (if (empty? deps)
+       (if (empty? rdeps)
+         acc
+         (let [cd (get data (ffirst rdeps))]
+           (recur (conj acc (first rdeps))
+                  (let [ndeps (filter #(not (known-dep? acc %))
+                                      (mapv #(vector % %) (second cd)))]
+                    (if (seq ndeps)
+                      (concat deps ndeps)
+                      deps))
+                  (let [nrdeps (filter #(not (known-dep? acc %))
+                                       (mapv #(vector % (ffirst rdeps)) (nth cd 2)))]
+                    (if (seq nrdeps)
+                      (concat (rest rdeps) nrdeps)
+                      (rest rdeps))))))
+       (let [cd (get data (ffirst deps))]
+         (recur (conj acc (first deps))
+                (let [ndeps (filter #(not (known-dep? acc %))
+                                    (mapv #(vector % %) (second cd)))]
+                    (if (seq ndeps)
+                      (concat (rest deps) ndeps)
+                      (rest deps)))
+                (let [nrdeps (filter #(not (known-dep? acc %))
+                                     (mapv #(vector % (ffirst deps)) (nth cd 2)))]
+                    (if (seq nrdeps)
+                      (concat rdeps nrdeps)
+                      rdeps))))))
+   [] [[by by]] []))
 
-(defn- get-all-by-site
-  [state]
-  (db/clj-keys (db/with-connection state -get-all-by-site)))
-
-(defn- get-all-by-camera
-  [state]
-  (db/clj-keys (db/with-connection state -get-all-by-camera)))
-
-(defn- get-all
-  [state]
-  (db/clj-keys (db/with-connection state -get-all)))
-
-(def ^:private query-fn-map
-  {:survey get-all-by-survey
-   :species get-all-by-taxonomy
-   :site get-all-by-site
-   :camera get-all-by-camera
-   :all get-all})
+(defn- join-all
+  [state by]
+  (let [rorder (resolution-order data-definitions by)
+        data (reduce (fn [acc [t1 [t2s]]]
+                       (let [qres ((first (get data-definitions t1)) state)]
+                         (assoc acc t1
+                                (reduce (fn [iacc t2] (assoc iacc t2 (group-by t2 qres)))
+                                        {}
+                                        t2s))))
+                     {} (group-by first rorder))]
+    (reduce (fn [acc [tbl key]]
+              (mapcat (fn [a] (let [rs (get-in data [tbl key (get a key)])]
+                                (if (seq rs)
+                                  (map #(merge a %) rs)
+                                  (list a)))) acc))
+            (map #(into {} %) (apply concat (vals (get-in data (first rorder)))))
+            (rest rorder))))
 
 (s/defn get-by :- [{s/Keyword s/Any}]
   "Retrieve the data for the given report type."
   [state :- State
    by :- s/Keyword]
-  ((get query-fn-map by) state))
+  (join-all state (if (= by :all)
+                    :media-id
+                    (keyword (str (name by) "-id")))))
 
 (defn- fill-keys
   [columns data]
@@ -70,13 +125,17 @@
 
 (defn- distinct-in-results
   [results]
-  (loop [{:keys [acc check against] :as ps} {:acc [] :against results :check results}]
-    (let [ag (drop-while #(= (count (first check)) (count %)) against)]
-      (if (empty? check)
-        acc
-        (if (first (filter #(better-for-known-keys (first check) %) ag))
-          (recur {:check (rest check) :against ag :acc acc})
-          (recur {:check (rest check) :against ag :acc (conj acc (first check))}))))))
+  (loop [{:keys [acc check against] :as ps} {:acc [] :against {} :check results}]
+    (if (empty? check)
+      acc
+      (if-let [cur (first check)]
+        (if (some empty? (map (fn [[k v]] (get-in against [k v])) cur))
+          (recur {:check (rest check)
+                  :against (reduce-kv (fn [acc k v]
+                                        (update-in acc [k v] #(conj % cur)))
+                                      against cur)
+                  :acc (conj acc cur)})
+          (recur {:check (rest check) :against against :acc acc}))))))
 
 (defn- project
   [columns data]
@@ -84,20 +143,20 @@
                   (set data)
                   (set/project data columns))]
     (->> results
-         (sort-by count)
+         (sort-by count >)
          distinct-in-results
          (fill-keys columns)
          (into #{}))))
 
 (defn- apply-filters
   [filters record]
-  (if (seq filters)
-    (every? #(% record) filters)
-    true))
+  (every? #(% record) filters))
 
 (defn- filter-records
   [state filters data]
-  (filter (partial apply-filters filters) data))
+  (if (seq filters)
+    (filter (partial apply-filters filters) data)
+    data))
 
 (defn- aggregate-reducer
   [state group acc c]
@@ -149,7 +208,9 @@
   [state :- State
    transforms :- [IFn]
    data :- [{s/Keyword s/Any}]]
-  (map (fn [r] (reduce #(%2 %1) r transforms)) data))
+  (if (seq transforms)
+    (map (fn [r] (reduce #(%2 %1) r transforms)) data)
+    data))
 
 (def add-calculated-columns (module/build-calculated-columns :calculate))
 (def add-post-aggregate-columns (module/build-calculated-columns :post-aggregate))
@@ -210,7 +271,10 @@
 
 (defn- as-rows
   [state cols data]
-  (map (partial as-row state cols) data))
+  (let [eff-cols (if (all-cols? cols)
+                   (keys (first data))
+                   cols)]
+    (map (partial as-row state eff-cols) data)))
 
 (defn- to-csv-string
   "Return data as a CSV string."

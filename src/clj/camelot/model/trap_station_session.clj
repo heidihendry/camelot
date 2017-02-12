@@ -58,6 +58,12 @@
        (map #(add-label state %))
        (map trap-station-session)))
 
+(s/defn get-all* :- [TrapStationSession]
+  [state :- State]
+  (->> (db/with-db-keys state -get-all* {})
+       (map #(add-label state %))
+       (map trap-station-session)))
+
 (s/defn get-specific :- TrapStationSession
   [state :- State
    id :- s/Int]

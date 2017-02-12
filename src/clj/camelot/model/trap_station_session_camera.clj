@@ -46,6 +46,10 @@
        (db/with-db-keys state -get-all)
        (map trap-station-session-camera)))
 
+(s/defn get-all* :- [TrapStationSessionCamera]
+  [state :- State]
+  (map trap-station-session-camera (db/with-db-keys state -get-all* {})))
+
 (s/defn get-specific :- (s/maybe TrapStationSessionCamera)
   [state :- State
    id :- s/Int]

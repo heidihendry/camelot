@@ -44,6 +44,11 @@ FROM trap_station_session_camera
 LEFT JOIN camera using (camera_id)
 WHERE trap_station_session_id = :trap_station_session_id
 
+-- name: -get-all*
+SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, trap_station_session_id, camera_id, camera_name, trap_station_session_camera_import_path, trap_station_session_camera_media_unrecoverable
+FROM trap_station_session_camera
+LEFT JOIN camera using (camera_id)
+
 -- name: -get-available
 SELECT camera_id, camera_name
 FROM camera

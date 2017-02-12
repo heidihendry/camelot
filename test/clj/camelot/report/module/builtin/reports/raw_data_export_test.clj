@@ -110,7 +110,5 @@
         (is (= (report state 1 records)
                [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
                  "Trap1" -25 130 "Bird" "Yellow Spotted" 2]
-                ["file-id-1" "2015-01-07 05:00:00" "ASite" nil
-                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]
                 ["file-id-2" "2015-01-07 05:00:00" "ASite" nil
                  "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))))))

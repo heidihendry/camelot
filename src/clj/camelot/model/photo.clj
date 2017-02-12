@@ -43,6 +43,10 @@
    id :- s/Num]
   (map photo (db/with-db-keys state -get-all {:media-id id})))
 
+(s/defn get-all* :- [Photo]
+  [state :- State]
+  (map photo (db/with-db-keys state -get-all* {})))
+
 (s/defn get-specific :- Photo
   [state :- State
    id :- s/Num]

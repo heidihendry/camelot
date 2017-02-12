@@ -42,6 +42,12 @@ SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
 FROM trap_station_session
 WHERE trap_station_id = :trap_station_id
 
+-- name: -get-all*
+SELECT trap_station_session_id, trap_station_id, trap_station_session_created,
+       trap_station_session_updated, trap_station_session_start_date,
+       trap_station_session_end_date, trap_station_session_notes
+FROM trap_station_session
+
 -- name: -get-active
 SELECT camera_id, camera_name, trap_station_session_camera_id
 FROM camera
