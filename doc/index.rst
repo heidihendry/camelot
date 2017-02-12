@@ -16,6 +16,7 @@ Camelot Documentation
    reports
    bulkimport
    advancedmenu
+   scale
    network
    administration
    misc
