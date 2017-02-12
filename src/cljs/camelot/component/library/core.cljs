@@ -62,9 +62,14 @@
 (defn tincan-listener
   [data opts]
   (let [search (aget opts "search")
+        survey-id (aget opts "survey")
         reload (aget opts "reload")]
     (when reload
-      (util/load-library-search data search 0))))
+      (prn survey-id)
+      (prn search)
+      (if survey-id
+        (util/load-library-search data survey-id search)
+        (util/load-library-search data search)))))
 
 (defn delete-media!
   [data ids]

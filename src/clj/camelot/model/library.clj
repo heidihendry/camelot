@@ -68,15 +68,17 @@
        (into {})))
 
 (defn add-in-metadata
-  [state records]
+  [state sightings records]
   (let [md (build-library-metadata state)]
-    (map #(merge (get md (:trap-station-session-camera-id %)) %)
+    (map #(assoc (merge (get md (:trap-station-session-camera-id %)) %)
+                 :sightings (or (get sightings (:media-id %)) []))
          records)))
 
 (defn filtered-media
   [state records {:keys [search]}]
   (let [spps (reduce #(assoc %1 (:taxonomy-id %2) %2) {} (taxonomy/get-all state))
-        matches (filter/only-matching search spps (add-in-metadata state records))]
+        sightings (group-by :media-id (sighting/get-all* state))
+        matches (filter/only-matching search spps (add-in-metadata state sightings records))]
     (map #(:media-id %) matches)))
 
 (defn search-media

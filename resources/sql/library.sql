@@ -2,6 +2,7 @@
 SELECT media_id, media_created, media_updated, media_filename, media_format, media_cameracheck, media_attention_needed, media_processed,
        media_reference_quality, media_capture_timestamp, trap_station_session_camera_id
 FROM media
+LEFT JOIN photo USING (media_id)
 LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
 LEFT JOIN camera USING (camera_id)
 LEFT JOIN trap_station_session USING (trap_station_session_id)
@@ -15,6 +16,7 @@ ORDER BY trap_station_id, camera_id, trap_station_session_start_date, trap_stati
 SELECT media_id, media_created, media_updated, media_filename, media_format, media_cameracheck, media_attention_needed, media_processed,
        media_reference_quality, media_capture_timestamp, trap_station_session_camera_id
 FROM media
+LEFT JOIN photo USING (media_id)
 LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)
 LEFT JOIN camera USING (camera_id)
 LEFT JOIN trap_station_session USING (trap_station_session_id)

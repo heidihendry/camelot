@@ -218,10 +218,10 @@
 (defn species-reference-filter
   [data spp]
   (if (string? spp)
-    (str "species:"
-         (:taxonomy-label
-          (get (:species data)
-               (cljs.reader/read-string spp))))
+    (let [tax (:taxonomy-label (get (:species data) (cljs.reader/read-string spp)))]
+      (if tax
+        (str "species:\"" tax "\"")
+        ""))
     ""))
 
 (defn maybe-unidentified-reference-filter
@@ -242,6 +242,7 @@
 
 (defn build-reference-filter-string
   [data]
+  (prn (:identification data))
   (str (species-reference-filter data (get-in data [:identification :species]))
        " "
        (maybe-unidentified-reference-filter "sighting-sex"
@@ -258,6 +259,10 @@
       (do
         (.tincan (:secondary-window data)
                  #js {:search (build-reference-filter-string data)
+                      :survey (let [sid (get-in data [:search :survey-id])]
+                                (if (and sid (not= sid -1))
+                                  sid
+                                  nil))
                       :reload reload}))
       (when-not prevent-open
         (let [w (.open js/window (str (nav/get-token) "/restricted")
@@ -265,6 +270,10 @@
                        features)]
           (om/update! data :secondary-window w)
           (tincan-sender-wait w #js {:search (build-reference-filter-string data)
+                                     :survey (let [sid (get-in data [:search :survey-id])]
+                                               (if (and sid (not= sid -1))
+                                                 sid
+                                                 nil))
                                      :reload reload}))))))
 
 (defn identification-panel-button-component
@@ -625,6 +634,6 @@
         (go (>! (:search-chan state) {:search (deref (:search data))})))
       (when (-> data :identification :dirty-state)
         (om/update! (:identification data) :dirty-state false)
-        (tincan-sender data false {:prevent-open true}))
+        (tincan-sender data true {:prevent-open true}))
       (dom/div #js {:className "search-container"}
                (om/build search-bar-component data {:init-state state})))))
