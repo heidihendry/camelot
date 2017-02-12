@@ -20,7 +20,7 @@ some parts of Camelot will take longer to load as the size of the dataset
 grows. The authors have simulated datasets with 2 million images to ensure
 that Camelot will perform reasonably for 99% of datasets Camelot is used with.
 
-The main performance considerations with this volume of data performing the
+The main performance considerations with this volume of data is performing the
 initial load of the library, and the CPU and memory constraints required to
 produce reports.
 
@@ -35,9 +35,9 @@ of 14GB:
 Considerations for your dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This section will describe considerations relevant for using Camelot for
-larger datasets on the Camelot server, and offer some guidelines for what the
-authors would expect to be reasonable under various scenarios.
+This section will describe considerations relevant for using Camelot with
+larger datasets on a Camelot server, and offer some guidelines for what the
+authors would expect to be reasonable configurations under various scenarios.
 
 Data for Camelot's performance is known for only a small number of scenarios,
 thus the numbers offered are very much guidelines and you may find different
@@ -51,21 +51,23 @@ though should not be strictly necessary to use Camelot with large datasets.
 However, using Camelot with remote storage, for example, running Camelot on a
 laptop and connecting to a database stored on a NAS over wifi, is unlikely to
 result in nice performance characteristics.  Effort should be made to reduce
-the latency between where Camelot is running, and where its database resides.
+the latency and maximise throughput between where Camelot is running, and
+where its database resides.
 
 That said, much of the volume of data for an installation of Camelot is
 occupied by images.  Images may reside on lower-throughput and higher latency
-storage as it is not an essential aspect of Camelot's performance profile.
-Separating the Database and Media filesystems is not supported by Camelot
-directly and may require some technical trickery to achieve, though is
-nonetheless possible on most Operating Systems.
+storage as it does not impact significantly on Camelot's performance profile.
+A mechanism for storing the ``Database`` and ``Media`` directories on separate
+filesystems is not provided by Camelot directly.  It is however possible on
+most Operating Systems with some technical trickery.
 
 Another very important aspect of Camelot's ability to scale is the filesystem
-used to store media.  Camelot stores all media in a single directory, thus may
-hit upon limitations in older filesystems. In particular **do not use FAT32**
-where Camelot's Media directory is stored: this supports only 65,534 files in
-one directory.  While FAT32 is little-used on computers themselves, it is
-important to note USB HDDs may use this filesystem as default.
+used to store media.  Camelot stores all media in a single directory (the
+``Media`` directory), thus may hit upon limitations in older filesystems. In
+particular **do not use FAT32** for Camelot's ``Media`` directory: this
+supports only 65,534 files in one directory.  While FAT32 is little-used on
+computers themselves, it is important to note USB HDDs may use this filesystem
+as default.
 
 Memory
 ^^^^^^
@@ -79,13 +81,15 @@ considerably longer to complete, or may never complete.  There are two main
 aspects to memory in Camelot: the physical memory available, and the memory
 available to the JVM heap.
 
-The most important consideration is the memory available to the JVM heap.
-Regardless of how much physical memory is available to a machine, Camelot may
-only use the memory available in the JVM heap (and some small additional
-amounts, as per other JVM configurations).  The JVM heap size should not
-exceed the size of physical memory available, and ideally should not impinge
-upon the resources required by other applications on the machine Camelot is
-running upon.
+The most important consideration is maximum size of the JVM heap.  Regardless
+of how much physical memory is available to a machine, Camelot may only use
+the memory available in the JVM heap (and some small additional amounts, as
+per other JVM configurations), and this is something must be configured
+manually for large datasets.
+
+The JVM heap size should not exceed the size of physical memory available, and
+ideally should not impinge upon the resources required by other applications
+on the machine Camelot is running upon.
 
 There are a number of ways to set the JVM Heap size. We recommend setting it
 via the command line (which may be in a script for convenience and
