@@ -156,30 +156,12 @@
 
 (defn load-library
   ([data]
-   (rest/get-x "/library/metadata"
-               (fn [md]
-                 (rest/get-x "/library" (partial load-library-callback data (:body md))))))
-  ([data survey-id]
-   (rest/get-x "/library/metadata"
-               (fn [md]
-                 (rest/get-x (str "/library/" survey-id)
-                             (partial load-library-callback data (:body md)))))))
-
-(defn load-library-search
+   (load-library data ""))
   ([data search]
    (om/update! data [:search :inprogress] true)
    (rest/get-x "/library/metadata"
                (fn [md]
                  (rest/post-x "/library" {:data {:search search}}
-                              (fn [resp]
-                                (load-library-callback data (:body md) resp)
-                                (om/update! data [:search :inprogress] false))))))
-  ([data survey-id search]
-   (om/update! data [:search :inprogress] true)
-   (rest/get-x "/library/metadata"
-               (fn [md]
-                 (rest/post-x (str "/library/" survey-id)
-                              {:data {:search search}}
                               (fn [resp]
                                 (load-library-callback data (:body md) resp)
                                 (om/update! data [:search :inprogress] false)))))))

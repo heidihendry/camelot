@@ -25,6 +25,10 @@
    "reference-quality" :media-reference-quality
    "city" :site-city})
 
+(defn field-key-lookup
+  [f]
+  (or (get field-keys f) (keyword f)))
+
 (def model-fields
   (mapv name model/fields))
 
@@ -38,14 +42,20 @@
     [""]
     s))
 
+(defn valid-id?
+  [id?]
+  (and id? (> id? -1)) )
+
 (defn append-subfilters
   [s search-conf]
   (-> s
       (str/split #"\|")
       (non-empty-list)
       (append-to-strings (if (:unprocessed-only search-conf) " processed:false" ""))
-      (append-to-strings (if (and (:trap-station-id search-conf)
-                                  (> (:trap-station-id search-conf) -1))
+      (append-to-strings (if (valid-id? (:trap-station-id search-conf))
                            (str " trapid:" (:trap-station-id search-conf))
+                           ""))
+      (append-to-strings (if (valid-id? (:survey-id search-conf))
+                           (str " survey-id:" (:survey-id search-conf))
                            ""))
       (#(str/join "|" %))))

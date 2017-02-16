@@ -65,11 +65,7 @@
         survey-id (aget opts "survey")
         reload (aget opts "reload")]
     (when reload
-      (prn survey-id)
-      (prn search)
-      (if survey-id
-        (util/load-library-search data survey-id search)
-        (util/load-library-search data search)))))
+      (util/load-library data search))))
 
 (defn delete-media!
   [data ids]
@@ -96,7 +92,8 @@
     (did-mount [_]
       (when restricted-mode
         (om/update! (state/app-state-cursor) :restricted-mode true))
-      (om/update! data [:library :search] {})
+      (om/update! data [:library :search] {:last-search-terms ""
+                                           :terms ""})
       (om/update! data [:library :search :page] 1)
       (om/update! data [:library :survey-id] (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! data [:library :search :show-select-count] 0)
@@ -111,7 +108,7 @@
           (do
             (util/load-taxonomies (:library data) sid)
             (util/load-trap-stations (:library data) sid)
-            (util/load-library (:library data) sid))
+            (util/load-library (:library data) (str "survey-id:" sid)))
           (do
             (util/load-taxonomies (:library data))
             (util/load-trap-stations (:library data))

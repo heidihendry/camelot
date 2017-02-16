@@ -994,7 +994,6 @@ pre.field-input {
     margin-top: -2px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    background-color: #fafafa;
 }
 #app .library .search-bar button {
     margin-right: 0.5rem;
@@ -1146,9 +1145,14 @@ pre.field-input {
 #app .library .btn.search {
     background: none;
     border: 1px solid #ccc;
-    opacity: 0.8;
+    opacity: 0.5;
+}
+#app .library .btn.search-dirty {
+    color: #116095;
+    opacity: 1;
 }
 #app .library .btn.search:hover {
+    color: #116095;
     opacity: 1;
 }
 #app .library .subfilter-bar {

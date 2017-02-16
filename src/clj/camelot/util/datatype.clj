@@ -1,4 +1,4 @@
-(ns camelot.import.datatype
+(ns camelot.util.datatype
   "Datatypes, constraints and deseralisation for bulk import."
   (:require
    [camelot.util.model :as model]

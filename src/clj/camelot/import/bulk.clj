@@ -4,7 +4,7 @@
    [clojure.core.async :refer [<! >!! chan go-loop] :as async]
    [camelot.util.db :refer [with-transaction]]
    [camelot.import.db :as db]
-   [camelot.import.datatype :as datatype]
+   [camelot.util.datatype :as datatype]
    [camelot.util.model :as model]
    [camelot.translation.core :as tr]
    [camelot.import.validate :as validate]

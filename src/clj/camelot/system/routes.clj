@@ -231,7 +231,6 @@
            (GET "/" [] (r/response (report/available-reports (assoc state :session session)))))
 
   (context "/library" {session :session state :system}
-           (GET "/" [] (r/response (library/search-media (assoc state :session session) "")))
            (POST "/" [data]
                  (r/response (library/search-media (assoc state :session session)
                                                     (:search data))))
@@ -240,13 +239,6 @@
            (POST "/hydrate" [data]
                  (r/response (library/hydrate-media (assoc state :session session)
                                                     (:media-ids data))))
-           (GET "/:id" [id] (r/response (library/search-media (assoc state :session session)
-                                                              (edn/read-string id)
-                                                              "")))
-           (POST "/:id" [id data]
-                 (r/response (library/search-media (assoc state :session session)
-                                                   (edn/read-string id)
-                                                   (:search data))))
            (POST "/media/flags" [data] (r/response (library/update-bulk-media-flags
                                                     (assoc state :session session)
                                                     data)))

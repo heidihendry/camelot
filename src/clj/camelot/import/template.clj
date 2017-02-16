@@ -8,7 +8,7 @@
             [camelot.import.scan-dir :as scan-dir]
             [clj-time.local :as tl]
             [camelot.util.model :as model]
-            [camelot.import.datatype :as datatype]
+            [camelot.util.datatype :as datatype]
             [clojure.edn :as edn]
             [ring.util.response :as r]
             [camelot.translation.core :as tr]

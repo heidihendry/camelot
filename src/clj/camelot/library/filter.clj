@@ -3,16 +3,13 @@
   (:require
    [clojure.string :as str]
    [clojure.edn :as edn]
-   [camelot.util.filter :as futil])
+   [camelot.util.filter :as futil]
+   [camelot.library.filter-parser :as parser])
   (:import
    (java.lang String Boolean)))
 
 (def exact-matches-needed
   #{:sighting-sex :sighting-lifestage})
-
-(defn field-key-lookup
-  [f]
-  (or (get futil/field-keys f) (keyword f)))
 
 (defn nil->empty
   [v]
@@ -38,72 +35,54 @@
     (list rec)))
 
 (defn needs-exact-match?
-  [f]
-  (some #(= % (field-key-lookup f)) exact-matches-needed))
+  [field]
+  (some #(= % field) exact-matches-needed))
 
 (defn field-search
   [search species sightings]
-  (let [[f s] (str/split search #":")]
-    (if (re-find #"\-id$" (name (field-key-lookup f)))
-      (some? (some #(= (get % (field-key-lookup f)) (edn/read-string s))
+  (let [{f :field s :value} search
+        field (futil/field-key-lookup f)]
+    (if (re-find #"\-id$" (name field))
+      (some? (some #(= (get % field) (edn/read-string s))
                    sightings))
       (some #(if (= s "*")
-               (not (nil? (get % (field-key-lookup f))))
-               (if (needs-exact-match? f)
-                 (= (str/lower-case (nil->empty (get % (field-key-lookup f))))
+               (not (nil? (get % field)))
+               (if (needs-exact-match? field)
+                 (= (str/lower-case (nil->empty (get % field)))
                     (str/lower-case (nil->empty s)))
-                 (substring? (nil->empty (get % (field-key-lookup f))) s)))
+                 (substring? (nil->empty (get % field)) s)))
             sightings))))
 
 (defn record-string-search
   [search species records]
   (some #(cond
-           (= (type %) String) (substring? (str %) search)
-           (= (type %) Boolean) (= (str %) search))
+           (= (type %) String) (substring? (str %) (:value search))
+           (= (type %) Boolean) (= (str %) (:value search)))
         (mapcat vals records)))
 
 (defn record-matches
   [search species record]
   (let [rs (flatten (sighting-record species record))]
-    (if (substring? search ":")
+    (if (contains? search :field)
       (field-search search species rs)
       (record-string-search search species rs))))
 
 (defn conjunctive-terms
   [search species record]
-  (every? #(record-matches % species record) (str/split search #"\+\+\+")))
+  (every? #(record-matches % species record) search))
 
 (defn disjunctive-terms
   [search species record]
-  (some #(conjunctive-terms % species record) (str/split search #"\|")))
+  (some #(conjunctive-terms % species record) search))
 
 (defn matches-search?
   [search species record]
-  (if (= search "")
+  (if (empty? search)
     true
     (disjunctive-terms search species record)))
-
-(defn format-reducer
-  [acc c]
-  (cond
-    (and (= c \ ) (not (:quoted acc)))
-    (update acc :result #(conj % "+++"))
-
-    (= c \")
-    (update acc :quoted not)
-
-    :else
-    (update acc :result #(conj % c))))
-
-(defn format-terms
-  [terms]
-  (str/lower-case (apply str (:result (reduce format-reducer {:result []
-                                                              :quoted false}
-                                              (seq terms))))))
 
 (defn only-matching
   [terms species records]
   (if (empty? terms)
     records
-    (let [t (format-terms terms)]
-      (filter #(matches-search? t species %) records))))
+    (filter #(matches-search? (parser/parse terms) species %) records)))

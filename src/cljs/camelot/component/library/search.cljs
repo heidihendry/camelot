@@ -75,7 +75,8 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/button #js {:className "fa fa-search btn search"
+      (dom/button #js {:className (str "fa fa-search btn search" (if (not= (:terms data) (:last-search-terms data))
+                                                                   " search-dirty" ""))
                        :title (tr/translate ::filter-button-title)
                        :id "apply-filter"
                        :disabled (if (:inprogress data) "disabled" "")
@@ -603,11 +604,11 @@
 
 (defn search
   [data search]
-  (let [terms (filter/append-subfilters (:terms search) (deref (:search data)))]
-    (if-let [survey-id (or (:survey-id search)
-                           (get-in @data [:search :survey-id]))]
-      (util/load-library-search data survey-id terms)
-      (util/load-library-search data terms))))
+  (let [survey-id (or (:survey-id search) (get-in @data [:search :survey-id]))]
+    (let [terms (filter/append-subfilters (:terms search) (assoc (deref (:search data))
+                                                                 :survey-id survey-id))]
+      (util/load-library data terms)
+      (om/update! data [:search :last-search-terms] (:terms search)))))
 
 (defn search-component
   [data owner]
@@ -619,7 +620,6 @@
     (will-mount [_]
       (om/update! (:search data) :mode :search)
       (om/update! (:search data) :page 1)
-      (om/update! (:search data) :terms nil)
       (go
         (loop []
           (let [ch (om/get-state owner :search-chan)
