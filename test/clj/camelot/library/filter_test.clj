@@ -1,6 +1,7 @@
 (ns camelot.library.filter-test
   (:require
    [camelot.library.filter :as sut]
+   [camelot.library.filter-parser :as sut-parser]
    [clojure.test :refer [deftest is testing]]))
 
 (def species {1 {:taxonomy-id 1
@@ -276,10 +277,10 @@
 
 (deftest term-formatter-replaces-spaces
   (let [search "this is a test"]
-    (is (= (sut/format-terms search)
+    (is (= (sut-parser/format-terms search)
            "this+++is+++a+++test"))))
 
 (deftest term-formatter-leaves-spaces-in-quotes-alone
   (let [search "this is \"a test\""]
-    (is (= (sut/format-terms search)
+    (is (= (sut-parser/format-terms search)
            "this+++is+++a test"))))
