@@ -93,7 +93,9 @@
       (when restricted-mode
         (om/update! (state/app-state-cursor) :restricted-mode true))
       (om/update! data [:library :search] {:last-search-terms ""
-                                           :terms ""})
+                                           :terms ""
+                                           :survey-id (get-in (state/app-state-cursor)
+                                                              [:selected-survey :survey-id :value])})
       (om/update! data [:library :search :page] 1)
       (om/update! data [:library :survey-id] (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! data [:library :search :show-select-count] 0)
@@ -108,15 +110,18 @@
           (do
             (util/load-taxonomies (:library data) sid)
             (util/load-trap-stations (:library data) sid)
-            (util/load-library (:library data) (str "survey-id:" sid)))
+            (when-not (:restricted-mode @data)
+              (util/load-library (:library data) (str "survey-id:" sid))))
           (do
             (util/load-taxonomies (:library data))
             (util/load-trap-stations (:library data))
-            (util/load-library (:library data))))))
+            (when-not (:restricted-mode @data)
+              (util/load-library (:library data)))))))
     om/IRender
     (render [_]
       (let [lib (:library data)]
-        (if (not (nil? (get-in lib [:search :ordered-ids])))
+        (if (or (not (nil? (get-in lib [:search :ordered-ids])))
+                (:restricted-mode @data))
           (dom/div #js {:className (str "library" (if restricted-mode " restricted-mode" ""))
                         :onKeyDown key-handler
                         :tabIndex 0}

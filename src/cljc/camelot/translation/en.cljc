@@ -530,7 +530,9 @@
     :select-none-button "Select None"
     :select-all-button-title "Select all media on this page"
     :select-all-button "Select All"
-    :item-name "media"}
+    :item-name "media"
+    :reference-window-no-media-notice "No reference quality images found"
+    :reference-window-no-media-advice "Images which will be useful for identifying a species in future can be marked as 'reference quality' in the main window, and will show up here in future."}
 
    :camelot.component.library.util
    {:reference-quality "reference quality"

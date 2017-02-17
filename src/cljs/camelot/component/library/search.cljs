@@ -191,7 +191,7 @@
     (render-state [_ state]
       (dom/select #js {:className "survey-select field-input"
                        :title (tr/translate ::filter-survey-title)
-                       :value (:survey-id data)
+                       :value (get-in data [:search :survey-id])
                        :disabled (if (get-in data [:search :inprogress]) "disabled" "")
                        :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                     (om/update! data [:search :survey-id] sid)

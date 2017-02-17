@@ -13,7 +13,8 @@
    [camelot.util.trap-station :as util.ts]
    [camelot.library.filter-parser :as fparser]
    [camelot.model.taxonomy :as taxonomy]
-   [clojure.edn :as edn])
+   [clojure.edn :as edn]
+   [camelot.util.config :as config])
   (:import
    (camelot.model.sighting Sighting)))
 
@@ -85,6 +86,12 @@
         matches (filter/only-matching search spps (add-in-metadata state sightings records))]
     (map #(:media-id %) matches)))
 
+(defn all-media-with-taxonomy-label
+  [state value]
+  (if (= (config/lookup state :species-name-style) :scientific)
+    (db/with-db-keys state -all-media-with-taxonomy-scientific-name value)
+    (db/with-db-keys state -all-media-with-taxonomy-common-name value)))
+
 (def queries
   "Query strategies for different field types."
   {:media-reference-quality
@@ -112,6 +119,11 @@
     :check-value datatype/could-be-integer?
     :parse-value edn/read-string}
 
+   :taxonomy-id
+   {:query -all-media-with-taxonomy-id
+    :check-value datatype/could-be-integer?
+    :parse-value edn/read-string}
+
    :survey-id
    {:query -all-media-with-survey-id
     :check-value datatype/could-be-integer?
@@ -119,14 +131,16 @@
 
    :camera-name {:query -all-media-with-camera-name}
    :site-name {:query -all-media-with-site-name}
+   :taxonomy-label {:query all-media-with-taxonomy-label
+                    :clojure-fn true}
    :taxonomy-common-name {:query -all-media-with-taxonomy-common-name}
    :taxonomy-species {:query -all-media-with-taxonomy-species}
    :taxonomy-genus {:query -all-media-with-taxonomy-genus}})
 
 (def query-priority
   "Ordering of (likely) most to least specific field, to optimise a search."
-  [:taxonomy-common-name :taxonomy-species :taxonomy-genus
-   :media-reference-quality :trap-station-id
+  [:taxonomy-label :taxonomy-id :taxonomy-common-name :taxonomy-species
+   :taxonomy-genus :media-reference-quality :trap-station-id
    :media-processed :media-cameracheck :media-attention-needed
    :site-name :camera-name :survey-id])
 
@@ -137,7 +151,8 @@
                         [(hash-map :search (:value term)
                                    :config (get queries %))])]
     (->> query-priority
-         (filter #(= (futil/field-key-lookup (:field term)) %))
+         (filter #(and (= (futil/field-key-lookup (:field term)) %)
+                       (not= (:value term) "*")))
          first
          build-config)))
 
@@ -157,27 +172,37 @@
                        first)]
     (if (search-valid? (get-in qc [:config :check-value]) (:search qc))
       (let [parse-fn (get-in qc [:config :parse-value])]
-        (db/with-db-keys state (get-in qc [:config :query])
-          {:field-value (if parse-fn
-                          (parse-fn (:search qc))
-                          (:search qc))}))
+        (let [fv {:field-value (if parse-fn
+                                 (parse-fn (:search qc))
+                                 (:search qc))}]
+          (if (get-in qc [:config :clojure-fn])
+            ((get-in qc [:config :query]) state fv)
+            (db/with-db-keys state (get-in qc [:config :query]) fv))))
       [])
       (db/with-db-keys state -all-media {})))
 
 (defn execute-query-for-search
   "Executes a query for the search, returning the result."
   [state psearch]
-  (if (or (fparser/has-disjunctions? psearch)
-          (fparser/match-all? psearch))
+  (if (fparser/has-disjunctions? psearch)
     (db/with-db-keys state -all-media {})
     (execute-optimised-query-for-search state psearch)))
 
 (defn search-media
   [state search]
   (let [psearch (fparser/parse search)]
-    (filtered-media state
-                    (execute-query-for-search state psearch)
-                    search)))
+    (cond
+      (fparser/match-all? psearch)
+      (map :media-id (db/with-db-keys state -all-media-ids {}))
+
+      (fparser/match-all-in-survey? psearch)
+      (map :media-id (db/with-db-keys state -all-media-ids-for-survey
+                       {:field-value (:value (ffirst psearch))}))
+
+      :else
+      (filtered-media state
+                      (execute-query-for-search state psearch)
+                      search))))
 
 (s/defn build-records
   [state sightings media]

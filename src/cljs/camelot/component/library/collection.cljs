@@ -86,6 +86,15 @@
       (> bot-row-per bottom-per) (- (* bot-row-per doc-height) elt-height)
       :else top)))
 
+(defn reference-window-media-tips-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build cutil/blank-slate-component data
+                {:opts {:notice (tr/translate ::reference-window-no-media-notice)
+                        :advice (tr/translate ::reference-window-no-media-advice)}}))))
+
 (defn media-tips-component
   [data owner]
   (reify
@@ -124,6 +133,18 @@
                         :className "media-collection-container"
                         :tabIndex 1}
                    (cond
+                     (and (:restricted-mode (deref (state/app-state-cursor)))
+                          (get-in data [:search :inprogress]))
+                     (dom/div #js {:className "align-center"}
+                              (dom/img #js {:className "spinner"
+                                            :src "images/spinner.gif"
+                                            :height "32"
+                                            :width "32"}))
+
+                     (and (:restricted-mode (deref (state/app-state-cursor)))
+                          (empty? (:records (state/library-state))))
+                     (om/build reference-window-media-tips-component data)
+
                      (empty? (:records (state/library-state)))
                      (om/build media-tips-component data)
 

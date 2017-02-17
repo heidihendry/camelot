@@ -31,14 +31,20 @@
 
 (defn format-terms
   [terms]
-  (str/lower-case (apply str (:result (reduce format-reducer {:result []
-                                                              :quoted false}
-                                              (seq terms))))))
+  (->> terms
+       seq
+       (reduce format-reducer {:result [] :quoted false})
+       :result
+       (apply str)
+       str/lower-case
+       str/trim))
 
 (defn parse
   [search]
   (let [t (format-terms search)]
-    (parse-disjunctions t)))
+    (if (= t "")
+      []
+      (parse-disjunctions t))))
 
 (defn has-disjunctions?
   [psearch]
@@ -47,3 +53,9 @@
 (defn match-all?
   [psearch]
   (= (count psearch) 0))
+
+(defn match-all-in-survey?
+  [psearch]
+  (and (= (count psearch) 1)
+       (= (count (first psearch)) 1)
+       (= (:field (ffirst psearch)) :survey-id)))
