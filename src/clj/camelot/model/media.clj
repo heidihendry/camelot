@@ -8,7 +8,8 @@
    [clojure.java.io :as io]
    [camelot.util.file :as file]
    [clojure.string :as str]
-   [clj-time.format :as tf])
+   [clj-time.format :as tf]
+   [clojure.tools.logging :as log])
   (:import
    (org.apache.commons.lang3 SystemUtils)))
 
@@ -175,9 +176,11 @@
    variant :- (s/enum :thumb :preview :original)]
   (let [mpath (get-in state [:config :path :media])]
     (if-let [media (get-specific-by-filename state filename)]
-      (io/input-stream
-       (if (= variant :original)
-         (io/file mpath (apply str (take 2 filename))
-                  (str filename "." (:media-format media)))
-         (io/file mpath (apply str (take 2 filename))
-                  (str (name variant) "-" filename ".png")))))))
+      (let [fpath (if (= variant :original)
+                    (io/file mpath (apply str (take 2 filename))
+                             (str filename "." (:media-format media)))
+                    (io/file mpath (apply str (take 2 filename))
+                             (str (name variant) "-" filename ".png")))]
+        (if (and (file/exists? fpath) (file/readable? fpath) (file/file? fpath))
+          (io/input-stream fpath)
+          (log/warn "File not found: " (file/get-path fpath)))))))
