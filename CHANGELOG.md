@@ -1,15 +1,15 @@
 ## ChangeLog
 ### 1.2.0 (upcoming)
 #### Enhancements
-* Library is now much more responsive for larger datasets, and able to support significantly larger datasets.
+* Improve the responsiveness of the library for large datasets and greatly improve the size of the dataset which can be supported in the Library.
 * Improve media selection shortcuts in the library, which includes support for selecting ranges of images with the mouse, while holding the shift key.
+* Greatly improve the performance and memory usage of Reports.
 * Add ability to delete all selected media in the library.
 * Add ability to delete all sightings across selected media in the library.
-* Reporting is now much faster and requires much less memory.
-* Update Media directory structure to support large datasets on FAT32.
+* Restructure Camelot's `Media` data directory, in order to support large datasets on FAT32.
 
 #### Fixes
-* Fix template generation for bulk import where `:root-path` is unset in `config.clj`.
+* Fix an error in template generation for bulk import where `:root-path` is unset in `config.clj`.
 
 ### 1.1.1 (2017-02-08)
 #### Fixes
