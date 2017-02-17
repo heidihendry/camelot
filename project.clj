@@ -13,7 +13,7 @@
                  [org.clojure/tools.nrepl "0.2.12"]
 
                  ;; Note: ragtime.jdbc/basename has been redefined in camelot.db.
-                 [ragtime "0.6.4"]
+                 [ragtime "0.5.3"]
                  [resauce "0.1.0"]
                  [yesql "0.5.3"]
 
