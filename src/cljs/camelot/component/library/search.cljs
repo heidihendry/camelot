@@ -243,7 +243,6 @@
 
 (defn build-reference-filter-string
   [data]
-  (prn (:identification data))
   (str (species-reference-filter data (get-in data [:identification :species]))
        " "
        (maybe-unidentified-reference-filter "sighting-sex"
