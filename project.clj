@@ -23,7 +23,7 @@
                  [bk/ring-gzip "0.2.1"]
                  [ring/ring-defaults "0.2.3"]
 
-                 [com.stuartsierra/component "0.3.2"]
+                 [com.stuartsierra/component "0.3.1"]
                  [clj-time "0.11.0"]
                  [clj-http "2.2.0"]
                  [cheshire "5.6.1"]
