@@ -19,6 +19,7 @@
                  [compojure "1.5.0"]
                  [environ "1.0.2"]
                  [net.mikera/imagez "0.10.0"]
+                 [org.clojure/math.combinatorics "0.1.4"]
                  [org.apache.commons/commons-lang3 "3.4"]
                  [org.apache.derby/derby "10.12.1.1"]
                  [org.clojure/tools.namespace "0.2.11"]
