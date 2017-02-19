@@ -19,6 +19,7 @@ n  :url "http://gitlab.com/camelot-project/camelot"
                  [compojure "1.5.0"]
                  [ragtime "0.5.3"]
                  [resauce "0.1.0"]
+                 [yesql "0.5.2"]
                  [ring.middleware.logger "0.5.0"]
                  [ring/ring-defaults "0.2.0"]
                  [ring "1.4.0"]
