@@ -772,10 +772,10 @@
     :submit-title "Submit this survey."
     :validation-error-title "Complete all required fields before submitting."
     :bulk-import-prompt-title "Bulk Import"
-    :bulk-import-introduction "You can import all of the data for a survey at once, should you already have all of the data collected. This can only be done during survey creation."
-    :bulk-import-question "Would you like to perform a Bulk Data Import for this survey once it is created?"
-    :create-only "Create only"
-    :create-and-import "Create and import"}
+    :bulk-import-introduction "Bulk Import is an optional step in the survey set-up to import all of the camera trap data for a survey at once. If you have already collected the data for this survey, you may wish to use Bulk Import."
+    :bulk-import-question "Would you like to set up this survey using Bulk Import?"
+    :create-only "Create Survey"
+    :create-and-import "Set Up with Bulk Import"}
 
    :camelot.component.survey.file
    {:upload-time "Upload time"

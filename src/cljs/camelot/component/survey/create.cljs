@@ -186,19 +186,19 @@
                                                                  (tr/translate ::bulk-import-question)))
                                        :actions (dom/div #js {:className "button-container"}
                                                          (dom/button #js {:className "btn btn-default"
-                                                                          :ref "action-first"
-                                                                          :onClick #(create-survey data false
-                                                                                                   (fn [data surv-resp]
-                                                                                                     (nav/analytics-event "org-survey-create" "skip-bulk-import")
-                                                                                                     (navigate-bypassing-bulk-import data surv-resp)))}
-                                                                     (tr/translate ::create-only))
-                                                         (dom/button #js {:className "btn btn-default"
                                                                           :onClick #(create-survey data true
                                                                                                    (fn [data surv-resp]
                                                                                                      (nav/analytics-event "org-survey-create" "nav-to-bulk-import")
                                                                                                      (nav/nav! (str "/" (get-in surv-resp [:body :survey-id :value])
                                                                                                                     "/bulk-import"))))}
-                                                                     (tr/translate ::create-and-import)))}}))
+                                                                     (tr/translate ::create-and-import))
+                                                         (dom/button #js {:className "btn btn-primary"
+                                                                          :ref "action-first"
+                                                                          :onClick #(create-survey data false
+                                                                                                   (fn [data surv-resp]
+                                                                                                     (nav/analytics-event "org-survey-create" "skip-bulk-import")
+                                                                                                     (navigate-bypassing-bulk-import data surv-resp)))}
+                                                                     (tr/translate ::create-only)))}}))
                    (dom/div #js {:className "intro"}
                             (dom/h4 nil (tr/translate ::intro)))
                    (dom/div nil
