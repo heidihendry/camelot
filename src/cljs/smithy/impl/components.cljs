@@ -78,11 +78,12 @@
 
 (defn body-component
   "Render all fields in the body"
-  [vs owner]
+  [data owner]
   (reify
     om/IRender
     (render [_]
-      (let [gens {:generator-fn (let [f (get-in vs [:events-ref :build-generator])]
+      (let [vs (:vs data)
+            gens {:generator-fn (let [f (get-in vs [:events-ref :build-generator])]
                                   (when f
                                     (f vs)))
                   :generators (get vs :generators-ref)
@@ -97,11 +98,11 @@
                                            (if (= (get-in vs [:screen :mode]) :readonly)
                                              (merge gens {:disabled true})
                                              gens))
-                                  (get (util/get-screen vs) :layout))))))))
+                                  (get (:screen data) :layout))))))))
 
 (defn update-button-component
   "Button-group component for finalising an update"
-  [{:keys [view-state update cancel delete]}]
+  [{:keys [vs update cancel delete]}]
   (reify
     om/IRender
     (render [_]
@@ -115,18 +116,19 @@
 
 (defn resource-update-component
   "Component for Update Mode"
-  [{:keys [view-state update cancel delete] :as k} owner]
+  [{:keys [vs screen update cancel delete] :as k} owner]
   (reify
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/h4 nil (str "Update "  (util/get-screen-title view-state)))
-               (dom/div nil (om/build body-component view-state))
+               (dom/h4 nil (str "Update "  (util/get-screen-title vs)))
+               (dom/div nil (om/build body-component {:vs vs
+                                                      :screen screen}))
                (om/build update-button-component k)))))
 
 (defn resource-view-component
   "Component for Readonly Mode"
-  [vs owner]
+  [{:keys [vs screen]} owner]
   (reify
     om/IRender
     (render [_]
@@ -134,19 +136,21 @@
                (when (get (util/get-screen vs) :actionmenu)
                  (om/build actionmenu-component vs))
                (dom/h4 nil (util/get-screen-title vs))
-               (dom/div nil (om/build body-component vs))))))
+               (dom/div nil (om/build body-component {:vs vs
+                                                      :screen screen}))))))
 
 (defn resource-create-component
   "Component for Create Mode"
-  [{:keys [view-state create]} owner]
+  [{:keys [vs screen create]} owner]
   (reify
     om/IRender
     (render [_]
       (dom/div nil
-               (if (get view-state :title-override)
-                 (dom/h4 nil (get view-state :title-override))
-                 (dom/h4 nil (str "Create " (util/get-screen-title view-state))))
-               (dom/div nil (om/build body-component view-state))
+               (if (get vs :title-override)
+                 (dom/h4 nil (get vs :title-override))
+                 (dom/h4 nil (str "Create " (util/get-screen-title vs))))
+               (dom/div nil (om/build body-component {:vs vs
+                                                      :screen screen}))
                (dom/div #js {:className "button-container"}
                         (dom/button #js {:className "btn btn-primary fa fa-plus fa-2x"
                                          :onClick create}
@@ -204,50 +208,62 @@
 
 (defn build-update-component
   "Builder for a Update-Mode component"
-  [vs]
-  (if (get vs :buffer)
-    (let [screen (util/get-screen vs)
-          rupdate #((get-in vs [:events-ref :update])
-                     (get-in screen [:states :update :submit :success :event])
-                     (get-in screen [:states :update :submit :error :event])
-                     vs
-                     (get vs :selected-resource)
-                     :details)
-          rcancel #((get-in vs [:events-ref :cancel-update]) (get-in screen [:states :update :cancel :event])
-                    vs
-                    (get vs :selected-resource) :details)
-          rdelete #((get-in vs [:events-ref :delete]) (get-in screen [:states :delete :submit :success :event])
-                    (get-in screen [:states :delete :submit :error :event])
-                    vs (get vs :selected-resource) :details)]
-      (om/build resource-update-component {:view-state vs
-                                           :update rupdate
-                                           :cancel rcancel
-                                           :delete rdelete}))
-    (dom/span nil "Loading...")))
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [vs (:vs data)]
+        (if (get vs :buffer)
+          (let [screen (util/get-screen vs)
+                rupdate #((get-in vs [:events-ref :update])
+                          (get-in screen [:states :update :submit :success :event])
+                          (get-in screen [:states :update :submit :error :event])
+                          vs
+                          (get vs :selected-resource)
+                          :details)
+                rcancel #((get-in vs [:events-ref :cancel-update]) (get-in screen [:states :update :cancel :event])
+                          vs
+                          (get vs :selected-resource) :details)
+                rdelete #((get-in vs [:events-ref :delete]) (get-in screen [:states :delete :submit :success :event])
+                          (get-in screen [:states :delete :submit :error :event])
+                          vs (get vs :selected-resource) :details)]
+            (om/build resource-update-component {:vs vs
+                                                 :screen screen
+                                                 :update rupdate
+                                                 :cancel rcancel
+                                                 :delete rdelete}))
+          (dom/span nil "Loading..."))))))
 
 (defn build-readonly-component
   "Builder for a Readonly-Mode component"
-  [vs]
-  (do
-    (if (get vs :buffer)
-      (om/build resource-view-component vs)
-      (dom/span nil "Loading..."))))
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (if (get-in data [:vs :buffer])
+        (om/build resource-view-component data)
+        (dom/span nil "Loading...")))))
 
 (defn build-create-component
   "Builder for a Create-Mode component"
-  [vs]
-  (let [screen (util/get-screen vs)
-        create-fn #((if (get-in vs [:screen :nav-to])
-                      (get-in vs [:events-ref :create-nav])
-                      (get-in vs [:events-ref :create]))
-                    (get-in screen [:states :create :submit :success :event])
-                    (get-in screen [:states :create :submit :error :event])
-                    vs
-                    (get vs :selected-resource)
-                    :details)]
-    (when-not (get-in (util/get-screen vs) [:resource :non-creatable])
-      (om/build resource-create-component {:view-state vs
-                                           :create create-fn}))))
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [vs (:vs data)
+            screen (:screen data)
+            create-fn #((if (get-in vs [:screen :nav-to])
+                          (get-in vs [:events-ref :create-nav])
+                          (get-in vs [:events-ref :create]))
+                        (get-in screen [:states :create :submit :success :event])
+                        (get-in screen [:states :create :submit :error :event])
+                        vs
+                        (get vs :selected-resource)
+                        :details)]
+        (when-not (get-in screen [:resource :non-creatable])
+          (om/build resource-create-component {:vs vs
+                                               :screen screen
+                                               :create create-fn}))))))
 
 (defn breadcrumb-item-component
   "A single segment in the breadcrumbs component."
@@ -275,18 +291,19 @@
 
 (defn content-component
   "Wrap a component for the current view mode."
-  [vs]
+  [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "main-content"}
-               (om/build breadcrumb-component vs)
-               (case (get-in vs [:screen :mode])
-                 :update (build-update-component vs)
-                 :readonly (build-readonly-component vs)
-                 :create (build-create-component vs)
-                 (dom/span nil (str "Unable to find mode: "
-                                    (get-in vs [:screen :mode]))))))))
+      (let [vs (:vs data)]
+        (dom/div #js {:className "main-content"}
+                 (om/build breadcrumb-component vs)
+                 (case (get-in vs [:screen :mode])
+                   :update (om/build build-update-component data)
+                   :readonly (om/build build-readonly-component data)
+                   :create (om/build build-create-component data)
+                   (dom/span nil (str "Unable to find mode: "
+                                      (get-in vs [:screen :mode])))))))))
 
 (defn build-view-component
   "Build a view component for `type', where type is a screen type."
@@ -300,7 +317,8 @@
             (om/update! vs :screens-ref (get app :screens)))
           (om/update! vs :events-ref (get app :events))
           (om/update! vs :actions-ref (get app :actions))
-          (om/update! vs :generators-ref (get app :generators))))
+          (om/update! vs :generators-ref (get app :generators))
+          (om/transact! vs :buffer #(into {} %))))
       om/IRender
       (render [_]
         (let [vs (get-in app [:view type])
@@ -311,4 +329,5 @@
           (dom/div #js {:className "main-content-container"}
                    (when (get screen :sidebar)
                      (om/build sidebar-component vs))
-                   (om/build content-component vs)))))))
+                   (om/build content-component {:vs vs
+                                                :screen screen})))))))

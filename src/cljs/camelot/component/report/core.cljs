@@ -25,27 +25,34 @@
 (defn configure-report-view
   [data owner {:keys [report-key]}]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:view-component (smithy/build-view-component :content)})
     om/IWillMount
     (will-mount [_]
+      (om/set-state! owner :renderable false)
       (rest/get-x (str "/report/" report-key)
-                  #(om/update! (get (state/app-state-cursor) :view) :content
-                               {:screen {:type :report :mode :create :id :report
-                                         :resource-id :report
-                                         :nav-to true}
-                                :title-override (:title (:body %))
-                                :screens-ref-override true
-                                :buffer {}
-                                :screens-ref {:report (assoc (:form (:body %))
-                                                             :resource {:type :report
-                                                                        :endpoint (str "/report/" report-key "/download")})}
-                                :selected-resource {}
-                                :generator-data {}})))
-    om/IRender
-    (render [_]
-      (when (:content (get (state/app-state-cursor) :view))
+                  #(do
+                     (om/update! (state/app-state-cursor) [:view :content]
+                                 {:screen {:type :report :mode :create :id :report
+                                           :resource-id :report
+                                           :nav-to true}
+                                  :title-override (:title (:body %))
+                                  :screens-ref-override true
+                                  :buffer {}
+                                  :screens-ref {:report (assoc (:form (:body %))
+                                                               :resource {:type :report
+                                                                          :endpoint (str "/report/" report-key "/download")})}
+                                  :selected-resource {}
+                                  :generator-data {}})
+                     (om/set-state! owner :renderable true))))
+    om/IRenderState
+    (render-state [_ state]
+      (when (om/get-state owner :renderable)
         (dom/div #js {:className "split-menu"}
                  (dom/div #js {:className "single-section long-single"}
-                        (om/build (smithy/build-view-component :content) data)))))))
+                          (om/build (om/get-state owner :view-component)
+                                    (state/app-state-cursor))))))))
 
 (defn menu-component
   "List all reports."

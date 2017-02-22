@@ -77,7 +77,7 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (when (nil? (get buf k))
+      (when (nil? (get @buf k))
         (om/update! buf k {:value nil}))
       (if (get-in v [:schema :get-options])
         ;; TODO fix dependency on camelot
@@ -112,30 +112,31 @@
     (render [_]
       (let [val (get-in buf [k :value])
             generator (get-in v [:schema :generator])]
-        (dom/select #js {:className "field-input"
-                         :disabled (:disabled opts)
-                         :onChange #((state/set-coerced-value! val) %
-                                     (k buf) :value owner)
-                         :value
-                         (if (= (type val) cljs.core/Keyword)
-                           (name val)
-                           val)}
-                    (om/build-all select-option-component
-                                  (sort-by :desc
-                                           (if generator
-                                             (get-in opts [:generator-data generator])
-                                             (map #(hash-map :vkey (list-react-key (first %))
-                                                             :desc (second %))
-                                                  (or (get-in opts [:generator-data :default])
-                                                      (get-in v [:schema :options])))))
-                                  {:key :vkey}))))))
+        (when (get buf k)
+          (dom/select #js {:className "field-input"
+                           :disabled (:disabled opts)
+                           :onChange #((state/set-coerced-value! val) %
+                                       (get buf k) :value owner)
+                           :value
+                           (if (= (type val) cljs.core/Keyword)
+                             (name val)
+                             val)}
+                      (om/build-all select-option-component
+                                    (sort-by :desc
+                                             (if generator
+                                               (get-in opts [:generator-data generator])
+                                               (map #(hash-map :vkey (list-react-key (first %))
+                                                               :desc (second %))
+                                                    (or (get-in opts [:generator-data :default])
+                                                        (get-in v [:schema :options])))))
+                                    {:key :vkey})))))))
 
 (defmethod input-field :datetime
   [[k v buf opts :as d] owner]
   (reify
     om/IWillMount
     (will-mount [_]
-      (when (nil? (get buf k))
+      (when (nil? (get @buf k))
         (om/update! buf k {:value nil})))
     om/IRender
     (render [_]
