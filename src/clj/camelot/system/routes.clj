@@ -3,6 +3,7 @@
    [camelot.system.screens :as screens]
    [camelot.system.state :as state]
    [camelot.system.version :as version]
+   [camelot.system.db-migrate :as db-migrate]
    [camelot.import.capture :as capture]
    [camelot.import.bulk :as bulk]
    [camelot.import.template :as template]
@@ -287,6 +288,12 @@
            (POST "/cancel" [] (r/response (importer/cancel-import state))))
 
   (GET "/" _ (retrieve-index))
+  (GET "/heartbeat" {session :session state :system}
+       (do
+         (let [conn (get-in state [:database :connection])]
+           (r/response (format "Status: OK\n  Software version: %s\n  Database version: %s\n"
+                               (version/get-version)
+                               (db-migrate/version conn))))))
   (POST "/quit" [] (System/exit 0))
   (GET "/quit" [] (System/exit 0))
   (route/resources "/"))

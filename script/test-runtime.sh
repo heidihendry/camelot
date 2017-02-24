@@ -12,23 +12,39 @@ fi
 
 java -jar target/camelot.jar &
 PID=$!
-sleep 45
-# Ensure process is still running
-ps -p $PID
-# Check the compiled JS is served
-curl -s http://localhost:5341/js/compiled/camelot.js > /dev/null
-# Stop process
-curl -s -X POST http://localhost:5341/quit || true
-# Ensure process is stopped
-set +e
-ps -p $PID > /dev/null
 
-if [ $? -eq 0 ]; then
-    set -e
-    echo "camelot seems to not be listening to requests. aborting."
-    kill $PID
-    false
+i=0
+expected_db="$(ls -1 resources/migrations | tail -n1 | grep -ioE "^[-a-z0-9_]+")"
+set +e
+while [ $i -lt 20 ]; do
+    sleep 5
+    status="$(curl -s -X GET 'http://localhost:5341/heartbeat' || true)"
+    echo -e $status | grep -q "Status: OK"
+    if [ $? -eq 0 ]; then
+        actual_db="$(echo -e $status | grep -oE "Database version: [-a-z0-9_]+" | cut -d\: -f2 | tr -d ' ')"
+        if [ "${actual_db}" == "${expected_db}" ]; then
+            echo -e "\nFound expected database version: $actual_db"
+        else
+            echo -e "\nDatabase version is $actual_db, but $expected_db expected"
+        fi
+        break
+    else
+        i=$(($i+1))
+    fi
+done
+
+set -e
+
+if [ $i -gt 20 ]; then
+   echo "Camelot was not reachable after 2 minutes. aborting."
 else
-    echo "camelot is responsive."
-    set -e
+    curl -s -X POST http://localhost:5341/quit || true
+fi
+
+set +e
+sleep 5
+ps -p $PID > /dev/null
+if [ $? -eq 0 ]; then
+    echo "Process had not stopped. Sending SIGKILL."
+    kill -9 $PID
 fi
