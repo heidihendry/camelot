@@ -654,7 +654,6 @@ pre.field-input {
 }
 .library .media-collection {
     width: 32%;
-    padding-left: 1rem;
     flex-grow: 0;
     flex-shrink: 0;
     display: flex;
@@ -671,11 +670,14 @@ pre.field-input {
 }
 .library .media-collection-container {
     margin: auto;
+    padding-top: 0.5rem;
+    padding-left: 0.5rem;
     overflow: auto;
     float: left;
     position: relative;
     width: 100%;
     flex-grow: 1;
+    padding-bottom: 6rem;
 }
 .library .library-body {
     display: flex;
@@ -685,6 +687,22 @@ pre.field-input {
 }
 .library.restricted-mode .library-body {
     max-height: calc(100vh - 6rem);
+}
+.library .identify-selection-bar {
+    position: fixed;
+    bottom: -6rem;
+    left: 0;
+    background: #fafafa;
+    text-align: center;
+    border-top: 1px solid #ccc;
+    height: 5rem;
+    width: calc(32% - 1.5rem);
+    padding: 0.8rem;
+    z-index: 50;
+    transition: all 0.2s ease-in-out;
+}
+.library .identify-selection-bar.show-selection-bar {
+    bottom: 0;
 }
 .library .media-control-panel {
     position: relative;
@@ -733,6 +751,58 @@ pre.field-input {
     padding: 1rem;
     border-left: 1px solid #ccc;
     opacity: 0.8;
+}
+.library .identification-panel {
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    transition: all 0.3s ease-in-out;
+    left: -33rem;
+    width: 32.5rem;
+    z-index: 400;
+    height: 100vh;
+    background: #fafafa;
+    padding: 1rem;
+    opacity: 1;
+    border-right: 1px solid #ccc;
+}
+#identification-panel .flex-row {
+    display: flex;
+    direction: row;
+}
+#app #identification-panel .flex-row .field {
+    flex-grow: 1;
+    width: 100%;
+}
+#app #identification-panel .flex-row .field select {
+    width: 100%;
+}
+#identification-panel .single-field {
+    width: 100%;
+}
+#identification-panel #identify-species-select {
+    width: 100%;
+}
+#identification-panel {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 11rem);
+}
+#identification-panel .identification-panel-content {
+    flex-grow: 1;
+}
+#identification-panel .button-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+#app #identification-panel .button-container button {
+    margin-left: 0;
+    width: 100%;
+    flex-grow: 1;
+}
+.library .identification-panel.show-panel {
+    left: 0rem;
 }
 .library .remove-sighting {
     padding-top: 0.3rem;
@@ -1174,6 +1244,10 @@ pre.field-input {
 }
 #app .library .search-bar .field-input {
     display: inline-block;
+}
+#app .library .identification-panel .field {
+    display: inline-block;
+    margin-right: 1rem;
 }
 #app .library .search-bar label {
     display: inline-block;

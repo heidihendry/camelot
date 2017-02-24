@@ -531,8 +531,15 @@
     :select-all-button-title "Select all media on this page"
     :select-all-button "Select All"
     :item-name "media"
+    :identify-selected "Identify selected"
     :reference-window-no-media-notice "No reference quality images found"
     :reference-window-no-media-advice "Images which will be useful for identifying a species in future can be marked as 'reference quality' in the main window, and will show up here in future."}
+
+   :camelot.component.library.identify
+   {:identify-selected "Identify Selected"
+    :taxonomy-add-placeholder "New species name..."
+    :add-duplicate-species-error "A species with this name already exists"
+    :add-new-species-label "Add a new species..."}
 
    :camelot.component.library.util
    {:reference-quality "reference quality"
@@ -569,10 +576,7 @@
     :media-cameracheck-title "Mark the selected media as a human-caused test fire."
     :media-processed-title "Set the selected media as processed or unprocessed."
     :media-reference-quality-title "Indicates the selected media are high quality and should be used as a reference."
-    :filter-unprocessed-label "Unprocessed"
-    :taxonomy-add-placeholder "New species name..."
-    :add-duplicate-species-error "A species with this name already exists"
-    :add-new-species-label "Add a new species..."}
+    :filter-unprocessed-label "Unprocessed"}
 
    :camelot.component.albums
    {:num-nights "%d nights"

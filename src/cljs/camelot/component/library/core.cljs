@@ -8,6 +8,7 @@
             [camelot.component.library.util :as util]
             [camelot.component.library.search :as search]
             [camelot.component.library.preview :as preview]
+            [camelot.component.library.identify :as identify]
             [camelot.component.library.collection :as collection]
             [camelot.translation.core :as tr]
             [cljs.reader :as reader]
@@ -127,7 +128,9 @@
                         :tabIndex 0}
                    (if restricted-mode
                      (set! (.-tincan js/window) (partial tincan-listener lib))
-                     (om/build search/search-component lib))
+                     (dom/div nil
+                       (om/build search/search-component lib)
+                       (om/build identify/identify-component lib)))
                    (dom/div #js {:className "media-control-panel"}
                             (let [media-ids (map :media-id (util/all-media-selected lib))]
                               (dom/div nil

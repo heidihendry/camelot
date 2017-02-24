@@ -6,7 +6,8 @@
             [om.core :as om]
             [camelot.nav :as nav]
             [camelot.translation.core :as tr]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [camelot.component.library.identify :as identify]))
 
 (defn handle-key-event
   [data e]
@@ -292,6 +293,28 @@
                                (get-in data [:search :show-select-action]))))
                (om/build media-item-collection-wrapper data)))))
 
+(defn show-identification-bar?
+  [data]
+  (and (not (identify/show-panel? data))
+       (pos? (count (util/all-media-selected data)))))
+
+(defn identify-selection-bar
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className (str "identify-selection-bar"
+                                    (if (show-identification-bar? data)
+                                      " show-selection-bar"
+                                      ""))}
+               (dom/button #js {:className "btn btn-primary"
+                                :id "identify-selected"
+                                :disabled (if (zero? (count (util/all-media-selected data))) "disabled" "")
+                                :onClick #(do
+                                            (om/transact! data :show-identification-panel not)
+                                            (.focus (.getElementById js/document "identify-species-select")))}
+                           (tr/translate ::identify-selected))))))
+
 (defn media-collection-component
   "Render a collection of library."
   [data owner]
@@ -300,4 +323,5 @@
     (render [_]
       (dom/div #js {:className "media-collection"
                     :onKeyDown #(handle-key-event data %)}
-               (om/build media-collection-content-component data)))))
+               (om/build media-collection-content-component data)
+               (om/build identify-selection-bar data)))))
