@@ -1,8 +1,6 @@
 Bulk Import
 -----------
 
-**New in Camelot 1.1.0**
-
 A Bulk Import in Camelot provides a means to import a survey's worth of
 data at once. You're not left to your own devices when it comes to
 preparing the data for import though, nor is it (entirely) on your

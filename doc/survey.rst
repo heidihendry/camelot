@@ -14,15 +14,19 @@ name.
 
 Once ready, click "Create Survey".
 
-**New in Camelot 1.1.0** At this stage you will be prompted asking
-whether you already have the data available for the survey to do a Bulk
-Import. If you have already collected all of the media for this survey,
-you may wish to select "Create and import". Refer to `Bulk
-Import <#bulk-import>`__ for more information.
+At this stage you will be prompted asking whether you already have the data
+available for the survey to do a Bulk Import. If you have already collected
+all of the media for this survey, you may wish to select "Set Up with Bulk
+Import".
+
+If unsure, you should choose "Create Survey" at this prompt. Should you choose
+"Set Up with Bulk Import", the survey will require the initial setup of the
+survey to be completed via Camelot's Bulk Import capabilities.  Refer to `Bulk
+Import <#bulk-import>`__ for more information on Bulk Import.
 
 .. figure:: screenshot/survey-bulk-import-prompt.png
-   :alt: 
+   :alt: Bulk Import prompt
 
-The ordering of sections in this guide will assume you choose "Create
-only" here, and will add data for your survey and organisation
+The ordering of sections in this guide will assume you choose "Create Survey"
+here, and that you will add data for your survey and organisation
 incrementally.

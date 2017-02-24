@@ -7,9 +7,11 @@
 * Add ability to delete all selected media in the library.
 * Add ability to delete all sightings across selected media in the library.
 * Restructure Camelot's `Media` data directory, in order to support large datasets on FAT32.
+* Relocate library identification to a floating panel.
 
 #### Fixes
 * Fix an error in template generation for bulk import where `:root-path` is unset in `config.clj`.
+* Fix a bug which would cause date selection popups to hide every 5 seconds when configuring reports.
 
 ### 1.1.1 (2017-02-08)
 #### Fixes
