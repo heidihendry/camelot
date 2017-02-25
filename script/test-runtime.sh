@@ -22,7 +22,7 @@ while [ $i -lt 20 ]; do
     echo -e $status | grep -q "Status: OK"
     if [ $? -eq 0 ]; then
         actual_db="$(echo -e $status | grep -oE "Database version: [-a-z0-9_]+" | cut -d\: -f2 | tr -d ' ')"
-        if [[ "${actual_db}" == "${expected_db}" ]]; then
+        if [ "${actual_db}"="${expected_db}" ]; then
             echo -e "\nFound expected database version: $actual_db"
             failed=0
         else
