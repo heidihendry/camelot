@@ -19,11 +19,11 @@ Limitations
 Camelot has no known upper limit on the amount of data it can support, however
 some parts of Camelot will take longer to load as the size of the dataset
 grows. The authors have simulated datasets with 2 million images to ensure
-that Camelot will perform reasonably for 99% of datasets Camelot is used with.
+that Camelot will perform well for 99% of datasets Camelot could be used for.
 
 The main performance considerations with this volume of data is performing the
-initial load of the library, and the CPU and memory constraints required to
-produce reports.
+initial load of the library, searching the library, and the CPU and memory
+constraints required to produce reports.
 
 To serve as a guide for how Camelot may perform for large datasets, below is
 the approximate times to produce those using a high-end laptop in 2017 (Dell
@@ -32,6 +32,8 @@ of 14GB:
 
 * **Full Export report**: 368 seconds
 * **Library load time**: <2 seconds
+* **Library search time (basic search)**: <2 seconds
+* **Library search time (full/advanced search)**: 50 seconds
 
 Considerations for your dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
