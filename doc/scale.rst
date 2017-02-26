@@ -31,7 +31,7 @@ Precision 5510; 16GB RAM; Intel i7-6820HQ; SSD) with a maximum JVM heap size
 of 14GB:
 
 * **Full Export report**: 368 seconds
-* **Library load time**: 50 seconds
+* **Library load time**: <2 seconds
 
 Considerations for your dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
