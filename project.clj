@@ -1,4 +1,4 @@
-(defproject camelot "1.2.0"
+(defproject camelot "1.2.1-SNAPSHOT"
   :description "Camera trap software for data management and analysis. Designed for researchers and conservationists."
   :url "http://gitlab.com/camelot-project/camelot"
   :license {:name "Eclipse Public License"
