@@ -101,9 +101,9 @@ workloads via the ``-server`` flag.
 As a (very) rough guide, the authors suggest an additional 600MB of heap space
 for every 100,000 images, with a starting heap space of 2GB.  You needn't be
 concerned with setting the initial or maximum heap size to 2GB explicitly, as
-this will be the default on most machines.  Typically, you also needn't be
-concerned with configuring the heap space if your dataset is notable smaller
-than 100,000 images.
+this will be the default on most machines.  That is to say, you probably
+needn't be concerned with configuring the heap space if your dataset is
+smaller than 100,000 images.
 
 Concurrent users
 ^^^^^^^^^^^^^^^^
