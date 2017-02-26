@@ -13,8 +13,7 @@
 
 (defn show-panel?
   [data]
-  (or (not= (get-in data [:search :mode]) :search)
-      (get data :show-identification-panel)))
+  (get data :show-identification-panel))
 
 (defn species-option-component
   [data owner]
