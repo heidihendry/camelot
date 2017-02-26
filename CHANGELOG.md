@@ -1,5 +1,5 @@
 ## ChangeLog
-### 1.2.0 (upcoming)
+### 1.2.0
 #### Enhancements
 * Improve the responsiveness of the library for large datasets and greatly improve the size of the dataset which can be supported in the Library.
 * Improve media selection shortcuts in the library, which includes support for selecting ranges of images with the mouse, while holding the shift key.
