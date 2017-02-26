@@ -1,13 +1,14 @@
 Working with large datasets
 ---------------------------
 
-*Foreword: the below applies to versions of Camelot beyond 1.1.1. Significant performance improvements have been made since this release.*
+*This section applies to versions of Camelot 1.2.0 and beyond.*
 
 You'll have noticed in setting up Camelot, that you probably did not need to
 provision servers, configure relational databases, network equipment and so
-on. Camelot does *not* treat working with crazy volumes of data as its
+on. Camelot does *not* treat working with massive volumes of data as its
 priority use case. However, we've spent much time ensuring you won't encounter
-growth pain, no matter how much data you want to throw at it (within reason).
+growth pain, no matter how much data you want to throw at it (within reason,
+of course).
 
 This page describes what you can expect, and recommendations should you be
 dealing with large datasets.
