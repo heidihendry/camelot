@@ -44,14 +44,16 @@
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-environ "1.0.2"]
-            [com.jakemccrary/lein-test-refresh "0.17.0"]]
+            [com.jakemccrary/lein-test-refresh "0.18.1"]]
 
   :min-lein-version "2.6.1"
   :env {:squiggly "{:checkers [:eastwood :kibit]}"}
   :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]
   :test-paths ["test/cljc" "test/clj"]
-  :test-refresh {:refresh-dirs ["resources" "test/clj" "test/cljc"]
-                 :watch-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]}
+  :test-refresh {:refresh-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]
+                 :watch-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]
+                 :changes-only true
+                 :quiet true}
   :clean-targets ^{:protect false} [:target-path :compile-path "resources/public/js"]
   :uberjar-name "camelot.jar"
   :main camelot.core
