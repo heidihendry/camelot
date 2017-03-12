@@ -15,11 +15,12 @@
    [camelot.model.photo :as photo]
    [camelot.model.sighting :as sighting]
    [camelot.model.site :as site]
-   [camelot.model.taxonomy :as taxonomy]
+   [camelot.model.sighting-field :as sighting-field]
    [camelot.model.species-mass :as species-mass]
    [camelot.model.survey :as survey]
    [camelot.model.survey-site :as survey-site]
    [camelot.model.survey-file :as survey-file]
+   [camelot.model.taxonomy :as taxonomy]
    [camelot.model.trap-station :as trap-station]
    [camelot.model.trap-station-session :as trap-station-session]
    [camelot.model.trap-station-session-camera :as trap-station-session-camera]
@@ -277,6 +278,23 @@
                                                                :trap-station-session id (assoc state :session session)))
            (POST "/" [data] (crud/create-resource camera-deployment/create-camera-check!
                                                   camera-deployment/tcamera-deployment data (assoc state :session session))))
+
+  (context "/sighting-fields" {session :session state :system}
+           (GET "/" [] (crud/list-resources sighting-field/get-all :sighting-field
+                                            (assoc state :session session)))
+           (GET "/:id" [id] (crud/specific-resource
+                             sighting-field/get-specific id
+                             (assoc state :session session)))
+           (PUT "/:id/label" [id data]
+                (crud/update-resource sighting-field/update-label! id
+                                      identity
+                                      (assoc data {:value (edn/read-string id)})
+                                      (assoc state :session session)))
+           (POST "/" [data]
+                 (crud/create-resource sighting-field/create!
+                                       sighting-field/tsighting-field
+                                       data
+                                       (assoc state :session session))))
 
   (context "/settings" {session :session state :system}
            (GET "/" [] (r/response (cursorise/cursorise (merge (deref (get-in state [:config :store])) session))))

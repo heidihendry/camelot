@@ -52,21 +52,21 @@
    id :- s/Num]
   (some->> {:photo-id id}
            (db/with-db-keys state -get-specific)
-           (first)
-           (photo)))
+           first
+           photo))
 
 (s/defn create! :- Photo
   [state :- State
    data :- TPhoto]
   (let [record (db/with-db-keys state -create<! data)]
-    (photo (get-specific state (int (:1 record))))))
+    (get-specific state (int (:1 record)))))
 
 (s/defn update! :- Photo
   [state :- State
    id :- s/Int
    data :- TPhoto]
   (db/with-db-keys state -update! (merge data {:photo-id id}))
-  (photo (get-specific state id)))
+  (get-specific state id))
 
 (s/defn delete!
   [state :- State
