@@ -10,7 +10,7 @@ HTML_FILE="resources/public/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
 echo "Ensuring branch is clean..."
-git status | grep -q 'branch is up-to-date'
+git status | grep -qE 'working tree clean|branch is up-to-date'
 
 echo "Bumping release version... "
 sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"$/${PROJECT_NAME} \"\1\"/" ${PROJECT_FILE}
