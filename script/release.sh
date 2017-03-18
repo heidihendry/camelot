@@ -9,7 +9,7 @@ GETTING_STARTED_DOC="doc/gettingstarted.rst"
 HTML_FILE="resources/public/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
-echo "Switching to master and making sure it's clean..."
+echo "Ensuring branch is clean..."
 git checkout master
 git status | grep -q 'branch is up-to-date'
 

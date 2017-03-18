@@ -15,11 +15,17 @@
                            :language :en}
                           config)))
 
+(defn- day-end
+  [d]
+  (t/minus (t/plus d (t/days 1)) (t/millis 1)))
+
 (defn ->record
   [overrides]
   (merge {:taxonomy-id 1
           :trap-station-name "T1"
           :trap-station-id 1
+          :trap-station-session-start-date (t/date-time 2015 1 1)
+          :trap-station-session-end-date (t/date-time 2015 1 15)
           :trap-station-session-id 1
           :sighting-quantity 1}
          overrides
@@ -96,4 +102,89 @@
             result (rest (sut/generate-presence 1 (jan 1) (jan 6) (gen-state-helper {}) data))]
         (is (= (get-in (mapv vec result) [0 3]) 1))
         (is (= (get-in (mapv vec result) [0 5]) 1))
-        (is (= (check-non-zero result) [1 1]))))))
+        (is (= (check-non-zero result) [1 1]))))
+
+    (testing "Should show hyphen for dates outside of session dates."
+      (let [data [(->record {:media-capture-timestamp (jan 14)})
+                  (->record {:media-capture-timestamp (jan 15)
+                             :sighting-quantity 3})]
+            result (rest (sut/generate-presence 1 (jan 14) (jan 17) (gen-state-helper {}) data))]
+        (is (= (rest (first (mapv vec result))) [1 1 "-" "-"]))))
+
+    (testing "Should shows hyphen for all, if no sessions within nominated dates."
+      (let [data [(->record {:media-capture-timestamp (jan 14)})
+                  (->record {:media-capture-timestamp (jan 15)
+                             :sighting-quantity 3})]
+            result (rest (sut/generate-presence 1 (jan 20) (jan 23) (gen-state-helper {}) data))]
+        (is (= (rest (first (mapv vec result))) ["-" "-" "-" "-"]))))))
+
+(deftest test-session-date-ranges
+  (testing "Session date ranges"
+    (testing "Computes range for zero entries"
+      (is (= (sut/session-date-ranges []) [])))
+
+    (testing "Computes range for one entry"
+      (let [data [{:trap-station-session-start-date (t/date-time 2015 1 1)
+                   :trap-station-session-end-date (t/date-time 2015 1 7)}]]
+        (is (= (sut/session-date-ranges data)
+               [[(t/date-time 2015 1 1)
+                 (day-end (t/date-time 2015 1 7))]]))))
+
+    (testing "Computes range for non-overlapping entries"
+      (let [data [{:trap-station-session-start-date (t/date-time 2015 1 1)
+                   :trap-station-session-end-date (t/date-time 2015 1 7)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 9)
+                   :trap-station-session-end-date (t/date-time 2015 1 15)}]]
+        (is (= (sut/session-date-ranges data)
+               [[(t/date-time 2015 1 1)
+                 (day-end (t/date-time 2015 1 7))]
+                [(t/date-time 2015 1 9)
+                 (day-end (t/date-time 2015 1 15))]]))))
+
+    (testing "Date ranges for adjacent periods are merged"
+      (let [data [{:trap-station-session-start-date (t/date-time 2015 1 1)
+                   :trap-station-session-end-date (t/date-time 2015 1 8)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 9)
+                   :trap-station-session-end-date (t/date-time 2015 1 15)}]]
+        (is (= (sut/session-date-ranges data)
+               [[(t/date-time 2015 1 1)
+                 (day-end (t/date-time 2015 1 15))]]))))
+
+    (testing "Computes range for overlapping entries"
+      (let [data [{:trap-station-session-start-date (t/date-time 2015 1 1)
+                   :trap-station-session-end-date (t/date-time 2015 1 7)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 6)
+                   :trap-station-session-end-date (t/date-time 2015 1 15)}]]
+        (is (= (sut/session-date-ranges data)
+               [[(t/date-time 2015 1 1)
+                 (day-end (t/date-time 2015 1 15))]]))))
+
+    (testing "Computes range for mixed overlapping and non-overlapping entries"
+      (let [data [{:trap-station-session-start-date (t/date-time 2015 1 1)
+                   :trap-station-session-end-date (t/date-time 2015 1 7)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 6)
+                   :trap-station-session-end-date (t/date-time 2015 1 15)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 17)
+                   :trap-station-session-end-date (t/date-time 2015 1 20)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 18)
+                   :trap-station-session-end-date (t/date-time 2015 1 21)}]]
+        (is (= (sut/session-date-ranges data)
+               [[(t/date-time 2015 1 1)
+                 (day-end (t/date-time 2015 1 15))]
+                [(t/date-time 2015 1 17)
+                 (day-end (t/date-time 2015 1 21))]]))))
+
+    (testing "Computes range for mixed overlapping and non-overlapping entries, regardless of order"
+      (let [data [{:trap-station-session-start-date (t/date-time 2015 1 18)
+                   :trap-station-session-end-date (t/date-time 2015 1 21)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 1)
+                   :trap-station-session-end-date (t/date-time 2015 1 7)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 17)
+                   :trap-station-session-end-date (t/date-time 2015 1 20)}
+                  {:trap-station-session-start-date (t/date-time 2015 1 6)
+                   :trap-station-session-end-date (t/date-time 2015 1 15)}]]
+        (is (= (sut/session-date-ranges data)
+               [[(t/date-time 2015 1 1)
+                 (day-end (t/date-time 2015 1 15))]
+                [(t/date-time 2015 1 17)
+                 (day-end (t/date-time 2015 1 21))]]))))))

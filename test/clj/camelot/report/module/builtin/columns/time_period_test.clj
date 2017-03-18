@@ -10,7 +10,7 @@
       (let [r (sut/date->period :from :time-period-start (state/gen-state)
                                 [{:from (t/date-time 2016 7 5)}])]
         (is (= r [{:from (t/date-time 2016 7 5)
-                   :time-period-start "2016/07"}]))))
+                   :time-period-start "2016-07-05"}]))))
 
     (testing "Should assoc nil for nil value"
       (let [r (sut/date->period :from :time-period-start (state/gen-state)

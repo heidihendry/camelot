@@ -5,7 +5,7 @@
    [clj-time.core :as t]
    [clj-time.format :as tf]))
 
-(def month-formatter (tf/formatter "YYYY/MM"))
+(def month-formatter (tf/formatter "YYYY-MM-dd"))
 
 (defn before-reducer
   "Reducer returning the earliest date-time."

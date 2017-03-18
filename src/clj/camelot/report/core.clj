@@ -38,7 +38,7 @@
    :trap-station-session-camera-id [trap-station-session-camera/get-all* [:trap-station-session-id :camera-id] [:media-id]]
    :camera-id [camera/get-all [:camera-status-id] [:trap-station-session-camera-id]]
    :trap-station-session-id [trap-station-session/get-all* [:trap-station-id] [:trap-station-session-camera-id]]
-   :trap-station-id [trap-station/get-all* [:site-id] [:trap-station-session-id]]
+   :trap-station-id [trap-station/get-all* [:survey-site-id] [:trap-station-session-id]]
    :survey-site-id [survey-site/get-all* [:survey-id :site-id] []]
    :species-mass-id [species-mass/get-all [] [:taxonomy-id]]
    :camera-status-id [camera-status/get-all [] [:camera-id]]
@@ -81,6 +81,18 @@
                       rdeps))))))
    [] [[by by]] []))
 
+(defn- build-records
+  [rorder data]
+  (clojure.tools.logging/error data)
+  (reduce (fn [acc [tbl key]]
+              (mapcat (fn [a] (let [rs (get-in data [tbl key (get a key)])]
+                                (if (seq rs)
+                                  (map #(merge a %) rs)
+                                  (list a))))
+                      acc))
+            (map #(into {} %) (apply concat (vals (get-in data (first rorder)))))
+            (rest rorder)))
+
 (defn- join-all
   [state by]
   (let [rorder (resolution-order data-definitions by)
@@ -91,13 +103,7 @@
                                         {}
                                         t2s))))
                      {} (group-by first rorder))]
-    (reduce (fn [acc [tbl key]]
-              (mapcat (fn [a] (let [rs (get-in data [tbl key (get a key)])]
-                                (if (seq rs)
-                                  (map #(merge a %) rs)
-                                  (list a)))) acc))
-            (map #(into {} %) (apply concat (vals (get-in data (first rorder)))))
-            (rest rorder))))
+    (build-records rorder data)))
 
 (s/defn get-by :- [{s/Keyword s/Any}]
   "Retrieve the data for the given report type."
