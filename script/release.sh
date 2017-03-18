@@ -10,7 +10,6 @@ HTML_FILE="resources/public/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
 echo "Ensuring branch is clean..."
-git checkout master
 git status | grep -q 'branch is up-to-date'
 
 echo "Bumping release version... "
