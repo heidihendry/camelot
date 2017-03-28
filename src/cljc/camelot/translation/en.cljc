@@ -60,8 +60,8 @@
     :survey-sampling-point-density.description "The distance between camera trap stations across the survey."
     :survey-sighting-independence-threshold.label "Sighting independence threshold (mins)"
     :survey-sighting-independence-threshold.description "The minimum amount of minutes which must elapse between an initial sighting, and a subsequent sighting, for the new sighting to be considered independent"
-    :survey-notes.label "Survey notes"
-    :survey-notes.description "Notes about this survey."}
+    :survey-notes.label "Survey description"
+    :survey-notes.description "Detail about this survey's goals and methods."}
 
    :survey-site
    {:title "Survey Site"
@@ -730,7 +730,18 @@
     :upload-captures "Upload media"
     :species "Species"
     :files "Related files"
-    :import "Bulk import"}
+    :import "Bulk import"
+    :settings "Settings"}
+
+   :camelot.component.survey.settings
+   {:details "Survey details"
+    :sighting-fields "Sighting fields"
+    :survey-name-placeholder "Survey name..."
+    :validation-error-title "Ensure all fields have valid content before updating."
+    :validation-survey-name-blank "Survey name must not be blank"
+    :validation-survey-name-duplicate "Survey cannot have the same name as another survey"
+    :validation-survey-notes-blank "Survey description must not be blank"
+    :validation-survey-sighting-independence-threshold-not-a-number "Independence threshold must be a number"}
 
    :camelot.component.bulk-import.core
    {:download "Download template"

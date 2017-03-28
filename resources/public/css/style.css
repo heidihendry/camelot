@@ -1533,6 +1533,12 @@ pre.field-input {
     padding: 2rem;
     color: inherit;
 }
+#app .simple-menu .basic-menu-item-link {
+    height: 100%;
+    width: 100%;
+    display: block;
+    color: inherit;
+}
 #app .simple-menu a:hover {
     text-decoration: none;
 }

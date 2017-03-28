@@ -5,6 +5,7 @@
             [camelot.state :as state]
             [camelot.component.survey.create :as create]
             [camelot.component.survey.manage :as manage]
+            [camelot.component.survey.settings :as settings]
             [om.dom :as dom]
             [camelot.translation.core :as tr]
             [camelot.rest :as rest]
@@ -30,7 +31,9 @@
    {:action :species
     :name (tr/translate ::species)}
    {:action :files
-    :name (tr/translate ::files)}])
+    :name (tr/translate ::files)}
+   {:action :settings
+    :name (tr/translate ::settings)}])
 
 (defn delete
   "Delete the survey and trigger a removal event."
@@ -57,6 +60,13 @@
                          (:survey-name data))
                (dom/span #js {:className "menu-item-description"}
                          (:survey-notes data))))))
+
+(defn edit-details-view
+  [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build settings/edit-details-component app))))
 
 (defn create-view-component
   [app owner]
