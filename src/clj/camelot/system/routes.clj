@@ -44,6 +44,15 @@
    :headers {"Content-Type" "text/html; charset=utf-8"}
    :body (io/input-stream (io/resource "public/index.html"))})
 
+(defn- heartbeat
+  [state]
+  (let [conn (get-in state [:database :connection])]
+    {:status 200
+     :headers {"Content-Type" "text/plain; charset=utf-8"}
+     :body (format "Status: OK\nSoftware version: %s\nDatabase version: %s\n"
+                   (version/get-version)
+                   (db-migrate/version conn))}))
+
 (defroutes app-routes
   (context "/trap-stations" {session :session state :system}
            (GET "/site/:id" [id]
@@ -307,11 +316,7 @@
 
   (GET "/" _ (retrieve-index))
   (GET "/heartbeat" {session :session state :system}
-       (do
-         (let [conn (get-in state [:database :connection])]
-           (r/response (format "Status: OK\n  Software version: %s\n  Database version: %s\n"
-                               (version/get-version)
-                               (db-migrate/version conn))))))
+       (heartbeat state))
   (POST "/quit" [] (System/exit 0))
   (GET "/quit" [] (System/exit 0))
   (route/resources "/"))
