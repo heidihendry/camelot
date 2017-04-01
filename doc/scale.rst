@@ -69,16 +69,16 @@ By default, Java will (typically) make available 25% of the total memory
 available in your machine to Camelot.  This gives the following approximate
 minimum memory requirements for various report sizes:
 
-+--------------+----------+----------------+
-| Dataset size | Heap size| Physical memory|
-| (images)     | (MB)     | (MB)           |
-+==============+==========+================+
-| 20,000       | 256      | 1024           |
-+--------------+----------+----------------+
-| 50,000       | 512      | 2048           |
-+--------------+----------+----------------+
-| 100,000      | 1024     | 4096           |
-+--------------+----------+----------------+
++-----------------------+---------------+---------------------+
+| Dataset size (images) | Heap size (MB)| Physical memory (MB)|
+|                       |               |                     |
++=======================+===============+=====================+
+| 20,000                | 256           | 1024                |
++-----------------------+---------------+---------------------+
+| 50,000                | 512           | 2048                |
++-----------------------+---------------+---------------------+
+| 100,000               | 1024          | 4096                |
++-----------------------+---------------+---------------------+
 
 From Camelot's perspective, the important column here is the Heap Size, which
 is the amount of memory which it can actually use.  However, Camelot can use
