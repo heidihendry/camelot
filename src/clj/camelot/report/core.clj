@@ -83,7 +83,6 @@
 
 (defn- build-records
   [rorder data]
-  (clojure.tools.logging/error data)
   (reduce (fn [acc [tbl key]]
               (mapcat (fn [a] (let [rs (get-in data [tbl key (get a key)])]
                                 (if (seq rs)

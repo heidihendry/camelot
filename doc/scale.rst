@@ -18,7 +18,7 @@ Limitations
 
 Camelot has no known upper limit on the amount of data it can support, however
 some parts of Camelot will take longer to load as the size of the dataset
-grows. The authors have simulated datasets with 2 million images to ensure
+grows. The authors have simulated datasets with **2 million** images to ensure
 that Camelot will perform well for 99% of datasets Camelot could be used for.
 
 The main performance considerations with this volume of data is performing the
@@ -46,6 +46,70 @@ Data for Camelot's performance is known for only a small number of scenarios,
 thus the numbers offered are very much guidelines and you may find different
 considerations important in your use case.
 
+Memory
+^^^^^^
+
+Memory can be a difficult consideration to judge. Generally speaking, while
+there is sufficient memory, it has little impact upon performance. However
+when there is not enough memory, it may result in things which will take
+considerably longer to complete, or may never complete.  There are two main
+aspects to memory in Camelot: the physical memory available, and the memory
+available to the JVM heap.
+
+The most important consideration is maximum size of the JVM heap.  Regardless
+of how much physical memory is available to a machine, Camelot may only use
+the memory available in the JVM heap (and some small additional amounts, as
+per other JVM configurations), and this is something should be configured
+manually for large datasets.
+
+What you can expect without configuration
+:::::::::::::::::::::::::::::::::::::::::
+
+By default, Java will (typically) make available 25% of the total memory
+available in your machine to Camelot.  This gives the following approximate
+minimum memory requirements for various report sizes:
+
++-------------------------+----------------+
+| Dataset Size | Heap Size| Physical Memory|
+| (Images)     | (MB)     | (MB)           |
++==============+==========+================+
+| 20,000       | 256      | 1024           |
++--------------+----------+----------------+
+| 50,000       | 512      | 2048           |
++--------------+----------+----------------+
+| 100,000      | 1024     | 4096           |
++--------------+----------+----------------+
+
+From Camelot's perspective, the important column here is the Heap Size, which
+is the amount of memory which it can actually use.  However, Camelot can use
+any and all available physical memory with the appropriate configuration of
+Java.
+
+Configuring the Heap Size becomes increasingly important for
+resource-efficient use of Camelot.
+
+Configuration
+:::::::::::::
+
+The JVM heap size should not exceed the size of physical memory available, and
+ideally should not impinge upon the resources required by other applications
+on the machine Camelot is running upon.
+
+There are a number of ways to set the JVM Heap size. We recommend setting it
+via the command line (which may be in a script, such as the `camelot-desktop`
+script for your Operating System, for convenience and consistency).  The java
+command would look as follows:
+
+.. code:: shell
+
+  java -Xms6g -Xmx6g -server -jar path/to/camelot.jar
+
+The above will set the initial heap size (``Xms``) and the maximum heap size
+(``Xmx``) to 6GB.
+
+As a (very) rough guide, the authors suggest an additional 800MB of heap space
+for every 100,000 images, with a starting heap space of 1GB.
+
 Storage
 ^^^^^^^
 
@@ -63,47 +127,6 @@ storage as it does not impact significantly on Camelot's performance profile.
 A mechanism for storing the ``Database`` and ``Media`` directories on separate
 filesystems is not provided by Camelot directly.  It is however possible on
 most Operating Systems with some technical trickery.
-
-Memory
-^^^^^^
-
-*This ignores restrictions on addressable memory imposed by 32-bit operating systems. The authors recommend ensuring you are NOT using a 32-bit operating system on the machine Camelot runs on.*
-
-Memory is a very difficult consideration to judge. Generally speaking, while
-there is sufficient memory, it has little impact upon performance. However
-when there is not enough memory, it may result in things which will take
-considerably longer to complete, or may never complete.  There are two main
-aspects to memory in Camelot: the physical memory available, and the memory
-available to the JVM heap.
-
-The most important consideration is maximum size of the JVM heap.  Regardless
-of how much physical memory is available to a machine, Camelot may only use
-the memory available in the JVM heap (and some small additional amounts, as
-per other JVM configurations), and this is something must be configured
-manually for large datasets.
-
-The JVM heap size should not exceed the size of physical memory available, and
-ideally should not impinge upon the resources required by other applications
-on the machine Camelot is running upon.
-
-There are a number of ways to set the JVM Heap size. We recommend setting it
-via the command line (which may be in a script for convenience and
-consistency).  The invocation would look as follows:
-
-.. code:: shell
-
-  java -Xms6g -Xmx6g -server -jar path/to/camelot.jar
-
-The above will set the initial heap size (``Xms``) and the maximum heap size
-(``Xmx``) to 6GB. It will also ensure the Java Hotspot is tuned for server
-workloads via the ``-server`` flag.
-
-As a (very) rough guide, the authors suggest an additional 600MB of heap space
-for every 100,000 images, with a starting heap space of 2GB.  You needn't be
-concerned with setting the initial or maximum heap size to 2GB explicitly, as
-this will be the default on most machines.  That is to say, you probably
-needn't be concerned with configuring the heap space if your dataset is
-smaller than 100,000 images.
 
 Concurrent users
 ^^^^^^^^^^^^^^^^
