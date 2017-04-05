@@ -111,6 +111,24 @@
             result (rest (sut/generate-presence 1 (jan 14) (jan 17) (gen-state-helper {}) data))]
         (is (= (rest (first (mapv vec result))) [1 1 "-" "-"]))))
 
+    (testing "Date calculations shuold be distinct per trap station"
+      (let [data [(->record {:media-capture-timestamp (jan 14)})
+                  (->record {:media-capture-timestamp (jan 15)
+                             :sighting-quantity 3})
+                  (->record {:media-capture-timestamp (jan 17)
+                             :trap-station-id 2
+                             :trap-station-session-start-date (t/date-time 2015 1 17)
+                             :trap-station-session-end-date (t/date-time 2015 1 20)
+                             :sighting-quantity 3})
+                  (->record {:media-capture-timestamp (jan 20)
+                             :trap-station-id 2
+                             :trap-station-session-start-date (t/date-time 2015 1 17)
+                             :trap-station-session-end-date (t/date-time 2015 1 20)
+                             :sighting-quantity 3})]
+            result (rest (sut/generate-presence 1 (jan 14) (jan 17) (gen-state-helper {}) data))]
+        (is (= (map rest (mapv vec result)) [[1 1 "-" "-"]
+                                             ["-" "-" "-" 1]]))))
+
     (testing "Should shows hyphen for all, if no sessions within nominated dates."
       (let [data [(->record {:media-capture-timestamp (jan 14)})
                   (->record {:media-capture-timestamp (jan 15)
