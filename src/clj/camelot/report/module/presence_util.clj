@@ -86,15 +86,14 @@
 (defn generate
   [value-fn taxonomy-id start-date end-date state data]
   (let [end-excl (t/plus end-date (t/days 1))
-        day-list (list-days start-date end-date)
-        ranges (session-date-ranges data)]
+        day-list (list-days start-date end-date)]
     (->> data
          (indep/->independent-sightings state)
          (group-by :trap-station-id)
          vals
          (map #(cons (:trap-station-name (first %))
                      (generate-row state value-fn taxonomy-id start-date end-excl
-                                   ranges day-list %)))
+                                   (session-date-ranges %) day-list %)))
          (add-date-header day-list))))
 
 (defn no-sightings-value
