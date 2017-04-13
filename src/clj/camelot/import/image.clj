@@ -39,12 +39,20 @@
 
 (defn- create-image
   [state path file-basename extension variant width]
-  (let [target (str (get-in state [:config :path :media]) SystemUtils/FILE_SEPARATOR
-                    variant (str/lower-case file-basename))]
-    (if width
-      ;; Always create variants as .png; OpenJDK cannot write .jpg
-      (create-variant path (str target ".png") width)
-      (store-original path (str target "." extension)))))
+  (let [dir (str (get-in state [:config :path :media])
+                 SystemUtils/FILE_SEPARATOR
+                 (subs (str/lower-case file-basename) 0 2))
+        fdir (io/file dir)]
+    (when-not (file/exists? fdir)
+      (file/mkdir fdir))
+    (let [target (str dir
+                      SystemUtils/FILE_SEPARATOR
+                      variant
+                      (str/lower-case file-basename))]
+      (if width
+        ;; Always create variants as .png; OpenJDK cannot write .jpg
+        (create-variant path (str target ".png") width)
+        (store-original path (str target "." extension))))))
 
 (defn create-image-files
   [state path extension]
