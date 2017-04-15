@@ -2,7 +2,8 @@
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
-   [camelot.util.db :as db]))
+   [camelot.util.db :as db]
+   [clj-time.core :as t]))
 
 (sql/defqueries "sql/sighting-field.sql")
 
@@ -18,15 +19,39 @@
      sighting-field-updated :- org.joda.time.DateTime
      sighting-field-key :- s/Str
      sighting-field-label :- s/Str
-     sighting-field-datatype :- s/Str]
+     sighting-field-datatype :- s/Str
+     sighting-field-default :- (s/maybe s/Str)
+     sighting-field-required :- s/Bool
+     sighting-field-affects-independence :- s/Bool
+     sighting-field-ordering :- s/Int
+     survey-id :- s/Int]
   {s/Any s/Any})
 
 (def sighting-field map->SightingField)
 (def tsighting-field map->TSightingField)
 
+(def sighting-field-template
+  {:sighting-field-id 1
+   :sighting-field-created (t/date-time 2015 1 1)
+   :sighting-field-updated (t/date-time 2015 1 1)
+   :sighting-field-key ":field-key"
+   :sighting-field-label "Gender"
+   :sighting-field-datatype "text"
+   :sighting-field-required true
+   :sighting-field-affects-independence true
+   :sighting-field-ordering 0
+   :survey-id 302})
+
+(defn fake-sighting-field
+  [vs]
+  (sighting-field (merge sighting-field-template vs)))
+
 (defn get-all
   [state]
-  (map sighting-field (db/with-db-keys state -get-all {})))
+  #_(map sighting-field (db/with-db-keys state -get-all {}))
+  [(fake-sighting-field {:sighting-field-id 1})
+   (fake-sighting-field {:sighting-field-id 2
+                         :sighting-field-label "Lifestage"})])
 
 (defn get-specific
   [state field-id]

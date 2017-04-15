@@ -114,7 +114,7 @@
     (will-mount [_]
       (rest/get-x (str "/surveys/" (state/get-survey-id))
                   #(om/update! data ::data (:body %)))
-      (rest/get-x (str "/surveys")
+      (rest/get-x "/surveys"
                   (fn [r] (om/update! data ::other-survey-names
                                       (->> (:body r)
                                            (filter #(not= (:survey-id %)
@@ -123,7 +123,8 @@
                                            (into #{}))))))
     om/IWillUnmount
     (will-unmount [_]
-      (om/update! data ::data nil))
+      (om/update! data ::data nil)
+      (om/update! data ::other-survey-names nil))
     om/IRender
     (render [_]
       (if (::data data)
@@ -152,7 +153,7 @@
                              :onClick #(nav/nav! (str "/" (state/get-survey-id) "/details"))}
                         (dom/span #js {:className "menu-item-title"}
                                   (tr/translate ::details)))
-               #_(dom/div #js {:className "menu-item"
+               (dom/div #js {:className "menu-item"
                              :onClick #(nav/nav! (str "/" (state/get-survey-id) "/sighting-fields"))}
                         (dom/span #js {:className "menu-item-title"}
                                   (tr/translate ::sighting-fields)))))))

@@ -6,6 +6,7 @@
             [camelot.component.survey.create :as create]
             [camelot.component.survey.manage :as manage]
             [camelot.component.survey.settings :as settings]
+            [camelot.component.survey.sighting-fields :as sighting-fields]
             [om.dom :as dom]
             [camelot.translation.core :as tr]
             [camelot.rest :as rest]
@@ -67,6 +68,13 @@
     om/IRender
     (render [_]
       (om/build settings/edit-details-component app))))
+
+(defn sighting-fields-view
+  [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build sighting-fields/manage-fields-component app))))
 
 (defn create-view-component
   [app owner]

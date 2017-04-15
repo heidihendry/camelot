@@ -358,6 +358,8 @@
   (generate-view species/manage-view {:survey-id survey}))
 (defroute "/:survey/details" [survey]
   (generate-view survey/edit-details-view {:survey-id survey}))
+(defroute "/:survey/sighting-fields" [survey]
+  (generate-view survey/sighting-fields-view {:survey-id survey}))
 (defroute "/:survey/deployments/create" [survey]
   (generate-view deployment/create-view-component {:survey-id survey}))
 (defroute "/:survey/deployments/:trap-station-id/edit" [survey trap-station-id]

@@ -175,30 +175,29 @@
                           #(conj % (deref (get-in data [:species-search :selection]))))
             (om/update! (:species-search data) :selection nil))
           (dom/div #js {:className "split-menu"}
-                   (when (feature/enabled? (state/settings) :bulk-import)
-                     (om/build util/prompt-component data
-                               {:opts {:active-key :show-bulk-import-prompt
-                                       :title (tr/translate ::bulk-import-prompt-title)
-                                       :body (dom/div nil
-                                                      (dom/p #js {:className "bulk-import-introduction"}
-                                                             (tr/translate ::bulk-import-introduction))
-                                                      (dom/label #js {:className "question prompt-question"}
-                                                                 (tr/translate ::bulk-import-question)))
-                                       :actions (dom/div #js {:className "button-container"}
-                                                         (dom/button #js {:className "btn btn-default"
-                                                                          :onClick #(create-survey data true
-                                                                                                   (fn [data surv-resp]
-                                                                                                     (nav/analytics-event "org-survey-create" "nav-to-bulk-import")
-                                                                                                     (nav/nav! (str "/" (get-in surv-resp [:body :survey-id :value])
-                                                                                                                    "/bulk-import"))))}
-                                                                     (tr/translate ::create-and-import))
-                                                         (dom/button #js {:className "btn btn-primary"
-                                                                          :ref "action-first"
-                                                                          :onClick #(create-survey data false
-                                                                                                   (fn [data surv-resp]
-                                                                                                     (nav/analytics-event "org-survey-create" "skip-bulk-import")
-                                                                                                     (navigate-bypassing-bulk-import data surv-resp)))}
-                                                                     (tr/translate ::create-only)))}}))
+                   (om/build util/prompt-component data
+                             {:opts {:active-key :show-bulk-import-prompt
+                                     :title (tr/translate ::bulk-import-prompt-title)
+                                     :body (dom/div nil
+                                                    (dom/p #js {:className "bulk-import-introduction"}
+                                                           (tr/translate ::bulk-import-introduction))
+                                                    (dom/label #js {:className "question prompt-question"}
+                                                               (tr/translate ::bulk-import-question)))
+                                     :actions (dom/div #js {:className "button-container"}
+                                                       (dom/button #js {:className "btn btn-default"
+                                                                        :onClick #(create-survey data true
+                                                                                                 (fn [data surv-resp]
+                                                                                                   (nav/analytics-event "org-survey-create" "nav-to-bulk-import")
+                                                                                                   (nav/nav! (str "/" (get-in surv-resp [:body :survey-id :value])
+                                                                                                                  "/bulk-import"))))}
+                                                                   (tr/translate ::create-and-import))
+                                                       (dom/button #js {:className "btn btn-primary"
+                                                                        :ref "action-first"
+                                                                        :onClick #(create-survey data false
+                                                                                                 (fn [data surv-resp]
+                                                                                                   (nav/analytics-event "org-survey-create" "skip-bulk-import")
+                                                                                                   (navigate-bypassing-bulk-import data surv-resp)))}
+                                                                   (tr/translate ::create-only)))}})
                    (dom/div #js {:className "intro"}
                             (dom/h4 nil (tr/translate ::intro)))
                    (dom/div nil

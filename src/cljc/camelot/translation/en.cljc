@@ -26,17 +26,20 @@
     :import "Import"
     :in "in"
     :name "Name"
+    :no "No"
     :notes "Notes"
     :or "Or"
     :to-lc "to"
     :at-lc "at"
     :remove "Remove"
+    :revert "Revert"
     :search "Search"
     :select "Select"
     :submit "Submit"
     :update "Update"
     :uploading "Uploading"
-    :version "Version"}
+    :version "Version"
+    :yes "Yes"}
 
    :problems
    {:root-path-missing "Please specify the absolute path to the Survey Directory in the settings panel."
@@ -743,6 +746,40 @@
     :validation-survey-notes-blank "Survey description must not be blank"
     :validation-survey-sighting-independence-threshold-not-a-number "Independence threshold must be a number"}
 
+   :sighting-field
+   {:sighting-field-label.label "Sighting field label"
+    :sighting-field-label.description "Label of the sighting field"
+    :sighting-field-key.label "Sighting field key"
+    :sighting-field-key.description "Key which identifies the sighting field. May use the same key across surveys to associate fields."
+    :sighting-field-datatype.label "Sighting field type"
+    :sighting-field-datatype.description "The type of input field to create. This selection influences how the field behaves."
+    :sighting-field-required.label "Sighting field required?"
+    :sighting-field-required.description "Whether the field must have a value before a sighting can be submitted."
+    :sighting-field-default.label "Sighting field default"
+    :sighting-field-default.description "The default value to use for a new sighting."
+    :sighting-field-affects-independence.label "Sighting field affects independence?"
+    :sighting-field-affects-independence.description "In some reports, Camelot filters sightings which are considered 'dependent'. Consult Camelot's documentation for more details sighting independence."
+    :sighting-field-ordering.label "Sighting field ordering"
+    :sighting-field-ordering.description "The placement of this field in the form, relative to other fields."}
+
+   :camelot.component.survey.sighting-fields
+   {:page-title "Sighting fields"
+    :new-field "New field"
+    :sighting-field-label.label "Label"
+    :sighting-field-label.description "Label of the sighting field"
+    :sighting-field-key.label "Identification key"
+    :sighting-field-key.description "Key which identifies the sighting field. May use the same key across surveys to associate fields."
+    :sighting-field-datatype.label "Field type"
+    :sighting-field-datatype.description "The type of input field to create. This selection influences how the field behaves."
+    :sighting-field-required.label "Required?"
+    :sighting-field-required.description "Whether the field must have a value before a sighting can be submitted."
+    :sighting-field-default.label "Default value"
+    :sighting-field-default.description "The default value to use for a new sighting."
+    :sighting-field-affects-independence.label "Affects independence?"
+    :sighting-field-affects-independence.description "In some reports, Camelot filters sightings which are considered 'dependent'. Consult Camelot's documentation for more details sighting independence."
+    :sighting-field-ordering.label "Ordering"
+    :sighting-field-ordering.description "The placement of this field in the form, relative to other fields."}
+
    :camelot.component.bulk-import.core
    {:download "Download template"
     :title "Bulk Import"
@@ -818,6 +855,12 @@
     :datatype-file "the path to a file"
     :datatype-string "a string"
     :datatype-date "a date"}
+
+   :datatype
+   {:text "Text input"
+    :textarea "Multi-line text input"
+    :number "Number"
+    :select "Drop-down"}
 
    :camelot.component.nav
    {:bulk-import-progress-label "Progress of bulk import"

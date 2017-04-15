@@ -59,7 +59,7 @@ html > body {
     flex-grow: 1;
 }
 #page-content .button-container button {
-    width: 14.5rem;
+    min-width: 14.5rem;
 }
 #import-dialog .import-location-selector .field-input {
     display: block;

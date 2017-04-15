@@ -56,3 +56,31 @@
   [n]
   (and (number? n)
        (or (zero? n) (pos? n))))
+
+(defn pair?
+  "Predicate returning true if x is a coll consisting representing a key and a
+  value. False otherwise."
+  [x]
+  (let [c (count x)]
+    (or (and (coll? x) (not (map? x)) (= c 2)) (and (map? x) (= c 1)))))
+
+(defn map-val
+  "Map applying f, a function taking two arguments: a key and a value. Return
+  the result as a hash-map."
+  [f xs]
+  {:pre [(ifn? f)]}
+  (if (not (or (nil? xs) (coll? xs)))
+    (throw (IllegalArgumentException. (str "coll expected, but '" xs "' is not a coll")))
+    (into {} (map (fn [[k v]] [k (f v)]) xs))))
+
+(defn key-by
+  "Key `xs` by the result of applying `f` to each item.
+  Should multiple items in xs return the same value of f, yield only the
+  first."
+  [f xs]
+  {:pre [(ifn? f)]}
+  (if (not (or (nil? xs) (coll? xs)))
+    (throw (IllegalArgumentException. (str "coll expected, but '" xs "' is not a coll")))
+    (->> xs
+         (group-by f)
+         (map-val (fn [v] (first v))))))
