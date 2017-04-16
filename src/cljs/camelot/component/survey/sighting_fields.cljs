@@ -5,6 +5,7 @@
             [camelot.rest :as rest]
             [camelot.translation.core :as tr]
             [camelot.state :as state]
+            [camelot.nav :as nav]
             [cljs.core.async :refer [<! chan >!]]
             [goog.date :as date]
             [camelot.util.data :as data])
@@ -41,7 +42,7 @@
     (render [_]
       (dom/div #js {:className "menu-item"
                     :onClick #(let [sid (get-in data [:item :sighting-field-id])]
-                                ;; TODO analytics
+                                (nav/analytics-event "sighting-fields" "survey-field-click")
                                 (select-sighting-field (:data data) sid))}
                (:sighting-field-label (:item data))))))
 
@@ -66,7 +67,7 @@
                         (dom/div nil
                          (dom/button #js {:className "btn btn-primary"
                                           :onClick #(do
-                                                      ;; TODO analytics
+                                                      (nav/analytics-event "sighting-fields" "new-field-click")
                                                       (select-sighting-field data nil))}
                                      (tr/translate ::new-field))))))))
 
@@ -84,7 +85,7 @@
     (render-state [_ state]
       (dom/button #js {:className "btn btn-primary"
                        :onClick #(do
-                                   ;; TODO analytics
+                                   (nav/analytics-event "sighting-fields" "update-click")
                                    (go (>! (:chan state) {:event :update
                                                           :buffer (::buffer data)})))}
                   (tr/translate :words/update)))))
@@ -97,7 +98,7 @@
     (render-state [_ state]
       (dom/button #js {:className "btn btn-default"
                        :onClick #(do
-                                   ;; TODO analytics
+                                   (nav/analytics-event "sighting-fields" "revert-click")
                                    (go (>! (::chan state) {:event :revert})))}
                   (tr/translate :words/revert)))))
 
