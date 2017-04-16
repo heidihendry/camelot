@@ -108,9 +108,11 @@
   "Retrieve the data for the given report type."
   [state :- State
    by :- s/Keyword]
-  (join-all state (if (= by :all)
-                    :media-id
-                    (keyword (str (name by) "-id")))))
+  (if (= by :none)
+    []
+    (join-all state (if (= by :all)
+                      :media-id
+                      (keyword (str (name by) "-id"))))))
 
 (defn- fill-keys
   [columns data]
