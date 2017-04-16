@@ -70,7 +70,8 @@
   [f xs]
   {:pre [(ifn? f)]}
   (if (not (or (nil? xs) (coll? xs)))
-    (throw (IllegalArgumentException. (str "coll expected, but '" xs "' is not a coll")))
+    #?(:clj (throw (IllegalArgumentException. (str "coll expected, but '" xs "' is not a coll")))
+       :cljs (throw (js/Error. (str "coll expected, but '" xs "' is not a coll"))))
     (into {} (map (fn [[k v]] [k (f v)]) xs))))
 
 (defn key-by
@@ -80,7 +81,30 @@
   [f xs]
   {:pre [(ifn? f)]}
   (if (not (or (nil? xs) (coll? xs)))
-    (throw (IllegalArgumentException. (str "coll expected, but '" xs "' is not a coll")))
+    #?(:clj (throw (IllegalArgumentException. (str "coll expected, but '" xs "' is not a coll")))
+       :cljs (throw (js/Error. (str "coll expected, but '" xs "' is not a coll"))))
     (->> xs
          (group-by f)
          (map-val (fn [v] (first v))))))
+
+(defn require-keys
+  "Add keys nominated in keyseq to smap with a default value.
+  The resulting map will have all key-value pairs in smap, and additionally
+  any keys in keyseq with the given default value, or nil should a default
+  value not be provided."
+  ([smap keyseq]
+   (require-keys smap keyseq nil))
+  ([smap keyseq default]
+   (let [dm (->> keyseq
+                 (map #(vector % default))
+                 (into {}))]
+     (merge dm smap))))
+
+(defn assign-keys
+  "Like `select-keys`, but will always return a map with all keys in `keyseq`.
+  `default` is an optional third argument for the value to use for a key not
+  found in `map`."
+  ([smap keyseq]
+   (assign-keys smap keyseq nil))
+  ([smap keyseq default]
+   (require-keys (select-keys smap keyseq) keyseq default)))

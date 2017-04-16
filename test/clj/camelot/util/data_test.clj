@@ -144,3 +144,53 @@
 
     (testing "Should throw if f is not a function"
       (is (thrown? AssertionError (sut/key-by 1 []))))))
+
+(deftest test-assign-keys
+  (testing "assign-keys"
+    (testing "Should return empty map if no keys given"
+      (is (= (sut/assign-keys {:key "val"} []) {})))
+
+    (testing "Should return empty map if source map is nil"
+      (is (= (sut/assign-keys nil []) {})))
+
+    (testing "Should return empty map if keyseq is nil"
+      (is (= (sut/assign-keys {} nil) {})))
+
+    (testing "Should assign nil value if key not found in map"
+      (is (= (sut/assign-keys {} [:key]) {:key nil})))
+
+    (testing "Should assign default value if key not found in map and default value given"
+      (is (= (sut/assign-keys {} [:key] :default) {:key :default})))
+
+    (testing "Should use value from map if available"
+      (is (= (sut/assign-keys {:key "val"} [:key]) {:key "val"})))
+
+    (testing "Should mix available and default values, if required"
+      (is (= (sut/assign-keys {:key "val"} [:key :key2] :default)
+             {:key "val"
+              :key2 :default})))))
+
+(deftest test-require-keys
+  (testing "require-keys"
+    (testing "Should return source map if no keys given"
+      (is (= (sut/require-keys {:key "val"} []) {:key "val"})))
+
+    (testing "Should return empty map if source map is nil"
+      (is (= (sut/require-keys nil []) {})))
+
+    (testing "Should return empty map if keyseq is nil"
+      (is (= (sut/require-keys {} nil) {})))
+
+    (testing "Should assign nil value if key not found in map"
+      (is (= (sut/require-keys {} [:key]) {:key nil})))
+
+    (testing "Should assign default value if key not found in map and default value given"
+      (is (= (sut/require-keys {} [:key] :default) {:key :default})))
+
+    (testing "Should use value from map if available"
+      (is (= (sut/require-keys {:key "val"} [:key]) {:key "val"})))
+
+    (testing "Should mix available and default values, if required"
+      (is (= (sut/require-keys {:key "val"} [:key :key2] :default)
+             {:key "val"
+              :key2 :default})))))
