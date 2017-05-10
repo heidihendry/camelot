@@ -123,23 +123,29 @@
   (db/with-db-keys state -update! (merge data {:media-id id}))
   (media (get-specific state id)))
 
-(s/defn delete-files!
-  [state :- State
-   files :- [s/Str]]
-  (let [mp (get-in state [:config :path :media])]
-    (dorun (map #(file/delete (io/file mp %))
-                (mapcat #(list %
-                               (str "preview-" (file/basename (io/file %) #"\.\w+?$") ".png")
-                               (str "thumb-" (file/basename (io/file %) #"\.\w+?$") ".png"))
-                        files)))))
+(defn path-to-file
+  "Return the full path to an image file."
+  [state variant filename orig-format]
+  (let [mpath (get-in state [:config :path :media])
+        prefix (if (= variant :original) "" (str (name variant) "-"))
+        fmt (if (= variant :original) orig-format "png")]
+    (io/file mpath (apply str (take 2 filename))
+             (str prefix filename "." fmt))))
+
+(defn path-to-media
+  "Return the path to a file given a media record"
+  [state variant media]
+  (path-to-file state variant (:media-filename media) (:media-format media)))
 
 (s/defn delete!
+  "Delete the file with the given ID."
   [state :- State
    id :- s/Num]
-  (let [fs (map #(str (:media-filename %) "." (:media-format %))
-                (get-specific state id))]
-    (db/with-db-keys state -delete! {:media-id id})
-    (delete-files! state fs))
+  (if-let [media (get-specific state id)]
+    (do
+      (db/with-db-keys state -delete! {:media-id id})
+      (dorun (map #(file/delete (path-to-media state % media))
+                  [:original :thumb]))))
   nil)
 
 (s/defn delete-with-ids!
@@ -174,13 +180,9 @@
   [state :- State
    filename :- s/Str
    variant :- (s/enum :thumb :preview :original)]
-  (let [mpath (get-in state [:config :path :media])]
-    (if-let [media (get-specific-by-filename state filename)]
-      (let [fpath (if (= variant :original)
-                    (io/file mpath (apply str (take 2 filename))
-                             (str filename "." (:media-format media)))
-                    (io/file mpath (apply str (take 2 filename))
-                             (str (name variant) "-" filename ".png")))]
-        (if (and (file/exists? fpath) (file/readable? fpath) (file/file? fpath))
-          (io/input-stream fpath)
-          (log/warn "File not found: " (file/get-path fpath)))))))
+  (if-let [media (get-specific-by-filename state filename)]
+    (let [format (:media-format media)
+          fpath (path-to-media state variant media)]
+      (if (and (file/exists? fpath) (file/readable? fpath) (file/file? fpath))
+        (io/input-stream fpath)
+        (log/warn "File not found: " (file/get-path fpath))))))
