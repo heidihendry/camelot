@@ -74,8 +74,10 @@
                  {:data {:media-ids ids}}
                  #(do
                     (om/update! data :show-delete-media-prompt false)
-                    (dorun (map util/delete-with-id! ids))
-                    (om/update! data :selected-media-id nil))))
+                    (om/update! data :selected-media-id nil)
+                    (om/update! data :anchor-media-id nil)
+                    (util/delete-with-ids! data ids)
+                    (om/update! data :deferred-hydrate true))))
 
 (defn delete-sightings!
   [data media-ids]

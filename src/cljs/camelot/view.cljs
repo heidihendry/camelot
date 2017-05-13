@@ -92,7 +92,8 @@
 (defn map-to-params
   [m]
   (clojure.string/join "&" (reduce-kv #(do (conj %1 (str (name %2) "="
-                                                         (if (aget %3 "getTime")
+                                                         (if (and (not (nil? %3))
+                                                                  (aget %3 "getTime"))
                                                            (.getTime %3)
                                                            %3)))) [] m)))
 

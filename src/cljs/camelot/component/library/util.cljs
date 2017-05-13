@@ -41,11 +41,11 @@
   [data media-id]
   (get-in data [:records media-id]))
 
-(defn delete-with-id!
-  [media-id]
-  (om/transact! (state/library-state) :records #(dissoc % media-id))
-  (om/transact! (state/library-state) [:search :ordered-ids]
-                (fn [ms] (vec (remove #(= media-id %) ms)))))
+(defn delete-with-ids!
+  [data media-ids]
+  (om/transact! data :records (fn [rs] (reduce #(dissoc %1 %2) rs media-ids)))
+  (om/transact! data [:search :ordered-ids]
+                (fn [ms] (vec (remove #(contains? (into #{} media-ids) %) ms)))))
 
 (defn delete-sightings-from-media-with-id!
   [media-id]
@@ -57,12 +57,12 @@
   (rest/post-x "/library/hydrate" {:data {:media-ids media}}
                #(do
                   (om/update! data :records
-                                (->> (:body %)
-                                     (reduce (fn [acc x]
-                                               (assoc acc (:media-id x)
-                                                      (merge (get md (:trap-station-session-camera-id x)) x)
-                                                      :selected false))
-                                             {})))
+                              (->> (:body %)
+                                   (reduce (fn [acc x]
+                                             (assoc acc (:media-id x)
+                                                    (assoc (merge (om/value (get md (:trap-station-session-camera-id x))) x)
+                                                           :selected false)))
+                                           {})))
                   (when cb
                     (cb data)))))
 
@@ -289,6 +289,6 @@
       (apply-selection-range data media-idxs new-endpoint shift ctrl))))
 
 (defn toggle-select-image
-  [media-id evt]
-  (mouse-select-media (state/library-state) media-id
+  [data media-id evt]
+  (mouse-select-media data media-id
                       (.-shiftKey evt) (.-ctrlKey evt)))

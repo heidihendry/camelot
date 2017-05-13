@@ -57,14 +57,14 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "media-item"}
-               (dom/div #js {:className (media-thumb-class data)}
+               (dom/div #js {:className (media-thumb-class (:media data))}
                         (dom/img #js {:onMouseDown #(do
-                                                      (util/toggle-select-image (:media-id data) %)
+                                                      (util/toggle-select-image (:data data) (:media-id (:media data)) %)
                                                       (nav/analytics-event "library-collection" "select-media"))
-                                      :src (str (get-in data [:media-uri]) "/thumb")}))
+                                      :src (str (get-in (:media data) [:media-uri]) "/thumb")}))
                (dom/div #js {:className "view-photo fa fa-eye fa-2x"
                              :onClick #(do
-                                         (om/update! (state/library-state) :selected-media-id (:media-id data))
+                                         (om/update! (state/library-state) :selected-media-id (:media-id (:media data)))
                                          (nav/analytics-event "library-collection" "view-media"))})))))
 
 
@@ -155,7 +155,9 @@
                      :else (dom/div #js {:className "media-item-wrapper"}
                                     (when (seq (:records data))
                                       (om/build-all media-item-component
-                                                    (util/media-on-page data)
+                                                    (map #(hash-map :data data
+                                                                    :media %)
+                                                         (util/media-on-page data))
                                                     {:key :media-id}))))))
         (dom/div #js {:id "media-collection-container"
                       :className "media-collection-container"
@@ -321,7 +323,11 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "media-collection"
-                    :onKeyDown #(handle-key-event data %)}
-               (om/build media-collection-content-component data)
-               (om/build identify-selection-bar data)))))
+      (do
+        (when (:deferred-hydrate data)
+          (util/hydrate-media data (util/media-ids-on-page data) (:metadata data))
+          (om/update! data :deferred-hydrate nil))
+        (dom/div #js {:className "media-collection"
+                      :onKeyDown #(handle-key-event data %)}
+                 (om/build media-collection-content-component data)
+                 (om/build identify-selection-bar data))))))
