@@ -38,6 +38,12 @@
       (.click (.getElementById js/document "select-all"))
       (nav/analytics-event "library-key" "C-a"))
 
+    (and (= (.-keyCode e) 46))
+    (do
+      (.preventDefault e)
+      (om/update! data :show-delete-media-prompt true)
+      (nav/analytics-event "library-key" "<del>"))
+
     :else
     (util/keyboard-select-media data e)))
 
