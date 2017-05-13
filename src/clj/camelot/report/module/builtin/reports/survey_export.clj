@@ -2,6 +2,7 @@
   (:require
    [camelot.report.module.core :as module]
    [camelot.import.template :as template]
+   [camelot.model.media :as media]
    [clj-time.format :as tf]
    [camelot.translation.core :as tr])
   (:import
@@ -13,9 +14,7 @@
    :filters [#(not (nil? (:media-id %)))
              #(= (:survey-id %) survey-id)]
    :transforms [#(assoc % :absolute-path
-                        (str (get-in state [:config :path :media])
-                             SystemUtils/FILE_SEPARATOR
-                             (:media-filename %) "." (:media-format %)))]
+                        (media/path-to-media state :original %))]
    :options {:leave-blank-fields-empty true}})
 
 (defn form-smith

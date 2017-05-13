@@ -4,6 +4,7 @@
    [clojure.string :as str])
   (:import
    (java.io File)
+   (org.apache.commons.io FilenameUtils)
    (org.apache.commons.lang3 SystemUtils)))
 
 (defn get-parent
@@ -80,6 +81,11 @@
   ([file pattern]
    (str/replace (get-name file) pattern "")))
 
+(defn extension
+  "Return the extension of the file as a string, sans the period."
+  [^String file]
+  (FilenameUtils/getExtension file))
+
 (defn delete-recursive
   "Remove a directory and its content recursively."
   [file]
@@ -127,11 +133,9 @@
     #"/"))
 
 (defn ^File ->file
-  "Return a File object from `path`."
-  ([path]
-   (io/file path))
-  ([parent child]
-   (io/file parent child)))
+  "Return a File object from `paths`."
+  ([& paths]
+   (apply io/file paths)))
 
 (defn rel-path-components
   "Return the relative path to `file' as a list of strings, each string representing a component of the path."

@@ -7,11 +7,10 @@
 
 (def clj-file-re #"(?i)\.clj$")
 
-(defn- module-path
+(defn module-path
+  "Return the module path."
   [state]
-  (format "%s%s%s" (get-in state [:config :path :config])
-          SystemUtils/FILE_SEPARATOR
-          "modules"))
+  (file/->file (get-in state [:config :path :config]) "modules"))
 
 (defn- clj-file?
   "Predicate for whether a given file is a clojure file."
@@ -22,15 +21,20 @@
            true)
       false))
 
+(defn- load-module-file
+  "Load a module file, catching any exception which may be raised."
+  [file]
+  (try
+    (load-file (file/get-path file))
+    (catch Exception e
+      (println "Error loading module: " file "\n"
+               (.getMessage e)))))
+
 (defn load-user-modules
+  "Load all modules in the module-path."
   [state]
-  (let [dir (file/->file (module-path state))
+  (let [dir (module-path state)
         modules (file-seq dir)]
     (when-not (file/exists? dir)
       (file/mkdirs dir))
-    (doseq [file (filter clj-file? modules)]
-      (try
-        (load-file (file/get-path file))
-        (catch Exception e
-          (println "Error loading module: " file "\n"
-                   (.getMessage e)))))))
+    (doall (map load-module-file (filter clj-file? modules)))))
