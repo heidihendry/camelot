@@ -137,6 +137,21 @@
   [state variant media]
   (path-to-file state variant (:media-filename media) (:media-format media)))
 
+(s/defn delete-file!
+  "Delete a file with the given name from the media directory, along with any
+  associated variants."
+  [state filename]
+  (let [file (io/file filename)]
+    (map #(file/delete (path-to-file state %
+                                     (file/basename file #"\.(png|jpg)$")
+                                     (file/extension filename)))
+         [:original :thumb])))
+
+(defn delete-files!
+  "Delete the images associated with each image file."
+  [state files]
+  (doall (mapcat (partial delete-file! state) files)))
+
 (s/defn delete!
   "Delete the file with the given ID."
   [state :- State
@@ -176,7 +191,7 @@
                                                :media-cameracheck (or media-cameracheck false)
                                                :media-processed media-processed}))
 
-(s/defn read-media-file :- java.io.BufferedInputStream
+(s/defn read-media-file :- (s/maybe java.io.BufferedInputStream)
   [state :- State
    filename :- s/Str
    variant :- (s/enum :thumb :preview :original)]

@@ -1,6 +1,7 @@
 (ns camelot.report.module.builtin.reports.full-export
   (:require
    [camelot.report.module.core :as module]
+   [camelot.model.media :as media]
    [camelot.import.template :as template]
    [clj-time.format :as tf]
    [camelot.translation.core :as tr])
@@ -12,9 +13,7 @@
   {:columns [:all]
    :filters [#(not (nil? (:media-id %)))]
    :transforms [#(assoc % :absolute-path
-                        (str (get-in state [:config :path :media])
-                             SystemUtils/FILE_SEPARATOR
-                             (:media-filename %) "." (:media-format %)))]
+                        (media/path-to-media state :original %))]
    :options {:leave-blank-fields-empty true}})
 
 (defn form-smith
