@@ -8,8 +8,10 @@
             [camelot.nav :as nav]
             [cljs.core.async :refer [<! chan >!]]
             [goog.date :as date]
+            [camelot.validation.validated-component :as vc]
             [camelot.util.data :as data])
-  (:require-macros [cljs.core.async.macros :refer [go-loop go]]))
+  (:require-macros [cljs.core.async.macros :refer [go-loop go]]
+                   [camelot.macros.ui.validation :refer [with-validation]]))
 
 (def sighting-field-input-keys
   "Minimal set of keys which a sighting field must possess."
@@ -41,10 +43,10 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "menu-item"
-                    :onClick #(let [sid (get-in data [:item :sighting-field-id])]
+                    :onClick #(let [sid (get-in data [::item :sighting-field-id])]
                                 (nav/analytics-event "sighting-fields" "survey-field-click")
-                                (select-sighting-field (:data data) sid))}
-               (:sighting-field-label (:item data))))))
+                                (select-sighting-field (::context data) sid))}
+               (get-in data [::item :sighting-field-label])))))
 
 (defn menu-component
   "Side menu for sighting fields within a survey."
@@ -60,8 +62,8 @@
                                       (->> (::sighting-fields data)
                                            vals
                                            (filter #(= (:survey-id %) (state/get-survey-id)))
-                                           (sort-by :sighting-field-name)
-                                           (map #(hash-map :data data :item %))))
+                                           (sort-by :sighting-field-label)
+                                           (map #(hash-map ::context data ::item %))))
                         (dom/div nil
                          (dom/label nil (tr/translate :words/add)))
                         (dom/div nil
@@ -84,10 +86,11 @@
     om/IRenderState
     (render-state [_ state]
       (dom/button #js {:className "btn btn-primary"
+                       :disabled (if (::validated data) "" "disabled")
                        :onClick #(do
                                    (nav/analytics-event "sighting-fields" "update-click")
-                                   (go (>! (:chan state) {:event :update
-                                                          :buffer (::buffer data)})))}
+                                   (go (>! (::chan state) {:event :update
+                                                           :buffer data})))}
                   (tr/translate :words/update)))))
 
 (defn revert-button-component
@@ -121,9 +124,9 @@ Options for select are given by the `options` option."
                (dom/label #js {:className "field-label"}
                           (tr/translate (field-translation field ".label")))
                (dom/select (clj->js (merge {:className "field-input"
-                                            :onChange #(om/update! data [::buffer field]
+                                            :onChange #(om/update! data field
                                                                    (.. % -target -value))
-                                            :value (get-in data [::buffer field])
+                                            :value (get data field)
                                             :title (tr/translate (field-translation field ".description"))}
                                            (or attrs {})))
                            (om/build-all select-option-component options))))))
@@ -138,9 +141,9 @@ Options for select are given by the `options` option."
                (dom/label #js {:className "field-label"}
                           (tr/translate (field-translation field ".label")))
                (dom/input (clj->js (merge {:className "field-input"
-                                           :onChange #(om/update! data [::buffer field]
+                                           :onChange #(om/update! data field
                                                                   (.. % -target -value))
-                                           :value (get-in data [::buffer field])
+                                           :value (get data field)
                                            :title (tr/translate (field-translation field ".description"))}
                                           (or attrs {}))))))))
 
@@ -148,25 +151,68 @@ Options for select are given by the `options` option."
   "Component for editing sighting field details."
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:result-vchan (chan)})
+    om/IWillMount
+    (will-mount [_]
+      (let [rvchan (om/get-state owner :result-vchan)]
+        (om/set-state! owner :component-vchan
+                       (vc/component-validator rvchan))
+        (go-loop []
+          (let [{:keys [validated]} (<! rvchan)]
+            (om/update! data ::validated validated)
+            (recur)))))
+    om/IWillUnmount
+    (will-unmount [_]
+      (go
+        (>! (om/get-state owner :result-vchan) {:command :unmount})))
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "section"}
-               (om/build text-input-component data {:opts {:field :sighting-field-label}})
-               (om/build text-input-component data {:opts {:field :sighting-field-key}})
-               (om/build select-component data {:opts {:field :sighting-field-datatype
-                                                       :options {"text" (tr/translate :datatype/text)
-                                                                 "textarea" (tr/translate :datatype/textarea)
-                                                                 "number" (tr/translate :datatype/number)
-                                                                 "select" (tr/translate :datatype/select)}}})
-               (om/build select-component data {:opts {:field :sighting-field-required
-                                                       :options {"true" (tr/translate :words/yes)
-                                                                 "false" (tr/translate :words/no)}}})
-               (om/build text-input-component data {:opts {:field :sighting-field-default}})
-               (om/build select-component data {:opts {:field :sighting-field-affects-independence
-                                                       :options {"true" (tr/translate :words/yes)
-                                                                 "false" (tr/translate :words/no)}}})
-               (om/build text-input-component data {:opts {:field :sighting-field-ordering
-                                                           :attrs {:type "number"}}})
+      (dom/div {:className "section"}
+               (with-validation dom/div {:validation-chan (:component-vchan state)}
+                 (om/build text-input-component data
+                           {:data-key :sighting-field-label
+                            :validators []
+                            :params {:opts {:field :sighting-field-label}}})
+                 (om/build text-input-component data
+                           {:data-key :sighting-field-key
+                            :validators []
+                            :params {:opts {:field :sighting-field-key}}})
+                 (om/build select-component data
+                           {:data-key :sighting-field-datatype
+                            :validators []
+                            :params {:opts
+                                     {:field :sighting-field-datatype
+                                      :options {"text" (tr/translate :datatype/text)
+                                                "textarea" (tr/translate :datatype/textarea)
+                                                "number" (tr/translate :datatype/number)
+                                                "select" (tr/translate :datatype/select)}}}})
+                 (om/build select-component data
+                           {:data-key :sighting-field-required
+                            :validators []
+                            :params {:opts
+                                     {:field :sighting-field-required
+                                      :options {"true" (tr/translate :words/yes)
+                                                "false" (tr/translate :words/no)}}}})
+                 (om/build text-input-component data
+                           {:data-key :sighting-field-default
+                            :validators []
+                            :params {:opts {:field :sighting-field-default}}})
+                 (om/build select-component data
+                           {:data-key :sighting-field-affects-independence
+                            :validators []
+                            :params
+                            {:opts {:field :sighting-field-affects-independence
+                                    :options {"true" (tr/translate :words/yes)
+                                              "false" (tr/translate :words/no)}}}})
+                 (om/build text-input-component data
+                           {:data-key :sighting-field-ordering
+                            :validators []
+                            :params
+                            {:opts {:field :sighting-field-ordering
+                                    :attrs {:type "number"}}}}))
+
                (dom/div #js {:className "button-container"}
                         (om/build revert-button-component data {:state state})
                         (om/build update-button-component data {:state state}))))))
@@ -190,8 +236,10 @@ Options for select are given by the `options` option."
         (go-loop []
           (let [r (<! ch)]
             (condp = (:event r)
-              :save
-              (om/transact! data ::sighting-fields #(assoc % (:sighting-field-id r) r))
+              :update
+              (let [v (assoc (:buffer r) :survey-id (state/get-survey-id))]
+                ;; TODO post to server and transact! result
+                (om/transact! data ::sighting-fields #(assoc % (:sighting-field-id r) v)))
 
               :revert
               (do
@@ -212,7 +260,7 @@ Options for select are given by the `options` option."
                  (dom/div #js {:className "section-container"}
                           (om/build menu-component data))
                  (dom/div #js {:className "section-container"}
-                          (om/build edit-component data {:state state})))
+                          (om/build edit-component (::buffer data) {:state state})))
         (dom/div #js {:className "align-center"}
                  (dom/img #js {:className "spinner"
                                :src "images/spinner.gif"
