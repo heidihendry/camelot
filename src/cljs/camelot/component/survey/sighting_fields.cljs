@@ -169,7 +169,7 @@ Options for select are given by the `options` option."
         (>! (om/get-state owner :result-vchan) {:command :unmount})))
     om/IRenderState
     (render-state [_ state]
-      (dom/div {:className "section"}
+      (dom/div #js {:className "section"}
                (with-validation dom/div {:validation-chan (:component-vchan state)}
                  (om/build text-input-component data
                            {:data-key :sighting-field-label
