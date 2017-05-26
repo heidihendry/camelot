@@ -151,7 +151,7 @@
                    file/->file
                    file/fs-usable-space)
         needed (* record-size record-size-safety-threshold)]
-    (if (> needed avail)
+    (if (and (pos? avail) (> needed avail))
       [{:result :fail
         :reason (tr/translate state ::filesystem-space
                               (long (/ needed 1024 1024)) "MB"

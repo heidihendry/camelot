@@ -257,12 +257,22 @@ Throws an IOException if the file cannot be read."
    :subname (final-db-path),
    :create true})
 
+(defn- create-missing
+  "Create the directory for `path` should it not already exist."
+  [path]
+  (let [file (io/file path)]
+    (or (file/exists? file) (file/mkdirs file))))
+
 (defn path-map
   []
-  {:filestore-base (filestore-base-path)
-   :media (get-media-path)
-   :database (get-db-path)
-   :config (get-config-dir)})
+  (let [media-path (get-media-path)
+        filestore-path (filestore-base-path)]
+    (create-missing media-path)
+    (create-missing filestore-path)
+    {:filestore-base filestore-path
+     :media media-path
+     :database (get-db-path)
+     :config (get-config-dir)}))
 
 (defn lookup [state k]
   (let [store (get-in state [:config :store])]
