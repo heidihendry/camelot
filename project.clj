@@ -20,6 +20,7 @@
                  [ragtime "0.5.3"]
                  [resauce "0.1.0"]
                  [yesql "0.5.2"]
+                 [riddley "0.1.4"]
                  [ring.middleware.logger "0.5.0"]
                  [ring/ring-defaults "0.2.0"]
                  [ring "1.4.0"]
@@ -82,7 +83,7 @@
                              [org.clojure/tools.nrepl "0.2.12"]
                              [org.apache.derby/derbytools "10.12.1.1"]]
               :env {:camelot-dev-mode "true"}
-              :plugins [[lein-figwheel "0.5.8" :exclusions [org.clojure/clojure]]
+              :plugins [[lein-figwheel "0.5.10" :exclusions [org.clojure/clojure]]
                         [lein-doo "0.1.7" :exclusions [org.clojure/clojure]]]
               :cljsbuild {:builds
                           {:test
