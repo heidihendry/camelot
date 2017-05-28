@@ -17,6 +17,16 @@
   {::predicate f
    ::msg msg})
 
+(defn required
+  []
+  (validator (complement empty?)
+             (tr/translate ::not-empty)))
+
+(defn max-length
+  [n]
+  (validator (fn [x] (< (count x) n))
+             (tr/translate ::too-long n)))
+
 (defn- validated?
   [state]
   (every? identity (vals state)))
@@ -75,7 +85,7 @@
         (go (>! validation-chan {:key data-key :success (nil? result)}))))
     om/IRenderState
     (render-state [_ state]
-      (dom/div nil
+      (dom/div #js {:className "validated-component"}
                (om/build component data params)
                (when (::show-messages state)
                  (dom/div #js {:className "validation-warning"}

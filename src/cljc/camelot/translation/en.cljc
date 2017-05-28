@@ -883,4 +883,8 @@
     :directory-not-readable "%s: directory not readable"
     :no-media-found "%s: no media found"}
 
+   :camelot.validation.validated-component
+   {:not-empty "Must not be blank"
+    :too-long "Must not be longer than %d characters"}
+
    :missing "[Translation missing]"})

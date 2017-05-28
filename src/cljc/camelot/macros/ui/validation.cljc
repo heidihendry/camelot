@@ -26,8 +26,7 @@
   `data-key` korks in data (as passed to the Om's build) for the value being
   validated.  `validators` is a seq of validation fuctions.  Finally `params`
   is an optional map of parameters to pass to the component."
-  [component form-opts & body]
-  (let [vc# (:validation-chan form-opts)]
-    (list* component (list 'clj->js (dissoc form-opts :validation-chan))
-           (walk/walk-exprs validated-field? (partial wrap-component vc#)
-                            body))))
+  [vc component form-opts & body]
+  (list* component (list 'clj->js form-opts)
+         (walk/walk-exprs validated-field? (partial wrap-component vc)
+                          body)))

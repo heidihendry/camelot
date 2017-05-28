@@ -157,7 +157,7 @@ Options for select are given by the `options` option."
     om/IWillMount
     (will-mount [_]
       (let [rvchan (om/get-state owner :result-vchan)]
-        (om/set-state! owner :component-vchan
+        (om/set-state! owner :validation-chan
                        (vc/component-validator rvchan))
         (go-loop []
           (let [{:keys [validated]} (<! rvchan)]
@@ -170,10 +170,10 @@ Options for select are given by the `options` option."
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className "section"}
-               (with-validation dom/div {:validation-chan (:component-vchan state)}
+               (with-validation (:validation-chan state) dom/div {}
                  (om/build text-input-component data
                            {:data-key :sighting-field-label
-                            :validators []
+                            :validators [(vc/required) (vc/max-length 255)]
                             :params {:opts {:field :sighting-field-label}}})
                  (om/build text-input-component data
                            {:data-key :sighting-field-key
