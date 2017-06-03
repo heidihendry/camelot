@@ -1,7 +1,7 @@
 CREATE TABLE sighting_field (
        sighting_field_id        INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 1, increment by 1),
-       sighting_field_created   TIMESTAMP NOT NULL,
-       sighting_field_updated   TIMESTAMP NOT NULL,
+       sighting_field_created   BIGINT NOT NULL,
+       sighting_field_updated   BIGINT NOT NULL,
        sighting_field_key       VARCHAR(255) NOT NULL,
        sighting_field_label     VARCHAR(255) NOT NULL,
        sighting_field_datatype  VARCHAR(63) NOT NULL,
@@ -15,8 +15,8 @@ CREATE TABLE sighting_field (
 --;;
 CREATE TABLE sighting_field_option (
        sighting_field_option_id        INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 1, increment by 1),
-       sighting_field_option_created   TIMESTAMP NOT NULL,
-       sighting_field_option_updated   TIMESTAMP NOT NULL,
+       sighting_field_option_created   BIGINT NOT NULL,
+       sighting_field_option_updated   BIGINT NOT NULL,
        sighting_field_option_label     VARCHAR(255) NOT NULL,
        sighting_field_option_visible   BOOLEAN NOT NULL DEFAULT true,
        sighting_field_id               INT NOT NULL REFERENCES sighting_field ON DELETE CASCADE ON UPDATE RESTRICT,
@@ -25,8 +25,8 @@ CREATE TABLE sighting_field_option (
 --;;
 CREATE TABLE sighting_field_value (
        sighting_field_value_id        INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (start with 1, increment by 1),
-       sighting_field_value_created   TIMESTAMP NOT NULL,
-       sighting_field_value_updated   TIMESTAMP NOT NULL,
+       sighting_field_value_created   BIGINT NOT NULL,
+       sighting_field_value_updated   BIGINT NOT NULL,
        sighting_field_value_data      VARCHAR(4095) NOT NULL,
        sighting_field_id              INT NOT NULL REFERENCES sighting_field ON DELETE CASCADE ON UPDATE RESTRICT,
        sighting_id                    INT NOT NULL REFERENCES sighting ON DELETE CASCADE ON UPDATE RESTRICT,

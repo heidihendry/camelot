@@ -10,7 +10,12 @@
 (s/defrecord TSightingField
     [sighting-field-key :- s/Str
      sighting-field-label :- s/Str
-     sighting-field-datatype :- s/Str]
+     sighting-field-datatype :- s/Str
+     sighting-field-required :- s/Bool
+     sighting-field-default :- s/Str
+     sighting-field-affects-independence :- s/Bool
+     sighting-field-ordering :- s/Int
+     survey-id :- s/Int]
   {s/Any s/Any})
 
 (s/defrecord SightingField
@@ -30,40 +35,18 @@
 (def sighting-field map->SightingField)
 (def tsighting-field map->TSightingField)
 
-(def sighting-field-template
-  {:sighting-field-id 1
-   :sighting-field-created (t/date-time 2015 1 1)
-   :sighting-field-updated (t/date-time 2015 1 1)
-   :sighting-field-key ":field-key"
-   :sighting-field-label "Gender"
-   :sighting-field-datatype "text"
-   :sighting-field-required true
-   :sighting-field-affects-independence true
-   :sighting-field-ordering 0
-   :survey-id 302})
-
-(defn fake-sighting-field
-  [vs]
-  (sighting-field (merge sighting-field-template vs)))
-
 (defn get-all
   [state]
-  #_(map sighting-field (db/with-db-keys state -get-all {}))
-  [(fake-sighting-field {:sighting-field-id 1})
-   (fake-sighting-field {:sighting-field-id 2
-                         :sighting-field-label "Lifestage"})])
+  (map sighting-field (db/with-db-keys state -get-all {})))
 
 (defn get-specific
   [state field-id]
-  (sighting-field (db/with-db-keys state -get-specific {:sighting-field-id field-id})))
+  (sighting-field (first (db/with-db-keys state -get-specific {:sighting-field-id field-id}))))
 
-(defn update-label!
-  [state {:keys [label field-id]}]
-  ;; TODO changing label should update all values using it.
-  (db/with-db-keys state -update-label!
-    {:sighting-field-id field-id
-     :sighting-field-label label})
-  (get-specific state field-id))
+(defn update!
+  [state id field-config]
+  (db/with-db-keys state -update! (assoc field-config :sighting-field-id id))
+  (get-specific state id))
 
 (defn create!
   [state field-config]
