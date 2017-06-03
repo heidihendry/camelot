@@ -58,22 +58,6 @@
   (db/with-db-keys state -delete! {:sighting-field-id field-id})
   nil)
 
-(defn get-all-options
-  [state sighting-field-id]
-  (db/with-db-keys state -get-all-options {:sighting-field-id sighting-field-id}))
-
-(defn update-option-visibility!
-  [state visible? field-option-id]
-  (db/with-db-keys state -update-option-visibility!
-    {:sighting-field-option-id field-option-id
-     :sighting-field-option-visible visible?}))
-
-(defn update-option-label!
-  [state option-label field-option-id]
-  (db/with-db-keys state -update-option-label!
-    {:sighting-field-option-id field-option-id
-     :sighting-field-option-label option-label}))
-
 (defn create-option!
   [state field-id option-config]
   (db/with-db-keys state -create-option<!
