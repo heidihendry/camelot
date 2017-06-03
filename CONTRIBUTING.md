@@ -8,13 +8,11 @@ Here's some specific ways you can help:
 
 ### Raising issues for bugs and problems
 
-[Raise an issue](https://gitlab.com/camelot-project/camelot/issues/new) should you encounter a problem or limitation within Camelot.  When reporting a problem, please give the issue a clear and meaningful title and try to provide as much information about the problem itself as possible.
+[Raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues) should you encounter a problem or limitation within Camelot.  When reporting a problem, please give the issue a clear and meaningful subject and try to provide as much information about the problem itself as possible.
 
 The following is a great template to use.  You can copy and paste this in to the issue description to give yourself a head start.
 
 ```
-**Description**
-
 *Please describe clearly what the problem is.  If there are errors provided by Camelot, also include the error in its entirety here.*
 
 **Steps to reproduce**
@@ -25,19 +23,17 @@ The following is a great template to use.  You can copy and paste this in to the
 2. Click "Reports"
 3. ...
 
-This lets whoever is looking in to the problem not only work out what is happening, but make sure that it's resolved properly.</i>
+**The expected behaviour is**
 
-**The expected behaviour was**
-
-*Tell us what you thought Camelot would do, or should do, in this scenario.*
+...
 
 **But the actual behaviour was**
 
-*Tell us what Camelot actually did*
+...
 
 **Camelot version**
 
-*e.g., version 1.0.0*
+*e.g., 1.0.0*
 
 **Additional information**
 
@@ -54,9 +50,9 @@ For example:
 
 ### Requesting features
 
-[Raise an issue](https://gitlab.com/camelot-project/camelot/issues/new) to request a new feature in Camelot.  For a feature to be added to Camelot, it will need to solve a specific problem which would apply to a number of Camelot's users.
+[Raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues) to suggest a change in Camelot.
 
-When raising a feature request, give it a clear and meaningful title.  For the description, consider using the following template:
+When raising a suggestion, give it a clear and meaningful title.  For the description, consider using the following template:
 
 ```
 As a [a user role]
@@ -64,13 +60,13 @@ I would like [the goal of the feature]
 So that [the benefit of the feature to that user]
 ```
 
-When raising a feature request, remember the best feature requests clearly capture the problem and the value of solving that problem.
+When raising a suggestion, remember the best feature requests clearly capture the problem and the value of solving that problem.
 
 ### Documentation improvements
 
-Regardless of how good a piece of software is, it offers no value if it can't be understood.  We want to provide excellent documentation, so if you see a mistake, omission or areas it can be improved, please do let us know.
+Regardless of how good a piece of software is, it offers no value if it can't be understood.  We want to provide excellent documentation, so if you see a mistake, omission or area it can be improved, please do let us know.
 
-If you're comfortable with git, we gratefully accept [Merge Requests](https://docs.gitlab.com/ce/gitlab-basics/add-merge-request.html) for documentation improvements.  Otherwise please [raise an issue](https://gitlab.com/camelot-project/camelot/issues/new) describing the documentation change you would like to be included.
+If you're comfortable with git, we gratefully accept [Merge Requests](https://docs.gitlab.com/ce/gitlab-basics/add-merge-request.html) for documentation improvements.  Otherwise please [raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues) describing the documentation change you would like to be included.
 
 ### Translations
 
@@ -86,13 +82,13 @@ Building a translation simply involves taking the strings in the [English transl
 
 Translations for project files, such as the User Guide or this Contribution Guide, are help to make Camelot more accessible to native speakers of other languages.
 
-To contribute new translations or improvements to existing translations back to the project, please either raise a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests) or [raise an issue](https://gitlab.com/camelot-project/camelot/issues/new).
+To contribute new translations or improvements to existing translations back to the project, please either raise a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests) or [raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues).
 
 ### Code contributions
 
 And of course we accept code contributions. :-)
 
-If you're looking for something to work on, check to see if there are any [outstanding issues](https://gitlab.com/camelot-project/camelot/issues).  If you have "scratched your own itch", please do open a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests), as it would be great if we could include your changes in the project.
+If you're looking for something to work on, check to see if there are any [outstanding issues](https://tree.taiga.io/project/cshclm-camelot/issues) or take a look [through our backlog](https://tree.taiga.io/project/cshclm-camelot/backlog).  If you have "scratched your own itch", please do open a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests), as it would be great if we could include your changes in the project.
 
 If you'd like to help, but are not sure where to start, check out Camelot's built-in reports.  These are relatively easy to get started with, and we would love to add better compatibility with more data analysis products used in research.
 
