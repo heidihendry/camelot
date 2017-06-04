@@ -41,7 +41,7 @@
                  [environ "1.0.2"]
                  [net.mikera/imagez "0.10.0"]
                  [org.apache.commons/commons-lang3 "3.4"]
-                 [prismatic/schema "1.0.5"]]
+                 [prismatic/schema "1.1.6"]]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-environ "1.0.2"]

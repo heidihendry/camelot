@@ -142,8 +142,8 @@
   "Return the term at a given cursor position."
   [search point]
   (let [p (next-separator search (min (count search) point))]
-    (if (or (re-matches term-separator-re (str (nth search (dec point))))
-            (zero? point))
+    (if (or (zero? point)
+            (re-matches term-separator-re (str (nth search (dec point)))))
       ""
       (last (str/split (apply str (first (split-at p search)))
                        term-separator-re)))))

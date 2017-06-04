@@ -1,6 +1,5 @@
 (ns camelot.util.deployment
   (:require
-   [schema.core :as s]
    [camelot.util.data :as data]))
 
 (defn- assoc-cameras-for-group
