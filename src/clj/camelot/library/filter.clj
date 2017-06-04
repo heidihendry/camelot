@@ -18,7 +18,7 @@
     v))
 
 (defn substring?
-  [s sub]
+  [s ^String sub]
   (if (not= (.indexOf (str/lower-case (str (nil->empty s))) sub) -1)
     true
     false))
