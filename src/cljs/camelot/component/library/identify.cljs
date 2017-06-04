@@ -33,13 +33,15 @@
         sex (get-in (state/library-state) [:identification :sex])
         selected (:selected-media-id (state/library-state))
         all-selected (util/all-media-selected)]
-    (rest/put-x "/library/identify" {:data (merge {:identification
-                                                   {:quantity qty
-                                                    :lifestage (if (util/unidentified? lifestage) nil lifestage)
-                                                    :sex (if (util/unidentified? sex) nil sex)
-                                                    :species spp}}
-                                                  {:media
-                                                   (mapv :media-id all-selected)})}
+    (rest/put-x "/library/identify"
+                {:data (assoc {:identification
+                               (merge
+                                (dissoc (:identification @(state/library-state)) :dirty-state)
+                                {:quantity qty
+                                 :lifestage (if (util/unidentified? lifestage) nil lifestage)
+                                 :sex (if (util/unidentified? sex) nil sex)
+                                 :species spp})}
+                              :media (mapv :media-id all-selected))}
                 (fn [resp]
                   (dorun (map #(do (om/update! (second %)
                                                :sightings
@@ -54,10 +56,11 @@
                   (util/show-identified-message)
                   (.focus (.getElementById js/document "media-collection-container"))
                   (om/update! (state/library-state) :show-identification-panel false)
-                  (om/update! (:identification (state/library-state)) :quantity 1)
-                  (om/update! (:identification (state/library-state)) :species -1)
-                  (om/update! (:identification (state/library-state)) :sex "unidentified")
-                  (om/update! (:identification (state/library-state)) :lifestage "unidentified")))))
+                  (om/update! (state/library-state) :identification
+                              {:quantity 1
+                               :species -1
+                               :sex "unidentified"
+                               :lifestage "unidentified"})))))
 
 (defn sighting-option-component
   [data owner]
@@ -231,6 +234,12 @@
                         :title (tr/translate ::identify-selected)
                         :body (om/build identify-panel data)
                         :actions (dom/div #js {:className "button-container"}
+                                          (dom/button #js {:className "btn btn-default"
+                                                           :onClick #(do (om/update! data :show-identification-panel false)
+                                                                         (om/update! data [:search :mode] :search)
+                                                                         (om/update! data :show-identification-panel false)
+                                                                         (nav/analytics-event "library-id" "cancel-identification"))}
+                                                      (tr/translate :words/cancel))
                                           (dom/button #js {:className "btn btn-primary"
                                                            :disabled (when (or (not (and (get-in data [:identification :species])
                                                                                          (> (get-in data [:identification :species]) -1)
@@ -239,10 +248,4 @@
                                                                        "disabled")
                                                            :onClick #(do (submit-identification)
                                                                          (nav/analytics-event "library-id" "submit-identification"))}
-                                                      (tr/translate :words/submit))
-                                          (dom/button #js {:className "btn btn-default"
-                                                           :onClick #(do (om/update! data :show-identification-panel false)
-                                                                         (om/update! data [:search :mode] :search)
-                                                                         (om/update! data :show-identification-panel false)
-                                                                         (nav/analytics-event "library-id" "cancel-identification"))}
-                                                      (tr/translate :words/cancel)))}}))))
+                                                      (tr/translate :words/submit)))}}))))

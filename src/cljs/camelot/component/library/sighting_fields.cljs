@@ -19,8 +19,7 @@
       (let [field-key (keyword (get-in data [::field :sighting-field-key]))]
         (dom/input #js {:type "text"
                         :className "field-input"
-                        :onChange #(om/update! data [::identification field-key]
-                                               (value-of %))
+                        :onChange #(om/update! (::identification data) field-key (value-of %))
                         :value (get-in data [::identification field-key])})))))
 
 (defn number-component
@@ -32,8 +31,7 @@
       (let [field-key (keyword (get-in data [::field :sighting-field-key]))]
         (dom/input #js {:type "number"
                         :className "field-input"
-                        :onChange #(om/update! data [::identification field-key]
-                                               (value-of %))
+                        :onChange #(om/update! (::identification data) field-key (value-of %))
                         :value (get-in data [::identification field-key])})))))
 
 (defn textarea-component
@@ -46,8 +44,7 @@
         (dom/textarea #js {:className "field-input"
                            :rows 3
                            :cols 50
-                           :onChange #(om/update! data [::identification field-key]
-                                                  (value-of %))
+                           :onChange #(om/update! (::identification data) field-key (value-of %))
                            :value (get-in data [::identification field-key])})))))
 
 (defn field-component

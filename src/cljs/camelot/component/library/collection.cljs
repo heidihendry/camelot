@@ -307,7 +307,6 @@
 
 (defn single-survey?
   [data]
-  (prn (into #{} (map :survey-id) (util/all-media-selected data)))
   (= (count (into #{} (map :survey-id) (util/all-media-selected data))) 1))
 
 (defn identify-selection-bar
