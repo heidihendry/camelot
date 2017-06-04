@@ -5,6 +5,7 @@
    [camelot.translation.core :as tr]
    [camelot.component.library.util :as util]
    [camelot.component.util :as cutil]
+   [camelot.component.library.sighting-fields :as sighting-fields]
    [camelot.rest :as rest]
    [camelot.nav :as nav]
    [clojure.string :as str]
@@ -216,7 +217,9 @@
                                            (om/build sighting-sex-select-component data))
                                  (dom/span #js {:className "field"}
                                            (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
-                                           (om/build sighting-lifestage-select-component data))))))))
+                                           (om/build sighting-lifestage-select-component data)))
+                        (dom/div #js {:className "flex-row"}
+                                 (om/build sighting-fields/component data)))))))
 
 (defn identify-component
   [data owner]

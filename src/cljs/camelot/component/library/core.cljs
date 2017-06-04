@@ -105,8 +105,9 @@
       (om/update! data [:library :search :show-select-count] 0)
       (om/update! data [:library :identification] {:quantity 1})
       (rest/get-x "/sighting-fields"
-                  (fn [r] (om/update! data [:library :sighting-fields]
-                                      (group-by :survey-id (:body r)))))
+                  (fn [r]
+                    (om/update! data [:library :sighting-fields]
+                                (group-by :survey-id (:body r)))))
       (rest/get-x "/surveys"
                   (fn [resp]
                     (om/update! (get data :library) :surveys (:body resp))))

@@ -196,8 +196,7 @@ Options for select are given by the `options` option."
                                         :options {nil ""
                                                   "text" (tr/translate :datatype/text)
                                                   "textarea" (tr/translate :datatype/textarea)
-                                                  "number" (tr/translate :datatype/number)
-                                                  "select" (tr/translate :datatype/select)}}}})
+                                                  "number" (tr/translate :datatype/number)}}}})
                    (om/build select-component buf
                              {:data-key :sighting-field-required
                               :validators []
