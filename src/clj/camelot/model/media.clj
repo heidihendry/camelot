@@ -65,6 +65,10 @@
    id :- s/Int]
   (map :media-file (db/with-db-keys state -get-all-files-by-survey {:survey-id id})))
 
+(defn get-with-ids
+  [state media-ids]
+  (map media (db/with-db-keys state -get-with-ids {:media-ids media-ids})))
+
 (s/defn get-all-files-by-survey-site :- [s/Str]
   [state :- State
    id :- s/Int]

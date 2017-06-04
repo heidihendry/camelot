@@ -238,5 +238,8 @@
 
 (s/defn identify
   [state {:keys [identification media]}]
+  (let [media (media/get-with-ids state media)]
+    (when (> (count (into #{} (map :survey-id) media)) 1)
+      (throw (IllegalArgumentException. "Cannot identify media across multiple surveys"))))
   (db/with-transaction [s state]
     (map :sighting-id (doall (map (partial identify-media s identification) media)))))
