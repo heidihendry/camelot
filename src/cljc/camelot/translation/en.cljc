@@ -536,12 +536,13 @@
     :item-name "media"
     :identify-selected "Identify selected"
     :reference-window-no-media-notice "No reference quality images found"
-    :reference-window-no-media-advice "Images which will be useful for identifying a species in future can be marked as 'reference quality' in the main window, and will show up here in future."}
+    :reference-window-no-media-advice "Images which will be useful for identifying a species in future can be marked as 'reference quality' in the main window, and will show up here in future."
+    :selected-media-from-multiple-surveys "Selected media must belong to only one survey in order to be identified."}
 
    :camelot.component.library.identify
    {:identify-selected "Identify Selected"
     :taxonomy-add-placeholder "New species name..."
-    :add-duplicate-species-error "A species with this name already exists"
+    :species-format-error "Invalid scientific name for species"
     :add-new-species-label "Add a new species..."}
 
    :camelot.component.library.util

@@ -4,6 +4,7 @@
    [om.core :as om]
    [camelot.translation.core :as tr]
    [camelot.component.library.util :as util]
+   [camelot.component.util :as cutil]
    [camelot.rest :as rest]
    [camelot.nav :as nav]
    [clojure.string :as str]
@@ -51,6 +52,7 @@
                               (zipmap (:body resp) all-selected)))
                   (util/show-identified-message)
                   (.focus (.getElementById js/document "media-collection-container"))
+                  (om/update! (state/library-state) :show-identification-panel false)
                   (om/update! (:identification (state/library-state)) :quantity 1)
                   (om/update! (:identification (state/library-state)) :species -1)
                   (om/update! (:identification (state/library-state)) :sex "unidentified")
@@ -153,7 +155,7 @@
                     (dom/input #js {:type "submit"
                                     :disabled (if is-valid "" "disabled")
                                     :title (when-not is-valid
-                                             (tr/translate ::add-duplicate-species-error))
+                                             (tr/translate ::species-format-error))
                                     :className "btn btn-primary input-field-submit"
                                     :onClick #(add-taxonomy-handler data)
                                     :value (tr/translate :words/add)})))))))
@@ -187,22 +189,21 @@
                                                         :taxonomy-label (tr/translate ::add-new-species-label)})))
                                   {:key :taxonomy-id}))))))
 
-(defn identify-component
+(defn identify-panel
   [data owner]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:id "identification-panel"
-                    :className (str "identification-panel"
-                                    (if (show-panel? data) " show-panel" ""))}
+                    :className (str "identification-panel")}
                (dom/div #js {:className "identification-panel-content"}
-                        (dom/h4 nil (tr/translate ::identify-selected))
                         (dom/div #js {:className "single-field"}
                                  (dom/label nil (tr/translate :sighting/taxonomy-id.label))
                                  (om/build taxonomy-select-component data))
                         (dom/div nil
                                  (dom/label nil (tr/translate :sighting/sighting-quantity.label))
                                  (dom/input #js {:type "number"
+                                                 :min "1"
                                                  :className "field-input short-input"
                                                  :value (get-in data [:identification :quantity])
                                                  :onChange #(do
@@ -215,19 +216,30 @@
                                            (om/build sighting-sex-select-component data))
                                  (dom/span #js {:className "field"}
                                            (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
-                                           (om/build sighting-lifestage-select-component data))))
-               (dom/div #js {:className "field button-container"}
-                        (dom/button #js {:className "btn btn-primary"
-                                         :disabled (when (or (not (and (get-in data [:identification :quantity])
-                                                                       (get-in data [:identification :species])
-                                                                       (> (get-in data [:identification :species]) -1)))
-                                                             (:taxonomy-create-mode data))
-                                                     "disabled")
-                                         :onClick #(do (submit-identification)
-                                                       (nav/analytics-event "library-id" "submit-identification"))}
-                                    (tr/translate :words/submit))
-                        (dom/button #js {:className "btn btn-default"
-                                           :onClick #(do (om/update! data :show-identification-panel false)
-                                                         (om/update! data [:search :mode] :search)
-                                                       (nav/analytics-event "library-id" "cancel-identification"))}
-                                      (tr/translate :words/cancel)))))))
+                                           (om/build sighting-lifestage-select-component data))))))))
+
+(defn identify-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (om/build cutil/prompt-component data
+                {:opts {:active-key :show-identification-panel
+                        :title (tr/translate ::identify-selected)
+                        :body (om/build identify-panel data)
+                        :actions (dom/div #js {:className "button-container"}
+                                          (dom/button #js {:className "btn btn-primary"
+                                                           :disabled (when (or (not (and (get-in data [:identification :species])
+                                                                                         (> (get-in data [:identification :species]) -1)
+                                                                                         (pos? (get-in data [:identification :quantity]))))
+                                                                               (:taxonomy-create-mode data))
+                                                                       "disabled")
+                                                           :onClick #(do (submit-identification)
+                                                                         (nav/analytics-event "library-id" "submit-identification"))}
+                                                      (tr/translate :words/submit))
+                                          (dom/button #js {:className "btn btn-default"
+                                                           :onClick #(do (om/update! data :show-identification-panel false)
+                                                                         (om/update! data [:search :mode] :search)
+                                                                         (om/update! data :show-identification-panel false)
+                                                                         (nav/analytics-event "library-id" "cancel-identification"))}
+                                                      (tr/translate :words/cancel)))}}))))

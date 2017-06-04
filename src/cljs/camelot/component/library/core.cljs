@@ -16,49 +16,50 @@
             [camelot.nav :as nav]))
 
 (defn key-handler
-  [e]
-  (cond
-    ;; >
-    (and (= (.-keyCode e) 190) (.-shiftKey e))
-    (do (.click (.getElementById js/document "next-page"))
-        (nav/analytics-event "library-key" ">")
-        (.preventDefault e))
+  [data e]
+  (when-not (:show-identification-panel data)
+    (cond
+      ;; >
+      (and (= (.-keyCode e) 190) (.-shiftKey e))
+      (do (.click (.getElementById js/document "next-page"))
+          (nav/analytics-event "library-key" ">")
+          (.preventDefault e))
 
-    ;; <
-    (and (= (.-keyCode e) 188) (.-shiftKey e))
-    (do (.click (.getElementById js/document "prev-page"))
-        (nav/analytics-event "library-key" "<")
-        (.preventDefault e))
+      ;; <
+      (and (= (.-keyCode e) 188) (.-shiftKey e))
+      (do (.click (.getElementById js/document "prev-page"))
+          (nav/analytics-event "library-key" "<")
+          (.preventDefault e))
 
-    ;; ctrl+f
-    (and (= (.-keyCode e) 70) (.-ctrlKey e))
-    (do (.focus (.getElementById js/document "filter"))
-        (nav/analytics-event "library-key" "C-f")
-        (.preventDefault e))
+      ;; ctrl+f
+      (and (= (.-keyCode e) 70) (.-ctrlKey e))
+      (do (.focus (.getElementById js/document "filter"))
+          (nav/analytics-event "library-key" "C-f")
+          (.preventDefault e))
 
-    ;; alt+f
-    (and (= (.-keyCode e) 70) (.-altKey e))
-    (do (.click (.getElementById js/document "apply-filter"))
-        (nav/analytics-event "library-key" "M-f")
-        (.preventDefault e))
+      ;; alt+f
+      (and (= (.-keyCode e) 70) (.-altKey e))
+      (do (.click (.getElementById js/document "apply-filter"))
+          (nav/analytics-event "library-key" "M-f")
+          (.preventDefault e))
 
-    ;; ctrl+m
-    (and (= (.-keyCode e) 77) (.-ctrlKey e))
-    (do (.focus (.getElementById js/document "media-collection-container"))
-        (nav/analytics-event "library-key" "C-m")
-        (.preventDefault e))
+      ;; ctrl+m
+      (and (= (.-keyCode e) 77) (.-ctrlKey e))
+      (do (.focus (.getElementById js/document "media-collection-container"))
+          (nav/analytics-event "library-key" "C-m")
+          (.preventDefault e))
 
-    ;; ctrl+i
-    (and (= (.-keyCode e) 73) (.-ctrlKey e))
-    (do (.click (.getElementById js/document "identify-selected"))
-        (nav/analytics-event "library-key" "C-i")
-        (.preventDefault e))
+      ;; ctrl+i
+      (and (= (.-keyCode e) 73) (.-ctrlKey e))
+      (do (.click (.getElementById js/document "identify-selected"))
+          (nav/analytics-event "library-key" "C-i")
+          (.preventDefault e))
 
-    ;; ctrl+d
-    (and (= (.-keyCode e) 68) (.-ctrlKey e))
-    (do (.click (.getElementById js/document "details-panel-toggle"))
-        (nav/analytics-event "library-key" "C-d")
-        (.preventDefault e))))
+      ;; ctrl+d
+      (and (= (.-keyCode e) 68) (.-ctrlKey e))
+      (do (.click (.getElementById js/document "details-panel-toggle"))
+          (nav/analytics-event "library-key" "C-d")
+          (.preventDefault e)))))
 
 (defn tincan-listener
   [data opts]
@@ -103,6 +104,9 @@
       (om/update! data [:library :survey-id] (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! data [:library :search :show-select-count] 0)
       (om/update! data [:library :identification] {:quantity 1})
+      (rest/get-x "/sighting-fields"
+                  (fn [r] (om/update! data [:library :sighting-fields]
+                                      (group-by :survey-id (:body r)))))
       (rest/get-x "/surveys"
                   (fn [resp]
                     (om/update! (get data :library) :surveys (:body resp))))
@@ -126,7 +130,7 @@
         (if (or (not (nil? (get-in lib [:search :ordered-ids])))
                 (:restricted-mode @data))
           (dom/div #js {:className (str "library" (if restricted-mode " restricted-mode" ""))
-                        :onKeyDown key-handler
+                        :onKeyDown (partial key-handler lib)
                         :tabIndex 0}
                    (if restricted-mode
                      (set! (.-tincan js/window) (partial tincan-listener lib))

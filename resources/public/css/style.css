@@ -667,6 +667,9 @@ pre.field-input {
     flex-direction: column;
     min-height: calc(100vh - 13.5rem);
 }
+.library .media-item-wrapper {
+    padding-bottom: 5rem;
+}
 .library.restricted-mode .media-collection-content-wrapper {
     min-height: calc(100vh - 7.5rem);
 }
@@ -675,11 +678,9 @@ pre.field-input {
     padding-top: 0.5rem;
     padding-left: 0.5rem;
     overflow: auto;
-    float: left;
     position: relative;
     width: 100%;
     flex-grow: 1;
-    padding-bottom: 6rem;
 }
 .library .library-body {
     display: flex;
@@ -755,18 +756,11 @@ pre.field-input {
     opacity: 0.8;
 }
 .library .identification-panel {
-    position: absolute;
     padding: 0;
     margin: 0;
     transition: all 0.3s ease-in-out;
-    left: -33rem;
-    width: 32.5rem;
-    z-index: 400;
-    height: 100vh;
-    background: #fafafa;
     padding: 1rem;
     opacity: 1;
-    border-right: 1px solid #ccc;
 }
 #identification-panel .flex-row {
     display: flex;
@@ -788,7 +782,6 @@ pre.field-input {
 #identification-panel {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 11rem);
 }
 #identification-panel .identification-panel-content {
     flex-grow: 1;
@@ -802,9 +795,6 @@ pre.field-input {
     margin-left: 0;
     width: 100%;
     flex-grow: 1;
-}
-.library .identification-panel.show-panel {
-    left: 0rem;
 }
 .library .remove-sighting {
     padding-top: 0.3rem;

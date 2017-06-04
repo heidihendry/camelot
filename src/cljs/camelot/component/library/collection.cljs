@@ -303,8 +303,12 @@
 
 (defn show-identification-bar?
   [data]
-  (and (not (identify/show-panel? data))
-       (pos? (count (util/all-media-selected data)))))
+  (pos? (count (util/all-media-selected data))))
+
+(defn single-survey?
+  [data]
+  (prn (into #{} (map :survey-id) (util/all-media-selected data)))
+  (= (count (into #{} (map :survey-id) (util/all-media-selected data))) 1))
 
 (defn identify-selection-bar
   [data owner]
@@ -317,7 +321,13 @@
                                       ""))}
                (dom/button #js {:className "btn btn-primary"
                                 :id "identify-selected"
-                                :disabled (if (zero? (count (util/all-media-selected data))) "disabled" "")
+                                :title (cond
+                                         (not (single-survey? data))
+                                         (tr/translate ::selected-media-from-multiple-surveys)
+
+                                         :default nil)
+                                :disabled (if (or (zero? (count (util/all-media-selected data)))
+                                                  (not (single-survey? data))) "disabled" "")
                                 :onClick #(do
                                             (om/transact! data :show-identification-panel not)
                                             (.focus (.getElementById js/document "identify-species-select")))}
