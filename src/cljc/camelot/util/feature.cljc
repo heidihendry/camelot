@@ -1,6 +1,4 @@
-(ns camelot.util.feature
-  (:require
-   #?(:clj [schema.core :as s])))
+(ns camelot.util.feature)
 
 (def default-feature-state
   "Map of feature keys and whether or not they're enabled by default."
