@@ -16,7 +16,7 @@
 (defn get-specific
   "Return a specific sighting field value."
   [state value-id]
-  (->> {:sighting-field-value-id field-id}
+  (->> {:sighting-field-value-id value-id}
        (db/with-db-keys state -get-specific)
        first))
 
