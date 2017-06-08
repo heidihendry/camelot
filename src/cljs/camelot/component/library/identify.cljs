@@ -31,17 +31,17 @@
         qty (get-in (state/library-state) [:identification :quantity])
         lifestage (get-in (state/library-state) [:identification :lifestage])
         sex (get-in (state/library-state) [:identification :sex])
+        sighting-fields (get-in (state/library-state) [:identification :sighting-fields])
         selected (:selected-media-id (state/library-state))
         all-selected (util/all-media-selected)]
     (rest/put-x "/library/identify"
-                {:data (assoc {:identification
-                               (merge
-                                (dissoc (:identification @(state/library-state)) :dirty-state)
-                                {:quantity qty
-                                 :lifestage (if (util/unidentified? lifestage) nil lifestage)
-                                 :sex (if (util/unidentified? sex) nil sex)
-                                 :species spp})}
-                              :media (mapv :media-id all-selected))}
+                {:data
+                 {:identification {:quantity qty
+                                   :lifestage (if (util/unidentified? lifestage) nil lifestage)
+                                   :sex (if (util/unidentified? sex) nil sex)
+                                   :species spp
+                                   :sighting-fields @sighting-fields}
+                  :media (mapv :media-id all-selected)}}
                 (fn [resp]
                   (dorun (map #(do (om/update! (second %)
                                                :sightings
@@ -60,7 +60,8 @@
                               {:quantity 1
                                :species -1
                                :sex "unidentified"
-                               :lifestage "unidentified"})))))
+                               :lifestage "unidentified"
+                               :sighting-fields {}})))))
 
 (defn sighting-option-component
   [data owner]

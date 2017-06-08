@@ -16,11 +16,11 @@
   (reify
     om/IRender
     (render [_]
-      (let [field-key (keyword (get-in data [::field :sighting-field-key]))]
+      (let [field-id (get-in data [::field :sighting-field-id])]
         (dom/input #js {:type "text"
                         :className "field-input"
-                        :onChange #(om/update! (::identification data) field-key (value-of %))
-                        :value (get-in data [::identification field-key])})))))
+                        :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                        :value (get-in data [::identification :sighting-fields field-id])})))))
 
 (defn number-component
   "Render a number input component for the field"
@@ -28,11 +28,11 @@
   (reify
     om/IRender
     (render [_]
-      (let [field-key (keyword (get-in data [::field :sighting-field-key]))]
+      (let [field-id (get-in data [::field :sighting-field-id])]
         (dom/input #js {:type "number"
                         :className "field-input"
-                        :onChange #(om/update! (::identification data) field-key (value-of %))
-                        :value (get-in data [::identification field-key])})))))
+                        :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                        :value (get-in data [::identification :sighting-fields field-id])})))))
 
 (defn textarea-component
   "Render a textarea component for the field"
@@ -40,12 +40,12 @@
   (reify
     om/IRender
     (render [_]
-      (let [field-key (keyword (get-in data [::field :sighting-field-key]))]
+      (let [field-id (get-in data [::field :sighting-field-id])]
         (dom/textarea #js {:className "field-input"
                            :rows 3
                            :cols 50
-                           :onChange #(om/update! (::identification data) field-key (value-of %))
-                           :value (get-in data [::identification field-key])})))))
+                           :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                           :value (get-in data [::identification :sighting-fields field-id])})))))
 
 (defn field-component
   "Render a single field with a component appropriate for its datatype."

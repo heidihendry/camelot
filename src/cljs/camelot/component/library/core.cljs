@@ -104,6 +104,7 @@
       (om/update! data [:library :survey-id] (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! data [:library :search :show-select-count] 0)
       (om/update! data [:library :identification] {:quantity 1})
+      (om/update! data [:library :identification] {:sighting-fields {}})
       (rest/get-x "/sighting-fields"
                   (fn [r]
                     (om/update! data [:library :sighting-fields]

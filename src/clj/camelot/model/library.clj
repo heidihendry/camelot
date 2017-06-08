@@ -227,16 +227,18 @@
     (doall (map (partial media/update-media-flags! s) data))))
 
 (defn- identify-media
-  [state {:keys [quantity species lifestage sex]} media-id]
+  [state {:keys [quantity species lifestage sex sighting-fields]} media-id]
   (media/update-processed-flag! state {:media-id media-id
                                        :media-processed true})
   (sighting/create! state (sighting/tsighting {:sighting-quantity quantity
                                                :sighting-lifestage lifestage
                                                :sighting-sex sex
                                                :taxonomy-id species
-                                               :media-id media-id})))
+                                               :media-id media-id
+                                               :sighting-fields sighting-fields})))
 
 (s/defn identify
+  "Creates identification data as sightings for each media ID given."
   [state {:keys [identification media]}]
   (let [media (media/get-with-ids state media)]
     (when (> (count (into #{} (map :survey-id) media)) 1)

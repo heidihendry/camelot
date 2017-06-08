@@ -48,5 +48,5 @@ VALUES (:current_timestamp, :current_timestamp, :sighting_field_option_label,
         :sighting_field_option_visible, :sighting_field_id, :survey_id)
 
 -- name: -delete!
-DELETE sighting_field
-WHERE sighting_field_id = :sighing_field_id
+DELETE FROM sighting_field
+WHERE sighting_field_id = :sighting_field_id

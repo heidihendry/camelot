@@ -3,6 +3,7 @@
   (:require
    [yesql.core :as sql]
    [camelot.system.state :refer [State]]
+   [camelot.model.sighting-field-value :as sighting-field-value]
    [camelot.util.db :as db]
    [schema.core :as s]))
 
@@ -20,7 +21,8 @@
      sighting-lifestage :- (s/maybe s/Str)
      sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- s/Int
-     media-id :- s/Int]
+     media-id :- s/Int
+     sighting-fields :- (s/maybe {s/Int s/Str})]
   {s/Any s/Any})
 
 (s/defrecord Sighting
@@ -46,9 +48,11 @@
               (str sighting-quantity "x " taxonomy-genus " " taxonomy-species)))
 
 (s/defn tsighting :- TSighting
-  [{:keys [sighting-quantity sighting-lifestage sighting-sex taxonomy-id media-id]}]
+  [{:keys [sighting-quantity sighting-lifestage sighting-sex taxonomy-id
+           media-id sighting-fields]}]
   (->TSighting sighting-quantity (known-or-nil sighting-lifestage)
-               (known-or-nil sighting-sex) taxonomy-id media-id))
+               (known-or-nil sighting-sex) taxonomy-id media-id
+               sighting-fields))
 
 (s/defn get-all
   [state :- State
@@ -67,11 +71,22 @@
            (first)
            (sighting)))
 
+(defn- create-sighting-field-value!
+  [state sighting-id field-data]
+  (dorun
+   (some->> field-data
+            seq
+            (map (fn [[k v]]
+                   (sighting-field-value/create! state sighting-id k v))))))
+
 (s/defn create!
   [state :- State
    data :- TSighting]
-  (let [record (db/with-db-keys state -create<! data)]
-    (sighting (get-specific state (int (:1 record))))))
+  (clojure.tools.logging/error data)
+  (let [record (db/with-db-keys state -create<! data)
+        sighting-id (int (:1 record))]
+    (create-sighting-field-value! state sighting-id (:sighting-fields data))
+    (sighting (get-specific state sighting-id))))
 
 (s/defn update!
   [state :- State
@@ -83,7 +98,9 @@
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -delete! {:sighting-id id}))
+  (db/with-transaction [s state]
+    (sighting-field-value/delete-for-sighting! state id)
+    (db/with-db-keys state -delete! {:sighting-id id})))
 
 (s/defn delete-with-media-ids!
   [state :- State
