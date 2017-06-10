@@ -1,17 +1,5 @@
 image: clojure
 
-before_script:
-  - export BOOT_AS_ROOT='yes'
-  - apt-get install nodejs nodejs-legacy npm curl -y
-  - npm install -g phantomjs-prebuilt
-  - mkdir ~/.ssh
-  - chmod 700 ~/.ssh
-  - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
-  - mkdir -p ~/bin
-  - curl -fsSLo ~/bin/boot https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh
-  - chmod 755 ~/bin/boot
-  - export PATH="$HOME/bin:${PATH}"
-
 stages:
   - build
   - test
@@ -19,17 +7,25 @@ stages:
 
 compile:
   stage: build
-  image: clojure
+  before_script:
+    - export BOOT_AS_ROOT='yes'
+    - apt-get update -y
+    - apt-get install nodejs nodejs-legacy npm curl -y
+    - npm install -g phantomjs-prebuilt
+    - mkdir -p ~/bin
+    - curl -fsSLo ~/bin/boot https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh
+    - chmod 755 ~/bin/boot
+    - export PATH="$HOME/bin:${PATH}"
   script:
     - boot uberjar
-
-unittest:
-  stage: build
-  script:
     - boot test-all
 
 upgrade:
   stage: test
+  before_script:
+    - mkdir ~/.ssh
+    - chmod 700 ~/.ssh
+    - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
   script:
     - script/setup-testdata.sh
     - CAMELOT_DATADIR="testdata" script/test-runtime.sh
