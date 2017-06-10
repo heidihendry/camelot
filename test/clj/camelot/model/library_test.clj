@@ -87,7 +87,9 @@
       (with-redefs [camelot.model.media/get-with-ids
                     (constantly [{:media-id 1 :survey-id 1}
                                  {:media-id 2 :survey-id 2}])]
-        (is (thrown? IllegalArgumentException (sut/identify (state/gen-state) [1 2])))))
+        (is (thrown? IllegalArgumentException (sut/identify (state/gen-state)
+                                                            {:identification {}
+                                                             :media [1 2]})))))
 
     (testing "should accept media within a single survey"
       (with-redefs [camelot.model.media/get-with-ids
@@ -95,7 +97,8 @@
                                  {:media-id 2 :survey-id 1}])
                     camelot.model.media/update-processed-flag! (constantly nil)
                     camelot.model.sighting/create!
-                    (fn [s v]
-                      {:sighting-id (inc (:media-id v))})
+                    (fn [s v] {:sighting-id (inc (:media-id v))})
                     clojure.java.jdbc/db-transaction* (fn [s q] q)]
-        (is (= (sut/identify (state/gen-state) [2 3])))))))
+        (is (sut/identify (state/gen-state)
+                          {:identification {}
+                           :media [1 2]}))))))

@@ -9,7 +9,7 @@ echo "Compiling... "
 boot build
 
 echo "Running tests... "
-boot check
+boot test-all
 
 echo "Running camelot and ensuring it responds... "
 java -jar target/camelot.jar &

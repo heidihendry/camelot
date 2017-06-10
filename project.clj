@@ -55,7 +55,7 @@
                  :watch-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]
                  :changes-only true
                  :quiet true}
-  :clean-targets ^{:protect false} [:target-path :compile-path "resources/public/js"]
+  :clean-targets ^{:protect false} [:target-path :compile-path "resources/www/js"]
   :uberjar-name "camelot.jar"
   :main camelot.core
   :repl-options {:init-ns user}
@@ -66,10 +66,10 @@
                 :figwheel true
                 :compiler {:main camelot.core
                            :asset-path "js/compiled/out"
-                           :output-to "resources/public/js/compiled/camelot.js"
-                           :output-dir "resources/public/js/compiled/out"
+                           :output-to "resources/www/js/compiled/camelot.js"
+                           :output-dir "resources/www/js/compiled/out"
                            :source-map-timestamp true}}}}
-  :figwheel {:css-dirs ["resources/public/css"]
+  :figwheel {:css-dirs ["resources/www/css"]
              :ring-handler user/http-handler
              :server-logfile "log/figwheel.log"}
 
@@ -89,7 +89,7 @@
                           {:test
                            {:source-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]
                             :compiler
-                            {:output-to "resources/public/js/compiled/testable.js"
+                            {:output-to "resources/www/js/compiled/testable.js"
                              :main camelot.test-runner
                              :optimizations :none}}}}}
 
@@ -104,6 +104,6 @@
                            {:source-paths ^:replace ["src/cljc" "src/cljs"]
                             :compiler
                             {:optimizations :advanced
-                             :externs ["resources/public/lib/ga.js"]
+                             :externs ["resources/www/lib/ga.js"]
                              :closure-warnings {:externs-validation :off}
                              :pretty-print false}}}}}})
