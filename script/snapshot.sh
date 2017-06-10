@@ -6,7 +6,7 @@ PROJECT_NAME="camelot"
 PROJECT_FILE="project.clj"
 
 echo "Running snapshot build... "
-lein with-profiles -dev,-user,+uberjar uberjar
+boot uberjar
 
 snapshot_version="$(grep -oE "[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT" ${PROJECT_FILE} | head -n1)"
 cp "target/${PROJECT_NAME}.jar" "target/$PROJECT_NAME-${snapshot_version}.jar"

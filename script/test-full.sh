@@ -6,7 +6,7 @@ echo "Checking binaries in \$PATH... "
 which boot &> /dev/null
 
 echo "Compiling... "
-boot build
+boot uberjar
 
 echo "Running tests... "
 boot test-all

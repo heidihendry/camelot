@@ -3,8 +3,7 @@
 set -e
 
 PROJECT_NAME="camelot"
-PROJECT_FILE="project.clj"
-BUILD_BOOT="build.boot"
+BUILD_FILE="build.boot"
 README_FILE="README.md"
 GETTING_STARTED_DOC="doc/gettingstarted.rst"
 HTML_FILE="resources/public/index.html"
@@ -14,9 +13,8 @@ echo "Ensuring branch is clean..."
 git status | grep -qE 'working tree clean|branch is up-to-date'
 
 echo "Bumping release version... "
-sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"$/${PROJECT_NAME} \"\1\"/" ${PROJECT_FILE}
-sed -i "s/\+version\+\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"/\+version\+ \"\1\"/" ${BUILD_BOOT}
-released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${PROJECT_FILE} | head -n1)"
+sed -i "s/\+version\+\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"/\+version\+ \"\1\"/" ${BUILD_FILE}
+released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${BUILD_FILE} | head -n1)"
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${README_FILE}
 sed -i "s/\([0-9]\+\.[0-9]\+\.[0-9]\+\)\]/${released_version}\]/" ${README_FILE}
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${GETTING_STARTED_DOC}
@@ -41,8 +39,7 @@ echo "Bumping version to *-SNAPSHOT... "
 patch_version=$(echo $released_version | cut -d\. -f3)
 new_patch_version=$(($patch_version+1))
 new_version="$(basename "${released_version}" ".${patch_version}").${new_patch_version}"
-sed -i "s/${PROJECT_NAME}\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"$/${PROJECT_NAME} \"${new_version}-SNAPSHOT\"/" ${PROJECT_FILE}
-sed -i "s/\+version\+\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"$/\+version\+ \"${new_version}-SNAPSHOT\"/" ${BUILD_BOOT}
+sed -i "s/\+version\+\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"$/\+version\+ \"${new_version}-SNAPSHOT\"/" ${BUILD_FILE}
 sed -i "s/\\?v=${released_version}/?v=${new_version}-SNAPSHOT/" ${HTML_FILE}
 git commit -a -m "Version bump: ${new_version}-SNAPSHOT"
 
