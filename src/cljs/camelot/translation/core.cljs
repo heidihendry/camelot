@@ -6,8 +6,11 @@
 (def tconfig
   "Configuration for translations."
   {:dev-mode? true
-   :compiled-dictionary (dict-compile* {:en camelot.translation.en/t-en
-                                        :vn camelot.translation.vn/t-vn})
+   :compiled-dictionary (dict-compile* (do
+                                         (clojure.core/require '[camelot.translation.en])
+                                         (clojure.core/require '[camelot.translation.vn])
+                                         {:en camelot.translation.en/t-en
+                                          :vn camelot.translation.vn/t-vn}))
    :fallback-locale :en})
 
 (defn get-language

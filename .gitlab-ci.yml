@@ -1,24 +1,50 @@
-before_script:
-  - export LEIN_ROOT=1
-  - apt-get update -y
-  - apt-get install nodejs nodejs-legacy npm curl -y
-  - npm install -g phantomjs-prebuilt
-  - mkdir ~/.ssh
-  - chmod 700 ~/.ssh
-  - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
+image: registry.gitlab.com/camelot-project/camelot/image
 
-build:
-  image: clojure
+stages:
+  - build
+  - test
+  - package
+
+compile:
+  stage: build
+  before_script:
+    - export BOOT_AS_ROOT='yes'
+    - export PATH="$HOME/bin:${PATH}"
   script:
-    - sh -c "lein deps || lein deps || exit 0"
-    - script/clean-build.sh
-    - lein with-profiles +test test
-    - lein doo phantom test once
+    - boot uberjar
+  artifacts:
+    paths:
+      - "target/camelot.jar"
+    expire_in: 20 minutes
+
+unittest:
+  stage: build
+  before_script:
+    - export BOOT_AS_ROOT='yes'
+    - export PATH="$HOME/bin:${PATH}"
+  script:
+    - boot test-all
+
+upgrade:
+  stage: test
+  before_script:
+    - mkdir ~/.ssh
+    - chmod 700 ~/.ssh
+    - sh -c "ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts"
+  script:
     - script/setup-testdata.sh
-    - script/test-runtime.sh
     - CAMELOT_DATADIR="testdata" script/test-runtime.sh
-    - script/prepare-snapshot.sh
+
+new-install:
+  stage: test
+  script:
+    - script/test-runtime.sh
+
+package:
+  stage: package
+  script:
     - mkdir -p "camelot-${CI_BUILD_REF_NAME}/"
+    - script/prepare-snapshot.sh
     - cp target/camelot-*.jar script/bin/camelot-desktop.sh script/bin/camelot-desktop.bat script/bin/camelot-desktop.command "camelot-${CI_BUILD_REF_NAME}/"
   artifacts:
     name: "camelot-${CI_BUILD_REF_NAME}-$(date '+%Y%m%d%H%M%S')"

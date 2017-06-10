@@ -42,7 +42,7 @@
   []
   {:status 200
    :headers {"Content-Type" "text/html; charset=utf-8"}
-   :body (io/input-stream (io/resource "public/index.html"))})
+   :body (io/input-stream (io/resource "www/index.html"))})
 
 (defn- heartbeat
   [state]
@@ -319,4 +319,4 @@
        (heartbeat state))
   (POST "/quit" [] (System/exit 0))
   (GET "/quit" [] (System/exit 0))
-  (route/resources "/"))
+  (route/resources "/" {:root "www"}))

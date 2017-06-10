@@ -32,8 +32,7 @@
                                   :importer {:config :config}})))
 
 (defn start-prod []
-  (reset! http/system (component/start (camelot {})))
-  nil)
+  (reset! http/system (component/start (camelot {}))))
 
 (defn -main [& args]
   (camelot {:cli args})

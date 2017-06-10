@@ -1,0 +1,5 @@
+{:require [camelot.core]
+ :compiler-options {:asset-path "js/compiled/camelot.out"
+                    :externs ["resources/www/lib/ga.js"]
+                    :closure-warnings {:externs-validation :off}
+                    :pretty-print false}}

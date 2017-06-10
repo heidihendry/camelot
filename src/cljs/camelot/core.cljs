@@ -25,6 +25,8 @@
      (set! (.. (js/document.getElementById "app") -style -cssText) ""))
    1000))
 
+(def reload secretary/dispatch!)
+
 (defn navigate-dwim
   []
   (-> js/document

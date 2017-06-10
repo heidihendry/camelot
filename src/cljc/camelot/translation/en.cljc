@@ -1,5 +1,4 @@
-(ns camelot.translation.en
-  )
+(ns camelot.translation.en)
 
 (def t-en
   {:words
