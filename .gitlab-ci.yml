@@ -19,6 +19,10 @@ compile:
   script:
     - boot uberjar
     - boot test-all
+  artifacts:
+    paths:
+      - "target/camelot.jar"
+    expire_in: 20 minutes
 
 upgrade:
   stage: test
