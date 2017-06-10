@@ -10,7 +10,7 @@
 (s/defrecord TSightingField
     [sighting-field-key :- s/Str
      sighting-field-label :- s/Str
-     sighting-field-datatype :- s/Str
+     sighting-field-datatype :- s/Keyword
      sighting-field-required :- s/Bool
      sighting-field-default :- s/Str
      sighting-field-affects-independence :- s/Bool
@@ -24,7 +24,7 @@
      sighting-field-updated :- org.joda.time.DateTime
      sighting-field-key :- s/Str
      sighting-field-label :- s/Str
-     sighting-field-datatype :- s/Str
+     sighting-field-datatype :- s/Keyword
      sighting-field-default :- (s/maybe s/Str)
      sighting-field-required :- s/Bool
      sighting-field-affects-independence :- s/Bool
@@ -32,28 +32,44 @@
      survey-id :- s/Int]
   {s/Any s/Any})
 
-(def sighting-field map->SightingField)
+(defn sighting-field
+  [data]
+  (map->SightingField (update data :sighting-field-datatype keyword)))
+
 (def tsighting-field map->TSightingField)
 
 (defn get-all
+  "Get all sighting fields."
   [state]
   (map sighting-field (db/with-db-keys state -get-all {})))
 
 (defn get-specific
+  "Return a specific sighting field by field ID."
   [state field-id]
-  (sighting-field (first (db/with-db-keys state -get-specific {:sighting-field-id field-id}))))
+  (->> {:sighting-field-id field-id}
+       (db/with-db-keys state -get-specific)
+       first
+       sighting-field))
 
 (defn update!
+  "Update the sighting field with the given ID with `field-config'."
   [state id field-config]
-  (db/with-db-keys state -update! (assoc field-config :sighting-field-id id))
+  (db/with-db-keys state -update!
+    (assoc (update field-config :sighting-field-datatype name)
+           :sighting-field-id id))
   (get-specific state id))
 
 (defn create!
+  "Create a sighting field with its configuration as `field-config'."
   [state field-config]
-  (let [record (db/with-db-keys state -create<! field-config)]
-    (get-specific state (int (:1 record)))))
+  (->> (update field-config :sighting-field-datatype name)
+       (db/with-db-keys state -create<! )
+       :1
+       int
+       (get-specific state)))
 
 (defn delete!
+  "Delete the sighting field with the given ID."
   [state field-id]
   (db/with-db-keys state -delete! {:sighting-field-id field-id})
   nil)

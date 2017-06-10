@@ -4,6 +4,7 @@
             [om.dom :as dom]
             [camelot.rest :as rest]
             [camelot.translation.core :as tr]
+            [camelot.util.sighting-fields :as util.sf]
             [camelot.state :as state]
             [camelot.nav :as nav]
             [cljs.core.async :refer [<! chan >!]]
@@ -96,7 +97,7 @@
                                    (go (>! (::chan state)
                                            {:event :submit
                                             :sighting-field-id (::selected-sighting-field-id data)
-                                            :buffer (::buffer data)})))}
+                                            :buffer (update (::buffer data) :sighting-field-datatype keyword)})))}
                   (if (::selected-sighting-field-id data)
                     (tr/translate :words/update)
                     (tr/translate :words/submit))))))
@@ -193,10 +194,10 @@ Options for select are given by the `options` option."
                               :validators []
                               :params {:opts
                                        {:field :sighting-field-datatype
-                                        :options {nil ""
-                                                  "text" (tr/translate :datatype/text)
-                                                  "textarea" (tr/translate :datatype/textarea)
-                                                  "number" (tr/translate :datatype/number)}}}})
+                                        :options
+                                        (letfn [(f [[k v]]
+                                                  [(name k) (tr/translate (:translation-key v))])]
+                                          (into {nil ""} (map f util.sf/datatypes)))}}})
                    (om/build select-component buf
                              {:data-key :sighting-field-required
                               :validators []

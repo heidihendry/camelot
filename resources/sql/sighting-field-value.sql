@@ -1,15 +1,17 @@
 -- name: -get-all
 SELECT sighting_field_value_id, sighting_field_value_created,
        sighting_field_value_updated, sighting_field_value_data,
-       sighting_field_id, sighting_id
+       sighting_field_id, sighting_id, sighting_field_datatype
 FROM sighting_field_value
+LEFT JOIN sighting_field USING (sighting_field_id)
 WHERE sighting_id IN (:sighting_ids)
 
 -- name: -get-specific
 SELECT sighting_field_value_id, sighting_field_value_created,
        sighting_field_value_updated, sighting_field_value_data,
-       sighting_field_id, sighting_id
+       sighting_field_id, sighting_id, sighting_field_datatype
 FROM sighting_field_value
+LEFT JOIN sighting_field USING (sighting_field_id)
 WHERE sighting_field_value_id = :sighting_field_value_id
 
 -- name: -update!

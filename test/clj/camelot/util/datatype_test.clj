@@ -498,22 +498,34 @@
       (is (= (sut/possible-constraints ["abc" "123" "true" ""])
              #{})))))
 
-(deftest test-deserialise
-  (testing "deserialise"
-    (testing "should deserialise a string field to a string"
-      (is (= (sut/deserialise {:field {:datatype :string}} :field "str")
+(deftest test-deserialise-field
+  (testing "deserialise-field"
+    (testing "should deserialise field a string field to a string"
+      (is (= (sut/deserialise-field {:field {:datatype :string}} :field "str")
              "str")))
 
     (testing "should deserialise a string field to a string"
-      (is (= (sut/deserialise :taxonomy-common-name "smiley wolf")
+      (is (= (sut/deserialise-field :taxonomy-common-name "smiley wolf")
              "smiley wolf")))
 
     (testing "should deserialise a timestamp field to a date-time"
-      (is (= (sut/deserialise :media-capture-timestamp "2016-04-21 10:10:10")
+      (is (= (sut/deserialise-field :media-capture-timestamp "2016-04-21 10:10:10")
              (t/date-time 2016 4 21 10 10 10))))
 
     (testing "should return nil if given a field for which it does not have a schema"
-      (is (nil? (sut/deserialise :bad-field "2016-04-21 10:10:10"))))))
+      (is (nil? (sut/deserialise-field :bad-field "2016-04-21 10:10:10"))))))
+
+(deftest test-deserialise
+  (testing "deserialise"
+    (testing "should deserialise a string to a string"
+      (is (= (sut/deserialise :string "str") "str")))
+
+    (testing "should deserialise a timestamp to a date-time"
+      (is (= (sut/deserialise :timestamp "2016-04-21 10:10:10")
+             (t/date-time 2016 4 21 10 10 10))))
+
+    (testing "should return nil if a deserialiser is not available"
+      (is (nil? (sut/deserialise :notknown "2016-04-21 10:10:10"))))))
 
 (deftest test-max-length
   (testing "max-length"

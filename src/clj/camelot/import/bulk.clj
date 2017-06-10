@@ -88,7 +88,7 @@
                   (if (nil? v)
                     acc
                     (let [d (nth row (get headings v))]
-                      (assoc acc k (datatype/deserialise k d))))) {} mappings))
+                      (assoc acc k (datatype/deserialise-field k d))))) {} mappings))
    file-data))
 
 (defn validate-and-import

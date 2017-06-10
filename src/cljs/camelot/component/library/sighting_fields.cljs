@@ -56,9 +56,10 @@
       (dom/div nil
                (dom/label nil (get-in data [::field :sighting-field-label]))
                (condp = (get-in data [::field :sighting-field-datatype])
-                 "text" (om/build text-input-component data)
-                 "textarea" (om/build textarea-component data)
-                 "number" (om/build number-component data))))))
+                 :text (om/build text-input-component data)
+                 :textarea (om/build textarea-component data)
+                 :number (om/build number-component data)
+                 (om/build text-input-component data))))))
 
 (defn field-data
   "Helper to combine field configuration with form data."

@@ -264,9 +264,17 @@
    :longitude edn/read-string
    :latitude edn/read-string
    :boolean as-boolean
-   :file io/file})
+   :file io/file
+   :string identity})
 
 (defn deserialise
+  "Deserialise value from a string to the given datatype."
+  [datatype value]
+  (when (some? (some #{datatype} (possible-datatypes [value])))
+    (let [f (get deserialisers datatype)]
+      (f value))))
+
+(defn deserialise-field
   "Deserialise a string given its field and (optionally) given a map of schemas."
   ([schemas field str-value]
    (if-let [s (get schemas field)]
@@ -274,4 +282,4 @@
        (f str-value)
        str-value)))
   ([field str-value]
-   (deserialise model/all-mappable-fields field str-value)))
+   (deserialise-field model/all-mappable-fields field str-value)))
