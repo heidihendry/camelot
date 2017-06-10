@@ -8,7 +8,7 @@
 (deftest test-file-data-to-record-list
   (testing "transforming file data to records"
     (testing "mapping to null is omitted"
-      (with-redefs [datatype/deserialise (fn [k d] d)]
+      (with-redefs [datatype/deserialise-field (fn [k d] d)]
         (is (= (sut/file-data-to-record-list (state/gen-state)
                                              [["V1-1","V1-2","V1-3"]
                                               ["V2-1","V2-2","V2-3"]]
