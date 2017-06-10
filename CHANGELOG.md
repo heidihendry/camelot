@@ -1,5 +1,35 @@
 ## ChangeLog
-### 1.2.0
+### 1.2.5 (2017-05-13)
+#### Enhancements
+* Add "delete" as a shortcut key for deleting selected media in the library
+
+#### Fixes
+* Fix image data not being removed after media itself has been deleted.
+* Fix the location reported for image files in the full export and survey export is incorrect.
+* Fix the thumbnail not being loaded when media appears in the library's media sidebar due to the deletion of other media.
+
+### 1.2.4 (2017-04-14)
+#### Fixes
+* Fix a bug where links to newly uploaded images may be broken.
+
+### 1.2.3 (2017-04-05)
+#### Fixes
+* Fix a bug where occupancy matrix dates would not be calculated per trap-station.
+* Fix a bug which prevented Camelot from starting on Windows when a 32-bit JRE was used.
+
+### 1.2.2 (2017-04-03)
+#### Fixes
+* Fix a bug which would cause reports to consume much more memory than necessary.
+
+### 1.2.1 (2017-03-18)
+#### Enhancements
+* Effort summary period start and end now includes the day of the of the month.
+
+#### Fixes
+* Fix a bug where some reports will not contain data
+* Fix a bug where PRESENCE reports will record periods where no data is available as "0", while such entries should be denoted "-"
+
+### 1.2.0 (2017-02-26)
 #### Enhancements
 * Improve the responsiveness of the library for large datasets and greatly improve the size of the dataset which can be supported in the Library.
 * Improve media selection shortcuts in the library, which includes support for selecting ranges of images with the mouse, while holding the shift key.

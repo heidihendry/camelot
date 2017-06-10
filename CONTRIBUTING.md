@@ -109,15 +109,15 @@ There are plenty of resources for working with Clojure; this contribution guide 
 
 There's only a couple of steps to getting Camelot built from sources\*.
 
-1. Camelot uses Leiningen for managing the project build.  First, follow [the installation instructions](http://leiningen.org/#install) for Leiningen.
+1. Camelot uses [Boot](http://boot-clj.com) for managing the project build.  First, follow the [installation instructions](https://github.com/boot-clj/boot#install) for Boot.
 
 2. Once installed, building Camelot is one command\*\*:
 
 ```
-./script/clean-build.sh
+boot uberjar
 ```
 
-This will produce artifacts in /target.  To run the new build, use:
+This will build Camelot and produce a new .jar file, which can be ran with:
 
 ```
 java -jar target/camelot.jar
@@ -131,56 +131,36 @@ If you encounter problems, raise an issue or reach out via the Google Group.
 
 ### Running tests
 
-Camelot currently has 2 test suites, one for .cljc and clj, and one for cljs.
+Camelot currently has 2 test suites, one for .cljc and clj, and one for cljs. To run the tests use:
 
-The commands to invoke them are, respectively:
-
-* `lein test`
-* `lein doo phantom test once`
-
-(If someone is keen to raise a merge request to tidy this up, that would be awesome!)
+```
+boot test-all
+```
 
 ### Working at the REPL
 
-Open a terminal and type `lein repl` to start a Clojure REPL
-(interactive prompt).
+Open a terminal and type `boot dev` to start a development environment.  Once
+running, you can connect to it from a different terminal:
 
-To run Camelot  from the REPL:
-
-```clojure
-(start)
+```
+boot repl -c -H localhost -p 5600
 ```
 
-The call to `(start)` starts the Figwheel server at port 3449, which takes care
-of live reloading ClojureScript code and CSS. Figwheel's server will also act
-as your app server, so requests are correctly forwarded to the http-handler
-you define.
+This will connect to a clj repl.  You can access the cljs repl by:
 
-To access the ClojureScript REPL:
-```clojure
-(browser-repl)
 ```
-
-Running `(browser-repl)` starts the Weasel REPL server, and drops you into a
-ClojureScript REPL. Evaluating expressions here will only work once you've
-loaded the page, so the browser can connect to Weasel.
-
-When you see the line `Successfully compiled "resources/public/app.js" in 21.36
-seconds.`, you're ready to go. Browse to `http://localhost:3449` and enjoy.
-
-To start midje's autotest (for clj tests):
-```clojure
-(autotest)
+(in-ns 'boot.user)
+(start-repl)
 ```
 
 ### Emacs/Cider
 
 Start a repl in the context of your project with `M-x cider-jack-in`.
 
-Switch to repl-buffer with `C-c C-z` and start web and figwheel servers with
-`(start)`, and weasel server with `(browser-repl`). Load
-[http://localhost:3449](http://localhost:3449) on an external browser, which
-connects to weasel, and start evaluating cljs inside Cider.
+Switch to repl-buffer with `C-c C-z` and start the development environment by
+typing `(start`) at the prompt, After a minute you'll see that Camelot has
+started up.  Load [http://localhost:5341](http://localhost:5341) in an
+external browser and you're all set. Happy hacking.
 
 ## Licensing and Ownership
 
