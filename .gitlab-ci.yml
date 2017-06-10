@@ -1,4 +1,4 @@
-image: clojure
+image: registry.gitlab.com/camelot-project/camelot/image
 
 stages:
   - build

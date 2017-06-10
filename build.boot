@@ -151,11 +151,6 @@
    (jar)
    (target :dir #{"target"})))
 
-(deftask classpath
-  []
-  (println (get-env :fake-class-path))
-  identity)
-
 (defn start
   []
   (boot (dev)))
