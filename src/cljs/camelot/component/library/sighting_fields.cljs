@@ -76,7 +76,8 @@
         fields (get-in data [:sighting-fields survey-id])]
     (map #(hash-map ::identification (:identification data)
                     ::field %)
-         fields)))
+         (sort-by (juxt :sighting-field-ordering :sighting-field-label)
+                  fields))))
 
 (defn component
   "Top level component for custom sighting fields."
