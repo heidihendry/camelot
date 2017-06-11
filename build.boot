@@ -19,6 +19,7 @@
     [org.clojure/tools.nrepl "0.2.12"]
     [org.clojure/math.combinatorics "0.1.4"]
     [org.clojure/tools.namespace "0.2.11"]
+    [org.clojure/tools.cli "0.3.5"]
 
     [org.apache.derby/derby "10.12.1.1"]
     [org.omcljs/om "1.0.0-alpha32"
@@ -80,6 +81,9 @@
       :license {"Eclipse Public License" "http://www.eclipse.org/legal/epl-v10.html"}}
  cljs {:ids #{"www/js/compiled/camelot"}
        :optimizations :advanced}
+ cljs-repl {:nrepl-opts {:client false
+                         :port repl-port
+                         :init-ns 'user}}
  aot {:namespace #{'camelot.core}}
  jar {:main 'camelot.core
       :file (str project ".jar")
@@ -105,18 +109,14 @@
 
 (deftask dev
   "Start a development environment."
-  [p port PORT int "The web server port to listen on (default: 3449)"]
+  [p port PORT int "The web server port to listen on"]
   (set-env! :source-paths #(conj % "dev"))
   (System/setProperty "camelot.version" +version+)
   (apply ns.repl/set-refresh-dirs (get-env :directories))
-
   (comp
    (watch)
    (reload :ids #{"www/js/compiled/camelot"}
            :asset-path "/www")
-   (cljs-repl :nrepl-opts {:client false
-                           :port repl-port
-                           :init-ns 'user}) ; this is also the server repl!
    (cljs :optimizations :none)
    (dev-system)
    (target)))
@@ -151,13 +151,32 @@
    (jar)
    (target :dir #{"target"})))
 
-(defn start
+(defonce dev-watcher (atom nil))
+
+(defn watcher-running?
   []
-  (boot (dev)))
+  (and (future? @dev-watcher)
+       (not (future-cancelled? @dev-watcher))
+       (not (future-done? @dev-watcher))))
+
+(defn start []
+  (if (watcher-running?)
+    (println "Already running. Run '(stop)' first.")
+    (do
+      (println "Starting dev server in the background.")
+      (reset! dev-watcher (if (nil? @dev-watcher)
+                            (future (boot (cljs-repl) (dev)))
+                            (future (boot (dev)))))
+      nil)))
 
 (defn stop []
-  (swap! system component/stop)
-  nil)
+  (if (watcher-running?)
+    (do
+      (println "Stopping dev server...")
+      (swap! system component/stop)
+      (future-cancel @dev-watcher)
+      nil)
+    (println "Dev server is not running. Run '(start)' first.")))
 
 (defn state []
   @system)
