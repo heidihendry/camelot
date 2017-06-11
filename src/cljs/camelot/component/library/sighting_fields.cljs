@@ -16,9 +16,11 @@
   (reify
     om/IRender
     (render [_]
-      (let [field-id (get-in data [::field :sighting-field-id])]
+      (let [field-id (get-in data [::field :sighting-field-id])
+            required (get-in data [::field :sighting-field-required])]
         (dom/input #js {:type "text"
                         :className "field-input"
+                        :required required
                         :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
                         :value (get-in data [::identification :sighting-fields field-id])})))))
 
@@ -28,9 +30,11 @@
   (reify
     om/IRender
     (render [_]
-      (let [field-id (get-in data [::field :sighting-field-id])]
+      (let [field-id (get-in data [::field :sighting-field-id])
+            required (get-in data [::field :sighting-field-required])]
         (dom/input #js {:type "number"
                         :className "field-input"
+                        :required required
                         :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
                         :value (get-in data [::identification :sighting-fields field-id])})))))
 
@@ -40,10 +44,12 @@
   (reify
     om/IRender
     (render [_]
-      (let [field-id (get-in data [::field :sighting-field-id])]
+      (let [field-id (get-in data [::field :sighting-field-id])
+            required (get-in data [::field :sighting-field-required])]
         (dom/textarea #js {:className "field-input"
                            :rows 3
                            :cols 50
+                           :required required
                            :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
                            :value (get-in data [::identification :sighting-fields field-id])})))))
 
@@ -53,13 +59,15 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div nil
-               (dom/label nil (get-in data [::field :sighting-field-label]))
-               (condp = (get-in data [::field :sighting-field-datatype])
-                 :text (om/build text-input-component data)
-                 :textarea (om/build textarea-component data)
-                 :number (om/build number-component data)
-                 (om/build text-input-component data))))))
+      (let [required (get-in data [::field :sighting-field-required])]
+        (dom/div nil
+                 (dom/label #js {:className (str "field-label " (if required "required" ""))}
+                            (get-in data [::field :sighting-field-label]))
+                 (condp = (get-in data [::field :sighting-field-datatype])
+                   :text (om/build text-input-component data)
+                   :textarea (om/build textarea-component data)
+                   :number (om/build number-component data)
+                   (om/build text-input-component data)))))))
 
 (defn field-data
   "Helper to combine field configuration with form data."

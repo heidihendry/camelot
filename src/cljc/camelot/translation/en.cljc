@@ -542,7 +542,8 @@
    {:identify-selected "Identify Selected"
     :taxonomy-add-placeholder "New species name..."
     :species-format-error "Invalid scientific name for species"
-    :add-new-species-label "Add a new species..."}
+    :add-new-species-label "Add a new species..."
+    :submit-not-allowed "One or more fields cannot be submitted in their current state."}
 
    :camelot.component.library.util
    {:reference-quality "reference quality"

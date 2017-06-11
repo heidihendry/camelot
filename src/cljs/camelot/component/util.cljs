@@ -44,7 +44,7 @@
       :else nil)))
 
 (defn prompt-component
-  [data owner {:keys [active-key title body actions closable]}]
+  [data owner {:keys [form-opts active-key title body actions closable]}]
   (reify
     om/IInitState
     (init-state [_]
@@ -74,13 +74,14 @@
                           (dom/button #js {:className "pull-right fa fa-times btn-flat"
                                            :ref "close-button"
                                            :onClick #(om/update! data active-key false)}))
-                        (dom/div #js {:className "prompt-title"}
-                                 title)
-                        (dom/div #js {:className "prompt-body"}
-                                 body)
-                        (dom/div #js {:className "prompt-actions"
-                                      :ref "actions"}
-                                 actions))
+                        (dom/form (clj->js (fnil form-opts {:onSubmit #(.preventDefault %)}))
+                                  (dom/div #js {:className "prompt-title"}
+                                           title)
+                                  (dom/div #js {:className "prompt-body"}
+                                           body)
+                                  (dom/div #js {:className "prompt-actions"
+                                                :ref "actions"}
+                                           actions)))
                (dom/div #js {:className "tabguard"
                              :tabIndex "0"
                              :onFocus #(if-let [cl (om/get-node owner "close-button")]

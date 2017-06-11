@@ -117,6 +117,7 @@
    (watch)
    (reload :ids #{"www/js/compiled/camelot"}
            :asset-path "/www")
+   (cljs-repl)
    (cljs :optimizations :none)
    (dev-system)
    (target)))
@@ -164,9 +165,7 @@
     (println "Already running. Run '(stop)' first.")
     (do
       (println "Starting dev server in the background.")
-      (reset! dev-watcher (if (nil? @dev-watcher)
-                            (future (boot (cljs-repl) (dev)))
-                            (future (boot (dev)))))
+      (reset! dev-watcher (future (boot (dev))))
       nil)))
 
 (defn stop []
