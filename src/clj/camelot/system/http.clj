@@ -15,7 +15,8 @@
    [ring.middleware.session :refer [wrap-session]]
    [ring.middleware.session.cookie :refer [cookie-store]]
    [ring.middleware.gzip :refer [wrap-gzip]]
-   [ring.middleware.logger :refer [wrap-with-logger]]))
+   [ring.middleware.logger :refer [wrap-with-logger]])
+  (:import (org.eclipse.jetty.server Server)))
 
 (defonce system (atom {}))
 (defonce jetty (atom nil))
@@ -59,6 +60,6 @@
 
   (stop [this]
     (when (get this :jetty)
-      (.stop (get this :jetty))
+      (.stop ^Server (get this :jetty))
       (reset! jetty nil))
     (assoc this :jetty nil)))
