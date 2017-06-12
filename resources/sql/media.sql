@@ -29,6 +29,15 @@ ORDER BY media_capture_timestamp
 SELECT media_id, media_created, media_updated, media_filename,
        media_notes, media_cameracheck, media_attention_needed,
        media_processed, media_capture_timestamp, media_reference_quality,
+       trap_station_session_camera_id, media_format
+FROM media
+WHERE media_id IN (:media-ids)
+ORDER BY media_capture_timestamp
+
+-- name: -get-with-ids
+SELECT media_id, media_created, media_updated, media_filename,
+       media_notes, media_cameracheck, media_attention_needed,
+       media_processed, media_capture_timestamp, media_reference_quality,
        trap_station_session_camera_id, media_format, survey_id
 FROM media
 LEFT JOIN trap_station_session_camera USING (trap_station_session_camera_id)

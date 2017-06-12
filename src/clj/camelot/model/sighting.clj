@@ -38,21 +38,19 @@
   {s/Any s/Any})
 
 (s/defn sighting :- Sighting
-  [{:keys [sighting-id sighting-created sighting-updated sighting-quantity
-           sighting-lifestage sighting-sex taxonomy-id media-id taxonomy-genus
-           taxonomy-species]}]
-  (->Sighting sighting-id sighting-created sighting-updated sighting-quantity
-              (or sighting-lifestage sighting-default-option)
-              (or sighting-sex sighting-default-option)
-              taxonomy-id media-id
-              (str sighting-quantity "x " taxonomy-genus " " taxonomy-species)))
+  [data]
+  (map->Sighting (-> data
+                  (update :sighting-lifestage #(or % sighting-default-option))
+                  (update :sighting-sex #(or % sighting-default-option))
+                  (assoc :sighting-label (str (:sighting-quantity data) "x "
+                                              (:taxonomy-genus data) " "
+                                              (:taxonomy-species data))))))
 
 (s/defn tsighting :- TSighting
-  [{:keys [sighting-quantity sighting-lifestage sighting-sex taxonomy-id
-           media-id sighting-fields]}]
-  (->TSighting sighting-quantity (known-or-nil sighting-lifestage)
-               (known-or-nil sighting-sex) taxonomy-id media-id
-               sighting-fields))
+  [data]
+  (map->TSighting (-> data
+                   (update :sighting-lifestage known-or-nil)
+                   (update :sighting-sex known-or-nil))))
 
 (s/defn get-all
   [state :- State
@@ -61,7 +59,15 @@
 
 (s/defn get-all*
   [state :- State]
-  (map sighting (db/clj-keys (db/with-connection state -get-all*))))
+  (let [sf (sighting-field-value/query-all state)]
+    (->> (db/clj-keys (db/with-connection state -get-all*))
+                   (map #(sighting (merge (get sf (:sighting-id %)) %))))))
+
+(defn get-with-media-ids
+  [state media-ids]
+  (let [sf (sighting-field-value/query-with-media-ids state media-ids)]
+    (->> (db/with-db-keys state -get-with-media-ids {:media-ids media-ids})
+                   (map #(sighting (merge (get sf (:sighting-id %)) %))))))
 
 (s/defn get-specific
   [state :- State
@@ -82,7 +88,6 @@
 (s/defn create!
   [state :- State
    data :- TSighting]
-  (clojure.tools.logging/error data)
   (let [record (db/with-db-keys state -create<! data)
         sighting-id (int (:1 record))]
     (create-sighting-field-value! state sighting-id (:sighting-fields data))

@@ -3,8 +3,10 @@
   (:require
    [schema.core :as s]
    [yesql.core :as sql]
+   [medley.core :as medley]
    [camelot.util.db :as db]
    [camelot.library.filter :as filter]
+   [camelot.report.query :as query]
    [camelot.util.filter :as futil]
    [camelot.util.datatype :as datatype]
    [camelot.model.sighting :as sighting]
@@ -71,20 +73,6 @@
        (group-by :trap-station-session-camera-id)
        (map (fn [[k v]] (vector k (map->LibraryMetadata (first v)))))
        (into {})))
-
-(defn add-in-metadata
-  [state sightings records]
-  (let [md (build-library-metadata state)]
-    (map #(assoc (merge (get md (:trap-station-session-camera-id %)) %)
-                 :sightings (or (get sightings (:media-id %)) []))
-         records)))
-
-(defn filtered-media
-  [state records search]
-  (let [spps (reduce #(assoc %1 (:taxonomy-id %2) %2) {} (taxonomy/get-all state))
-        sightings (group-by :media-id (sighting/get-all* state))
-        matches (filter/only-matching search spps (add-in-metadata state sightings records))]
-    (map #(:media-id %) matches)))
 
 (defn all-media-with-taxonomy-label
   [state value]
@@ -162,31 +150,33 @@
     (datatype-fn value)
     true))
 
-(defn- execute-optimised-query-for-search
-  "Return the research for a search.
-  Attempts to optimise the query for simple searches."
-  [state psearch]
-  (if-let [qc (some->> psearch
-                       first
-                       (mapcat query-config)
-                       first)]
-    (if (search-valid? (get-in qc [:config :check-value]) (:search qc))
-      (let [parse-fn (get-in qc [:config :parse-value])]
-        (let [fv {:field-value (if parse-fn
-                                 (parse-fn (:search qc))
-                                 (:search qc))}]
-          (if (get-in qc [:config :clojure-fn])
-            ((get-in qc [:config :query]) state fv)
-            (db/with-db-keys state (get-in qc [:config :query]) fv))))
-      [])
-      (db/with-db-keys state -all-media {})))
+(defn- execute-optimised-query-for-config
+  "Return all media IDs for (at least a portion) of a conjunction."
+  [state query-config]
+  (let [parse-fn (get-in query-config [:config :parse-value])]
+    (let [fv {:field-value (if parse-fn
+                             (parse-fn (:search query-config))
+                             (:search query-config))}]
+      (if (get-in query-config [:config :clojure-fn])
+        ((get-in query-config [:config :query]) state fv)
+        (db/with-db-keys state (get-in query-config [:config :query]) fv)))))
 
-(defn execute-query-for-search
+(defn- execute-query-for-conjunction
+  "Return at least the required results to satisfy the conjunction.
+  May include extraneous results."
+  [state search-exp]
+  (if-let [qc (first (mapcat query-config search-exp))]
+    (if (search-valid? (get-in qc [:config :check-value]) (:search qc))
+      (execute-optimised-query-for-config state qc)
+      [])
+    (db/with-db-keys state -all-media-ids {})))
+
+(defn- execute-queries-for-search
   "Executes a query for the search, returning the result."
   [state psearch]
-  (if (fparser/has-disjunctions? psearch)
-    (db/with-db-keys state -all-media {})
-    (execute-optimised-query-for-search state psearch)))
+  (->> psearch
+       (mapcat #(map :media-id (execute-query-for-conjunction state %)))
+       (query/get-media state)))
 
 (defn search-media
   [state search]
@@ -200,9 +190,10 @@
                        {:field-value (:value (ffirst psearch))}))
 
       :else
-      (filtered-media state
-                      (execute-query-for-search state psearch)
-                      search))))
+      (->> psearch
+           (execute-queries-for-search state)
+           (filter/only-matching psearch)
+           (map :media-id)))))
 
 (s/defn build-records
   [state sightings media]

@@ -6,12 +6,6 @@
    [reloaded.repl :as rrepl]
    [schema.core :as s]))
 
-;; Let Clojure warn you when it needs to reflect on types, or when it does math
-;; on unboxed numbers. In both cases you should add type annotations to prevent
-;; degraded performance.
-(set! *warn-on-reflection* true)
-(set! *unchecked-math* :warn-on-boxed)
-
 (s/set-fn-validation! true)
 
 (defn migrate

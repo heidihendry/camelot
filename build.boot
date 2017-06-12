@@ -37,6 +37,7 @@
     [secretary "1.2.3"]
     [com.taoensso/tower "3.1.0-beta4"]
 
+    [medley "1.0.0"]
     [bk/ring-gzip "0.1.1"]
     [cheshire "5.6.1"]
     [clj-http "2.2.0"]
@@ -62,12 +63,16 @@
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[crisptrutski.boot-cljs-test :refer [test-cljs]]
-         '[camelot.system.http :refer [system http-handler] :as http]
-         '[camelot.system.db-migrate :refer [migrate rollback]]
-         '[camelot.core :as camelot]
          '[clojure.tools.namespace.repl :as ns.repl]
          '[com.stuartsierra.component :as component]
          '[schema.core :as schema])
+
+(set! *warn-on-reflection* true)
+(set! *unchecked-math* :warn-on-boxed)
+
+(require '[camelot.core :as camelot]
+         '[camelot.system.http :refer [system http-handler] :as http]
+         '[camelot.system.db-migrate :refer [migrate rollback]])
 
 (def project "camelot")
 (def repl-port 5600)
@@ -134,12 +139,12 @@
   (let [namespaces (or namespaces #{})]
     (comp
      (add-source-paths :dirs #{"test/cljc" "test/clj" "test/cljs"})
+     (test :namespaces namespaces)
      (test-cljs :ids ["camelot.test-runner"]
                 :update-fs? true
                 :namespaces namespaces
                 :js-env :phantom
-                :optimizations :none)
-     (test :namespaces namespaces))))
+                :optimizations :none))))
 
 (deftask uberjar
   "Build an uberjar."

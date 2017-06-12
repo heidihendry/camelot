@@ -6,6 +6,19 @@ SELECT sighting_field_id, sighting_field_created, sighting_field_updated,
        sighting_field_ordering, survey_id
 FROM sighting_field
 
+-- name: -get-with-media-ids
+SELECT DISTINCT
+       sighting_field_id, sighting_field_created, sighting_field_updated,
+       sighting_field_key, sighting_field_label,
+       sighting_field_datatype, sighting_field_required,
+       sighting_field_default, sighting_field_affects_independence,
+       sighting_field_ordering, survey_id
+FROM sighting_field
+LEFT JOIN sighting_field_value USING (sighting_field_id)
+LEFT JOIN sighting USING (sighting_id)
+LEFT JOIN media USING (media_id)
+WHERE media_id IN (:media_ids)
+
 -- name: -get-specific
 SELECT sighting_field_id, sighting_field_created, sighting_field_updated,
        sighting_field_key, sighting_field_label,
@@ -50,3 +63,4 @@ VALUES (:current_timestamp, :current_timestamp, :sighting_field_option_label,
 -- name: -delete!
 DELETE FROM sighting_field
 WHERE sighting_field_id = :sighting_field_id
+

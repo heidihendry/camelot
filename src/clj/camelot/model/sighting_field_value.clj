@@ -28,11 +28,17 @@
        util.sf/datatypes
        :deserialiser-datatype))
 
+(defn augment-data
+  [data]
+  (letfn [(deserialise [v] (datatype/deserialise (deserialiser-datatype data) v))]
+    (let [ddata (update data :sighting-field-value-data deserialise)
+          user-key (keyword (str "field-" (:sighting-field-key data)))]
+      (assoc ddata user-key (:sighting-field-value-data ddata)))))
+
 (defn sighting-field-value
   "Return a record, deserialising the field value data in the process."
   [data]
-  (letfn [(deserialise [v] (datatype/deserialise (deserialiser-datatype data) v))]
-    (map->SightingFieldValue (update data :sighting-field-value-data deserialise))))
+  (map->SightingFieldValue (augment-data data)))
 
 (defn get-all
   "Return all sighting field values for a collection of sighting IDs."
@@ -40,6 +46,31 @@
   (->> {:sighting-ids sighting-ids}
        (db/with-db-keys state -get-all)
        (map sighting-field-value)))
+
+(defn sighting-field-query-reducer
+  [acc sighting-id fields]
+  (->> fields
+       (map augment-data)
+       (apply merge)
+       ((fn [x] (dissoc x :sighting-field-key
+                        :sighting-field-value-data
+                        :sighting-field-datatype)))
+       (assoc acc sighting-id)))
+
+(defn query-with-media-ids
+  "Return all sighting field values all media-ids provided."
+  [state media-ids]
+  (->> {:media-ids media-ids}
+       (db/with-db-keys state -query-with-media-ids)
+       (group-by :sighting-id)
+       (reduce-kv sighting-field-query-reducer {})))
+
+(defn query-all
+  "Return all sighting field values."
+  [state]
+  (->> (db/with-db-keys state -query-all {})
+       (group-by :sighting-id)
+       (reduce-kv sighting-field-query-reducer {})))
 
 (defn get-specific
   "Return a specific sighting field value."

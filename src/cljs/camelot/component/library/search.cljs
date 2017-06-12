@@ -46,7 +46,7 @@
 
 (defn completion-field
   [ctx]
-  (let [field (get filter/field-keys ctx)]
+  (let [field (get filter/field-keys (keyword ctx))]
     (if field
       (name field)
       (some (set filter/model-fields) (list ctx)))))
@@ -90,7 +90,7 @@
       (or (nil? cf) (nil? ep)) nil
 
       :else
-      (rest/get-x (str ep)
+      (rest/get-x ep
                   #(go (>! ch (->> (:body %)
                                    (mapv (keyword cf))
                                    (filter (complement nil?))
@@ -112,7 +112,7 @@
                          (apply conj (map #(hash-map :term %
                                                      :props {:field true
                                                              :completion-fn completions})
-                                          (apply conj (keys filter/field-keys) filter/model-fields))
+                                          (apply conj (map name (keys filter/field-keys)) filter/model-fields))
                                 (if (get-in data [:taxonomy-completions :species])
                                   (mapv typeahead/->basic-entry
                                         (apply conj (get-in data [:taxonomy-completions :species])

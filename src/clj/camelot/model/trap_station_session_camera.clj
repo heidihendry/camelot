@@ -50,6 +50,11 @@
   [state :- State]
   (map trap-station-session-camera (db/with-db-keys state -get-all* {})))
 
+(defn get-with-media-ids
+  [state media-ids]
+  (map trap-station-session-camera
+       (db/with-db-keys state -get-with-media-ids {:media-ids media-ids})))
+
 (s/defn get-specific :- (s/maybe TrapStationSessionCamera)
   [state :- State
    id :- s/Int]

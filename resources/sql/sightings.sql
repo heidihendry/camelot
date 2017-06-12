@@ -20,6 +20,16 @@ FROM sighting
 LEFT JOIN taxonomy USING (taxonomy_id)
 WHERE media_id = :media_id
 
+-- name: -get-with-media-ids
+SELECT DISTINCT
+       sighting_id, sighting_created, sighting_updated, sighting_quantity,
+       sighting_lifestage, sighting_sex, taxonomy_id, media_id, taxonomy_genus,
+       taxonomy_species
+FROM sighting
+LEFT JOIN taxonomy USING (taxonomy_id)
+LEFT JOIN media USING (media_id)
+WHERE media_id IN (:media_ids)
+
 -- name: -update!
 UPDATE sighting
 SET sighting_updated = :current_timestamp,

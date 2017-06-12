@@ -3,22 +3,10 @@
   (:require
    [camelot.util.db :as db]
    [camelot.system.state :refer [State]]
+   [camelot.report.query :as query]
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
    [camelot.translation.core :as tr]
-   [camelot.model.camera :as camera]
-   [camelot.model.camera-status :as camera-status]
-   [camelot.model.media :as media]
-   [camelot.model.photo :as photo]
-   [camelot.model.sighting :as sighting]
-   [camelot.model.site :as site]
-   [camelot.model.taxonomy :as taxonomy]
-   [camelot.model.species-mass :as species-mass]
-   [camelot.model.survey :as survey]
-   [camelot.model.survey-site :as survey-site]
-   [camelot.model.trap-station :as trap-station]
-   [camelot.model.trap-station-session :as trap-station-session]
-   [camelot.model.trap-station-session-camera :as trap-station-session-camera]
    [clj-time.local :as tl]
    [clj-time.format :as tf]
    [clojure.data.csv :as csv]
@@ -30,89 +18,6 @@
   (:import
    (clojure.lang IFn)))
 
-(def data-definitions
-  {:media-id [media/get-all* [:trap-station-session-camera-id] [:sighting-id :photo-id]]
-   :sighting-id [sighting/get-all* [:taxonomy-id] [:media-id]]
-   :taxonomy-id [taxonomy/get-all [:species-mass-id] [:sighting-id]]
-   :photo-id [photo/get-all* [] [:media-id]]
-   :trap-station-session-camera-id [trap-station-session-camera/get-all* [:trap-station-session-id :camera-id] [:media-id]]
-   :camera-id [camera/get-all [:camera-status-id] [:trap-station-session-camera-id]]
-   :trap-station-session-id [trap-station-session/get-all* [:trap-station-id] [:trap-station-session-camera-id]]
-   :trap-station-id [trap-station/get-all* [:survey-site-id] [:trap-station-session-id]]
-   :survey-site-id [survey-site/get-all* [:survey-id :site-id] []]
-   :species-mass-id [species-mass/get-all [] [:taxonomy-id]]
-   :camera-status-id [camera-status/get-all [] [:camera-id]]
-   :site-id [site/get-all [] [:survey-site-id :trap-station-id]]
-   :survey-id [survey/get-all [] [:survey-site-id]]})
-
-(defn known-dep?
-  [acc dep]
-  (some? (some #{(first dep)} (map first acc))))
-
-(defn resolution-order
-  [data by]
-  ((fn [acc deps rdeps]
-     (if (empty? deps)
-       (if (empty? rdeps)
-         acc
-         (let [cd (get data (ffirst rdeps))]
-           (recur (conj acc (first rdeps))
-                  (let [ndeps (filter #(not (known-dep? acc %))
-                                      (mapv #(vector % %) (second cd)))]
-                    (if (seq ndeps)
-                      (concat deps ndeps)
-                      deps))
-                  (let [nrdeps (filter #(not (known-dep? acc %))
-                                       (mapv #(vector % (ffirst rdeps)) (nth cd 2)))]
-                    (if (seq nrdeps)
-                      (concat (rest rdeps) nrdeps)
-                      (rest rdeps))))))
-       (let [cd (get data (ffirst deps))]
-         (recur (conj acc (first deps))
-                (let [ndeps (filter #(not (known-dep? acc %))
-                                    (mapv #(vector % %) (second cd)))]
-                    (if (seq ndeps)
-                      (concat (rest deps) ndeps)
-                      (rest deps)))
-                (let [nrdeps (filter #(not (known-dep? acc %))
-                                     (mapv #(vector % (ffirst deps)) (nth cd 2)))]
-                    (if (seq nrdeps)
-                      (concat rdeps nrdeps)
-                      rdeps))))))
-   [] [[by by]] []))
-
-(defn- build-records
-  [rorder data]
-  (reduce (fn [acc [tbl key]]
-              (mapcat (fn [a] (let [rs (get-in data [tbl key (get a key)])]
-                                (if (seq rs)
-                                  (map #(merge a %) rs)
-                                  (list a))))
-                      acc))
-            (map #(into {} %) (apply concat (vals (get-in data (first rorder)))))
-            (rest rorder)))
-
-(defn- join-all
-  [state by]
-  (let [rorder (resolution-order data-definitions by)
-        data (reduce (fn [acc [t1 [t2s]]]
-                       (let [qres ((first (get data-definitions t1)) state)]
-                         (assoc acc t1
-                                (reduce (fn [iacc t2] (assoc iacc t2 (group-by t2 qres)))
-                                        {}
-                                        t2s))))
-                     {} (group-by first rorder))]
-    (build-records rorder data)))
-
-(s/defn get-by :- [{s/Keyword s/Any}]
-  "Retrieve the data for the given report type."
-  [state :- State
-   by :- s/Keyword]
-  (if (= by :none)
-    []
-    (join-all state (if (= by :all)
-                      :media-id
-                      (keyword (str (name by) "-id"))))))
 
 (defn- fill-keys
   [columns data]
@@ -359,7 +264,7 @@
    configuration]
   (loader/load-user-modules state)
   (if-let [report (module/get-report state report-key)]
-    (let [sightings (get-by state (:by report))
+    (let [sightings (query/get-by state (:by report))
           data (csv-report report-key state configuration sightings)]
       (-> (r/response data)
           (r/content-type "text/csv; charset=utf-8")

@@ -43,6 +43,12 @@
   [state]
   (map sighting-field (db/with-db-keys state -get-all {})))
 
+(defn get-with-media-ids
+  "Get all sighting fields for media-ids, by way of values defined for their sightings."
+  [state media-ids]
+  (map sighting-field
+       (db/with-db-keys state -get-with-media-ids {:media-ids media-ids})))
+
 (defn get-specific
   "Return a specific sighting field by field ID."
   [state field-id]

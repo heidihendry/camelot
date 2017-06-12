@@ -1,12 +1,13 @@
 (ns camelot.library.filter-parser
-  (:require [clojure.string :as str]))
+  (:require
+   [clojure.string :as str]))
 
 (defn parse-term
   [search]
   (let [parts (str/split search #":")]
     (if (= (count parts) 1)
       {:value (first parts)}
-      {:field (first parts)
+      {:field (keyword (first parts))
        :value (str/join ":" (rest parts))})))
 
 (defn parse-conjunction
@@ -32,6 +33,7 @@
 (defn format-terms
   [terms]
   (->> terms
+       str/trim
        seq
        (reduce format-reducer {:result [] :quoted false})
        :result
@@ -41,7 +43,7 @@
 
 (defn parse
   [search]
-  (let [t (format-terms search)]
+  (let [t (format-terms (or search ""))]
     (if (= t "")
       []
       (parse-disjunctions t))))

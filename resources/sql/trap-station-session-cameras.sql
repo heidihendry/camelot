@@ -44,6 +44,14 @@ FROM trap_station_session_camera
 LEFT JOIN camera using (camera_id)
 WHERE trap_station_session_id = :trap_station_session_id
 
+-- name: -get-with-media-ids
+SELECT DISTINCT
+       trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, trap_station_session_id, camera_id, camera_name, trap_station_session_camera_import_path, trap_station_session_camera_media_unrecoverable
+FROM trap_station_session_camera
+LEFT JOIN camera USING (camera_id)
+LEFT JOIN media USING (trap_station_session_camera_id)
+WHERE media_id IN (:media_ids)
+
 -- name: -get-all*
 SELECT trap_station_session_camera_id, trap_station_session_camera_created, trap_station_session_camera_updated, trap_station_session_id, camera_id, camera_name, trap_station_session_camera_import_path, trap_station_session_camera_media_unrecoverable
 FROM trap_station_session_camera
