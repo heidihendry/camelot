@@ -13,16 +13,6 @@ SELECT sighting_field_value_data, sighting_id, sighting_field_datatype,
 FROM sighting_field_value
 LEFT JOIN sighting_field USING (sighting_field_id)
 
--- name: -query-with-media-ids
-SELECT DISTINCT
-       sighting_field_value_data, sighting_id, sighting_field_datatype,
-       sighting_field_key
-FROM sighting_field_value
-LEFT JOIN sighting_field USING (sighting_field_id)
-LEFT JOIN sighting USING (sighting_id)
-LEFT JOIN media USING (media_id)
-WHERE media_id IN ( :media_ids )
-
 -- name: -get-specific
 SELECT sighting_field_value_id, sighting_field_value_created,
        sighting_field_value_updated, sighting_field_value_data,

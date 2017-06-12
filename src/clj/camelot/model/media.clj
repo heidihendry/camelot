@@ -56,10 +56,6 @@
   [state id]
   (map media (db/with-db-keys state -get-all {:trap-station-session-camera-id id})))
 
-(s/defn get-with-ids
-  [state ids]
-  (map media (db/with-db-keys state -get-with-ids {:media-ids ids})))
-
 (s/defn get-all* :- [Media]
   [state :- State]
   (map media (db/clj-keys (db/with-connection state -get-all*))))

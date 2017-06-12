@@ -19,23 +19,19 @@
    [camelot.model.trap-station-session-camera :as trap-station-session-camera]))
 
 (def query-fns
-  {:media-id {:all media/get-all*
-              :media-id media/get-with-ids}
-   :sighting-id {:all sighting/get-all*
-                 :media-id sighting/get-with-media-ids}
-   :taxonomy-id {:all taxonomy/get-all}
-   :photo-id {:all photo/get-all*
-              :media-id photo/get-with-media-ids}
-   :trap-station-session-camera-id {:all trap-station-session-camera/get-all*
-                                    :media-id trap-station-session-camera/get-with-media-ids}
-   :camera-id {:all camera/get-all}
-   :trap-station-session-id {:all trap-station-session/get-all*}
-   :trap-station-id {:all trap-station/get-all*}
-   :survey-site-id {:all survey-site/get-all*}
-   :species-mass-id {:all species-mass/get-all}
-   :camera-status-id {:all camera-status/get-all}
-   :site-id {:all site/get-all}
-   :survey-id {:all survey/get-all}})
+  {:media-id media/get-all*
+   :sighting-id sighting/get-all*
+   :taxonomy-id taxonomy/get-all
+   :photo-id photo/get-all*
+   :trap-station-session-camera-id trap-station-session-camera/get-all*
+   :camera-id camera/get-all
+   :trap-station-session-id trap-station-session/get-all*
+   :trap-station-id trap-station/get-all*
+   :survey-site-id survey-site/get-all*
+   :species-mass-id species-mass/get-all
+   :camera-status-id camera-status/get-all
+   :site-id site/get-all
+   :survey-id survey/get-all})
 
 (def data-definitions
   {:media-id [[:trap-station-session-camera-id] [:sighting-id :photo-id]]
@@ -100,22 +96,17 @@
           (rest rorder)))
 
 (defn- join-all
-  ([state by media-ids]
-   (let [rorder (resolution-order data-definitions by)
-         data (reduce (fn [acc [t1 [t2s]]]
-                        (let [media-q (get-in query-fns [t1 :media-id])
-                              fallback-q (get-in query-fns [t1 :all])
-                              qres (if (and media-ids media-q)
-                                     (media-q state media-ids)
-                                     (fallback-q state))]
-                          (assoc acc t1
-                                 (reduce (fn [iacc t2] (assoc iacc t2 (group-by t2 qres)))
-                                         {}
-                                         t2s))))
-                      {} (group-by first rorder))]
-     (build-records rorder data)))
-  ([state by]
-   (join-all state by nil)))
+  [state by]
+  (let [rorder (resolution-order data-definitions by)
+        data (reduce (fn [acc [t1 [t2s]]]
+                       (let [qfn (get query-fns t1)
+                             qres (qfn state)]
+                         (assoc acc t1
+                                (reduce (fn [iacc t2] (assoc iacc t2 (group-by t2 qres)))
+                                        {}
+                                        t2s))))
+                     {} (group-by first rorder))]
+    (build-records rorder data)))
 
 (s/defn get-by :- [{s/Keyword s/Any}]
   "Retrieve the data for the given report type."
@@ -126,11 +117,3 @@
     (join-all state (if (= by :all)
                       :media-id
                       (keyword (str (name by) "-id"))))))
-
-(s/defn get-media :- [{s/Keyword s/Any}]
-  "Retrieve the data for the given report type."
-  [state :- State
-   media-ids]
-  (if (empty? media-ids)
-    []
-    (join-all state :media-id media-ids)))

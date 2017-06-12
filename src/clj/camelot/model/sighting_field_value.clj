@@ -57,14 +57,6 @@
                         :sighting-field-datatype)))
        (assoc acc sighting-id)))
 
-(defn query-with-media-ids
-  "Return all sighting field values all media-ids provided."
-  [state media-ids]
-  (->> {:media-ids media-ids}
-       (db/with-db-keys state -query-with-media-ids)
-       (group-by :sighting-id)
-       (reduce-kv sighting-field-query-reducer {})))
-
 (defn query-all
   "Return all sighting field values."
   [state]

@@ -22,23 +22,6 @@
 
 (sql/defqueries "sql/library.sql")
 
-(def max-result-records 2000)
-
-(defrecord LibraryRecord
-    [media-id
-     media-created
-     media-updated
-     media-filename
-     media-format
-     media-uri
-     media-cameracheck
-     media-attention-needed
-     media-processed
-     media-reference-quality
-     media-capture-timestamp
-     trap-station-session-camera-id
-     sightings])
-
 (defrecord LibraryMetadata
     [trap-station-session-camera-id
      trap-station-session-id
@@ -60,123 +43,12 @@
      site-id
      site-name])
 
-(defn library-record
-  [ks]
-  (map->LibraryRecord (-> ks
-                          (update :media-processed #(or % false))
-                          (update :media-reference-quality #(or % false))
-                          (update :sightings #(or % [])))))
-
 (defn build-library-metadata
   [state]
   (->> (db/with-db-keys state -hierarchy-data {})
        (group-by :trap-station-session-camera-id)
        (map (fn [[k v]] (vector k (map->LibraryMetadata (first v)))))
        (into {})))
-
-(defn all-media-with-taxonomy-label
-  [state value]
-  (if (= (config/lookup state :species-name-style) :scientific)
-    (db/with-db-keys state -all-media-with-taxonomy-scientific-name value)
-    (db/with-db-keys state -all-media-with-taxonomy-common-name value)))
-
-(def queries
-  "Query strategies for different field types."
-  {:media-reference-quality
-   {:query -all-media-with-reference-quality-sighting
-    :check-value datatype/could-be-boolean?
-    :parse-value datatype/as-boolean}
-
-   :media-attention-needed
-   {:query -all-media-with-attention-needed-flag
-    :check-value datatype/could-be-boolean?
-    :parse-value datatype/as-boolean}
-
-   :media-processed
-   {:query -all-media-with-media-processed-flag
-    :check-value datatype/could-be-boolean?
-    :parse-value datatype/as-boolean}
-
-   :media-cameracheck
-   {:query -all-media-with-media-cameracheck-flag
-    :check-value datatype/could-be-boolean?
-    :parse-value datatype/as-boolean}
-
-   :trap-station-id
-   {:query -all-media-with-trap-station-id
-    :check-value datatype/could-be-integer?
-    :parse-value edn/read-string}
-
-   :taxonomy-id
-   {:query -all-media-with-taxonomy-id
-    :check-value datatype/could-be-integer?
-    :parse-value edn/read-string}
-
-   :survey-id
-   {:query -all-media-with-survey-id
-    :check-value datatype/could-be-integer?
-    :parse-value edn/read-string}
-
-   :camera-name {:query -all-media-with-camera-name}
-   :site-name {:query -all-media-with-site-name}
-   :taxonomy-label {:query all-media-with-taxonomy-label
-                    :clojure-fn true}
-   :taxonomy-common-name {:query -all-media-with-taxonomy-common-name}
-   :taxonomy-species {:query -all-media-with-taxonomy-species}
-   :taxonomy-genus {:query -all-media-with-taxonomy-genus}})
-
-(def query-priority
-  "Ordering of (likely) most to least specific field, to optimise a search."
-  [:taxonomy-label :taxonomy-id :taxonomy-common-name :taxonomy-species
-   :taxonomy-genus :media-reference-quality :trap-station-id
-   :media-processed :media-cameracheck :media-attention-needed
-   :site-name :camera-name :survey-id])
-
-(defn query-config
-  "Return a configuration, if available, to optimise a search term."
-  [term]
-  (let [build-config #(when %
-                        [(hash-map :search (:value term)
-                                   :config (get queries %))])]
-    (->> query-priority
-         (filter #(and (= (futil/field-key-lookup (:field term)) %)
-                       (not= (:value term) "*")))
-         first
-         build-config)))
-
-(defn search-valid?
-  [datatype-fn value]
-  (if datatype-fn
-    (datatype-fn value)
-    true))
-
-(defn- execute-optimised-query-for-config
-  "Return all media IDs for (at least a portion) of a conjunction."
-  [state query-config]
-  (let [parse-fn (get-in query-config [:config :parse-value])]
-    (let [fv {:field-value (if parse-fn
-                             (parse-fn (:search query-config))
-                             (:search query-config))}]
-      (if (get-in query-config [:config :clojure-fn])
-        ((get-in query-config [:config :query]) state fv)
-        (db/with-db-keys state (get-in query-config [:config :query]) fv)))))
-
-(defn- execute-query-for-conjunction
-  "Return at least the required results to satisfy the conjunction.
-  May include extraneous results."
-  [state search-exp]
-  (if-let [qc (first (mapcat query-config search-exp))]
-    (if (search-valid? (get-in qc [:config :check-value]) (:search qc))
-      (execute-optimised-query-for-config state qc)
-      [])
-    (db/with-db-keys state -all-media-ids {})))
-
-(defn- execute-queries-for-search
-  "Executes a query for the search, returning the result."
-  [state psearch]
-  (->> psearch
-       (mapcat #(map :media-id (execute-query-for-conjunction state %)))
-       (query/get-media state)))
 
 (defn search-media
   [state search]
@@ -190,8 +62,7 @@
                        {:field-value (:value (ffirst psearch))}))
 
       :else
-      (->> psearch
-           (execute-queries-for-search state)
+      (->> (query/get-by state :media)
            (filter/only-matching psearch)
            (map :media-id)))))
 

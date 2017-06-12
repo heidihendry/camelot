@@ -63,12 +63,6 @@
     (->> (db/clj-keys (db/with-connection state -get-all*))
                    (map #(sighting (merge (get sf (:sighting-id %)) %))))))
 
-(defn get-with-media-ids
-  [state media-ids]
-  (let [sf (sighting-field-value/query-with-media-ids state media-ids)]
-    (->> (db/with-db-keys state -get-with-media-ids {:media-ids media-ids})
-                   (map #(sighting (merge (get sf (:sighting-id %)) %))))))
-
 (s/defn get-specific
   [state :- State
    id :- s/Int]
