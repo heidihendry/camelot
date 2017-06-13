@@ -64,7 +64,13 @@
       :else
       (->> (query/get-by state :media)
            (filter/only-matching psearch)
-           (map :media-id)))))
+           (sort-by (juxt :trap-station-id
+                          :camera-id
+                          :trap-station-session-start-date
+                          :trap-station-session-id
+                          :media-capture-timestamp))
+           (map :media-id)
+           distinct))))
 
 (s/defn build-records
   [state sightings media]

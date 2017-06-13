@@ -165,10 +165,11 @@
    (om/update! data [:search :inprogress] true)
    (rest/get-x-opts "/library/metadata"
                     {:success (fn [md]
-                                (rest/post-x "/library" {:data {:search search}}
-                                             (fn [resp]
-                                               (load-library-callback data (:body md) resp))))
-                     :always (fn [x] (om/update! data [:search :inprogress] false))})))
+                                (rest/post-x-opts "/library" {:search search}
+                                                  {:success (fn [resp]
+                                                              (load-library-callback data (:body md) resp))
+                                                   :always (fn [x] (om/update! data [:search :inprogress] false))}))
+                     :failure (fn [x] (om/update! data [:search :inprogress] false))})))
 
 (defn load-taxonomies
   ([data]
