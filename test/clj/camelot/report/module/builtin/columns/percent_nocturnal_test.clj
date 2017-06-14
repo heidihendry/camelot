@@ -109,3 +109,17 @@
                    :taxonomy-id 1
                    :sighting-quantity 1}]]
         (is (= (aggregate data) "66.67"))))))
+
+(deftest test-maybe-night-in-extreme-latitude?
+  (testing "maybe-night-in-extreme-latitude?"
+    (testing "Should not be night in the northern hemisphere during 'warmer' months"
+      (is (not (sut/maybe-night-in-extreme-latitude? (t/date-time 2016 6 1) "80"))))
+
+    (testing "Should be night in the northern hemisphere during 'colder' months"
+      (is (sut/maybe-night-in-extreme-latitude? (t/date-time 2016 12 1) "80")))
+
+    (testing "Should not be night in the southern hemisphere during 'warmer' months"
+      (is (not (sut/maybe-night-in-extreme-latitude? (t/date-time 2016 12 1) "-80"))))
+
+    (testing "Should be night in the southern hemisphere during 'colder' months"
+      (is (sut/maybe-night-in-extreme-latitude? (t/date-time 2016 6 1) "-80")))))
