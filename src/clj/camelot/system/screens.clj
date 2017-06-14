@@ -196,8 +196,10 @@
             [:trap-station-notes]]
    :schema {:trap-station-name {:type :text
                                 :required true}
-            :trap-station-longitude {:type :number}
-            :trap-station-latitude {:type :number}
+            :trap-station-longitude {:type :number
+                                     :required true}
+            :trap-station-latitude {:type :number
+                                    :required true}
             :trap-station-altitude {:type :number}
             :trap-station-distance-above-ground {:type :number}
             :trap-station-distance-to-road {:type :number}
