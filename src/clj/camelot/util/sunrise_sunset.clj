@@ -50,7 +50,7 @@
   (fn [tz lat lon date]
     (some-> (->location lat lon)
             (->sunrise-sunset-calculator tz)
-            (calendar-fn (calendar-for-date date))
+            (calendar-fn (->calendar-for-date date))
             (truncate-tz date tz))))
 
 (s/defn sunrise-time :- (s/maybe DateTime)
