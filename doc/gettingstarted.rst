@@ -36,7 +36,7 @@ Installation
 ~~~~~~~~~~~~
 
 Download the `latest version of
-Camelot <http://camelot.bitpattern.com.au/release/camelot-1.2.5.zip>`__.
+Camelot <http://camelot.bitpattern.com.au/release/camelot-1.2.6.zip>`__.
 
 Unzip the archive. To run Camelot:
 
