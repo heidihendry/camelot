@@ -632,9 +632,10 @@ pre.field-input {
     max-width: 100%;
     width: 100%;
     height: 100%;
+    transition: filter 0.15s ease-in-out;
 }
 .library .media img:hover {
-    opacity: 0.8;
+    filter: brightness(1.15);
 }
 #app .library .media:before {
     font-family: FontAwesome;
