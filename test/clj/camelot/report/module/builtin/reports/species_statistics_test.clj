@@ -31,11 +31,13 @@
 
 (defn report
   [state id data]
-  (sut/report :species-statistics state {:taxonomy-id id} data))
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (sut/report :species-statistics state {:taxonomy-id id} data)))
 
 (defn csv-report
   [state id data]
-  (sut/csv-report :species-statistics state {:taxonomy-id id} data))
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (sut/csv-report :species-statistics state {:taxonomy-id id} data)))
 
 (def default-sample
   {:media-capture-timestamp (t/date-time 2015 1 3 10 10 15)

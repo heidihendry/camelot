@@ -16,11 +16,13 @@
 
 (defn report
   [state id data]
-  (sut/report :trap-station-statistics state {:trap-station-id id} data))
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (sut/report :trap-station-statistics state {:trap-station-id id} data)))
 
 (defn csv-report
   [state id data]
-  (sut/csv-report :trap-station-statistics state {:trap-station-id id} data))
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (sut/csv-report :trap-station-statistics state {:trap-station-id id} data)))
 
 (def headings ["Genus"
                "Species"

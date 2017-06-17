@@ -11,22 +11,20 @@
 
 (defn report
   [state id data]
-  (sut/report :raw-data-export state {:survey-id id} data))
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (sut/report :raw-data-export state {:survey-id id} data)))
+
+(defn report-with-sighting-fields
+  [state id data]
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [{:sighting-field-key "individual"
+                                                                   :sighting-field-ordering 10
+                                                                   :sighting-field-label "Individual"}])]
+    (sut/report :raw-data-export state {:survey-id id} data)))
 
 (defn csv-report
   [state id data]
-  (sut/csv-report :raw-data-export state {:survey-id id} data))
-
-(def headings ["Media Filename"
-               "Media Capture Timestamp"
-               "Site Name"
-               "Site Sublocation"
-               "Trap Station Name"
-               "Trap Station Longitude"
-               "Trap Station Latitude"
-               "Genus"
-               "Species"
-               "Sighting Quantity"])
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (sut/csv-report :raw-data-export state {:survey-id id} data)))
 
 (def default-record
   {:site-id 1
@@ -111,4 +109,15 @@
                [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
                  "Trap1" -25 130 "Bird" "Yellow Spotted" 2]
                 ["file-id-2" "2015-01-07 05:00:00" "ASite" nil
-                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]]))))))
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1]])))))
+
+  (testing "Sighting fields"
+    (testing "Export with sighting fields contains sighting fields"
+      (let [records [(->record {:media-id 1
+                                :field-individual "Bruce"
+                                :media-filename "file-id-1"})]
+            state (gen-state-helper {})
+            result (report-with-sighting-fields state 1 records)]
+        (is (= (report-with-sighting-fields state 1 records)
+               [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+                 "Trap1" -25 130 "Cat" "Yellow Spotted" 1 "Bruce"]]))))))

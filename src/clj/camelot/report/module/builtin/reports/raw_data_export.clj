@@ -17,7 +17,8 @@
              :trap-station-longitude
              :taxonomy-genus
              :taxonomy-species
-             :sighting-quantity]
+             :sighting-quantity
+             :all-fields]
    :filters [#(= (:survey-id %) survey-id)
              #(not (nil? (:media-id %)))]
    :transforms [#(update % :media-capture-timestamp

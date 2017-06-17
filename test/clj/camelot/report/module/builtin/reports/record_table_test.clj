@@ -13,11 +13,13 @@
 
 (defn report
   [state id data]
-  (report/report :record-table state {:survey-id id} data))
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (report/report :record-table state {:survey-id id} data)))
 
 (defn csv-report
   [state id data]
-  (report/csv-report :record-table state {:survey-id id} data))
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+    (report/csv-report :record-table state {:survey-id id} data)))
 
 (def headings ["Station"
                "Camera"

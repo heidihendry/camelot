@@ -3,6 +3,7 @@
   (:require
    [camelot.util.db :as db]
    [camelot.system.state :refer [State]]
+   [camelot.model.sighting-field :as sighting-field]
    [camelot.report.query :as query]
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
@@ -105,7 +106,7 @@
        (map #(% a b))
        vec
        (#(conj % (compare (vec a) (vec b))))
-       (reduce #(if (zero? %2)
+       (reduce #(if (= 0 %2)
                   %1
                   (reduced %2)) 0)))
 
@@ -136,7 +137,8 @@
 (s/defn generate-report
   "Generate a report given an output configuration and data."
   [state :- State
-   {:keys [columns rewrites pre-transforms pre-filters apply-fn
+   columns
+   {:keys [rewrites pre-transforms pre-filters apply-fn
            transforms filters aggregate-on order-by function]}
    data :- [{s/Keyword s/Any}]]
   (if function
@@ -158,13 +160,23 @@
   [cols]
   (= (first cols) :all))
 
+(defn sighting-field-map
+  "Return key-value pair of sighting fields and their order weighting."
+  [sf value-fn]
+  (letfn [(reducer [acc k v] (assoc acc (keyword (name (str "field-" k))) (value-fn v)))]
+    (reduce-kv reducer {} (group-by :sighting-field-key sf))))
+
+(defn sighting-field-label-map
+  "Return key-value pair of sighting fields and its label."
+  [sf]
+  (sighting-field-map sf #(first (sort (map :sighting-field-label %)))))
+
 (defn- cons-headings
-  [state columns cust-titles data]
-  (let [cols (if (all-cols? columns)
-               (keys (first data))
-               columns)]
+  [state sf cols cust-titles data]
+  (let [sf-labels (sighting-field-label-map sf)]
     (cons (map #(or (get cust-titles %)
                     (get-in @module/known-columns [% :heading])
+                    (get sf-labels %)
                     (tr/translate state
                                   (keyword (str "report/" (name %))))) cols)
           data)))
@@ -208,19 +220,61 @@
     (as-rows state cols data)
     (as-dashed-rows state cols data)))
 
+(defn sighting-field-columns
+  "Return all sighting field columns present in the dataset."
+  [sf data]
+  (let [sfset (into #{} (keys sf))]
+    (if (empty? sfset)
+      #{}
+      (reduce (fn [acc r] (set/union acc (set/intersection sfset (into #{} (keys r)))))
+              #{}
+              data))))
+
+(defn sighting-field-ordering-map
+  "Return key-value pair of sighting fields and their order weighting."
+  [sf]
+  (sighting-field-map sf #(apply min (map :sighting-field-ordering %))))
+
+(defn expand-all-fields-col
+  "Expand all-fields into an ordered list of sighting fields"
+  [data sf cols]
+  (let [sf-order (sighting-field-ordering-map sf)]
+    (mapcat #(if (= :all-fields %)
+               (sort-by (partial get sf-order)
+                        (sighting-field-columns sf-order data))
+               (list %))
+            cols)))
+
+(defn expand-wildcard-col
+  "Expand the wildcard column into a seq of all fields."
+  [cols]
+  (if (all-cols? cols)
+    (let [fields (->> model/extended-schema-definitions
+                      (remove #(get (second %) :export-excluded))
+                      (map first)
+                      sort
+                      vec)]
+      (conj fields :all-fields))
+    cols))
+
+(defn expand-cols
+  "Returns seq of the columns in the report, as per their ordering."
+  [data sf cols]
+  (->> cols
+       expand-wildcard-col
+       (expand-all-fields-col data sf)))
+
 (defn- exportable-report
   "Generate a report as a CSV."
   [state params column-title-fn data]
-  (let [d (generate-report state params data)
-        cols (if (all-cols? (:columns params))
-               (map first (remove #(get (second %) :export-excluded)
-                                  model/extended-schema-definitions))
-               (:columns params))]
+  (let [sf (sighting-field/get-all state)
+        cols (expand-cols data sf (:columns params))
+        d (generate-report state cols params data)]
     (if (:function params)
       (to-csv-string d)
       (->> d
            (stylise-output state params cols)
-           (cons-headings state cols (custom-titles state column-title-fn))
+           (cons-headings state sf cols (custom-titles state column-title-fn))
            (to-csv-string)))))
 
 (s/defn report :- [s/Any]
@@ -231,10 +285,12 @@
    data :- [{s/Keyword s/Any}]]
   (loader/load-user-modules state)
   (let [report (module/get-report state report-key)
-        conf ((:output report) state configuration)]
+        conf ((:output report) state configuration)
+        sf (sighting-field/get-all state)
+        cols (expand-cols data sf (:columns conf))]
     (->> data
-         (generate-report state conf)
-         (as-rows state (:columns conf)))))
+         (generate-report state cols conf)
+         (as-rows state cols))))
 
 (s/defn csv-report
   "Produce the report as a CSV."
