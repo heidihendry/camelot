@@ -192,7 +192,7 @@ direction is considered negative."
   (remove #(-> % second :unmappable) model/schema-definitions))
 
 (defn column-compatibility
-  [[title & vs]]
+  [vs]
   {:constraints (datatype/possible-constraints vs)
    :max-length (datatype/max-length vs)
    :datatypes (datatype/possible-datatypes vs)})
