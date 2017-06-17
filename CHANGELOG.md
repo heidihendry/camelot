@@ -1,4 +1,26 @@
 ## ChangeLog
+### 1.3.0 (in development)
+#### Enhancements
+* Adds user-definable fields for capturing additional sighting data
+* Adds keybinding to delete media currently selected in the library
+* Adds ability to change survey details via the main UI
+* Improves media hover effect in library
+
+#### Fixes
+* Fixes a bug which would cause zero results to be found when searching on some fields
+* Fixes automatic opening of Camelot in a new browser tab on startup
+* Fixes selection of thumbnails in the library when the underlying image is not found
+
+#### Internal
+* Switch build tooling to boot (http://boot-clj.com/)
+* Adds a new --port command line option to specify the port camelot is to run on
+
+### 1.2.6 (2017-06-16)
+#### Fixes
+* Fixes an error which may occur while generating reports containing the "Percent nocturnal" column
+* Fixes a spurious "insufficient disk space" error which may arise when bulk import is used in a new installation
+* Fixes a bug which allows trap station latitude and longitude to be blanked via the advanced menu; these are required fields.
+
 ### 1.2.5 (2017-05-13)
 #### Enhancements
 * Add "delete" as a shortcut key for deleting selected media in the library
