@@ -8,6 +8,7 @@
    [camelot.model.media :as media]
    [camelot.model.photo :as photo]
    [camelot.model.sighting :as sighting]
+   [camelot.model.sighting-field-value :as sighting-field-value]
    [camelot.model.taxonomy :as taxonomy]
    [camelot.model.site :as site]
    [camelot.model.camera :as camera]
@@ -112,4 +113,14 @@
          sighting/tsighting
          (sighting/create! state)
          (merge record))
+    record))
+
+(defn create-sighting-field-values!
+  [state record]
+  (when (:sighting-id record)
+    ;; Single record may result in many new values, so we don't augment here.
+    (sighting-field-value/create-bulk! state
+                                       (:sighting-id record)
+                                       (:survey-id record)
+                                       record)
     record))

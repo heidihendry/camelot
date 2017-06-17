@@ -74,9 +74,6 @@
     (render [_]
       (when-not (:upload-pending data)
         (dom/button #js {:className "btn btn-default"
-                         :onClick #(om/transact! data :page dec)}
-                    )
-        (dom/button #js {:className "btn btn-default"
                          :onClick #(nav/nav-up! 2)}
                     (if (:column-properties data)
                       (tr/translate :words/cancel)
@@ -95,7 +92,8 @@
             mappings (:mappings data)]
         (dom/div nil
                  (dom/label #js {:className (str "field-label" (if required " required" ""))}
-                            (tr/translate (str "report/" (name (first field)))))
+                            (or (:label (second field))
+                                (tr/translate (str "report/" (name (first field))))))
                  (dom/select #js {:className "field-input"
                                   :onChange #(go (>! (:chan state)
                                                      {:mapping (hash-map (first field)
@@ -111,7 +109,7 @@
                  (if-let [m (get mappings (first field))]
                    (dom/label #js {:className "validation-warning"}
                               (model/reason-mapping-invalid
-                               model/extended-schema-definitions
+                               (:mappable-fields data)
                                (first field)
                                (get column-properties m)
                                tr/translate))))))))
@@ -186,9 +184,9 @@
 
 (defn compare-column-schema-weight
   "Sort based on column schema weightings."
-  [a b]
-  (let [da (get model/schema-definitions (first a))
-        db (get model/schema-definitions (first b))]
+  [schema-definitions a b]
+  (let [da (get schema-definitions (first a))
+        db (get schema-definitions (first b))]
     (let [o (compare (:order da) (:order db))]
       (if (zero? o)
         (compare (first a) (first b))
@@ -200,20 +198,19 @@
     om/IRenderState
     (render-state [_ state]
       (if-let [cps (:column-properties data)]
-        (let [colmaps (:mappings data)]
+        (let [colmaps (:mappings data)
+              mappable (into {} (:mappable-fields data))]
           (dom/div nil
                    (dom/h5 nil "Required fields")
                    (om/build-all
                     field-mapping-component
                     (mapv #(hash-map :column-properties cps
                                      :mappings colmaps
+                                     :mappable-fields (into {} (:mappable-fields data))
                                      :field %
                                      :vkey (first %))
-                          (sort compare-column-schema-weight
-                                (-> model/schema-definitions
-                                    model/mappable-fields
-                                    model/required-fields
-                                    model/with-absolute-path)))
+                          (sort (partial compare-column-schema-weight mappable)
+                                (model/required-fields (:mappable-fields data))))
                     {:init-state state
                      :opts {:required true}
                      :key :vkey})
@@ -222,12 +219,11 @@
                     field-mapping-component
                     (mapv #(hash-map :column-properties cps
                                      :mappings colmaps
+                                     :mappable-fields mappable
                                      :field %
                                      :vkey (first %))
-                          (sort compare-column-schema-weight
-                                (-> model/schema-definitions
-                                    model/mappable-fields
-                                    model/optional-fields)))
+                          (sort (partial compare-column-schema-weight mappable)
+                                (model/optional-fields (:mappable-fields data))))
                     {:init-state state
                      :key :vkey})
                    (let [vs (validation-summary (:validation-problem data))]
@@ -253,6 +249,19 @@
     om/IInitState
     (init-state [_]
       {:chan (chan)})
+    om/IWillMount
+    (will-mount [_]
+      (let [fields (-> model/schema-definitions
+                       model/mappable-fields
+                       model/with-absolute-path)]
+        (letfn [(survey-fields [all-sf]
+                  (let [survey-sf (filter #(= (state/get-survey-id) (:survey-id %)) all-sf)]
+                    (om/update! data :mappable-fields
+                                (model/with-sighting-fields fields survey-sf))))]
+          (rest/get-x-opts "/sighting-fields"
+                           {:success #(survey-fields (:body %))
+                            :failure #(om/update! data :mappable-fields
+                                                  (model/with-sighting-fields fields fields))}))))
     om/IDidMount
     (did-mount [_]
       (go
@@ -265,15 +274,13 @@
           (recur))))
     om/IWillUpdate
     (will-update [_ _ _]
-      (let [fs (-> model/schema-definitions
-                   model/mappable-fields
-                   model/with-absolute-path)]
+      (let [fs (:mappable-fields @data)]
         (om/update! data :validation-problem
                     (or
                      (reduce #(let [m (get-in @data [:mappings (first %2)])]
                                 (if (and m
                                          (model/reason-mapping-invalid
-                                          model/extended-schema-definitions
+                                          (into {} fs)
                                           (first %2)
                                           (get-in @data [:column-properties m])
                                           identity))
@@ -285,28 +292,34 @@
                              nil (model/required-fields fs))))))
     om/IRenderState
     (render-state [_ state]
-      (dom/div #js {:className "split-menu"}
-               (om/build import-status-dialog data)
-               (dom/div #js {:className "intro"}
-                        (dom/h4 nil (tr/translate ::title)))
-               (dom/div #js {:className "single-section"}
-                        (om/build upload/file-upload-component data
-                                  {:init-state {:chan (chan)}
-                                   :opts {:analytics-event "mapping-upload"
-                                          :pending-handler (partial upload-pending-handler data)
-                                          :success-handler (partial upload-success-handler data)
-                                          :failure-handler #(om/update! data :upload-pending false)
-                                          :endpoint "/surveys/bulkimport/columnmap"}})
-                        (if (:upload-pending data)
-                          (dom/div #js {:className "align-center"}
-                                   (dom/img #js {:className "spinner"
-                                                 :src "images/spinner.gif"
-                                                 :height "32"
-                                                 :width "32"})
-                                   (dom/p nil
-                                          (tr/translate ::scanning)))
-                          (om/build column-mapping-form-component data
-                                    {:init-state state})))))))
+      (if (:mappable-fields data)
+        (dom/div #js {:className "split-menu"}
+                 (om/build import-status-dialog data)
+                 (dom/div #js {:className "intro"}
+                          (dom/h4 nil (tr/translate ::title)))
+                 (dom/div #js {:className "single-section"}
+                          (om/build upload/file-upload-component data
+                                    {:init-state {:chan (chan)}
+                                     :opts {:analytics-event "mapping-upload"
+                                            :pending-handler (partial upload-pending-handler data)
+                                            :success-handler (partial upload-success-handler data)
+                                            :failure-handler #(om/update! data :upload-pending false)
+                                            :endpoint "/surveys/bulkimport/columnmap"}})
+                          (if (:upload-pending data)
+                            (dom/div #js {:className "align-center"}
+                                     (dom/img #js {:className "spinner"
+                                                   :src "images/spinner.gif"
+                                                   :height "32"
+                                                   :width "32"})
+                                     (dom/p nil
+                                            (tr/translate ::scanning)))
+                            (om/build column-mapping-form-component data
+                                      {:init-state state}))))
+        (dom/div #js {:className "align-center"}
+                                     (dom/img #js {:className "spinner"
+                                                   :src "images/spinner.gif"
+                                                   :height "32"
+                                                   :width "32"}))))))
 
 (defn bulk-import-mapping-view
   [app owner]

@@ -23,7 +23,8 @@
            (image/add-media-file! s)
            (db/create-media! s)
            (db/create-sighting! s)
-           (db/create-photo! s)))
+           (db/create-photo! s)
+           (db/create-sighting-field-values! s)))
     (assoc msg :result :complete
            :absolute-path (get-in msg [:record :absolute-path]))
     (catch Exception e

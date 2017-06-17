@@ -1,5 +1,6 @@
 (ns camelot.util.model
-  )
+  (:require
+   [camelot.util.sighting-fields :as sighting-fields]))
 
 (def schema-definitions
   {:camera-id {:datatype :integer
@@ -233,6 +234,20 @@
 (def absolute-path {:absolute-path {:datatype :file
                                     :required true
                                     :order 40}})
+
+(defn sighting-field-to-schema-definition
+  [field]
+  (let [k (keyword (str "field-" (:sighting-field-key field)))
+        dt (get-in sighting-fields/datatypes [(:sighting-field-datatype field)
+                                              :deserialiser-datatype])]
+    [k {:datatype dt
+        :required (:sighting-field-required field)
+        :label (:sighting-field-label field)
+        :order (+ 100 (:sighting-field-ordering field))}]))
+
+(defn with-sighting-fields
+  [xs fields]
+  (concat xs (map sighting-field-to-schema-definition fields)))
 
 (def extended-schema-definitions
   (merge schema-definitions absolute-path))

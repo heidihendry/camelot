@@ -204,6 +204,11 @@
          (file/readable? f)
          (file/file? f))))
 
+(defn is-user-field?
+  "Predicate returning true if a key is for a sighting field."
+  [x]
+  (re-find #"^field-" (name x)))
+
 (defn could-be-required?
   "Predicate returning true if input is non-blank and non-nil."
   [x]
@@ -277,9 +282,11 @@
 (defn deserialise-field
   "Deserialise a string given its field and (optionally) given a map of schemas."
   ([schemas field str-value]
-   (if-let [s (get schemas field)]
-     (if-let [f (get deserialisers (model/effective-datatype s))]
-       (f str-value)
-       str-value)))
+   (if (is-user-field? field)
+     str-value
+     (if-let [s (get schemas field)]
+       (if-let [f (get deserialisers (model/effective-datatype s))]
+         (f str-value)
+         str-value))))
   ([field str-value]
    (deserialise-field model/all-mappable-fields field str-value)))

@@ -4,6 +4,8 @@
    [schema.core :as s]
    [yesql.core :as sql]
    [camelot.util.datatype :as datatype]
+   [clojure.string :as str]
+   [camelot.model.sighting-field :as sighting-field]
    [camelot.util.sighting-fields :as util.sf]
    [camelot.util.db :as db]
    [clj-time.core :as t]))
@@ -79,6 +81,27 @@
                                                  :sighting-field-value-data (str value)
                                                  :sighting-id sighting-id})]
     (get-specific state (int (:1 record)))))
+
+(defn- survey-fields-by-key
+  [state survey-id]
+  (reduce-kv (fn [acc k v] (assoc acc k (first v))) {}
+          (group-by :sighting-field-key
+                    (filter #(= survey-id (:survey-id %))
+                            (sighting-field/get-all state)))))
+
+(defn create-bulk!
+  "Create sighting field values from user-field/value pairs."
+  [state sighting-id survey-id data]
+  (let [survey-sf (survey-fields-by-key state survey-id)]
+    (dorun (->> data
+                (filter (fn [[k v]] (re-find #"^field-" (name k))))
+                (map
+                 (fn [[k v]]
+                   (let [sf (get survey-sf
+                                 (str/replace (name k) #"^field-" ""))]
+                     [(:sighting-field-id sf) v])))
+                (filter (fn [[k v]] (not (nil? k))))
+                (map (fn [[k v]] (create! state sighting-id k v)))))))
 
 (defn update!
   [state id value]
