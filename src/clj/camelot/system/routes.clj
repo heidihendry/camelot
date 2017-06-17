@@ -14,6 +14,7 @@
    [camelot.model.media :as media]
    [camelot.model.photo :as photo]
    [camelot.model.sighting :as sighting]
+   [camelot.model.sighting-field-value :as sighting-field-value]
    [camelot.model.site :as site]
    [camelot.model.sighting-field :as sighting-field]
    [camelot.model.species-mass :as species-mass]
@@ -152,7 +153,7 @@
                                                   survey-site/tsurvey-site data (assoc state :session session)))
            (DELETE "/:id" [id] (crud/delete-resource survey-site/delete! id (assoc state :session session))))
 
-  (context "/sightings" {session :session state :system}
+  (context "/sighting" {session :session state :system}
            (GET "/media/:id" [id] (crud/list-resources sighting/get-all :sighting id (assoc state :session session)))
            (GET "/:id" [id] (crud/specific-resource sighting/get-specific id (assoc state :session session)))
            (PUT "/:id" [id data] (crud/update-resource sighting/update! id
@@ -164,6 +165,9 @@
            (DELETE "/media" [data] (r/response (sighting/delete-with-media-ids! (assoc state :session session)
                                                                                 (:media-ids data))))
            (DELETE "/:id" [id] (crud/delete-resource sighting/delete! id (assoc state :session session))))
+
+  (context "/sighting-field-values" {session :session state :system}
+           (GET "/" [] (r/response (vals (sighting-field-value/query-all (assoc state :session session))))))
 
   (context "/camera-statuses" {session :session state :system}
            (GET "/available/" [] (crud/list-resources camera-status/get-all :camera-status (assoc state :session session)))

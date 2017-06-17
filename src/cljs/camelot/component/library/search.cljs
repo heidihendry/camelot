@@ -47,16 +47,18 @@
 (defn completion-field
   [ctx]
   (let [field (get filter/field-keys (keyword ctx))]
-    (if field
-      (name field)
-      (some (set filter/model-fields) (list ctx)))))
+    (cond
+      (re-find #"^field-" ctx) ctx
+      field (name field)
+      :else (some #{ctx} filter/model-fields))))
 
 (def prefix-endpoints
   {"survey" "/surveys"
    "site" "/sites"
    "trap" "/trap-stations"
    "camera" "/cameras"
-   "taxonomy" "/taxonomy"})
+   "taxonomy" "/taxonomy"
+   "field" "/sighting-field-values"})
 
 (defn basic-word-index
   [xs]
@@ -103,20 +105,30 @@
   (om/update! data :page 1)
   (om/update! data :dirty-state true))
 
+(defn sighting-field-to-field-user-key
+  [sighting-field]
+  (prn sighting-field)
+  (str "field-" (:sighting-field-key sighting-field)))
+
 (defn filter-input-component
   [data owner]
   (reify
     om/IInitState
     (init-state [_]
+      (prn (:sighting-fields data))
       {:typeahead-index (typeahead/phrase-index
                          (apply conj (map #(hash-map :term %
                                                      :props {:field true
                                                              :completion-fn completions})
-                                          (apply conj (map name (keys filter/field-keys)) filter/model-fields))
-                                (if (get-in data [:taxonomy-completions :species])
+                                          (apply conj
+                                                 (apply conj (map name (keys filter/field-keys))
+                                                        filter/model-fields)
+                                                 (map sighting-field-to-field-user-key
+                                                      (apply concat (vals (:sighting-fields data))))))
+                                (if (get-in data [:search :taxonomy-completions :species])
                                   (mapv typeahead/->basic-entry
-                                        (apply conj (get-in data [:taxonomy-completions :species])
-                                               (get-in data [:taxonomy-completions :common-names])))
+                                        (apply conj (get-in data [:search :taxonomy-completions :species])
+                                               (get-in data [:search :taxonomy-completions :common-names])))
                                   [])))})
     om/IWillMount
     (will-mount [_]
@@ -331,7 +343,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/span #js {:className "search-option-container"}
-                (om/build filter-input-component (:search data) {:init-state state})
+                (om/build filter-input-component data {:init-state state})
                 (om/build filter-button-component (:search data) {:init-state state})
                 (let [global-survey (get-in (state/app-state-cursor)
                                             [:selected-survey :survey-id :value])]
