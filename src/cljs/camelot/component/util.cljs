@@ -74,7 +74,7 @@
                           (dom/button #js {:className "pull-right fa fa-times btn-flat"
                                            :ref "close-button"
                                            :onClick #(om/update! data active-key false)}))
-                        (dom/form (clj->js (fnil form-opts {:onSubmit #(.preventDefault %)}))
+                        (dom/form (clj->js (or form-opts {:onSubmit #(.preventDefault %)}))
                                   (dom/div #js {:className "prompt-title"}
                                            title)
                                   (dom/div #js {:className "prompt-body"}

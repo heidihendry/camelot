@@ -31,7 +31,7 @@ SELECT media_id, media_created, media_updated, media_filename,
        media_processed, media_capture_timestamp, media_reference_quality,
        trap_station_session_camera_id, media_format
 FROM media
-WHERE media_id IN (:media-ids)
+WHERE media_id IN (:media_ids)
 ORDER BY media_capture_timestamp
 
 -- name: -get-all*
