@@ -18,12 +18,14 @@
 
 (defn report
   [state id data]
-  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])
+                camelot.model.survey/survey-settings (constantly {})]
     (sut/report :summary-statistics state {:survey-id id} data)))
 
 (defn csv-report
   [state id data]
-  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])
+                camelot.model.survey/survey-settings (constantly {})]
     (sut/csv-report :summary-statistics state {:survey-id id} data)))
 
 (def headings ["Genus"

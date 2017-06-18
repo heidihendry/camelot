@@ -16,12 +16,14 @@
 
 (defn report
   [state id data]
-  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])
+                camelot.model.survey/survey-settings (constantly {})]
     (sut/report :survey-site-statistics state {:survey-site-id id} data)))
 
 (defn csv-report
   [state id data]
-  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])
+                camelot.model.survey/survey-settings (constantly {})]
     (sut/csv-report :survey-site-statistics state {:survey-site-id id} data)))
 
 (def headings ["Genus"
@@ -31,8 +33,8 @@
                "Nights Elapsed"
                "Abundance Index"])
 
-(deftest test-summary-statistics-rport
-  (testing "Summary Statistics Report"
+(deftest test-survey-site-report
+  (testing "Survey site Report"
     (testing "Report data form empty sightings is empty"
       (let [sightings '()
             state (gen-state-helper {})
@@ -253,7 +255,7 @@
         (is (= result (list ["Smiley" "Wolf" "X" 4 14 (calc-obs-nights 4 14)]
                             ["Yellow" "Spotted Cat" "X" 5 14 (calc-obs-nights 5 14)]))))))
 
-  (testing "CSV output"
+  (testing "Survey site report CSV output"
     (testing "CSV should contain header row"
       (let [sightings '()
             state (gen-state-helper {})

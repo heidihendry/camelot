@@ -6,6 +6,7 @@
             [camelot.rest :as rest]
             [camelot.nav :as nav]
             [camelot.util.filter :as filter]
+            [camelot.util.sighting-fields :as sighting-fields]
             [typeahead.core :as typeahead]
             [clojure.string :as str]
             [cljs.core.async :refer [<! chan >! timeout sliding-buffer]]
@@ -107,8 +108,7 @@
 
 (defn sighting-field-to-field-user-key
   [sighting-field]
-  (prn sighting-field)
-  (str "field-" (:sighting-field-key sighting-field)))
+  (name (sighting-fields/user-key sighting-field)))
 
 (defn filter-input-component
   [data owner]

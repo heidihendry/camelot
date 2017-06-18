@@ -3,6 +3,7 @@
   (:require
    [camelot.util.model :as model]
    [clojure.java.io :as io]
+   [camelot.util.sighting-fields :as util.sf]
    [clj-time.format :as tf]
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
@@ -207,7 +208,7 @@
 (defn is-user-field?
   "Predicate returning true if a key is for a sighting field."
   [x]
-  (re-find #"^field-" (name x)))
+  (re-find (re-pattern (str "^" util.sf/user-key-prefix)) (name x)))
 
 (defn could-be-required?
   "Predicate returning true if input is non-blank and non-nil."

@@ -4,12 +4,24 @@
    [clj-time.core :as t]
    [schema.core :as s]
    [camelot.util.config :as config]
+   [camelot.util.sighting-fields :as util.sf]
    [clojure.string :as str]))
+
+(defn sighting-fields
+  [state survey-id]
+  (filter :sighting-field-affects-independence
+          (get-in state [:survey-settings survey-id :sighting-fields])))
+
+(defn independence-threshold
+  [state survey-id]
+  (get-in state [:survey-settings survey-id :survey-sighting-independence-threshold]))
 
 (defn- add-sighting
   "Add a new (i.e., independent) sighting."
   [state previous-sightings this-sighting]
-  (let [duration (config/lookup state :sighting-independence-minutes-threshold)]
+  (let [duration (or (independence-threshold state (:survey-id this-sighting))
+                     (config/lookup state :sighting-independence-minutes-threshold)
+                     20)]
     (conj previous-sightings (assoc this-sighting
                                     :sighting-independence-window-end
                                     (t/plus (:media-capture-timestamp this-sighting)
@@ -19,6 +31,7 @@
   "Predicate for whether a value could be considered unidentified."
   [v]
   (or (nil? v)
+      (and (string? v) (empty? v))
       (= (str/lower-case v) "unidentified")))
 
 (defn- most-specific
@@ -30,20 +43,28 @@
 
 (defn- infer-attributes
   "Attempt to infer lifestage or sex of a dependent sighting."
-  [sighting new-sighting]
-  (assoc sighting
-         :sighting-lifestage (most-specific (:sighting-lifestage sighting)
-                                            (:sighting-lifestage new-sighting))
-         :sighting-sex (most-specific (:sighting-sex sighting)
-                                      (:sighting-sex new-sighting))))
+  [state sighting new-sighting]
+  (let [sighting-fields (sighting-fields state (:survey-id new-sighting))]
+    (letfn [(reducer [acc x]
+              (assoc acc x (most-specific (get sighting x)
+                                          (get new-sighting x))))]
+      (->> sighting-fields
+           (map util.sf/user-key)
+           (into [:sighting-lifestage :sighting-sex])
+           (reduce reducer sighting)))))
+
+(defn- sighting-quantity ^long
+  [sighting]
+  (or (get sighting :sighting-quantity) 0))
 
 (defn- update-sighting
   "Update the set of previous (i.e., dependent) sightings"
-  [previous-sightings sighting this-sighting]
-  (let [new-qty (max (or (get sighting :sighting-quantity) 0)
-                     (or (:sighting-quantity this-sighting) 0))]
+  [state previous-sightings sighting this-sighting]
+  (let [new-qty (max (sighting-quantity sighting)
+                     (sighting-quantity this-sighting))]
     (conj previous-sightings
-          (infer-attributes (assoc sighting :sighting-quantity new-qty)
+          (infer-attributes state
+                            (assoc sighting :sighting-quantity new-qty)
                             this-sighting))))
 
 (defn- could=?
@@ -57,32 +78,37 @@
 
 (defn- dependent-sighting?
   "Predicate for whether the sighting would be dependent."
-  [current existing]
+  [state current existing]
   (let [curtime (:media-capture-timestamp current)]
     (and (could=? :sighting-sex current existing)
          (could=? :sighting-lifestage current existing)
+         (every? #(could=? % current existing)
+                 (map util.sf/user-key (sighting-fields state
+                                                                (:survey-id current))))
          (or (= curtime (:media-capture-timestamp existing))
              (and (t/after? curtime (:media-capture-timestamp existing))
                   (t/before? curtime (:sighting-independence-window-end existing)))))))
 
 (defn- first-dependent-sighting
   "Return the first dependent sighting, if any."
-  [sighting existing]
-  (first (filter (partial dependent-sighting? sighting) existing)))
+  [state sighting existing]
+  (first (filter (partial dependent-sighting? state sighting) existing)))
 
 (defn- independence-reducer
   "Reducing function, adding or updating the sightings based on their dependence."
   [state acc this-sighting]
   (let [datetime (:media-capture-timestamp this-sighting)
         species (:taxonomy-id this-sighting)
-        previous-sighting (first-dependent-sighting this-sighting (get acc species))
+        previous-sighting (first-dependent-sighting state this-sighting (get acc species))
         known-sightings (get acc species)]
     (if (nil? species)
       acc
       (assoc acc species
              (if previous-sighting
-               (update-sighting (remove #(= previous-sighting %) known-sightings)
-                                previous-sighting this-sighting)
+               (update-sighting
+                state
+                (remove #(= previous-sighting %) known-sightings)
+                previous-sighting this-sighting)
                (add-sighting state known-sightings this-sighting))))))
 
 (s/defn datetime-comparison :- s/Bool
@@ -126,4 +152,4 @@
     (->> sightings
          (independent-sightings-by-species state)
          (map total-spp)
-         (remove #(zero? (:count %))))))
+         (remove #(= (:count %) 0)))))

@@ -6,9 +6,10 @@
 
 (defn calculate
   [data]
-  (sut/calculate-presence-absence
-   (state/gen-state {:sighting-independence-minutes-threshold 20})
-   data))
+  (with-redefs [camelot.model.survey/survey-settings (constantly {})]
+    (sut/calculate-presence-absence
+     (state/gen-state {:sighting-independence-minutes-threshold 20})
+     data)))
 
 (defn aggregate
   [data]

@@ -5,6 +5,7 @@
    [camelot.util.db :as db]
    [yesql.core :as sql]
    [camelot.system.state :refer [State]]
+   [camelot.model.sighting-field :as sighting-field]
    [camelot.util.file :as file]
    [camelot.util.filesystem :as filesystem]
    [clojure.java.io :as io]
@@ -46,6 +47,21 @@
 (s/defn get-all :- [Survey]
   [state :- State]
   (map survey (db/clj-keys (db/with-connection state -get-all))))
+
+(defn survey-settings
+  "Return configuration data for all surveys."
+  [state]
+  (let [fields (group-by :survey-id (sighting-field/get-all state))]
+    (reduce #(let [sid (:survey-id %2)]
+               (assoc %1 sid
+                      (merge %2 :sighting-fields (or (get fields sid) [])))) {}
+            (get-all state))))
+
+(defmacro with-survey-settings
+  "Assoc survey settings into a state map."
+  [[bind state] & body]
+  `(let [~bind (assoc ~state :survey-settings (~#'survey-settings ~state))]
+     ~@body))
 
 (s/defn get-specific :- (s/maybe Survey)
   [state :- State

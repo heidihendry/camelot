@@ -12,3 +12,11 @@
    :number
    {:deserialiser-datatype :number
     :translation-key :datatype/number}})
+
+(def user-key-prefix "field-")
+
+(defn user-key
+  [sighting-field]
+  (keyword (str user-key-prefix (if (map? sighting-field)
+                                  (:sighting-field-key sighting-field)
+                                  sighting-field))))

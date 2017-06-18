@@ -6,7 +6,8 @@
    [clj-time.core :as t]
    [camelot.report.module.column-util :as col-util]
    [camelot.report.sighting-independence :as indep]
-   [camelot.util.config :as config])
+   [camelot.util.config :as config]
+   [camelot.model.survey :as survey])
   (:import
    (org.joda.time DateTime)
    (java.util TimeZone)))
@@ -55,8 +56,9 @@
 (defn aggregate-is-night
   "Assoc percent-nocturnal to the percentage of flagged indep. sightings."
   [state col data-group]
-  (col-util/aggregate-boolean-by-independent-observations
-   state col (indep/->independent-sightings state data-group)))
+  (survey/with-survey-settings [s state]
+    (col-util/aggregate-boolean-by-independent-observations
+     state col (indep/->independent-sightings s data-group))))
 
 (module/register-column
  :percent-nocturnal

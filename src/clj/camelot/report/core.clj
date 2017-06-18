@@ -4,6 +4,7 @@
    [camelot.util.db :as db]
    [camelot.system.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
+   [camelot.util.sighting-fields :as util.sf]
    [camelot.report.query :as query]
    [camelot.report.module.loader :as loader]
    [camelot.report.module.core :as module]
@@ -129,9 +130,9 @@
 (def add-post-aggregate-columns (module/build-calculated-columns :post-aggregate))
 
 (defn maybe-apply
-  [state f data]
+  [f data]
   (if f
-    (f state data)
+    (f data)
     data))
 
 (s/defn generate-report
@@ -148,7 +149,7 @@
          (add-calculated-columns state columns)
          (transform-records state pre-transforms)
          (filter-records state pre-filters)
-         (maybe-apply state apply-fn)
+         (maybe-apply apply-fn)
          (aggregate-data state columns aggregate-on)
          (add-post-aggregate-columns state columns)
          (transform-records state transforms)
@@ -163,7 +164,7 @@
 (defn sighting-field-map
   "Return key-value pair of sighting fields and their order weighting."
   [sf value-fn]
-  (letfn [(reducer [acc k v] (assoc acc (keyword (name (str "field-" k))) (value-fn v)))]
+  (letfn [(reducer [acc k v] (assoc acc (util.sf/user-key k) (value-fn v)))]
     (reduce-kv reducer {} (group-by :sighting-field-key sf))))
 
 (defn sighting-field-label-map

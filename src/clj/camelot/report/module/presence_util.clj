@@ -4,6 +4,7 @@
    [clj-time.core :as t]
    [camelot.report.sighting-independence :as indep]
    [clj-time.format :as tf]
+   [camelot.model.survey :as survey]
    [camelot.util.date :as date]
    [clj-time.coerce :as tc]))
 
@@ -87,14 +88,15 @@
   [value-fn taxonomy-id start-date end-date state data]
   (let [end-excl (t/plus end-date (t/days 1))
         day-list (list-days start-date end-date)]
-    (->> data
-         (indep/->independent-sightings state)
-         (group-by :trap-station-id)
-         vals
-         (map #(cons (:trap-station-name (first %))
-                     (generate-row state value-fn taxonomy-id start-date end-excl
-                                   (session-date-ranges %) day-list %)))
-         (add-date-header day-list))))
+    (survey/with-survey-settings [s state]
+      (->> data
+           (indep/->independent-sightings state)
+           (group-by :trap-station-id)
+           vals
+           (map #(cons (:trap-station-name (first %))
+                       (generate-row state value-fn taxonomy-id start-date end-excl
+                                     (session-date-ranges %) day-list %)))
+           (add-date-header day-list)))))
 
 (defn no-sightings-value
   [session-ranges d]

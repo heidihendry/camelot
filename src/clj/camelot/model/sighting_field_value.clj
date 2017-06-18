@@ -34,7 +34,7 @@
   [data]
   (letfn [(deserialise [v] (datatype/deserialise (deserialiser-datatype data) v))]
     (let [ddata (update data :sighting-field-value-data deserialise)
-          user-key (keyword (str "field-" (:sighting-field-key data)))]
+          user-key (util.sf/user-key data)]
       (assoc ddata user-key (:sighting-field-value-data ddata)))))
 
 (defn sighting-field-value
@@ -92,13 +92,14 @@
 (defn create-bulk!
   "Create sighting field values from user-field/value pairs."
   [state sighting-id survey-id data]
-  (let [survey-sf (survey-fields-by-key state survey-id)]
+  (let [survey-sf (survey-fields-by-key state survey-id)
+        user-key-re (re-pattern (str "^" util.sf/user-key-prefix))]
     (dorun (->> data
-                (filter (fn [[k v]] (re-find #"^field-" (name k))))
+                (filter (fn [[k v]] (re-find user-key-re (name k))))
                 (map
                  (fn [[k v]]
                    (let [sf (get survey-sf
-                                 (str/replace (name k) #"^field-" ""))]
+                                 (str/replace (name k) user-key-re ""))]
                      [(:sighting-field-id sf) v])))
                 (filter (fn [[k v]] (not (nil? k))))
                 (map (fn [[k v]] (create! state sighting-id k v)))))))

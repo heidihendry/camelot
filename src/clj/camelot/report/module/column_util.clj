@@ -2,6 +2,7 @@
   "Utilities for defining report columns."
   (:require
    [camelot.report.sighting-independence :as indep]
+   [camelot.model.survey :as survey]
    [clj-time.core :as t]
    [schema.core :as s]
    [camelot.system.state :refer [State]])
@@ -124,10 +125,11 @@
 
 (defn- get-independent-observations
   [state data]
-  (let [obs-reducer (partial independent-observation-reducer state)]
-    (->> data
-         (group-by :trap-station-session-id)
-         (reduce-kv obs-reducer {}))))
+  (survey/with-survey-settings [s state]
+    (let [obs-reducer (partial independent-observation-reducer s)]
+      (->> data
+           (group-by :trap-station-session-id)
+           (reduce-kv obs-reducer {})))))
 
 (s/defn calculate-independent-observations
   "Return the number of independent observations for a species"

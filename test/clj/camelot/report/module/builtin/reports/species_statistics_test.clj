@@ -31,12 +31,14 @@
 
 (defn report
   [state id data]
-  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])
+                camelot.model.survey/survey-settings (constantly {})]
     (sut/report :species-statistics state {:taxonomy-id id} data)))
 
 (defn csv-report
   [state id data]
-  (with-redefs [camelot.model.sighting-field/get-all (constantly [])]
+  (with-redefs [camelot.model.sighting-field/get-all (constantly [])
+                camelot.model.survey/survey-settings (constantly {})]
     (sut/csv-report :species-statistics state {:taxonomy-id id} data)))
 
 (def default-sample

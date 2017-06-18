@@ -5,37 +5,39 @@
    [clj-time.format :as tf]
    [camelot.translation.core :as tr]
    [camelot.report.sighting-independence :as indep]
-   [camelot.util.config :as config]))
+   [camelot.util.config :as config]
+   [camelot.model.survey :as survey]))
 
 (defn report-output
   [state {:keys [survey-id]}]
-  {:columns [:trap-station-name
-             :trap-station-session-camera-id
-             :camera-name
-             :species-name
-             :trap-camera-pair
-             :media-capture-timestamp
-             :media-capture-date
-             :media-capture-time
-             :sighting-time-delta-seconds
-             :sighting-time-delta-minutes
-             :sighting-time-delta-hours
-             :sighting-time-delta-days
-             :media-directory
-             :media-full-filename]
-   :apply-fn indep/->independent-sightings
-   :transforms [#(update % :media-capture-timestamp
-                         (partial tf/unparse (tf/formatters :mysql)))
-                #(assoc % :media-directory (get-in state [:config :path :media]))
-                #(assoc % :trap-camera-pair (format "%s_%s"
-                                                    (:trap-station-name %)
-                                                    (:trap-station-session-camera-id %)))
-                #(assoc % :media-full-filename (if (:media-filename %)
-                                                 (str (:media-filename %) "."
-                                                      (:media-format %))
-                                                 nil))]
-   :filters [#(= (:survey-id %) survey-id)]
-   :order-by [:media-capture-timestamp]})
+  (survey/with-survey-settings [s state]
+    {:columns [:trap-station-name
+               :trap-station-session-camera-id
+               :camera-name
+               :species-name
+               :trap-camera-pair
+               :media-capture-timestamp
+               :media-capture-date
+               :media-capture-time
+               :sighting-time-delta-seconds
+               :sighting-time-delta-minutes
+               :sighting-time-delta-hours
+               :sighting-time-delta-days
+               :media-directory
+               :media-full-filename]
+     :apply-fn (partial indep/->independent-sightings state)
+     :transforms [#(update % :media-capture-timestamp
+                           (partial tf/unparse (tf/formatters :mysql)))
+                  #(assoc % :media-directory (get-in state [:config :path :media]))
+                  #(assoc % :trap-camera-pair (format "%s_%s"
+                                                      (:trap-station-name %)
+                                                      (:trap-station-session-camera-id %)))
+                  #(assoc % :media-full-filename (if (:media-filename %)
+                                                   (str (:media-filename %) "."
+                                                        (:media-format %))
+                                                   nil))]
+     :filters [#(= (:survey-id %) survey-id)]
+     :order-by [:media-capture-timestamp]}))
 
 (defn form-smith
   [state]

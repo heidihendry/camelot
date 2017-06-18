@@ -1,4 +1,4 @@
-(ns camelot.report.module.persence-util-test
+(ns camelot.report.module.presence-util-test
   (:require
    [camelot.report.module.presence-util :as sut]
    [clojure.test :refer :all]
@@ -14,6 +14,16 @@
   (state/gen-state (merge {:timezone "Asia/Ho_Chi_Minh"
                            :language :en}
                           config)))
+
+(defn generate-count
+  [tax-id start-date end-date state data]
+  (with-redefs [camelot.model.survey/survey-settings (constantly {})]
+    (sut/generate-count tax-id start-date end-date state data)))
+
+(defn generate-presence
+  [tax-id start-date end-date state data]
+  (with-redefs [camelot.model.survey/survey-settings (constantly {})]
+    (sut/generate-presence tax-id start-date end-date state data)))
 
 (defn- day-end
   [d]
@@ -46,7 +56,7 @@
     (testing "Produces basic occupancy matrix with the correct dimensions"
       (let [data [(->record {:media-capture-timestamp (jan 3)})
                   (->record {:media-capture-timestamp (jan 5)})]
-            result (sut/generate-count 1 (jan 1) (jan 4) (gen-state-helper {}) data)]
+            result (generate-count 1 (jan 1) (jan 4) (gen-state-helper {}) data)]
         (is (= (count result) 2))
         (is (= (count (first result)) 5))))
 
@@ -54,7 +64,7 @@
       (let [data [(->record {:media-capture-timestamp (jan 3)})
                   (->record {:media-capture-timestamp (jan 5)
                              :sighting-quantity 3})]
-            result (rest (sut/generate-count 1 (jan 1) (jan 6) (gen-state-helper {}) data))]
+            result (rest (generate-count 1 (jan 1) (jan 6) (gen-state-helper {}) data))]
         (is (= (get-in (mapv vec result) [0 3]) 1))
         (is (= (get-in (mapv vec result) [0 5]) 3))
         (is (= (check-non-zero result) [1 3]))))
@@ -65,7 +75,7 @@
                              :trap-station-id 2})
                   (->record {:media-capture-timestamp (jan 5)
                              :trap-station-id 3})]
-            result (sut/generate-count 1 (jan 1) (jan 6) (gen-state-helper {}) data)]
+            result (generate-count 1 (jan 1) (jan 6) (gen-state-helper {}) data)]
         (is (= (map first result) ["", "T1", "T2", "T3"]))))
 
     (testing "Occupancy matrix does not show records outside of date range, but still shows trap stations."
@@ -75,7 +85,7 @@
                              :sighting-quantity 3})
                   (->record {:media-capture-timestamp (jan 7)
                              :trap-station-id 3})]
-            result (sut/generate-count 1 (jan 3) (jan 6) (gen-state-helper {}) data)]
+            result (generate-count 1 (jan 3) (jan 6) (gen-state-helper {}) data)]
         (is (= (map first result) ["", "T1", "T2", "T3"]))
         (is (= (check-non-zero (rest result)) [3]))))
 
@@ -85,21 +95,23 @@
                              :taxonomy-id 2
                              :sighting-quantity 3})
                   (->record {:media-capture-timestamp (jan 5)})]
-            result (sut/generate-count 2 (jan 1) (jan 6) (gen-state-helper {}) data)]
+            result (generate-count 2 (jan 1) (jan 6) (gen-state-helper {}) data)]
         (is (= (check-non-zero (rest result)) [3]))))
 
     (testing "Results from the first and final days are included."
       (let [data [(->record {:media-capture-timestamp (jan 1)})
                   (->record {:media-capture-timestamp (jan 5)})]
-            result (sut/generate-count 1 (jan 1) (jan 5) (gen-state-helper {}) data)]
+            result (generate-count 1 (jan 1) (jan 5) (gen-state-helper {}) data)]
         (is (= (get-in (mapv vec result) [1 1]) 1))
-        (is (= (get-in (mapv vec result) [1 5]) 1))))
+        (is (= (get-in (mapv vec result) [1 5]) 1))))))
 
+(deftest test-generate-presence
+  (testing "Generate presence"
     (testing "Should show only 1/0 for presence/absence."
       (let [data [(->record {:media-capture-timestamp (jan 3)})
                   (->record {:media-capture-timestamp (jan 5)
                              :sighting-quantity 3})]
-            result (rest (sut/generate-presence 1 (jan 1) (jan 6) (gen-state-helper {}) data))]
+            result (rest (generate-presence 1 (jan 1) (jan 6) (gen-state-helper {}) data))]
         (is (= (get-in (mapv vec result) [0 3]) 1))
         (is (= (get-in (mapv vec result) [0 5]) 1))
         (is (= (check-non-zero result) [1 1]))))
@@ -108,33 +120,33 @@
       (let [data [(->record {:media-capture-timestamp (jan 14)})
                   (->record {:media-capture-timestamp (jan 15)
                              :sighting-quantity 3})]
-            result (rest (sut/generate-presence 1 (jan 14) (jan 17) (gen-state-helper {}) data))]
-        (is (= (rest (first (mapv vec result))) [1 1 "-" "-"]))))
+            result (rest (generate-presence 1 (jan 14) (jan 17) (gen-state-helper {}) data))]
+        (is (= (rest (first (mapv vec result))) [1 1 "-" "-"])))))
 
-    (testing "Date calculations shuold be distinct per trap station"
-      (let [data [(->record {:media-capture-timestamp (jan 14)})
-                  (->record {:media-capture-timestamp (jan 15)
-                             :sighting-quantity 3})
-                  (->record {:media-capture-timestamp (jan 17)
-                             :trap-station-id 2
-                             :trap-station-session-start-date (t/date-time 2015 1 17)
-                             :trap-station-session-end-date (t/date-time 2015 1 20)
-                             :sighting-quantity 3})
-                  (->record {:media-capture-timestamp (jan 20)
-                             :trap-station-id 2
-                             :trap-station-session-start-date (t/date-time 2015 1 17)
-                             :trap-station-session-end-date (t/date-time 2015 1 20)
-                             :sighting-quantity 3})]
-            result (rest (sut/generate-presence 1 (jan 14) (jan 17) (gen-state-helper {}) data))]
-        (is (= (map rest (mapv vec result)) [[1 1 "-" "-"]
-                                             ["-" "-" "-" 1]]))))
+  (testing "Date calculations shuold be distinct per trap station"
+    (let [data [(->record {:media-capture-timestamp (jan 14)})
+                (->record {:media-capture-timestamp (jan 15)
+                           :sighting-quantity 3})
+                (->record {:media-capture-timestamp (jan 17)
+                           :trap-station-id 2
+                           :trap-station-session-start-date (t/date-time 2015 1 17)
+                           :trap-station-session-end-date (t/date-time 2015 1 20)
+                           :sighting-quantity 3})
+                (->record {:media-capture-timestamp (jan 20)
+                           :trap-station-id 2
+                           :trap-station-session-start-date (t/date-time 2015 1 17)
+                           :trap-station-session-end-date (t/date-time 2015 1 20)
+                           :sighting-quantity 3})]
+          result (rest (generate-presence 1 (jan 14) (jan 17) (gen-state-helper {}) data))]
+      (is (= (map rest (mapv vec result)) [[1 1 "-" "-"]
+                                           ["-" "-" "-" 1]]))))
 
-    (testing "Should shows hyphen for all, if no sessions within nominated dates."
-      (let [data [(->record {:media-capture-timestamp (jan 14)})
-                  (->record {:media-capture-timestamp (jan 15)
-                             :sighting-quantity 3})]
-            result (rest (sut/generate-presence 1 (jan 20) (jan 23) (gen-state-helper {}) data))]
-        (is (= (rest (first (mapv vec result))) ["-" "-" "-" "-"]))))))
+  (testing "Should shows hyphen for all, if no sessions within nominated dates."
+    (let [data [(->record {:media-capture-timestamp (jan 14)})
+                (->record {:media-capture-timestamp (jan 15)
+                           :sighting-quantity 3})]
+          result (rest (generate-presence 1 (jan 20) (jan 23) (gen-state-helper {}) data))]
+      (is (= (rest (first (mapv vec result))) ["-" "-" "-" "-"])))))
 
 (deftest test-session-date-ranges
   (testing "Session date ranges"

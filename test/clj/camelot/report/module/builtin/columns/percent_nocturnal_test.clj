@@ -10,8 +10,9 @@
 
 (defn aggregate
   [data]
-  (sut/aggregate-is-night (state/gen-state {:sighting-independence-minutes-threshold 20})
-                          :percent-nocturnal data))
+  (with-redefs [camelot.model.survey/survey-settings (constantly {})]
+    (sut/aggregate-is-night (state/gen-state {:sighting-independence-minutes-threshold 20})
+                            :percent-nocturnal data)))
 
 (deftest test-percent-nocturnal
   (testing "calculate-is-night"
