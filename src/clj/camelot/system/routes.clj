@@ -153,7 +153,7 @@
                                                   survey-site/tsurvey-site data (assoc state :session session)))
            (DELETE "/:id" [id] (crud/delete-resource survey-site/delete! id (assoc state :session session))))
 
-  (context "/sighting" {session :session state :system}
+  (context "/sightings" {session :session state :system}
            (GET "/media/:id" [id] (crud/list-resources sighting/get-all :sighting id (assoc state :session session)))
            (GET "/:id" [id] (crud/specific-resource sighting/get-specific id (assoc state :session session)))
            (PUT "/:id" [id data] (crud/update-resource sighting/update! id

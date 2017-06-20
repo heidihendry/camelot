@@ -54,7 +54,7 @@
   (let [fields (group-by :survey-id (sighting-field/get-all state))]
     (reduce #(let [sid (:survey-id %2)]
                (assoc %1 sid
-                      (merge %2 :sighting-fields (or (get fields sid) [])))) {}
+                      (assoc %2 :sighting-fields (or (get fields sid) [])))) {}
             (get-all state))))
 
 (defmacro with-survey-settings
