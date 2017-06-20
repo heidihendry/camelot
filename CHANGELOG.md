@@ -4,6 +4,7 @@
 * Adds user-definable fields for capturing additional sighting data
 * Adds keybinding to delete media currently selected in the library
 * Adds ability to change survey details via the main UI
+* Adds per-survey configuration of independence threshold
 * Improves media hover effect in library
 
 #### Fixes
