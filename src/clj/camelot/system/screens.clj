@@ -444,7 +444,6 @@
               :title (tr/translate state :settings/title)
               :endpoint "/settings"}
    :layout [[:label (tr/translate state :settings/survey-settings)]
-            [:sighting-independence-minutes-threshold]
             [:species-name-style]
             [:send-usage-data]]
    :schema {:language {:type :select
@@ -455,9 +454,7 @@
                                 :required true
                                  :options {:scientific (tr/translate state :settings/species-name-style-scientific)
                                            :common-name (tr/translate state :settings/species-name-style-common)}}
-            :send-usage-data {:type :boolean}
-            :sighting-independence-minutes-threshold {:type :number
-                                                      :required true}}
+            :send-usage-data {:type :boolean}}
    :states {:update {:submit {:success {:type :event
                                         :event :settings-save}
                               :error {:type :event
