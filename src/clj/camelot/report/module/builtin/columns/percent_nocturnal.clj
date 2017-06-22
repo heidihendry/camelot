@@ -23,7 +23,7 @@
   "Heuristic for checking night if we don't have a sunrise or sunset."
   [ts lat]
   (let [apr-sep? (some? (some #{(.getMonthOfYear ^DateTime ts)} (range 4 10)))]
-    (if (pos? (Double/parseDouble lat))
+    (if (pos? ^long lat)
       (not apr-sep?)
       apr-sep?)))
 
