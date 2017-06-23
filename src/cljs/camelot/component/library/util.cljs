@@ -37,6 +37,17 @@
   ([]
    (all-media-selected (state/library-state))))
 
+(defn selection-survey
+  ([data]
+   (into #{} (map :survey-id) (all-media-selected data)))
+  ([]
+   (selection-survey (state/library-state))))
+
+(defn survey-sighting-fields
+  [survey-id]
+  (prn (get (state/library-state) :sighting-fields))
+  (get-in (state/library-state) [:sighting-fields survey-id]))
+
 (defn find-with-id
   [data media-id]
   (get-in data [:records media-id]))

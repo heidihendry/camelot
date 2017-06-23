@@ -4,6 +4,7 @@
    [clj-time.core :as t]
    [schema.core :as s]
    [camelot.util.config :as config]
+   [camelot.util.sighting :as util.sighting]
    [camelot.util.sighting-fields :as util.sf]
    [clojure.string :as str]))
 
@@ -27,17 +28,10 @@
                                     (t/plus (:media-capture-timestamp this-sighting)
                                             (t/minutes duration))))))
 
-(defn- unidentified?
-  "Predicate for whether a value could be considered unidentified."
-  [v]
-  (or (nil? v)
-      (and (string? v) (empty? v))
-      (= (str/lower-case v) "unidentified")))
-
 (defn- most-specific
   "Return the most specific value of the two given."
   [v1 v2]
-  (if (unidentified? v1)
+  (if (util.sighting/unidentified? v1)
     v2
     v1))
 
@@ -72,8 +66,8 @@
   [field s1 s2]
   (let [v1 (get s1 field)
         v2 (get s2 field)]
-    (or (unidentified? v1)
-        (unidentified? v2)
+    (or (util.sighting/unidentified? v1)
+        (util.sighting/unidentified? v2)
         (= v1 v2))))
 
 (defn- dependent-sighting?

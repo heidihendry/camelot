@@ -4,6 +4,8 @@
             [camelot.state :as state]
             [om.core :as om]
             [camelot.component.library.util :as util]
+            [camelot.util.sighting-fields :as util.sf]
+            [camelot.util.sighting :as util.sighting]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
             [clojure.string :as str]
@@ -34,15 +36,21 @@
                  (dom/div #js {:className "none-selected"}
                           (dom/h4 nil photo-not-selected)))))))
 
-(defn unidentified?
-  [v]
-  (or (nil? v) (= v "unidentified")))
+(defn display-sighting-field-details
+  [{:keys [field sighting]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [value (get sighting (util.sf/user-key field))]
+        (when-not (util.sighting/unidentified? value)
+          (dom/div nil (:sighting-field-label field) ": " value))))))
 
 (defn mcp-details-sightings
   [sighting owner]
   (reify
     om/IRender
     (render [_]
+      (prn sighting)
       (dom/div #js {:className "data"}
                (if (> (:sighting-id sighting) -1)
                  (dom/div #js {:className "fa fa-trash remove-sighting"
@@ -55,16 +63,15 @@
                    (tr/translate ::species-not-in-survey))
                (let [ls (:sighting-lifestage sighting)
                      sex (:sighting-sex sighting)]
-                 (when (or (unidentified? "unidentified")
-                           (unidentified? "unidentified"))
-                   (dom/p #js {:className "sighting-extra-details"}
-                          (str/join ", "
-                                    (filter (complement nil?)
-                                            [(when-not (unidentified? sex)
-                                               (str (tr/translate :sighting/sighting-sex.label) ":" sex))
-                                             (when-not (unidentified? ls)
-                                               (str (tr/translate :sighting/sighting-lifestage.abbrev)
-                                                    ":" ls))])))))))))
+                 (dom/div #js {:className "sighting-extra-details"}
+                          (when-not (util.sighting/unidentified? sex)
+                            (dom/div nil (tr/translate :sighting/sighting-sex.label) ": " sex))
+                          (when-not (util.sighting/unidentified? ls)
+                            (dom/div nil (tr/translate :sighting/sighting-lifestage.label) ": " ls))
+                          (om/build-all display-sighting-field-details
+                                        (map #(hash-map :field %
+                                                        :sighting sighting)
+                                             (util/survey-sighting-fields (:survey-id sighting))))))))))
 
 (defn mcp-detail
   [data owner]
@@ -80,7 +87,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "details"}
+      (dom/div #js {:className "details media-details-inner-container"}
                (om/build-all mcp-detail (map #(merge {:data data} %)
                                              [{:key :trap-station-latitude :label (tr/translate :trap-station/trap-station-latitude.label)}
                                               {:key :trap-station-longitude :label (tr/translate :trap-station/trap-station-longitude.label)}
@@ -98,9 +105,11 @@
                                      "-"))))
                (dom/div nil
                         (when (seq (:sightings data))
-                          (dom/label nil (tr/translate ::sightings))
-                          (om/build-all mcp-details-sightings (:sightings data)
-                                        {:key :sighting-id})))))))
+                          (dom/div nil
+                                   (dom/label nil (tr/translate ::sightings))
+                                   (om/build-all mcp-details-sightings (map #(assoc % :survey-id (:survey-id data))
+                                                                            (:sightings data))
+                                                 {:key :sighting-id}))))))))
 
 (defn mcp-details
   [data owner]

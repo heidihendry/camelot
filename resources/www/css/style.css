@@ -789,11 +789,15 @@ pre.field-input {
 .library .sighting-extra-details {
     margin-left: 2rem;
     color: #333;
-    font-style: italic;
     font-size: 90%;
 }
 .library .media-details-panel.show-panel {
     right: 0rem;
+}
+.library .media-details-inner-container {
+    position: relative;
+    overflow: auto;
+    padding: 1rem;
 }
 .library .media-details-panel-text {
     position: absolute;
@@ -802,8 +806,11 @@ pre.field-input {
     width: 25rem;
     z-index: 400;
     height: 100vh;
-    padding: 1rem;
+    padding-top: 1rem;
     border-left: 1px solid #ccc;
+}
+.library .media-details-panel-text h4 {
+    padding-left: 1rem;
 }
 .library .media-details-panel-text.show-panel {
     right: 0rem;
@@ -885,6 +892,9 @@ pre.field-input {
 #app .library .selection-delete {
     font-size: 80%;
     text-align: right;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
 }
 #app .library .preview-delete-button {
     float: right;

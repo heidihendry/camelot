@@ -307,7 +307,7 @@
 
 (defn single-survey?
   [data]
-  (= (count (into #{} (map :survey-id) (util/all-media-selected data))) 1))
+  (= (count (util/selection-survey data)) 1))
 
 (defn identify-selection-bar
   [data owner]

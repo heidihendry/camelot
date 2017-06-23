@@ -6,6 +6,7 @@
    [camelot.component.library.util :as util]
    [camelot.component.util :as cutil]
    [camelot.component.library.sighting-fields :as sighting-fields]
+   [camelot.util.sighting-fields :as util.sf]
    [camelot.rest :as rest]
    [camelot.nav :as nav]
    [clojure.string :as str]
@@ -34,6 +35,18 @@
                :lifestage "unidentified"
                :sighting-fields {}}))
 
+(defn key-by-user-key
+  [sighting-fields]
+  (prn sighting-fields)
+  (prn (util/selection-survey))
+  (prn (util/survey-sighting-fields (util/selection-survey)))
+  (reduce
+   (fn [acc sf]
+     (if-let [v (get sighting-fields (:sighting-field-id sf))]
+       (assoc acc (util.sf/user-key sf) v)
+       acc))
+   {} (util/survey-sighting-fields (first (util/selection-survey)))))
+
 (defn add-sighting
   []
   (let [spp (cljs.reader/read-string (get-in (state/library-state) [:identification :species]))
@@ -52,14 +65,16 @@
                                    :sighting-fields @sighting-fields}
                   :media (mapv :media-id all-selected)}}
                 (fn [resp]
+                  (prn (key-by-user-key @sighting-fields))
                   (dorun (map #(do (om/update! (second %)
                                                :sightings
                                                (conj (:sightings (second %))
-                                                     {:taxonomy-id spp
-                                                      :sighting-lifestage lifestage
-                                                      :sighting-sex sex
-                                                      :sighting-id (first %)
-                                                      :sighting-quantity qty}))
+                                                     (merge {:taxonomy-id spp
+                                                             :sighting-lifestage lifestage
+                                                             :sighting-sex sex
+                                                             :sighting-id (first %)
+                                                             :sighting-quantity qty}
+                                                            (key-by-user-key @sighting-fields))))
                                    (om/update! (second %) :media-processed true))
                               (zipmap (:body resp) all-selected)))
                   (util/show-identified-message)
