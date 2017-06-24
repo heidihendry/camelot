@@ -42,13 +42,6 @@
   [data]
   (map->SightingFieldValue (augment-data data)))
 
-(defn get-all
-  "Return all sighting field values for a collection of sighting IDs."
-  [state sighting-ids]
-  (->> {:sighting-ids sighting-ids}
-       (db/with-db-keys state -get-all)
-       (map sighting-field-value)))
-
 (defn sighting-field-query-reducer
   [acc sighting-id fields]
   (->> fields
