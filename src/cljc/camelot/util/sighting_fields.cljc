@@ -11,7 +11,12 @@
 
    :number
    {:deserialiser-datatype :number
-    :translation-key :datatype/number}})
+    :translation-key :datatype/number}
+
+   :select
+   {:deserialiser-datatype :string
+    :translation-key :datatype/select
+    :has-options true}})
 
 (def user-key-prefix "field-")
 

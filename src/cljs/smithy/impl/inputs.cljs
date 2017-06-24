@@ -35,21 +35,6 @@
        cljs.core/PersistentVector) (string/join "#" (map name key))
        :else key))
 
-(defn- string-list-item
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [rm-fn #(state/remove-item! (:elt data)
-                                       (get (:state data) (:key data))
-                                       :value owner)]
-        (if (:disabled (:opts data))
-          (dom/span #js {:className "list-item"} (:elt data))
-          (dom/span #js {:className "list-item"}
-                    (:elt data)
-                    (dom/span #js {:className "list-item-delete fa fa-trash"
-                                   :onClick rm-fn})))))))
-
 (defn- select-option-component
   [{:keys [vkey desc]} owner]
   (reify

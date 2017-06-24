@@ -292,7 +292,7 @@ pre.field-input {
     max-height: 30rem;
     display: block;
 }
-#settings .list-item {
+#app .list-item {
   background: #1175aa;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -302,29 +302,32 @@ pre.field-input {
   display: inline-block;
   color: white;
 }
-#settings .list-item-delete {
+#app .list-item-delete {
   padding-left: 0.5rem;
   color: #aef;
 }
-#settings .list-item-delete:hover {
+#app .list-item-delete:hover {
   cursor: pointer;
   color: #fafafa;
 }
-#app .list-input select.field-input {
-  width: 26.7rem;
-  min-width: auto;
-  margin-right: 0.3rem;
+#app .list-input {
+    width: 100%;
+}
+#app .list-input-add-container {
+    display: flex;
+    flex-direction: row;
 }
 #app .list-input input.field-input {
-  width: 26.7rem;
-  min-width: auto;
-  margin-top: 0;
-  margin-right: 0.3rem;
+    flex: 1 1 auto;
+    display: block-inline;
+    width: auto;
+    margin-top: 0;
+    margin-right: 0.3rem;
 }
-#settings .list-input button {
-  width: 3rem;
-  margin-top: 0;
-  padding: 0.5rem 0.5rem;
+#app .list-input button {
+    flex: 0 1 auto;
+    display: block-inline;
+    margin-top: 0;
 }
 #loading p {
     opacity: 0.5;
@@ -1912,4 +1915,21 @@ pre.field-input {
 }
 #bulk-import-details-panel .bulk-import-status.bulk-import-cancelled {
     color: #aa3311;
+}
+#app .flex-input {
+    display: flex;
+}
+#app .flex-input .field-input {
+    display: inline-block;
+    flex: 1 1 auto;
+}
+#app .flex-input .fixed-input {
+    width: 16rem;
+    display: inline-block;
+    flex: 0 1 auto;
+    padding: 0;
+    height: 3rem;
+}
+#app .sighting-field-options {
+    margin-left: 2rem;
 }

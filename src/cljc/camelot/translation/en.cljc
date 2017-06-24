@@ -772,6 +772,7 @@
     :sighting-field-key.description "Key which identifies the sighting field. May use the same key across surveys to associate fields."
     :sighting-field-datatype.label "Field type"
     :sighting-field-datatype.description "The type of input field to create. This selection influences how the field behaves."
+    :sighting-field-options.label "Select options"
     :sighting-field-required.label "Required?"
     :sighting-field-required.description "Whether the field must have a value before a sighting can be submitted."
     :sighting-field-default.label "Default value"
@@ -779,7 +780,8 @@
     :sighting-field-affects-independence.label "Affects independence?"
     :sighting-field-affects-independence.description "In some reports, Camelot filters sightings which are considered 'dependent'. Consult Camelot's documentation for more details sighting independence."
     :sighting-field-ordering.label "Ordering"
-    :sighting-field-ordering.description "The placement of this field in the form, relative to other fields."}
+    :sighting-field-ordering.description "The placement of this field in the form, relative to other fields."
+    :add-option "Add option"}
 
    :camelot.component.bulk-import.core
    {:download "Download template"
@@ -861,7 +863,7 @@
    {:text "Text input"
     :textarea "Multi-line text input"
     :number "Number"
-    :select "Drop-down"}
+    :select "Drop down"}
 
    :camelot.component.nav
    {:bulk-import-progress-label "Progress of bulk import"

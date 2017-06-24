@@ -2,6 +2,7 @@
   "Management of sighting fields."
   (:require [om.core :as om]
             [om.dom :as dom]
+            [clojure.string :as str]
             [camelot.rest :as rest]
             [camelot.translation.core :as tr]
             [camelot.util.sighting-fields :as util.sf]
@@ -20,6 +21,7 @@
   #{:sighting-field-key
     :sighting-field-label
     :sighting-field-datatype
+    :sighting-field-options
     :sighting-field-default
     :sighting-field-required
     :sighting-field-affects-independence
@@ -158,6 +160,47 @@ Options for select are given by the `options` option."
                                            :title (tr/translate (field-translation field ".description"))}
                                           (or attrs {}))))))))
 
+(defn- string-list-item
+  "Display and removal of a single list item."
+  [{:keys [data field value]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [rm-fn #(om/transact! data field (fn [v] (remove #{value} v)))]
+        (dom/span #js {:className "list-item"}
+                  value
+                  (dom/span #js {:className "list-item-delete fa fa-times"
+                                 :onClick rm-fn}))))))
+
+(defn- field-options-component
+  "Component for managing lists of items"
+  [data owner {:keys [field attrs]}]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {::text-value ""})
+    om/IRenderState
+    (render-state [this state]
+      (letfn [(additem! [] (do (let [v (str/trim (om/get-state owner ::text-value))]
+                                 (when-not (some #{v} (get data field))
+                                   (om/transact! data field #(conj % v))))
+                               (om/set-state! owner ::text-value "")))]
+        (dom/div #js {:className "sighting-field-options"}
+                 (dom/label #js {:className "field-label"}
+                            (tr/translate (field-translation field ".label")))
+                 (dom/div #js {:className "list-input"}
+                          (dom/div #js {:className "list-input-add-container"}
+                                   (dom/input #js {:type "text" :className "field-input" :placeholder (tr/translate ::add-option)
+                                                   :value (get state ::text-value)
+                                                   :onKeyDown #(when (= (.-key %) "Enter") (additem!))
+                                                   :onChange #(om/set-state! owner ::text-value (.. % -target -value))})
+                                   (dom/button #js {:className "btn btn-primary"
+                                                    :onClick additem!}
+                                               (tr/translate :words/add)))
+                          (apply dom/div nil
+                                 (om/build-all string-list-item (into [] (map #(hash-map :data data :field field :value %)
+                                                                              (sort (get data field))))))))))))
+
 (defn edit-component
   "Component for editing sighting field details."
   [data owner]
@@ -200,6 +243,11 @@ Options for select are given by the `options` option."
                                         (letfn [(f [[k v]]
                                                   [(name k) (tr/translate (:translation-key v))])]
                                           (into {nil ""} (map f util.sf/datatypes)))}}})
+                   (when (get-in util.sf/datatypes [(keyword (:sighting-field-datatype buf)) :has-options])
+                       (om/build field-options-component buf
+                                 {:data-key :sighting-field-options
+                                  :validators [(vc/required)]
+                                  :params {:opts {:field :sighting-field-options}}}))
                    (om/build select-component buf
                              {:data-key :sighting-field-required
                               :validators [(vc/required)]
