@@ -6,3 +6,6 @@
 `type' should correspond to a type in the schema."
   [type]
   (components/build-view-component type))
+
+(def content-view-component components/content-view-component)
+(def settings-view-component components/settings-view-component)

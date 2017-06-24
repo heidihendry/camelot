@@ -331,3 +331,6 @@
                      (om/build sidebar-component vs))
                    (om/build content-component {:vs vs
                                                 :screen screen})))))))
+
+(def content-view-component (build-view-component :content))
+(def settings-view-component (build-view-component :settings))

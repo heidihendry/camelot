@@ -300,9 +300,8 @@
   (om/update! (state/app-state-cursor) :actions actions)
   (om/update! (state/app-state-cursor) :generators generators)
   (when (:settings (:screens (state/app-state-cursor)))
-    (let [f (smithy/build-view-component :settings)]
-      (om/root f state/app-state
-               {:target (js/document.getElementById "settings")}))))
+    (om/root smithy/settings-view-component state/app-state
+             {:target (js/document.getElementById "settings")})))
 
 (defn page-content-view
   [type mode {:keys [id resource-id]}]
@@ -313,9 +312,8 @@
                  :buffer {}
                  :selected-resource {}
                  :generator-data {}})
-    (let [f (smithy/build-view-component :content)]
-      (om/root f state/app-state
-               {:target (js/document.getElementById "page-content")}))))
+    (om/root smithy/content-view-component state/app-state
+             {:target (js/document.getElementById "page-content")})))
 
 (defroute "/surveys" [] (page-content-view :survey :create {}))
 (defroute "/surveys/:mode/:rid" [mode rid] (page-content-view :survey (keyword mode)
