@@ -18,7 +18,6 @@ CREATE TABLE sighting_field_option (
        sighting_field_option_created   BIGINT NOT NULL,
        sighting_field_option_updated   BIGINT NOT NULL,
        sighting_field_option_label     VARCHAR(255) NOT NULL,
-       sighting_field_option_visible   BOOLEAN NOT NULL DEFAULT true,
        sighting_field_id               INT NOT NULL REFERENCES sighting_field ON DELETE CASCADE ON UPDATE RESTRICT,
        CONSTRAINT UNIQUE_FIELD_OPTION UNIQUE (sighting_field_option_label, sighting_field_id),
        PRIMARY KEY (sighting_field_option_id))

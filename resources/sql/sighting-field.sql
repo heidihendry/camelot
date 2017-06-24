@@ -42,12 +42,24 @@ VALUES (:current_timestamp, :current_timestamp,
 -- name: -create-option<!
 INSERT INTO sighting_field_option (
        sighting_field_option_created, sighting_field_option_updated,
-       sighting_field_option_label, sighting_field_option_visible,
-       sighting_field_id, survey_id)
-VALUES (:current_timestamp, :current_timestamp, :sighting_field_option_label,
-        :sighting_field_option_visible, :sighting_field_id, :survey_id)
+       sighting_field_option_label, sighting_field_id)
+VALUES (:current_timestamp, :current_timestamp, :sighting_field_option_label, :sighting_field_id)
+
+-- name: -get-all-options
+SELECT sighting_field_option_created, sighting_field_option_updated,
+       sighting_field_option_label, sighting_field_id, sighting_field_id
+FROM sighting_field_option
+
+-- name: -get-options
+SELECT sighting_field_option_created, sighting_field_option_updated,
+       sighting_field_option_label, sighting_field_id, sighting_field_id
+FROM sighting_field_option
+WHERE sighting_field_id = :sighting_field_id
 
 -- name: -delete!
 DELETE FROM sighting_field
 WHERE sighting_field_id = :sighting_field_id
 
+-- name: -delete-options!
+DELETE FROM sighting_field_option
+WHERE sighting_field_id = :sighting_field_id
