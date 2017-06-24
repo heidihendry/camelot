@@ -33,8 +33,9 @@
 (defn- update-buffer
   "Set buffer based the selected sighting-field ID."
   [data sf-id]
-  (let [vs (data/require-keys (get-in data [::sighting-fields sf-id])
-                              sighting-field-input-keys)]
+  (let [sf (get-in data [::sighting-fields sf-id])
+        vs (assoc (data/require-keys sf sighting-field-input-keys)
+                  ::field-key-edited (not (empty? (:sighting-field-key sf))))]
     (om/update! data ::buffer vs)))
 
 (defn- select-sighting-field
@@ -144,21 +145,48 @@ Options for select are given by the `options` option."
                                            (or attrs {})))
                            (om/build-all select-option-component options))))))
 
-(defn text-input-component
-  "Render a component for text input, adding in any additional attributes specified by `attrs`."
-  [data owner {:keys [field attrs]}]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div nil
-               (dom/label #js {:className "field-label"}
-                          (tr/translate (field-translation field ".label")))
-               (dom/input (clj->js (merge {:className "field-input"
-                                           :onChange #(om/update! data field
-                                                                  (.. % -target -value))
-                                           :value (get data field)
-                                           :title (tr/translate (field-translation field ".description"))}
-                                          (or attrs {}))))))))
+(defn build-text-input-component
+  "Builds a component which executes the given function on change."
+  [onchange]
+  (fn [data owner {:keys [field attrs]}]
+    (reify
+      om/IRender
+      (render [_]
+        (dom/div nil
+                 (dom/label #js {:className "field-label"}
+                            (tr/translate (field-translation field ".label")))
+                 (dom/input (clj->js (merge {:className "field-input"
+                                             :onChange (onchange data field)
+                                             :value (get data field)
+                                             :title (tr/translate (field-translation field ".description"))}
+                                            (or attrs {})))))))))
+
+(defn label-to-field-key
+  [label]
+  (-> (str/lower-case label)
+      (str/replace #"[^-0-9a-z]+" "-")
+      (str/replace #"^-*" "")
+      (str/replace #"-*$" "")))
+
+(def text-input-component
+  (build-text-input-component (fn [data field] #(om/update! data field (.. % -target -value)))))
+
+(def field-label-input-component
+  (build-text-input-component
+   (fn [data field]
+     (fn [evt]
+       (let [v (.. evt -target -value)]
+         (om/update! data field v)
+         (when-not (::field-key-edited data)
+           (om/update! data :sighting-field-key (label-to-field-key v))))))))
+
+(def field-key-input-component
+  (build-text-input-component
+   (fn [data field]
+     (fn [evt]
+       (let [v (.. evt -target -value)]
+         (om/update! data field v)
+         (om/update! data ::field-key-edited (not (empty? v))))))))
 
 (defn- string-list-item
   "Display and removal of a single list item."
@@ -226,11 +254,11 @@ Options for select are given by the `options` option."
       (if-let [buf (::buffer data)]
         (dom/div #js {:className "section"}
                  (with-validation (:validation-chan state) dom/div {}
-                   (om/build text-input-component buf
+                   (om/build field-label-input-component buf
                              {:data-key :sighting-field-label
                               :validators [(vc/required) (vc/max-length 255)]
                               :params {:opts {:field :sighting-field-label}}})
-                   (om/build text-input-component buf
+                   (om/build field-key-input-component buf
                              {:data-key :sighting-field-key
                               :validators [(vc/required) (vc/keyword-like)]
                               :params {:opts {:field :sighting-field-key}}})
