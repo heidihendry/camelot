@@ -103,7 +103,8 @@
                                                :sighting-sex sex
                                                :taxonomy-id species
                                                :media-id media-id
-                                               :sighting-fields sighting-fields})))
+                                               :sighting-fields (reduce-kv #(assoc %1 %2 (str %3))
+                                                                           {} sighting-fields)})))
 
 (s/defn identify
   "Creates identification data as sightings for each media ID given."

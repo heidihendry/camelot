@@ -115,7 +115,6 @@
   (reify
     om/IInitState
     (init-state [_]
-      (prn (:sighting-fields data))
       {:typeahead-index (typeahead/phrase-index
                          (apply conj (map #(hash-map :term %
                                                      :props {:field true

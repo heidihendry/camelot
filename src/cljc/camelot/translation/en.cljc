@@ -863,7 +863,8 @@
    {:text "Text input"
     :textarea "Multi-line text input"
     :number "Number"
-    :select "Drop down"}
+    :select "Drop down"
+    :checkbox "Checkbox"}
 
    :camelot.component.nav
    {:bulk-import-progress-label "Progress of bulk import"

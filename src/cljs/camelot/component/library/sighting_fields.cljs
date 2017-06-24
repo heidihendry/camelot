@@ -47,6 +47,24 @@
                          :value (get-in data [::identification :sighting-fields field-id])}
                     (om/build-all select-component-options (conj (map #(vector % %) options) [nil ""])))))))
 
+(defn checkbox-component
+  "Render a checkbox component for the field"
+  [data owner]
+  (reify
+    om/IWillMount
+    (will-mount [_]
+      (let [field-id (get-in data [::field :sighting-field-id])]
+        (om/update! (::identification data) [:sighting-fields field-id] false)))
+    om/IRender
+    (render [_]
+      (let [field-id (get-in data [::field :sighting-field-id])
+            checked (get-in data [::identification :sighting-fields field-id])]
+        (dom/input #js {:type "checkbox"
+                        :className "field-input"
+                        :checked checked
+                        :onChange #(do (om/update! (::identification data) [:sighting-fields field-id]
+                                                   (.. % -target -checked)))})))))
+
 (defn number-component
   "Render a number input component for the field"
   [data owner]
@@ -91,6 +109,7 @@
                    :textarea (om/build textarea-component data)
                    :number (om/build number-component data)
                    :select (om/build select-component data)
+                   :checkbox (om/build checkbox-component data)
                    (om/build text-input-component data)))))))
 
 (defn field-data

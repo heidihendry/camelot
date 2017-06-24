@@ -37,14 +37,10 @@
 
 (defn key-by-user-key
   [sighting-fields]
-  (prn sighting-fields)
-  (prn (util/selection-survey))
-  (prn (util/survey-sighting-fields (util/selection-survey)))
   (reduce
    (fn [acc sf]
-     (if-let [v (get sighting-fields (:sighting-field-id sf))]
-       (assoc acc (util.sf/user-key sf) v)
-       acc))
+     (let [v (get sighting-fields (:sighting-field-id sf))]
+       (assoc acc (util.sf/user-key sf) v)))
    {} (util/survey-sighting-fields (first (util/selection-survey)))))
 
 (defn add-sighting
@@ -65,7 +61,6 @@
                                    :sighting-fields @sighting-fields}
                   :media (mapv :media-id all-selected)}}
                 (fn [resp]
-                  (prn (key-by-user-key @sighting-fields))
                   (dorun (map #(do (om/update! (second %)
                                                :sightings
                                                (conj (:sightings (second %))

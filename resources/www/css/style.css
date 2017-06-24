@@ -776,10 +776,13 @@ pre.field-input {
 }
 #app #identification-panel .button-container button,
 #app #identification-panel .button-container input[type=button],
-#app #identification-panel .button-container input[type=submit]{
+#app #identification-panel .button-container input[type=submit] {
     margin-left: 0;
     width: 100%;
     flex-grow: 1;
+}
+#app #identification-panel input[type=checkbox] {
+    width: 2rem;
 }
 .library .remove-sighting {
     padding-top: 0.3rem;

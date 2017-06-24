@@ -43,14 +43,13 @@
     (render [_]
       (let [value (get sighting (util.sf/user-key field))]
         (when-not (util.sighting/unidentified? value)
-          (dom/div nil (:sighting-field-label field) ": " value))))))
+          (dom/div nil (:sighting-field-label field) ": " (str value)))))))
 
 (defn mcp-details-sightings
   [sighting owner]
   (reify
     om/IRender
     (render [_]
-      (prn sighting)
       (dom/div #js {:className "data"}
                (if (> (:sighting-id sighting) -1)
                  (dom/div #js {:className "fa fa-trash remove-sighting"

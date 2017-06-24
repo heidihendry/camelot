@@ -45,7 +45,6 @@
 
 (defn survey-sighting-fields
   [survey-id]
-  (prn (get (state/library-state) :sighting-fields))
   (get-in (state/library-state) [:sighting-fields survey-id]))
 
 (defn find-with-id

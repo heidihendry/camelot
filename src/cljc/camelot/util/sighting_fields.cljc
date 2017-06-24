@@ -16,7 +16,11 @@
    :select
    {:deserialiser-datatype :string
     :translation-key :datatype/select
-    :has-options true}})
+    :has-options true}
+
+   :checkbox
+   {:deserialiser-datatype :boolean
+    :translation-key :datatype/checkbox}})
 
 (def user-key-prefix "field-")
 

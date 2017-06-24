@@ -5,5 +5,5 @@
   "Predicate for whether a value could be considered unidentified."
   [v]
   (or (nil? v)
-      (and (string? v) (empty? v))
-      (= (str/lower-case v) "unidentified")))
+      (and (string? v) (or (empty? v)
+                           (= (str/lower-case v) "unidentified")))))
