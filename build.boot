@@ -5,6 +5,7 @@
     [adzerk/boot-reload "0.5.0" :scope "test"]
     [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
     [adzerk/boot-test "1.0.7" :scope "test"]
+    [samestep/boot-refresh "0.1.0" :scope "test"]
     [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
     [com.cemerick/piggieback "0.2.1" :scope "test"]
     [weasel "0.7.0" :scope "test"]
@@ -62,6 +63,7 @@
          '[adzerk.boot-test :refer [test]]
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
+         '[samestep.boot-refresh :refer [refresh]]
          '[crisptrutski.boot-cljs-test :refer [test-cljs]]
          '[clojure.tools.namespace.repl :as ns.repl]
          '[com.stuartsierra.component :as component]
@@ -140,11 +142,13 @@
     (comp
      (add-source-paths :dirs #{"test/cljc" "test/clj" "test/cljs"})
      (test :namespaces namespaces)
-     (test-cljs :ids ["camelot.test-runner"]
-                :update-fs? true
+     (test-cljs :ids ["camelot/test-runner"]
                 :namespaces namespaces
-                :js-env :phantom
-                :optimizations :none))))
+                :cljs-opts {:foreign-libs
+                            [{:provides ["cljsjs.react"]
+                              :file "www/lib/react-with-addons-0.14.3.js"
+                              :file-min "www/lib/react-with-addons-0.14.3.js"}]}
+                :js-env :phantom))))
 
 (deftask uberjar
   "Build an uberjar."
