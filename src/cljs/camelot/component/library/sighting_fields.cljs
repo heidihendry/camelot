@@ -24,6 +24,29 @@
                         :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
                         :value (get-in data [::identification :sighting-fields field-id])})))))
 
+(defn select-component-options
+  [[key value] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value key} value))))
+
+(defn select-component
+  "Render a text input component for the field"
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [field-id (get-in data [::field :sighting-field-id])
+            required (get-in data [::field :sighting-field-required])
+            options (get-in data [::field :sighting-field-options])]
+        (dom/select #js {:type "text"
+                         :className "field-input"
+                         :required required
+                         :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                         :value (get-in data [::identification :sighting-fields field-id])}
+                    (om/build-all select-component-options (conj (map #(vector % %) options) [nil ""])))))))
+
 (defn number-component
   "Render a number input component for the field"
   [data owner]
@@ -67,6 +90,7 @@
                    :text (om/build text-input-component data)
                    :textarea (om/build textarea-component data)
                    :number (om/build number-component data)
+                   :select (om/build select-component data)
                    (om/build text-input-component data)))))))
 
 (defn field-data

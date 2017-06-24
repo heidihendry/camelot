@@ -218,36 +218,37 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:id "identification-panel"
-                    :className (str "identification-panel")}
-               (dom/div #js {:className "identification-panel-content"}
-                        (dom/div #js {:className "single-field"
-                                      :required true}
-                                 (dom/label #js {:className "field-label required"}
-                                            (tr/translate :sighting/taxonomy-id.label))
-                                 (om/build taxonomy-select-component data))
-                        (dom/div nil
-                                 (dom/label #js {:className "field-label required"}
-                                            (tr/translate :sighting/sighting-quantity.label))
-                                 (dom/input #js {:type "number"
-                                                 :min "1"
-                                                 :required true
-                                                 :className "field-input short-input"
-                                                 :value (get-in data [:identification :quantity])
-                                                 :onChange #(do
-                                                              (om/update! (:identification data) :quantity
-                                                                          (cljs.reader/read-string (.. % -target -value)))
-                                                              (nav/analytics-event "library-id" "quantity-change"))}))
-                        (dom/div nil
-                                 (dom/span #js {:className "field"}
-                                           (dom/label nil (tr/translate :sighting/sighting-sex.label))
-                                           (om/build sighting-sex-select-component data)))
-                        (dom/div nil
-                                 (dom/span #js {:className "field"}
-                                           (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
-                                           (om/build sighting-lifestage-select-component data)))
-                        (dom/div #js {:className "flex-row"}
-                                 (om/build sighting-fields/component data)))))))
+      (when (:show-identification-panel data)
+        (dom/div #js {:id "identification-panel"
+                      :className (str "identification-panel")}
+                 (dom/div #js {:className "identification-panel-content"}
+                          (dom/div #js {:className "single-field"
+                                        :required true}
+                                   (dom/label #js {:className "field-label required"}
+                                              (tr/translate :sighting/taxonomy-id.label))
+                                   (om/build taxonomy-select-component data))
+                          (dom/div nil
+                                   (dom/label #js {:className "field-label required"}
+                                              (tr/translate :sighting/sighting-quantity.label))
+                                   (dom/input #js {:type "number"
+                                                   :min "1"
+                                                   :required true
+                                                   :className "field-input short-input"
+                                                   :value (get-in data [:identification :quantity])
+                                                   :onChange #(do
+                                                                (om/update! (:identification data) :quantity
+                                                                            (cljs.reader/read-string (.. % -target -value)))
+                                                                (nav/analytics-event "library-id" "quantity-change"))}))
+                          (dom/div nil
+                                   (dom/span #js {:className "field"}
+                                             (dom/label nil (tr/translate :sighting/sighting-sex.label))
+                                             (om/build sighting-sex-select-component data)))
+                          (dom/div nil
+                                   (dom/span #js {:className "field"}
+                                             (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
+                                             (om/build sighting-lifestage-select-component data)))
+                          (dom/div #js {:className "flex-row"}
+                                   (om/build sighting-fields/component data))))))))
 
 (defn submit-allowed?
   [data]
