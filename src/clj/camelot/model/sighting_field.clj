@@ -100,12 +100,13 @@
 (defn create!
   "Create a sighting field with its configuration as `field-config'."
   [state field-config]
-  (let [sf-id (->> (update field-config :sighting-field-datatype name)
-                   (db/with-db-keys state -create<! )
-                   :1
-                   int
-                   (get-specific state))]
-    (create-options! state sf-id (:sighting-field-options field-config))))
+  (let [sf (->> (update field-config :sighting-field-datatype name)
+                (db/with-db-keys state -create<! )
+                :1
+                int
+                (get-specific state))]
+    (create-options! state (:sighting-field-id sf) (:sighting-field-options field-config))
+    sf))
 
 (defn delete!
   "Delete the sighting field with the given ID."
