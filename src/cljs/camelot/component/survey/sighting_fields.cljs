@@ -39,7 +39,9 @@
   "Select the sighting field with the given ID."
   [data sf-id]
   (om/update! data ::selected-sighting-field-id sf-id)
-  (update-buffer data sf-id))
+  (if (nil? sf-id)
+    (om/update! data ::buffer nil)
+    (update-buffer data sf-id)))
 
 (defn sighting-field-menu-item
   "Menu item representing a single sighting field."
@@ -178,7 +180,7 @@ Options for select are given by the `options` option."
         (>! (om/get-state owner :result-vchan) {:command :unmount})))
     om/IRenderState
     (render-state [_ state]
-      (let [buf (::buffer data)]
+      (if-let [buf (::buffer data)]
         (dom/div #js {:className "section"}
                  (with-validation (:validation-chan state) dom/div {}
                    (om/build text-input-component buf
@@ -187,11 +189,11 @@ Options for select are given by the `options` option."
                               :params {:opts {:field :sighting-field-label}}})
                    (om/build text-input-component buf
                              {:data-key :sighting-field-key
-                              :validators []
+                              :validators [(vc/required) (vc/keyword-like)]
                               :params {:opts {:field :sighting-field-key}}})
                    (om/build select-component buf
                              {:data-key :sighting-field-datatype
-                              :validators []
+                              :validators [(vc/required)]
                               :params {:opts
                                        {:field :sighting-field-datatype
                                         :options
@@ -200,19 +202,19 @@ Options for select are given by the `options` option."
                                           (into {nil ""} (map f util.sf/datatypes)))}}})
                    (om/build select-component buf
                              {:data-key :sighting-field-required
-                              :validators []
+                              :validators [(vc/required)]
                               :params {:opts
                                        {:field :sighting-field-required
                                         :options {nil ""
                                                   "true" (tr/translate :words/yes)
                                                   "false" (tr/translate :words/no)}}}})
-                   (om/build text-input-component buf
+                   #_(om/build text-input-component buf
                              {:data-key :sighting-field-default
                               :validators []
                               :params {:opts {:field :sighting-field-default}}})
                    (om/build select-component buf
                              {:data-key :sighting-field-affects-independence
-                              :validators []
+                              :validators [(vc/required)]
                               :params
                               {:opts {:field :sighting-field-affects-independence
                                       :options {nil ""
@@ -220,14 +222,16 @@ Options for select are given by the `options` option."
                                                 "false" (tr/translate :words/no)}}}})
                    (om/build text-input-component buf
                              {:data-key :sighting-field-ordering
-                              :validators []
+                              :validators [(vc/required)]
                               :params
                               {:opts {:field :sighting-field-ordering
                                       :attrs {:type "number"}}}}))
 
                  (dom/div #js {:className "button-container"}
                           (om/build revert-button-component data {:state state})
-                          (om/build submit-button-component data {:state state})))))))
+                          (om/build submit-button-component data {:state state})))
+        (do (update-buffer data nil)
+            nil)))))
 
 (defn assoc-sighting-field
   [data sighting-field]
@@ -257,9 +261,11 @@ Options for select are given by the `options` option."
                                    allowed-request-fields)]
                 (if-let [sf-id (:sighting-field-id r)]
                   (rest/put-x (str "/sighting-fields/" sf-id) {:data v}
-                              #(assoc-sighting-field data (cursorise/decursorise (:body %))))
+                              #(do (assoc-sighting-field data (cursorise/decursorise (:body %)))
+                                   (select-sighting-field data nil)))
                   (rest/post-x "/sighting-fields" {:data v}
-                               #(assoc-sighting-field data (cursorise/decursorise (:body %))))))
+                               #(do (assoc-sighting-field data (cursorise/decursorise (:body %)))
+                                    (select-sighting-field data nil)))))
 
               :revert
               (select-sighting-field data (::selected-sighting-field-id @data)))

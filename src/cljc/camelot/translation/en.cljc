@@ -886,6 +886,7 @@
 
    :camelot.validation.validated-component
    {:not-empty "Must not be blank"
+    :not-keyword "May contain only lower-case alphanumeric characters and hyphen ('-')"
     :too-long "Must not be longer than %d characters"}
 
    :missing "[Translation missing]"})

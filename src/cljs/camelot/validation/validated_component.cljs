@@ -19,8 +19,13 @@
 
 (defn required
   []
-  (validator (complement empty?)
+  (validator (fn [v] (not (or (nil? v) (and (string? v) (empty? v)))))
              (tr/translate ::not-empty)))
+
+(defn keyword-like
+  []
+  (validator #(and (string? %) (re-find #"^[-a-z0-9]+$" %))
+             (tr/translate ::not-keyword)))
 
 (defn max-length
   [n]
@@ -78,8 +83,8 @@
     (will-receive-props [this next-props]
       (when (get-in data (if (keyword? data-key) [data-key] data-key))
         (om/set-state! owner ::show-messages true))
-      (let [result (reduce-kv (partial apply-validator
-                                       (get next-props data-key)) nil
+      (let [result (reduce-kv (fn [acc k v] (apply-validator (get next-props data-key)
+                                                             acc k v)) nil
                               validators)]
         (om/set-state! owner ::validator-failed result)
         (go (>! validation-chan {:key data-key :success (nil? result)}))))
