@@ -781,6 +781,7 @@
     :sighting-field-affects-independence.description "In some reports, Camelot filters sightings which are considered 'dependent'. Consult Camelot's documentation for more details sighting independence."
     :sighting-field-ordering.label "Ordering"
     :sighting-field-ordering.description "The placement of this field in the form, relative to other fields."
+    :delete-question "Are you sure you want to delete this sighting field?"
     :add-option "Add option"}
 
    :camelot.component.bulk-import.core

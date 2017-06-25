@@ -307,7 +307,9 @@
                  (crud/create-resource sighting-field/create!
                                        sighting-field/tsighting-field
                                        data
-                                       (assoc state :session session))))
+                                       (assoc state :session session)))
+           (DELETE "/:id" [id] (crud/delete-resource sighting-field/delete! id
+                                                     (assoc state :session session))))
 
   (context "/settings" {session :session state :system}
            (GET "/" [] (r/response (cursorise/cursorise (merge (deref (get-in state [:config :store])) session))))

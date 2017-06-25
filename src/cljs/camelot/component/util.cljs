@@ -70,7 +70,7 @@
                              :onKeyDown #(when (= (.-keyCode %) escape-keycode)
                                            (om/update! data active-key false))
                              :ref "dialog"}
-                        (when-not (= closable false)
+                        (when-not (and (= closable false) (get data active-key))
                           (dom/button #js {:className "pull-right fa fa-times btn-flat"
                                            :ref "close-button"
                                            :onClick #(om/update! data active-key false)}))
@@ -81,7 +81,8 @@
                                            body)
                                   (dom/div #js {:className "prompt-actions"
                                                 :ref "actions"}
-                                           actions)))
+                                           (when (get data active-key)
+                                             actions))))
                (dom/div #js {:className "tabguard"
                              :tabIndex "0"
                              :onFocus #(if-let [cl (om/get-node owner "close-button")]

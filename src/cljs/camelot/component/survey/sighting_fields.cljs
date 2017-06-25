@@ -6,6 +6,7 @@
             [camelot.rest :as rest]
             [camelot.translation.core :as tr]
             [camelot.util.sighting-fields :as util.sf]
+            [camelot.component.util :as cutil]
             [camelot.state :as state]
             [camelot.nav :as nav]
             [cljs.core.async :refer [<! chan >!]]
@@ -41,10 +42,13 @@
 (defn- select-sighting-field
   "Select the sighting field with the given ID."
   [data sf-id]
-  (om/update! data ::selected-sighting-field-id sf-id)
-  (if (nil? sf-id)
-    (om/update! data ::buffer nil)
-    (update-buffer data sf-id)))
+  (if (contains? (::sighting-fields data) sf-id)
+    (do
+      (om/update! data ::selected-sighting-field-id sf-id)
+      (update-buffer data sf-id))
+    (do
+      (om/update! data ::selected-sighting-field-id nil)
+      (om/update! data ::buffer nil))))
 
 (defn sighting-field-menu-item
   "Menu item representing a single sighting field."
@@ -52,11 +56,18 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "menu-item"
-                    :onClick #(let [sid (get-in data [::item :sighting-field-id])]
-                                (nav/analytics-event "sighting-fields" "survey-field-click")
-                                (select-sighting-field (::context data) sid))}
-               (get-in data [::item :sighting-field-label])))))
+      (let [sid (get-in data [::item :sighting-field-id])]
+        (dom/div #js {:className "menu-item"
+                      :onClick #(do
+                                  (nav/analytics-event "sighting-fields" "survey-field-click")
+                                  (select-sighting-field (::context data) sid))}
+                 (dom/div #js {:className "pull-right fa fa-times remove top-corner"
+                               :onClick #(do
+                                           (.preventDefault %)
+                                           (.stopPropagation %)
+                                           (om/update! (::context data) ::delete-sighting-field-id sid)
+                                           (om/update! (::context data) ::show-delete-sighting-field-prompt true))})
+                 (get-in data [::item :sighting-field-label]))))))
 
 (defn menu-component
   "Side menu for sighting fields within a survey."
@@ -343,6 +354,14 @@ Options for select are given by the `options` option."
                                #(do (assoc-sighting-field data (cursorise/decursorise (:body %)))
                                     (select-sighting-field data nil)))))
 
+              :delete
+              (let [sf-id (:sighting-field-id r)]
+                (rest/delete-x (str "/sighting-fields/" sf-id)
+                               #(do (om/transact! data ::sighting-fields (fn [m] (dissoc m sf-id)))
+                                    (select-sighting-field data (::selected-sighting-field-id data))))
+                (om/update! data ::delete-sighting-field-id nil)
+                (om/update! data ::show-delete-sighting-field-prompt false))
+
               :revert
               (select-sighting-field data (::selected-sighting-field-id @data)))
             (recur)))))
@@ -361,7 +380,26 @@ Options for select are given by the `options` option."
                  (dom/div #js {:className "section-container"}
                           (om/build menu-component data))
                  (dom/div #js {:className "section-container"}
-                          (om/build edit-component data {:state state})))
+                          (om/build edit-component data {:state state}))
+                 (om/build cutil/prompt-component data
+                           {:opts {:active-key ::show-delete-sighting-field-prompt
+                                   :title (get-in data [::sighting-fields (::delete-sighting-field-id data) :sighting-field-label])
+                                   :body (dom/div nil
+                                                  (dom/p #js {:className "delete-question"}
+                                                         (tr/translate ::delete-question)))
+                                   :actions (dom/div #js {:className "button-container"}
+                                                     (dom/button #js {:className "btn btn-default"
+                                                                      :ref "action-first"
+                                                                      :onClick #(om/update! data ::show-delete-sighting-field-prompt false)}
+                                                                 (tr/translate :words/cancel))
+                                                     (dom/button #js {:className "btn btn-primary"
+                                                                      :ref "action-first"
+                                                                      :onClick #(do
+                                                                                  (nav/analytics-event "sighting-fields" "delete-click")
+                                                                                  (go (>! (::chan state)
+                                                                                          {:event :delete
+                                                                                           :sighting-field-id (::delete-sighting-field-id data)})))}
+                                                                 (tr/translate :words/delete)))}}))
         (dom/div #js {:className "align-center"}
                  (dom/img #js {:className "spinner"
                                :src "images/spinner.gif"
