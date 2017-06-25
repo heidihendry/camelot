@@ -47,6 +47,49 @@
                (assoc ::field-key-edited (not (empty? (:sighting-field-key sf)))))]
     (om/update! data ::buffer vs)))
 
+(defn survey-sighting-field-keys
+  [data]
+  (->> (::sighting-fields data)
+       vals
+       (filter #(= (:survey-id %) (state/get-survey-id)))
+       (map :sighting-field-key)
+       (into #{})))
+
+(defn compatible-sighting-fields
+  [data]
+  (let [sf-keys (survey-sighting-field-keys data)]
+    (->> (::sighting-fields data)
+         vals
+         (remove #(= (:survey-id %) (state/get-survey-id)))
+         (remove #(sf-keys (:sighting-field-key %)))
+         (map (fn [sf] [(:sighting-field-id sf)
+                        (str (:sighting-field-label sf) " ("
+                             (get-in data [::surveys (:survey-id sf) :survey-name]) ")")])))))
+
+(defn select-option-component
+  "Render a component for a select option."
+  [[key value] owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value key} value))))
+
+(defn copy-from-survey-component
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (let [fields (compatible-sighting-fields data)]
+        (when (seq fields)
+          (dom/div nil
+                   (dom/label nil (tr/translate ::template)) ": "
+                   (dom/select #js {:onChange #(om/update! data ::field-template-id
+                                                           (let [v (.. % -target -value)]
+                                                             (if v (cljs.reader/read-string v) v)))}
+                               (om/build-all select-option-component
+                                             (conj fields ["" (tr/translate ::default-template)])
+                                             {:key-fn first}))))))))
+
 (defn- select-sighting-field
   "Select the sighting field with the given ID."
   [data sf-id]
@@ -57,6 +100,15 @@
           (contains? (::sighting-fields data) sf-id))
     (om/update! data ::selected-sighting-field-id sf-id)
     (om/update! data ::selected-sighting-field-id nil)))
+
+(defn- copy-sighting-field
+  "Select the sighting field with the given ID."
+  [data sf-id]
+  (prn sf-id)
+  (if sf-id
+    (update-buffer data sf-id)
+    (om/update! data ::buffer nil))
+  (om/update! data ::selected-sighting-field-id ::new))
 
 (defn sighting-field-menu-item
   "Menu item representing a single sighting field."
@@ -97,11 +149,14 @@
                             (om/build cutil/blank-slate-component {}
                                       {:opts {:notice (tr/translate ::help-text)}})))
                  (dom/div #js {:className "sep"})
+                 (om/build copy-from-survey-component data)
                  (dom/button #js {:className "btn btn-primary"
                                   :onClick #(do
                                               (nav/analytics-event "sighting-fields" "new-field-click")
-                                              (select-sighting-field data ::new))}
-                             (tr/translate ::new-field)))))))
+                                              (copy-sighting-field data (::field-template-id data)))}
+                             (if (number? (::field-template-id data))
+                               (tr/translate ::new-field-from-template)
+                               (tr/translate ::new-field))))))))
 
 (defn field-translation
   "Return the translation for the field. Suffix may be either '.label' or '.description'."
@@ -138,14 +193,6 @@
                                    (nav/analytics-event "sighting-fields" "cancel-click")
                                    (go (>! (::chan state) {:event :cancel})))}
                   (tr/translate :words/cancel)))))
-
-(defn select-option-component
-  "Render a component for a select option."
-  [[key value] owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/option #js {:value key} value))))
 
 (defn select-component
   "Render a component for selections, adding in any additional attributes specified by `attrs`.
@@ -360,7 +407,7 @@ Options for select are given by the `options` option."
                   (fn [r] (om/update! data ::sighting-fields
                                       (data/key-by :sighting-field-id (:body r)))))
       (rest/get-x "/surveys"
-                  (fn [r] (om/update! data ::surveys (:body r))))
+                  (fn [r] (om/update! data ::surveys (data/key-by :survey-id (:body r)))))
       (update-buffer data nil)
       (let [ch (om/get-state owner ::chan)]
         (go-loop []

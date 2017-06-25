@@ -766,6 +766,7 @@
    :camelot.component.survey.sighting-fields
    {:page-title "Sighting fields"
     :new-field "New field"
+    :new-field-from-template "New field from template"
     :sighting-field-label.label "Label"
     :sighting-field-label.description "Label of the sighting field"
     :sighting-field-key.label "Identification key"
@@ -783,6 +784,8 @@
     :sighting-field-ordering.description "The placement of this field in the form, relative to other fields."
     :delete-question "Are you sure you want to delete this sighting field?"
     :add-option "Add option"
+    :template "Select template"
+    :default-template "Default"
     :help-text "Sighting fields are used to capture more information during identification."}
 
    :camelot.component.bulk-import.core
