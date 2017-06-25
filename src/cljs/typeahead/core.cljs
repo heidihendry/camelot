@@ -30,7 +30,7 @@
 (defn index-single
   "Given an existing index, add a new word."
   [idx {:keys [term props]}]
-  (into-index idx (seq (str/lower-case term)) {:props props}))
+  (into-index idx (seq (str/lower-case (str term))) {:props props}))
 
 (defn- transforming-index
   [transformer phrases]
