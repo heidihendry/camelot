@@ -131,7 +131,8 @@
                                      (dom/div #js {:onClick #(om/update! data :show-delete-sightings-prompt true)}
                                               (dom/span #js {:className "preview-delete-button fa fa-trash"})
                                               (tr/translate ::delete-sightings))))
-                   (dom/div nil photo-not-selected)))))))
+                   (dom/div #js {:className "media-details-inner-container"}
+                            photo-not-selected)))))))
 
 (defn details-panel-class
   [data base]
