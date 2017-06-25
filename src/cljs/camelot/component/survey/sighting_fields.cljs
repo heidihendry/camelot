@@ -366,7 +366,7 @@ Options for select are given by the `options` option."
                                                      :options (into [] {nil ""
                                                                         "true" (tr/translate :words/yes)
                                                                         "false" (tr/translate :words/no)})}}})
-                                #_(om/build text-input-component buf
+                                (om/build text-input-component buf
                                             {:data-key :sighting-field-default
                                              :validators []
                                              :params {:opts {:field :sighting-field-default}}})

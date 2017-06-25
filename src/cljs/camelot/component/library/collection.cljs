@@ -327,9 +327,7 @@
                                          :default nil)
                                 :disabled (if (or (zero? (count (util/all-media-selected data)))
                                                   (not (single-survey? data))) "disabled" "")
-                                :onClick #(do
-                                            (om/transact! data :show-identification-panel not)
-                                            (.focus (.getElementById js/document "identify-species-select")))}
+                                :onClick #(om/transact! data :show-identification-panel not)}
                            (tr/translate ::identify-selected))))))
 
 (defn media-collection-component

@@ -4,7 +4,8 @@
    [om.core :as om]
    [camelot.component.library.util :as util]
    [camelot.util.feature :as feature]
-   [camelot.state :as state]))
+   [camelot.state :as state]
+   [clojure.string :as str]))
 
 (defn- value-of
   [e]
@@ -53,8 +54,10 @@
   (reify
     om/IWillMount
     (will-mount [_]
-      (let [field-id (get-in data [::field :sighting-field-id])]
-        (om/update! (::identification data) [:sighting-fields field-id] false)))
+      (let [field-id (get-in data [::field :sighting-field-id])
+            default-value (get-in data [::field :sighting-field-default])]
+        (om/update! (::identification data) [:sighting-fields field-id]
+                    (= (str/trim (or default-value "")) "true"))))
     om/IRender
     (render [_]
       (let [field-id (get-in data [::field :sighting-field-id])
@@ -98,6 +101,13 @@
   "Render a single field with a component appropriate for its datatype."
   [data owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (let [field-id (get-in data [::field :sighting-field-id])
+            default-value (get-in data [::field :sighting-field-default])
+            datatype (get-in data [::field :sighting-field-datatype])]
+        (when (not (empty? default-value))
+          (om/update! (::identification data) [:sighting-fields field-id] default-value))))
     om/IRender
     (render [_]
       (let [required (get-in data [::field :sighting-field-required])]
