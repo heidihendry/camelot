@@ -1,11 +1,12 @@
 ## ChangeLog
 ### 1.3.0 (in development)
 #### Enhancements
-* Adds user-definable fields for capturing additional sighting data
+* Adds user-definable fields for capturing additional sighting data ("sighting fields")
 * Adds keybinding to delete media currently selected in the library
 * Adds ability to change survey details via the main UI
 * Adds per-survey configuration of independence threshold
-* Improves media hover effect in library
+* Adds back button to survey menu
+* Improves clarity of thumbnails while hoving in the library
 
 #### Fixes
 * Fixes a bug which would cause zero results to be found when searching on some fields
