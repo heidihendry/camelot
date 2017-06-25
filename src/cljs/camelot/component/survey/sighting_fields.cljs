@@ -39,8 +39,12 @@
   "Set buffer based the selected sighting-field ID."
   [data sf-id]
   (let [sf (get-in data [::sighting-fields sf-id])
-        vs (assoc (data/require-keys sf sighting-field-input-keys)
-                  ::field-key-edited (not (empty? (:sighting-field-key sf))))]
+        vs (-> (data/require-keys sf sighting-field-input-keys)
+               (update :sighting-field-datatype #(or % "text"))
+               (update :sighting-field-required #(or % "false"))
+               (update :sighting-field-affects-independence #(or % "false"))
+               (update :sighting-field-ordering #(or % 20))
+               (assoc ::field-key-edited (not (empty? (:sighting-field-key sf)))))]
     (om/update! data ::buffer vs)))
 
 (defn- select-sighting-field
@@ -64,7 +68,7 @@
         (dom/div #js {:className (str "menu-item" (if (= (get-in data [::context ::selected-sighting-field-id])
                                                          sid) " active" ""))
                       :onClick #(do
-                                  (nav/analytics-event "sighting-fields" "survey-field-click")
+                                  (nav/analytics-event "sighting-fields" "survey-sighting-field-click")
                                   (select-sighting-field (::context data) sid))}
                  (dom/div #js {:className "pull-right fa fa-times remove top-corner"
                                :onClick #(do
@@ -88,7 +92,8 @@
         (dom/div #js {:className "section"}
                  (dom/div #js {:className "simple-menu"}
                           (if (seq fields)
-                            (om/build-all sighting-field-menu-item fields)
+                            (om/build-all sighting-field-menu-item fields
+                                          {:key-fn #(get-in % [::item :sighting-field-id])})
                             (om/build cutil/blank-slate-component {}
                                       {:opts {:notice (tr/translate ::help-text)}})))
                  (dom/div #js {:className "sep"})
@@ -118,9 +123,9 @@
                                            {:event :submit
                                             :sighting-field-id (::selected-sighting-field-id data)
                                             :buffer (update (::buffer data) :sighting-field-datatype keyword)})))}
-                  (if (::selected-sighting-field-id data)
-                    (tr/translate :words/update)
-                    (tr/translate :words/submit))))))
+                  (if (= (::selected-sighting-field-id data) ::new)
+                    (tr/translate :words/create)
+                    (tr/translate :words/update))))))
 
 (defn cancel-button-component
   "Cancel any changes."
@@ -158,7 +163,8 @@ Options for select are given by the `options` option."
                                             :value (get data field)
                                             :title (tr/translate (field-translation field ".description"))}
                                            (or attrs {})))
-                           (om/build-all select-option-component options))))))
+                           (om/build-all select-option-component options
+                                         {:key-fn first}))))))
 
 (defn build-text-input-component
   "Builds a component which executes the given function on change."
@@ -241,8 +247,10 @@ Options for select are given by the `options` option."
                                              :onClick additem!}
                                         (tr/translate :words/add)))
                    (apply dom/div nil
-                          (om/build-all string-list-item (into [] (map #(hash-map :data data :field field :value %)
-                                                                       (sort (get data field))))))))))))
+                          (om/build-all string-list-item
+                                        (into [] (map #(hash-map :data data :field field :value %)
+                                                      (sort (get data field))))
+                                        {:key-fn identity}))))))))
 
 (defn edit-component
   "Component for editing sighting field details."
@@ -297,7 +305,7 @@ Options for select are given by the `options` option."
                                                      :options
                                                      (letfn [(f [[k v]]
                                                                [(name k) (tr/translate (:translation-key v))])]
-                                                       (into {nil ""} (sort (map f util.sf/datatypes))))}}})
+                                                       (conj (sort (map f util.sf/datatypes)) [nil ""]))}}})
                                 (dom/div #js {:className "sighting-field-options"}
                                          (om/build field-options-component buf
                                                    {:data-key :sighting-field-options
@@ -308,9 +316,9 @@ Options for select are given by the `options` option."
                                            :validators [(vc/required)]
                                            :params {:opts
                                                     {:field :sighting-field-required
-                                                     :options {nil ""
-                                                               "true" (tr/translate :words/yes)
-                                                               "false" (tr/translate :words/no)}}}})
+                                                     :options (into [] {nil ""
+                                                                        "true" (tr/translate :words/yes)
+                                                                        "false" (tr/translate :words/no)})}}})
                                 #_(om/build text-input-component buf
                                             {:data-key :sighting-field-default
                                              :validators []
@@ -320,9 +328,9 @@ Options for select are given by the `options` option."
                                            :validators [(vc/required)]
                                            :params
                                            {:opts {:field :sighting-field-affects-independence
-                                                   :options {nil ""
-                                                             "true" (tr/translate :words/yes)
-                                                             "false" (tr/translate :words/no)}}}})
+                                                   :options (into [] {nil ""
+                                                                      "true" (tr/translate :words/yes)
+                                                                      "false" (tr/translate :words/no)})}}})
                                 (om/build text-input-component buf
                                           {:data-key :sighting-field-ordering
                                            :validators [(vc/required)]
