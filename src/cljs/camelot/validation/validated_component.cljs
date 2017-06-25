@@ -19,7 +19,20 @@
 
 (defn required
   []
-  (validator (fn [v] (not (or (nil? v) (and (string? v) (empty? v)))))
+  (validator (fn [v]
+               (not (or (nil? v) (and (or (string? v)
+                                          (coll? v))
+                                      (empty? v)))))
+             (tr/translate ::not-empty)))
+
+(defn required-if
+  [pred]
+  (validator (fn [v]
+               (if (pred)
+                 (not (or (nil? v) (and (or (string? v)
+                                            (coll? v))
+                                        (empty? v))))
+                 true))
              (tr/translate ::not-empty)))
 
 (defn keyword-like
@@ -31,6 +44,11 @@
   [n]
   (validator (fn [x] (< (count x) n))
              (tr/translate ::too-long n)))
+
+(defn unique
+  [others]
+  (validator (fn [x] (not (contains? others x)))
+             (tr/translate ::not-distinct)))
 
 (defn- validated?
   [state]
@@ -79,17 +97,15 @@
     om/IInitState
     (init-state [_]
       {::validator-failed nil})
-    om/IWillReceiveProps
-    (will-receive-props [this next-props]
+    om/IRenderState
+    (render-state [_ state]
       (when (get-in data (if (keyword? data-key) [data-key] data-key))
         (om/set-state! owner ::show-messages true))
-      (let [result (reduce-kv (fn [acc k v] (apply-validator (get next-props data-key)
+      (let [result (reduce-kv (fn [acc k v] (apply-validator (get data data-key)
                                                              acc k v)) nil
                               validators)]
         (om/set-state! owner ::validator-failed result)
-        (go (>! validation-chan {:key data-key :success (nil? result)}))))
-    om/IRenderState
-    (render-state [_ state]
+        (go (>! validation-chan {:key data-key :success (nil? result)})))
       (dom/div #js {:className "validated-component"}
                (om/build component data params)
                (when (::show-messages state)

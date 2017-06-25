@@ -889,8 +889,9 @@
     :no-media-found "%s: no media found"}
 
    :camelot.validation.validated-component
-   {:not-empty "Must not be blank"
+   {:not-empty "Must not be empty"
     :not-keyword "May contain only lower-case alphanumeric characters and hyphen ('-')"
-    :too-long "Must not be longer than %d characters"}
+    :too-long "Must not be longer than %d characters"
+    :not-distinct "Must not already be in use"}
 
    :missing "[Translation missing]"})
