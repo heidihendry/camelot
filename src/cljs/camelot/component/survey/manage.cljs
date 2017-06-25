@@ -8,6 +8,7 @@
             [camelot.component.survey.file :as file]
             [camelot.component.survey.settings :as settings]
             [camelot.component.bulk-import.core :as bulk-import]
+            [camelot.translation.core :as tr]
             [om.dom :as dom]
             [cljs.core.async :refer [<! chan >!]]
             [camelot.state :as state]
@@ -79,6 +80,11 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "split-menu"}
+               (dom/div #js {:className "back-button-container"}
+                        (dom/button #js {:className "btn btn-default back"
+                                         :onClick #(nav/nav-up! 1)}
+                                    (dom/span #js {:className "fa fa-mail-reply"})
+                                    " " (tr/translate :words/back)))
                (dom/div #js {:className "intro"}
                         (dom/h4 nil (get-in (state/app-state-cursor)
                                             [:selected-survey :survey-name :value])))
