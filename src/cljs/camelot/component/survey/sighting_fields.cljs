@@ -232,6 +232,7 @@ Options for select are given by the `options` option."
 (defn label-to-field-key
   [label]
   (-> (str/lower-case label)
+      (str/replace #"'" "")
       (str/replace #"[^-0-9a-z]+" "-")
       (str/replace #"^-*" "")
       (str/replace #"-*$" "")))
