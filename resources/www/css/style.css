@@ -1641,9 +1641,6 @@ pre.field-input {
 #app .validation-warning {
     color: #cc3311;
 }
-#app .validated-component {
-    margin-bottom: 1.5rem;
-}
 #app .validated-component .validation-warning {
     margin-top: -0.5rem;
 }
@@ -1935,4 +1932,7 @@ pre.field-input {
 }
 #app .sighting-field-options {
     margin-left: 2rem;
+}
+#app .list-input-items {
+    margin-top: -0.5rem;
 }

@@ -246,7 +246,7 @@ Options for select are given by the `options` option."
                             (dom/button #js {:className "btn btn-primary"
                                              :onClick additem!}
                                         (tr/translate :words/add)))
-                   (apply dom/div nil
+                   (apply dom/div #js {:className "list-input-items"}
                           (om/build-all string-list-item
                                         (into [] (map #(hash-map :data data :field field :value %)
                                                       (sort (get data field))))

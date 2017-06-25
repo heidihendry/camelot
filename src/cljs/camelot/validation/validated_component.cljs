@@ -8,7 +8,8 @@
             [camelot.nav :as nav]
             [cljs.core.async :refer [<! chan >!]]
             [goog.date :as date]
-            [camelot.util.data :as data])
+            [camelot.util.data :as data]
+            [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn validator
@@ -20,9 +21,8 @@
 (defn required
   []
   (validator (fn [v]
-               (not (or (nil? v) (and (or (string? v)
-                                          (coll? v))
-                                      (empty? v)))))
+               (not (or (nil? v) (or (and (coll? v) (empty? v))
+                                     (and (string? v) (empty? (str/trim v)))))))
              (tr/translate ::not-empty)))
 
 (defn required-if
@@ -108,6 +108,7 @@
         (go (>! validation-chan {:key data-key :success (nil? result)})))
       (dom/div #js {:className "validated-component"}
                (om/build component data params)
-               (when (::show-messages state)
+               (when (and (::show-messages state)
+                          (get-in validators [(::validator-failed state) ::msg]))
                  (dom/div #js {:className "validation-warning"}
                           (get-in validators [(::validator-failed state) ::msg])))))))
