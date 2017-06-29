@@ -139,7 +139,7 @@
       (let [fields (->> (::sighting-fields data)
                         vals
                         (filter #(= (:survey-id %) (state/get-survey-id)))
-                        (sort-by :sighting-field-label)
+                        (sort-by (juxt :sighting-field-ordering :sighting-field-label))
                         (map #(hash-map ::context data ::item %)))]
         (dom/div #js {:className "section"}
                  (dom/div #js {:className "simple-menu"}

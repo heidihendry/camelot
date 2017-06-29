@@ -70,7 +70,8 @@
                           (om/build-all display-sighting-field-details
                                         (map #(hash-map :field %
                                                         :sighting sighting)
-                                             (util/survey-sighting-fields (:survey-id sighting))))))))))
+                                             (sort-by (juxt :sighting-field-ordering :sighting-field-label)
+                                                      (util/survey-sighting-fields (:survey-id sighting)))))))))))
 
 (defn mcp-detail
   [data owner]
