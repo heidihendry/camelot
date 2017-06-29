@@ -14,6 +14,7 @@ Camelot Documentation
    library
    settings
    reports
+   sightingfields
    bulkimport
    advancedmenu
    scale
