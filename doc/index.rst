@@ -12,9 +12,9 @@ Camelot Documentation
    yourorganisation
    surveymanagement
    library
+   sightingfields
    settings
    reports
-   sightingfields
    bulkimport
    advancedmenu
    scale
