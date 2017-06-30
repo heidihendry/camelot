@@ -2,7 +2,7 @@ Sighting fields
 ---------------
 **Sighting fields are a new feature which will be available in Camelot 1.3.0**
 
-Some surveys require more specific data to be captured when identifying media. For this, Camelot provides *sighting fields*. Sighting fields are additional input fields during identification.
+Some surveys require more specific data to be captured when identifying media. For this, Camelot provides *sighting fields*. Sighting fields are additional input fields available during identification.
 
 .. figure:: screenshot/library-sighting-fields.png
    :alt: 
@@ -19,7 +19,7 @@ Sighting fields can be configured by navigating from within the main Survey menu
 .. figure:: screenshot/settings-sighting-fields.png
    :alt: 
 
-You can get started with creating a sighting fields by clicking **New field** towards the bottom left hand corner.  On the right, a menu will appear.  Let's go through the fields, and what they mean.
+You can get started with creating a sighting fields by clicking **New field** towards the bottom left hand corner.  On the right, the configuration for the field will appear.  Next we'll go through the options and what they mean.
 
 Configuration options
 ~~~~~~~~~~~~~~~~~~~~~
@@ -44,7 +44,13 @@ When selecting the drop-down field type, options in the drop-down may be added a
 
 *Example*: Where a sighting field identifies an individual, a sighting for "Simba" and a later sighting for "Mufasa" always depicts two distinct sightings regardless of the span of time between them.  However, a field for the confidence of a sighting -- say if one sighting was confidence "5", and another confidence "3" -- would not alone be an indication that these are two *distinct* sightings if they were sufficiently close together.
 
+See |indep_obs| for the details.
+
 **Ordering**: defines the order of fields will appear in the user interface. Lower values for ordering appear higher, relative to other sighting fields.
+
+.. |indep_obs| raw:: html
+
+   <a href="reports.html#independent-observations">Independent observations</a>
 
 Templates
 ~~~~~~~~~

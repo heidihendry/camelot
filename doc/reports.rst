@@ -16,10 +16,10 @@ sighting are taken at least some time threshold apart. If they are not,
 it is considered dependent. Whether they are considered dependent or
 independent effects the value of the data in this column.
 
-Photos may be considered dependent if they are within the same Trap
-Station Session. That is to say, photos taken by two cameras of a Trap
-Station at the same time, if for the same sighting, will be
-**dependent**.
+Photos may be considered dependent if they are within the same Trap Station
+Session. That is to say, photos taken by two cameras of a Trap Station at the
+same time will be **dependent** if certain criteria about the two sightings
+are the same.
 
 Below are some examples showing the various rules of the calculation
 (assume T=30 as the threshold). All rules assume sightings are within
@@ -99,8 +99,18 @@ Lifestage and Sex. Sighting 3 is **independent** of both sighting 1 and
 sighting 2 due to that inference. The number of independent observations
 is **2**.
 
-The value of the threshold is defined in Camelot's settings menu
-("Independent Sighting Threshold (mins)").
+Sighting fields, if configured for a survey, may also impact the independence
+of a sighting depending on its |sighting_fields_conf|.
+
+The value of the threshold can be found in the |survey_details|.
+
+.. |survey_details| raw:: html
+
+   <a href="settings.html#survey-details">Survey details menu</a>
+
+.. |sighting_fields_conf| raw:: html
+
+   <a href="sightingfields.html#configuration-options">configuration</a>
 
 Nocturnal (%)
 ~~~~~~~~~~~~~
