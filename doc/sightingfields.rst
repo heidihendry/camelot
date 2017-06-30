@@ -44,7 +44,7 @@ When selecting the drop-down field type, options in the drop-down may be added a
 
 *Example*: Where a sighting field identifies an individual, a sighting for "Simba" and a later sighting for "Mufasa" always depicts two distinct sightings regardless of the span of time between them.  However, a field for the confidence of a sighting -- say if one sighting was confidence "5", and another confidence "3" -- would not alone be an indication that these are two *distinct* sightings if they were sufficiently close together.
 
-See |indep_obs| for the details.
+See |indep_obs| for the details.  Sighting fields also abide the special inference behaviour for blank and "unidentified" values as discussed on that page.
 
 **Ordering**: defines the order of fields will appear in the user interface. Lower values for ordering appear higher, relative to other sighting fields.
 
