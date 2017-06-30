@@ -106,9 +106,10 @@
                               validators)]
         (om/set-state! owner ::validator-failed result)
         (go (>! validation-chan {:key data-key :success (nil? result)})))
-      (dom/div #js {:className "validated-component"}
-               (om/build component data params)
-               (when (and (::show-messages state)
-                          (get-in validators [(::validator-failed state) ::msg]))
-                 (dom/div #js {:className "validation-warning"}
-                          (get-in validators [(::validator-failed state) ::msg])))))))
+      (let [show-warning (and (::show-messages state)
+                              (get-in validators [(::validator-failed state) ::msg]))]
+        (dom/div #js {:className "validated-component"}
+                 (om/build component data params)
+                 (when show-warning
+                   (dom/div #js {:className (str "validation-warning ")}
+                            (get-in validators [(::validator-failed state) ::msg]))))))))

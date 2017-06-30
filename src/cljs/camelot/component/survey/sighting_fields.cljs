@@ -197,14 +197,15 @@
 (defn select-component
   "Render a component for selections, adding in any additional attributes specified by `attrs`.
 Options for select are given by the `options` option."
-  [data owner {:keys [field attrs options]}]
+  [data owner {:keys [field required attrs options]}]
   (reify
     om/IRender
     (render [_]
       (dom/div nil
-               (dom/label #js {:className "field-label"}
+               (dom/label #js {:className (str "field-label " (if required "required" ""))}
                           (tr/translate (field-translation field ".label")))
                (dom/select (clj->js (merge {:className "field-input"
+                                            :required required
                                             :onChange #(om/update! data field
                                                                    (.. % -target -value))
                                             :value (get data field)
@@ -216,14 +217,15 @@ Options for select are given by the `options` option."
 (defn build-text-input-component
   "Builds a component which executes the given function on change."
   [onchange]
-  (fn [data owner {:keys [field attrs]}]
+  (fn [data owner {:keys [field required attrs]}]
     (reify
       om/IRender
       (render [_]
         (dom/div nil
-                 (dom/label #js {:className "field-label"}
+                 (dom/label #js {:className (str "field-label " (if required "required" ""))}
                             (tr/translate (field-translation field ".label")))
                  (dom/input (clj->js (merge {:className "field-input"
+                                             :required required
                                              :onChange (onchange data field)
                                              :value (get data field)
                                              :title (tr/translate (field-translation field ".description"))}
@@ -271,7 +273,7 @@ Options for select are given by the `options` option."
 
 (defn- field-options-component
   "Component for managing lists of items"
-  [data owner {:keys [field attrs]}]
+  [data owner {:keys [field required attrs]}]
   (reify
     om/IInitState
     (init-state [_]
@@ -283,12 +285,13 @@ Options for select are given by the `options` option."
                                    (when-not (some #{v} (get data field))
                                      (om/transact! data field #(conj % v))))
                                  (om/set-state! owner ::text-value "")))]
-          (dom/label #js {:className "field-label"}
+          (dom/label #js {:className (str "field-label " (if required "required" ""))}
                      (tr/translate (field-translation field ".label")))
           (dom/div #js {:className "list-input"}
                    (dom/div #js {:className "list-input-add-container"}
                             (dom/input #js {:type "text" :className "field-input" :placeholder (tr/translate ::add-option)
                                             :value (get state ::text-value)
+                                            :required required
                                             :onKeyDown #(when (= (.-key %) "Enter") (additem!))
                                             :onChange #(om/set-state! owner ::text-value (.. % -target -value))})
                             (dom/button #js {:className "btn btn-primary"
@@ -333,7 +336,8 @@ Options for select are given by the `options` option."
                                 (om/build field-label-input-component buf
                                           {:data-key :sighting-field-label
                                            :validators [(vc/required) (vc/max-length 255)]
-                                           :params {:opts {:field :sighting-field-label}}})
+                                           :params {:opts {:field :sighting-field-label
+                                                           :required true}}})
                                 (om/build field-key-input-component buf
                                           {:data-key :sighting-field-key
                                            :validators [(vc/required)
@@ -344,16 +348,18 @@ Options for select are given by the `options` option."
                                                                         (filter #(= (:survey-id %) (state/get-survey-id)))
                                                                         (map :sighting-field-key)
                                                                         (into #{})))]
-                                           :params {:opts {:field :sighting-field-key}}})
+                                           :params {:opts {:field :sighting-field-key
+                                                           :required true}}})
                                 (om/build select-component buf
                                           {:data-key :sighting-field-datatype
                                            :validators [(vc/required)]
                                            :params {:opts
                                                     {:field :sighting-field-datatype
+                                                     :required true
                                                      :options
                                                      (letfn [(f [[k v]]
                                                                [(name k) (tr/translate (:translation-key v))])]
-                                                       (conj (sort (map f util.sf/datatypes)) [nil ""]))}}})
+                                                       (sort (map f util.sf/datatypes)))}}})
                                 (dom/div #js {:className "sighting-field-options"}
                                          (om/build field-options-component buf
                                                    {:data-key :sighting-field-options
@@ -364,8 +370,8 @@ Options for select are given by the `options` option."
                                            :validators [(vc/required)]
                                            :params {:opts
                                                     {:field :sighting-field-required
-                                                     :options (into [] {nil ""
-                                                                        "true" (tr/translate :words/yes)
+                                                     :required true
+                                                     :options (into [] {"true" (tr/translate :words/yes)
                                                                         "false" (tr/translate :words/no)})}}})
                                 (om/build text-input-component buf
                                             {:data-key :sighting-field-default
@@ -376,14 +382,15 @@ Options for select are given by the `options` option."
                                            :validators [(vc/required)]
                                            :params
                                            {:opts {:field :sighting-field-affects-independence
-                                                   :options (into [] {nil ""
-                                                                      "true" (tr/translate :words/yes)
+                                                   :required true
+                                                   :options (into [] {"true" (tr/translate :words/yes)
                                                                       "false" (tr/translate :words/no)})}}})
                                 (om/build text-input-component buf
                                           {:data-key :sighting-field-ordering
                                            :validators [(vc/required)]
                                            :params
                                            {:opts {:field :sighting-field-ordering
+                                                   :required true
                                                    :attrs {:type "number"}}}}))
                               (dom/div #js {:className "button-container"}
                                        (om/build cancel-button-component data {:state state})
