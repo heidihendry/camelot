@@ -5,7 +5,7 @@
 * Adds keybinding to delete media currently selected in the library
 * Adds ability to change survey details via the main UI
 * Adds per-survey configuration of independence threshold
-* Adds back button to survey menu
+* Adds 'back' button to survey menu and report creation
 * Improves clarity of thumbnails while hoving in the library
 * It is now possible to select a range of images in the library by dragging
 

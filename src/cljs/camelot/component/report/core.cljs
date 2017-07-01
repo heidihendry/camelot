@@ -50,6 +50,11 @@
     (render-state [_ state]
       (when (om/get-state owner :renderable)
         (dom/div #js {:className "split-menu"}
+                 (dom/div #js {:className "back-button-container"}
+                          (dom/button #js {:className "btn btn-default back"
+                                           :onClick #(nav/nav-up! 2)}
+                                      (dom/span #js {:className "fa fa-mail-reply"})
+                                      " " (tr/translate :words/back)))
                  (dom/div #js {:className "single-section long-single"}
                           (om/build (om/get-state owner :view-component)
                                     (state/app-state-cursor))))))))
