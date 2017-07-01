@@ -206,5 +206,6 @@ With the Media Collection panel focused (**Control + m**):
    test-fire of the camera)
 -  **Shift** + **Arrow key** to include media in a range, starting from the last selected image.
 -  **Control** + **Arrow key** to toggle the next image in that direction in the current selection.
+-  **Delete**: Delete the selected media
 
 Holding **Shift** or **Control** and clicking an image with the mouse will perform the equivalent behaviour.
