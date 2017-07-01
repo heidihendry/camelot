@@ -62,16 +62,29 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "media-item"}
-               (dom/div #js {:className (media-thumb-class (:media data))}
-                        (dom/img #js {:onMouseDown #(do
-                                                      (util/toggle-select-image (:data data) (:media-id (:media data)) %)
-                                                      (nav/analytics-event "library-collection" "select-media"))
-                                      :src (str (get-in (:media data) [:media-uri]) "/thumb")}))
-               (dom/div #js {:className "view-photo fa fa-eye fa-2x"
-                             :onClick #(do
-                                         (om/update! (state/library-state) :selected-media-id (:media-id (:media data)))
-                                         (nav/analytics-event "library-collection" "view-media"))})))))
+      (let [media-id (:media-id (:media data))]
+        (dom/div #js {:className "media-item"}
+                 (dom/div #js {:className (media-thumb-class (:media data))}
+                          (dom/img #js {:onMouseDown #(do
+                                                        (util/toggle-select-image (:data data) media-id %)
+                                                        (nav/analytics-event "library-collection" "select-media"))
+                                        :onDragOver #(do
+                                                       (let [mids (util/media-ids-on-page (:data data))
+                                                             idxs (vec (map-indexed (fn [i e] [i e]) mids))
+                                                             endpoint (.indexOf (vec mids) media-id)]
+                                                         (when-not (= (:drag-endpoint-media-id (:data data)) media-id)
+                                                           (om/update! (:data data) :drag-endpoint-media-id media-id)
+                                                           (util/apply-selection-range (:data data) idxs endpoint true false))))
+                                        :onDragStart #(do
+                                                        (om/update! (state/library-state) :selected-media-id media-id)
+                                                        (om/update! (state/library-state) :anchor-media-id media-id)
+                                                        (om/update! (state/library-state) :drag-endpoint-media-id nil)
+                                                        (nav/analytics-event "library-collection" "drag-media"))
+                                        :src (str (get-in (:media data) [:media-uri]) "/thumb")}))
+                 (dom/div #js {:className "view-photo fa fa-eye fa-2x"
+                               :onClick #(do
+                                           (om/update! (state/library-state) :selected-media-id media-id)
+                                           (nav/analytics-event "library-collection" "view-media"))}))))))
 
 
 (defn calculate-scroll-update

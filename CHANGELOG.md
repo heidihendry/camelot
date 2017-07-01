@@ -7,6 +7,7 @@
 * Adds per-survey configuration of independence threshold
 * Adds back button to survey menu
 * Improves clarity of thumbnails while hoving in the library
+* It is now possible to select a range of images in the library by dragging
 
 #### Fixes
 * Fixes a bug which would cause zero results to be found when searching on some fields
