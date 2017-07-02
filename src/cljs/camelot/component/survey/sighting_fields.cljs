@@ -431,7 +431,8 @@ Options for select are given by the `options` option."
                                      (select-sighting-field data nil)))
                     (rest/post-x "/sighting-fields" {:data v}
                                  #(do (assoc-sighting-field data (cursorise/decursorise (:body %)))
-                                      (select-sighting-field data nil))))))
+                                      (select-sighting-field data nil)
+                                      (om/update! data ::field-template-id nil))))))
 
               :delete
               (let [sf-id (:sighting-field-id r)]
@@ -449,7 +450,8 @@ Options for select are given by the `options` option."
       (om/update! data ::sighting-fields nil)
       (om/update! data ::selected-sighting-field-id nil)
       (om/update! data ::surveys nil)
-      (om/update! data ::buffer nil))
+      (om/update! data ::buffer nil)
+      (om/update! data ::field-template-id nil))
     om/IRenderState
     (render-state [_ state]
       (if (and (::surveys data) (::sighting-fields data))
