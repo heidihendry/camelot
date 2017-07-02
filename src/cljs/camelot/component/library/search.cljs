@@ -143,7 +143,7 @@
                                        :className "field-input search"
                                        :title (tr/translate ::filter-title)
                                        :id "filter"
-                                       :onChange #(om/update! data :terms %)
+                                       :onChange #(om/update! data [:search :terms] %)
                                        :onKeyDown (partial select-media-collection-container state data)}
                         :multi-term true}
                  :state {:disabled (:inprogress data)}}))))

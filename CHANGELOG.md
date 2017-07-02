@@ -13,6 +13,7 @@
 * Fixes a bug which would cause zero results to be found when searching on some fields
 * Fixes automatic opening of Camelot in a new browser tab on startup
 * Fixes selection of thumbnails in the library when the underlying image is not found
+* Fixes a bug where search terms would be ignored when applying other filters afterwards
 
 #### Internal
 * Switch build tooling to boot (http://boot-clj.com/)
