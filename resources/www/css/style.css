@@ -1647,6 +1647,9 @@ pre.field-input {
     margin-top: -0.5rem;
     margin-bottom: 0;
 }
+#app .validation-warning {
+    color: #cc3311;
+}
 #app .validated-component .validation-warning {
     position: relative;
     width: auto;

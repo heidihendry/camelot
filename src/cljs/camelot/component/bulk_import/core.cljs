@@ -56,6 +56,11 @@
     (render-state [_ state]
       (when (:bulk-import (state/app-state-cursor))
         (dom/div #js {:className "split-menu"}
+                 (dom/div #js {:className "back-button-container"}
+                          (dom/button #js {:className "btn btn-default back"
+                                           :onClick #(nav/nav-up! 1)}
+                                      (dom/span #js {:className "fa fa-mail-reply"})
+                                      " " (tr/translate ::survey-menu)))
                  (dom/div #js {:className "intro"}
                           (dom/h4 nil (tr/translate ::title))
                           (dom/h5 nil (:survey-name (get-survey-details))))

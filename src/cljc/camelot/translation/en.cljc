@@ -791,6 +791,7 @@
    :camelot.component.bulk-import.core
    {:download "Download template"
     :title "Bulk Import"
+    :survey-menu "Survey menu"
     :ready-to-upload "Import from template"
     :path-name-placeholder "Absolute or relative path name..."
     :help-text-step-1 "Step 1. Download a template of all data scanned in the survey folder."

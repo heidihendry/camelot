@@ -78,7 +78,7 @@
                     (if (:column-properties data)
                       (tr/translate :words/cancel)
                       (dom/span nil
-                                (dom/span #js {:className "fa fa-chevron-left"})
+                                (dom/span #js {:className "fa fa-mail-reply"})
                                 " "
                                 (tr/translate :words/back))))))))
 
