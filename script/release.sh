@@ -24,7 +24,7 @@ git commit -a -m "Version bump: $released_version"
 git tag -sa "v$released_version" -m "Release: $released_version"
 
 echo "Running release build... "
-boot build
+boot uberjar
 
 echo "Packaging release"
 mkdir "${PROJECT_NAME}-${released_version}/"
