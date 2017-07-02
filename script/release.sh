@@ -6,7 +6,7 @@ PROJECT_NAME="camelot"
 BUILD_FILE="build.boot"
 README_FILE="README.md"
 GETTING_STARTED_DOC="doc/gettingstarted.rst"
-HTML_FILE="resources/public/index.html"
+HTML_FILE="resources/www/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
 
 echo "Ensuring branch is clean..."
