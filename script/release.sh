@@ -33,7 +33,7 @@ cp "script/bin/"* "${PROJECT_NAME}-${released_version}/"
 zip -r "${PROJECT_NAME}-${released_version}.zip" "${PROJECT_NAME}-${released_version}"
 
 echo "Uploading release... "
-scp "${PROJECT_NAME}-${released_version}.zip" "${CAMELOT_UPLOAD_TARGET}/release/"
+aws s3 cp "${PROJECT_NAME}-${released_version}.zip" s3://camelot-project/release/ --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
 
 echo "Bumping version to *-SNAPSHOT... "
 patch_version=$(echo $released_version | cut -d\. -f3)

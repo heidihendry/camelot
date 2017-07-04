@@ -12,7 +12,7 @@ snapshot_version="$(grep -oE "[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT" ${BUILD_FILE} | h
 cp "target/${PROJECT_NAME}.jar" "target/$PROJECT_NAME-${snapshot_version}.jar"
 
 echo "Uploading snapshot... "
-scp "target/$PROJECT_NAME-${snapshot_version}.jar" "${CAMELOT_UPLOAD_TARGET}/snapshot/"
+aws s3 cp "target/$PROJECT_NAME-${snapshot_version}.jar" s3://camelot-project/snapshot/ --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
 
 if [ -n $CAMELOT_UPLOAD_HOST ]; then
     echo "${CAMELOT_UPLOAD_HOST}/snapshot/$PROJECT_NAME-${snapshot_version}.jar"
