@@ -39,8 +39,20 @@
      trap-station-distance-to-settlement :- (s/maybe s/Num)]
   {s/Any s/Any})
 
+(defn- round-gps
+  "Round GPS coordinates to 6dp (accurate to 1 meter)."
+  [coord]
+  (Double/parseDouble (format "%.6f" (double coord))))
+
 (def trap-station map->TrapStation)
-(def ttrap-station map->TTrapStation)
+
+(defn ttrap-station
+  "Create TTrapStation, rounding GPS coordinates"
+  [data]
+  (map->TTrapStation
+   (-> data
+       (update :trap-station-latitude round-gps)
+       (update :trap-station-longitude round-gps))))
 
 (s/defn get-all :- [TrapStation]
   [state :- State
