@@ -1,5 +1,5 @@
 ## ChangeLog
-### 1.3.0 (in development)
+### 1.3.0
 #### Enhancements
 * Adds user-definable fields for capturing additional sighting data ("sighting fields")
 * Adds keybinding to delete media currently selected in the library

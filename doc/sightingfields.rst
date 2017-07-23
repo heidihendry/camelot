@@ -1,7 +1,5 @@
 Sighting fields
 ---------------
-**Sighting fields are a new feature which will be available in Camelot 1.3.0**
-
 Some surveys require more specific data to be captured when identifying media. For this, Camelot provides *sighting fields*. Sighting fields are additional input fields available during identification.
 
 .. figure:: screenshot/library-sighting-fields.png
