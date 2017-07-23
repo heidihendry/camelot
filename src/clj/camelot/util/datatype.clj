@@ -201,7 +201,8 @@
   "Predicate returning true if input is a readable file, false otherwise."
   [x]
   (let [f (file/->file x)]
-    (and (file/exists? f)
+    (and f
+         (file/exists? f)
          (file/readable? f)
          (file/file? f))))
 

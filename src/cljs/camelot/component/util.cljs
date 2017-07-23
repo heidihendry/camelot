@@ -44,7 +44,7 @@
       :else nil)))
 
 (defn prompt-component
-  [data owner {:keys [form-opts active-key title body actions closable]}]
+  [data owner {:keys [form-opts active-key title body actions close-action closable]}]
   (reify
     om/IInitState
     (init-state [_]
@@ -68,12 +68,16 @@
                              :onFocus #(focus-subchild owner "actions" :last)})
                (dom/div #js {:className (dialog-classname data active-key)
                              :onKeyDown #(when (= (.-keyCode %) escape-keycode)
-                                           (om/update! data active-key false))
+                                           (om/update! data active-key false)
+                                           (when close-action
+                                             (close-action)))
                              :ref "dialog"}
                         (when-not (and (= closable false) (get data active-key))
                           (dom/button #js {:className "pull-right fa fa-times btn-flat"
                                            :ref "close-button"
-                                           :onClick #(om/update! data active-key false)}))
+                                           :onClick #(do (om/update! data active-key false)
+                                                         (when close-action
+                                                           (close-action)))}))
                         (dom/form (clj->js (or form-opts {:onSubmit #(.preventDefault %)}))
                                   (dom/div #js {:className "prompt-title"}
                                            title)

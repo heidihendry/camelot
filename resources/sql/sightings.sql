@@ -26,8 +26,7 @@ SET sighting_updated = :current_timestamp,
     sighting_quantity = :sighting_quantity,
     sighting_lifestage = :sighting_lifestage,
     sighting_sex = :sighting_sex,
-    taxonomy_id = :taxonomy_id,
-    media_id = :media_id
+    taxonomy_id = :taxonomy_id
 WHERE sighting_id = :sighting_id
 
 -- name: -delete!
