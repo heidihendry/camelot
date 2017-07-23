@@ -55,7 +55,7 @@
 (defn query-all
   "Return all sighting field values."
   [state]
-  (->> (db/with-db-keys state -query-all {})
+  (->> (db/fn-with-db-keys state #'-query-all {})
        (group-by :sighting-id)
        (reduce-kv sighting-field-query-reducer {})))
 
@@ -63,16 +63,17 @@
   "Return a specific sighting field value."
   [state value-id]
   (->> {:sighting-field-value-id value-id}
-       (db/with-db-keys state -get-specific)
+       (db/fn-with-db-keys state #'-get-specific)
        first
        sighting-field-value))
 
 (defn create!
   "Create a new sighting field value."
   [state sighting-id field-id value]
-  (let [record (db/with-db-keys state -create<! {:sighting-field-id field-id
-                                                 :sighting-field-value-data (str value)
-                                                 :sighting-id sighting-id})]
+  (let [record (db/fn-with-db-keys state #'-create<!
+                                   {:sighting-field-id field-id
+                                    :sighting-field-value-data (str value)
+                                    :sighting-id sighting-id})]
     (get-specific state (int (:1 record)))))
 
 (defn- survey-fields-by-key
@@ -99,14 +100,15 @@
 
 (defn update!
   [state id value]
-  (db/with-db-keys state -update! {:sighting-field-value-id id
-                                   :sighting-field-value-data (str value)})
+  (db/fn-with-db-keys state #'-update!
+                      {:sighting-field-value-id id
+                       :sighting-field-value-data (str value)})
   (get-specific state id))
 
 (defn get-for-sighting
   "Get field data for the given sighting."
   [state sighting-id]
-  (db/with-db-keys state -get-for-sighting {:sighting-id sighting-id}))
+  (db/fn-with-db-keys state #'-get-for-sighting {:sighting-id sighting-id}))
 
 (defn update-for-sighting!
   "Given a map of {field-id value-data}, create or update entries for a sighting."
@@ -124,5 +126,6 @@
 (defn delete-for-sighting!
   "Delete sighting field values for the given sighting ID."
   [state sighting-id]
-  (db/with-db-keys state -delete-for-sighting! {:sighting-id sighting-id})
+  (db/fn-with-db-keys state #'-delete-for-sighting!
+                      {:sighting-id sighting-id})
   nil)

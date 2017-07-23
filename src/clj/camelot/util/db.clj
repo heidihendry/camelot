@@ -75,3 +75,8 @@ Intended for async operations which are already running within a transaction."
       (db-keys)
       (with-connection state f)
       (clj-keys)))
+
+(defn fn-with-db-keys
+  "Run a function given its var, translating the parameters and results as needed."
+  [state f data]
+  (with-db-keys state (deref f) data))
