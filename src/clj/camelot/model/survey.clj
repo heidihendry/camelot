@@ -9,7 +9,8 @@
    [camelot.util.file :as file]
    [camelot.util.filesystem :as filesystem]
    [clojure.java.io :as io]
-   [camelot.model.media :as media]))
+   [camelot.model.media :as media]
+   [camelot.model.camera :as camera]))
 
 (sql/defqueries "sql/surveys.sql")
 
@@ -84,13 +85,23 @@
   (db/with-db-keys state -update! (merge data {:survey-id id}))
   (survey (get-specific state id)))
 
+(defn- get-active-cameras
+  [state params]
+  (->> params
+       (db/with-db-keys state -get-active-cameras)
+       (map :camera-id)
+       (remove nil?)))
+
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (let [fs (media/get-all-files-by-survey state id)]
+  (let [fs (media/get-all-files-by-survey state id)
+        ps {:survey-id id}
+        cams (get-active-cameras state ps)]
     (media/delete-files! state fs)
-    (file/delete-recursive (filesystem/filestore-survey-directory state id)))
-    (db/with-db-keys state -delete! {:survey-id id})
+    (file/delete-recursive (filesystem/filestore-survey-directory state id))
+    (camera/make-available state cams)
+    (db/with-db-keys state -delete! ps))
   nil)
 
 (s/defn get-specific-by-name :- (s/maybe Survey)

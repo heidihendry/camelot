@@ -58,3 +58,12 @@ FROM site
 WHERE site_id NOT IN (SELECT site_id
                       FROM survey_site
                       WHERE survey_id = :survey_id) OR site_id = :site_id
+
+-- name: -get-active-cameras
+SELECT camera_id
+FROM survey_site
+LEFT JOIN trap_station USING (survey_site_id)
+LEFT JOIN trap_station_session USING (trap_station_id)
+LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
+WHERE trap_station_session_end_date IS NULL AND
+      survey_site_id = :survey_site_id

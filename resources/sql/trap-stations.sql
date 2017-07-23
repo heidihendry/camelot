@@ -77,3 +77,11 @@ SELECT trap_station_id, survey_site_id, trap_station_created, trap_station_updat
 FROM trap_station
 LEFT JOIN survey_site USING (survey_site_id)
 WHERE survey_id = :survey_id
+
+-- name: -get-active-cameras
+SELECT camera_id
+FROM trap_station
+LEFT JOIN trap_station_session USING (trap_station_id)
+LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
+WHERE trap_station_session_end_date IS NULL AND
+      trap_station_id = :trap_station_id

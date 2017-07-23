@@ -5,7 +5,8 @@
    [camelot.model.trap-station-session :as trap-station-session]
    [camelot.system.state :refer [State]]
    [camelot.util.db :as db]
-   [camelot.model.media :as media]))
+   [camelot.model.media :as media]
+   [camelot.model.camera :as camera]))
 
 (sql/defqueries "sql/trap-station-session-cameras.sql")
 
@@ -111,12 +112,22 @@
     (merge data {:trap-station-session-camera-id id}))
   (trap-station-session-camera (get-specific state id)))
 
+(defn- get-active-cameras
+  [state params]
+  (->> params
+       (db/with-db-keys state -get-active-cameras)
+       (map :camera-id)
+       (remove nil?)))
+
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (let [fs (media/get-all-files-by-trap-station-session-camera state id)]
-    (db/with-db-keys state -delete! {:trap-station-session-camera-id id})
-    (media/delete-files! state fs))
+  (let [fs (media/get-all-files-by-trap-station-session-camera state id)
+        ps {:trap-station-session-camera-id id}
+        cams (get-active-cameras state ps)]
+    (db/with-db-keys state -delete! ps)
+    (media/delete-files! state fs)
+    (camera/make-available state cams))
   nil)
 
 (s/defn delete-media!

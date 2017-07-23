@@ -7,6 +7,7 @@
    [yesql.core :as sql]
    [clj-time.core :as t]
    [camelot.model.media :as media]
+   [camelot.model.camera :as camera]
    [camelot.translation.core :as tr]))
 
 (sql/defqueries "sql/trap-station-sessions.sql")
@@ -128,12 +129,22 @@
       (db/with-db-keys s -update! (merge data {:trap-station-session-id id}))
       (get-specific s id))))
 
+(defn- get-active-cameras
+  [state params]
+  (->> params
+       (db/with-db-keys state -get-active-cameras)
+       (map :camera-id)
+       (remove nil?)))
+
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (let [fs (media/get-all-files-by-trap-station-session state id)]
-    (db/with-db-keys state -delete! {:trap-station-session-id id})
-    (media/delete-files! state fs))
+  (let [fs (media/get-all-files-by-trap-station-session state id)
+        ps {:trap-station-session-id id}
+        cams (get-active-cameras state ps)]
+    (db/with-db-keys state -delete! ps)
+    (media/delete-files! state fs)
+    (camera/make-available state cams))
   nil)
 
 (s/defn get-or-create! :- TrapStationSession

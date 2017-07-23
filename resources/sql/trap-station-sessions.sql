@@ -76,3 +76,10 @@ UPDATE trap_station_session
            trap_station_session_updated = :current_timestamp
 WHERE trap_station_session_id = :trap_station_session_id
       AND trap_station_session_end_date IS NULL
+
+-- name: -get-active-cameras
+SELECT camera_id
+FROM trap_station_session
+LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
+WHERE trap_station_session_end_date IS NULL AND
+      trap_station_session_id = :trap_station_session_id
