@@ -4,6 +4,7 @@
 * Set camera status back to 'Available' when an active session it is used in is deleted
 
 #### Fixes
+* Fix bug in bulk import where trap stations are not reused when GPS coords are very precise
 
 ### 1.3.0
 #### Enhancements
