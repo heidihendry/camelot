@@ -42,6 +42,9 @@
 (defn add-camera-component
   [data owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data [:data (om/get-state owner :camera-id-field) :value] nil))
     om/IRenderState
     (render-state [_ state]
       (let [is-valid (validate-proposed-camera data (:camera-id-field state))]
@@ -142,6 +145,9 @@
 (defn add-site-component
   [data owner]
   (reify
+    om/IWillMount
+    (will-mount [_]
+      (om/update! data [:data :site-id :value] nil))
     om/IRender
     (render [_]
       (let [is-valid (validate-proposed-site data)]
@@ -188,17 +194,20 @@
 
 (defn validate-form
   [data]
-  (and (get-in data [:trap-station-session-start-date :value])
-       (and (get-in data [:trap-station-name :value])
-            (not (empty? (get-in data [:trap-station-name :value]))))
-       (and (not (nil? (get-in data [:trap-station-latitude :value])))
-            (util.ts/valid-latitude? (get-in data [:trap-station-latitude :value])))
-       (and (not (nil? (get-in data [:trap-station-longitude :value])))
-            (util.ts/valid-longitude? (get-in data [:trap-station-longitude :value])))
-       (not (shared/datetime-in-future? (get-in data [:trap-station-session-start-date :value])))
-       (get-in data [:primary-camera-id :value])
-       (not= (get-in data [:secondary-camera-id :value])
-             (get-in data [:primary-camera-id :value]))))
+  (let [buf (:data data)]
+    (and (get-in buf [:trap-station-session-start-date :value])
+         (and (get-in buf [:trap-station-name :value])
+              (not (empty? (get-in buf [:trap-station-name :value]))))
+         (and (not (nil? (get-in buf [:trap-station-latitude :value])))
+              (util.ts/valid-latitude? (get-in buf [:trap-station-latitude :value])))
+         (and (not (nil? (get-in buf [:trap-station-longitude :value])))
+              (util.ts/valid-longitude? (get-in buf [:trap-station-longitude :value])))
+         (not (shared/datetime-in-future? (get-in buf [:trap-station-session-start-date :value])))
+         (nil? (get-in data [:new-camera-name :secondary-camera-id]))
+         (get-in buf [:site-id :value])
+         (get-in buf [:primary-camera-id :value])
+         (not= (get-in buf [:secondary-camera-id :value])
+               (get-in buf [:primary-camera-id :value])))))
 
 (defn important-fields-form
   [data owner {:keys [mode]}]
@@ -268,8 +277,8 @@
                                                                    (get-in data [:data :trap-station-session-id :value])))}
                                     (tr/translate :words/cancel))
                         (dom/button #js {:className "btn btn-primary"
-                                         :disabled (if (validate-form (:data data)) "" "disabled")
-                                         :title (if (validate-form (:data data)) ""
+                                         :disabled (if (validate-form data) "" "disabled")
+                                         :title (if (validate-form data) ""
                                                     (tr/translate ::validation-failure))
                                          :onClick #(om/transact! data :page inc)}
                                     (tr/translate :words/next) " "
@@ -350,8 +359,8 @@
                                     " "
                                     (tr/translate :words/back))
                         (dom/button #js {:className "btn btn-primary pull-right"
-                                         :disabled (if (validate-form (:data data)) "" "disabled")
-                                         :title (if (validate-form (:data data)) ""
+                                         :disabled (if (validate-form data) "" "disabled")
+                                         :title (if (validate-form data) ""
                                                     (tr/translate ::validation-failure))
                                          :onClick #(submit-deployment data mode)}
                                     (if (= mode :edit)
