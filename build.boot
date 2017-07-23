@@ -1,4 +1,4 @@
-(def +version+ "1.3.0-SNAPSHOT")
+(def +version+ "1.4.0-SNAPSHOT")
 
 (def dependencies
   '[[adzerk/boot-cljs "1.7.228-2" :scope "test"]
