@@ -156,8 +156,6 @@
   (context "/sightings" {session :session state :system}
            (GET "/media/:id" [id] (crud/list-resources sighting/get-all :sighting id (assoc state :session session)))
            (GET "/:id" [id] (crud/specific-resource sighting/get-specific id (assoc state :session session)))
-           (PUT "/:id" [id data] (crud/update-resource sighting/update! id
-                                                       sighting/tsighting data (assoc state :session session)))
            (GET "/available/:id" [id] (crud/list-available sighting/get-available id (assoc state :session session)))
            (GET "/alternatives/:id" [id] (crud/list-available sighting/get-alternatives id (assoc state :session session)))
            (POST "/" [data] (crud/create-resource sighting/create!
@@ -257,8 +255,11 @@
            (POST "/media/flags" [data] (r/response (library/update-bulk-media-flags
                                                     (assoc state :session session)
                                                     data)))
-           (PUT "/identify" [data] (r/response (library/identify (assoc state :session session)
-                                                                 data))))
+           (POST "/identify" [data] (r/response (library/identify (assoc state :session session)
+                                                                  data)))
+           (PUT "/identify/:id" [id data] (r/response (library/update-identification!
+                                                       (assoc state :session session)
+                                                       id (:identification data)))))
   (context "/species" {session :session state :system}
            (GET "/search" {{search :search} :params}
                 (r/response (species-search/query-search

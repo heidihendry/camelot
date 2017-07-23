@@ -31,6 +31,7 @@
   (om/update! data :identification
               {:quantity 1
                :species -1
+               :sighting-id nil
                :sex "unidentified"
                :lifestage "unidentified"
                :sighting-fields {}}))
@@ -51,31 +52,55 @@
         sex (get-in (state/library-state) [:identification :sex])
         sighting-fields (get-in (state/library-state) [:identification :sighting-fields])
         selected (:selected-media-id (state/library-state))
-        all-selected (util/all-media-selected)]
-    (rest/put-x "/library/identify"
-                {:data
-                 {:identification {:quantity qty
-                                   :lifestage (if (util/unidentified? lifestage) nil lifestage)
-                                   :sex (if (util/unidentified? sex) nil sex)
-                                   :species spp
-                                   :sighting-fields @sighting-fields}
-                  :media (mapv :media-id all-selected)}}
-                (fn [resp]
-                  (dorun (map #(do (om/update! (second %)
-                                               :sightings
-                                               (conj (:sightings (second %))
-                                                     (merge {:taxonomy-id spp
-                                                             :sighting-lifestage lifestage
-                                                             :sighting-sex sex
-                                                             :sighting-id (first %)
-                                                             :sighting-quantity qty}
-                                                            (key-by-user-key @sighting-fields))))
-                                   (om/update! (second %) :media-processed true))
-                              (zipmap (:body resp) all-selected)))
-                  (util/show-identified-message)
-                  (.focus (.getElementById js/document "media-collection-container"))
-                  (om/update! (state/library-state) :show-identification-panel false)
-                  (blank-sighting-input (state/library-state))))))
+        sighting-id (get-in (state/library-state) [:identification :sighting-id])
+        all-selected (util/all-media-selected)
+        identification {:quantity qty
+                        :lifestage (if (util/unidentified? lifestage) nil lifestage)
+                        :sex (if (util/unidentified? sex) nil sex)
+                        :species spp
+                        :sighting-fields @sighting-fields}
+        add-sighting
+        (fn [resp] (dorun (map #(do (om/update! (second %)
+                                                :sightings
+                                                (conj (:sightings (second %))
+                                                      (merge {:taxonomy-id spp
+                                                              :sighting-lifestage lifestage
+                                                              :sighting-sex sex
+                                                              :sighting-id (first %)
+                                                              :sighting-quantity qty}
+                                                             (key-by-user-key @sighting-fields))))
+                                    (om/update! (second %) :media-processed true))
+                               (zipmap (:body resp) all-selected)))
+          (util/show-identified-message))
+        update-sighting
+        (fn [resp] (om/transact! (util/find-with-id (state/library-state) selected)
+                                 :sightings
+                                 #(sort-by :sighting-id
+                                           (conj (remove (fn [r] (= (:sighting-id r) sighting-id)) %)
+                                                 (merge {:taxonomy-id spp
+                                                         :sighting-lifestage lifestage
+                                                         :sighting-sex sex
+                                                         :sighting-id sighting-id
+                                                         :sighting-quantity qty}
+                                                        (key-by-user-key @sighting-fields))))))
+        success-handler (fn [resp]
+                          (if (number? sighting-id)
+                            (update-sighting resp)
+                            (add-sighting resp))
+                          (.focus (.getElementById js/document "media-collection-container"))
+                          (om/update! (state/library-state) :show-identification-panel false)
+                          (blank-sighting-input (state/library-state)))]
+    (prn identification)
+    (if (number? sighting-id)
+      (rest/put-x (str "/library/identify/" sighting-id)
+                  {:data
+                   {:identification identification}}
+                  success-handler)
+      (rest/post-x "/library/identify"
+                   {:data
+                    {:identification identification
+                     :media (mapv :media-id all-selected)}}
+                   success-handler))))
 
 (defn sighting-option-component
   [data owner]
@@ -266,12 +291,13 @@
                                                   (nav/analytics-event "library-id" "submit-identification"))}
                           :title (tr/translate ::identify-selected)
                           :body (om/build identify-panel data)
+                          :close-action #(do (blank-sighting-input data)
+                                             (nav/analytics-event "library-id" "cancel-identification"))
                           :actions (dom/div #js {:className "button-container"}
                                             (dom/input #js {:type "button"
                                                             :className "btn btn-default"
                                                             :onClick #(do (om/update! data :show-identification-panel false)
                                                                           (om/update! data [:search :mode] :search)
-                                                                          (om/update! data :show-identification-panel false)
                                                                           (blank-sighting-input data)
                                                                           (nav/analytics-event "library-id" "cancel-identification"))
                                                             :value (tr/translate :words/cancel)})

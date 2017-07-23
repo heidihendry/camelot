@@ -25,6 +25,14 @@
      sighting-fields :- (s/maybe {s/Int s/Str})]
   {s/Any s/Any})
 
+(s/defrecord TSightingUpdate
+    [sighting-quantity :- s/Int
+     sighting-lifestage :- (s/maybe s/Str)
+     sighting-sex :- (s/maybe s/Str)
+     taxonomy-id :- s/Int
+     sighting-fields :- (s/maybe {s/Int s/Str})]
+  {s/Any s/Any})
+
 (s/defrecord Sighting
     [sighting-id :- s/Int
      sighting-created :- org.joda.time.DateTime
@@ -40,17 +48,23 @@
 (s/defn sighting :- Sighting
   [data]
   (map->Sighting (-> data
-                  (update :sighting-lifestage #(or % sighting-default-option))
-                  (update :sighting-sex #(or % sighting-default-option))
-                  (assoc :sighting-label (str (:sighting-quantity data) "x "
-                                              (:taxonomy-genus data) " "
-                                              (:taxonomy-species data))))))
+                     (update :sighting-lifestage #(or % sighting-default-option))
+                     (update :sighting-sex #(or % sighting-default-option))
+                     (assoc :sighting-label (str (:sighting-quantity data) "x "
+                                                 (:taxonomy-genus data) " "
+                                                 (:taxonomy-species data))))))
 
 (s/defn tsighting :- TSighting
   [data]
   (map->TSighting (-> data
-                   (update :sighting-lifestage known-or-nil)
-                   (update :sighting-sex known-or-nil))))
+                      (update :sighting-lifestage known-or-nil)
+                      (update :sighting-sex known-or-nil))))
+
+(s/defn tsighting-update :- TSightingUpdate
+  [data]
+  (map->TSightingUpdate (-> data
+                            (update :sighting-lifestage known-or-nil)
+                            (update :sighting-sex known-or-nil))))
 
 (s/defn get-all
   [state :- State
@@ -90,9 +104,11 @@
 (s/defn update!
   [state :- State
    id :- s/Int
-   data]
-  (db/with-db-keys state -update! (merge data {:sighting-id id}))
-  (sighting (get-specific state id)))
+   data :- TSightingUpdate]
+  (db/with-transaction [s state]
+    (db/with-db-keys s -update! (merge data {:sighting-id id}))
+    (sighting-field-value/update-for-sighting! s id (:sighting-fields data))
+    (sighting (get-specific s id))))
 
 (s/defn delete!
   [state :- State

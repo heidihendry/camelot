@@ -45,33 +45,51 @@
         (when-not (util.sighting/unidentified? value)
           (dom/div nil (:sighting-field-label field) ": " (str value)))))))
 
+(defn load-sighting-details
+  [data survey-id sighting]
+  (om/update! data :identification
+              {:quantity (:sighting-quantity sighting)
+               :species (str (:taxonomy-id sighting))
+               :sighting-id (:sighting-id sighting)
+               :sex (:sighting-sex sighting)
+               :lifestage (:sighting-lifestage sighting)
+               :sighting-fields (into {}
+                                      (mapv #(let [user-key (util.sf/user-key %)]
+                                               (vector (:sighting-field-id %)
+                                                       (get sighting user-key)))
+                                            (util/survey-sighting-fields survey-id)))}))
+
 (defn mcp-details-sightings
-  [sighting owner]
+  [data owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "data"}
-               (if (> (:sighting-id sighting) -1)
-                 (dom/div #js {:className "fa fa-trash remove-sighting"
-                               :onClick #(do
-                                           (remove-sighting (state/library-state) (:sighting-id sighting))
-                                           (nav/analytics-event "library-preview" "delete-sighting"))}))
-               (:sighting-quantity sighting) "x "
-               (or (:taxonomy-label (get (:species (state/library-state))
-                                         (:taxonomy-id sighting)))
-                   (tr/translate ::species-not-in-survey))
-               (let [ls (:sighting-lifestage sighting)
-                     sex (:sighting-sex sighting)]
-                 (dom/div #js {:className "sighting-extra-details"}
-                          (when-not (util.sighting/unidentified? sex)
-                            (dom/div nil (tr/translate :sighting/sighting-sex.label) ": " sex))
-                          (when-not (util.sighting/unidentified? ls)
-                            (dom/div nil (tr/translate :sighting/sighting-lifestage.label) ": " ls))
-                          (om/build-all display-sighting-field-details
-                                        (map #(hash-map :field %
-                                                        :sighting sighting)
-                                             (sort-by (juxt :sighting-field-ordering :sighting-field-label)
-                                                      (util/survey-sighting-fields (:survey-id sighting)))))))))))
+      (let [sighting (:sighting data)]
+        (dom/div #js {:className "data"}
+                 (if (> (:sighting-id sighting) -1)
+                   (dom/div #js {:className "fa fa-trash remove-sighting"
+                                 :onClick #(do
+                                             (remove-sighting (state/library-state) (:sighting-id sighting))
+                                             (nav/analytics-event "library-preview" "delete-sighting"))}))
+                 (dom/a #js {:onClick #(do
+                                         (om/update! (:data data) :show-identification-panel true)
+                                         (load-sighting-details (:data data) (:survey-id data) sighting))}
+                        (:sighting-quantity sighting) "x "
+                        (or (:taxonomy-label (get (:species (state/library-state))
+                                                  (:taxonomy-id sighting)))
+                            (tr/translate ::species-not-in-survey)))
+                 (let [ls (:sighting-lifestage sighting)
+                       sex (:sighting-sex sighting)]
+                   (dom/div #js {:className "sighting-extra-details"}
+                            (when-not (util.sighting/unidentified? sex)
+                              (dom/div nil (tr/translate :sighting/sighting-sex.label) ": " sex))
+                            (when-not (util.sighting/unidentified? ls)
+                              (dom/div nil (tr/translate :sighting/sighting-lifestage.label) ": " ls))
+                            (om/build-all display-sighting-field-details
+                                          (map #(hash-map :field %
+                                                          :sighting sighting)
+                                               (sort-by (juxt :sighting-field-ordering :sighting-field-label)
+                                                        (util/survey-sighting-fields (:survey-id data))))))))))))
 
 (defn mcp-detail
   [data owner]
@@ -87,29 +105,32 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "details media-details-inner-container"}
-               (om/build-all mcp-detail (map #(merge {:data data} %)
-                                             [{:key :trap-station-latitude :label (tr/translate :trap-station/trap-station-latitude.label)}
-                                              {:key :trap-station-longitude :label (tr/translate :trap-station/trap-station-longitude.label)}
-                                              {:key :trap-station-name :label (tr/translate :trap-station/trap-station-name.label)}
-                                              {:key :site-sublocation :label (tr/translate :site/site-sublocation.label)}
-                                              {:key :site-name :label (tr/translate :site/site-name.label)}
-                                              {:key :camera-name :label (tr/translate :camera/camera-name.label)}])
-                             {:key :key})
-               (dom/div nil
-                        (dom/label nil (tr/translate :media/media-capture-timestamp.label))
-                        (let [df (DateTimeFormat. "HH:mm:ss EEE, dd LLL yyyy")]
-                          (dom/div #js {:className "data"}
-                                   (if-let [ts (:media-capture-timestamp data)]
-                                     (.format df ts)
-                                     "-"))))
-               (dom/div nil
-                        (when (seq (:sightings data))
-                          (dom/div nil
-                                   (dom/label nil (tr/translate ::sightings))
-                                   (om/build-all mcp-details-sightings (map #(assoc % :survey-id (:survey-id data))
-                                                                            (:sightings data))
-                                                 {:key :sighting-id}))))))))
+      (let [media (:media data)]
+        (dom/div #js {:className "details media-details-inner-container"}
+                 (om/build-all mcp-detail (map #(merge {:data media} %)
+                                               [{:key :trap-station-latitude :label (tr/translate :trap-station/trap-station-latitude.label)}
+                                                {:key :trap-station-longitude :label (tr/translate :trap-station/trap-station-longitude.label)}
+                                                {:key :trap-station-name :label (tr/translate :trap-station/trap-station-name.label)}
+                                                {:key :site-sublocation :label (tr/translate :site/site-sublocation.label)}
+                                                {:key :site-name :label (tr/translate :site/site-name.label)}
+                                                {:key :camera-name :label (tr/translate :camera/camera-name.label)}])
+                               {:key :key})
+                 (dom/div nil
+                          (dom/label nil (tr/translate :media/media-capture-timestamp.label))
+                          (let [df (DateTimeFormat. "HH:mm:ss EEE, dd LLL yyyy")]
+                            (dom/div #js {:className "data"}
+                                     (if-let [ts (:media-capture-timestamp media)]
+                                       (.format df ts)
+                                       "-"))))
+                 (dom/div nil
+                          (when (seq (:sightings media))
+                            (dom/div nil
+                                     (dom/label nil (tr/translate ::sightings))
+                                     (om/build-all mcp-details-sightings (map #(hash-map :survey-id (:survey-id media)
+                                                                                         :data (:data data)
+                                                                                         :sighting %)
+                                                                              (:sightings media))
+                                                   {:key :sighting-id})))))))))
 
 (defn mcp-details
   [data owner]
@@ -124,7 +145,7 @@
                (let [selected (util/find-with-id data (:selected-media-id data))]
                  (if selected
                    (dom/div #js {:className "details-container"}
-                            (om/build mcp-details-breakdown selected)
+                            (om/build mcp-details-breakdown {:data data :media selected})
                             (dom/div #js {:className "selection-delete"}
                                      (dom/div #js {:onClick #(om/update! data :show-delete-media-prompt true)}
                                               (dom/span #js {:className "preview-delete-button fa fa-trash"})

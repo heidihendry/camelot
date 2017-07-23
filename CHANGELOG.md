@@ -2,6 +2,7 @@
 ### 1.4.0 (in development)
 #### Enhancements
 * Set camera status back to 'Available' when an active session it is used in is deleted
+* Allow sightings to be edited
 
 #### Fixes
 * Fix bug in bulk import where trap stations are not reused when GPS coords are very precise

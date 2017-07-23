@@ -103,6 +103,24 @@
                                    :sighting-field-value-data (str value)})
   (get-specific state id))
 
+(defn get-for-sighting
+  "Get field data for the given sighting."
+  [state sighting-id]
+  (db/with-db-keys state -get-for-sighting {:sighting-id sighting-id}))
+
+(defn update-for-sighting!
+  "Given a map of {field-id value-data}, create or update entries for a sighting."
+  [state sighting-id new-field-data]
+  (let [cur-field-data (reduce #(assoc %1 (:sighting-field-id %2) %2)
+                               {} (get-for-sighting state sighting-id))]
+    (doseq [[k v] (vec new-field-data)]
+      (let [curdata (get cur-field-data k)
+            curval (:sighting-field-value-data curdata)]
+        (if (nil? curval)
+          (create! state sighting-id k v)
+          (when (not= v curval)
+            (update! state (:sighting-field-value-id curdata) v)))))))
+
 (defn delete-for-sighting!
   "Delete sighting field values for the given sighting ID."
   [state sighting-id]

@@ -5,6 +5,7 @@
    [yesql.core :as sql]
    [medley.core :as medley]
    [camelot.util.db :as db]
+   [clojure.tools.logging :as log]
    [camelot.library.filter :as filter]
    [camelot.report.query :as query]
    [camelot.util.filter :as futil]
@@ -114,3 +115,15 @@
       (throw (IllegalArgumentException. "Cannot identify media across multiple surveys"))))
   (db/with-transaction [s state]
     (map :sighting-id (doall (map (partial identify-media s identification) media)))))
+
+(s/defn update-identification!
+  "Update sighting information for the given sighting ID."
+  [state id {:keys [quantity species lifestage sex sighting-fields]}]
+  (sighting/update! state (edn/read-string id)
+                    (sighting/tsighting-update
+                     {:sighting-quantity quantity
+                      :sighting-lifestage lifestage
+                      :sighting-sex sex
+                      :taxonomy-id species
+                      :sighting-fields (reduce-kv #(assoc %1 %2 (str %3))
+                                                  {} sighting-fields)})))
