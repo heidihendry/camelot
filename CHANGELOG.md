@@ -5,6 +5,7 @@
 
 #### Fixes
 * Fix bug in bulk import where trap stations are not reused when GPS coords are very precise
+* Fix missing form validation around sites and cameras when creating trap stations
 
 ### 1.3.0
 #### Enhancements
