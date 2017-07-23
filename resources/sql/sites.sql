@@ -36,3 +36,13 @@ WHERE site_id = :site_id
 SELECT site_id, site_created, site_updated, site_name, site_sublocation, site_city,
        site_state_province, site_country, site_area, site_notes
 FROM site
+
+-- name: -get-active-cameras
+SELECT camera_id
+FROM site
+LEFT JOIN survey_site USING (site_id)
+LEFT JOIN trap_station USING (survey_site_id)
+LEFT JOIN trap_station_session USING (trap_station_id)
+LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
+WHERE trap_station_session_end_date IS NULL AND
+      site_id = :site_id

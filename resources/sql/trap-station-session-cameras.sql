@@ -66,3 +66,10 @@ UPDATE trap_station_session_camera
 SET trap_station_session_camera_media_unrecoverable = :trap_station_session_camera_media_unrecoverable,
     trap_station_session_camera_updated = :current_timestamp
 WHERE trap_station_session_id = :trap_station_session_id AND camera_id = :camera_id
+
+-- name: -get-active-cameras
+SELECT camera_id
+FROM trap_station_session_camera
+LEFT JOIN trap_station_session USING (trap_station_session_id)
+WHERE trap_station_session_end_date IS NULL AND
+      trap_station_session_camera_id = :trap_station_session_camera_id

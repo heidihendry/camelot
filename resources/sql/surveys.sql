@@ -45,3 +45,13 @@ SELECT survey_id, survey_created, survey_updated, survey_name, survey_directory,
        survey_sampling_point_density, survey_sighting_independence_threshold, survey_notes,
        survey_bulk_import_mode
 FROM survey
+
+-- name: -get-active-cameras
+SELECT camera_id
+FROM survey
+LEFT JOIN survey_site USING (survey_id)
+LEFT JOIN trap_station USING (survey_site_id)
+LEFT JOIN trap_station_session USING (trap_station_id)
+LEFT JOIN trap_station_session_camera USING (trap_station_session_id)
+WHERE trap_station_session_end_date IS NULL AND
+      survey_id = :survey_id

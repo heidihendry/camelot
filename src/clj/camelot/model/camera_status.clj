@@ -61,8 +61,19 @@
        (filter #(= desc (:camera-status-description %)))
        (first)))
 
-(s/defn active-status-id
-  [state]
-  (->> "camera-status/active"
+(defn- get-status-by-name
+  "Get the status ID given the status's name."
+  [state status]
+  (->> (str "camera-status/" status)
        (get-specific-with-description state)
        :camera-status-id))
+
+(s/defn active-status-id
+  "Return the status ID for the 'active' status"
+  [state]
+  (get-status-by-name state "active"))
+
+(s/defn available-status-id
+  "Return the status ID for the 'available' status"
+  [state]
+  (get-status-by-name state "available"))

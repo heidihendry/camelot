@@ -1,4 +1,10 @@
 ## ChangeLog
+### 1.4.0 (in development)
+#### Enhancements
+* Set camera status back to 'Available' when an active session it is used in is deleted
+
+#### Fixes
+
 ### 1.3.0
 #### Enhancements
 * Adds user-definable fields for capturing additional sighting data ("sighting fields")

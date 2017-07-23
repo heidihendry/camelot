@@ -103,3 +103,11 @@
   (db/with-db-keys state -set-camera-status!
     {:camera-id cam-id
      :camera-status-id cam-status}))
+
+(defn make-available
+  "Set the associated cameras' status to 'available'.
+  `cameras' is a coll of camera IDs."
+  [state cameras]
+  (let [available-status (camera-status/available-status-id state)]
+    (doseq [cam-id (distinct cameras)]
+      (set-camera-status! state cam-id available-status))))
