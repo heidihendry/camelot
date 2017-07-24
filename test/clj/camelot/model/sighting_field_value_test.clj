@@ -3,7 +3,7 @@
             [clojure.test :refer :all]
             [clj-time.core :as t]
             [camelot.test-util.state :as state]
-            [camelot.util.db :as db]))
+            [camelot.test-util.mock-db :refer [with-mocked-db with-args defmock with-mocking]]))
 
 (def ^:dynamic *get-for-sighting*
   [{:sighting-field-value-id 2
@@ -13,16 +13,7 @@
     :sighting-field-id 5
     :sighting-id 6}])
 
-(defn test-get-for-sighting
-  [ps]
-  *get-for-sighting*)
-
-(def ^:dynamic *create<!*
-  {:1 1})
-
-(defn test-create<!
-  [ps]
-  *create<!*)
+(def ^:dynamic *create<!* {:1 1})
 
 (def ^:dynamic *get-specific*
   [{:sighting-field-value-id 1
@@ -32,32 +23,16 @@
     :sighting-field-id 2
     :sighting-id 3}])
 
-(defn test-get-specific
-  [ps]
-  *get-specific*)
+(def update-for-sighting!
+  (with-mocked-db sut/update-for-sighting!))
 
-(defn test-update!
-  [ps]
-  nil)
-
-(def ^:dynamic *arguments* nil)
-
-(defmacro with-args [[args] & body]
-  `(let [ts# (transient {})
-         ~args ts#]
-     (binding [*arguments* ts#]
-       ~@body)))
-
-(defn update-for-sighting!
-  [state sighting-id data]
-  (with-redefs
-    [db/fn-with-db-keys
-     (fn [s f ps]
-       (let [fname (:name (meta f))]
-         (assoc! *arguments* fname
-                 (conj (or (get *arguments* fname) []) ps))
-         (eval (list (symbol (str (ns-name *ns*)) (str "test" fname)) ps))))]
-    (sut/update-for-sighting! state sighting-id data)))
+(use-fixtures :each (fn [f]
+                      (with-mocking
+                        (defmock -get-for-sighting *get-for-sighting*)
+                        (defmock -create<! *create<!*)
+                        (defmock -get-specific *get-specific*)
+                        (defmock -update! nil)
+                        (f))))
 
 (deftest test-update-for-sighting
   (testing "update-for-sighting"
