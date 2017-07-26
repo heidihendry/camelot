@@ -2,7 +2,7 @@
   (:require [camelot.model.media :as sut]
             [clojure.test :refer :all]
             [camelot.util.file :as file]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [clojure.java.io :as io]))
 
 (defn gen-state

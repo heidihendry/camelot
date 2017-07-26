@@ -3,7 +3,7 @@
    [camelot.report.module.builtin.columns.media-capture-time-breakdown :as sut]
    [clojure.test :refer :all]
    [clj-time.core :as t]
-   [camelot.test-util.state :as state]))
+   [camelot.testutil.state :as state]))
 
 (defn- gen-state-helper
   [config]

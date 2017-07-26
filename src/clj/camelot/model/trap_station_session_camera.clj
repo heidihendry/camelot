@@ -1,14 +1,13 @@
 (ns camelot.model.trap-station-session-camera
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.model.trap-station-session :as trap-station-session]
    [camelot.system.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))
 
-(sql/defqueries "sql/trap-station-session-cameras.sql")
+(def query (db/with-db-keys :trap-station-session-cameras))
 
 (s/defrecord TrapStationSessionCamera
     [trap-station-session-camera-id :- s/Int
@@ -44,18 +43,18 @@
   [state :- State
    id :- s/Int]
   (->> {:trap-station-session-id id}
-       (db/with-db-keys state -get-all)
+       (query state :get-all)
        (map trap-station-session-camera)))
 
 (s/defn get-all* :- [TrapStationSessionCamera]
   [state :- State]
-  (map trap-station-session-camera (db/with-db-keys state -get-all* {})))
+  (map trap-station-session-camera (query state :get-all* {})))
 
 (s/defn get-specific :- (s/maybe TrapStationSessionCamera)
   [state :- State
    id :- s/Int]
   (some->> {:trap-station-session-camera-id id}
-           (db/with-db-keys state -get-specific )
+           (query state :get-specific )
            first
            trap-station-session-camera))
 
@@ -66,7 +65,7 @@
    session-id :- s/Int]
   (some->> {:trap-station-session-id session-id
             :camera-id camera-id}
-           (db/with-db-keys state -get-specific-with-camera-and-session)
+           (query state :get-specific-with-camera-and-session)
            first
            trap-station-session-camera))
 
@@ -74,7 +73,7 @@
   [state :- State
    path :- s/Str]
   (some->> {:trap-station-session-camera-import-path path}
-           (db/with-db-keys state -get-specific-by-import-path)
+           (query state :get-specific-by-import-path)
            (first)
            (trap-station-session-camera)))
 
@@ -88,7 +87,7 @@
   "Create without checking camera availability."
   [state :- State
    data :- TTrapStationSessionCamera]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (trap-station-session-camera (get-specific state (int (:1 record))))))
 
 (s/defn create! :- TrapStationSessionCamera
@@ -108,14 +107,14 @@
    id :- s/Int
    data :- TTrapStationSessionCamera]
   {:pre [(camera-available-for-update? state id data)]}
-  (db/with-db-keys state -update!
+  (query state :update!
     (merge data {:trap-station-session-camera-id id}))
   (trap-station-session-camera (get-specific state id)))
 
 (defn- get-active-cameras
   [state params]
   (->> params
-       (db/with-db-keys state -get-active-cameras)
+       (query state :get-active-cameras)
        (map :camera-id)
        (remove nil?)))
 
@@ -125,7 +124,7 @@
   (let [fs (media/get-all-files-by-trap-station-session-camera state id)
         ps {:trap-station-session-camera-id id}
         cams (get-active-cameras state ps)]
-    (db/with-db-keys state -delete! ps)
+    (query state :delete! ps)
     (media/delete-files! state fs)
     (camera/make-available state cams))
   nil)
@@ -134,7 +133,7 @@
   [state :- State
    id :- s/Int]
   (let [fs (media/get-all-files-by-trap-station-session-camera state id)]
-    (db/with-db-keys state -delete-media! {:trap-station-session-camera-id id})
+    (query state :delete-media! {:trap-station-session-camera-id id})
     (media/delete-files! state fs))
   nil)
 
@@ -142,7 +141,7 @@
   "Return the available cameras, factoring in whether they're in use elsewhere."
   [state :- State
    id :- s/Int]
-  (db/clj-keys (db/with-connection state -get-available)))
+  (query state :get-available))
 
 (s/defn get-alternatives
   "Return the current and alternative cameras, factoring in whether they're in
@@ -151,7 +150,7 @@
    id :- s/Int]
   (let [res (get-specific state id)]
     (some->> res
-             (db/with-db-keys state -get-alternatives))))
+             (query state :get-alternatives))))
 
 (s/defn get-or-create-with-camera-and-session! :- TrapStationSessionCamera
   [state :- State
@@ -174,7 +173,7 @@
    camera-id :- s/Int
    trap-station-session-id :- s/Int
    media-unrecoverable :- s/Bool]
-  (db/with-db-keys state -update-media-unrecoverable!
+  (query state :update-media-unrecoverable!
     {:camera-id camera-id
      :trap-station-session-id trap-station-session-id
      :trap-station-session-camera-media-unrecoverable media-unrecoverable})

@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.reports.species-statistics-test
   (:require
    [camelot.report.core :as sut]
-   [camelot.test-util.state :as state]
+   [camelot.testutil.state :as state]
    [clj-time.core :as t]
    [clojure.string :as str]
    [clojure.test :refer :all :exclude [report]]

@@ -1,11 +1,49 @@
 (ns camelot.system.db
   (:require
+   [yesql.core :as sql]
    [com.stuartsierra.component :as component]
    [camelot.system.db-migrate :as migrate]
    [clojure.java.jdbc :as jdbc]
    [schema.core :as s])
   (:import
    (java.io IOException)))
+
+(def query-files
+  ["cameras"
+   "camera-status"
+   "deployments"
+   "library"
+   "media"
+   "photos"
+   "sighting-field"
+   "sighting-field-value"
+   "sightings"
+   "sites"
+   "species-mass"
+   "species"
+   "survey-file"
+   "survey-sites"
+   "surveys"
+   "survey-taxonomy"
+   "taxonomy"
+   "trap-station-session-cameras"
+   "trap-station-sessions"
+   "trap-stations"])
+
+(defn queries
+  [name]
+  (let [ns (create-ns (gensym "queryns-"))]
+    (binding [*ns* ns]
+      (sql/defqueries (str "sql/" name ".sql"))
+      (->> (ns-publics ns)
+           (map (fn [[k v]] (hash-map (keyword k) v)))
+           (into {})))))
+
+(defn build-queries
+  []
+  (->> query-files
+       (map (fn [f] (hash-map (keyword f) (queries f))))
+       (into {})))
 
 (defn connect
   "Establish a connection to the database given a JDBC spec."
@@ -27,9 +65,11 @@
   (start [this]
     (connect connection)
     (migrate/migrate connection)
-    this)
+    (assoc this :queries (build-queries)))
 
   (stop [this]
     (when connection
       (close connection))
-    (assoc this :connection nil)))
+    (-> this
+        (assoc :connection nil)
+        (assoc :queries nil))))

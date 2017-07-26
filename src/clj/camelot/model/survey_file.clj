@@ -1,6 +1,5 @@
 (ns camelot.model.survey-file
   (:require
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [schema.core :as s]
    [camelot.util.db :as db]
@@ -10,7 +9,7 @@
    [camelot.util.file :as file]
    [camelot.util.filesystem :as filesystem]))
 
-(sql/defqueries "sql/survey-file.sql")
+(def query (db/with-db-keys :survey-file))
 
 (s/defrecord TSurveyFile
     [survey-id :- s/Int
@@ -35,7 +34,7 @@
   [state :- State
    survey-id :- s/Int]
   (->> {:survey-id survey-id}
-       (db/with-db-keys state -get-all)
+       (query state :get-all)
        (map survey-file)))
 
 (s/defn get-specific :- (s/maybe SurveyFile)
@@ -43,7 +42,7 @@
   [state :- State
    id :- s/Int]
   (->> {:survey-file-id id}
-       (db/with-db-keys state -get-specific)
+       (query state :get-specific)
        (map survey-file)
        first))
 
@@ -54,21 +53,21 @@
    filename :- s/Str]
   (->> {:survey-file-name filename
         :survey-id survey-id}
-       (db/with-db-keys state -get-specific-by-details)
+       (query state :get-specific-by-details)
        (map survey-file)
        first))
 
 (s/defn create! :- SurveyFile
   [state :- State
    data :- TSurveyFile]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (survey-file (get-specific state (int (:1 record))))))
 
 (s/defn update! :- SurveyFile
   [state :- State
    id :- s/Int
    file-size :- s/Int]
-  (db/with-db-keys state -update! {:survey-file-id id
+  (query state :update! {:survey-file-id id
                                    :survey-file-size file-size})
   (survey-file (get-specific state id)))
 
@@ -78,7 +77,7 @@
   (if-let [r (get-specific state file-id)]
     (let [fs (filesystem/filestore-file-path state (:survey-id r)
                                              (:survey-file-name r))]
-      (db/with-db-keys state -delete! {:survey-file-id file-id})
+      (query state :delete! {:survey-file-id file-id})
       (io/delete-file fs))))
 
 (s/defn upload!

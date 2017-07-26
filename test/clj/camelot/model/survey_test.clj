@@ -1,7 +1,7 @@
 (ns camelot.model.survey-test
   "Tests around the survey model."
   (:require [camelot.model.survey :as sut]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [clojure.test :refer :all]))
 
 (deftest test-survey-settings

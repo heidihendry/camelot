@@ -2,7 +2,7 @@
   (:require [camelot.model.camera-deployment :as sut]
             [clojure.test :refer :all]
             [clj-time.core :as t]
-            [camelot.test-util.state :as state]))
+            [camelot.testutil.state :as state]))
 
 (def default-record
   {:trap-station-session-id 1

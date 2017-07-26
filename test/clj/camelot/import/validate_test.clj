@@ -2,7 +2,7 @@
   (:require [camelot.import.validate :as sut]
             [clojure.test :refer :all]
             [clj-time.core :as t]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [clojure.string :as str]
             [clojure.java.io :as io]))
 

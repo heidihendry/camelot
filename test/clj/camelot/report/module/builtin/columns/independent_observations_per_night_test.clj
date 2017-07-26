@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.columns.independent-observations-per-night-test
   (:require [camelot.report.module.builtin.columns.independent-observations-per-night :as sut]
             [clojure.test :refer :all]
-            [camelot.test-util.state :as state]))
+            [camelot.testutil.state :as state]))
 
 (defn calculate
   [data]

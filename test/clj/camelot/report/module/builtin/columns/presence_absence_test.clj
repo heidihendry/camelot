@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.columns.presence-absence-test
   (:require [camelot.report.module.builtin.columns.presence-absence :as sut]
             [clojure.test :refer :all]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [clj-time.core :as t]))
 
 (defn calculate

@@ -2,11 +2,10 @@
   "Species models and data access."
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [camelot.util.db :as db]))
 
-(sql/defqueries "sql/species.sql")
+(def query (db/with-db-keys :species))
 
 (s/defrecord TSpecies
     [species-scientific-name :- s/Str
@@ -28,13 +27,13 @@
 
 (s/defn get-all :- [Species]
   [state :- State]
-  (map species (db/clj-keys (db/with-connection state -get-all))))
+  (map species (query state :get-all)))
 
 (s/defn get-specific :- (s/maybe Species)
   [state :- State
    id :- s/Int]
   (some->> {:species-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            (first)
            (species)))
 
@@ -42,27 +41,27 @@
   [state :- State
    data :- TSpecies]
   (some->> data
-           (db/with-db-keys state -get-specific-by-scientific-name)
+           (query state :get-specific-by-scientific-name)
            (first)
            (species)))
 
 (s/defn create! :- Species
   [state :- State
    data :- TSpecies]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (species (get-specific state (int (:1 record))))))
 
 (s/defn update! :- Species
   [state :- State
    id :- s/Int
    data :- TSpecies]
-  (db/with-db-keys state -update! (merge data {:species-id id}))
+  (query state :update! (merge data {:species-id id}))
   (species (get-specific state id)))
 
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -delete! {:species-id id})
+  (query state :delete! {:species-id id})
   nil)
 
 (s/defn get-or-create! :- Species

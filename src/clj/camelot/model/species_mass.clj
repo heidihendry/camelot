@@ -1,12 +1,11 @@
 (ns camelot.model.species-mass
   "Species mass models and data access."
   (:require
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [schema.core :as s]
    [camelot.util.db :as db]))
 
-(sql/defqueries "sql/species-mass.sql")
+(def query (db/with-db-keys :species-mass))
 
 (defn- label-record
   "Add label to species record data."
@@ -28,7 +27,6 @@
 (s/defn get-all :- [SpeciesMass]
   "Retrieve, translate and return all species mass brackets."
   [state :- State]
-  (->> (db/with-connection state -get-all)
-       (db/clj-keys)
+  (->> (query state :get-all)
        label-record
        (map species-mass)))

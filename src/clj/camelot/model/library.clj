@@ -2,7 +2,6 @@
   "Library models and data access."
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [medley.core :as medley]
    [camelot.util.db :as db]
    [clojure.tools.logging :as log]
@@ -21,7 +20,7 @@
   (:import
    (camelot.model.sighting Sighting)))
 
-(sql/defqueries "sql/library.sql")
+(def query (db/with-db-keys :library))
 
 (defrecord LibraryMetadata
     [trap-station-session-camera-id
@@ -46,7 +45,7 @@
 
 (defn build-library-metadata
   [state]
-  (->> (db/with-db-keys state -hierarchy-data {})
+  (->> (query state :hierarchy-data {})
        (group-by :trap-station-session-camera-id)
        (map (fn [[k v]] (vector k (map->LibraryMetadata (first v)))))
        (into {})))
@@ -56,10 +55,10 @@
   (let [psearch (fparser/parse search)]
     (cond
       (fparser/match-all? psearch)
-      (map :media-id (db/with-db-keys state -all-media-ids {}))
+      (map :media-id (query state :all-media-ids {}))
 
       (fparser/match-all-in-survey? psearch)
-      (map :media-id (db/with-db-keys state -all-media-ids-for-survey
+      (map :media-id (query state :all-media-ids-for-survey
                        {:field-value (:value (ffirst psearch))}))
 
       :else

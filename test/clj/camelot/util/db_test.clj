@@ -4,7 +4,7 @@
    [clojure.test :refer :all]
    [clj-time.core :as t]
    [clj-time.coerce :as tc]
-   [camelot.test-util.state :as state]))
+   [camelot.testutil.state :as state]))
 
 (deftest test-clj-keys
   (testing "Converting from database types"
@@ -70,6 +70,7 @@
     (testing "Calls a function with the `db' data, returning a `clj' result."
       (let [fn (fn [a c] (update a :column_name inc))
             data {:column-name 5}
-            state (state/gen-state)]
-        (is (= (dissoc (sut/with-db-keys state fn data) :current-timestamp)
+            state (state/gen-state {} {:table-scope {:query fn}})]
+        (is (= (dissoc ((sut/with-db-keys :table-scope) state :query data)
+                       :current-timestamp)
                {:column-name 6}))))))

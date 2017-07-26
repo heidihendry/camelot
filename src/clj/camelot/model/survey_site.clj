@@ -1,13 +1,12 @@
 (ns camelot.model.survey-site
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))
 
-(sql/defqueries "sql/survey-sites.sql")
+(def query (db/with-db-keys :survey-sites))
 
 (s/defrecord TSurveySite
     [survey-id :- s/Int
@@ -30,17 +29,17 @@
 (s/defn get-all :- [SurveySite]
   [state :- State
    id :- s/Int]
-  (map survey-site (db/with-db-keys state -get-all {:survey-id id})))
+  (map survey-site (query state :get-all {:survey-id id})))
 
 (s/defn get-all* :- [SurveySite]
   [state :- State]
-  (map survey-site (db/clj-keys (db/with-connection state -get-all*))))
+  (map survey-site (query state :get-all*)))
 
 (s/defn get-specific :- (s/maybe SurveySite)
   [state :- State
    id :- s/Int]
   (some->>  {:survey-site-id id}
-            (db/with-db-keys state -get-specific)
+            (query state :get-specific)
             (first)
             (survey-site)))
 
@@ -48,27 +47,27 @@
   [state :- State
    data :- TSurveySite]
   (some->> data
-           (db/with-db-keys state -get-specific-by-site)
+           (query state :get-specific-by-site)
            (first)
            (survey-site)))
 
 (s/defn create! :- SurveySite
   [state :- State
    data :- TSurveySite]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (survey-site (get-specific state (int (:1 record))))))
 
 (s/defn update! :- SurveySite
   [state :- State
    id :- s/Int
    data :- TSurveySite]
-  (db/with-db-keys state -update! (merge data {:survey-site-id id}))
+  (query state :update! (merge data {:survey-site-id id}))
   (survey-site (get-specific state id)))
 
 (defn- get-active-cameras
   [state params]
   (->> params
-       (db/with-db-keys state -get-active-cameras)
+       (query state :get-active-cameras)
        (map :camera-id)
        (remove nil?)))
 
@@ -78,7 +77,7 @@
   (let [fs (media/get-all-files-by-survey-site state id)
         ps {:survey-site-id id}
         cams (get-active-cameras state ps)]
-    (db/with-db-keys state -delete! ps)
+    (query state :delete! ps)
     (media/delete-files! state fs)
     (camera/make-available state cams))
   nil)
@@ -86,14 +85,14 @@
 (s/defn get-available
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -get-available {:survey-id id}))
+  (query state :get-available {:survey-id id}))
 
 (s/defn get-alternatives
   [state :- State
    id :- s/Int]
   (let [res (get-specific state id)]
     (if res
-      (db/with-db-keys state -get-alternatives res)
+      (query state :get-alternatives res)
       [])))
 
 (s/defn get-or-create! :- SurveySite

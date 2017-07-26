@@ -1,4 +1,4 @@
-(ns camelot.test-util.state
+(ns camelot.testutil.state
   (:require
    [clj-time.coerce :as tc]
    [clj-time.core :as t]
@@ -35,4 +35,12 @@
                                  :config (merge default-config config)
                                  :path {}}))
     :database {:connection {}}
+    :app {}})
+  ([config queries]
+   {:config (component/start
+             (state/map->Config {:store (atom {})
+                                 :config (merge default-config config)
+                                 :path {}}))
+    :database {:connection {}
+               :queries queries}
     :app {}}))

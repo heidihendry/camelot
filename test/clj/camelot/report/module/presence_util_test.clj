@@ -2,7 +2,7 @@
   (:require
    [camelot.report.module.presence-util :as sut]
    [clojure.test :refer :all]
-   [camelot.test-util.state :as state]
+   [camelot.testutil.state :as state]
    [clj-time.core :as t]))
 
 (defn- jan

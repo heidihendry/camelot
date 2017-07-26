@@ -2,7 +2,7 @@
   (:require [camelot.report.module.loader :as sut]
             [camelot.util.file :as file]
             [clojure.java.io :as io]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [clojure.test :refer :all]))
 
 (def fake-files

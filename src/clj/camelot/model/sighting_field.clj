@@ -1,12 +1,11 @@
 (ns camelot.model.sighting-field
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.util.sighting-fields :as util.sf]
    [camelot.util.db :as db]
    [clj-time.core :as t]))
 
-(sql/defqueries "sql/sighting-field.sql")
+(def query (db/with-db-keys :sighting-field))
 
 (s/defrecord TSightingField
     [sighting-field-key :- s/Str
@@ -43,13 +42,13 @@
 (defn get-options
   "Return all options for a sighting field."
   [state sf-id]
-  (map :sighting-field-option-label (db/with-db-keys state -get-options {:sighting-field-id sf-id})))
+  (map :sighting-field-option-label (query state :get-options {:sighting-field-id sf-id})))
 
 (defn get-all-options
   "Return all sighting field options keyed by sighting field ID."
   [state]
   (reduce-kv #(assoc %1 %2 (map :sighting-field-option-label %3))
-   {} (group-by :sighting-field-id (db/with-db-keys state -get-all-options {}))))
+   {} (group-by :sighting-field-id (query state :get-all-options {}))))
 
 (defn- add-options
   "Assoc options for the given field."
@@ -59,14 +58,14 @@
 (defn delete-options!
   "Delete options for a sighting field."
   [state field-id]
-  (db/with-db-keys state -delete-options! {:sighting-field-id field-id})
+  (query state :delete-options! {:sighting-field-id field-id})
   nil)
 
 (defn create-options!
   "Create new sighting field options."
   [state sf-id options]
   (doseq [opt options]
-    (db/with-db-keys state -create-option<! {:sighting-field-id sf-id
+    (query state :create-option<! {:sighting-field-id sf-id
                                              :sighting-field-option-label opt})))
 
 (defn get-all
@@ -74,12 +73,12 @@
   [state]
   (let [all-options (get-all-options state)]
     (map (comp sighting-field (partial add-options all-options))
-         (db/with-db-keys state -get-all {}))))
+         (query state :get-all {}))))
 
 (defn get-specific
   "Return a specific sighting field by field ID."
   [state field-id]
-  (if-let [sf (first (db/with-db-keys state -get-specific
+  (if-let [sf (first (query state :get-specific
                     {:sighting-field-id field-id}))]
     (->> (get-options state field-id)
          (assoc sf :sighting-field-options)
@@ -90,7 +89,7 @@
   [state id field-config]
   (db/with-transaction [s state]
     (delete-options! s id)
-    (db/with-db-keys s -update!
+    (query s :update!
       (assoc (update field-config :sighting-field-datatype name)
              :sighting-field-id id))
     (when (get-in util.sf/datatypes [(:sighting-field-datatype field-config) :has-options])
@@ -101,7 +100,7 @@
   "Create a sighting field with its configuration as `field-config'."
   [state field-config]
   (let [sf (->> (update field-config :sighting-field-datatype name)
-                (db/with-db-keys state -create<! )
+                (query state :create<! )
                 :1
                 int
                 (get-specific state))]
@@ -111,5 +110,5 @@
 (defn delete!
   "Delete the sighting field with the given ID."
   [state field-id]
-  (db/with-db-keys state -delete! {:sighting-field-id field-id})
+  (query state :delete! {:sighting-field-id field-id})
   nil)

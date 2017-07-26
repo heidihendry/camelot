@@ -3,10 +3,9 @@
   (:require
    [schema.core :as s]
    [camelot.util.db :as db]
-   [camelot.system.state :refer [State]]
-   [yesql.core :as sql]))
+   [camelot.system.state :refer [State]]))
 
-(sql/defqueries "sql/photos.sql")
+(def query (db/with-db-keys :photos))
 
 (s/defrecord TPhoto
     [photo-iso-setting :- (s/maybe s/Int)
@@ -41,35 +40,35 @@
 (s/defn get-all :- [Photo]
   [state :- State
    id :- s/Num]
-  (map photo (db/with-db-keys state -get-all {:media-id id})))
+  (map photo (query state :get-all {:media-id id})))
 
 (s/defn get-all* :- [Photo]
   [state :- State]
-  (map photo (db/with-db-keys state -get-all* {})))
+  (map photo (query state :get-all* {})))
 
 (s/defn get-specific :- Photo
   [state :- State
    id :- s/Num]
   (some->> {:photo-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            first
            photo))
 
 (s/defn create! :- Photo
   [state :- State
    data :- TPhoto]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (get-specific state (int (:1 record)))))
 
 (s/defn update! :- Photo
   [state :- State
    id :- s/Int
    data :- TPhoto]
-  (db/with-db-keys state -update! (merge data {:photo-id id}))
+  (query state :update! (merge data {:photo-id id}))
   (get-specific state id))
 
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -delete! {:photo-id id})
+  (query state :delete! {:photo-id id})
   nil)

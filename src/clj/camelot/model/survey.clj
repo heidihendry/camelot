@@ -3,7 +3,6 @@
   (:require
    [schema.core :as s]
    [camelot.util.db :as db]
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
    [camelot.util.file :as file]
@@ -12,7 +11,7 @@
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))
 
-(sql/defqueries "sql/surveys.sql")
+(def query (db/with-db-keys :surveys))
 
 (s/defrecord TSurvey
     [survey-name :- s/Str
@@ -47,7 +46,7 @@
 
 (s/defn get-all :- [Survey]
   [state :- State]
-  (map survey (db/clj-keys (db/with-connection state -get-all))))
+  (map survey (query state :get-all)))
 
 (defn survey-settings
   "Return configuration data for all surveys."
@@ -68,27 +67,27 @@
   [state :- State
    id :- s/Int]
   (some->> {:survey-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            first
            survey))
 
 (s/defn create! :- Survey
   [state :- State
    data :- TSurvey]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (survey (get-specific state (int (:1 record))))))
 
 (s/defn update! :- Survey
   [state :- State
    id :- s/Int
    data :- TSurvey]
-  (db/with-db-keys state -update! (merge data {:survey-id id}))
+  (query state :update! (merge data {:survey-id id}))
   (survey (get-specific state id)))
 
 (defn- get-active-cameras
   [state params]
   (->> params
-       (db/with-db-keys state -get-active-cameras)
+       (query state :get-active-cameras)
        (map :camera-id)
        (remove nil?)))
 
@@ -101,14 +100,14 @@
     (media/delete-files! state fs)
     (file/delete-recursive (filesystem/filestore-survey-directory state id))
     (camera/make-available state cams)
-    (db/with-db-keys state -delete! ps))
+    (query state :delete! ps))
   nil)
 
 (s/defn get-specific-by-name :- (s/maybe Survey)
   [state :- State
    data :- {:survey-name s/Str}]
   (some->> data
-           (db/with-db-keys state -get-specific-by-name)
+           (query state :get-specific-by-name)
            (first)
            (survey)))
 
@@ -122,7 +121,7 @@
   [state :- State
    id :- s/Int
    bulk-import-mode :- s/Bool]
-  (db/with-db-keys state -set-bulk-import-mode!
+  (query state :set-bulk-import-mode!
     {:survey-id id
      :survey-bulk-import-mode bulk-import-mode})
   (survey (get-specific state id)))

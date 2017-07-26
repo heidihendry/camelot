@@ -1,4 +1,4 @@
--- name: -get-all
+-- name: get-all
 SELECT sighting_field_id, sighting_field_created, sighting_field_updated,
        sighting_field_key, sighting_field_label,
        sighting_field_datatype, sighting_field_required,
@@ -6,7 +6,7 @@ SELECT sighting_field_id, sighting_field_created, sighting_field_updated,
        sighting_field_ordering, survey_id
 FROM sighting_field
 
--- name: -get-specific
+-- name: get-specific
 SELECT sighting_field_id, sighting_field_created, sighting_field_updated,
        sighting_field_key, sighting_field_label,
        sighting_field_datatype, sighting_field_required,
@@ -15,7 +15,7 @@ SELECT sighting_field_id, sighting_field_created, sighting_field_updated,
 FROM sighting_field
 WHERE sighting_field_id = :sighting_field_id
 
--- name: -update!
+-- name: update!
 UPDATE sighting_field
 SET sighting_field_updated = :current_timestamp,
     sighting_field_key = :sighting_field_key,
@@ -27,7 +27,7 @@ SET sighting_field_updated = :current_timestamp,
     sighting_field_ordering = :sighting_field_ordering
 WHERE sighting_field_id = :sighting_field_id
 
--- name: -create<!
+-- name: create<!
 INSERT INTO sighting_field (sighting_field_created, sighting_field_updated,
        sighting_field_key, sighting_field_label,
        sighting_field_datatype, sighting_field_required,
@@ -39,27 +39,27 @@ VALUES (:current_timestamp, :current_timestamp,
        :sighting_field_default, :sighting_field_affects_independence,
        :sighting_field_ordering, :survey_id)
 
--- name: -create-option<!
+-- name: create-option<!
 INSERT INTO sighting_field_option (
        sighting_field_option_created, sighting_field_option_updated,
        sighting_field_option_label, sighting_field_id)
 VALUES (:current_timestamp, :current_timestamp, :sighting_field_option_label, :sighting_field_id)
 
--- name: -get-all-options
+-- name: get-all-options
 SELECT sighting_field_option_created, sighting_field_option_updated,
        sighting_field_option_label, sighting_field_id, sighting_field_id
 FROM sighting_field_option
 
--- name: -get-options
+-- name: get-options
 SELECT sighting_field_option_created, sighting_field_option_updated,
        sighting_field_option_label, sighting_field_id, sighting_field_id
 FROM sighting_field_option
 WHERE sighting_field_id = :sighting_field_id
 
--- name: -delete!
+-- name: delete!
 DELETE FROM sighting_field
 WHERE sighting_field_id = :sighting_field_id
 
--- name: -delete-options!
+-- name: delete-options!
 DELETE FROM sighting_field_option
 WHERE sighting_field_id = :sighting_field_id

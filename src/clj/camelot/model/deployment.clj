@@ -2,7 +2,6 @@
   "Deployment model and data access."
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.util.data :as data]
@@ -19,7 +18,7 @@
   (:import
    (camelot.model.trap_station_session_camera TrapStationSessionCamera)))
 
-(sql/defqueries "sql/deployments.sql")
+(def query (db/with-db-keys :deployments))
 
 (s/defrecord TDeployment
     [survey-id :- s/Int
@@ -72,7 +71,7 @@
   [state :- State
    id :- s/Int]
   (->> {:survey-id id}
-       (db/with-db-keys state -get-all)
+       (query state :get-all)
        dep-util/assoc-cameras
        (group-by :trap-station-id)
        vals
@@ -84,7 +83,7 @@
   [state :- State
    id :- s/Int]
   (some->> {:trap-station-session-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            dep-util/assoc-cameras
            first
            deployment))

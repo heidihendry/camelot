@@ -70,13 +70,16 @@ Intended for async operations which are already running within a transaction."
 
 (defn with-db-keys
   "Run a function, translating the parameters and results as needed."
-  [state f data]
-  (-> data
-      (db-keys)
-      (with-connection state f)
-      (clj-keys)))
-
-(defn fn-with-db-keys
-  "Run a function given its var, translating the parameters and results as needed."
-  [state f data]
-  (with-db-keys state (deref f) data))
+  [scope]
+  (fn -with-db-keys
+    ([state qkey data]
+     (let [query (get-in state [:database :queries scope qkey])]
+       (if (nil? query)
+         (throw (IllegalArgumentException.
+                 (format "Query '%s' not found in scope '%s'" qkey scope)))
+         (-> data
+             (db-keys)
+             (with-connection state query)
+             (clj-keys)))))
+    ([state qkey]
+     (-with-db-keys state qkey {}))))

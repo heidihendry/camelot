@@ -3,7 +3,7 @@
    [camelot.model.library :as sut]
    [clojure.test :refer :all]
    [clj-time.core :as t]
-   [camelot.test-util.state :as state]
+   [camelot.testutil.state :as state]
    [camelot.model.sighting :as sighting]))
 
 (def media-fixture

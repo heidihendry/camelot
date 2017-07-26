@@ -2,7 +2,7 @@
   (:require
    [camelot.report.core :as sut]
    [clojure.test :refer :all :exclude [report]]
-   [camelot.test-util.state :as state]
+   [camelot.testutil.state :as state]
    [clj-time.core :as t]))
 
 (defn- gen-state-helper

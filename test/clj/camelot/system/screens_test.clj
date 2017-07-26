@@ -1,6 +1,6 @@
 (ns camelot.system.screens-test
   (:require
-   [camelot.test-util.state :as state]
+   [camelot.testutil.state :as state]
    [camelot.system.screens :as sut]
    [clojure.test :refer :all]
    [schema.test :as st]))

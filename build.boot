@@ -97,28 +97,9 @@
       :manifest {"Description" "Manage and analyse camera trap data. Designed for researchers and conservationists."
                  "Url" "http://gitlab.com/camelot-project/camelot"}})
 
-(deftask dev-system
-  "Develop the server backend. The system is automatically started in
-  the dev profile."
+(deftask dev-frontend
+  "Start a frontend development environment."
   []
-  (let [run? (atom false)]
-    (with-pass-thru _
-      (when-not @run?
-        (reset! run? true)
-        (require 'reloaded.repl)
-        (let [go (resolve 'reloaded.repl/go)]
-          (try
-            (require 'user)
-            (go)
-            (catch Exception e
-              (boot.util/fail "Exception while starting the system\n")
-              (boot.util/print-ex (.getCause e)))))))))
-
-(deftask dev
-  "Start a development environment."
-  [p port PORT int "The web server port to listen on"]
-  (set-env! :source-paths #(conj % "dev"))
-  (System/setProperty "camelot.version" +version+)
   (apply ns.repl/set-refresh-dirs (get-env :directories))
   (comp
    (watch)
@@ -126,7 +107,6 @@
            :asset-path "/www")
    (cljs-repl)
    (cljs :optimizations :none)
-   (dev-system)
    (target)))
 
 (deftask add-source-paths
@@ -161,30 +141,25 @@
    (jar)
    (target :dir #{"target"})))
 
-(defonce dev-watcher (atom nil))
+(defonce frontend-started (atom false))
 
-(defn watcher-running?
-  []
-  (and (future? @dev-watcher)
-       (not (future-cancelled? @dev-watcher))
-       (not (future-done? @dev-watcher))))
+(defn start-frontend []
+  (println "Starting websocket server and compiling cljs...")
+  (future (boot (dev-frontend)))
+  (reset! frontend-started true)
+  nil)
 
 (defn start []
-  (if (watcher-running?)
-    (println "Already running. Run '(stop)' first.")
-    (do
-      (println "Starting dev server in the background.")
-      (reset! dev-watcher (future (boot (dev))))
-      nil)))
+  (println "Starting dev server...")
+  (set-env! :source-paths #(conj % "dev"))
+  (System/setProperty "camelot.version" +version+)
+  (camelot/start-prod)
+  (when-not (deref frontend-started)
+    (start-frontend)))
 
 (defn stop []
-  (if (watcher-running?)
-    (do
-      (println "Stopping dev server...")
-      (swap! system component/stop)
-      (future-cancel @dev-watcher)
-      nil)
-    (println "Dev server is not running. Run '(start)' first.")))
+  (println "Stopping dev server...")
+  (swap! system component/stop))
 
 (defn state []
   @system)

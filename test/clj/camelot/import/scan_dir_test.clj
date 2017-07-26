@@ -1,7 +1,7 @@
 (ns camelot.import.scan-dir-test
   (:require [camelot.import.scan-dir :as sut]
             [clojure.test :refer :all]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [camelot.util.file :as file]))
 
 (deftest test-resolve-server-directory

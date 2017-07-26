@@ -2,7 +2,6 @@
   "User-defined fields for sighting data."
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.util.datatype :as datatype]
    [clojure.string :as str]
    [camelot.model.sighting-field :as sighting-field]
@@ -10,7 +9,7 @@
    [camelot.util.db :as db]
    [clj-time.core :as t]))
 
-(sql/defqueries "sql/sighting-field-value.sql")
+(def query (db/with-db-keys :sighting-field-value))
 
 (s/defrecord SightingFieldValue
     [sighting-field-value-id :- s/Int
@@ -55,7 +54,7 @@
 (defn query-all
   "Return all sighting field values."
   [state]
-  (->> (db/fn-with-db-keys state #'-query-all {})
+  (->> (query state :query-all {})
        (group-by :sighting-id)
        (reduce-kv sighting-field-query-reducer {})))
 
@@ -63,25 +62,25 @@
   "Return a specific sighting field value."
   [state value-id]
   (->> {:sighting-field-value-id value-id}
-       (db/fn-with-db-keys state #'-get-specific)
+       (query state :get-specific)
        first
        sighting-field-value))
 
 (defn create!
   "Create a new sighting field value."
   [state sighting-id field-id value]
-  (let [record (db/fn-with-db-keys state #'-create<!
-                                   {:sighting-field-id field-id
-                                    :sighting-field-value-data (str value)
-                                    :sighting-id sighting-id})]
+  (let [record (query state :create<!
+                      {:sighting-field-id field-id
+                       :sighting-field-value-data (str value)
+                       :sighting-id sighting-id})]
     (get-specific state (int (:1 record)))))
 
 (defn- survey-fields-by-key
   [state survey-id]
   (reduce-kv (fn [acc k v] (assoc acc k (first v))) {}
-          (group-by :sighting-field-key
-                    (filter #(= survey-id (:survey-id %))
-                            (sighting-field/get-all state)))))
+             (group-by :sighting-field-key
+                       (filter #(= survey-id (:survey-id %))
+                               (sighting-field/get-all state)))))
 
 (defn create-bulk!
   "Create sighting field values from user-field/value pairs."
@@ -100,15 +99,15 @@
 
 (defn update!
   [state id value]
-  (db/fn-with-db-keys state #'-update!
-                      {:sighting-field-value-id id
-                       :sighting-field-value-data (str value)})
+  (query state :update!
+         {:sighting-field-value-id id
+          :sighting-field-value-data (str value)})
   (get-specific state id))
 
 (defn get-for-sighting
   "Get field data for the given sighting."
   [state sighting-id]
-  (db/fn-with-db-keys state #'-get-for-sighting {:sighting-id sighting-id}))
+  (query state :get-for-sighting {:sighting-id sighting-id}))
 
 (defn update-for-sighting!
   "Given a map of {field-id value-data}, create or update entries for a sighting."
@@ -126,6 +125,6 @@
 (defn delete-for-sighting!
   "Delete sighting field values for the given sighting ID."
   [state sighting-id]
-  (db/fn-with-db-keys state #'-delete-for-sighting!
-                      {:sighting-id sighting-id})
+  (query state :delete-for-sighting!
+         {:sighting-id sighting-id})
   nil)

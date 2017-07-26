@@ -1,10 +1,10 @@
--- name: -create<!
+-- name: create<!
 INSERT INTO sighting (sighting_created, sighting_updated, sighting_quantity,
        sighting_lifestage, sighting_sex, taxonomy_id, media_id)
 VALUES (:current_timestamp, :current_timestamp, :sighting_quantity, :sighting_lifestage,
        :sighting_sex, :taxonomy_id, :media_id)
 
--- name: -get-specific
+-- name: get-specific
 SELECT sighting_id, sighting_created, sighting_updated, sighting_quantity,
        sighting_lifestage, sighting_sex, taxonomy_id, media_id, taxonomy_genus,
        taxonomy_species
@@ -12,7 +12,7 @@ FROM sighting
 LEFT JOIN taxonomy USING (taxonomy_id)
 WHERE sighting_id = :sighting_id
 
--- name: -get-all
+-- name: get-all
 SELECT sighting_id, sighting_created, sighting_updated, sighting_quantity,
        sighting_lifestage, sighting_sex, taxonomy_id, media_id, taxonomy_genus,
        taxonomy_species
@@ -20,7 +20,7 @@ FROM sighting
 LEFT JOIN taxonomy USING (taxonomy_id)
 WHERE media_id = :media_id
 
--- name: -update!
+-- name: update!
 UPDATE sighting
 SET sighting_updated = :current_timestamp,
     sighting_quantity = :sighting_quantity,
@@ -29,25 +29,25 @@ SET sighting_updated = :current_timestamp,
     taxonomy_id = :taxonomy_id
 WHERE sighting_id = :sighting_id
 
--- name: -delete!
+-- name: delete!
 DELETE FROM sighting
 WHERE sighting_id = :sighting_id
 
--- name: -get-available
+-- name: get-available
 SELECT taxonomy_id, taxonomy_genus, taxonomy_species
 FROM taxonomy
 WHERE taxonomy_id NOT IN (SELECT taxonomy_id
                           FROM sighting
                           WHERE sighting_id = :sighting_id)
 
--- name: -get-alternatives
+-- name: get-alternatives
 SELECT taxonomy_id, taxonomy_genus, taxonomy_genus
 FROM taxonomy
 WHERE taxonomy_id NOT IN (SELECT taxonomy_id
                           FROM sighting
                           WHERE sighting_id = :sighting_id) OR taxonomy_id = :taxonomy_id
 
--- name: -get-all*
+-- name: get-all*
 SELECT sighting_id, sighting_created, sighting_updated, sighting_quantity,
        sighting_lifestage, sighting_sex, taxonomy_id, media_id, taxonomy_genus,
        taxonomy_species

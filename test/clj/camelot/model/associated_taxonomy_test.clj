@@ -4,7 +4,7 @@
             [camelot.model.taxonomy :as taxonomy]
             [camelot.model.survey :as survey]
             [clojure.test :refer :all]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [clojure.java.jdbc :as jdbc]))
 
 (defn create!

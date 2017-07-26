@@ -4,13 +4,12 @@
    [camelot.util.db :as db]
    [clj-time.format :as tf]
    [camelot.system.state :refer [State]]
-   [yesql.core :as sql]
    [clj-time.core :as t]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]
    [camelot.translation.core :as tr]))
 
-(sql/defqueries "sql/trap-station-sessions.sql")
+(def query (db/with-db-keys :trap-station-sessions))
 
 (s/defrecord TTrapStationSession
     [trap-station-id :- s/Int
@@ -55,13 +54,13 @@
   [state :- State
    id :- s/Int]
   (->> {:trap-station-id id}
-       (db/with-db-keys state -get-all)
+       (query state :get-all)
        (map #(add-label state %))
        (map trap-station-session)))
 
 (s/defn get-all* :- [TrapStationSession]
   [state :- State]
-  (->> (db/with-db-keys state -get-all* {})
+  (->> (query state :get-all* {})
        (map #(add-label state %))
        (map trap-station-session)))
 
@@ -69,7 +68,7 @@
   [state :- State
    id :- s/Int]
   (some->> {:trap-station-session-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            (first)
            (add-label state)
            (trap-station-session)))
@@ -79,12 +78,12 @@
   ([state session-id]
    (let [session (get-specific state session-id)]
      (when session
-       (map :camera-id (db/with-db-keys state -get-active session)))))
+       (map :camera-id (query state :get-active session)))))
   ([state session-id session-camera-id]
    (let [session (get-specific state session-id)]
      (when session
        (->> session
-            (db/with-db-keys state -get-active)
+            (query state :get-active)
             (remove #(= (:trap-station-session-camera-id %) session-camera-id))
             (map :camera-id))))))
 
@@ -92,7 +91,7 @@
   [state :- State
    data :- TTrapStationSession]
   (some->> data
-           (db/with-db-keys state -get-specific-by-dates)
+           (query state :get-specific-by-dates)
            (first)
            (add-label state)
            (trap-station-session)))
@@ -101,7 +100,7 @@
   [state :- State
    id :- s/Int]
   (some->> {:trap-station-session-camera-id id}
-           (db/with-db-keys state -get-specific-by-trap-station-session-camera-id)
+           (query state :get-specific-by-trap-station-session-camera-id)
            (first)
            (trap-station-session)))
 
@@ -115,7 +114,7 @@
   [state :- State
    data :- TTrapStationSession]
   {:pre [(start-date-before-end-date? data)]}
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (trap-station-session (get-specific state (int (:1 record))))))
 
 (s/defn update!
@@ -126,13 +125,13 @@
   {:pre [(start-date-before-end-date? data)]}
   (db/with-transaction [s state]
     (let [data (dissoc data :trap-station-session-label)]
-      (db/with-db-keys s -update! (merge data {:trap-station-session-id id}))
+      (query s :update! (merge data {:trap-station-session-id id}))
       (get-specific s id))))
 
 (defn- get-active-cameras
   [state params]
   (->> params
-       (db/with-db-keys state -get-active-cameras)
+       (query state :get-active-cameras)
        (map :camera-id)
        (remove nil?)))
 
@@ -142,7 +141,7 @@
   (let [fs (media/get-all-files-by-trap-station-session state id)
         ps {:trap-station-session-id id}
         cams (get-active-cameras state ps)]
-    (db/with-db-keys state -delete! ps)
+    (query state :delete! ps)
     (media/delete-files! state fs)
     (camera/make-available state cams))
   nil)
@@ -156,4 +155,4 @@
 (s/defn set-session-end-date!
   [state :- State
    data]
-  (db/with-db-keys state -set-session-end-date! data))
+  (query state :set-session-end-date! data))

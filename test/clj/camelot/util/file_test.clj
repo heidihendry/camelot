@@ -3,7 +3,7 @@
    [camelot.util.file :as sut]
    [clojure.test :refer :all]
    [clojure.java.io :as io]
-   [camelot.test-util.state :as state]))
+   [camelot.testutil.state :as state]))
 
 (defn state
   [p]

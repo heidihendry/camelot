@@ -2,13 +2,12 @@
   "Site models and data access."
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))
 
-(sql/defqueries "sql/sites.sql")
+(def query (db/with-db-keys :sites))
 
 (s/defrecord TSite
     [site-name :- s/Str
@@ -38,13 +37,13 @@
 
 (s/defn get-all :- [Site]
   [state :- State]
-  (map site (db/clj-keys (db/with-connection state -get-all))))
+  (map site (query state :get-all)))
 
 (s/defn get-specific :- (s/maybe Site)
   [state :- State
    id :- s/Int]
   (some->> {:site-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            (first)
            (site)))
 
@@ -52,27 +51,27 @@
   [state :- State
    data :- {:site-name s/Str}]
   (some->> data
-           (db/with-db-keys state -get-specific-by-name)
+           (query state :get-specific-by-name)
            (first)
            (site)))
 
 (s/defn create! :- Site
   [state :- State
    data :- TSite]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (site (get-specific state (int (:1 record))))))
 
 (s/defn update! :- Site
   [state :- State
    id :- s/Int
    data :- TSite]
-  (db/with-db-keys state -update! (merge data {:site-id id}))
+  (query state :update! (merge data {:site-id id}))
   (site (get-specific state id)))
 
 (defn- get-active-cameras
   [state params]
   (->> params
-       (db/with-db-keys state -get-active-cameras)
+       (query state :get-active-cameras)
        (map :camera-id)
        (remove nil?)))
 
@@ -82,7 +81,7 @@
   (let [fs (media/get-all-files-by-site state id)
         ps {:site-id id}
         cams (get-active-cameras state ps)]
-    (db/with-db-keys state -delete! ps)
+    (query state :delete! ps)
     (media/delete-files! state fs)
     (camera/make-available state cams))
   nil)

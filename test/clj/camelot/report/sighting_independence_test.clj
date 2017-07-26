@@ -4,7 +4,7 @@
    [clojure.test :refer :all]
    [clj-time.core :as t]
    [schema.test :as st]
-   [camelot.test-util.state :as state]))
+   [camelot.testutil.state :as state]))
 
 (defn gen-state-helper
   [config]

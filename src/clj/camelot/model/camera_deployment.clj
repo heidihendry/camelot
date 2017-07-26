@@ -2,7 +2,6 @@
   "Camera deployment / camera check model and data access."
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.util.db :as db]
    [camelot.system.state :refer [State]]
    [clj-time.core :as t]
@@ -15,7 +14,7 @@
    [camelot.util.deployment :as dep-util]
    [camelot.model.deployment :as deployment]))
 
-(sql/defqueries "sql/deployments.sql")
+(def query (db/with-db-keys :deployments))
 
 (s/defrecord TCameraDeployment
     [trap-station-session-id :- s/Int
@@ -103,7 +102,7 @@
   (assoc rec :has-uploaded-media
          (or (->> rec
                   (data/select-keys-inv [:trap-station-session-camera-id])
-                  (db/with-db-keys state -get-uploaded-status)
+                  (query state :get-uploaded-status)
                   first
                   :has-uploaded-media)
              false)))
@@ -112,7 +111,7 @@
   [state :- State
    id :- s/Int]
   (->> {:survey-id id}
-       (db/with-db-keys state -get-uploadable)
+       (query state :get-uploadable)
        (map (partial get-uploaded-status state))
        (map camera-deployment)))
 

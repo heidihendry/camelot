@@ -1,6 +1,6 @@
 (ns camelot.report.module.builtin.reports.trap-station-test
   (:require
-   [camelot.test-util.state :as state]
+   [camelot.testutil.state :as state]
    [camelot.report.core :as sut]
    [clj-time.core :as t]
    [clojure.string :as str]

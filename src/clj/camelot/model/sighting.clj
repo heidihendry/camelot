@@ -1,13 +1,12 @@
 (ns camelot.model.sighting
   "Sighting models and data access."
   (:require
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [camelot.model.sighting-field-value :as sighting-field-value]
    [camelot.util.db :as db]
    [schema.core :as s]))
 
-(sql/defqueries "sql/sightings.sql")
+(def query (db/with-db-keys :sightings))
 
 (def sighting-default-option "unidentified")
 
@@ -69,19 +68,19 @@
 (s/defn get-all
   [state :- State
    id :- s/Num]
-  (map sighting (db/with-db-keys state -get-all {:media-id id})))
+  (map sighting (query state :get-all {:media-id id})))
 
 (s/defn get-all*
   [state :- State]
   (let [sf (sighting-field-value/query-all state)]
-    (->> (db/clj-keys (db/with-connection state -get-all*))
+    (->> (query state :get-all*)
                    (map #(sighting (merge (get sf (:sighting-id %)) %))))))
 
 (s/defn get-specific
   [state :- State
    id :- s/Int]
   (some->> {:sighting-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            (first)
            (sighting)))
 
@@ -96,7 +95,7 @@
 (s/defn create!
   [state :- State
    data :- TSighting]
-  (let [record (db/with-db-keys state -create<! data)
+  (let [record (query state :create<! data)
         sighting-id (int (:1 record))]
     (create-sighting-field-value! state sighting-id (:sighting-fields data))
     (sighting (get-specific state sighting-id))))
@@ -106,7 +105,7 @@
    id :- s/Int
    data :- TSightingUpdate]
   (db/with-transaction [s state]
-    (db/with-db-keys s -update! (merge data {:sighting-id id}))
+    (query s :update! (merge data {:sighting-id id}))
     (sighting-field-value/update-for-sighting! s id (:sighting-fields data))
     (sighting (get-specific s id))))
 
@@ -115,7 +114,7 @@
    id :- s/Int]
   (db/with-transaction [s state]
     (sighting-field-value/delete-for-sighting! state id)
-    (db/with-db-keys state -delete! {:sighting-id id})))
+    (query state :delete! {:sighting-id id})))
 
 (s/defn delete-with-media-ids!
   [state :- State
@@ -128,10 +127,10 @@
 (s/defn get-available
   [state :- State
    id :- s/Int]
-  (db/with-db-keys state -get-available {:sighting-id id}))
+  (query state :get-available {:sighting-id id}))
 
 (s/defn get-alternatives
   [state :- State
    id :- s/Int]
   (let [res (get-specific state id)]
-    (db/with-db-keys state -get-alternatives res)))
+    (query state :get-alternatives res)))

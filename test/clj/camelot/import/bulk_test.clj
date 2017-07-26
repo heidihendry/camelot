@@ -1,7 +1,7 @@
 (ns camelot.import.bulk-test
   (:require [camelot.import.bulk :as sut]
             [clj-time.core :as t]
-            [camelot.test-util.state :as state]
+            [camelot.testutil.state :as state]
             [clojure.test :refer :all]
             [camelot.util.datatype :as datatype]))
 

@@ -1,13 +1,12 @@
 (ns camelot.model.camera-status
   "Camera status model and data access."
   (:require
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [schema.core :as s]
    [camelot.util.db :as db]
    [camelot.translation.core :as tr]))
 
-(sql/defqueries "sql/camera-status.sql")
+(def query (db/with-db-keys :camera-status))
 
 (def camera-available "camera-status/available")
 
@@ -41,16 +40,14 @@
 (s/defn get-all :- [CameraStatus]
   "Retrieve, translate and return all available camera statuses."
   [state :- State]
-  (->> (db/with-connection state -get-all)
-       db/clj-keys
+  (->> (query state :get-all)
        (translate-statuses state)
        (map camera-status)))
 
 (s/defn get-all-raw :- [CameraStatus]
   "Retrieve, translate and return all available camera statuses without translating."
   [state :- State]
-  (->> (db/with-connection state -get-all)
-       db/clj-keys
+  (->> (query state :get-all)
        (map camera-status)))
 
 (s/defn get-specific-with-description :- (s/maybe CameraStatus)

@@ -1,14 +1,13 @@
 (ns camelot.model.trap-station
   (:require
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.system.state :refer [State]]
    [camelot.util.trap-station :as util.ts]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))
 
-(sql/defqueries "sql/trap-stations.sql")
+(def query (db/with-db-keys :trap-stations))
 
 (s/defrecord TTrapStation
     [trap-station-name :- s/Str
@@ -58,23 +57,23 @@
   [state :- State
    id :- s/Int]
   (->> {:survey-site-id id}
-       (db/with-db-keys state -get-all)
+       (query state :get-all)
        (map trap-station)))
 
 (s/defn get-all* :- [TrapStation]
   [state :- State]
-  (map trap-station (db/clj-keys (db/with-connection state -get-all*))))
+  (map trap-station (query state :get-all*)))
 
 (s/defn get-all-for-survey :- [TrapStation]
   [state :- State
    survey-id :- s/Int]
-  (map trap-station (db/with-db-keys state -get-all-for-survey {:survey-id survey-id})))
+  (map trap-station (query state :get-all-for-survey {:survey-id survey-id})))
 
 (s/defn get-specific :- (s/maybe TrapStation)
   [state :- State
    id :- s/Int]
   (some->> {:trap-station-id id}
-           (db/with-db-keys state -get-specific)
+           (query state :get-specific)
            (first)
            (trap-station)))
 
@@ -82,27 +81,27 @@
   [state :- State
    data :- TTrapStation]
   (some->> data
-           (db/with-db-keys state -get-specific-by-location)
+           (query state :get-specific-by-location)
            (first)
            (trap-station)))
 
 (s/defn create! :- TrapStation
   [state :- State
    data :- TTrapStation]
-  (let [record (db/with-db-keys state -create<! data)]
+  (let [record (query state :create<! data)]
     (trap-station (get-specific state (int (:1 record))))))
 
 (s/defn update! :- TrapStation
   [state :- State
    id :- s/Int
    data :- TTrapStation]
-  (db/with-db-keys state -update! (merge data {:trap-station-id id}))
+  (query state :update! (merge data {:trap-station-id id}))
   (trap-station (get-specific state id)))
 
 (defn- get-active-cameras
   [state params]
   (->> params
-       (db/with-db-keys state -get-active-cameras)
+       (query state :get-active-cameras)
        (map :camera-id)
        (remove nil?)))
 
@@ -112,7 +111,7 @@
   (let [fs (media/get-all-files-by-trap-station state id)
         ps {:trap-station-id id}
         cams (get-active-cameras state ps)]
-    (db/with-db-keys state -delete! ps)
+    (query state :delete! ps)
     (media/delete-files! state fs)
     (camera/make-available state cams))
   nil)
