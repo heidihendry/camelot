@@ -1,4 +1,5 @@
 (ns camelot.model.sighting-field
+  "Additional fields for sighting records."
   (:require
    [schema.core :as s]
    [camelot.util.sighting-fields :as util.sf]
@@ -48,7 +49,7 @@
   "Return all sighting field options keyed by sighting field ID."
   [state]
   (reduce-kv #(assoc %1 %2 (map :sighting-field-option-label %3))
-   {} (group-by :sighting-field-id (query state :get-all-options {}))))
+             {} (group-by :sighting-field-id (query state :get-all-options {}))))
 
 (defn- add-options
   "Assoc options for the given field."
@@ -66,7 +67,7 @@
   [state sf-id options]
   (doseq [opt options]
     (query state :create-option<! {:sighting-field-id sf-id
-                                             :sighting-field-option-label opt})))
+                                   :sighting-field-option-label opt})))
 
 (defn get-all
   "Get all sighting fields."
@@ -79,7 +80,7 @@
   "Return a specific sighting field by field ID."
   [state field-id]
   (if-let [sf (first (query state :get-specific
-                    {:sighting-field-id field-id}))]
+                            {:sighting-field-id field-id}))]
     (->> (get-options state field-id)
          (assoc sf :sighting-field-options)
          sighting-field)))
@@ -90,8 +91,8 @@
   (db/with-transaction [s state]
     (delete-options! s id)
     (query s :update!
-      (assoc (update field-config :sighting-field-datatype name)
-             :sighting-field-id id))
+           (assoc (update field-config :sighting-field-datatype name)
+                  :sighting-field-id id))
     (when (get-in util.sf/datatypes [(:sighting-field-datatype field-config) :has-options])
       (create-options! s id (:sighting-field-options field-config))))
   (get-specific state id))
@@ -100,7 +101,7 @@
   "Create a sighting field with its configuration as `field-config'."
   [state field-config]
   (let [sf (->> (update field-config :sighting-field-datatype name)
-                (query state :create<! )
+                (query state :create<!)
                 :1
                 int
                 (get-specific state))]

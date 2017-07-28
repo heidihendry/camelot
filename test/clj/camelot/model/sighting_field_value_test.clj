@@ -70,7 +70,7 @@
       (with-spies [args]
         (let [state (gen-state)]
           (update-for-sighting! state 6 {5 "Updated value"
-                                               1 "Create value"})
+                                         1 "Create value"})
           (is (= (update-params args state)
                  {:sighting-field-value-id 2
                   :sighting-field-value-data "Updated value"}))

@@ -1,24 +1,26 @@
 (ns camelot.testutil.mock
   "Function stubs and mocks."
   (:require
-   [clojure.string :as string]))
+   [clojure.string :as string]
+   [clojure.test :refer :all]))
 
 (def ^:dynamic *invocations* nil)
 
 (defmacro with-spies [[args] & body]
   "Record invocations arguments for mocks created with defmock."
-  `(let [ts# (transient {})
-         ~args ts#]
+  `(let [ts# (atom {})
+         ~args #(::fns @ts#)]
      (binding [*invocations* ts#]
        ~@body)))
 
 (defmacro defmock [ps & body]
-  "Create a mock with the given params that returns `body.'"
+  "Create a mock with the given params that evaluates `body.'"
   (let [fname# (gensym "mock-")]
     `(fn fname# ~ps
-       (when ~`*invocations*
-         (assoc! ~`*invocations* fname#
-                 (conj (get ~`*invocations* fname#) ~ps)))
+       (reset! ~`*invocations*
+               (some-> @~`*invocations*
+                       (update-in [::fns fname#] #(conj (vec %) ~ps))
+                       (update ::order #(conj (vec %) fname#))))
        ~@body)))
 
 (defn- clj-key
@@ -35,3 +37,13 @@
        (map first)
        (map #(reduce-kv clj-key {} %))
        (map #(dissoc % :current-timestamp))))
+
+(defn query-order-is
+  [args state & ks]
+  (prn *invocations*)
+  (let [fns (->> ks
+                 (map #(concat [:database :queries] %))
+                 (map vec)
+                 (map #(get-in state %)))]
+    (is (= (count ks) (count fns)))
+    (is (= (filter (set fns) (::order @*invocations*)) fns))))
