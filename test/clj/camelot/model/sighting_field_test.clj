@@ -34,18 +34,18 @@
                         :get-options (defmock [p c] *get-options*)}}))
 
 (defn- first-query
-  [args state ks]
-  (let [r (mock/query-params args state ks)]
+  [calls state ks]
+  (let [r (mock/query-params calls state ks)]
     (is (< (count r) 2))
     (first r)))
 
 (defn update!-params
-  [args state]
-  (first-query args state [:sighting-field :update!]))
+  [calls state]
+  (first-query calls state [:sighting-field :update!]))
 
 (defn delete-options!-params
-  [args state]
-  (first-query args state [:sighting-field :delete-options!]))
+  [calls state]
+  (first-query calls state [:sighting-field :delete-options!]))
 
 (defn update!
   [state id params]
@@ -55,78 +55,78 @@
 (deftest test-update!
   (testing "update!"
     (testing "should update with given field config"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update! state 3 {:sighting-field-datatype :select
                             :sighting-field-key "individual"})
-          (is (= (update!-params (args) state)
+          (is (= (update!-params (calls) state)
                  {:sighting-field-datatype "select"
                   :sighting-field-key "individual"
                   :sighting-field-id 3})))))
 
     (testing "should delete options associated with field"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update! state 3 {:sighting-field-datatype :select
                             :sighting-field-key "individual"})
-          (is (= (delete-options!-params (args) state)
+          (is (= (delete-options!-params (calls) state)
                  {:sighting-field-id 3})))))
 
     (testing "should create new options for field types with options"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update! state 3 {:sighting-field-datatype :select
                             :sighting-field-key "individual"
                             :sighting-field-options
                             ["Option 1" "Option 2"]})
-          (is (= (mock/query-params (args) state [:sighting-field :create-option<!])
+          (is (= (mock/query-params (calls) state [:sighting-field :create-option<!])
                  [{:sighting-field-id 3
                    :sighting-field-option-label "Option 1"}
                   {:sighting-field-id 3
                    :sighting-field-option-label "Option 2"}])))))
 
     (testing "should delete options before creating new options"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update! state 3 {:sighting-field-datatype :select
                             :sighting-field-key "individual"
                             :sighting-field-options
                             ["Option 1" "Option 2"]})
-          (mock/query-order-is args state
+          (mock/query-order-is calls state
                                [:sighting-field :delete-options!]
                                [:sighting-field :create-option<!]
                                [:sighting-field :create-option<!]))))
 
     (testing "should not create options if the datatype does not support it"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update! state 3 {:sighting-field-datatype :text
                             :sighting-field-key "individual"
                             :sighting-field-options
                             ["Option 1" "Option 2"]})
-          (is (empty? (mock/query-params (args) state [:sighting-field :create-option<!]))))))
+          (is (empty? (mock/query-params (calls) state [:sighting-field :create-option<!]))))))
 
     (testing "should delete options even if the datatype (now) not support them"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update! state 3 {:sighting-field-datatype :text
                             :sighting-field-key "individual"})
-          (is (seq (mock/query-params (args) state [:sighting-field :delete-options!]))))))
+          (is (seq (mock/query-params (calls) state [:sighting-field :delete-options!]))))))
 
     (testing "should update before creating new options"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update! state 3 {:sighting-field-datatype :select
                             :sighting-field-key "individual"
                             :sighting-field-options
                             ["Option 1" "Option 2"]})
-          (mock/query-order-is args state
+          (mock/query-order-is (calls) state
                                [:sighting-field :update!]
                                [:sighting-field :create-option<!]
                                [:sighting-field :create-option<!]))))
 
     (testing "should return updated result"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)
               result (update! state 3 {:sighting-field-datatype :select
                                         :sighting-field-key "individual"

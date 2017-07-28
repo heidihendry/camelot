@@ -34,61 +34,61 @@
                         :update! (defmock [p c] nil)}}))
 
 (defn- first-query
-  [args state ks]
-  (let [r (mock/query-params args state ks)]
+  [calls state ks]
+  (let [r (mock/query-params calls state ks)]
     (is (< (count r) 2))
     (first r)))
 
 (defn create-params
-  [args state]
-  (first-query args state [:sighting-field-value :create<!]))
+  [calls state]
+  (first-query calls state [:sighting-field-value :create<!]))
 
 (defn update-params
-  [args state]
-  (first-query args state [:sighting-field-value :update!]))
+  [calls state]
+  (first-query calls state [:sighting-field-value :update!]))
 
 (deftest test-update-for-sighting
   (testing "update-for-sighting"
     (testing "should create new record if existing value not found"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update-for-sighting! state 3 {1 "value"})
-          (is (= (create-params args state)
+          (is (= (create-params (calls) state)
                  {:sighting-field-id 1
                   :sighting-field-value-data "value"
                   :sighting-id 3})))))
 
     (testing "should update record if existing value is found"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update-for-sighting! state 6 {5 "Updated value"})
-          (is (= (update-params args state)
+          (is (= (update-params (calls) state)
                  {:sighting-field-value-id 2
                   :sighting-field-value-data "Updated value"})))))
 
     (testing "should mix updates and creates"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update-for-sighting! state 6 {5 "Updated value"
                                          1 "Create value"})
-          (is (= (update-params args state)
+          (is (= (update-params (calls) state)
                  {:sighting-field-value-id 2
                   :sighting-field-value-data "Updated value"}))
-          (is (= (create-params args state)
+          (is (= (create-params (calls) state)
                  {:sighting-field-id 1
                   :sighting-field-value-data "Create value"
                   :sighting-id 6})))))
 
     (testing "should not create or update a field if no change needed"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update-for-sighting! state 6 {5 "Value"})
-          (is (= (update-params args state) nil))
-          (is (= (create-params args state) nil)))))
+          (is (= (update-params (calls) state) nil))
+          (is (= (create-params (calls) state) nil)))))
 
     (testing "should not create or update a field if no change needed"
-      (with-spies [args]
+      (with-spies [calls]
         (let [state (gen-state)]
           (update-for-sighting! state 6 {5 "Value"})
-          (is (= (update-params args state) nil))
-          (is (= (create-params args state) nil)))))))
+          (is (= (update-params (calls) state) nil))
+          (is (= (create-params (calls) state) nil)))))))
