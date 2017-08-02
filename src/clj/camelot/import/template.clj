@@ -223,16 +223,19 @@ direction is considered negative."
    {:keys [tempfile :- s/Str
            content-type :- s/Str
            size :- s/Int]}]
-  (cond
-    (not= content-type "text/csv")
-    (throw (RuntimeException. "File format must be a CSV."))
+  (let [filedata (slurp tempfile)]
+    (cond
+      ;; Assume a non-empty file without a null-byte can be treated as a CSV.
+      (some zero? (map int filedata))
+      (throw (RuntimeException. "File format must be a CSV."))
 
-    (zero? size)
-    (throw (RuntimeException. "CSV must not be empty")))
+      (zero? size)
+      (throw (RuntimeException. "CSV must not be empty")))
 
-  (let [data (csv/read-csv (slurp tempfile))
-        props (calculate-column-properties data)]
-    {:default-mappings (assoc (assign-default-mappings props)
-                              :absolute-path "Absolute Path")
-     :column-properties props
-     :file-data data}))
+
+    (let [csvdata (csv/read-csv filedata)
+          props (calculate-column-properties csvdata)]
+      {:default-mappings (assoc (assign-default-mappings props)
+                                :absolute-path "Absolute Path")
+       :column-properties props
+       :file-data csvdata})))
