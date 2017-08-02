@@ -820,7 +820,8 @@
     :please-wait "Please wait for the import to commence."
     :status-code "Status code"
     :validation-missing "One or more required fields do not have a mapping assigned."
-    :validation-passed "Submit mappings for import."}
+    :validation-passed "Submit mappings for import."
+    :invalid-csv "File could not be uploaded. Please check it is a valid CSV and try again."}
 
    :camelot.component.survey.create
    {:search-instructions "Search and add species using the options to the right."

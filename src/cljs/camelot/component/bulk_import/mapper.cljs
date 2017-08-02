@@ -49,7 +49,8 @@
 
 (defn upload-pending-handler
   [data r]
-  (om/update! data :upload-pending true))
+  (om/update! data :upload-pending true)
+  (om/update! data :upload-failed nil))
 
 (defn field-mapping-option
   [data owner]
@@ -303,9 +304,11 @@
                                      :opts {:analytics-event "mapping-upload"
                                             :pending-handler (partial upload-pending-handler data)
                                             :success-handler (partial upload-success-handler data)
-                                            :failure-handler #(om/update! data :upload-pending false)
+                                            :failure-handler #(do (om/update! data :upload-pending false)
+                                                                  (om/update! data :upload-failed true))
                                             :endpoint "/surveys/bulkimport/columnmap"}})
-                          (if (:upload-pending data)
+                          (cond
+                            (:upload-pending data)
                             (dom/div #js {:className "align-center"}
                                      (dom/img #js {:className "spinner"
                                                    :src "images/spinner.gif"
@@ -313,6 +316,13 @@
                                                    :width "32"})
                                      (dom/p nil
                                             (tr/translate ::scanning)))
+
+                            (:upload-failed data)
+                            (dom/p #js {:className "validation-warning"
+                                        :style #js {"margin-top" "1rem"}}
+                                   (dom/label nil (tr/translate ::invalid-csv)))
+
+                            :default
                             (om/build column-mapping-form-component data
                                       {:init-state state}))))
         (dom/div #js {:className "align-center"}
