@@ -36,7 +36,7 @@ Installation
 ~~~~~~~~~~~~
 
 Download the `latest version of
-Camelot <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.3.0.zip>`__.
+Camelot <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.3.1.zip>`__.
 
 Unzip the archive. To run Camelot:
 
