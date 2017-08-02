@@ -22,9 +22,12 @@
     [org.clojure/tools.namespace "0.2.11"]
     [org.clojure/tools.cli "0.3.5"]
 
+    [com.cognitect/transit-clj "0.8.300"]
     [org.apache.derby/derby "10.12.1.1"]
     [org.omcljs/om "1.0.0-alpha32"
-     :exclusions [com.cognitect/transit-cljs cljsjs/react]]
+     :exclusions [com.cognitect/transit-clj
+                  com.cognitect/transit-cljs
+                  cljsjs/react]]
     [com.stuartsierra/component "0.3.1"]
     [compojure "1.5.0"]
     [ragtime "0.5.3"]
@@ -34,7 +37,7 @@
     [ring.middleware.logger "0.5.0"]
     [ring/ring-defaults "0.2.0"]
     [ring "1.4.0"]
-    [ring-transit "0.1.4"]
+    [ring-transit "0.1.4" :exclusions [com.cognitect/transit-clj]]
     [secretary "1.2.3"]
     [com.taoensso/tower "3.1.0-beta4"]
 
@@ -43,7 +46,7 @@
     [cheshire "5.6.1"]
     [clj-http "2.2.0"]
     [clj-time "0.11.0"]
-    [cljs-http "0.1.39"]
+    [cljs-http "0.1.39" :exclusions [com.cognitect/transit-clj]]
     [cljsjs/react-with-addons "0.14.3-0"]
     [com.andrewmcveigh/cljs-time "0.5.0"]
     [com.drewnoakes/metadata-extractor "2.9.1"]
