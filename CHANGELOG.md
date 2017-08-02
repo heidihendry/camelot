@@ -8,6 +8,13 @@
 * Fix bug in bulk import where trap stations are not reused when GPS coords are very precise
 * Fix missing form validation around sites and cameras when creating trap stations
 
+### 1.3.1
+#### Fixes
+* Fix silent failure to upload a non-valid CSV file for bulk import
+* Fix detection of CSV files for bulk import for some operating systems
+* Fix transient error which could arise when navigating to the library
+* Fix link to issues page when error occurs
+
 ### 1.3.0
 #### Enhancements
 * Adds user-definable fields for capturing additional sighting data ("sighting fields")
