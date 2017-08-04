@@ -21,8 +21,12 @@ Import".
 
 If unsure, you should choose "Create Survey" at this prompt. Should you choose
 "Set Up with Bulk Import", the survey will require the initial setup of the
-survey to be completed via Camelot's Bulk Import capabilities.  Refer to `Bulk
-Import <#bulk-import>`__ for more information on Bulk Import.
+survey to be completed via Camelot's Bulk Import capabilities.  Refer to
+|bulk_import| for more information.
+
+.. |bulk_import| raw:: html
+
+   <a href="bulkimport.html">Bulk Import</a>
 
 .. figure:: screenshot/survey-bulk-import-prompt.png
    :alt: Bulk Import prompt
