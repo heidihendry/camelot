@@ -60,3 +60,32 @@
       (is (= (sut/expand-cols sample-data [{:sighting-field-key "missing"
                                             :sighting-field-ordering 10}]
                               [:col1 :col2 :field-missing]) [:col1 :col2 :field-missing])))))
+
+(deftest test-aggregate-data
+  (testing "aggregate-data"
+    (testing "should not treat nil specially"
+      (letfn [(redfn [s col grp] (reduce + 0 (map #(or (get % col) 0) grp)))
+              (agg-reducer [s grp acc col] (assoc acc col (redfn s col grp)))]
+        (with-redefs [sut/aggregate-reducer agg-reducer]
+          (let [data [{:aggcol1 1
+                       :aggcol2 2
+                       :anchor 1}
+                      {:aggcol1 1
+                       :aggcol2 2
+                       :anchor 2}
+                      {:aggcol1 10
+                       :aggcol2 nil
+                       :anchor 1}]
+                state {}
+                cols [:aggcol1 :aggcol2 :anchor]
+                agg-cols [:aggcol1 :aggcol2]]
+            (is (= (sut/aggregate-data state cols agg-cols data)
+                   [{:aggcol1 11
+                     :aggcol2 2
+                     :anchor 1}
+                    {:aggcol1 11
+                     :aggcol2 2
+                     :anchor 1}
+                    {:aggcol1 1
+                     :aggcol2 2
+                     :anchor 2}]))))))))

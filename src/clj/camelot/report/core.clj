@@ -72,7 +72,7 @@
     (filter (partial apply-filters filters) data)
     data))
 
-(defn- aggregate-reducer
+(defn aggregate-reducer
   [state group acc c]
   (let [f (get-in @module/known-columns [c :aggregate])]
     (if f
@@ -82,14 +82,10 @@
 (defn- aggregate-groups
   [state aggregated-columns group]
   (let [col-vals (reduce (partial aggregate-reducer state group) {} aggregated-columns)
-        update-vals #(reduce-kv (fn [acc col v]
-                                  (if (nil? (get acc col))
-                                    acc
-                                    (assoc acc col v)))
-                                % col-vals)]
+        update-vals #(reduce-kv (fn [acc col v] (assoc acc col v)) % col-vals)]
     (map update-vals group)))
 
-(defn- aggregate-data
+(defn aggregate-data
   [state columns aggregated-columns data]
   (let [anchors (remove (set aggregated-columns) columns)
         groups (group-by #(select-keys % anchors) data)]

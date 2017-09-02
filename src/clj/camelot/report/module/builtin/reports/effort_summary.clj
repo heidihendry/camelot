@@ -18,7 +18,7 @@
                   :taxonomy-count
                   :time-period-start
                   :time-period-end]
-   :filters [#(= (:survey-id %) survey-id)]
+   :pre-filters [#(= (:survey-id %) survey-id)]
    :order-by [:site-id]})
 
 (defn form-smith
@@ -41,5 +41,5 @@
   :title ::title
   :description ::description
   :form form-smith
-  :by :all
+  :by :survey
   :for :survey})
