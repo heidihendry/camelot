@@ -34,12 +34,12 @@
   {:resource {}
    :layout [[:survey-site-id]]
    :schema {:survey-site-id
-            {:label (tr/translate state :survey/title)
-             :description (tr/translate state :survey/report-description)
+            {:label (tr/translate state :survey-site/title)
+             :description (tr/translate state :survey-site/report-description)
              :schema {:type :select
                       :required true
                       :get-options {:url "/survey-sites"
-                                    :label :site-name
+                                    :label :survey-site-label
                                     :value :survey-site-id}}}}})
 
 (module/register-report

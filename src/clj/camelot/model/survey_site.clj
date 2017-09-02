@@ -20,10 +20,23 @@
      survey-site-updated :- org.joda.time.DateTime
      survey-id :- s/Int
      site-id :- s/Int
-     site-name :- (s/maybe s/Str)]
+     site-name :- (s/maybe s/Str)
+     survey-site-label :- (s/maybe s/Str)]
   {s/Any s/Any})
 
-(def survey-site map->SurveySite)
+(defn- format-survey-site-label
+  [data]
+  (let [survey-name (:survey-name data)
+        site-name (:site-name data)]
+    (format "%s - %s" survey-name site-name)))
+
+(defn survey-site
+  [data]
+  (let [label (format-survey-site-label data)]
+    (-> data
+        (assoc :survey-site-label label)
+        map->SurveySite)))
+
 (def tsurvey-site map->TSurveySite)
 
 (s/defn get-all :- [SurveySite]

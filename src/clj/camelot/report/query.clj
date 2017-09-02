@@ -42,7 +42,7 @@
    :camera-id [[:camera-status-id] [:trap-station-session-camera-id]]
    :trap-station-session-id [[:trap-station-id] [:trap-station-session-camera-id]]
    :trap-station-id [[:survey-site-id] [:trap-station-session-id]]
-   :survey-site-id [[:survey-id :site-id] []]
+   :survey-site-id [[:survey-id :site-id] [:trap-station-id]]
    :species-mass-id [[] [:taxonomy-id]]
    :camera-status-id [[] [:camera-id]]
    :site-id [[] [:survey-site-id :trap-station-id]]
