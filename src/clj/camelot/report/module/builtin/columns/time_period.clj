@@ -5,7 +5,7 @@
    [clj-time.core :as t]
    [clj-time.format :as tf]))
 
-(def month-formatter (tf/formatter "YYYY-MM-dd"))
+(def date-formatter (tf/formatter "YYYY-MM-dd"))
 
 (defn before-reducer
   "Reducer returning the earliest date-time."
@@ -29,7 +29,7 @@
   [from-col to-col state data]
   (map #(assoc % to-col
                (some->> (get % from-col)
-                        (tf/unparse month-formatter)))
+                        (tf/unparse date-formatter)))
        data))
 
 (module/register-column
