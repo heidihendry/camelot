@@ -58,5 +58,4 @@
   :description ::description
   :output report-output
   :form form-smith
-  :by :all
-  :for :species})
+  :by :all})

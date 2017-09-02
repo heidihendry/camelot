@@ -52,5 +52,4 @@
   :description ::description
   :form form-smith
   :by :all
-  :for :survey
   :column-title-fn column-titles})

@@ -46,5 +46,4 @@
   :title ::title
   :description ::description
   :form form-smith
-  :by :survey
-  :for :survey})
+  :by :survey})
