@@ -47,8 +47,7 @@
   :title ::title-count
   :description ::description-count
   :form form-smith
-  :by :all
-  :for :species})
+  :by :all})
 
 (module/register-report
  :occupancy-matrix-presence
@@ -57,5 +56,4 @@
   :title ::title-presence
   :description ::description-presence
   :form form-smith
-  :by :all
-  :for :species})
+  :by :all})
