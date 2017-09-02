@@ -17,16 +17,24 @@
 (defn report
   [state id data]
   (with-redefs [camelot.model.sighting-field/get-all (constantly [])
-                camelot.model.survey/survey-settings (constantly {})]
+                camelot.model.survey/survey-settings (constantly {})
+                camelot.model.survey-site/get-specific (constantly
+                                                        {:survey-name "Survy"
+                                                         :site-name "Sitey"})]
     (sut/report :survey-site-statistics state {:survey-site-id id} data)))
 
 (defn csv-report
   [state id data]
   (with-redefs [camelot.model.sighting-field/get-all (constantly [])
-                camelot.model.survey/survey-settings (constantly {})]
+                camelot.model.survey/survey-settings (constantly {})
+                camelot.model.survey-site/get-specific (constantly
+                                                        {:survey-name "Survy"
+                                                         :site-name "Sitey"})]
     (sut/csv-report :survey-site-statistics state {:survey-site-id id} data)))
 
-(def headings ["Genus"
+(def headings ["Survey Name"
+               "Site Name"
+               "Genus"
                "Species"
                "Presence"
                "Independent Observations"
@@ -64,7 +72,7 @@
                              :trap-station-id 1})
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)])))))
+        (is (= result (list ["Survy" "Sitey" "Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)])))))
 
     (testing "Report with one sighting should contain its summary"
       (let [sightings (list {:taxonomy-id 2
@@ -80,7 +88,7 @@
                              :trap-station-id 1})
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)])))))
+        (is (= result (list ["Survy" "Sitey" "Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)])))))
 
     (testing "Should exclude sightings in other survey sites"
       (let [sightings (list {:taxonomy-id 2
@@ -107,7 +115,7 @@
                              :trap-station-id 2})
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)])))))
+        (is (= result (list ["Survy" "Sitey" "Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)])))))
 
     (testing "Should respect independence threshold setting"
       (let [sightings (list {:taxonomy-id 2
@@ -134,7 +142,7 @@
                              :trap-station-id 1})
             state (gen-state-helper {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" "X" 8 7 (calc-obs-nights 8 7)])))))
+        (is (= result (list ["Survy" "Sitey" "Smiley" "Wolf" "X" 8 7 (calc-obs-nights 8 7)])))))
 
     (testing "Should return a result per species even those not sighted at that location"
       (let [sightings (list {:taxonomy-id 2
@@ -172,9 +180,9 @@
                              :trap-station-id 3})
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["A" "Meerkat" nil nil 7 nil]
-                            ["Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)]
-                            ["Yellow" "Spotted Cat" nil nil 7 nil])))))
+        (is (= result (list ["Survy" "Sitey" "A" "Meerkat" nil nil 7 nil]
+                            ["Survy" "Sitey" "Smiley" "Wolf" "X" 3 7 (calc-obs-nights 3 7)]
+                            ["Survy" "Sitey" "Yellow" "Spotted Cat" nil nil 7 nil])))))
 
     (testing "Should return a result per species where all are in the same site"
       (let [sightings (list {:taxonomy-id 2
@@ -212,9 +220,9 @@
                              :trap-station-id 3})
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["A" "Meerkat" "X" 1 21 (calc-obs-nights 1 21)]
-                            ["Smiley" "Wolf" "X" 3 21 (calc-obs-nights 3 21)]
-                            ["Yellow" "Spotted Cat" "X" 5 21 (calc-obs-nights 5 21)])))))
+        (is (= result (list ["Survy" "Sitey" "A" "Meerkat" "X" 1 21 (calc-obs-nights 1 21)]
+                            ["Survy" "Sitey" "Smiley" "Wolf" "X" 3 21 (calc-obs-nights 3 21)]
+                            ["Survy" "Sitey" "Yellow" "Spotted Cat" "X" 5 21 (calc-obs-nights 5 21)])))))
 
     (testing "Should group multiple sightings from different camera traps"
       (let [sightings (list {:taxonomy-id 2
@@ -252,8 +260,8 @@
                              :trap-station-id 3})
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" "X" 4 14 (calc-obs-nights 4 14)]
-                            ["Yellow" "Spotted Cat" "X" 5 14 (calc-obs-nights 5 14)]))))))
+        (is (= result (list ["Survy" "Sitey" "Smiley" "Wolf" "X" 4 14 (calc-obs-nights 4 14)]
+                            ["Survy" "Sitey" "Yellow" "Spotted Cat" "X" 5 14 (calc-obs-nights 5 14)]))))))
 
   (testing "Survey site report CSV output"
     (testing "CSV should contain header row"
@@ -299,6 +307,6 @@
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (csv-report state 1 sightings)]
         (is (= result (str (str/join "," headings) "\n"
-                           "A,Meerkat,-,-,7,-\n"
-                           "Smiley,Wolf,X,3,7," (calc-obs-nights 3 7) "\n"
-                           "Yellow,Spotted Cat,-,-,7,-\n")))))))
+                           "Survy,Sitey,A,Meerkat,-,-,7,-\n"
+                           "Survy,Sitey,Smiley,Wolf,X,3,7," (calc-obs-nights 3 7) "\n"
+                           "Survy,Sitey,Yellow,Spotted Cat,-,-,7,-\n")))))))

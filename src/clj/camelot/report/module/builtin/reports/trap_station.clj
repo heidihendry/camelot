@@ -1,33 +1,43 @@
 (ns camelot.report.module.builtin.reports.trap-station
   (:require
+   [camelot.model.trap-station :as trap-station]
    [camelot.report.module.core :as module]
    [camelot.translation.core :as tr]))
 
+(defn include?
+  [trap-station-id record]
+  (= (:orig-ts-id record) trap-station-id))
+
 (defn report-output
   [state {:keys [trap-station-id]}]
-  {:columns [:taxonomy-genus
-             :taxonomy-species
-             :presence-absence
-             :independent-observations
-             :total-nights
-             :independent-observations-per-night]
-   :aggregate-on [:independent-observations]
-   :rewrites [#(if (= (:trap-station-id %) trap-station-id)
-                 %
-                 (select-keys % [:taxonomy-species
-                                 :taxonomy-genus]))]
-   :pre-transforms [#(if (= (:trap-station-id %) trap-station-id)
-                       %
-                       (select-keys % [:taxonomy-species
-                                       :taxonomy-genus
-                                       :total-nights]))]
-   :transforms [#(if (= (:trap-station-id %) trap-station-id)
-                       %
-                       (select-keys % [:taxonomy-species
-                                       :taxonomy-genus
-                                       :total-nights]))]
-   :filters [#(:taxonomy-species %)]
-   :order-by [:taxonomy-genus :taxonomy-species]})
+  (let [ts (trap-station/get-specific state trap-station-id)]
+    {:columns [:trap-station-id
+               :trap-station-name
+               :taxonomy-genus
+               :taxonomy-species
+               :presence-absence
+               :independent-observations
+               :total-nights
+               :independent-observations-per-night]
+     :aggregate-on [:independent-observations]
+     :rewrites [#(assoc % :orig-ts-id (:trap-station-id %))
+                #(if (include? trap-station-id %)
+                   %
+                   (select-keys % [:taxonomy-species
+                                   :taxonomy-genus]))
+                #(if (nil? (:trap-station-id %))
+                   (assoc % :trap-station-id (:trap-station-id ts)
+                          :trap-station-name (:trap-station-name ts))
+                   %)]
+     :transforms [#(if (include? trap-station-id %)
+                     %
+                     (select-keys % [:taxonomy-species
+                                     :taxonomy-genus
+                                     :trap-station-id
+                                     :trap-station-name
+                                     :total-nights]))]
+     :filters [#(:taxonomy-species %)]
+     :order-by [:trap-station-id :taxonomy-genus :taxonomy-species]}))
 
 (defn form-smith
   [state]
