@@ -20,6 +20,7 @@
      survey-site-updated :- org.joda.time.DateTime
      survey-id :- s/Int
      site-id :- s/Int
+     survey-name :- (s/maybe s/Str)
      site-name :- (s/maybe s/Str)
      survey-site-label :- (s/maybe s/Str)]
   {s/Any s/Any})

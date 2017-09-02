@@ -5,7 +5,8 @@
 
 (defn report-output
   [state {:keys [survey-id]}]
-  {:columns [:site-id
+  {:columns [:survey-name
+             :site-id
              :site-name
              :site-area
              :trap-station-count
@@ -18,7 +19,11 @@
                   :taxonomy-count
                   :time-period-start
                   :time-period-end]
-   :pre-filters [#(= (:survey-id %) survey-id)]
+   :pre-filters [#(or (not (and (integer? survey-id)
+                                (pos? ^long survey-id)))
+                      (= (:survey-id %) survey-id))
+                 #(and (not (nil? (:time-period-start %)))
+                       (not (nil? (:time-period-end %))))]
    :order-by [:site-id]})
 
 (defn form-smith
@@ -29,7 +34,7 @@
             {:label (tr/translate state :survey/title)
              :description (tr/translate state :survey/report-description)
              :schema {:type :select
-                      :required true
+                      :required false
                       :get-options {:url "/surveys"
                                     :label :survey-name
                                     :value :survey-id}}}}})
