@@ -67,6 +67,7 @@
 
    :survey-site
    {:title "Survey Site"
+    :report-description "Data from a site within a specific survey."
     :sidebar-title "Survey Sites"
     :site-id.label "Site"
     :site-id.description "The site to add to the survey"}
