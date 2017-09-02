@@ -19,16 +19,19 @@
 (defn report
   [state id data]
   (with-redefs [camelot.model.sighting-field/get-all (constantly [])
-                camelot.model.survey/survey-settings (constantly {})]
+                camelot.model.survey/survey-settings (constantly {})
+                camelot.model.survey/get-specific (constantly {:survey-name "Survy"})]
     (sut/report :summary-statistics state {:survey-id id} data)))
 
 (defn csv-report
   [state id data]
   (with-redefs [camelot.model.sighting-field/get-all (constantly [])
-                camelot.model.survey/survey-settings (constantly {})]
+                camelot.model.survey/survey-settings (constantly {})
+                camelot.model.survey/get-specific (constantly {:survey-name "Survy"})]
     (sut/csv-report :summary-statistics state {:survey-id id} data)))
 
-(def headings ["Genus"
+(def headings ["Survey Name"
+               "Genus"
                "Species"
                "Number of Trap Stations"
                "Number of Photos"
@@ -77,7 +80,7 @@
                                        :trap-station-id 1}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 1 1 3 "0.00" 7 (calc-obs-nights 3 7)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 1 1 3 "0.00" 7 (calc-obs-nights 3 7)])))))
 
     (testing "Report for one sighting should contain its summary"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -93,7 +96,7 @@
                                        :trap-station-id 1}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 1 1 3 "0.00" 7 (calc-obs-nights 3 7)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 1 1 3 "0.00" 7 (calc-obs-nights 3 7)])))))
 
     (testing "Should account for dependence in sightings"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -120,7 +123,7 @@
                                        :trap-station-id 1}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 1 2 5 "0.00" 7 (calc-obs-nights 5 7)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 1 2 5 "0.00" 7 (calc-obs-nights 5 7)])))))
 
     (testing "Should respect independence threshold setting"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -147,7 +150,7 @@
                                        :trap-station-id 1}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 10})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 1 2 8 "0.00" 7 (calc-obs-nights 8 7)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 1 2 8 "0.00" 7 (calc-obs-nights 8 7)])))))
 
     (testing "Should not consider sightings dependent across trap stations"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -174,7 +177,7 @@
                                        :trap-station-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 2 8 "0.00" 14 (calc-obs-nights 8 14)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 2 8 "0.00" 14 (calc-obs-nights 8 14)])))))
 
     (testing "Should return a result per species, sightings across different trap stations"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -212,9 +215,9 @@
                                        :trap-station-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["A" "Meerkat" 1 1 1 "0.00" 45 (calc-obs-nights 1 45)]
-                            ["Smiley" "Wolf" 1 1 3 "0.00" 45 (calc-obs-nights 3 45)]
-                            ["Yellow" "Spotted Cat" 1 1 5 "0.00" 45 (calc-obs-nights 5 45)])))))
+        (is (= result (list ["Survy" "A" "Meerkat" 1 1 1 "0.00" 45 (calc-obs-nights 1 45)]
+                            ["Survy" "Smiley" "Wolf" 1 1 3 "0.00" 45 (calc-obs-nights 3 45)]
+                            ["Survy" "Yellow" "Spotted Cat" 1 1 5 "0.00" 45 (calc-obs-nights 5 45)])))))
 
     (testing "Should return a result per species, sightings in same trap station session"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -252,9 +255,9 @@
                                        :trap-station-id 1}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["A" "Meerkat" 1 1 1 "0.00" 7 (calc-obs-nights 1 7)]
-                            ["Smiley" "Wolf" 1 1 3 "0.00" 7 (calc-obs-nights 3 7)]
-                            ["Yellow" "Spotted Cat" 1 1 5 "0.00" 7 (calc-obs-nights 5 7)])))))
+        (is (= result (list ["Survy" "A" "Meerkat" 1 1 1 "0.00" 7 (calc-obs-nights 1 7)]
+                            ["Survy" "Smiley" "Wolf" 1 1 3 "0.00" 7 (calc-obs-nights 3 7)]
+                            ["Survy" "Yellow" "Spotted Cat" 1 1 5 "0.00" 7 (calc-obs-nights 5 7)])))))
 
     (testing "Should include trap session dates for stations without sightings"
       (let [sightings (list (->record {:species-scientific-name nil
@@ -299,8 +302,8 @@
                                        :trap-station-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["A" "Meerkat" 1 1 1 "0.00" 51 (calc-obs-nights 1 51)]
-                            ["Yellow" "Spotted Cat" 1 1 5 "0.00" 51 (calc-obs-nights 5 51)])))))
+        (is (= result (list ["Survy" "A" "Meerkat" 1 1 1 "0.00" 51 (calc-obs-nights 1 51)]
+                            ["Survy" "Yellow" "Spotted Cat" 1 1 5 "0.00" 51 (calc-obs-nights 5 51)])))))
 
     (testing "Should return only details for the species for the given survey ID"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -338,9 +341,9 @@
                                        :trap-station-id 1}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["A" "Meerkat" 1 1 1 "0.00" 7 (calc-obs-nights 1 7)]
-                            ["Smiley" "Wolf" 0 0 0 nil 7 (calc-obs-nights 0 7)]
-                            ["Yellow" "Spotted Cat" 0 0 0 nil 7 (calc-obs-nights 0 7)])))))
+        (is (= result (list ["Survy" "A" "Meerkat" 1 1 1 "0.00" 7 (calc-obs-nights 1 7)]
+                            ["Survy" "Smiley" "Wolf" 0 0 0 nil 7 (calc-obs-nights 0 7)]
+                            ["Survy" "Yellow" "Spotted Cat" 0 0 0 nil 7 (calc-obs-nights 0 7)])))))
 
     (testing "Should group multiple sightings from different camera traps"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -378,8 +381,8 @@
                                        :trap-station-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 2 4 "0.00" 14 (calc-obs-nights 4 14)]
-                            ["Yellow" "Spotted Cat" 1 1 5 "0.00" 14 (calc-obs-nights 5 14)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 2 4 "0.00" 14 (calc-obs-nights 4 14)]
+                            ["Survy" "Yellow" "Spotted Cat" 1 1 5 "0.00" 14 (calc-obs-nights 5 14)])))))
 
     (testing "Should calculate percentage of nocturnal sightings"
       (let [sightings (list (->record {:taxonomy-id 2
@@ -417,8 +420,8 @@
                                        :trap-station-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 2 4 "25.00" 14 (calc-obs-nights 4 14)]
-                            ["Yellow" "Spotted Cat" 1 1 5 "100.00" 14 (calc-obs-nights 5 14)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 2 4 "25.00" 14 (calc-obs-nights 4 14)]
+                            ["Survy" "Yellow" "Spotted Cat" 1 1 5 "100.00" 14 (calc-obs-nights 5 14)])))))
 
     (testing "Dependent sightings which start at night should be classified as a night sighting."
       (let [sightings (list (->record {:taxonomy-id 2
@@ -456,7 +459,7 @@
                                        :trap-station-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 3 2 "100.00" 14 (calc-obs-nights 2 14)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 3 2 "100.00" 14 (calc-obs-nights 2 14)])))))
 
     (testing "The number of sightings in a dependent sighting should affect the quantity."
       (let [sightings (list (->record {:taxonomy-id 2
@@ -494,7 +497,7 @@
                                        :trap-station-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 3 10 "90.00" 14 (calc-obs-nights 10 14)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 3 10 "90.00" 14 (calc-obs-nights 10 14)])))))
 
     (testing "Media with two different sightings should be calculated correctly."
       (let [sightings (list (->record {:taxonomy-id 2
@@ -533,8 +536,8 @@
                                        :trap-station-id 3}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 2 2 "50.00" 14 (calc-obs-nights 2 14)]
-                            ["Yellow" "Spotted Cat" 1 1 2 "100.00" 14 (calc-obs-nights 2 14)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 2 2 "50.00" 14 (calc-obs-nights 2 14)]
+                            ["Survy" "Yellow" "Spotted Cat" 1 1 2 "100.00" 14 (calc-obs-nights 2 14)])))))
 
     (testing "Media from separate trap stations sessions are not to be considered dependent for nocturnal calculations."
       (let [sightings (list (->record {:taxonomy-id 2
@@ -561,7 +564,7 @@
                                        :trap-station-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 2 2 "50.00" 14 (calc-obs-nights 2 14)])))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 2 2 "50.00" 14 (calc-obs-nights 2 14)])))))
 
     (testing "Independent sighting figures must not be counted twice."
       (let [sightings (list (->record {:taxonomy-id 2
@@ -599,7 +602,7 @@
                                        :trap-station-id 2}))
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (report state 1 sightings)]
-        (is (= result (list ["Smiley" "Wolf" 2 3 4 "25.00" 14 (calc-obs-nights 4 14)]))))))
+        (is (= result (list ["Survy" "Smiley" "Wolf" 2 3 4 "25.00" 14 (calc-obs-nights 4 14)]))))))
 
   (testing "CSV output"
     (testing "CSV should contain header row"
@@ -645,5 +648,5 @@
             state (gen-state-helper {:sighting-independence-minutes-threshold 20})
             result (csv-report state 1 sightings)]
         (is (= result (str (str/join "," headings) "\n"
-                           "Smiley,Wolf,2,2,4,0.00,14," (calc-obs-nights 4 14) "\n"
-                           "Yellow,Spotted Cat,1,1,5,0.00,14," (calc-obs-nights 5 14) "\n")))))))
+                           "Survy,Smiley,Wolf,2,2,4,0.00,14," (calc-obs-nights 4 14) "\n"
+                           "Survy,Yellow,Spotted Cat,1,1,5,0.00,14," (calc-obs-nights 5 14) "\n")))))))

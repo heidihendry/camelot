@@ -1,27 +1,33 @@
 (ns camelot.report.module.builtin.reports.summary-statistics
   (:require
+   [camelot.model.survey :as survey]
    [camelot.report.module.core :as module]
    [camelot.translation.core :as tr]))
 
 (defn report-output
   [state {:keys [survey-id]}]
-  {:columns [:taxonomy-genus
-             :taxonomy-species
-             :trap-station-count
-             :media-count
-             :independent-observations
-             :percent-nocturnal
-             :total-nights
-             :independent-observations-per-night]
-   :aggregate-on [:media-count
-                  :percent-nocturnal
-                  :independent-observations
-                  :trap-station-count]
-   :rewrites [#(if (= (:survey-id %) survey-id)
-                 %
-                 (select-keys % [:taxonomy-species :taxonomy-genus]))]
-   :filters [#(not (nil? (:taxonomy-species %)))]
-   :order-by [:taxonomy-genus :taxonomy-species]})
+  (let [survey (survey/get-specific state survey-id)]
+    {:columns [:survey-name
+               :taxonomy-genus
+               :taxonomy-species
+               :trap-station-count
+               :media-count
+               :independent-observations
+               :percent-nocturnal
+               :total-nights
+               :independent-observations-per-night]
+     :aggregate-on [:media-count
+                    :percent-nocturnal
+                    :independent-observations
+                    :trap-station-count]
+     :rewrites [#(if (= (:survey-id %) survey-id)
+                   %
+                   (select-keys % [:taxonomy-species :taxonomy-genus]))
+                #(if (nil? (:survey-name %))
+                   (assoc % :survey-name (:survey-name survey))
+                   %)]
+     :filters [#(not (nil? (:taxonomy-species %)))]
+     :order-by [:taxonomy-genus :taxonomy-species]}))
 
 (defn form-smith
   [state]
