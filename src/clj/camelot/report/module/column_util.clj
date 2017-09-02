@@ -90,7 +90,7 @@
   (aggregate-numeric :trap-station-session-id state col data))
 
 (s/defn aggregate-with-reducer
-  [pred :- IFn
+  [reducer :- IFn
    group-col :- s/Keyword
    state :- State
    col :- s/Keyword
@@ -99,8 +99,8 @@
        (group-by group-col)
        (vals)
        (map #(get (first %) col))
-       (flatten)
-       (reduce pred nil)))
+       flatten
+       (reduce reducer nil)))
 
 (defn- species-sighting-reducer
   [acc v]
