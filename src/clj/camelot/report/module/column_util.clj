@@ -144,14 +144,15 @@
   [sample]
   (let [start (:trap-station-session-start-date sample)
         end (:trap-station-session-end-date sample)]
-    (if (or (nil? start) (nil? end))
+    (if (or (nil? start)
+            (nil? end))
       0
       (t/in-days (t/interval (t/floor start t/day)
                              (t/floor end t/day))))))
 
 (defn- trap-session-nights-reducer
   [acc k v]
-  (assoc acc k (if (seq v)
+  (assoc acc k (if (seq (remove #(:trap-station-session-camera-media-unrecoverable %) v))
                  (get-nights-for-sample (first v))
                  0)))
 
@@ -162,6 +163,7 @@
        (reduce-kv trap-session-nights-reducer {})))
 
 (s/defn calculate-nights-elapsed
+  "Assoc the number of nights elapsed where at least one camera was active."
   [state :- State
    data :- [{s/Keyword s/Any}]]
   (let [nights (get-nights-for-sessions data)]
@@ -169,7 +171,8 @@
                  (get nights (:trap-station-session-id %))) data)))
 
 (s/defn calculate-total-nights
-  "Assoc the number of nights elapsed for a session."
+  "Assoc the total number of nights cameras were active. Multiple active
+  cameras on one night all contribute to the total."
   [state :- State
    data :- [{s/Keyword s/Any}]]
   (let [nights (get-nights-for-sessions data)
