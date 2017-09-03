@@ -1,7 +1,7 @@
 (ns camelot.report.module.column-util-test
   (:require [camelot.report.module.column-util :as sut]
             [clojure.test :refer :all]
-            [camelot.testutil.state :as state]
+            [camelot.test-util.state :as state]
             [clj-time.core :as t]))
 
 (defn calculate-nights-elapsed
