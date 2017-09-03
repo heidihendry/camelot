@@ -13,7 +13,7 @@ echo "Ensuring branch is clean..."
 git status | grep -qE 'working tree clean|branch is up-to-date'
 
 echo "Bumping release version... "
-sed -i "s/\+version\+\s\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"/\+version\+ \"\1\"/" ${BUILD_FILE}
+sed -i "s/+version+\s\+\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"/\+version\+ \"\1\"/" ${BUILD_FILE}
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${BUILD_FILE} | head -n1)"
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${README_FILE}
 sed -i "s/\([0-9]\+\.[0-9]\+\.[0-9]\+\)\]/${released_version}\]/" ${README_FILE}
