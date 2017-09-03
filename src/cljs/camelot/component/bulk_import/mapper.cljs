@@ -3,6 +3,7 @@
   (:require
    [cljs.core.async :refer [chan]]
    [om.core :as om]
+   [camelot.util.data :as util.data]
    [camelot.translation.core :as tr]
    [camelot.component.util :as util]
    [camelot.util.model :as model]
@@ -60,12 +61,40 @@
       (dom/option #js {:value (first data)}
                   (first data)))))
 
+(def ^:private sighting-fields [:taxonomy-genus
+                                :taxonomy-species
+                                :sighting-quantity
+                                :taxonomy-common-name])
+
+(defn- sightings-partially-mapped?
+  [mappings]
+  (let [mapped-count (->> (select-keys mappings sighting-fields)
+                          vals
+                          (remove nil?)
+                          count)]
+    (not (or (zero? mapped-count) (= mapped-count (count sighting-fields))))))
+
+(defn translated-sighting-field-names
+  "Pretty human-readable list of sighting fields."
+  []
+  (tr/list-to-user-string
+   (map #(tr/translate (keyword (str "report/" (name %)))) sighting-fields)))
+
 (defn validation-summary
   "Return a summary of the validation state"
-  [problem]
-  (case problem
-    :mismatch {:result :fail :reason (tr/translate ::validation-mismatch)}
-    :missing {:result :fail :reason (tr/translate ::validation-missing)}
+  [problem mappings]
+  (cond
+    (= problem :mismatch)
+    {:result :fail :reason (tr/translate ::validation-mismatch)}
+
+    (= problem :missing)
+    {:result :fail :reason (tr/translate ::validation-missing)}
+
+    (sightings-partially-mapped? mappings)
+    {:result :fail :reason (tr/translate ::sightings-partially-mapped
+                                         (translated-sighting-field-names))}
+
+    :default
     {:result :pass :reason (tr/translate ::validation-passed)}))
 
 (defn cancel-button-component
@@ -227,7 +256,7 @@
                                 (model/optional-fields (:mappable-fields data))))
                     {:init-state state
                      :key :vkey})
-                   (let [vs (validation-summary (:validation-problem data))]
+                   (let [vs (validation-summary (:validation-problem data) colmaps)]
                      (dom/div nil
                               (when (= (:result vs) :fail)
                                 (dom/label #js {:className "validation-warning"}
@@ -235,7 +264,7 @@
                               (dom/div #js {:className "button-container pull-right"}
                                        (om/build cancel-button-component data)
                                        (dom/button #js {:className "btn btn-primary"
-                                                        :disabled (when (or (:validation-problem data)
+                                                        :disabled (when (or (= (:result vs) :fail)
                                                                             (:show-import-status-dialog data))
                                                                     "disabled")
                                                         :onClick #(submit-mappings data)

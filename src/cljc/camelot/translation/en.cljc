@@ -821,6 +821,7 @@
     :please-wait "Please wait for the import to commence."
     :status-code "Status code"
     :validation-missing "One or more required fields do not have a mapping assigned."
+    :sightings-partially-mapped "One or more sighting fields are set, but a selection must be made for either all or none. The sighting fields are: %s."
     :validation-passed "Submit mappings for import."
     :invalid-csv "File could not be uploaded. Please check it is a valid CSV and try again."}
 

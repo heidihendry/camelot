@@ -1,6 +1,7 @@
 (ns camelot.translation.core
   (:require [taoensso.tower :as tower :refer-macros [with-tscope dict-compile*]]
             [camelot.state :as state]
+            [clojure.string :as string]
             [goog.string :as gstr]))
 
 (def tconfig
@@ -28,3 +29,20 @@
     (if (seq vars)
       (apply gstr/format (tlookup tkey) vars)
       (tlookup tkey))))
+
+(defn- long-list-to-user-string
+  [l]
+  (let [rl (reverse l)]
+    (->> rl
+         rest
+         (cons (gstr/format "%s %s" (translate :words/and-lc) (first rl)))
+         reverse
+         (string/join ", "))))
+
+(defn list-to-user-string
+  [l]
+  (case (count l)
+    0 nil
+    1 (first l)
+    2 (gstr/format "%s %s %s" (first l) (translate :words/and-lc) (second l))
+    (long-list-to-user-string l)))
