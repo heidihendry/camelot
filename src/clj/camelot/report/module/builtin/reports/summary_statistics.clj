@@ -49,4 +49,4 @@
   :description ::description
   :output report-output
   :form form-smith
-  :by :all})
+  :by :survey})
