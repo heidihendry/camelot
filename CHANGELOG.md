@@ -5,8 +5,18 @@
 * Allow sightings to be edited
 
 #### Fixes
-* Fix bug in bulk import where trap stations are not reused when GPS coords are very precise
 * Fix missing form validation around sites and cameras when creating trap stations
+
+### 1.3.2
+#### Enhancements
+* Allow effort summary to be created across all surveys
+* Add columns for reporting context to effort summary, survey site, trap station and summary statistics reports
+* Report columns 'total nights' & 'nights elapsed' now exclude sessions where no media was recoverable
+* Add validation for partial sighting configuration during bulk import
+
+#### Fixes
+* Fix lack of detail for options for survey site report
+* Fix period start/end dates in effort estimate report
 
 ### 1.3.1
 #### Fixes
@@ -14,6 +24,7 @@
 * Fix detection of CSV files for bulk import for some operating systems
 * Fix transient error which could arise when navigating to the library
 * Fix link to issues page when error occurs
+* Fix bug in bulk import where trap stations are not reused when GPS coords are very precise
 
 ### 1.3.0
 #### Enhancements
