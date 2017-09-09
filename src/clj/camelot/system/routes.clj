@@ -183,7 +183,7 @@
            (DELETE "/:id" [id] (crud/delete-resource media/delete! id (assoc state :session session)))
            (GET "/photo/:filename" [filename] (let [style :original]
                                                 {:status 200
-                                                 :headers {"Content-Type" "image/jpeg; charset=utf-8"}
+                                                 :headers {"Content-Type" "video/mp4; charset=utf-8"}
                                                  :body (media/read-media-file (assoc state :session session)
                                                                               filename (keyword style))}))
            (GET "/photo/:filename/:style" [filename style] {:status 200

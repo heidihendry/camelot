@@ -2,14 +2,16 @@
   (:require
    [camelot.util.config :as config]
    [camelot.util.file :as file]
+   [camelot.import.store :as store]
+   [camelot.import.video :as video]
    [clojure.java.io :as io]
    [clojure.string :as str]
    [mikera.image.core :as image]
    [clojure.tools.logging :as log])
   (:import
    (org.apache.commons.lang3 SystemUtils)
-   (java.util UUID)
-   (java.io IOException)
+   (java.nio.file Files)
+   (java.io IOException File)
    (java.awt.image BufferedImage)))
 
 (defn- save-pathname
@@ -32,28 +34,32 @@
   [^BufferedImage image dest]
   (save-pathname #(image/save image % :quality 0.7 :progressive false) dest))
 
+(defn video-file?
+  [^File path]
+  (re-find #"^video/" (Files/probeContentType (.toPath path))))
+
+(defn load-image
+  [^File path]
+  (if (video-file? path)
+    (video/get-thumb-frame (file/get-path path))
+    (image/load-image path)))
+
 (defn- create-variant
   [path target width]
-  (let [img (image/load-image path)]
+  (let [img (load-image path)]
     (store-variant (image/resize img width) target)))
 
 (defn- create-image
   [state path file-basename extension variant width]
-  (let [fdir (io/file (get-in state [:config :path :media])
-                      (subs (str/lower-case file-basename) 0 2))]
-    (when-not (file/exists? fdir)
-      (file/mkdir fdir))
-    (let [target (file/->file fdir
-                              (str variant
-                                   (str/lower-case file-basename)))]
-      (if width
-        ;; Always create variants as .png; OpenJDK cannot write .jpg
-        (create-variant path (str (file/get-path target) ".png") width)
-        (store-original path (str (file/get-path target) "." extension))))))
+  (let [target (store/path state file-basename variant)]
+    (if width
+      ;; Always create variants as .png; OpenJDK cannot write .jpg
+      (create-variant path (str (file/get-path target) ".png") width)
+      (store-original path (str (file/get-path target) "." extension)))))
 
 (defn create-image-files
   [state path extension]
-  (let [filename (str/lower-case (UUID/randomUUID))]
+  (let [filename (store/new-filename)]
     (dorun (map (fn [[k v]] (create-image state path filename extension k v))
                 image-variants))
     filename))

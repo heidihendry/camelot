@@ -53,13 +53,22 @@
     [com.luckycatlabs/SunriseSunsetCalculator "1.2"]
     [commons-io/commons-io "2.4"]
     [environ "1.0.2"]
+    [org.jcodec/jcodec "0.2.1"]
+    [org.jcodec/jcodec-javase "0.2.1"]
     [net.mikera/imagez "0.10.0"]
+    [com.vividsolutions/jts "1.13"]
+    [com.asprise.ocr/java-ocr-api "15.3.0.3"]
+    [org.bytedeco/javacv "1.3.2"]
+    [org.bytedeco.javacpp-presets/ffmpeg "3.2.1-1.3"]
+    [org.bytedeco.javacpp-presets/leptonica "1.73-1.3"]
+    [org.bytedeco.javacpp-presets/tesseract-platform "3.04.01-1.3"]
     [org.apache.commons/commons-lang3 "3.4"]
     [prismatic/schema "1.1.6"]])
 
 (set-env!
  :source-paths #{"src/cljc" "src/clj" "src/cljs"}
  :resource-paths #{"resources"}
+ :repositories #(conj % '["osgeo" {:url "http://download.osgeo.org/webdav/geotools/"}])
  :dependencies dependencies)
 
 (require '[adzerk.boot-cljs :refer [cljs]]

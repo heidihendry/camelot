@@ -3,16 +3,19 @@
   (:require
    [schema.core :as s]
    [camelot.util.capture :as capture]
+   [camelot.import.video :as video]
    [camelot.system.state :refer [State]]
    [camelot.import.dirtree :as dt]
    [camelot.import.metadata-utils :as mutil]
    [camelot.util.db :as db]
    [camelot.import.image :as image]
+   [camelot.import.cameras :as import.cameras]
    [camelot.model.media :as media]
    [camelot.model.photo :as photo]
    [camelot.model.trap-station-session :as trap-station-session]
    [clj-time.core :as t]
    [clojure.string :as str]
+   [clojure.java.io :as io]
    [camelot.translation.core :as tr])
   (:import
    (camelot.model.trap_station_session TrapStationSession)))
@@ -34,9 +37,23 @@
      :trap-station-session-camera-id trap-camera-id})))
 
 (s/defn read-photo
-  "Read and standardise file metadata."
+  "Read and standardise file metadata from an image."
   [state tempfile]
   (mutil/parse state (dt/file-raw-metadata state tempfile)))
+
+(s/defn read-video
+  "Read and standardise file metadata from a video."
+  [state session-camera-id file]
+  (let [camera (:cuddeback-default import.cameras/cameras)]
+    {:datetime (video/get-timestamp camera file)}))
+
+(defn extract-metadata
+  "Read and standardise file metadata from a capture."
+  [state session-camera-id tempfile]
+  (let [f (io/file tempfile)]
+    (if (image/video-file? tempfile)
+      (read-video state session-camera-id tempfile)
+      (read-photo state tempfile))))
 
 (defn create-record!
   "Create the media and photo records."
@@ -74,7 +91,7 @@
            size :- s/Int]}]
   (let [sess (trap-station-session/get-specific-by-trap-station-session-camera-id
               state session-camera-id)
-        photo (read-photo state tempfile)]
-    (if (or (nil? photo) (not (valid-session-date? sess (:datetime photo))))
+        capture (extract-metadata state session-camera-id tempfile)]
+    (if (or (nil? capture) (not (valid-session-date? sess (:datetime capture))))
       {:error (tr/translate state ::timestamp-outside-range)}
-      (create-media-and-image! state content-type tempfile size session-camera-id photo))))
+      (create-media-and-image! state content-type tempfile size session-camera-id capture))))
