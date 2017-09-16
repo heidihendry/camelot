@@ -54,21 +54,17 @@
 (defn settings-hide!
   "Hide the settings panel"
   []
-  (let [elt (js/document.getElementById "settings")
-        navelt (js/document.getElementById "settings-nav")]
-    (when elt
-      (set! (.-className elt) ""))
-    (when navelt
-      (set! (.-className navelt) (clojure.string/replace-first
-                                  (.-className navelt) #"active" "")))))
+  (let [navelt (js/document.getElementById "settings-nav")]
+    (aset navelt "className" (clojure.string/replace-first
+                              (aget navelt "className") #"active " ""))
+    (aset (js/document.getElementById "settings") "className" "")))
 
 (defn settings-show!
   "Show the settings panel"
   []
-  (let [elt (js/document.getElementById "settings")
-        navelt (js/document.getElementById "settings-nav")]
-    (set! (.-className elt) "show")
-    (set! (.-className navelt) (str "active " (.-className navelt)))))
+  (let [navelt (js/document.getElementById "settings-nav")]
+    (aset navelt "className" (str "active " (.-className navelt)))
+    (aset (js/document.getElementById "settings") "className" "show")))
 
 (defn toggle-settings!
   "Toggle the settings panel show state"
@@ -202,7 +198,8 @@
     (render [_]
       (cond
         (= (:function data) "settings")
-        (dom/li #js {:id "settings-nav" :className "icon-only"
+        (dom/li #js {:id "settings-nav"
+                     :className "icon-only"
                      :onClick #(toggle-settings!)}
                 (dom/a nil (dom/span #js {:className "fa fa-cogs fa-2x"})))
 
