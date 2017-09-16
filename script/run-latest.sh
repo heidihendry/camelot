@@ -18,6 +18,6 @@ else
 fi
 
 git pull | grep "Already up-to-date" > /dev/null
-$(dirname $0)/clean-build.sh
+$(dirname $0)/build.sh
 
 $BOOT dev

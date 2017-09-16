@@ -13,8 +13,4 @@ else
     BOOT=$(which boot)
 fi
 
-if [ -e $(dirname $(dirname $0))/target/camelot.jar ]; then
-    echo "camelot.jar already built"
-else
-    $BOOT uberjar
-fi
+$BOOT uberjar
