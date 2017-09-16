@@ -13,7 +13,7 @@
     [org.apache.derby/derbytools "10.12.1.1" :scope "test"]
 
     [org.clojure/clojure "1.8.0"]
-    [org.clojure/clojurescript "1.9.908"]
+    [org.clojure/clojurescript "1.9.671"]
     [org.clojure/core.async "0.2.391"]
     [org.clojure/data.csv "0.1.3"]
     [org.clojure/java.jdbc "0.4.2"]
