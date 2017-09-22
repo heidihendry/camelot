@@ -24,7 +24,7 @@
     (try (edn/read-string v)
          (catch java.lang.Exception e
            (do
-             (log/warn "as-long: Attemp to read-string on " v)
+             (log/warn "as-long: Attempt to read-string on " v)
              v)))
     v))
 

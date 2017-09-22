@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [clojure.data.csv :as csv]
             [clojure.tools.logging :as log]
+            [camelot.model.trap-station :as trap-station]
             [clj-time.format :as tf]
             [camelot.import.dirtree :as dt]
             [camelot.import.scan-dir :as scan-dir]
@@ -66,7 +67,7 @@
   (let [exact (+ (first parts)
                  (/ (nth parts 1) 0.6 100)
                  (/ (nth parts 2) 0.36 10000))]
-    (edn/read-string (format "%.6f" exact))))
+    (trap-station/round-gps exact)))
 
 (s/defn gps-degrees-as-parts
   "Return the numeric parts of a GPS location as a vector, given a string in degrees."

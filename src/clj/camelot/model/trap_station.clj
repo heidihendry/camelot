@@ -5,7 +5,10 @@
    [camelot.system.state :refer [State]]
    [camelot.util.trap-station :as util.ts]
    [camelot.util.db :as db]
-   [camelot.model.media :as media]))
+   [camelot.model.media :as media])
+  (:import
+   (java.util Locale)
+   (java.lang String)))
 
 (sql/defqueries "sql/trap-stations.sql")
 
@@ -38,10 +41,13 @@
      trap-station-distance-to-settlement :- (s/maybe s/Num)]
   {s/Any s/Any})
 
-(defn- round-gps
+(defn round-gps
   "Round GPS coordinates to 6dp (accurate to 1 meter)."
   [coord]
-  (Double/parseDouble (format "%.6f" (double coord))))
+  (->> [(double coord)]
+       (into-array Object)
+       (String/format Locale/ROOT "%.6f")
+       (Double/parseDouble)))
 
 (def trap-station map->TrapStation)
 
