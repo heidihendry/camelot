@@ -2,10 +2,20 @@
 ### 1.4.0 (in development)
 #### Enhancements
 * Set camera status back to 'Available' when an active session it is used in is deleted
-* Allow sightings to be edited
 
 #### Fixes
 * Fix missing form validation around sites and cameras when creating trap stations
+
+### 1.3.4
+#### Enhancements
+* Allow sightings to be edited
+
+#### Fixes
+* Fix an error on creating camera trap stations on systems with a localisation preference of "," as the decimal point.
+
+### 1.3.3
+#### Fixes
+* Fix opening of the settings sidepanel
 
 ### 1.3.2
 #### Enhancements
