@@ -12,9 +12,14 @@
     [reloaded.repl "0.2.3" :scope "test"]
     [org.apache.derby/derbytools "10.12.1.1" :scope "test"]
 
-    [org.clojure/clojure "1.8.0"]
-    [org.clojure/clojurescript "1.9.908"]
-    [org.clojure/core.async "0.2.391"]
+    [org.clojure/clojure "1.9.0-beta1"]
+
+    ;; Exclusion and following dep to work around CLJS-2352.
+    ;; Should be fixed beyond 1.9.908.
+    [org.clojure/clojurescript "1.9.908" :exclusions [org.clojure/tools.reader]]
+    [org.clojure/tools.reader "1.1.0"]
+
+    [org.clojure/core.async "0.3.443"]
     [org.clojure/data.csv "0.1.3"]
     [org.clojure/java.jdbc "0.4.2"]
     [org.clojure/tools.nrepl "0.2.12"]
@@ -34,7 +39,8 @@
     [resauce "0.1.0"]
     [yesql "0.5.2"]
     [riddley "0.1.4"]
-    [ring.middleware.logger "0.5.0"]
+    [onelog "0.5.0"]
+    [ring.middleware.logger "0.5.0" :exclusions [onelog]]
     [ring/ring-defaults "0.2.0"]
     [ring "1.4.0"]
     [ring-transit "0.1.4" :exclusions [com.cognitect/transit-clj]]
