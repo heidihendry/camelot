@@ -1,10 +1,11 @@
 ## ChangeLog
-### 1.4.0 (in development)
+### 1.3.5
 #### Enhancements
 * Set camera status back to 'Available' when an active session it is used in is deleted
 
 #### Fixes
 * Fix missing form validation around sites and cameras when creating trap stations
+* Fix date format in Raw data export
 
 ### 1.3.4
 #### Enhancements
