@@ -115,9 +115,10 @@
     (testing "Export with sighting fields contains sighting fields"
       (let [records [(->record {:media-id 1
                                 :field-individual "Bruce"
-                                :media-filename "file-id-1"})]
+                                :media-filename "file-id-1"
+                                :media-capture-timestamp (t/date-time 2015 1 7 20 0 0)})]
             state (gen-state-helper {})
             result (report-with-sighting-fields state 1 records)]
         (is (= (report-with-sighting-fields state 1 records)
-               [["file-id-1" "2015-01-07 05:00:00" "ASite" nil
+               [["file-id-1" "2015-01-07 20:00:00" "ASite" nil
                  "Trap1" -25 130 "Cat" "Yellow Spotted" 1 "Bruce"]]))))))
