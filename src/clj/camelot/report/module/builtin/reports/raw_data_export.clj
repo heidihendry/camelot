@@ -4,7 +4,7 @@
    [clj-time.format :as tf]
    [camelot.translation.core :as tr]))
 
-(def timestamp-formatter (tf/formatter "yyyy-MM-dd hh:mm:ss"))
+(def timestamp-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
 
 (defn report-output
   [state {:keys [survey-id]}]
