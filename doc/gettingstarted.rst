@@ -29,8 +29,6 @@ Camelot supports the latest versions of the following browsers:
 -  Chrome
 -  Firefox
 -  Edge
--  Safari
--  Internet Explorer 11
 
 Installation
 ~~~~~~~~~~~~
