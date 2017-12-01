@@ -55,7 +55,7 @@
     [cljs-http "0.1.39" :exclusions [com.cognitect/transit-clj]]
     [cljsjs/react-with-addons "0.14.3-0"]
     [com.andrewmcveigh/cljs-time "0.5.0"]
-    [com.drewnoakes/metadata-extractor "2.9.1"]
+    [com.drewnoakes/metadata-extractor "2.11.0"]
     [com.luckycatlabs/SunriseSunsetCalculator "1.2"]
     [commons-io/commons-io "2.4"]
     [environ "1.0.2"]
