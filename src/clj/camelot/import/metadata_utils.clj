@@ -39,7 +39,9 @@ Important: Timezone information will be discarded."
   "Check the minimum required fields are present in the metadata, returning an
 invalid entry if not."
   [state raw-metadata]
-  (if (get raw-metadata "Date/Time")
+  (if (or (get raw-metadata "Date/Time")
+          ;; Some Reconyx cameras set only this.
+          (get raw-metadata "Date/Time Original"))
     true
     false))
 
@@ -48,7 +50,8 @@ invalid entry if not."
   [state raw-metadata]
   (let [md #(get raw-metadata %)]
     (map->ImportPhotoMetadata
-     {:datetime (exif-date-to-datetime (md "Date/Time"))
+     {:datetime (exif-date-to-datetime (or (md "Date/Time")
+                                           (md "Date/Time Original")))
       :photo-exposure-value (md "Exposure Time")
       :photo-flash-setting (md "Flash")
       :photo-focal-length (md "Focal Length")
