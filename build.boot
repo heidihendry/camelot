@@ -1,19 +1,7 @@
 (def +version+ "1.4.0-SNAPSHOT")
 
 (def dependencies
-  '[[adzerk/boot-cljs "1.7.228-2" :scope "test"]
-    [adzerk/boot-reload "0.5.2" :scope "test"]
-    [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
-    [adzerk/boot-test "1.0.7" :scope "test"]
-    [samestep/boot-refresh "0.1.0" :scope "test"]
-    [doo "0.1.8" :scope "test"]
-    [crisptrutski/boot-cljs-test "0.3.0" :scope "test" :exclusions [doo]]
-    [com.cemerick/piggieback "0.2.1" :scope "test"]
-    [weasel "0.7.0" :scope "test"]
-    [reloaded.repl "0.2.3" :scope "test"]
-    [org.apache.derby/derbytools "10.12.1.1" :scope "test"]
-
-    [org.clojure/clojure "1.9.0"]
+  '[[org.clojure/clojure "1.9.0"]
     [org.clojure/clojurescript "1.9.946"]
 
     [org.clojure/core.async "0.3.443"]
@@ -40,23 +28,34 @@
     [ring/ring-defaults "0.2.0"]
     [ring "1.4.0"]
     [ring-transit "0.1.4" :exclusions [com.cognitect/transit-clj]]
-    [secretary "1.2.3"]
     [com.taoensso/tower "3.1.0-beta4"]
-
+    [commons-io/commons-io "2.4"]
+    [environ "1.0.2"]
+    [prismatic/schema "1.1.6"]
+    [org.apache.commons/commons-lang3 "3.4"]
+    [com.drewnoakes/metadata-extractor "2.11.0"]
     [medley "1.0.0"]
+    [secretary "1.2.3"]
     [bk/ring-gzip "0.1.1"]
     [cheshire "5.6.1"]
     [clj-http "2.2.0"]
     [clj-time "0.11.0"]
     [cljs-http "0.1.39" :exclusions [com.cognitect/transit-clj]]
     [com.andrewmcveigh/cljs-time "0.5.0"]
-    [com.drewnoakes/metadata-extractor "2.11.0"]
     [com.luckycatlabs/SunriseSunsetCalculator "1.2"]
-    [commons-io/commons-io "2.4"]
-    [environ "1.0.2"]
     [net.mikera/imagez "0.10.0"]
-    [org.apache.commons/commons-lang3 "3.4"]
-    [prismatic/schema "1.1.6"]])
+
+    [adzerk/boot-cljs "1.7.228-2" :scope "test"]
+    [adzerk/boot-reload "0.5.2" :scope "test"]
+    [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
+    [adzerk/boot-test "1.0.7" :scope "test"]
+    [samestep/boot-refresh "0.1.0" :scope "test"]
+    [doo "0.1.8" :scope "test"]
+    [crisptrutski/boot-cljs-test "0.3.0" :scope "test" :exclusions [doo]]
+    [com.cemerick/piggieback "0.2.1" :scope "test"]
+    [weasel "0.7.0" :scope "test"]
+    [reloaded.repl "0.2.3" :scope "test"]
+    [org.apache.derby/derbytools "10.12.1.1" :scope "test"]])
 
 (set-env!
  :source-paths #{"src/cljc" "src/clj" "src/cljs"}
