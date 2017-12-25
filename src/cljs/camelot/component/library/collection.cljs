@@ -177,7 +177,7 @@
                                                     (map #(hash-map :data data
                                                                     :media %)
                                                          (util/media-on-page data))
-                                                    {:key :media-id}))))))
+                                                    {:key-fn #(get-in % [:media :media-id])}))))))
         (dom/div #js {:id "media-collection-container"
                       :className "media-collection-container"
                       :tabIndex 1})))))

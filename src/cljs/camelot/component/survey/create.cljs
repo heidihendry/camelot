@@ -109,14 +109,14 @@
                (dom/input #js {:className "field-input"
                                :type "text"
                                :placeholder (tr/translate ::survey-name-placeholder)
-                               :value (:survey-name data)
+                               :value (get data :survey-name "")
                                :onChange #(om/update! data
                                                       :survey-name (.. % -target -value))})
                (dom/label #js {:className "field-label required"}
                           (tr/translate ::survey-description))
                (dom/textarea #js {:className "field-input"
                                   :rows "3"
-                                  :value (:survey-notes data)
+                                  :value (get data :survey-notes "")
                                   :onChange #(om/update! data :survey-notes (.. % -target -value))})
                (dom/label #js {:className "field-label"}
                           (tr/translate ::expected-species))

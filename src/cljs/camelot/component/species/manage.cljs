@@ -60,7 +60,8 @@
                                        (om/build-all species-row-component
                                                      (sort-by :taxonomy-genus (sort-by :taxonomy-species
                                                                                        (map cursorise/decursorise (:species data))))
-                                                     {:init-state state}))))
+                                                     {:init-state state
+                                                      :key :taxonomy-id}))))
         (dom/div #js {:className "no-species-found"}
                  (dom/p nil
                         (tr/translate ::search-instructions)))))))

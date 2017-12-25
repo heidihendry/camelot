@@ -265,7 +265,7 @@
             ctx (::completions state)]
         (dom/div #js {:className "typeahead"}
                  (dom/input (clj->js (merge input-config
-                                            {:value (::value state)
+                                            {:value (get state ::value "")
                                              :ref "search-input"
                                              :disabled (if (:disabled state) "disabled" "")
                                              :onKeyDown (fn [e]

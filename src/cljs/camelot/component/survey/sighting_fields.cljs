@@ -40,6 +40,10 @@
   [data sf-id]
   (let [sf (get-in data [::sighting-fields sf-id])
         vs (-> (data/require-keys sf sighting-field-input-keys)
+               (update :sighting-field-key #(or % ""))
+               (update :sighting-field-label #(or % ""))
+               (update :sighting-field-options #(or % ""))
+               (update :sighting-field-default #(or % ""))
                (update :sighting-field-datatype #(or % "text"))
                (update :sighting-field-required #(or % "false"))
                (update :sighting-field-affects-independence #(or % "false"))
@@ -104,7 +108,6 @@
 (defn- copy-sighting-field
   "Select the sighting field with the given ID."
   [data sf-id]
-  (prn sf-id)
   (if sf-id
     (update-buffer data sf-id)
     (om/update! data ::buffer nil))
@@ -208,7 +211,7 @@ Options for select are given by the `options` option."
                                             :required required
                                             :onChange #(om/update! data field
                                                                    (.. % -target -value))
-                                            :value (get data field)
+                                            :value (get data field "")
                                             :title (tr/translate (field-translation field ".description"))}
                                            (or attrs {})))
                            (om/build-all select-option-component options
@@ -227,7 +230,7 @@ Options for select are given by the `options` option."
                  (dom/input (clj->js (merge {:className "field-input"
                                              :required required
                                              :onChange (onchange data field)
-                                             :value (get data field)
+                                             :value (get data field "")
                                              :title (tr/translate (field-translation field ".description"))}
                                             (or attrs {})))))))))
 
@@ -290,7 +293,7 @@ Options for select are given by the `options` option."
           (dom/div #js {:className "list-input"}
                    (dom/div #js {:className "list-input-add-container"}
                             (dom/input #js {:type "text" :className "field-input" :placeholder (tr/translate ::add-option)
-                                            :value (get state ::text-value)
+                                            :value (get state ::text-value "")
                                             :required required
                                             :onKeyDown #(when (= (.-key %) "Enter") (additem!))
                                             :onChange #(om/set-state! owner ::text-value (.. % -target -value))})
@@ -317,7 +320,8 @@ Options for select are given by the `options` option."
                        (vc/component-validator rvchan))
         (go-loop []
           (let [{:keys [validated]} (<! rvchan)]
-            (om/update! data ::validated validated)
+            (when (not= validated (::validated data))
+              (om/update! data ::validated validated))
             (recur)))))
     om/IWillUnmount
     (will-unmount [_]

@@ -93,7 +93,7 @@
       {:chan (chan)})
     om/IWillMount
     (will-mount [_]
-      (om/update! data :files nil))
+      (om/update! data :files ""))
     om/IDidMount
     (did-mount [_]
       (rest/get-x (str "/surveys/" (state/get-survey-id) "/files")
@@ -101,7 +101,7 @@
                                                    {} (:body %)))))
     om/IWillUnmount
     (will-unmount [_]
-      (om/update! data :files nil))
+      (om/update! data :files ""))
     om/IRenderState
     (render-state [_ state]
       (if (:files data)

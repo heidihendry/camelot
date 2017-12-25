@@ -23,7 +23,7 @@
                         :className "field-input"
                         :required required
                         :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
-                        :value (get-in data [::identification :sighting-fields field-id])})))))
+                        :value (get-in data [::identification :sighting-fields field-id] "")})))))
 
 (defn select-component-options
   [[key value] owner]
@@ -46,7 +46,10 @@
                          :required required
                          :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
                          :value (get-in data [::identification :sighting-fields field-id])}
-                    (om/build-all select-component-options (conj (map #(vector % %) options) [nil ""])))))))
+                    (om/build-all
+                     select-component-options
+                     (conj (map #(vector % %) options) [nil ""])
+                     {:key-fn #(:value (first %))}))))))
 
 (defn checkbox-component
   "Render a checkbox component for the field"
@@ -80,7 +83,7 @@
                         :className "field-input"
                         :required required
                         :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
-                        :value (get-in data [::identification :sighting-fields field-id])})))))
+                        :value (get-in data [::identification :sighting-fields field-id] "")})))))
 
 (defn textarea-component
   "Render a textarea component for the field"
@@ -141,4 +144,6 @@
       (let [selected-media (util/all-media-selected data)]
         (when (pos? (count selected-media))
           (dom/div nil
-                   (om/build-all field-component (field-data data selected-media))))))))
+                   (om/build-all field-component
+                                 (field-data data selected-media)
+                                 {:key-fn #(get-in % [::field :sighting-field-id])})))))))

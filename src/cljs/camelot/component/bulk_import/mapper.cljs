@@ -125,12 +125,14 @@
                             (or (:label (second field))
                                 (tr/translate (str "report/" (name (first field))))))
                  (dom/select #js {:className "field-input"
-                                  :onChange #(go (>! (:chan state)
-                                                     {:mapping (hash-map (first field)
-                                                                         (let [v (.. % -target -value)]
-                                                                           (if (or (nil? v) (empty? v))
-                                                                             nil
-                                                                             v)))}))
+                                  :onChange #(do
+                                               (.persist %)
+                                               (go (>! (:chan state)
+                                                       {:mapping (hash-map (first field)
+                                                                           (let [v (.. % -target -value)]
+                                                                             (if (or (nil? v) (empty? v))
+                                                                               nil
+                                                                               v)))})))
                                   :value (get mappings (first field))}
                              (om/build-all field-mapping-option
                                            (sort-by first (conj column-properties
@@ -348,7 +350,7 @@
 
                             (:upload-failed data)
                             (dom/p #js {:className "validation-warning"
-                                        :style #js {"margin-top" "1rem"}}
+                                        :style #js {:marginTop "1rem"}}
                                    (dom/label nil (tr/translate ::invalid-csv)))
 
                             :default

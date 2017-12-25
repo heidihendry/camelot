@@ -155,7 +155,7 @@
     (render-state [_ state]
       (dom/select #js {:className "survey-select field-input"
                        :title (tr/translate ::filter-survey-title)
-                       :value (get-in data [:search :survey-id])
+                       :value (get-in data [:search :survey-id] "")
                        :disabled (if (get-in data [:search :inprogress]) "disabled" "")
                        :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                     (om/update! data [:search :survey-id] sid)
@@ -255,7 +255,7 @@
     (render-state [_ state]
       (dom/span nil
                (dom/select #js {:className "trap-station-select field-input"
-                                :value (get-in data [:search :trap-station-id])
+                                :value (get-in data [:search :trap-station-id] "")
                                 :disabled (if (get-in data [:search :inprogress]) "disabled" "")
                                 :onChange #(let [sid (cljs.reader/read-string (.. % -target -value))]
                                              (om/update! (:search data) :trap-station-id sid)
@@ -277,7 +277,7 @@
       (dom/div #js {:className "checkbox-container"}
                 (dom/label nil (:label state))
                 (dom/input #js {:type "checkbox"
-                                :value (get-in data [:search (:key state)])
+                                :value (get-in data [:search (:key state)] "")
                                 :disabled (if (get-in data [:search :inprogress]) "disabled" "")
                                 :onChange #(do (om/update! (:search (state/library-state))
                                                            (:key state) (.. % -target -checked))

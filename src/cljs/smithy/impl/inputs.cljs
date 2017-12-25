@@ -153,7 +153,7 @@
                       :step "any"
                       :disabled (:disabled opts)
                       :onChange #(state/set-percentage! % (k buf) :value owner)
-                      :value (get-in buf [k :value])}))))
+                      :value (get-in buf [k :value] "")}))))
 
 (defmethod input-field :number
   [[k v buf opts :as d] owner]
@@ -168,7 +168,7 @@
                       :step "any"
                       :disabled (:disabled opts)
                       :onChange #(state/set-number! % (k buf) :value owner)
-                      :value (get-in buf [k :value])}))))
+                      :value (get-in buf [k :value] "")}))))
 
 (defmethod input-field :directory
   [[k v buf opts :as d] owner]
@@ -200,7 +200,7 @@
                              :rows (:rows schema)
                              :cols (:cols schema)
                              :onChange #(state/set-unvalidated-text! % (k buf) :value owner)
-                             :value (get-in buf [k :value])}))))))
+                             :value (get-in buf [k :value] "")}))))))
 
 (defmethod input-field :boolean
   [[k v buf opts :as d] owner]
@@ -228,4 +228,4 @@
       (dom/input #js {:type "text" :className "field-input"
                       :disabled (:disabled opts)
                       :onChange #(state/set-unvalidated-text! % (k buf) :value owner)
-                      :value (get-in buf [k :value])}))))
+                      :value (get-in buf [k :value] "")}))))

@@ -75,7 +75,7 @@
                                 :placeholder (tr/translate ::scientific-name)
                                 :className "field-input inline long-input"
                                 :onChange #(om/set-state! owner :search (.. % -target -value))
-                                :value (:search state)})
+                                :value (get state :search "")})
                 (dom/input #js {:type "submit"
                                 :name "submit"
                                 :disabled (if (or (nil? (:search state))

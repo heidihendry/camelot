@@ -90,7 +90,6 @@
                           (.focus (.getElementById js/document "media-collection-container"))
                           (om/update! (state/library-state) :show-identification-panel false)
                           (blank-sighting-input (state/library-state)))]
-    (prn identification)
     (if (number? sighting-id)
       (rest/put-x (str "/library/identify/" sighting-id)
                   {:data
@@ -115,7 +114,7 @@
     om/IRender
     (render [_]
       (dom/select #js {:className "field-input"
-                       :value (get-in data [:identification :lifestage])
+                       :value (get-in data [:identification :lifestage] "")
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :lifestage v)
                                     (om/update! (:identification data) :dirty-state true))}
@@ -134,7 +133,7 @@
     om/IRender
     (render [_]
       (dom/select #js {:className "field-input"
-                       :value (get-in data [:identification :sex])
+                       :value (get-in data [:identification :sex] "")
                        :onChange #(let [v (.. % -target -value)]
                                     (om/update! (:identification data) :sex v)
                                     (om/update! (:identification data) :dirty-state true))}
@@ -187,7 +186,7 @@
                   (dom/input #js {:className "field-input inline long-input"
                                   :autoFocus "autofocus"
                                   :placeholder (tr/translate ::taxonomy-add-placeholder)
-                                  :value (get-in data [:new-species-name])
+                                  :value (get-in data [:new-species-name] "")
                                   :onChange #(om/update! data :new-species-name
                                                          (.. % -target -value))})
                   (if (and (empty? (:new-species-name data))
@@ -213,7 +212,7 @@
         (om/build add-taxonomy-component data)
         (dom/select #js {:className "field-input"
                          :id "identify-species-select"
-                         :value (get-in data [:identification :species])
+                         :value (get-in data [:identification :species] "")
                          :onChange #(let [v (.. % -target -value)]
                                       (if (= v "create")
                                         (do
@@ -254,7 +253,7 @@
                                                    :min "1"
                                                    :required true
                                                    :className "field-input short-input"
-                                                   :value (get-in data [:identification :quantity])
+                                                   :value (get-in data [:identification :quantity] 1)
                                                    :onChange #(do
                                                                 (om/update! (:identification data) :quantity
                                                                             (cljs.reader/read-string (.. % -target -value)))

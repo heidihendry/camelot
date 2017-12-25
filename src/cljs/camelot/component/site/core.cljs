@@ -24,7 +24,7 @@
 (defn add-success-handler
   [data resp]
   (om/transact! data :list #(conj % (cursorise/decursorise (:body resp))))
-  (om/update! data :new-site-name nil))
+  (om/update! data :new-site-name ""))
 
 (defn add-site-handler
   [data]
@@ -51,7 +51,7 @@
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input"
                                   :placeholder (tr/translate ::new-site-name)
-                                  :value (get-in data [:new-site-name])
+                                  :value (get-in data [:new-site-name] "")
                                   :onChange #(om/update! data :new-site-name
                                                          (.. % -target -value))})
                   (dom/input #js {:type "submit"
@@ -144,7 +144,7 @@
         (dom/div #js {:className "section"}
                  (dom/div nil
                           (dom/input #js {:className "field-input"
-                                          :value (:filter data)
+                                          :value (get data :filter "")
                                           :placeholder (tr/translate ::filter-sites)
                                           :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu scroll"}

@@ -70,7 +70,7 @@
               (reset! state (hash-map key success))
               (swap! state #(assoc % key success)))
             (let [vpass (validated? @state)]
-              (if (or (and (nil? pstate) (empty @state))
+              (if (or (and (nil? pstate) (empty? @state))
                       (not= (validated? pstate) vpass))
                 (>! result-chan {:validated vpass})))
             (recur)))))
@@ -99,13 +99,15 @@
       {::validator-failed nil})
     om/IRenderState
     (render-state [_ state]
-      (when (get-in data (if (keyword? data-key) [data-key] data-key))
-        (om/set-state! owner ::show-messages true))
+      (let [v (get-in data (if (keyword? data-key) [data-key] data-key))]
+        (when-not (or (and (or (string? v) (coll? v)) (empty? v)) (nil? v))
+          (om/set-state! owner ::show-messages true)))
       (let [result (reduce-kv (fn [acc k v] (apply-validator (get data data-key)
                                                              acc k v)) nil
                               validators)]
-        (om/set-state! owner ::validator-failed result)
-        (go (>! validation-chan {:key data-key :success (nil? result)})))
+        (when (not= result (om/get-state owner ::validator-failed))
+          (om/set-state! owner ::validator-failed result)
+          (go (>! validation-chan {:key data-key :success (nil? result)}))))
       (let [show-warning (and (::show-messages state)
                               (get-in validators [(::validator-failed state) ::msg]))]
         (dom/div #js {:className "validated-component"}

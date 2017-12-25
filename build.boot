@@ -2,22 +2,19 @@
 
 (def dependencies
   '[[adzerk/boot-cljs "1.7.228-2" :scope "test"]
-    [adzerk/boot-reload "0.5.0" :scope "test"]
+    [adzerk/boot-reload "0.5.2" :scope "test"]
     [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
     [adzerk/boot-test "1.0.7" :scope "test"]
     [samestep/boot-refresh "0.1.0" :scope "test"]
-    [crisptrutski/boot-cljs-test "0.3.0" :scope "test"]
+    [doo "0.1.8" :scope "test"]
+    [crisptrutski/boot-cljs-test "0.3.0" :scope "test" :exclusions [doo]]
     [com.cemerick/piggieback "0.2.1" :scope "test"]
     [weasel "0.7.0" :scope "test"]
     [reloaded.repl "0.2.3" :scope "test"]
     [org.apache.derby/derbytools "10.12.1.1" :scope "test"]
 
-    [org.clojure/clojure "1.9.0-beta1"]
-
-    ;; Exclusion and following dep to work around CLJS-2352.
-    ;; Should be fixed beyond 1.9.908.
-    [org.clojure/clojurescript "1.9.908" :exclusions [org.clojure/tools.reader]]
-    [org.clojure/tools.reader "1.1.0"]
+    [org.clojure/clojure "1.9.0"]
+    [org.clojure/clojurescript "1.9.946"]
 
     [org.clojure/core.async "0.3.443"]
     [org.clojure/data.csv "0.1.3"]
@@ -29,10 +26,9 @@
 
     [com.cognitect/transit-clj "0.8.300"]
     [org.apache.derby/derby "10.12.1.1"]
-    [org.omcljs/om "1.0.0-alpha32"
+    [org.omcljs/om "1.0.0-beta1"
      :exclusions [com.cognitect/transit-clj
-                  com.cognitect/transit-cljs
-                  cljsjs/react]]
+                  com.cognitect/transit-cljs]]
     [com.stuartsierra/component "0.3.1"]
     [compojure "1.5.0"]
     [ragtime "0.5.3"]
@@ -53,7 +49,6 @@
     [clj-http "2.2.0"]
     [clj-time "0.11.0"]
     [cljs-http "0.1.39" :exclusions [com.cognitect/transit-clj]]
-    [cljsjs/react-with-addons "0.14.3-0"]
     [com.andrewmcveigh/cljs-time "0.5.0"]
     [com.drewnoakes/metadata-extractor "2.11.0"]
     [com.luckycatlabs/SunriseSunsetCalculator "1.2"]
@@ -73,7 +68,7 @@
          '[adzerk.boot-reload :refer [reload]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[samestep.boot-refresh :refer [refresh]]
-         '[crisptrutski.boot-cljs-test :refer [test-cljs]]
+         '[crisptrutski.boot-cljs-test :as boot-test-cljs]
          '[clojure.tools.namespace.repl :as ns.repl]
          '[com.stuartsierra.component :as component]
          '[schema.core :as schema])
@@ -124,20 +119,32 @@
   (merge-env! :source-paths dirs)
   identity)
 
+(deftask test-clj
+  "Run tests for all source paths."
+  [n namespaces NS #{sym} "the set of namespace symbols to run tests in"]
+  (let [namespaces (or namespaces #{})]
+    (comp
+     (add-source-paths :dirs #{"test/cljc" "test/clj" "test/cljs"})
+     (test :namespaces namespaces))))
+
+(deftask test-cljs
+  "Run tests for all source paths."
+  [n namespaces NS #{sym} "the set of namespace symbols to run tests in"]
+  (let [namespaces (or namespaces #{})]
+    (comp
+     (add-source-paths :dirs #{"test/cljc" "test/clj" "test/cljs"})
+     (boot-test-cljs/test-cljs :ids ["camelot/test-runner"]
+                               :namespaces namespaces
+                               :js-env :phantom))))
+
 (deftask test-all
   "Run tests for all source paths."
   [n namespaces NS #{sym} "the set of namespace symbols to run tests in"]
   (let [namespaces (or namespaces #{})]
     (comp
      (add-source-paths :dirs #{"test/cljc" "test/clj" "test/cljs"})
-     (test :namespaces namespaces)
-     (test-cljs :ids ["camelot/test-runner"]
-                :namespaces namespaces
-                :cljs-opts {:foreign-libs
-                            [{:provides ["cljsjs.react"]
-                              :file "www/lib/react-with-addons-0.14.3.js"
-                              :file-min "www/lib/react-with-addons-0.14.3.js"}]}
-                :js-env :phantom))))
+     (test-clj)
+     (test-cljs))))
 
 (deftask uberjar
   "Build an uberjar."

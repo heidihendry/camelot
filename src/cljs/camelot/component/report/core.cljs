@@ -79,7 +79,7 @@
         (dom/div #js {:className "section"}
                  (dom/div nil
                           (dom/input #js {:className "field-input"
-                                          :value (:filter data)
+                                          :value (get data :filter "")
                                           :placeholder (tr/translate ::filter-reports-placeholder)
                                           :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu scroll"}

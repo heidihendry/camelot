@@ -89,7 +89,8 @@
                                           (map #(hash-map :field %
                                                           :sighting sighting)
                                                (sort-by (juxt :sighting-field-ordering :sighting-field-label)
-                                                        (util/survey-sighting-fields (:survey-id data))))))))))))
+                                                        (util/survey-sighting-fields (:survey-id data))))
+                                          {:key-fn #(get-in % [:field :sighting-field-id])}))))))))
 
 (defn mcp-detail
   [data owner]
@@ -130,7 +131,7 @@
                                                                                          :data (:data data)
                                                                                          :sighting %)
                                                                               (:sightings media))
-                                                   {:key :sighting-id})))))))))
+                                                   {:key-fn #(get-in % [:sighting :sighting-id])})))))))))
 
 (defn mcp-details
   [data owner]

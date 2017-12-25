@@ -25,7 +25,7 @@
 (defn add-success-handler
   [data resp]
   (om/transact! data :list #(conj % (cursorise/decursorise (:body resp))))
-  (om/update! data :new-camera-name nil))
+  (om/update! data :new-camera-name ""))
 
 (defn add-camera-handler
   [data]
@@ -52,7 +52,7 @@
                        :onSubmit #(.preventDefault %)}
                   (dom/input #js {:className "field-input"
                                   :placeholder (tr/translate ::new-camera-name-placeholder)
-                                  :value (get-in data [:new-camera-name])
+                                  :value (get data :new-camera-name "")
                                   :onChange #(om/update! data :new-camera-name
                                                          (.. % -target -value))})
                   (dom/input #js {:type "submit"
@@ -133,7 +133,7 @@
         (dom/div #js {:className "section"}
                  (dom/div nil
                           (dom/input #js {:className "field-input"
-                                          :value (:filter data)
+                                          :value (get data :filter "")
                                           :placeholder (tr/translate ::filter-cameras)
                                           :onChange #(om/update! data :filter (.. % -target -value))}))
                  (dom/div #js {:className "simple-menu scroll"}

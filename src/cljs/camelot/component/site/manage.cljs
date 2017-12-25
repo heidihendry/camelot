@@ -16,7 +16,7 @@
                                   :rows 3
                                   :cols 48
                                   :onChange #(om/update! data [value-key :value] (.. % -target -value))
-                                  :value (get-in data [value-key :value])})))))
+                                  :value (get-in data [value-key :value] "")})))))
 
 (defn form-input
   [data owner {:keys [label value-key required validator warning]}]
@@ -31,7 +31,7 @@
                  (dom/input #js {:className "field-input"
                                  :placeholder (str label "...")
                                  :onChange #(om/update! data [value-key :value] (.. % -target -value))
-                                 :value (get-in data [value-key :value])})
+                                 :value (get-in data [value-key :value] "")})
                  (when-not vr
                    (dom/div #js {:className "validation-warning"} warning)))))))
 

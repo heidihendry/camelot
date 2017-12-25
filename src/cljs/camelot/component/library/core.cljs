@@ -99,7 +99,7 @@
       (om/update! data [:library :search] {:last-search-terms ""
                                            :terms ""
                                            :survey-id (get-in (state/app-state-cursor)
-                                                              [:selected-survey :survey-id :value])})
+                                                              [:selected-survey :survey-id :value] -1)})
       (om/update! data [:library :search :page] 1)
       (om/update! data [:library :survey-id] (get-in (state/app-state-cursor) [:selected-survey :survey-id :value]))
       (om/update! data [:library :search :show-select-count] 0)
