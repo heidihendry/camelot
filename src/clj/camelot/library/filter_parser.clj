@@ -2,13 +2,23 @@
   (:require
    [clojure.string :as str]))
 
+(defmacro with-negation [search [s-bind is-neg?] & body]
+  (let [s# search]
+    `(let [found-bang# (= (first ~s#) \!)
+           ~is-neg? found-bang#
+           ~s-bind (if found-bang# (subs ~s# 1) ~s#)]
+       ~@body)))
+
 (defn parse-term
   [search]
-  (let [parts (str/split search #":")]
-    (if (= (count parts) 1)
-      {:value (first parts)}
-      {:field (keyword (first parts))
-       :value (str/join ":" (rest parts))})))
+  (with-negation search [s is-neg?]
+    (let [parts (str/split s #":")]
+      (if (= (count parts) 1)
+        {:value (first parts)
+         :negated? is-neg?}
+        {:field (keyword (first parts))
+         :value (str/join ":" (rest parts))
+         :negated? is-neg?}))))
 
 (defn parse-conjunction
   [search]

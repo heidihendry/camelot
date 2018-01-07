@@ -138,6 +138,12 @@
   (or (first (filter #(>= % point) (term-separators search)))
       (count search)))
 
+(defn remove-negation
+  [term]
+  (if (= (first term) \!)
+    (subs term 1)
+    term))
+
 (defn term-at-point
   "Return the term at a given cursor position."
   [search point]
@@ -145,8 +151,13 @@
     (if (or (zero? point)
             (re-matches term-separator-re (str (nth search (dec point)))))
       ""
-      (last (str/split (apply str (first (split-at p search)))
-                       term-separator-re)))))
+      (->> search
+           (split-at p)
+           first
+           (apply str)
+           (#(str/split % term-separator-re))
+           last
+           remove-negation))))
 
 (defn splice
   [all new start end]

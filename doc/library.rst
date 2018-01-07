@@ -153,6 +153,12 @@ Camelot can also do searches with disjunctions:
 
 Note the pipe ('\|') in the above example: this means "OR" in a search.
 
+(requires 1.4.0+) Camelot also supports negation. For example, to find all
+photos which are flagged but do not have any species:
+
+::
+    flagged:true !species:*
+
 We think Camelot's search is pretty handy, and hope you think so too.
 
 Reference window

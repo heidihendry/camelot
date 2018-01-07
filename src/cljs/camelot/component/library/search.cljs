@@ -39,10 +39,11 @@
 
 (defn select-media-collection-container
   [state data e]
+  (.persist e)
   (when (= (.-keyCode e) 13)
     (let [node (.getElementById js/document "media-collection-container")]
-      (go (>! (:search-chan state) {:search (assoc (deref data)
-                                                   :terms (.. e -target -value))}))
+      (go (>! (:search-chan state)
+              {:search (assoc (deref data) :terms (.. e -target -value))}))
       (.focus node))))
 
 (defn completion-field
@@ -144,7 +145,7 @@
                                        :title (tr/translate ::filter-title)
                                        :id "filter"
                                        :onChange #(om/update! data [:search :terms] %)
-                                       :onKeyDown (partial select-media-collection-container state data)}
+                                       :onKeyDown #(select-media-collection-container state (:search data) %)}
                         :multi-term true}
                  :state {:disabled (:inprogress data)}}))))
 

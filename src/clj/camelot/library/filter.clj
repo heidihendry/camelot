@@ -24,7 +24,7 @@
   [field]
   (some #(= % field) exact-matches-needed))
 
-(defn field-search
+(defn field-search-matches?
   [search record]
   (let [{f :field s :value} search
         field (futil/field-key-lookup f)]
@@ -38,15 +38,21 @@
                (normalise-str s))
             (substring? (normalise-str val) s)))))))
 
-(defn record-string-search
+(defn record-string-search-matches?
   [search record]
   (substring? (apply str (interpose "|||" (vals record))) (:value search)))
 
-(defn record-matches?
+(defn value-matches?
   [search record]
   (if (contains? search :field)
-    (field-search search record)
-    (record-string-search search record)))
+    (field-search-matches? search record)
+    (record-string-search-matches? search record)))
+
+(defn record-matches?
+  [search record]
+  (if (:negated? search)
+    (not (value-matches? search record))
+    (value-matches? search record)))
 
 (defn conjunctive-terms
   [search record]
