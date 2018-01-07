@@ -1,8 +1,6 @@
 Working with large datasets
 ---------------------------
 
-*This section applies to versions of Camelot 1.2.0 and beyond.*
-
 You'll have noticed in setting up Camelot, that you probably did not need to
 provision servers, configure relational databases, network equipment and so
 on. Camelot does *not* treat working with massive volumes of data as its
