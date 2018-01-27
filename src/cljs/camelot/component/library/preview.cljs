@@ -42,7 +42,7 @@
     om/IRender
     (render [_]
       (let [value (get sighting (util.sf/user-key field))]
-        (when-not (util.sighting/unidentified? value)
+        (when-not (or (nil? value) (= value ""))
           (dom/div nil (:sighting-field-label field) ": " (str value)))))))
 
 (defn load-sighting-details
@@ -51,8 +51,6 @@
               {:quantity (:sighting-quantity sighting)
                :species (str (:taxonomy-id sighting))
                :sighting-id (:sighting-id sighting)
-               :sex (:sighting-sex sighting)
-               :lifestage (:sighting-lifestage sighting)
                :sighting-fields (into {}
                                       (mapv #(let [user-key (util.sf/user-key %)]
                                                (vector (:sighting-field-id %)
@@ -78,19 +76,13 @@
                         (or (:taxonomy-label (get (:species (state/library-state))
                                                   (:taxonomy-id sighting)))
                             (tr/translate ::species-not-in-survey)))
-                 (let [ls (:sighting-lifestage sighting)
-                       sex (:sighting-sex sighting)]
-                   (dom/div #js {:className "sighting-extra-details"}
-                            (when-not (util.sighting/unidentified? sex)
-                              (dom/div nil (tr/translate :sighting/sighting-sex.label) ": " sex))
-                            (when-not (util.sighting/unidentified? ls)
-                              (dom/div nil (tr/translate :sighting/sighting-lifestage.label) ": " ls))
-                            (om/build-all display-sighting-field-details
-                                          (map #(hash-map :field %
-                                                          :sighting sighting)
-                                               (sort-by (juxt :sighting-field-ordering :sighting-field-label)
-                                                        (util/survey-sighting-fields (:survey-id data))))
-                                          {:key-fn #(get-in % [:field :sighting-field-id])}))))))))
+                 (dom/div #js {:className "sighting-extra-details"}
+                          (om/build-all display-sighting-field-details
+                                        (map #(hash-map :field %
+                                                        :sighting sighting)
+                                             (sort-by (juxt :sighting-field-ordering :sighting-field-label)
+                                                      (util/survey-sighting-fields (:survey-id data))))
+                                        {:key-fn #(get-in % [:field :sighting-field-id])})))))))
 
 (defn mcp-detail
   [data owner]

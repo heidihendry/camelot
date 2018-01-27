@@ -165,38 +165,6 @@
       true
       false)))
 
-(defn as-sex
-  "Return a single-character indicator of the sex."
-  [v]
-  (when (seq v)
-    (if (seq (re-matches #"^(?i)M(ale)?$" v))
-      "M"
-      "F")))
-
-(defn could-be-sex?
-  "Predicate returning true if the input could be a sex, false otherwise."
-  [x]
-  (if (or (empty? x)
-          (seq (re-matches #"^(?i)M(ale)?|F(emale)?$" x)))
-    true
-    false))
-
-(defn as-lifestage
-  "Return the lifestage. Defaults to Juvenile if non-adult."
-  [v]
-  (when (seq v)
-    (if (seq (re-matches #"^(?i)A(dult)?$" v))
-      "adult"
-      "juvenile")))
-
-(defn could-be-lifestage?
-  "Predicate returning true if the input could be a lifestage, false otherwise."
-  [x]
-  (if (or (empty? x)
-          (seq (re-matches #"^(?i)A(dult)?|J(uvenile)?$" x)))
-    true
-    false))
-
 (defn could-be-file?
   "Predicate returning true if input is a readable file, false otherwise."
   [x]
@@ -230,8 +198,6 @@
    :boolean could-be-boolean?
    :latitude could-be-latitude?
    :longitude could-be-longitude?
-   :sex could-be-sex?
-   :lifestage could-be-lifestage?
    :file could-be-file?
    :string (constantly true)})
 
@@ -264,8 +230,6 @@
   {:integer edn/read-string
    :readable-integer edn/read-string
    :number edn/read-string
-   :sex as-sex
-   :lifestage as-lifestage
    :timestamp as-datetime
    :date as-date
    :longitude edn/read-string

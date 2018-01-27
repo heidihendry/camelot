@@ -14,10 +14,6 @@
   (mapv #(get-in data [:records %])
         (get-in data [:search :ordered-ids])))
 
-(defn unidentified?
-  [x]
-  (or (nil? x) (= "unidentified" x)))
-
 (defn media-ids-on-page
   [data]
   (->> (get-in data [:search :ordered-ids])

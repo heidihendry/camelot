@@ -292,26 +292,7 @@
                      (->record {:taxonomy-id 2
                                 :trap-station-id 5
                                 :media-id 1})]]
-        (is (= (only-matching "trapid:5" results) expected))))
-
-    (testing "should respect exact matches"
-      (let [expected [(->record {:taxonomy-id 1
-                                 :sighting-sex "F"
-                                 :media-id 2
-                                 :media-processed true})]
-            results [(->record {:taxonomy-id 1
-                                :sighting-sex "F"
-                                :media-id 2
-                                :media-processed true})
-                     (->record {:taxonomy-id 2
-                                :sighting-sex "unidentified"
-                                :media-id 1
-                                :media-processed false})
-                     (->record {:taxonomy-id 3
-                                :sighting-sex nil
-                                :media-id 3
-                                :media-processed false})]]
-        (is (= (only-matching "sighting-sex:f" results) expected))))))
+        (is (= (only-matching "trapid:5" results) expected))))))
 
 (deftest term-formatter-replaces-spaces
   (let [search "this is a test"]

@@ -334,30 +334,12 @@
                        {:label (tr/translate state :words/edit)
                         :action :edit-mode}]}
    :layout [[:taxonomy-id]
-            [:sighting-quantity]
-            [:sighting-sex]
-            [:sighting-lifestage]]
+            [:sighting-quantity]]
    :schema {:taxonomy-id {:type :select
                          :required true
                          :generator :taxonomy-available}
             :sighting-quantity {:type :number
-                                :required true}
-            :sighting-sex {:type :select
-                           :required false
-                           :options {"unidentified" (tr/translate state
-                                                                        :sighting/sighting-property.unidentified)
-                                     "M" (tr/translate state
-                                                       :sighting/sighting-sex.male)
-                                     "F" (tr/translate state
-                                                       :sighting/sighting-sex.female)}}
-            :sighting-lifestage {:type :select
-                                 :required false
-                                 :options {"unidentified" (tr/translate state
-                                                                        :sighting/sighting-property.unidentified)
-                                           "adult" (tr/translate state
-                                                                 :sighting/sighting-lifestage.adult)
-                                           "juvenile" (tr/translate state
-                                                                    :sighting/sighting-lifestage.juvenile)}}}
+                                :required true}}
    :states {:create {:submit {:success {:type :event
                                         :event :sighting-create}
                               :error {:type :event

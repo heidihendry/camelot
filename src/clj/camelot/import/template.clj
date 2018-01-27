@@ -39,8 +39,6 @@
    :site-area "Site Area (km2)"
    :site-notes "Site Notes"
    :sighting-quantity "Sighting Quantity"
-   :sighting-sex "Sighting Sex"
-   :sighting-lifestage "Sighting Life Stage"
    :taxonomy-common-name "Species Common Name"
    :taxonomy-species "Species"
    :taxonomy-genus "Genus"

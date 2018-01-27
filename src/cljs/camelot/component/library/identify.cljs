@@ -32,8 +32,6 @@
               {:quantity 1
                :species -1
                :sighting-id nil
-               :sex "unidentified"
-               :lifestage "unidentified"
                :sighting-fields {}}))
 
 (defn key-by-user-key
@@ -48,15 +46,11 @@
   []
   (let [spp (cljs.reader/read-string (get-in (state/library-state) [:identification :species]))
         qty (get-in (state/library-state) [:identification :quantity])
-        lifestage (get-in (state/library-state) [:identification :lifestage])
-        sex (get-in (state/library-state) [:identification :sex])
         sighting-fields (get-in (state/library-state) [:identification :sighting-fields])
         selected (:selected-media-id (state/library-state))
         sighting-id (get-in (state/library-state) [:identification :sighting-id])
         all-selected (util/all-media-selected)
         identification {:quantity qty
-                        :lifestage (if (util/unidentified? lifestage) nil lifestage)
-                        :sex (if (util/unidentified? sex) nil sex)
                         :species spp
                         :sighting-fields @sighting-fields}
         add-sighting
@@ -64,8 +58,6 @@
                                                 :sightings
                                                 (conj (:sightings (second %))
                                                       (merge {:taxonomy-id spp
-                                                              :sighting-lifestage lifestage
-                                                              :sighting-sex sex
                                                               :sighting-id (first %)
                                                               :sighting-quantity qty}
                                                              (key-by-user-key @sighting-fields))))
@@ -78,8 +70,6 @@
                                  #(sort-by :sighting-id
                                            (conj (remove (fn [r] (= (:sighting-id r) sighting-id)) %)
                                                  (merge {:taxonomy-id spp
-                                                         :sighting-lifestage lifestage
-                                                         :sighting-sex sex
                                                          :sighting-id sighting-id
                                                          :sighting-quantity qty}
                                                         (key-by-user-key @sighting-fields))))))
@@ -107,44 +97,6 @@
     om/IRender
     (render [_]
       (dom/option #js {:value (:key data)} (:label data)))))
-
-(defn sighting-lifestage-select-component
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/select #js {:className "field-input"
-                       :value (get-in data [:identification :lifestage] "")
-                       :onChange #(let [v (.. % -target -value)]
-                                    (om/update! (:identification data) :lifestage v)
-                                    (om/update! (:identification data) :dirty-state true))}
-                  (om/build-all sighting-option-component
-                                (list {:key "unidentified"
-                                       :label (tr/translate :sighting/sighting-property.unidentified)}
-                                      {:key "adult"
-                                       :label (tr/translate :sighting/sighting-lifestage.adult)}
-                                      {:key "juvenile"
-                                       :label (tr/translate :sighting/sighting-lifestage.juvenile)})
-                                {:key :key})))))
-
-(defn sighting-sex-select-component
-  [data owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/select #js {:className "field-input"
-                       :value (get-in data [:identification :sex] "")
-                       :onChange #(let [v (.. % -target -value)]
-                                    (om/update! (:identification data) :sex v)
-                                    (om/update! (:identification data) :dirty-state true))}
-                  (om/build-all sighting-option-component
-                                (list {:key "unidentified"
-                                       :label (tr/translate :sighting/sighting-property.unidentified)}
-                                      {:key "M"
-                                       :label (tr/translate :sighting/sighting-sex.male)}
-                                      {:key "F"
-                                       :label (tr/translate :sighting/sighting-sex.female)})
-                                {:key :key})))))
 
 (defn submit-identification
   []
@@ -258,14 +210,6 @@
                                                                 (om/update! (:identification data) :quantity
                                                                             (cljs.reader/read-string (.. % -target -value)))
                                                                 (nav/analytics-event "library-id" "quantity-change"))}))
-                          (dom/div nil
-                                   (dom/span #js {:className "field"}
-                                             (dom/label nil (tr/translate :sighting/sighting-sex.label))
-                                             (om/build sighting-sex-select-component data)))
-                          (dom/div nil
-                                   (dom/span #js {:className "field"}
-                                             (dom/label nil (tr/translate :sighting/sighting-lifestage.label))
-                                             (om/build sighting-lifestage-select-component data)))
                           (dom/div #js {:className "flex-row"}
                                    (om/build sighting-fields/component data))))))))
 

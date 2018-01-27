@@ -161,17 +161,7 @@
     :taxonomy-id.label "Species"
     :taxonomy-id.description "Species in the media"
     :sighting-quantity.label "Quantity"
-    :sighting-quantity.description "Quantity of this species in the media."
-    :sighting-sex.label "Sex"
-    :sighting-sex.description "Sex of the species sighted."
-    :sighting-sex.male "Male"
-    :sighting-sex.female "Female"
-    :sighting-lifestage.label "Life stage"
-    :sighting-lifestage.description "Stage of life of the species sighted."
-    :sighting-lifestage.abbrev "LS"
-    :sighting-lifestage.adult "Adult"
-    :sighting-lifestage.juvenile "Juvenile"
-    :sighting-property.unidentified "Unidentified"}
+    :sighting-quantity.description "Quantity of this species in the media."}
 
    :media
    {:sidebar-title "Media"
@@ -440,8 +430,6 @@
     :sighting-created "Sighting Created"
     :sighting-updated "Sighting Updated"
     :sighting-quantity "Sighting Quantity"
-    :sighting-lifestage "Sighting Life Stage"
-    :sighting-sex "Sighting Sex"
     :photo-iso-setting "Photo ISO Setting"
     :photo-exposure-value "Photo Exposure Value"
     :photo-flash-setting "Photo Flash Setting"
@@ -858,8 +846,6 @@
     :calculated-schema-not-available "Could not determine the metadata about column '%s'."
     :datatype-integer "an integer"
     :datatype-number "a number"
-    :datatype-sex "either 'male' or 'female'"
-    :datatype-lifestage "either 'adult' or 'juvenile'"
     :datatype-timestamp "a timestamp"
     :datatype-longitude "a value in the range [-180, 180]"
     :datatype-latitude "a value in the range [-90, 90]"

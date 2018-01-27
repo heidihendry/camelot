@@ -8,17 +8,8 @@
 
 (def query (db/with-db-keys :sightings))
 
-(def sighting-default-option "unidentified")
-
-(defn known-or-nil
-  [v]
-  (when-not (= v sighting-default-option)
-    v))
-
 (s/defrecord TSighting
     [sighting-quantity :- s/Int
-     sighting-lifestage :- (s/maybe s/Str)
-     sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- s/Int
      media-id :- s/Int
      sighting-fields :- (s/maybe {s/Int s/Str})]
@@ -26,8 +17,6 @@
 
 (s/defrecord TSightingUpdate
     [sighting-quantity :- s/Int
-     sighting-lifestage :- (s/maybe s/Str)
-     sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- s/Int
      sighting-fields :- (s/maybe {s/Int s/Str})]
   {s/Any s/Any})
@@ -37,8 +26,6 @@
      sighting-created :- org.joda.time.DateTime
      sighting-updated :- org.joda.time.DateTime
      sighting-quantity :- s/Int
-     sighting-lifestage :- (s/maybe s/Str)
-     sighting-sex :- (s/maybe s/Str)
      taxonomy-id :- (s/maybe s/Int)
      media-id :- s/Int
      sighting-label :- s/Str]
@@ -47,23 +34,17 @@
 (s/defn sighting :- Sighting
   [data]
   (map->Sighting (-> data
-                     (update :sighting-lifestage #(or % sighting-default-option))
-                     (update :sighting-sex #(or % sighting-default-option))
                      (assoc :sighting-label (str (:sighting-quantity data) "x "
                                                  (:taxonomy-genus data) " "
                                                  (:taxonomy-species data))))))
 
 (s/defn tsighting :- TSighting
   [data]
-  (map->TSighting (-> data
-                      (update :sighting-lifestage known-or-nil)
-                      (update :sighting-sex known-or-nil))))
+  (map->TSighting data))
 
 (s/defn tsighting-update :- TSightingUpdate
   [data]
-  (map->TSightingUpdate (-> data
-                            (update :sighting-lifestage known-or-nil)
-                            (update :sighting-sex known-or-nil))))
+  (map->TSightingUpdate data))
 
 (s/defn get-all
   [state :- State

@@ -79,18 +79,6 @@
              basic-word-index
              (>! ch)))
 
-      (= ctx "sighting-sex")
-      (go
-        (->> ["M" "F" "unidentified"]
-             basic-word-index
-             (>! ch)))
-
-      (= ctx "sighting-lifestage")
-      (go
-        (->> ["adult" "juvenile" "unidentified"]
-             basic-word-index
-             (>! ch)))
-
       (or (nil? cf) (nil? ep)) nil
 
       :else
@@ -190,12 +178,6 @@
         ""))
     ""))
 
-(defn maybe-unidentified-reference-filter
-  [f x]
-  (if (util/unidentified? x)
-    ""
-    (str f ":" x)))
-
 (defn tincan-sender-wait
   [window opts]
   (go
@@ -209,12 +191,6 @@
 (defn build-reference-filter-string
   [data]
   (str (species-reference-filter data (get-in data [:identification :species]))
-       " "
-       (maybe-unidentified-reference-filter "sighting-sex"
-                                            (get-in data [:identification :sex]))
-       " "
-       (maybe-unidentified-reference-filter "sighting-lifestage"
-                                            (get-in data [:identification :lifestage]))
        " reference-quality:true"))
 
 (defn tincan-sender

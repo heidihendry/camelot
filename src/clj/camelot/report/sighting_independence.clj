@@ -4,7 +4,6 @@
    [clj-time.core :as t]
    [schema.core :as s]
    [camelot.util.config :as config]
-   [camelot.util.sighting :as util.sighting]
    [camelot.util.sighting-fields :as util.sf]
    [clojure.string :as str]))
 
@@ -28,15 +27,19 @@
                                     (t/plus (:media-capture-timestamp this-sighting)
                                             (t/minutes duration))))))
 
+(defn- unidentified?
+  [v]
+  (or (nil? v) (= v "")))
+
 (defn- most-specific
   "Return the most specific value of the two given."
   [v1 v2]
-  (if (util.sighting/unidentified? v1)
+  (if (unidentified? v1)
     v2
     v1))
 
 (defn- infer-attributes
-  "Attempt to infer lifestage or sex of a dependent sighting."
+  "Infer dependent sighting using independent sighting field values."
   [state sighting new-sighting]
   (let [sighting-fields (sighting-fields state (:survey-id new-sighting))]
     (letfn [(reducer [acc x]
@@ -44,7 +47,6 @@
                                           (get new-sighting x))))]
       (->> sighting-fields
            (map util.sf/user-key)
-           (into [:sighting-lifestage :sighting-sex])
            (reduce reducer sighting)))))
 
 (defn- sighting-quantity ^long
@@ -66,19 +68,17 @@
   [field s1 s2]
   (let [v1 (get s1 field)
         v2 (get s2 field)]
-    (or (util.sighting/unidentified? v1)
-        (util.sighting/unidentified? v2)
+    (or (unidentified? v1)
+        (unidentified? v2)
         (= v1 v2))))
 
 (defn- dependent-sighting?
   "Predicate for whether the sighting would be dependent."
   [state current existing]
   (let [curtime (:media-capture-timestamp current)]
-    (and (could=? :sighting-sex current existing)
-         (could=? :sighting-lifestage current existing)
-         (every? #(could=? % current existing)
+    (and (every? #(could=? % current existing)
                  (map util.sf/user-key (sighting-fields state
-                                                                (:survey-id current))))
+                                                        (:survey-id current))))
          (or (= curtime (:media-capture-timestamp existing))
              (and (t/after? curtime (:media-capture-timestamp existing))
                   (t/before? curtime (:sighting-independence-window-end existing)))))))

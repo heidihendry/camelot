@@ -66,14 +66,6 @@
    :sighting-quantity {:datatype :integer
                        :required false
                        :order 40}
-   :sighting-lifestage {:datatype :string
-                        :validation-type :lifestage
-                        :required false
-                        :order 42}
-   :sighting-sex {:datatype :string
-                  :validation-type :sex
-                  :required false
-                  :order 41}
    :sighting-updated {:datatype :timestamp
                       :required true
                       :unmappable true}
@@ -314,8 +306,6 @@
                     :integer ::datatype-integer
                     :readable-integer ::datatype-integer
                     :number ::datatype-number
-                    :sex ::datatype-sex
-                    :lifestage ::datatype-lifestage
                     :timestamp ::datatype-timestamp
                     :longitude ::datatype-longitude
                     :latitude ::datatype-latitude

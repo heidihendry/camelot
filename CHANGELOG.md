@@ -1,4 +1,13 @@
 ## ChangeLog
+### 1.4.0
+#### Enhancements
+* Sighting 'sex' and 'lifestage' fields are now Sighting Fields.
+
+#### Notes
+This release moves 'sex' and 'lifestage' fields to the Sighting Fields functionality. This opens up a bunch of flexibility around these fields.
+
+For this upgrade Camelot reserves use of the sighting field keys "sex" and "lifestage". The upgrade to 1.4.0 may fail should sighting fields with these keys exist.  If this is the case, the keys of the existing fields should be changed using an older version of Camelot. (i.e., 1.3.x)
+
 ### 1.3.5
 #### Enhancements
 * Set camera status back to 'Available' when an active session it is used in is deleted

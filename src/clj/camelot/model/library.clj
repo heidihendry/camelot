@@ -95,12 +95,10 @@
     (doall (map (partial media/update-media-flags! s) data))))
 
 (defn- identify-media
-  [state {:keys [quantity species lifestage sex sighting-fields]} media-id]
+  [state {:keys [quantity species sighting-fields]} media-id]
   (media/update-processed-flag! state {:media-id media-id
                                        :media-processed true})
   (sighting/create! state (sighting/tsighting {:sighting-quantity quantity
-                                               :sighting-lifestage lifestage
-                                               :sighting-sex sex
                                                :taxonomy-id species
                                                :media-id media-id
                                                :sighting-fields (reduce-kv #(assoc %1 %2 (str %3))
@@ -117,12 +115,10 @@
 
 (s/defn update-identification!
   "Update sighting information for the given sighting ID."
-  [state id {:keys [quantity species lifestage sex sighting-fields]}]
+  [state id {:keys [quantity species sighting-fields]}]
   (sighting/update! state (edn/read-string id)
                     (sighting/tsighting-update
                      {:sighting-quantity quantity
-                      :sighting-lifestage lifestage
-                      :sighting-sex sex
                       :taxonomy-id species
                       :sighting-fields (reduce-kv #(assoc %1 %2 (str %3))
                                                   {} sighting-fields)})))

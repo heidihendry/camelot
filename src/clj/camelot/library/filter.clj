@@ -7,9 +7,6 @@
   (:import
    (java.lang String Boolean)))
 
-(def exact-matches-needed
-  #{:sighting-sex :sighting-lifestage})
-
 (defn normalise-str
   [v]
   (if (nil? v)
@@ -20,10 +17,6 @@
   [s ^String sub]
   (.contains ^String (normalise-str s) sub))
 
-(defn needs-exact-match?
-  [field]
-  (some #(= % field) exact-matches-needed))
-
 (defn field-search-matches?
   [search record]
   (let [{f :field s :value} search
@@ -33,10 +26,7 @@
       (let [val (get record field)]
         (if (= s "*")
           (not (nil? val))
-          (if (needs-exact-match? field)
-            (= (normalise-str val)
-               (normalise-str s))
-            (substring? (normalise-str val) s)))))))
+          (substring? (normalise-str val) s))))))
 
 (defn record-string-search-matches?
   [search record]
