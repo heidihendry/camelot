@@ -5,7 +5,6 @@
             [om.core :as om]
             [camelot.component.library.util :as util]
             [camelot.util.sighting-fields :as util.sf]
-            [camelot.util.sighting :as util.sighting]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
             [clojure.string :as str]
