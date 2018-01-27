@@ -314,7 +314,88 @@
                                         :sighting-field-key "custom"}]}}
             state (gen-state-helper config)]
         (is (= (extract-indep-sightings state survey-configuration sightings)
-               '({:species-id 1 :count 1})))))))
+               '({:species-id 1 :count 1}))))))
+
+  (testing "Copes with species ID without a sighting quantity"
+    (let [sightings [(->record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                                :taxonomy-id 3
+                                :trap-station-session-id 1
+                                :media-id 1})
+                     (->record {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                                :taxonomy-id 1
+                                :taxonomy-genus "Yellow"
+                                :taxonomy-species "Spotted Housecat"
+                                :sighting-quantity 1})]
+          state (gen-state-helper config)]
+      (is (= (extract-indep-sightings state sightings)
+             '({:species-id 1 :count 1})))))
+
+  (testing "Copes with sighting quantity without a taxonomy ID"
+    (let [sightings [(->record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                                :sighting-quantity 1
+                                :trap-station-session-id 1
+                                :media-id 1})
+                     (->record {:media-capture-timestamp (t/date-time 2015 01 01 06 05 00)
+                                :taxonomy-id 1
+                                :taxonomy-genus "Yellow"
+                                :taxonomy-species "Spotted Housecat"
+                                :sighting-quantity 1})]
+          state (gen-state-helper config)]
+      (is (= (extract-indep-sightings state sightings)
+             '({:species-id 1 :count 1})))))
+
+  (testing "May use a different independence threshold for different surveys"
+    (let [sightings [(->record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                                :sighting-quantity 1
+                                :survey-id 1
+                                :taxonomy-id 1
+                                :trap-station-session-id 1
+                                :media-id 1})
+                     (->record {:media-capture-timestamp (t/date-time 2015 1 1 7 25 00)
+                                :sighting-quantity 1
+                                :survey-id 1
+                                :taxonomy-id 1
+                                :trap-station-session-id 1
+                                :media-id 1})
+                     (->record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                                :sighting-quantity 1
+                                :survey-id 2
+                                :trap-station-session-id 2
+                                :taxonomy-id 2
+                                :media-id 2})
+                     (->record {:media-capture-timestamp (t/date-time 2015 1 1 7 25 00)
+                                :sighting-quantity 1
+                                :survey-id 2
+                                :trap-station-session-id 2
+                                :taxonomy-id 2
+                                :media-id 2})]
+          state (gen-state-helper config)]
+      (is (= (extract-indep-sightings state sightings)
+             '({:species-id 1 :count 1}
+               {:species-id 2 :count 2})))))
+
+  (testing "Should use global threshold configuration if survey configuration not found"
+    (let [sightings [(->record {:media-capture-timestamp (t/date-time 2015 1 1 7 10 00)
+                                :sighting-quantity 1
+                                :survey-id -1
+                                :taxonomy-id 1
+                                :trap-station-session-id 1
+                                :media-id 1})
+                     (->record {:media-capture-timestamp (t/date-time 2015 1 1 7 25 00)
+                                :sighting-quantity 1
+                                :survey-id -1
+                                :taxonomy-id 1
+                                :trap-station-session-id 1
+                                :media-id 1})
+                     (->record {:media-capture-timestamp (t/date-time 2015 1 1 7 31 00)
+                                :sighting-quantity 3
+                                :survey-id -1
+                                :taxonomy-id 1
+                                :trap-station-session-id 1
+                                :media-id 1})]
+          state (gen-state-helper config)]
+      (is (= (extract-indep-sightings state sightings)
+             '({:species-id 1 :count 4}))))))
 
 (deftest test-->independent-sightings
   (testing "Sighting independence"
