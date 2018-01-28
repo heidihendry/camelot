@@ -1,7 +1,8 @@
 (def +version+ "1.4.0-SNAPSHOT")
 
 (def dependencies
-  '[[org.clojure/clojure "1.9.0"]
+  '[[org.clojure/test.check "0.9.0" :scope "test"]
+    [org.clojure/clojure "1.9.0"]
     [org.clojure/clojurescript "1.9.946"]
 
     [org.clojure/core.async "0.3.443"]
@@ -39,7 +40,7 @@
     [bk/ring-gzip "0.1.1"]
     [cheshire "5.6.1"]
     [clj-http "2.2.0"]
-    [clj-time "0.11.0"]
+    [clj-time "0.14.2"]
     [cljs-http "0.1.39" :exclusions [com.cognitect/transit-clj]]
     [com.andrewmcveigh/cljs-time "0.5.0"]
     [com.luckycatlabs/SunriseSunsetCalculator "1.2"]

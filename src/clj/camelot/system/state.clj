@@ -3,7 +3,7 @@
   (:require
    [camelot.util.file :as file]
    [camelot.util.filesystem :as filesystem]
-   [schema.core :as s]
+   [schema.core :as sch]
    [clj-time.core :as t]
    [clj-time.coerce :as tc]
    [com.stuartsierra.component :as component]
@@ -295,11 +295,11 @@ Throws an IOException if the file cannot be read."
            :path nil)))
 
 (def State
-  {(s/required-key :config) Config
-   (s/required-key :database) s/Any
-   (s/required-key :app) s/Any
-   (s/optional-key :figwheel) s/Any
-   (s/optional-key :importer) s/Any
-   (s/optional-key :session) s/Any
-   (s/optional-key :jetty) s/Any
-   (s/optional-key :camera-status-active-id) s/Int})
+  {(sch/required-key :config) Config
+   (sch/required-key :database) sch/Any
+   (sch/required-key :app) sch/Any
+   (sch/optional-key :figwheel) sch/Any
+   (sch/optional-key :importer) sch/Any
+   (sch/optional-key :session) sch/Any
+   (sch/optional-key :jetty) sch/Any
+   (sch/optional-key :camera-status-active-id) sch/Int})

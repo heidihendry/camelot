@@ -1,7 +1,9 @@
 (ns camelot.model.camera
   "Camera model and data-access."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
+   [clojure.spec.alpha :as s]
+   [camelot.system.spec :as sysspec]
    [camelot.util.db :as db]
    [camelot.system.state :refer [State]]
    [camelot.model.camera-status :as camera-status]
@@ -9,95 +11,95 @@
 
 (def query (db/with-db-keys :cameras))
 
-(s/defrecord TCamera
-    [camera-name :- s/Str
-     camera-make :- (s/maybe s/Str)
-     camera-model :- (s/maybe s/Str)
-     camera-notes :- (s/maybe s/Str)
-     camera-status-id :- s/Num]
-  {s/Any s/Any})
+(sch/defrecord TCamera
+    [camera-name :- sch/Str
+     camera-make :- (sch/maybe sch/Str)
+     camera-model :- (sch/maybe sch/Str)
+     camera-notes :- (sch/maybe sch/Str)
+     camera-status-id :- sch/Num]
+  {sch/Any sch/Any})
 
-(s/defrecord Camera
-    [camera-id :- s/Num
+(sch/defrecord Camera
+    [camera-id :- sch/Num
      camera-created :- org.joda.time.DateTime
      camera-updated :- org.joda.time.DateTime
-     camera-name :- s/Str
-     camera-make :- (s/maybe s/Str)
-     camera-model :- (s/maybe s/Str)
-     camera-notes :- (s/maybe s/Str)
-     camera-status-id :- s/Num
-     camera-status-description :- s/Str]
-  {s/Any s/Any})
+     camera-name :- sch/Str
+     camera-make :- (sch/maybe sch/Str)
+     camera-model :- (sch/maybe sch/Str)
+     camera-notes :- (sch/maybe sch/Str)
+     camera-status-id :- sch/Num
+     camera-status-description :- sch/Str]
+  {sch/Any sch/Any})
 
 (def camera map->Camera)
 (defn tcamera
   [ks]
   (map->TCamera (update ks :camera-status-id #(or % 1))))
 
-(s/defn to-camera :- Camera
+(sch/defn to-camera :- Camera
   [state record]
   (-> record
       (update :camera-status-description
               #(camera-status/translate-status state %))
       camera))
 
-(s/defn get-all :- [Camera]
+(sch/defn get-all :- [Camera]
   [state :- State]
   (map #(to-camera state %)
        (query state :get-all)))
 
-(s/defn get-available :- [Camera]
+(sch/defn get-available :- [Camera]
   [state :- State]
   (->> (query state :get-available)
        (map #(to-camera state %))))
 
-(s/defn get-specific :- (s/maybe Camera)
+(sch/defn get-specific :- (sch/maybe Camera)
   [state :- State
-   id :- s/Num]
+   id :- sch/Num]
   (some->> {:camera-id id}
            (query state :get-specific)
            (first)
            (to-camera state)))
 
-(s/defn get-specific-by-name :- (s/maybe Camera)
+(sch/defn get-specific-by-name :- (sch/maybe Camera)
   [state :- State
-   data :- {:camera-name s/Str}]
+   data :- {:camera-name sch/Str}]
   (some->> data
            (query state :get-specific-by-name)
            first
            (to-camera state)))
 
-(s/defn create!
+(sch/defn create!
   [state :- State
    data :- TCamera]
   (let [record (query state :create<! data)]
     (get-specific state (int (:1 record)))))
 
-(s/defn update!
+(sch/defn update!
   [state :- State
-   id :- s/Num
+   id :- sch/Num
    data :- TCamera]
   (query state :update! (merge data {:camera-id id}))
   (get-specific state id))
 
-(s/defn delete!
+(sch/defn delete!
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [fs (media/get-all-files-by-camera state id)]
     (query state :delete! {:camera-id id})
     (media/delete-files! state fs))
   nil)
 
-(s/defn get-or-create! :- Camera
+(sch/defn get-or-create! :- Camera
   [state :- State
    data :- TCamera]
   (or (get-specific-by-name state (select-keys data [:camera-name]))
       (create! state data)))
 
-(s/defn set-camera-status!
+(sch/defn set-camera-status!
   [state :- State
-   cam-id :- s/Int
-   cam-status :- s/Int]
+   cam-id :- sch/Int
+   cam-status :- sch/Int]
   (query state :set-camera-status!
     {:camera-id cam-id
      :camera-status-id cam-status}))
@@ -109,3 +111,10 @@
   (let [available-status (camera-status/available-status-id state)]
     (doseq [cam-id (distinct cameras)]
       (set-camera-status! state cam-id available-status))))
+
+(s/def ::camera-id int?)
+
+(s/fdef make-available
+        :args (s/cat :state ::sysspec/state
+                     :cameras (s/coll-of ::camera-id))
+        :ret nil?)

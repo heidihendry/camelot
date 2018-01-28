@@ -1,5 +1,7 @@
 (ns camelot.util.db
   (:require
+   [clojure.spec.alpha :as s]
+   [camelot.system.spec :as sysspec]
    [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
    [clj-time.core :as t]
@@ -68,12 +70,22 @@ Intended for async operations which are already running within a transaction."
    (if-let [conn (get-in state [:database :connection])]
      (q {} {:connection conn}))))
 
+(defn get-query
+  [state scope qkey]
+  (get-in state [:database :queries scope qkey]))
+
+(s/fdef get-query
+        :args (s/cat :state ::sysspec/state
+                     :scope keyword?
+                     :qkey keyword?)
+        :ret fn?)
+
 (defn with-db-keys
   "Run a function, translating the parameters and results as needed."
   [scope]
   (fn -with-db-keys
     ([state qkey data]
-     (let [query (get-in state [:database :queries scope qkey])]
+     (let [query (get-query state scope qkey)]
        (if (nil? query)
          (throw (IllegalArgumentException.
                  (format "Query '%s' not found in scope '%s'" qkey scope)))

@@ -1,7 +1,9 @@
 (ns camelot.model.media
   "Media models and data access."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
+   [clojure.spec.alpha :as s]
+   [camelot.system.spec :as sysspec]
    [camelot.system.state :refer [State]]
    [camelot.util.db :as db]
    [clojure.java.io :as io]
@@ -14,33 +16,33 @@
 
 (def query (db/with-db-keys :media))
 
-(s/defrecord TMedia
-    [media-filename :- s/Str
-     media-format :- s/Str
-     media-notes :- (s/maybe s/Str)
-     media-cameracheck :- s/Bool
-     media-attention-needed :- s/Bool
-     media-processed :- (s/maybe s/Bool)
+(sch/defrecord TMedia
+    [media-filename :- sch/Str
+     media-format :- sch/Str
+     media-notes :- (sch/maybe sch/Str)
+     media-cameracheck :- sch/Bool
+     media-attention-needed :- sch/Bool
+     media-processed :- (sch/maybe sch/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
-     media-reference-quality :- (s/maybe s/Bool)
-     trap-station-session-camera-id :- s/Int]
-  {s/Any s/Any})
+     media-reference-quality :- (sch/maybe sch/Bool)
+     trap-station-session-camera-id :- sch/Int]
+  {sch/Any sch/Any})
 
-(s/defrecord Media
-    [media-id :- s/Int
+(sch/defrecord Media
+    [media-id :- sch/Int
      media-created :- org.joda.time.DateTime
      media-updated :- org.joda.time.DateTime
-     media-filename :- s/Str
-     media-format :- s/Str
-     media-notes :- (s/maybe s/Str)
-     media-cameracheck :- s/Bool
-     media-attention-needed :- s/Bool
-     media-processed :- (s/maybe s/Bool)
+     media-filename :- sch/Str
+     media-format :- sch/Str
+     media-notes :- (sch/maybe sch/Str)
+     media-cameracheck :- sch/Bool
+     media-attention-needed :- sch/Bool
+     media-processed :- (sch/maybe sch/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
-     media-reference-quality :- s/Bool
-     trap-station-session-camera-id :- s/Int
-     media-capture-timestamp-label :- s/Str]
-  {s/Any s/Any})
+     media-reference-quality :- sch/Bool
+     trap-station-session-camera-id :- sch/Int
+     media-capture-timestamp-label :- sch/Str]
+  {sch/Any sch/Any})
 
 (defn tmedia
   [ks]
@@ -51,64 +53,64 @@
   (map->Media (assoc ks :media-capture-timestamp-label
                      (tf/unparse (tf/formatters :mysql) (:media-capture-timestamp ks)))))
 
-(s/defn get-all
+(sch/defn get-all
   [state id]
   (map media (query state :get-all {:trap-station-session-camera-id id})))
 
-(s/defn get-all* :- [Media]
+(sch/defn get-all* :- [Media]
   [state :- State]
   (map media (query state :get-all*)))
 
-(s/defn get-all-files-by-survey :- [s/Str]
+(sch/defn get-all-files-by-survey :- [sch/Str]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map :media-file (query state :get-all-files-by-survey {:survey-id id})))
 
 (defn get-with-ids
   [state media-ids]
   (map media (query state :get-with-ids {:media-ids media-ids})))
 
-(s/defn get-all-files-by-survey-site :- [s/Str]
+(sch/defn get-all-files-by-survey-site :- [sch/Str]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map :media-file (query state :get-all-files-by-survey-site {:survey-site-id id})))
 
-(s/defn get-all-files-by-site :- [s/Str]
+(sch/defn get-all-files-by-site :- [sch/Str]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map :media-file (query state :get-all-files-by-site {:site-id id})))
 
-(s/defn get-all-files-by-camera :- [s/Str]
+(sch/defn get-all-files-by-camera :- [sch/Str]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map :media-file (query state :get-all-files-by-camera {:camera-id id})))
 
-(s/defn get-all-files-by-trap-station :- [s/Str]
+(sch/defn get-all-files-by-trap-station :- [sch/Str]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map :media-file (query state :get-all-files-by-trap-station {:trap-station-id id})))
 
-(s/defn get-all-files-by-trap-station-session :- [s/Str]
+(sch/defn get-all-files-by-trap-station-session :- [sch/Str]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map :media-file (query state :get-all-files-by-trap-station-session {:trap-station-session-id id})))
 
-(s/defn get-all-files-by-trap-station-session-camera :- [s/Str]
+(sch/defn get-all-files-by-trap-station-session-camera :- [sch/Str]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map :media-file (query state :get-all-files-by-trap-station-session-camera {:trap-station-session-camera-id id})))
 
-(s/defn get-specific :- (s/maybe Media)
+(sch/defn get-specific :- (sch/maybe Media)
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (some->> {:media-id id}
            (query state :get-specific)
            first
            media))
 
-(s/defn get-specific-by-filename :- (s/maybe Media)
+(sch/defn get-specific-by-filename :- (sch/maybe Media)
   [state :- State
-   filename :- s/Str]
+   filename :- sch/Str]
   (some->> {:media-filename filename}
            (query state :get-specific-by-filename)
            first
@@ -119,9 +121,9 @@
   (let [record (query state :create<! data)]
     (media (get-specific state (int (:1 record))))))
 
-(s/defn update! :- Media
+(sch/defn update! :- Media
   [state :- State
-   id :- s/Int
+   id :- sch/Int
    data :- TMedia]
   (query state :update! (merge data {:media-id id}))
   (media (get-specific state id)))
@@ -140,7 +142,7 @@
   [state variant media]
   (path-to-file state variant (:media-filename media) (:media-format media)))
 
-(s/defn delete-file!
+(sch/defn delete-file!
   "Delete a file with the given name from the media directory, along with any
   associated variants."
   [state filename]
@@ -155,10 +157,15 @@
   [state files]
   (doall (mapcat (partial delete-file! state) files)))
 
-(s/defn delete!
+(s/fdef delete-files!
+        :args (s/cat :state ::sysspec/state
+                     :files (s/coll-of string?))
+        :ret nil?)
+
+(sch/defn delete!
   "Delete the file with the given ID."
   [state :- State
-   id :- s/Num]
+   id :- sch/Num]
   (if-let [media (get-specific state id)]
     (do
       (query state :delete! {:media-id id})
@@ -166,26 +173,26 @@
                   [:original :thumb]))))
   nil)
 
-(s/defn delete-with-ids!
+(sch/defn delete-with-ids!
   [state :- State
    media-ids]
   (dorun (map (partial delete! state) media-ids))
   nil)
 
-(s/defn update-processed-flag!
+(sch/defn update-processed-flag!
   [state :- State
    {:keys [media-id media-processed]}]
   (query state :update-processed-flag! {:media-id media-id
                                                   :media-processed media-processed}))
 
-(s/defn update-reference-quality-flag!
+(sch/defn update-reference-quality-flag!
   [state :- State
    {:keys [media-id media-reference-quality]}]
   (query state :update-reference-quality-flag!
     {:media-id media-id
      :media-reference-quality media-reference-quality}))
 
-(s/defn update-media-flags!
+(sch/defn update-media-flags!
   [state :- State
    {:keys [media-id media-attention-needed media-processed media-reference-quality media-cameracheck]}]
   (query state :update-media-flags! {:media-id media-id
@@ -194,10 +201,10 @@
                                                :media-cameracheck (or media-cameracheck false)
                                                :media-processed media-processed}))
 
-(s/defn read-media-file :- (s/maybe java.io.BufferedInputStream)
+(sch/defn read-media-file :- (sch/maybe java.io.BufferedInputStream)
   [state :- State
-   filename :- s/Str
-   variant :- (s/enum :thumb :preview :original)]
+   filename :- sch/Str
+   variant :- (sch/enum :thumb :preview :original)]
   (if-let [media (get-specific-by-filename state filename)]
     (let [format (:media-format media)
           fpath (path-to-media state variant media)]
