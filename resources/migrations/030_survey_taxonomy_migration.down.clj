@@ -1,5 +1,5 @@
 (require '[yesql.core :as sql])
-(require '[camelot.system.state :as state])
+(require '[camelot.util.state :as state])
 (require '[clojure.java.jdbc :as jdbc])
 (require '[schema.core :as s])
 (require '[camelot.util.db :as db])

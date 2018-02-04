@@ -1,6 +1,6 @@
 (require '[yesql.core :as sql])
 (require '[camelot.util.db :as db])
-(require '[camelot.system.state :as state])
+(require '[camelot.util.state :as state])
 
 (sql/defqueries "sql/migration-helpers/040.sql")
 

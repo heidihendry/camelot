@@ -1,4 +1,4 @@
-(require '[camelot.system.state :as state])
+(require '[camelot.util.state :as state])
 (require '[camelot.util.db :as db])
 (require '[yesql.core :as sql])
 (require '[clj-time.core :as t])

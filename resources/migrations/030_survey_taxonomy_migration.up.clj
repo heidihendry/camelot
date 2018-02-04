@@ -1,7 +1,7 @@
 (require '[clojure.math.combinatorics :as combinatorics])
 (require '[yesql.core :as sql])
 (require '[camelot.util.db :as db])
-(require '[camelot.system.state :as state])
+(require '[camelot.util.state :as state])
 (require '[schema.core :as s])
 
 (sql/defqueries "sql/migration-helpers/030.sql")

@@ -1,4 +1,4 @@
-(require '[camelot.system.state :as state])
+(require '[camelot.util.state :as state])
 (require '[camelot.util.file :as file])
 
 (let [media-dir (file/->file (:media (state/path-map)))]

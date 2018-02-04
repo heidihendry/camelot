@@ -1,4 +1,4 @@
-(require '[camelot.system.state :as state])
+(require '[camelot.util.state :as state])
 (require '[camelot.util.file :as file])
 (require '[clojure.string :as str])
 
