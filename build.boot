@@ -165,11 +165,15 @@
   (reset! frontend-started true)
   nil)
 
-(defn start []
+(defn start-server
+  []
   (println "Starting dev server...")
   (set-env! :source-paths #(conj % "dev"))
   (System/setProperty "camelot.version" +version+)
-  (camelot/start-prod)
+  (camelot/start-prod))
+
+(defn start []
+  (start-server)
   (when-not (deref frontend-started)
     (start-frontend)))
 

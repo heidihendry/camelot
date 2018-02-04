@@ -88,6 +88,16 @@
                       (rtc/into-index (:migrations conf))
                       (:migrations conf)))))
 
+(defn latest-available-version
+  [conn]
+  (some->> conn
+           ragtime-config
+           :migrations
+           (map :id)
+           last
+           (take-while #(not= % \-))
+           (str/join "")))
+
 (defn version
   "Return the prefix of the latest migration name as a string, e.g., '019'.
 This will return nil if a migration has never been applied."
@@ -101,6 +111,13 @@ This will return nil if a migration has never been applied."
              last
              (take-while #(not= % \-))
              (str/join ""))))
+
+(defn migrations-available?
+  "Returns `true` if a migration with a newer version than currently applied
+  to the database is available. `false` otherwise."
+  [connection]
+  (not= (version connection)
+        (latest-available-version connection)))
 
 (defn rollback
   "Rollback the last migration."

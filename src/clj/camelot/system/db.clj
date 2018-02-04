@@ -2,14 +2,14 @@
   (:require
    [yesql.core :as sql]
    [com.stuartsierra.component :as component]
-   [camelot.system.db-migrate :as migrate]
    [clojure.java.jdbc :as jdbc]
    [schema.core :as s])
   (:import
    (java.io IOException)))
 
 (def query-files
-  ["cameras"
+  ["maintenance"
+   "cameras"
    "camera-status"
    "deployments"
    "library"
@@ -64,7 +64,6 @@
   component/Lifecycle
   (start [this]
     (connect connection)
-    (migrate/migrate connection)
     (assoc this :queries (build-queries)))
 
   (stop [this]

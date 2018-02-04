@@ -11,8 +11,8 @@
   [filename]
   (str/replace filename #"(?i)[^a-z0-9 .-_]+" "-"))
 
-(defn checked-datadir
-  "Check the custom datadir, and return the canonicalised path.
+(defn checked-dir
+  "Check the custom directory, and return the canonicalised path.
   throws an IO Exception if unsuitable."
   [dir]
   (let [f (io/file dir)]
@@ -37,5 +37,5 @@
                 (replace-unsafe-chars filename))]
     (when-not (file/exists? parent)
       (file/mkdirs parent))
-    (checked-datadir parent)
+    (checked-dir parent)
     fs))

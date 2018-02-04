@@ -5,6 +5,7 @@
    [camelot.util.filesystem :as filesystem]
    [schema.core :as sch]
    [clj-time.core :as t]
+   [clj-time.format :as tf]
    [clj-time.coerce :as tc]
    [com.stuartsierra.component :as component]
    [clojure.java.io :as io]
@@ -29,7 +30,9 @@
    :timezone nil
    :sighting-independence-minutes-threshold 30})
 
+(def backup-timestamp-formatter (tf/formatter "YYYYMMddHHmmss"))
 (def db-name "Database")
+(def backup-dir-name "Backups")
 (def media-directory-name "Media")
 (def filestore-directory-name "FileStore")
 
@@ -97,8 +100,42 @@
   "Return the path to the database directory."
   []
   (if (datadir-path)
-    (str (filesystem/checked-datadir (datadir-path)) SystemUtils/FILE_SEPARATOR db-name)
+    (str (filesystem/checked-dir (datadir-path)) SystemUtils/FILE_SEPARATOR db-name)
     (get-std-db-path)))
+
+(defn- build-backup-dir-path
+  "Return the full path where the backups is stored."
+  [dir]
+  (format "%s%scamelot%s%s" dir SystemUtils/FILE_SEPARATOR
+          SystemUtils/FILE_SEPARATOR backup-dir-name))
+
+(defn get-std-backup-dir-path
+  "Return the OS-specific path to the database directory."
+  []
+  (case (get-os)
+    :windows (build-backup-dir-path (env :localappdata))
+    :linux (build-backup-dir-path (str (env :home) "/.local/share"))
+    :macosx (build-backup-dir-path (str (env :home) "/Library/Application Support"))
+    :other (build-backup-dir-path ".")))
+
+(def ^:dynamic *backup-dir-override* nil)
+
+(defn backup-dir-path
+  []
+  (or *backup-dir-override* (env :camelot-backup-dir)))
+
+(defn get-backup-dir-path
+  "Return the path to the Backups directory."
+  []
+  (if (backup-dir-path)
+    (str (filesystem/checked-dir (backup-dir-path)) SystemUtils/FILE_SEPARATOR
+         backup-dir-name)
+    (get-std-backup-dir-path)))
+
+(defn generate-backup-dirname
+  []
+  (str (get-backup-dir-path) SystemUtils/FILE_SEPARATOR
+       (tf/unparse backup-timestamp-formatter (t/now))))
 
 (defn- media-path
   "Return the full path where imported media is stored."
@@ -119,7 +156,7 @@
   "Return the path to the media directory."
   []
   (if (datadir-path)
-    (str (filesystem/checked-datadir (datadir-path))
+    (str (filesystem/checked-dir (datadir-path))
          SystemUtils/FILE_SEPARATOR media-directory-name)
     (get-std-media-path)))
 
@@ -142,7 +179,7 @@
   "Return the base path to the filestore directory."
   []
   (if (datadir-path)
-    (str (filesystem/checked-datadir (datadir-path))
+    (str (filesystem/checked-dir (datadir-path))
          SystemUtils/FILE_SEPARATOR filestore-directory-name)
     (get-std-filestore-path)))
 

@@ -1,6 +1,6 @@
 (ns user
   (:require
-   [camelot.core]
+   [camelot.core :as camelot]
    [camelot.system.http :as http]
    [com.stuartsierra.component :as component]
    [reloaded.repl :as rrepl]
@@ -16,13 +16,8 @@
   [state]
   (camelot.system.db-migrate/rollback (get-in state [:database :connection])))
 
-(defn runprod []
-  (camelot.core/start-prod))
-
 (defn start []
-  (reset! http/system (->> {}
-                           camelot.core/camelot
-                           component/start)))
+  (camelot/start-prod))
 
 (defn stop []
   (swap! http/system component/stop)
@@ -36,4 +31,4 @@
 (defn state []
   @http/system)
 
-(rrepl/set-init! camelot.core/start-prod)
+(rrepl/set-init! camelot/start-prod)
