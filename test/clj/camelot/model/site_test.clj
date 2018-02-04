@@ -3,7 +3,7 @@
   (:require
    [clojure.test.check]
    [clojure.spec.alpha :as s]
-   [camelot.system.spec :as sysspec]
+   [camelot.spec.system :as sysspec]
    [clojure.spec.test.alpha :as stest]
    [camelot.spec.db :as dbspec]
    [camelot.model.media :as media]

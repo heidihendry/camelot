@@ -3,7 +3,7 @@
   (:require
    [schema.core :as s]
    [camelot.util.db :as db]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [clj-time.core :as t]
    [camelot.util.trap-station :as util.ts]
    [camelot.model.camera :as camera]

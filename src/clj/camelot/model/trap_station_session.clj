@@ -3,7 +3,7 @@
    [schema.core :as s]
    [camelot.util.db :as db]
    [clj-time.format :as tf]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [clj-time.core :as t]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]

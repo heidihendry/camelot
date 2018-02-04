@@ -2,7 +2,7 @@
   "Deployment model and data access."
   (:require
    [schema.core :as s]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.util.data :as data]
    [camelot.model.trap-station :as trap-station]

@@ -1,6 +1,6 @@
 (ns camelot.model.survey-file
   (:require
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [schema.core :as s]
    [camelot.util.db :as db]
    [camelot.translation.core :as tr]

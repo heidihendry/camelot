@@ -2,7 +2,7 @@
   (:require
    [schema.core :as s]
    [camelot.model.trap-station-session :as trap-station-session]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))

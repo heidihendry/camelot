@@ -77,8 +77,8 @@
 (set! *unchecked-math* :warn-on-boxed)
 
 (require '[camelot.core :as camelot]
-         '[camelot.system.http :refer [system http-handler] :as http]
-         '[camelot.system.db-migrate :refer [migrate rollback]])
+         '[camelot.system.http.core :refer [system http-handler] :as http]
+         '[camelot.util.db-migrate :refer [migrate rollback]])
 
 (def project "camelot")
 (def repl-port 5600)

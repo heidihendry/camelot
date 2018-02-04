@@ -1,5 +1,4 @@
 (ns camelot.system.cli
-  "Command-line handling"
   (:require
    [environ.core :refer [env]]))
 

@@ -1,7 +1,7 @@
 (ns camelot.model.survey-site
   (:require
    [schema.core :as s]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))

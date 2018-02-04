@@ -1,7 +1,7 @@
 (ns camelot.model.taxonomy
   (:require
    [schema.core :as s]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.util.config :as config]))
 

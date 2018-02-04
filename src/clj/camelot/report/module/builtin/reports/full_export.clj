@@ -2,7 +2,7 @@
   (:require
    [camelot.report.module.core :as module]
    [camelot.model.media :as media]
-   [camelot.import.template :as template]
+   [camelot.util.bulk-import :as bulk-import]
    [clj-time.format :as tf]
    [camelot.translation.core :as tr])
   (:import
@@ -23,7 +23,7 @@
 
 (defn column-titles
   [state]
-  (assoc template/default-column-mappings :absolute-path "Absolute Path"))
+  (assoc bulk-import/default-column-mappings :absolute-path "Absolute Path"))
 
 (module/register-report
  :full-export

@@ -3,7 +3,7 @@
   (:require
    [schema.core :as s]
    [camelot.util.db :as db]
-   [camelot.system.state :refer [State]]))
+   [camelot.spec.schema.state :refer [State]]))
 
 (def query (db/with-db-keys :photos))
 

@@ -1,13 +1,14 @@
 (ns camelot.system.systems
-  "Camelot's available systems."
+  "Available systems."
   (:require
    [camelot.system.cli :as cli]
-   [camelot.system.http :as http]
-   [camelot.system.db :as db]
-   [camelot.system.state :as state]
-   [camelot.system.maintenance :as maintenance]
+   [camelot.system.config.core :as config]
+   [camelot.system.http.core :as http]
+   [camelot.system.db.core :as db]
+   [camelot.system.importer.core :as importer]
+   [camelot.util.maintenance :as maintenance]
+   [camelot.util.state :as state]
    [com.stuartsierra.component :as component]
-   [camelot.system.importer :as importer]
    [clojure.tools.logging :as log]))
 
 (defn- init
@@ -16,7 +17,7 @@
                  (assoc state/spec :restoreFrom restore-db)
                  state/spec)
         smap (component/system-map
-              :config (state/map->Config {:store state/config-store
+              :config (config/map->Config {:store state/config-store
                                           :config (state/config)
                                           :path (state/path-map)})
               :database (db/map->Database {:connection dbspec}))]
@@ -52,7 +53,7 @@
 (defn- camelot-system
   [{:keys [port browser]}]
   (let [smap (component/system-map
-              :config (state/map->Config {:store state/config-store
+              :config (config/map->Config {:store state/config-store
                                           :config (state/config)
                                           :path (state/path-map)})
               :database (db/map->Database {:connection state/spec})
@@ -72,7 +73,7 @@
 (defn- maintenance-system
   [{:keys [port browser]}]
   (let [smap (component/system-map
-              :config (state/map->Config {:store state/config-store
+              :config (config/map->Config {:store state/config-store
                                           :config (state/config)
                                           :path (state/path-map)})
               :database (db/map->Database {:connection state/spec})

@@ -1,7 +1,7 @@
 (ns camelot.model.trap-station
   (:require
    [schema.core :as s]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.trap-station :as util.ts]
    [camelot.util.db :as db]
    [camelot.model.media :as media]

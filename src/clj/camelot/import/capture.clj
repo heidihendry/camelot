@@ -1,19 +1,19 @@
 (ns camelot.import.capture
   "Camera check capture import."
   (:require
-   [schema.core :as s]
-   [camelot.util.capture :as capture]
-   [camelot.system.state :refer [State]]
    [camelot.import.dirtree :as dt]
-   [camelot.import.metadata-utils :as mutil]
-   [camelot.util.db :as db]
    [camelot.import.image :as image]
+   [camelot.import.metadata-utils :as mutil]
    [camelot.model.media :as media]
    [camelot.model.photo :as photo]
    [camelot.model.trap-station-session :as trap-station-session]
+   [camelot.spec.schema.state :refer [State]]
+   [camelot.translation.core :as tr]
+   [camelot.util.capture :as capture]
+   [camelot.util.db :as db]
    [clj-time.core :as t]
    [clojure.string :as str]
-   [camelot.translation.core :as tr])
+   [schema.core :as s])
   (:import
    (camelot.model.trap_station_session TrapStationSession)))
 

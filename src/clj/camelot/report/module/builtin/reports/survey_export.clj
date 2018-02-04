@@ -1,7 +1,7 @@
 (ns camelot.report.module.builtin.reports.survey-export
   (:require
    [camelot.report.module.core :as module]
-   [camelot.import.template :as template]
+   [camelot.util.bulk-import :as bulk-import]
    [camelot.model.media :as media]
    [clj-time.format :as tf]
    [camelot.translation.core :as tr])
@@ -32,7 +32,7 @@
 
 (defn column-titles
   [state]
-  (assoc template/default-column-mappings :absolute-path "Absolute Path"))
+  (assoc bulk-import/default-column-mappings :absolute-path "Absolute Path"))
 
 (module/register-report
  :survey-export

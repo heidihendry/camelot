@@ -1,6 +1,6 @@
 (ns camelot.import.dirtree
   (:require
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.file :as file]
    [clojure.string :as str]
    [schema.core :as s])

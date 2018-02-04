@@ -5,7 +5,7 @@
    [camelot.model.survey :as survey]
    [clj-time.core :as t]
    [schema.core :as s]
-   [camelot.system.state :refer [State]])
+   [camelot.spec.schema.state :refer [State]])
   (:import
    (clojure.lang IFn)))
 

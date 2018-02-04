@@ -1,6 +1,5 @@
 (ns camelot.core
-  "Camelot - Camera Trap management software for conservation research.
-  Core initialisation."
+  "Camelot - Camera Trap management software for conservation research."
   (:require
    [camelot.system.core :as system]
    [camelot.system.cli :as cli]

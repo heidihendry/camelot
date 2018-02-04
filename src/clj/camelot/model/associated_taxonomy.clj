@@ -2,7 +2,7 @@
   "Model to associate survey with taxonomy details."
   (:require
    [camelot.model.taxonomy :as taxonomy]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [schema.core :as s]
    [camelot.util.db :as db]
    [camelot.model.survey :as survey]

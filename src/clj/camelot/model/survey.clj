@@ -3,7 +3,7 @@
   (:require
    [schema.core :as s]
    [camelot.util.db :as db]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
    [camelot.util.file :as file]
    [camelot.util.filesystem :as filesystem]

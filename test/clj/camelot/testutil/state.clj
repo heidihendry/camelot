@@ -2,7 +2,7 @@
   (:require
    [clj-time.coerce :as tc]
    [clj-time.core :as t]
-   [camelot.system.state :as state]
+   [camelot.system.config.core :as config]
    [com.stuartsierra.component :as component]))
 
 (def default-config
@@ -24,21 +24,21 @@
 
 (defn gen-state
   ([] {:config (component/start
-                (state/map->Config {:store (atom {})
+                (config/map->Config {:store (atom {})
                                     :config default-config
                                     :path {}}))
        :database {:connection {}}
        :app {}})
   ([config]
    {:config (component/start
-             (state/map->Config {:store (atom {})
+             (config/map->Config {:store (atom {})
                                  :config (merge default-config config)
                                  :path {}}))
     :database {:connection {}}
     :app {}})
   ([config queries]
    {:config (component/start
-             (state/map->Config {:store (atom {})
+             (config/map->Config {:store (atom {})
                                  :config (merge default-config config)
                                  :path {}}))
     :database {:connection {}

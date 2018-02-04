@@ -1,7 +1,7 @@
 (ns camelot.model.species-mass
   "Species mass models and data access."
   (:require
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [schema.core :as s]
    [camelot.util.db :as db]))
 

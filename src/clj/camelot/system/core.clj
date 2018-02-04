@@ -1,10 +1,10 @@
 (ns camelot.system.core
   "System lifecycle management."
   (:require
-   [camelot.system.http :as http]
-   [com.stuartsierra.component :as component]
-   [camelot.system.maintenance :as maintenance]
    [camelot.system.systems :as systems]
+   [camelot.system.http.core :as http]
+   [camelot.util.maintenance :as maintenance]
+   [com.stuartsierra.component :as component]
    [clojure.core.async :refer [>!! <! chan go-loop]]))
 
 (def ^:private lifecycle-chan-buf-size 1)

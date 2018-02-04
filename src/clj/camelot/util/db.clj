@@ -1,7 +1,7 @@
 (ns camelot.util.db
   (:require
    [clojure.spec.alpha :as s]
-   [camelot.system.spec :as sysspec]
+   [camelot.spec.system :as sysspec]
    [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
    [clj-time.core :as t]

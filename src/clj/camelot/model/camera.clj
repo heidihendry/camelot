@@ -3,9 +3,9 @@
   (:require
    [schema.core :as sch]
    [clojure.spec.alpha :as s]
-   [camelot.system.spec :as sysspec]
+   [camelot.spec.system :as sysspec]
    [camelot.util.db :as db]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.model.camera-status :as camera-status]
    [camelot.model.media :as media]))
 

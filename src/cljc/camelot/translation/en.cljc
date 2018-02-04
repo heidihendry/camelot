@@ -787,7 +787,7 @@
     :help-text-step-2 "Step 2. Modify the template as you see fit, then start the import once you're ready."
     :survey-directory "Path to survey directory"}
 
-   :camelot.import.validate
+   :camelot.system.importer.validate
    {:camera-overlap "%s is used in multiple sessions between %s."
     :filesystem-space "Import requires %d %s of disk space, but only %d %s is available."
     :session-dates "Media not within session dates. CSV row: %d."
@@ -877,7 +877,7 @@
    {:trap-station-session-closed-label "%s to %s"
     :trap-station-session-ongoing-label "%s and ongoing"}
 
-   :camelot.import.template
+   :camelot.system.importer.template
    {:directory-not-found "%s: Directory not found"
     :directory-not-readable "%s: directory not readable"
     :no-media-found "%s: no media found"}

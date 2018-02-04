@@ -3,7 +3,7 @@
   (:require
    [schema.core :as s]
    [medley.core :as medley]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.model.camera :as camera]
    [camelot.model.camera-status :as camera-status]
    [camelot.model.media :as media]

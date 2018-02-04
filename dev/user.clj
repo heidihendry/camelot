@@ -1,7 +1,7 @@
 (ns user
   (:require
    [camelot.core :as camelot]
-   [camelot.system.http :as http]
+   [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
    [reloaded.repl :as rrepl]
    [schema.core :as s]))

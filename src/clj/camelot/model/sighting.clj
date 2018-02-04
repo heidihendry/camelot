@@ -1,7 +1,7 @@
 (ns camelot.model.sighting
   "Sighting models and data access."
   (:require
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field-value :as sighting-field-value]
    [camelot.util.db :as db]
    [schema.core :as s]))

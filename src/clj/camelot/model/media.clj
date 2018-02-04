@@ -3,8 +3,8 @@
   (:require
    [schema.core :as sch]
    [clojure.spec.alpha :as s]
-   [camelot.system.spec :as sysspec]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.system :as sysspec]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [clojure.java.io :as io]
    [camelot.util.file :as file]

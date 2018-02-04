@@ -2,7 +2,7 @@
   "Generate a report from a DSL."
   (:require
    [camelot.util.db :as db]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
    [camelot.util.sighting-fields :as util.sf]
    [camelot.report.query :as query]

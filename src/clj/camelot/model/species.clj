@@ -2,7 +2,7 @@
   "Species models and data access."
   (:require
    [schema.core :as s]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]))
 
 (def query (db/with-db-keys :species))

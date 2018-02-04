@@ -2,10 +2,10 @@
   "Site models and data access."
   (:require
    [schema.core :as sch]
-   [camelot.system.spec :as sysspec]
+   [camelot.spec.system :as sysspec]
    [clojure.spec.alpha :as s]
    [clj-time.spec :as tspec]
-   [camelot.system.state :refer [State]]
+   [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]))
