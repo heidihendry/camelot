@@ -46,7 +46,7 @@
     [com.luckycatlabs/SunriseSunsetCalculator "1.2"]
     [net.mikera/imagez "0.10.0"]
 
-    [adzerk/boot-cljs "1.7.228-2" :scope "test"]
+    [adzerk/boot-cljs "2.1.4" :scope "test"]
     [adzerk/boot-reload "0.5.2" :scope "test"]
     [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
     [adzerk/boot-test "1.0.7" :scope "test"]

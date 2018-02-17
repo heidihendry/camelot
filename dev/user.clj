@@ -1,5 +1,6 @@
 (ns user
   (:require
+   [camelot.util.db-migrate]
    [camelot.core :as camelot]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
@@ -10,11 +11,11 @@
 
 (defn migrate
   [state]
-  (camelot.system.db-migrate/migrate (get-in state [:database :connection])))
+  (camelot.util.db-migrate/migrate (get-in state [:database :connection])))
 
 (defn rollback
   [state]
-  (camelot.system.db-migrate/rollback (get-in state [:database :connection])))
+  (camelot.util.db-migrate/rollback (get-in state [:database :connection])))
 
 (defn start []
   (camelot/start-prod))
