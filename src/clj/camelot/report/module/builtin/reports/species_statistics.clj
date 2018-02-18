@@ -10,6 +10,7 @@
   (let [spp (taxonomy/get-specific state taxonomy-id)]
     {:columns [:taxonomy-genus
                :taxonomy-species
+               :trap-station-name
                :trap-station-latitude
                :trap-station-longitude
                :presence-absence
@@ -29,6 +30,7 @@
                      %
                      (select-keys % [:trap-station-longitude
                                      :trap-station-latitude
+                                     :trap-station-name
                                      :total-nights]))
                   #(if (nil? (:taxonomy-id %))
                      (assoc % :taxonomy-species
