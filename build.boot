@@ -3,7 +3,7 @@
 (def dependencies
   '[[org.clojure/test.check "0.9.0" :scope "test"]
     [org.clojure/clojure "1.9.0"]
-    [org.clojure/clojurescript "1.9.946"]
+    [org.clojure/clojurescript "1.9.946" :classifier "aot"]
 
     [org.clojure/core.async "0.3.443"]
     [org.clojure/data.csv "0.1.3"]
@@ -36,7 +36,7 @@
     [org.apache.commons/commons-lang3 "3.4"]
     [com.drewnoakes/metadata-extractor "2.11.0"]
     [medley "1.0.0"]
-    [secretary "1.2.3"]
+    [secretary "1.2.3" :exclusions [org.clojure/clojurescript]]
     [bk/ring-gzip "0.1.1"]
     [cheshire "5.6.1"]
     [clj-http "2.2.0"]
@@ -45,16 +45,17 @@
     [com.andrewmcveigh/cljs-time "0.5.0"]
     [com.luckycatlabs/SunriseSunsetCalculator "1.2"]
     [net.mikera/imagez "0.10.0"]
+    [com.cemerick/url "0.1.1"]
 
     [adzerk/boot-cljs "2.1.4" :scope "test"]
     [adzerk/boot-reload "0.5.2" :scope "test"]
     [adzerk/boot-cljs-repl "0.3.3" :scope "test"]
     [adzerk/boot-test "1.0.7" :scope "test"]
     [samestep/boot-refresh "0.1.0" :scope "test"]
-    [doo "0.1.8" :scope "test"]
+    [doo "0.1.8" :scope "test" :exclusions [org.clojure/clojurescript]]
     [crisptrutski/boot-cljs-test "0.3.0" :scope "test" :exclusions [doo]]
-    [com.cemerick/piggieback "0.2.1" :scope "test"]
-    [weasel "0.7.0" :scope "test"]
+    [com.cemerick/piggieback "0.2.1" :scope "test" :exclusions [org.clojure/clojurescript]]
+    [weasel "0.7.0" :scope "test" :exclusions [org.clojure/clojurescript]]
     [reloaded.repl "0.2.3" :scope "test"]
     [org.apache.derby/derbytools "10.12.1.1" :scope "test"]])
 
@@ -107,7 +108,7 @@
   (apply ns.repl/set-refresh-dirs (get-env :directories))
   (comp
    (watch)
-   (reload :ids #{"www/js/compiled/camelot"}
+   (reload :ids #{"www/js/compiled/camelot" "www/js/compiled/manager"}
            :asset-path "/www")
    (cljs-repl)
    (cljs :optimizations :none)
