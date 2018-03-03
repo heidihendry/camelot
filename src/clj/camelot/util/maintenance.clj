@@ -9,7 +9,8 @@
    [camelot.util.db-migrate :as db-migrate]
    [com.stuartsierra.component :as component])
   (:import
-   (java.io IOException)))
+   (java.io IOException)
+   (java.util.zip ZipEntry ZipOutputStream)))
 
 (def ^:private derby-container-dir "seg0")
 (def ^:private query (dbutil/with-db-keys :maintenance))
@@ -43,10 +44,24 @@
     (catch IOException e
       false)))
 
+(defn- compress-dir
+  [dir]
+  (let [zip-path (str dir ".zip")]
+    (with-open [zip (ZipOutputStream. (io/output-stream (str dir ".zip")))]
+      (doseq [f (file-seq (io/file dir)) :when (file/file? f)]
+        (.putNextEntry zip (ZipEntry. ^String (file/get-path f)))
+        (io/copy f zip)
+        (.closeEntry zip)))
+    zip-path))
+
 (defn backup
   "Back up the database."
   [state]
-  (query state :backup! {:path (state/generate-backup-dirname)}))
+  (let [backup-dir (state/generate-backup-dirname)]
+    (query state :backup! {:path backup-dir})
+    (let [zip (compress-dir backup-dir)]
+      (file/delete-recursive (io/file backup-dir))
+      zip)))
 
 (defn migrate
   "Upgrade the database."
