@@ -668,7 +668,8 @@
     :cameras "Cameras"
     :surveys "Surveys"
     :sites "Sites"
-    :reports "Reports"}
+    :reports "Reports"
+    :backup "Backup / restore"}
 
    :camelot.component.species-search
    {:scientific-name "Scientific name..."

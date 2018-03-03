@@ -132,9 +132,7 @@
                                          :onClick #(do
                                                      (nav/analytics-event "org-survey-create" "submit-next-click")
                                                      (om/update! data :survey-data-existed? (survey-data-existed?))
-                                                     (if (feature/enabled? (state/settings) :bulk-import)
-                                                       (om/update! data :show-bulk-import-prompt true)
-                                                       (create-survey data false navigate-bypassing-bulk-import)))
+                                                     (om/update! data :show-bulk-import-prompt true))
                                          :disabled (if (and (survey-details-completed? data)
                                                             (not (:submitting-form data)))
                                                      "" "disabled")

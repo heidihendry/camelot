@@ -8,6 +8,8 @@
             [camelot.component.site.core :as site]
             [camelot.component.camera.core :as camera]
             [camelot.component.report.core :as report]
+            [camelot.component.backup.core :as backup]
+            [camelot.util.desktop :as desktop]
             [smithy.util :as util]
             [camelot.component.nav :as cnav]
             [camelot.nav :as nav]
@@ -75,6 +77,7 @@
                                    :site (om/build site/site-menu-component (:site data))
                                    :camera (om/build camera/camera-menu-component (:camera data))
                                    :report (om/build report/menu-component (:report data))
+                                   :backup (om/build backup/menu-component {})
                                    (om/build not-implemented data))))))))
 
 (defn organisation-view-component
@@ -90,6 +93,10 @@
                                :name (tr/translate ::cameras)}
                               {:concept :report
                                :name (tr/translate ::reports)}])
+      (when (and (desktop/is-desktop-mode?)
+                 (feature/enabled? (state/settings) :backup))
+        (om/transact! data :menu #(conj % {:concept :backup
+                                           :name (tr/translate ::backup)})))
       (when (nil? (:active @data))
         (om/update! data :active :survey))
       (om/update! data :camera {})

@@ -15,9 +15,8 @@
 
 (defn bulk-import-mode?
   []
-  (and (feature/enabled? (state/settings) :bulk-import)
-       (get-in (state/app-state-cursor)
-               [:selected-survey :survey-bulk-import-mode :value])))
+  (get-in (state/app-state-cursor)
+          [:selected-survey :survey-bulk-import-mode :value]))
 
 (def survey-menu
   [{:action :deployment

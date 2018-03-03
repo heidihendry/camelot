@@ -1,6 +1,7 @@
 (ns camelot.util.misc
   "Miscellaneous utilities."
   (:require
+   [camelot.util.url :as url]
    [cljs-time.core :as t]))
 
 (defn nights-elapsed
@@ -8,18 +9,24 @@
   [start end]
   (t/in-days (t/interval (t/at-midnight start) (t/at-midnight end))))
 
+(defn get-host
+  []
+  (some-> (-> js/window (aget "location") (aget "search"))
+          (subs 1)
+          (.split "&")
+          first
+          (.split "=")
+          second))
+
 (defn with-baseurl
   "Return the given path along with the correct base URL."
   [path]
-  (let [protocol (-> js/window (aget "location") (aget "protocol"))
-        port (-> js/window (aget "location") (aget "port"))]
+  (let [u (url/window-href)
+        protocol (:protocol u)
+        port (:port u)]
     (if (or (clojure.string/starts-with? protocol "http")
             (clojure.string/starts-with? protocol "https"))
-      (str
-       (-> js/window (aget "location") (aget "protocol"))
-       "//"
-       (-> js/window (aget "location") (aget "hostname"))
-       (when-not (zero? (count port))
-         (str ":" port))
-       path)
+      (str protocol "://" (:host u)
+           (when port (str ":" port))
+           path)
       (str "http://localhost:3449" path))))

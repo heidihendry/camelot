@@ -29,6 +29,7 @@
    [camelot.system.importer.bulk :as bulk]
    [camelot.system.importer.core :as importer]
    [camelot.system.importer.template :as template]
+   [camelot.backup.core :as backup]
    [camelot.util.cursorise :as cursorise]
    [camelot.util.db-migrate :as db-migrate]
    [camelot.util.state :as state]
@@ -320,6 +321,10 @@
   (context "/importer" {session :session state :system}
            (GET "/" [] (r/response (importer/importer-state state)))
            (POST "/cancel" [] (r/response (importer/cancel-import state))))
+
+  (context "/backup" {session :session state :system}
+           (GET "/file/:filename" [filename] (backup/download state filename))
+           (GET "/manifest" [] (backup/manifest state)))
 
   (GET "/" _ (retrieve-index))
   (GET "/heartbeat" {session :session state :system}

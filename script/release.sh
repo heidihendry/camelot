@@ -8,6 +8,7 @@ README_FILE="README.md"
 GETTING_STARTED_DOC="doc/gettingstarted.rst"
 HTML_FILE="resources/www/index.html"
 BATCH_FILE="script/bin/camelot-desktop.bat"
+PACKAGE_JSON="resources/www/package.json"
 
 echo "Ensuring branch is clean..."
 git status | grep -qE 'working tree clean|branch is up-to-date'
@@ -19,6 +20,7 @@ sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${re
 sed -i "s/\([0-9]\+\.[0-9]\+\.[0-9]\+\)\]/${released_version}\]/" ${README_FILE}
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${GETTING_STARTED_DOC}
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).jar/${PROJECT_NAME}-${released_version}.jar/" ${BATCH_FILE}
+sed -i "s/\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT/${released_version}/" ${PACKAGE_JSON}
 sed -i "s/\\?v=\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT/?v=${released_version}/" ${HTML_FILE}
 git commit -a -m "Version bump: $released_version"
 git tag -sa "v$released_version" -m "Release: $released_version"
@@ -40,6 +42,7 @@ patch_version=$(echo $released_version | cut -d\. -f3)
 new_patch_version=$(($patch_version+1))
 new_version="$(basename "${released_version}" ".${patch_version}").${new_patch_version}"
 sed -i "s/+version+\s\+\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)\"/\+version\+ \"${new_version}-SNAPSHOT\"/" ${BUILD_FILE}
+sed -i "s/${released_version}/${new_version}-SNAPSHOT/" ${PACKAGE_JSON}
 sed -i "s/\\?v=${released_version}/?v=${new_version}-SNAPSHOT/" ${HTML_FILE}
 git commit -a -m "Version bump: ${new_version}-SNAPSHOT"
 
