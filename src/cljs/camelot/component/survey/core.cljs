@@ -1,7 +1,6 @@
 (ns camelot.component.survey.core
   (:require [om.core :as om]
             [camelot.nav :as nav]
-            [camelot.util.feature :as feature]
             [camelot.state :as state]
             [camelot.component.survey.create :as create]
             [camelot.component.survey.manage :as manage]
