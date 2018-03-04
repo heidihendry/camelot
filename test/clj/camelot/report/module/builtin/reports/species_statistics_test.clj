@@ -17,6 +17,7 @@
 
 (def headings ["Genus"
                "Species"
+               "Trap Station Name"
                "Trap Station Latitude"
                "Trap Station Longitude"
                "Presence"
@@ -45,6 +46,7 @@
   {:media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
    :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
    :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
+   :trap-station-name "Trap1"
    :trap-station-id 1
    :site-id 1
    :trap-station-longitude 30
@@ -87,7 +89,7 @@
                                           :species-mass-id 2}))
               state (gen-state-helper {:sighting-independence-minutes-threshold 20})
               result (report state 1 sightings)]
-          (is (= result (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
+          (is (= result (list ["Smiley" "Wolf" "Trap1" 5 30 "X" 3 14 (calc-obs-nights 3 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
 
     (testing "Report for one sighting should contain its summary"
       (with-redefs [taxonomy/get-specific
@@ -108,7 +110,7 @@
                                           :species-mass-id 2}))
               state (gen-state-helper {:sighting-independence-minutes-threshold 20})
               result (report state 1 sightings)]
-          (is (= result (list ["Smiley" "Wolf" 5 30 "X" 3 7 (calc-obs-nights 3 7) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
+          (is (= result (list ["Smiley" "Wolf" "Trap1" 5 30 "X" 3 7 (calc-obs-nights 3 7) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
 
     (testing "Should return a record per location."
       (with-redefs [taxonomy/get-specific
@@ -134,6 +136,7 @@
                                           :taxonomy-id 1
                                           :trap-station-longitude 30.5
                                           :trap-station-latitude 5.5
+                                          :trap-station-name "Trap2"
                                           :trap-station-id 2
                                           :media-capture-timestamp (t/date-time 2015 1 4 10 50 15)
                                           :trap-station-session-id 2
@@ -144,8 +147,8 @@
                                           :species-mass-id 2}))
               state (gen-state-helper {:sighting-independence-minutes-threshold 20})
               result (report state 1 sightings)]
-          (is (= result (list ["Smiley" "Wolf" 5 30 "X" 3 14 (calc-obs-nights 3 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]
-                              ["Smiley" "Wolf" 5.5 30.5 "X" 5 14 (calc-obs-nights 5 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
+          (is (= result (list ["Smiley" "Wolf" "Trap1" 5 30 "X" 3 14 (calc-obs-nights 3 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]
+                              ["Smiley" "Wolf" "Trap2" 5.5 30.5 "X" 5 14 (calc-obs-nights 5 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
 
     (testing "Should respect independence threshold setting"
       (with-redefs [taxonomy/get-specific
@@ -179,7 +182,7 @@
                                           :species-mass-id 2}))
               state (gen-state-helper {:sighting-independence-minutes-threshold 10})
               result (report state 1 sightings)]
-          (is (= result (list ["Smiley" "Wolf" 5 30 "X" 8 7 (calc-obs-nights 8 7) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
+          (is (= result (list ["Smiley" "Wolf" "Trap1" 5 30 "X" 8 7 (calc-obs-nights 8 7) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
 
     (testing "Should include entries for locations the species was not found in"
       (with-redefs [taxonomy/get-specific
@@ -200,11 +203,13 @@
                                           :taxonomy-class "Animal"
                                           :species-mass-id 2})
                               (as-sample {:trap-station-id 2
+                                          :trap-station-name "Trap2"
                                           :trap-station-longitude 40
                                           :trap-station-latitude 10
                                           :media-capture-timestamp (t/date-time 2015 1 3 10 15 15)
                                           :trap-station-session-id 2})
                               (as-sample {:trap-station-id 3
+                                          :trap-station-name "Trap3"
                                           :trap-station-longitude 90
                                           :trap-station-latitude 50
                                           :media-capture-timestamp (t/date-time 2015 1 3 10 30 15)
@@ -212,9 +217,9 @@
               state (gen-state-helper {:sighting-independence-minutes-threshold 10})
               result (report state 1 sightings)]
           (is (= (into #{} result)
-                 #{["Smiley" "Wolf" 5 30 "X" 3 21 (calc-obs-nights 3 21) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]
-                   ["Smiley" "Wolf" 10 40 nil nil 21 nil nil nil nil nil nil]
-                   ["Smiley" "Wolf" 50 90 nil nil 21 nil nil nil nil nil nil]})))))
+                 #{["Smiley" "Wolf" "Trap1" 5 30 "X" 3 21 (calc-obs-nights 3 21) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]
+                   ["Smiley" "Wolf" "Trap2" 10 40 nil nil 21 nil nil nil nil nil nil]
+                   ["Smiley" "Wolf" "Trap3" 50 90 nil nil 21 nil nil nil nil nil nil]})))))
 
     (testing "Should return only the species searched"
       (with-redefs [taxonomy/get-specific
@@ -257,7 +262,7 @@
                                           :species-mass-id 1}))
               state (gen-state-helper {:sighting-independence-minutes-threshold 20})
               result (report state 3 sightings)]
-          (is (= result (list ["A" "Meerkat" 5 30 "X" 1 21 (calc-obs-nights 1 21) "A Meerkat" "Meerkatos" "Mammal" "Animal" 1]))))))
+          (is (= result (list ["A" "Meerkat" "Trap1" 5 30 "X" 1 21 (calc-obs-nights 1 21) "A Meerkat" "Meerkatos" "Mammal" "Animal" 1]))))))
 
     (testing "CSV output"
       (testing "CSV should contain header row"
@@ -296,6 +301,7 @@
                                             :trap-station-longitude 30.5
                                             :trap-station-latitude 5.5
                                             :trap-station-id 2
+                                            :trap-station-name "Trap2"
                                             :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
                                             :trap-station-session-id 2
                                             :taxonomy-common-name "Smiley Wolf"
@@ -306,5 +312,5 @@
                 state (gen-state-helper {:sighting-independence-minutes-threshold 20})
                 result (csv-report state 1 sightings)]
             (is (= result (str (str/join "," headings) "\n"
-                               "Smiley,Wolf,5,30,X,3,14," (calc-obs-nights 3 14) ",Smiley Wolf,Wolfos,Mammal,Animal,2\n"
-                               "Smiley,Wolf,5.5,30.5,X,5,14," (calc-obs-nights 5 14) ",Smiley Wolf,Wolfos,Mammal,Animal,2\n")))))))))
+                               "Smiley,Wolf,Trap1,5,30,X,3,14," (calc-obs-nights 3 14) ",Smiley Wolf,Wolfos,Mammal,Animal,2\n"
+                               "Smiley,Wolf,Trap2,5.5,30.5,X,5,14," (calc-obs-nights 5 14) ",Smiley Wolf,Wolfos,Mammal,Animal,2\n")))))))))
