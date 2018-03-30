@@ -109,7 +109,7 @@
                                       t2s)))
                      {}
                      grorder)]
-    (build-records rorder (into {} data))))
+    (build-records rorder data)))
 
 (s/defn get-by :- [{s/Keyword s/Any}]
   "Retrieve the data for the given report type."
