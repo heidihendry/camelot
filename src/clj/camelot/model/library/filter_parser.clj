@@ -1,5 +1,6 @@
 (ns camelot.model.library.filter-parser
   (:require
+   [camelot.util.filter :as futil]
    [clojure.string :as str]))
 
 (defmacro with-negation [search [s-bind is-neg?] & body]
@@ -18,7 +19,7 @@
          :negated? is-neg?}
         (let [field (keyword (first parts))]
           {:field field
-           :id-field? (re-find #"\-id$" (name field))
+           :id-field? (re-find #"\-id$" (name (futil/field-key-lookup field)))
            :value (str/join ":" (rest parts))
            :negated? is-neg?})))))
 
