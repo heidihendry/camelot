@@ -1,7 +1,11 @@
 ## ChangeLog
-### 1.4.0
+### 1.4.0 (upcoming)
 #### Enhancements
 * Sighting 'sex' and 'lifestage' fields are now Sighting Fields.
+* Provide database configuration for improved performance
+* Improve search performance in the library, particularly for full-text search
+* A backup of the database is now created automatically before upgrading
+* Adds negation to library search expressions (e.g., "flagged:true !species:*")
 
 #### Notes
 This release moves 'sex' and 'lifestage' fields to the Sighting Fields functionality. This opens up a bunch of flexibility around these fields.
