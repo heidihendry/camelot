@@ -11,6 +11,11 @@
   [e]
   (.. e -target -value))
 
+(defn update-identification!
+  [field-id data value]
+  (om/update! (::identification data) [:sighting-fields field-id] value)
+  (om/update! (::identification data) :dirty-state true))
+
 (defn text-input-component
   "Render a text input component for the field"
   [data owner]
@@ -22,7 +27,7 @@
         (dom/input #js {:type "text"
                         :className "field-input"
                         :required required
-                        :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                        :onChange #(update-identification! field-id data (value-of %))
                         :value (get-in data [::identification :sighting-fields field-id] "")})))))
 
 (defn select-component-options
@@ -44,7 +49,7 @@
         (dom/select #js {:type "text"
                          :className "field-input"
                          :required required
-                         :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                         :onChange #(update-identification! field-id data (value-of %))
                          :value (get-in data [::identification :sighting-fields field-id])}
                     (om/build-all
                      select-component-options
@@ -68,8 +73,7 @@
         (dom/input #js {:type "checkbox"
                         :className "field-input"
                         :checked checked
-                        :onChange #(do (om/update! (::identification data) [:sighting-fields field-id]
-                                                   (.. % -target -checked)))})))))
+                        :onChange #(update-identification! field-id data (.. % -target -checked))})))))
 
 (defn number-component
   "Render a number input component for the field"
@@ -82,7 +86,7 @@
         (dom/input #js {:type "number"
                         :className "field-input"
                         :required required
-                        :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                        :onChange #(update-identification! field-id data (value-of %))
                         :value (get-in data [::identification :sighting-fields field-id] "")})))))
 
 (defn textarea-component
@@ -97,7 +101,7 @@
                            :rows 3
                            :cols 50
                            :required required
-                           :onChange #(om/update! (::identification data) [:sighting-fields field-id] (value-of %))
+                           :onChange #(update-identification! field-id data (value-of %))
                            :value (get-in data [::identification :sighting-fields field-id])})))))
 
 (defn field-component

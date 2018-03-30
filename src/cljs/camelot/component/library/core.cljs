@@ -66,7 +66,7 @@
   (let [search (aget opts "search")
         survey-id (aget opts "survey")
         reload (aget opts "reload")]
-    (when reload
+    (when (and reload (not (get-in data [:search :inprogress] false)))
       (util/load-library data search))))
 
 (defn delete-media!

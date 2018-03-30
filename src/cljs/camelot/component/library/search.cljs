@@ -188,9 +188,23 @@
           (<! (timeout 100))
           (recur))))))
 
+(defn- sighting-field-reference-filters
+  [data]
+  (let [identification (:identification data)
+        sf-list (map #(vector (:sighting-field-id %) (sighting-field-to-field-user-key %))
+                     (apply concat (vals (:sighting-fields data))))]
+    (mapcat (fn [[id key]]
+              (let [value (get-in identification [:sighting-fields id])]
+                (if (empty? (str value))
+                  []
+                  [(str key ":" value)])))
+            sf-list)))
+
 (defn build-reference-filter-string
   [data]
   (str (species-reference-filter data (get-in data [:identification :species]))
+       " "
+       (str/join " " (sighting-field-reference-filters data))
        " reference-quality:true"))
 
 (defn tincan-sender
