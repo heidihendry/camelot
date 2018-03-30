@@ -40,6 +40,18 @@
 
 (def tsighting-field map->TSightingField)
 
+(defn- build-select-tsighting-field
+  [{:keys [survey-id internal-key key label ordering]}]
+  (tsighting-field {:sighting-field-internal-key internal-key
+                    :sighting-field-key key
+                    :sighting-field-label label
+                    :sighting-field-datatype "select"
+                    :sighting-field-required false
+                    :sighting-field-default ""
+                    :sighting-field-affects-independence true
+                    :sighting-field-ordering ordering
+                    :survey-id survey-id}))
+
 (defn get-options
   "Return all options for a sighting field."
   [state sf-id]
@@ -107,6 +119,36 @@
                 (get-specific state))]
     (create-options! state (:sighting-field-id sf) (:sighting-field-options field-config))
     sf))
+
+(defn- create-select-field!
+  [state field-config options]
+  (create! state (assoc (build-select-tsighting-field field-config)
+                        :sighting-field-options options)))
+
+(defn- create-sex-default-field!
+  [state survey-id]
+  (let [field {:survey-id survey-id
+               :key "sex"
+               :label "Sex"
+               :ordering 5}
+        options ["Male" "Female"]]
+    (create-select-field! state field options)))
+
+(defn- create-lifestage-default-field!
+  [state survey-id]
+  (let [field {:survey-id survey-id
+               :key "lifestage"
+               :label "Life stage"
+               :ordering 10}
+        options ["Adult" "Juvenile"]]
+    (create-select-field! state field options)))
+
+(defn create-default-fields!
+  "Create default sighting fields for a survey."
+  [state survey-id]
+  (create-sex-default-field! state survey-id)
+  (create-lifestage-default-field! state survey-id)
+  nil)
 
 (defn delete!
   "Delete the sighting field with the given ID."

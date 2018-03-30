@@ -1,12 +1,12 @@
 -- name: create<!
 INSERT INTO sighting (sighting_created, sighting_updated, sighting_quantity,
-       sighting_lifestage, sighting_sex, taxonomy_id, media_id)
-VALUES (:current_timestamp, :current_timestamp, :sighting_quantity, :sighting_lifestage,
-       :sighting_sex, :taxonomy_id, :media_id)
+        taxonomy_id, media_id)
+VALUES (:current_timestamp, :current_timestamp, :sighting_quantity,
+        :taxonomy_id, :media_id)
 
 -- name: get-specific
 SELECT sighting_id, sighting_created, sighting_updated, sighting_quantity,
-       sighting_lifestage, sighting_sex, taxonomy_id, media_id, taxonomy_genus,
+       taxonomy_id, media_id, taxonomy_genus,
        taxonomy_species
 FROM sighting
 LEFT JOIN taxonomy USING (taxonomy_id)
@@ -14,7 +14,7 @@ WHERE sighting_id = :sighting_id
 
 -- name: get-all
 SELECT sighting_id, sighting_created, sighting_updated, sighting_quantity,
-       sighting_lifestage, sighting_sex, taxonomy_id, media_id, taxonomy_genus,
+       taxonomy_id, media_id, taxonomy_genus,
        taxonomy_species
 FROM sighting
 LEFT JOIN taxonomy USING (taxonomy_id)
@@ -24,8 +24,6 @@ WHERE media_id = :media_id
 UPDATE sighting
 SET sighting_updated = :current_timestamp,
     sighting_quantity = :sighting_quantity,
-    sighting_lifestage = :sighting_lifestage,
-    sighting_sex = :sighting_sex,
     taxonomy_id = :taxonomy_id
 WHERE sighting_id = :sighting_id
 
@@ -49,7 +47,7 @@ WHERE taxonomy_id NOT IN (SELECT taxonomy_id
 
 -- name: get-all*
 SELECT sighting_id, sighting_created, sighting_updated, sighting_quantity,
-       sighting_lifestage, sighting_sex, taxonomy_id, media_id, taxonomy_genus,
+       taxonomy_id, media_id, taxonomy_genus,
        taxonomy_species
 FROM sighting
 LEFT JOIN taxonomy USING (taxonomy_id)

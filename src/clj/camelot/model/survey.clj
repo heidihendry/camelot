@@ -74,8 +74,10 @@
 (s/defn create! :- Survey
   [state :- State
    data :- TSurvey]
-  (let [record (query state :create<! data)]
-    (survey (get-specific state (int (:1 record))))))
+  (let [record (query state :create<! data)
+        s (survey (get-specific state (int (:1 record))))]
+    (sighting-field/create-default-fields! state (:survey-id s))
+    s))
 
 (s/defn update! :- Survey
   [state :- State
