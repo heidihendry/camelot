@@ -16,9 +16,11 @@
       (if (= (count parts) 1)
         {:value (first parts)
          :negated? is-neg?}
-        {:field (keyword (first parts))
-         :value (str/join ":" (rest parts))
-         :negated? is-neg?}))))
+        (let [field (keyword (first parts))]
+          {:field field
+           :id-field? (re-find #"\-id$" (name field))
+           :value (str/join ":" (rest parts))
+           :negated? is-neg?})))))
 
 (defn parse-conjunction
   [search]

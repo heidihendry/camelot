@@ -19,9 +19,9 @@
 
 (defn field-search-matches?
   [search record]
-  (let [{f :field s :value} search
+  (let [{f :field s :value id? :id-field?} search
         field (futil/field-key-lookup f)]
-    (if (re-find #"\-id$" (name field))
+    (if id?
       (= (get record field) (edn/read-string s))
       (let [val (get record field)]
         (if (= s "*")
@@ -30,7 +30,7 @@
 
 (defn record-string-search-matches?
   [search record]
-  (substring? (apply str (interpose "|||" (vals record))) (:value search)))
+  (some #(substring? (str %) (:value search)) (vals record)))
 
 (defn value-matches?
   [search record]

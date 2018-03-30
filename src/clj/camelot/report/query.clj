@@ -98,15 +98,18 @@
 (defn- join-all
   [state by]
   (let [rorder (resolution-order data-definitions by)
+        grorder (group-by first rorder)
+        qdata (reduce #(let [qfn (get query-fns %2)]
+                         (assoc %1 %2 (future (qfn state))))
+                      {} (keys grorder))
         data (reduce (fn [acc [t1 [t2s]]]
-                       (let [qfn (get query-fns t1)
-                             qres (qfn state)]
-                         (assoc acc t1
-                                (reduce (fn [iacc t2] (assoc iacc t2 (group-by t2 qres)))
-                                        {}
-                                        t2s))))
-                     {} (group-by first rorder))]
-    (build-records rorder data)))
+                       (assoc acc t1
+                              (reduce (fn [iacc t2] (assoc iacc t2 (group-by t2 @(get qdata t1))))
+                                      {}
+                                      t2s)))
+                     {}
+                     grorder)]
+    (build-records rorder (into {} data))))
 
 (s/defn get-by :- [{s/Keyword s/Any}]
   "Retrieve the data for the given report type."
