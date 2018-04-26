@@ -21,6 +21,10 @@ Java can be downloaded here:
 If using OSX, you will need to install the "JDK". For Windows and Linux,
 you can install either the "JRE" or the "JDK".
 
+*Note*: If you already have Java installed on your system, we recommend making
+sure it's Oracle's Java implementation, and not OpenJDK.  OpenJDK is known to
+have problems uploading some images.
+
 Web browser
 ^^^^^^^^^^^
 
