@@ -94,14 +94,13 @@
 (defn media
   "Return the IDs for all media matching `psearch`."
   [state psearch]
-  (let [{valid :valid where-qpart :where} (where-query psearch)]
+  (try
+    (let [{valid :valid where-qpart :where} (where-query psearch)]
       (if valid
         (let [ext-q (join-sighting-fields honey-util/base-query psearch)
               sql (honey-util/->query ext-q where-qpart)]
           (map :media_id (jdbc/query (get-in state [:database :connection]) sql)))
         '()))
-  #_(try
-    
-    #_(catch Exception e
+    (catch Exception e
       (log/error (.getMessage e))
       '())))
