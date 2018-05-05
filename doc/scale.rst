@@ -24,14 +24,14 @@ initial load of the library, searching the library, and the CPU and memory
 constraints required to produce reports.
 
 To serve as a guide for how Camelot may perform for large datasets, below is
-the approximate times to produce those using a high-end laptop in 2017 (Dell
-Precision 5510; 16GB RAM; Intel i7-6820HQ; SSD) with a maximum JVM heap size
-of 14GB:
+the timing for working with a dataset of 2 million images using a high-end
+laptop in 2017 (Dell Precision 5510; 16GB RAM; Intel i7-6820HQ; SSD) with a
+maximum JVM heap size of 14GB:
 
 * **Full Export report**: 368 seconds
-* **Library load time**: <2 seconds
-* **Library search time (basic search)**: <2 seconds
-* **Library search time (full/advanced search)**: 50 seconds
+* **Library load time**: 13 seconds
+* **Library search time (basic search)**: 6.5 seconds
+* **Library search time (full-text search)**: 28 seconds
 
 Considerations for your dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
