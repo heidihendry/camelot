@@ -8,7 +8,6 @@
             [camelot.util.cursorise :as cursorise]
             [camelot.translation.core :as tr]
             [cljs.core.async :refer [<! chan >!]]
-            [camelot.util.filter :as filter]
             [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 

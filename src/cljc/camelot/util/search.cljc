@@ -1,4 +1,4 @@
-(ns camelot.util.filter
+(ns camelot.util.search
   (:require
    [clojure.string :as str]
    [camelot.util.model :as model]))

@@ -55,7 +55,7 @@
   [state :- State]
   (let [sf (sighting-field-value/query-all state)]
     (->> (query state :get-all*)
-                   (map #(sighting (merge (get sf (:sighting-id %)) %))))))
+         (map #(sighting (merge (get sf (:sighting-id %)) %))))))
 
 (s/defn get-specific
   [state :- State

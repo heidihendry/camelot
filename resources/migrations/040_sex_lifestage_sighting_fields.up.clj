@@ -75,7 +75,7 @@
   (condp = (:sighting_sex sightings)
     "M" "Male"
     "F" "Female"
-    ""))
+    nil))
 
 (defn- -m040-migrate-sex-fields!
   [conn sightings field-id]

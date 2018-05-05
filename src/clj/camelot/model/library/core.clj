@@ -5,15 +5,14 @@
    [medley.core :as medley]
    [camelot.util.db :as db]
    [clojure.tools.logging :as log]
-   [camelot.model.library.filter :as filter]
+   [camelot.model.library.search :as search]
    [camelot.report.query :as query]
-   [camelot.util.filter :as futil]
    [camelot.util.datatype :as datatype]
    [camelot.model.sighting :as sighting]
    [camelot.model.media :as media]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.trap-station :as util.ts]
-   [camelot.model.library.filter-parser :as fparser]
+   [camelot.model.library.search-parser :as sparser]
    [camelot.model.taxonomy :as taxonomy]
    [clojure.edn :as edn]
    [camelot.util.config :as config])
@@ -52,25 +51,17 @@
 
 (defn search-media
   [state search]
-  (let [psearch (fparser/parse search)]
+  (let [psearch (sparser/parse search)]
     (cond
-      (fparser/match-all? psearch)
+      (sparser/match-all? psearch)
       (map :media-id (query state :all-media-ids {}))
 
-      (fparser/match-all-in-survey? psearch)
+      (sparser/match-all-in-survey? psearch)
       (map :media-id (query state :all-media-ids-for-survey
                        {:field-value (:value (ffirst psearch))}))
 
       :else
-      (->> (query/get-by state :media)
-           (filter/only-matching psearch)
-           (sort-by (juxt :trap-station-id
-                          :camera-id
-                          :trap-station-session-start-date
-                          :trap-station-session-id
-                          :media-capture-timestamp))
-           (map :media-id)
-           distinct))))
+      (search/media state psearch))))
 
 (s/defn build-records
   [state sightings media]

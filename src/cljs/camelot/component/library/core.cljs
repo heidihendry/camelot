@@ -3,7 +3,6 @@
             [om.dom :as dom]
             [camelot.rest :as rest]
             [camelot.state :as state]
-            [camelot.util.filter :as filter]
             [camelot.component.util :as cutil]
             [camelot.component.library.util :as util]
             [camelot.component.library.search :as search]

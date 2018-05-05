@@ -1,6 +1,8 @@
-(ns camelot.model.library.filter-parser
+(ns camelot.model.library.search-parser
   (:require
-   [camelot.util.filter :as futil]
+   [clojure.edn :as edn]
+   [camelot.util.model :as model]
+   [camelot.util.search :as search-util]
    [clojure.string :as str]))
 
 (defmacro with-negation [search [s-bind is-neg?] & body]
@@ -10,6 +12,10 @@
            ~s-bind (if found-bang# (subs ~s# 1) ~s#)]
        ~@body)))
 
+(defn sighting-field?
+  [field]
+  (re-find #"field-" (name field)))
+
 (defn parse-term
   [search]
   (with-negation search [s is-neg?]
@@ -17,15 +23,17 @@
       (if (= (count parts) 1)
         {:value (first parts)
          :negated? is-neg?}
-        (let [field (keyword (first parts))]
+        (let [field (search-util/field-key-lookup (keyword (first parts)))]
           {:field field
-           :id-field? (re-find #"\-id$" (name (futil/field-key-lookup field)))
+           :sighting-field? (sighting-field? field)
+           :table (:table (get model/schema-definitions field))
+           :id-field? (some? (re-find #"\-id$" (name field)))
            :value (str/join ":" (rest parts))
            :negated? is-neg?})))))
 
 (defn parse-conjunction
   [search]
-  (map parse-term (str/split search #"\+\+\+")))
+  (reverse (sort-by (juxt :id-field? :field) (map parse-term (str/split search #"\+\+\+")))))
 
 (defn parse-disjunctions
   [search]
@@ -35,13 +43,15 @@
   [acc c]
   (cond
     (and (= c \ ) (not (:quoted acc)))
-    (update acc :result #(conj % "+++"))
+    (if (:is-conj acc)
+      acc
+      (update (assoc acc :is-conj true) :result #(conj % "+++")))
 
     (= c \")
-    (update acc :quoted not)
+    (update (assoc acc :is-conj false) :quoted not)
 
     :else
-    (update acc :result #(conj % c))))
+    (update (assoc acc :is-conj false) :result #(conj % c))))
 
 (defn format-terms
   [terms]

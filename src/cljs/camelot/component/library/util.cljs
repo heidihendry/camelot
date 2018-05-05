@@ -3,7 +3,6 @@
             [om.core :as om]
             [camelot.nav :as nav]
             [camelot.rest :as rest]
-            [camelot.util.filter :as filter]
             [camelot.translation.core :as tr]))
 
 (def collection-columns 3)

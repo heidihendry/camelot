@@ -3,8 +3,7 @@
 (def dependencies
   '[[org.clojure/test.check "0.9.0" :scope "test"]
     [org.clojure/clojure "1.9.0"]
-    [org.clojure/clojurescript "1.9.946" :classifier "aot"]
-
+    [org.clojure/clojurescript "1.10.238"]
     [org.clojure/core.async "0.3.443"]
     [org.clojure/data.csv "0.1.3"]
     [org.clojure/java.jdbc "0.4.2"]
@@ -23,6 +22,7 @@
     [ragtime "0.5.3"]
     [resauce "0.1.0"]
     [yesql "0.5.2"]
+    [honeysql "0.9.2"]
     [riddley "0.1.4"]
     [onelog "0.5.0"]
     [ring.middleware.logger "0.5.0" :exclusions [onelog]]

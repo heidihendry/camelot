@@ -5,7 +5,7 @@
             [camelot.state :as state]
             [camelot.rest :as rest]
             [camelot.nav :as nav]
-            [camelot.util.filter :as filter]
+            [camelot.util.search :as search]
             [camelot.util.sighting-fields :as sighting-fields]
             [typeahead.core :as typeahead]
             [clojure.string :as str]
@@ -48,11 +48,11 @@
 
 (defn completion-field
   [ctx]
-  (let [field (get filter/field-keys (keyword ctx))]
+  (let [field (get search/field-keys (keyword ctx))]
     (cond
       (re-find #"^field-" ctx) ctx
       field (name field)
-      :else (some #{ctx} filter/model-fields))))
+      :else (some #{ctx} search/model-fields))))
 
 (def prefix-endpoints
   {"survey" "/surveys"
@@ -109,8 +109,8 @@
                                                      :props {:field true
                                                              :completion-fn completions})
                                           (apply conj
-                                                 (apply conj (map name (keys filter/field-keys))
-                                                        filter/model-fields)
+                                                 (apply conj (map name (keys search/field-keys))
+                                                        search/model-fields)
                                                  (map sighting-field-to-field-user-key
                                                       (apply concat (vals (:sighting-fields data))))))
                                 (if (get-in data [:search :taxonomy-completions :species])
@@ -368,7 +368,7 @@
 (defn search
   [data search]
   (let [survey-id (or (:survey-id search) (get-in @data [:search :survey-id]))]
-    (let [terms (filter/append-subfilters (:terms search) (assoc (deref (:search data))
+    (let [terms (search/append-subfilters (:terms search) (assoc (deref (:search data))
                                                                  :survey-id survey-id))]
       (util/load-library data terms)
       (om/update! data [:search :last-search-terms] (:terms search)))))

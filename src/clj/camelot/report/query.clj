@@ -45,7 +45,7 @@
    :survey-site-id [[:survey-id :site-id] [:trap-station-id]]
    :species-mass-id [[] [:taxonomy-id]]
    :camera-status-id [[] [:camera-id]]
-   :site-id [[] [:survey-site-id :trap-station-id]]
+   :site-id [[] [:survey-site-id]]
    :survey-id [[] [:survey-site-id]]})
 
 (defn known-dep?
