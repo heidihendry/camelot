@@ -3,7 +3,7 @@
 (def dependencies
   '[[org.clojure/test.check "0.9.0" :scope "test"]
     [org.clojure/clojure "1.9.0"]
-    [org.clojure/clojurescript "1.10.238"]
+    [org.clojure/clojurescript "1.9.946" :classifier "aot"]
     [org.clojure/core.async "0.3.443"]
     [org.clojure/data.csv "0.1.3"]
     [org.clojure/java.jdbc "0.4.2"]
