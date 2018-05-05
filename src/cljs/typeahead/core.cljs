@@ -316,11 +316,6 @@
                                                             (om/set-state! owner ::value tv)
                                                             (when tv
                                                               (go (>! (::int-chan state) tv)))))})))
-                 (when (:disabled state)
-                   (dom/div #js {:className "typeahead-spinner"}
-                            (dom/img #js {:src "images/spinner.gif"
-                                          :height "16"
-                                          :width "16"})))
                  (when-not (and (empty? v) (empty? ctx))
                    (let [completions (complete (or (and (::context state) ctx)
                                                    data) v)]

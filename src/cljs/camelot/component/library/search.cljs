@@ -29,13 +29,20 @@
   (reify
     om/IRenderState
     (render-state [_ state]
-      (dom/button #js {:className (str "fa fa-search btn search" (if (not= (:terms data) (:last-search-terms data))
-                                                                   " search-dirty" ""))
+      (dom/button #js {:className (str "btn search"
+                                       (if (:inprogress data) "" " fa fa-search")
+                                       (if (not= (:terms data) (:last-search-terms data))
+                                         " search-dirty" ""))
                        :title (tr/translate ::filter-button-title)
                        :id "apply-filter"
                        :disabled (if (:inprogress data) "disabled" "")
                        :onClick #(do (go (>! (:search-chan state) {:search (deref data)}))
-                                     (nav/analytics-event "library-search" "forced-refresh-click"))}))))
+                                     (nav/analytics-event "library-search" "forced-refresh-click"))}
+                  (when (:inprogress data)
+                    (dom/div #js {:className "typeahead-spinner"}
+                             (dom/img #js {:src "images/spinner.gif"
+                                           :height "22"
+                                           :width "22"})))))))
 
 (defn select-media-collection-container
   [state data e]
@@ -135,7 +142,7 @@
                                        :onChange #(om/update! data [:search :terms] %)
                                        :onKeyDown #(select-media-collection-container state (:search data) %)}
                         :multi-term true}
-                 :state {:disabled (:inprogress data)}}))))
+                 :state {:disabled (get-in data [:search :inprogress])}}))))
 
 (defn filter-survey-component
   [data owner]
