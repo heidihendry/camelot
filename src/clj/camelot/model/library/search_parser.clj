@@ -33,7 +33,11 @@
 
 (defn parse-conjunction
   [search]
-  (reverse (sort-by (juxt :id-field? :field) (map parse-term (str/split search #"\+\+\+")))))
+  (->> (str/split search #"\+\+\+")
+       (map parse-term)
+       (sort-by (juxt :id-field? :field))
+       reverse
+       (remove #(empty? (:value %)))))
 
 (defn parse-disjunctions
   [search]
