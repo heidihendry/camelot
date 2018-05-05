@@ -3,7 +3,7 @@
 #### Enhancements
 * Sighting 'sex' and 'lifestage' fields are now Sighting Fields.
 * Provide database configuration for improved performance
-* Improve search performance in the library, particularly for full-text search
+* Significantly improve search performance in the library
 * A backup of the database is now created automatically before upgrading
 * Adds negation to library search expressions (e.g., "flagged:true !species:*")
 
