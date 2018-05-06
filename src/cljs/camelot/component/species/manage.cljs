@@ -134,7 +134,7 @@
                                (sort-by :taxonomy-label
                                         (filter #(not (some (fn [x]
                                                               (= (:taxonomy-id %) x)) defined-spps))
-                                                (vals (:known-species data)))))]
+                                                (map (fn [[k v]] v) (:known-species data)))))]
         (dom/div nil
                  (dom/label #js {:className "field-label"}
                             (tr/translate ::new-or-existing))

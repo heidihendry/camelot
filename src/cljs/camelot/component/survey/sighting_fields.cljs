@@ -54,7 +54,7 @@
 (defn survey-sighting-field-keys
   [data]
   (->> (::sighting-fields data)
-       vals
+       (map (fn [[k v]] v))
        (filter #(= (:survey-id %) (state/get-survey-id)))
        (map :sighting-field-key)
        (into #{})))
@@ -63,7 +63,7 @@
   [data]
   (let [sf-keys (survey-sighting-field-keys data)]
     (->> (::sighting-fields data)
-         vals
+         (map (fn [[k v]] v))
          (remove #(= (:survey-id %) (state/get-survey-id)))
          (remove #(sf-keys (:sighting-field-key %)))
          (map (fn [sf] [(:sighting-field-id sf)
@@ -140,7 +140,7 @@
     om/IRender
     (render [_]
       (let [fields (->> (::sighting-fields data)
-                        vals
+                        (map (fn [[k v]] v))
                         (filter #(= (:survey-id %) (state/get-survey-id)))
                         (sort-by (juxt :sighting-field-ordering :sighting-field-label))
                         (map #(hash-map ::context data ::item %)))]
@@ -348,7 +348,7 @@ Options for select are given by the `options` option."
                                                         (vc/keyword-like)
                                                         (vc/unique (->> (::selected-sighting-field-id data)
                                                                         (dissoc (::sighting-fields data))
-                                                                        vals
+                                                                        (map (fn [[k v]] v))
                                                                         (filter #(= (:survey-id %) (state/get-survey-id)))
                                                                         (map :sighting-field-key)
                                                                         (into #{})))]

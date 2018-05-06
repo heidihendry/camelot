@@ -40,16 +40,16 @@
 
 (defn cancel-import
   [data]
-  (rest/post-x-opts "/importer/cancel" {}
+  (rest/post-x-opts "/import/cancel" {}
                     {:successs #(om/update! data :cancelling-import true)
                      :suppress-error-dialog true}))
 
 (defn import-progress
   "Get the progress of the bulk import."
   [data]
-  (double (/ (reduce + 0 (vals (select-keys (get-in data [:import-status :counts])
+  (double (/ (reduce + 0 (map (fn [[k v]] v) (select-keys (get-in data [:import-status :counts])
                                             [:complete :failed :ignored])))
-             (max (reduce + (vals (get-in data [:import-status :counts]))) 1))))
+             (max (reduce + 0 (map (fn [[k v]] v) (get-in data [:import-status :counts]))) 1))))
 
 (defn settings-hide!
   "Hide the settings panel"
@@ -79,7 +79,7 @@
   (reify
     om/IRender
     (render [_]
-      (let [total (reduce + 0 (vals (get-in data [:import-status :counts])))
+      (let [total (reduce + 0 (map (fn [[k v]] v) (get-in data [:import-status :counts])))
             progress (import-progress data)]
         (dom/div #js {:id "bulk-import-details-panel"
                       :onClick #(do (.preventDefault %)
@@ -91,7 +91,7 @@
                  (when (:import-status data)
                    (dom/div #js {:className "bulk-import-details-container"}
                             (dom/span #js {:className "progress-numbers"}
-                                      (reduce + 0 (vals (select-keys (get-in data [:import-status :counts])
+                                      (reduce + 0 (map (fn [[k v]] v) (select-keys (get-in data [:import-status :counts])
                                                                      [:complete :failed :ignored])))
                                       " " (tr/translate :words/of-lc) " "
                                       total)
@@ -169,8 +169,8 @@
           (if (= port cch)
             (.log js/console "Bulk import poller cleaned up")
             (do
-              (rest/get-x-opts "/importer" {:success #(om/update! data :import-status (:body %))
-                                            :suppress-error-dialog true})
+              (rest/get-x-opts "/import" {:success #(om/update! data :import-status (:body %))
+                                          :suppress-error-dialog true})
               (let [p (import-progress @data)]
                 (recur (if (and (pos? p) (< p 1))
                          bulk-import-refresh-short-timeout

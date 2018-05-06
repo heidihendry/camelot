@@ -30,8 +30,8 @@
   [state data event]
   (when (js/confirm (tr/translate ::confirm-delete))
     (rest/delete-x
-     (str "/surveys/" (state/get-survey-id)
-          "/files/" (:survey-file-id data))
+     (str "/files/survey/" (state/get-survey-id)
+          "/file/" (:survey-file-id data))
      #(go (>! (:chan state) {:event :remove-file
                              :file data})))))
 
@@ -43,8 +43,8 @@
       (dom/div #js {:className "menu-item detailed dynamic paddingless"}
                (dom/div #js {:className "pull-right fa fa-times remove top-corner surveyfile"
                              :onClick (partial delete-file state data)})
-               (dom/a #js {:href (str "/surveys/" (state/get-survey-id)
-                                      "/files/" (:survey-file-id data) "/download")
+               (dom/a #js {:href (str "/files/survey/" (state/get-survey-id)
+                                      "/file/" (:survey-file-id data) "/download")
                            :className "menu-item-link"}
                       (dom/span #js {:className "menu-item-title"}
                                 (:survey-file-name data))
@@ -72,14 +72,14 @@
                                    :advice (tr/translate ::advice)}})
                  (dom/div nil
                           (om/build-all file-item-component
-                                        (sort-by :survey-file-name (vals (:files data)))
+                                        (sort-by :survey-file-name (map (fn [[k v]] v) (:files data)))
                                         {:key :survey-file-id
                                          :init-state state})))))))
 
 (defn upload-success-handler
   [data r]
-  (rest/get-x (str "/surveys/" (:survey-id (:response r))
-                   "/files/" (:survey-file-id (:response r)))
+  (rest/get-x (str "/file/survey/" (:survey-id (:response r))
+                   "/file/" (:survey-file-id (:response r)))
               (fn [resp]
                 (om/transact! data :files
                               #(assoc % (get-in resp [:body :survey-file-id :value])
@@ -96,7 +96,7 @@
       (om/update! data :files ""))
     om/IDidMount
     (did-mount [_]
-      (rest/get-x (str "/surveys/" (state/get-survey-id) "/files")
+      (rest/get-x (str "/files/survey/" (state/get-survey-id))
                   #(om/update! data :files (reduce (fn [acc x] (assoc acc (:survey-file-id x) x))
                                                    {} (:body %)))))
     om/IWillUnmount
@@ -113,7 +113,7 @@
                            {:init-state state
                             :opts {:analytics-event "file-upload"
                                    :success-handler (partial upload-success-handler data)
-                                   :endpoint "/surveys/files"}}))
+                                   :endpoint "/files"}}))
         (dom/div #js {:className "align-center"}
                  (dom/img #js {:className "spinner"
                                :src "images/spinner.gif"

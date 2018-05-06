@@ -93,7 +93,7 @@
                 (get-in data [:camera-create-mode (:camera-id-field state)]))
           (om/build add-camera-component data {:init-state state})
           (dom/select #js {:className "field-input"
-                           :value (get-in data [:data (:camera-id-field state) :value])
+                           :value (get-in data [:data (:camera-id-field state) :value] "")
                            :onChange (partial camera-change-handler data (:camera-id-field state))}
                       (om/build-all camera-select-option-component
                                     (cons {:camera-id -1
@@ -180,7 +180,7 @@
       (if (or (empty? (:sites data)) (:site-create-mode data))
         (om/build add-site-component data)
         (dom/select #js {:className "field-input"
-                         :value (get-in data [:data :site-id :value])
+                         :value (get-in data [:data :site-id :value] "")
                          :onChange (partial site-change-handler data owner)}
                     (om/build-all site-select-option-component
                                   (cons {:site-id -1

@@ -1,10 +1,11 @@
 (ns camelot.system.http.core
   (:require
    [camelot.system.http.transit :as transit]
-   [camelot.system.http.routes :refer [app-routes]]
-   [camelot.system.http.version :as version]
-   [camelot.system.http.network :as network]
-   [camelot.system.http.desktop :as desktop]
+   [camelot.system.state :as state]
+   [camelot.http.core :refer [app-routes]]
+   [camelot.util.network :as network]
+   [camelot.util.desktop :as desktop]
+   [camelot.util.version :as version]
    [com.stuartsierra.component :as component]
    [ring.adapter.jetty :refer [run-jetty]]
    [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
@@ -18,17 +19,17 @@
    [ring.middleware.logger :refer [wrap-with-logger]])
   (:import (org.eclipse.jetty.server Server)))
 
-(defonce system (atom {}))
 (defonce jetty (atom nil))
 (defonce cookie-store-key "insecureinsecure")
 
 (defn wrap-system
   [handler & [options]]
   (fn [request]
-    (handler (merge-with merge request {:system @system}))))
+    (handler (merge-with merge request {:system @state/system}))))
 
-(def http-handler
+(defn http-handler
   "Handler for HTTP requests"
+  []
   (-> app-routes
       wrap-params
       wrap-system
@@ -54,7 +55,7 @@
         (network/print-network-addresses port)
         (when browser
           (desktop/start-browser port))
-        (let [j (run-jetty http-handler {:port port :join? false})]
+        (let [j (run-jetty (http-handler) {:port port :join? false})]
           (reset! jetty j)
           (assoc this :jetty j)))))
 

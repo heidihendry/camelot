@@ -52,7 +52,7 @@
 
 (defn- validated?
   [state]
-  (every? identity (vals state)))
+  (every? identity (map (fn [[k v]] v) state)))
 
 (defn component-validator
   "Takes a channel on to which form-wide validation results should be placed,

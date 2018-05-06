@@ -31,7 +31,7 @@
                                :placeholder (tr/translate ::path-name-placeholder)
                                :onChange #(om/update! data ::survey-directory (.. % -target -value))
                                :value (::survey-directory data)})
-               (dom/a #js {:href (str "/surveys/bulkimport/template?dir=" (::survey-directory data))}
+               (dom/a #js {:href (str "/import/bulk/template?dir=" (::survey-directory data))}
                       (dom/button #js {:className "btn btn-primary full-width"
                                        :disabled (if (seq (::survey-directory data)) "" "disabled")}
                                   (tr/translate ::download)))

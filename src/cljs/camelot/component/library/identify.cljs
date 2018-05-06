@@ -179,7 +179,7 @@
                                                               "...")}
                                         (reverse (conj (into '()
                                                              (sort-by :taxonomy-label
-                                                                      (vals (:species data))))
+                                                                      (map (fn [[k v]] v) (:species data))))
                                                        {:taxonomy-id "create"
                                                         :taxonomy-label (tr/translate ::add-new-species-label)})))
                                   {:key :taxonomy-id}))))))

@@ -5,7 +5,7 @@
    [camelot.system.config.core :as config]
    [camelot.system.http.core :as http]
    [camelot.system.db.core :as db]
-   [camelot.system.importer.core :as importer]
+   [camelot.system.importer :as importer]
    [camelot.util.maintenance :as maintenance]
    [camelot.util.state :as state]
    [com.stuartsierra.component :as component]

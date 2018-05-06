@@ -46,7 +46,7 @@
 (defn- upload-file
   [sesscam-id owner file chan]
   (if (is-uploadable? file)
-    (rest/post-x-raw "/capture/upload" [["session-camera-id" sesscam-id]
+    (rest/post-x-raw "/import/upload" [["session-camera-id" sesscam-id]
                                         ["file" file]]
                      #(go (let [err (:error (:body %))]
                             (>! chan {:file file

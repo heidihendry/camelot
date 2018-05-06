@@ -29,7 +29,7 @@
   [data]
   (om/update! data :show-import-status-dialog true)
   (om/update! data :import-status :initialising)
-  (rest/post-x "/surveys/bulkimport/import" {:data (get-import-data data)}
+  (rest/post-x "/import/bulk/import" {:data (get-import-data data)}
                #(if (or (nil? (:body %)) (empty? (:body %)))
                   (om/update! data :import-status :active)
                   (do
@@ -69,7 +69,7 @@
 (defn- sightings-partially-mapped?
   [mappings]
   (let [mapped-count (->> (select-keys mappings sighting-fields)
-                          vals
+                          (map (fn [[k v]] v))
                           (remove nil?)
                           count)]
     (not (or (zero? mapped-count) (= mapped-count (count sighting-fields))))))
@@ -337,7 +337,7 @@
                                             :success-handler (partial upload-success-handler data)
                                             :failure-handler #(do (om/update! data :upload-pending false)
                                                                   (om/update! data :upload-failed true))
-                                            :endpoint "/surveys/bulkimport/columnmap"}})
+                                            :endpoint "/import/bulk/columnmap"}})
                           (cond
                             (:upload-pending data)
                             (dom/div #js {:className "align-center"}

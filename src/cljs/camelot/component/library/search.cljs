@@ -119,7 +119,7 @@
                                                  (apply conj (map name (keys search/field-keys))
                                                         search/model-fields)
                                                  (map sighting-field-to-field-user-key
-                                                      (apply concat (vals (:sighting-fields data))))))
+                                                      (apply concat (map (fn [[k v]] v) (:sighting-fields data))))))
                                 (if (get-in data [:search :taxonomy-completions :species])
                                   (mapv typeahead/->basic-entry
                                         (apply conj (get-in data [:search :taxonomy-completions :species])
@@ -199,7 +199,7 @@
   [data]
   (let [identification (:identification data)
         sf-list (map #(vector (:sighting-field-id %) (sighting-field-to-field-user-key %))
-                     (apply concat (vals (:sighting-fields data))))]
+                     (apply concat (map (fn [[k v]] v) (:sighting-fields data))))]
     (mapcat (fn [[id key]]
               (let [value (get-in identification [:sighting-fields id])]
                 (if (empty? (str value))

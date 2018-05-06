@@ -2,7 +2,7 @@
   (:require
    [camelot.util.db-migrate]
    [camelot.core :as camelot]
-   [camelot.system.http.core :as http]
+   [camelot.system.state :as state]
    [com.stuartsierra.component :as component]
    [reloaded.repl :as rrepl]
    [schema.core :as s]))
@@ -21,7 +21,7 @@
   (camelot/start-prod))
 
 (defn stop []
-  (swap! http/system component/stop)
+  (swap! state/system component/stop)
   nil)
 
 (defn restart
@@ -30,6 +30,6 @@
   (start))
 
 (defn state []
-  @http/system)
+  @state/system)
 
 (rrepl/set-init! camelot/start-prod)

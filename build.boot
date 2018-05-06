@@ -78,7 +78,7 @@
 (set! *unchecked-math* :warn-on-boxed)
 
 (require '[camelot.core :as camelot]
-         '[camelot.system.http.core :refer [system http-handler] :as http]
+         '[camelot.system.state :refer [system]]
          '[camelot.util.db-migrate :refer [migrate rollback]])
 
 (def project "camelot")
@@ -181,6 +181,10 @@
 (defn stop []
   (println "Stopping dev server...")
   (swap! system component/stop))
+
+(defn restart []
+  (stop)
+  (start))
 
 (defn state []
   @system)

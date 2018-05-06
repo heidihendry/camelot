@@ -2,7 +2,7 @@
   "System lifecycle management."
   (:require
    [camelot.system.systems :as systems]
-   [camelot.system.http.core :as http]
+   [camelot.system.state :as state]
    [camelot.util.maintenance :as maintenance]
    [com.stuartsierra.component :as component]
    [clojure.core.async :refer [>!! <! chan go-loop]]))
@@ -46,8 +46,8 @@
 
 (defn- stop-running-system
   []
-  (when @http/system
-    (swap! http/system component/stop)))
+  (when @state/system
+    (swap! state/system component/stop)))
 
 (defn- build-lifecycle
   ([]
@@ -60,17 +60,17 @@
            :pre-init
            (do
              (stop-running-system)
-             (reset! http/system (systems/pre-init payload)))
+             (reset! state/system (systems/pre-init payload)))
 
            :user
            (do
              (stop-running-system)
-             (reset! http/system (systems/camelot opts)))
+             (reset! state/system (systems/camelot opts)))
 
            :maintenance
            (do
              (stop-running-system)
-             (reset! http/system (systems/maintenance opts)))
+             (reset! state/system (systems/maintenance opts)))
            nil))
        (recur))
      (LifecycleImpl. ch))))
