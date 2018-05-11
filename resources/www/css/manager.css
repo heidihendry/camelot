@@ -31,6 +31,25 @@ html, body {
   height: 100%;
 }
 
-webview {
-    height: 100%;
+.loading {
+    position: relative;
+    top: 15rem;
+    margin: auto;
+    text-align: center;
+    width: 100%;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner {
+    margin: auto;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #116095;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 2s linear infinite;
 }

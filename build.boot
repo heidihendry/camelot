@@ -91,7 +91,7 @@
       :url "http://gitlab.com/camelot-project/camelot"
       :scm {:url "http://gitlab.com/camelot-project/camelot"}
       :license {"Eclipse Public License" "http://www.eclipse.org/legal/epl-v10.html"}}
- cljs {:ids #{"www/js/compiled/camelot"}
+ cljs {:ids #{"www/js/compiled/camelot" "www/js/compiled/manager"}
        :optimizations :advanced}
  cljs-repl {:nrepl-opts {:client false
                          :port repl-port

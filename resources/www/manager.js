@@ -1,29 +1,42 @@
 'use strict';
 
 const electron = require('electron');
+const http = require('http');
+const exec = require("child_process").exec;
+
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
-var mainWindow = null;
+let managerWindow = null;
+let proc = null;
+let interval = null;
 
-app.on('window-all-closed', function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform != 'darwin') {
-    app.quit();
-  }
+app.on('before-quit', () => {
+    if (proc) {
+        process.exit(0);
+    }
 });
 
-app.on('ready', function() {
-    mainWindow = new BrowserWindow({
+const startCamelot = () => {
+    proc = exec("./camelot-desktop.sh");
+};
+
+app.on('ready', () => {
+    managerWindow = new BrowserWindow({
         width: 800,
         height: 600,
         frame: false
     });
-  mainWindow.loadURL('file://' + __dirname + '/main.html');
-  mainWindow.webContents.openDevTools();
 
-  mainWindow.on('closed', function() {
-    mainWindow = null;
-  });
+    managerWindow.loadURL('file://' + __dirname + '/manager.html');
+    managerWindow.webContents.openDevTools();
+
+    managerWindow.on('closed', () => {
+        if (process.platform !== 'darwin') {
+            managerWindow = null;
+            app.quit();
+        }
+    });
+
+    startCamelot();
 });
