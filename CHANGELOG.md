@@ -1,18 +1,22 @@
 ## ChangeLog
-### 1.4.0 (upcoming)
+### 1.4.0
 #### Enhancements
 * Migrate sighting 'sex' and 'lifestage' fields to Sighting Fields.
 * Significantly improve search performance in the library
 * Create a backup of the database automatically before upgrading
 * Provide tailored database configuration for improved performance
 * Add negation to library search expressions (e.g., "flagged:true !species:*")
-* Add detection for bulk-import'ability instead of prompting if new surveys should be setup with bulk import
+* Add detection for whether bulk-import can be used for a survey instead of prompting
 * Improve the way error messages are displayed
 
 #### Notes
-This release moves 'sex' and 'lifestage' fields to the Sighting Fields functionality. This opens up a bunch of flexibility around these fields.
+This release moves 'sex' and 'lifestage' fields to the Sighting Fields
+functionality. This opens up a bunch of flexibility around these fields.
 
-For this upgrade Camelot reserves use of the sighting field keys "sex" and "lifestage". The upgrade to 1.4.0 may fail should sighting fields with these keys exist.  If this is the case, the keys of the existing fields should be changed using an older version of Camelot. (i.e., 1.3.x)
+For this upgrade Camelot reserves use of the sighting field keys "sex" and
+"lifestage". The upgrade to 1.4.0 may fail should sighting fields with these
+keys exist.  If this is the case, the keys of the existing fields should be
+changed using an older version of Camelot. (i.e., 1.3.x)
 
 ### 1.3.5
 #### Enhancements
