@@ -206,7 +206,6 @@
     (when-not (= page newpage)
       (hydrate-for-page data newpage match-count
                         #(do (om/update! % [:search :page] newpage)
-                             (om/update! % :selected-media-id nil)
                              (util/deselect-all %))))))
 
 (defn next-page
@@ -218,7 +217,6 @@
     (when-not (= page newpage)
       (hydrate-for-page data newpage match-count
                         #(do (om/update! % [:search :page] newpage)
-                             (om/update! % :selected-media-id nil)
                              (util/deselect-all %))))))
 
 (defn thousands-sep

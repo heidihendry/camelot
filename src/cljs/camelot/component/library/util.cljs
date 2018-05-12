@@ -14,10 +14,12 @@
         (get-in data [:search :ordered-ids])))
 
 (defn media-ids-on-page
-  [data]
-  (->> (get-in data [:search :ordered-ids])
-       (drop (* (- (get-in data [:search :page]) 1) page-size))
-       (take page-size)))
+  ([data]
+   (media-ids-on-page data nil))
+  ([data page-num]
+   (->> (get-in data [:search :ordered-ids])
+        (drop (* (or page-num (- (get-in data [:search :page]) 1)) page-size))
+        (take page-size))))
 
 (defn media-on-page
   ([data]
@@ -57,31 +59,26 @@
   (om/update! (find-with-id (state/library-state) media-id)
               :sightings []))
 
+(defn select-media-id
+  [data media-id]
+  (om/update! data [:records media-id :selected] true)
+  (om/update! data :selected-media-id media-id)
+  (om/update! data :anchor-media-id media-id))
+
 (defn hydrate-media
   [data media md & [cb]]
   (rest/post-x "/library/hydrate" {:data {:media-ids media}}
                #(do
-                  (om/update! data :records
+                  (om/update! (state/library-state) :records
                               (->> (:body %)
                                    (reduce (fn [acc x]
                                              (assoc acc (:media-id x)
                                                     (assoc (merge (om/value (get md (:trap-station-session-camera-id x))) x)
                                                            :selected false)))
                                            {})))
+                  (select-media-id (state/library-state) (first media))
                   (when cb
-                    (cb data)))))
-
-(defn load-library-callback
-  [data md resp]
-  (let [media-ids (:body resp)]
-    (hydrate-media data
-                   (take page-size media-ids)
-                   md
-                   #(do
-                      (om/update! % :selected-media-id nil)
-                      (om/update! % :metadata md)
-                      (om/update! (:search %) :ordered-ids (vec media-ids))
-                      (om/update! (:search %) :page 1)))))
+                    (cb (state/library-state))))))
 
 (defn get-media-flags
   [rec]
@@ -162,19 +159,6 @@
                      {:media-cameracheck true
                       :media-processed true}
                      {:media-cameracheck false})))
-
-(defn load-library
-  ([data]
-   (load-library data ""))
-  ([data search]
-   (om/update! data [:search :inprogress] true)
-   (rest/get-x-opts "/library/metadata"
-                    {:success (fn [md]
-                                (rest/post-x-opts "/library" {:search search}
-                                                  {:success (fn [resp]
-                                                              (load-library-callback data (:body md) resp))
-                                                   :always (fn [x] (om/update! data [:search :inprogress] false))}))
-                     :failure (fn [x] (om/update! data [:search :inprogress] false))})))
 
 (defn load-taxonomies
   ([data]
@@ -298,3 +282,27 @@
   [data media-id evt]
   (mouse-select-media data media-id
                       (.-shiftKey evt) (.-ctrlKey evt)))
+
+(defn load-library-callback
+  [data md resp]
+  (let [media-ids (:body resp)]
+    (hydrate-media data
+                   (take page-size media-ids)
+                   md
+                   #(do
+                      (om/update! % :metadata md)
+                      (om/update! (:search %) :ordered-ids (vec media-ids))
+                      (om/update! (:search %) :page 1)))))
+
+(defn load-library
+  ([data]
+   (load-library data ""))
+  ([data search]
+   (om/update! data [:search :inprogress] true)
+   (rest/get-x-opts "/library/metadata"
+                    {:success (fn [md]
+                                (rest/post-x-opts "/library" {:search search}
+                                                  {:success (fn [resp]
+                                                              (load-library-callback (state/library-state) (:body md) resp))
+                                                   :always (fn [x] (om/update!  (state/library-state) [:search :inprogress] false))}))
+                     :failure (fn [x] (om/update! data [:search :inprogress] false))})))

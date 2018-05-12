@@ -9,6 +9,7 @@
 * Add detection for whether bulk-import can be used for a survey instead of prompting
 * Improve the way error messages are displayed
 * Allow bulk-import of "media-reference-quality" field
+* Automatically select first available image in the library
 
 #### Notes
 This release moves 'sex' and 'lifestage' fields to the Sighting Fields
