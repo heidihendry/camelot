@@ -10,7 +10,7 @@
    {}
    {:other true}])
 
-(def built-in-column-count 59)
+(def built-in-column-count 60)
 
 (deftest test-expand-cols
   (testing "expand-cols"
