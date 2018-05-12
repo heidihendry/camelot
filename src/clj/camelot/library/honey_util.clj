@@ -167,7 +167,7 @@
       :integer [:= sql-expr (edn/read-string search-val)]
       :readable-integer [:= sql-expr (edn/read-string search-val)]
       :number [:= sql-expr (edn/read-string search-val)]
-      :boolean [:= sql-expr (edn/read-string search-val)]
+      :boolean [:= sql-expr (= search-val "true")]
       ;; TODO TG-485 https://tree.taiga.io/project/cshclm-camelot/us/485
       :timestamp nil
       :date nil

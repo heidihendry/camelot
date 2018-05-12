@@ -62,6 +62,10 @@
                      :required false
                      :table :media
                      :order 81}
+   :media-reference-quality {:datatype :boolean
+                             :required false
+                             :table :media
+                             :order 82}
    :media-updated {:datatype :timestamp
                    :required true
                    :table :media
@@ -72,7 +76,7 @@
                :unmappable true}
    :media-notes {:datatype :string
                  :required false
-                 :order 82
+                 :order 83
                  :unmappable true
                  :table :media
                  :export-excluded true}

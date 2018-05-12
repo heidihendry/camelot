@@ -8,6 +8,7 @@
 * Add negation to library search expressions (e.g., "flagged:true !species:*")
 * Add detection for whether bulk-import can be used for a survey instead of prompting
 * Improve the way error messages are displayed
+* Allow bulk-import of "media-reference-quality" field
 
 #### Notes
 This release moves 'sex' and 'lifestage' fields to the Sighting Fields
