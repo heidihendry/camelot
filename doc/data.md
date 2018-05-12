@@ -102,6 +102,7 @@ By using the Default Column Names in a CSV for a Bulk Import, Camelot will autom
 | taxonomy-notes | Species Notes |
 | taxonomy-order | Order |
 | taxonomy-species | Species |
+| taxonomy-label | Genus and species |
 | trap-station-altitude | GPS Altitude |
 | trap-station-latitude | Camelot GPS Latitude |
 | trap-station-longitude | Camelot GPS Longitude |
