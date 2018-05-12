@@ -63,3 +63,24 @@ If running Camelot on a server, you can instead use:
     java -jar /path/to/camelot-<version>.jar -server
 
 See the section on 'Networked usage' for more information.
+
+
+Creating a survey
+-----------------
+
+The first thing you'll see when opening Camelot in the web-browser is the
+"Create Survey" screen.  A survey represents a research project and will
+contain details about your camera traps and uploaded images.
+
+The left hand side is the current survey configuration. You can give a
+survey a name and description. A survey will often start with one or
+more species are expecting to be found over the course of the study.
+Species can be added by searching for the scientific name using the
+right-hand panel. Behind the scenes, Camelot will automatically set
+additional details about the species, including its family and common
+name.
+
+.. figure:: screenshot/survey-create.png
+   :alt: 
+
+Once ready, click "Create Survey".

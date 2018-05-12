@@ -8,7 +8,6 @@ Camelot Documentation
    introduction
    gettingstarted
    terminology
-   survey
    yourorganisation
    surveymanagement
    library
