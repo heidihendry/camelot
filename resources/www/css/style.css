@@ -1063,7 +1063,7 @@ pre.field-input {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right: 0;
-    width: 20rem;
+    width: 31rem;
 }
 #app .library button.search {
     position: relative;
@@ -1753,7 +1753,7 @@ pre.field-input {
     background: white;
     position: absolute;
     z-index: 10;
-    width: 20rem;
+    width: 30rem;
     border: 1px solid #ccc;
     margin-left: 0.5rem;
     margin-top: -1rem;
