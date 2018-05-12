@@ -12,21 +12,20 @@
             [cljs.core.async :refer [<! chan >!]])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
-(defn bulk-import-mode?
+(defn bulk-import-available?
   []
   (get-in (state/app-state-cursor)
-          [:selected-survey :survey-bulk-import-mode :value]))
+          [:selected-survey :survey-bulk-import-available :value]))
 
 (def survey-menu
   [{:action :deployment
-    :name (tr/translate ::manage-traps)
-    :condition (complement bulk-import-mode?)}
+    :name (tr/translate ::manage-traps)}
    {:action :upload
     :name (tr/translate ::upload-captures)
-    :condition (complement bulk-import-mode?)}
+    :condition (complement bulk-import-available?)}
    {:action :import
     :name (tr/translate ::import)
-    :condition bulk-import-mode?}
+    :condition bulk-import-available?}
    {:action :species
     :name (tr/translate ::species)}
    {:action :files

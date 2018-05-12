@@ -60,7 +60,8 @@
                   (dosync
                    (ref-set (get-in (:state msg) [:importer :end-time]) (t/now)))
                   (try
-                    (deref (:handler msg))
+                    (when (:handler msg)
+                      (deref (:handler msg)))
                     (catch Exception e
                       (log/error "Finish command handler failed with error: " (.getMessage ^Exception e)))))
 

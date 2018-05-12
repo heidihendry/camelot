@@ -779,13 +779,13 @@
     :help-text "Sighting fields are used to capture more information during identification."}
 
    :camelot.component.bulk-import.core
-   {:download "Download template"
+   {:download "Create CSV"
     :title "Bulk Import"
     :survey-menu "Survey menu"
-    :ready-to-upload "Import from template"
-    :path-name-placeholder "Absolute or relative path name..."
-    :help-text-step-1 "Step 1. Download a template of all data scanned in the survey folder."
-    :help-text-step-2 "Step 2. Modify the template as you see fit, then start the import once you're ready."
+    :ready-to-upload "Import from CSV"
+    :path-name-placeholder "Absolute or relative path to a folder..."
+    :help-text-step-1 "Step 1. Automatically create a CSV of all data scanned in your survey folder."
+    :help-text-step-2 "Step 2. Modify the CSV as you see fit, then start the import once you're ready."
     :survey-directory "Path to survey directory"}
 
    :camelot.import.validate
@@ -823,12 +823,7 @@
     :create-survey "Create survey"
     :intro "Create Survey"
     :submit-title "Submit this survey."
-    :validation-error-title "Complete all required fields before submitting."
-    :bulk-import-prompt-title "Bulk Import"
-    :bulk-import-introduction "Bulk Import is an optional step in the survey set-up to import all of the camera trap data for a survey at once. If you have already collected the data for this survey, you may wish to use Bulk Import."
-    :bulk-import-question "Would you like to set up this survey using Bulk Import?"
-    :create-only "Create Survey"
-    :create-and-import "Set Up with Bulk Import"}
+    :validation-error-title "Complete all required fields before submitting."}
 
    :camelot.component.survey.file
    {:upload-time "Upload time"

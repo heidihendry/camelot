@@ -9,7 +9,8 @@
    [camelot.util.filesystem :as filesystem]
    [clojure.java.io :as io]
    [camelot.model.media :as media]
-   [camelot.model.camera :as camera]))
+   [camelot.model.camera :as camera]
+   [camelot.model.trap-station :as trap-station]))
 
 (def query (db/with-db-keys :surveys))
 
@@ -18,8 +19,7 @@
      survey-sighting-independence-threshold :- s/Num
      survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
-     survey-notes :- (s/maybe s/Str)
-     survey-bulk-import-mode :- (s/maybe s/Bool)]
+     survey-notes :- (s/maybe s/Str)]
   {s/Any s/Any})
 
 (s/defrecord Survey
@@ -30,19 +30,16 @@
      survey-sighting-independence-threshold :- s/Num
      survey-directory :- (s/maybe s/Str)
      survey-sampling-point-density :- (s/maybe s/Num)
-     survey-notes :- (s/maybe s/Str)
-     survey-bulk-import-mode :- (s/maybe s/Bool)]
+     survey-notes :- (s/maybe s/Str)]
   {s/Any s/Any})
 
 (defn survey
   [ks]
-  (map->Survey (update ks :survey-bulk-import-mode #(or % false))))
+  (map->Survey ks))
 
 (defn tsurvey
   [ks]
-  (map->TSurvey (-> ks
-                    (update :survey-bulk-import-mode #(or % false))
-                    (update :survey-sighting-independence-threshold #(or % 20)))))
+  (map->TSurvey (update ks :survey-sighting-independence-threshold #(or % 20))))
 
 (s/defn get-all :- [Survey]
   [state :- State]
@@ -63,12 +60,18 @@
   `(let [~bind (assoc ~state :survey-settings (~#'survey-settings ~state))]
      ~@body))
 
+(defn assoc-bulk-import-available
+  [state survey]
+  (let [ts (trap-station/get-all-for-survey state (:survey-id survey))]
+    (assoc survey :survey-bulk-import-available (empty? ts))))
+
 (s/defn get-specific :- (s/maybe Survey)
   [state :- State
    id :- s/Int]
   (some->> {:survey-id id}
            (query state :get-specific)
            first
+           (assoc-bulk-import-available state)
            survey))
 
 (s/defn create! :- Survey
@@ -118,12 +121,3 @@
    data :- TSurvey]
   (or (get-specific-by-name state (select-keys data [:survey-name]))
       (create! state data)))
-
-(s/defn set-bulk-import-mode! :- Survey
-  [state :- State
-   id :- s/Int
-   bulk-import-mode :- s/Bool]
-  (query state :set-bulk-import-mode!
-    {:survey-id id
-     :survey-bulk-import-mode bulk-import-mode})
-  (survey (get-specific state id)))

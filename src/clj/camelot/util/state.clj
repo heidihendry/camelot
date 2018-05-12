@@ -90,7 +90,7 @@
     :macosx (db-path (str (env :home) "/Library/Application Support"))
     :other (db-path ".")))
 
-(def ^:dynamic *db-override* nil)
+(def ^:dynamic *db-override* "/home/chris/test2")
 
 (defn datadir-path
   []
