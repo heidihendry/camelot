@@ -552,12 +552,29 @@ pre.field-input {
     padding-bottom: 2rem;
     border-radius: 0.5rem;
 }
+#notification-dialog .error-text {
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    resize: none;
+}
 #notification-dialog .error-title {
     margin-top: 0;
     text-align: center;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #800;
     color: #800;
+}
+#notification-dialog .error-summary {
+    margin-top: 0;
+    text-align: left;
+    padding-bottom: 0.5rem;
+}
+#notification-dialog .need-help {
+    margin-top: 0;
+    text-align: left;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 #notification-dialog .info-title {
     margin-top: 0;

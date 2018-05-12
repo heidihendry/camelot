@@ -16,7 +16,8 @@
    [ring.middleware.session :refer [wrap-session]]
    [ring.middleware.session.cookie :refer [cookie-store]]
    [ring.middleware.gzip :refer [wrap-gzip]]
-   [ring.middleware.logger :refer [wrap-with-logger]])
+   [ring.middleware.logger :refer [wrap-with-logger]]
+   [ring.util.response :as r])
   (:import (org.eclipse.jetty.server Server)))
 
 (defonce jetty (atom nil))
@@ -27,12 +28,23 @@
   (fn [request]
     (handler (merge-with merge request {:system @state/system}))))
 
+(defn errors-to-internal-server-error
+  [handler & options]
+  (fn [request]
+    (try
+      (handler request)
+      (catch Exception e
+          {:status 500
+           :headers {}
+           :body (.getMessage e)}))))
+
 (defn http-handler
   "Handler for HTTP requests"
   []
   (-> app-routes
       wrap-params
       wrap-system
+      errors-to-internal-server-error
       wrap-multipart-params
       (wrap-session {:store (cookie-store {:key cookie-store-key})})
       (wrap-transit-response {:encoding :json, :opts transit/transit-write-options})

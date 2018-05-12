@@ -6,6 +6,7 @@
             [camelot.translation.core :as tr]))
 
 (def new-issue-url "https://tree.taiga.io/project/cshclm-camelot/issues")
+(def forum-url "https://groups.google.com/forum/#!forum/camelot-project")
 
 (defn error-dialog-content
   [data owner]
@@ -15,17 +16,25 @@
       (dom/div #js {:className "content"}
                (dom/h3 #js {:className "error-title"}
                        (tr/translate ::problems))
+               (dom/p #js {:className "error-summary"}
+                      (tr/translate ::generic-error))
                (dom/textarea #js {:className "error-text"
                                   :disabled "disabled"
-                                  :rows 10
+                                  :rows 12
                                   :cols 55
                                   :value (:error data)})
-               (dom/p nil
+               (dom/p #js {:className "need-help"}
                       (tr/translate ::maybe-bug)
                       (dom/a #js {:href new-issue-url
                                   :target "_blank"
                                   :rel "noopener noreferrer"}
-                             (tr/translate ::report-issue)))
+                             (tr/translate ::report-issue))
+                      " " (tr/translate :words/or-lc) " "
+                      (dom/a #js {:href forum-url
+                                  :target "_blank"
+                                  :rel "noopener noreferrer"}
+                             (tr/translate ::ask-on-forum))
+                      ".")
                (dom/button #js {:className "error-ack btn btn-danger"
                                 :onClick #(do (om/update! data :error nil)
                                               (nav/analytics-event "error"

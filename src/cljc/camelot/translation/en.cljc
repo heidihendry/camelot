@@ -9,6 +9,7 @@
     :back "Back"
     :of-lc "of"
     :on-lc "on"
+    :or-lc "or"
     :cancel "Cancel"
     :continue "Continue"
     :citation "Citation"
@@ -654,9 +655,11 @@
 
    :camelot.component.notification
    {:problems "There were some problems..."
+    :generic-error "The operation could not be completed. This could be because the input is not valid. The details of the error are below."
     :page-not-found "A page with that name has not been sighted."
     :maybe-bug "If you think this is a bug, "
-    :report-issue "Report an Issue"}
+    :report-issue "report an issue"
+    :ask-on-forum "ask on the forum"}
 
    :camelot.component.import-dialog
    {:import-from "Import from"

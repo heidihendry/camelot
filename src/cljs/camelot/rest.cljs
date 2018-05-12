@@ -13,14 +13,14 @@
 
 (defn- -build-error
   [method url params status response]
-  (let [sep "\n--------\n"
-        req (str "Requested: " url " via " method)
-        stat (str "Status Code: " status "\n")]
+  (let [sep "\n\nTechnical details:\n"
+        req (str " - Requested: " url " via " method)
+        stat (str " - Status Code: " status "\n")]
     (cond
       (zero? status) (str "Unable to contact server" sep req)
       (nil? params) (str response sep stat req)
       :else (str response sep stat req
-                 "\nWith parameters: " params "\n"))))
+                 "\n - With parameters: " params "\n"))))
 
 (defn build-error
   ([method url status response]

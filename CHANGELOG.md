@@ -1,11 +1,13 @@
 ## ChangeLog
 ### 1.4.0 (upcoming)
 #### Enhancements
-* Sighting 'sex' and 'lifestage' fields are now Sighting Fields.
-* Provide database configuration for improved performance
+* Migrate sighting 'sex' and 'lifestage' fields to Sighting Fields.
 * Significantly improve search performance in the library
-* A backup of the database is now created automatically before upgrading
-* Adds negation to library search expressions (e.g., "flagged:true !species:*")
+* Create a backup of the database automatically before upgrading
+* Provide tailored database configuration for improved performance
+* Add negation to library search expressions (e.g., "flagged:true !species:*")
+* Add detection for bulk-import'ability instead of prompting if new surveys should be setup with bulk import
+* Improve the way error messages are displayed
 
 #### Notes
 This release moves 'sex' and 'lifestage' fields to the Sighting Fields functionality. This opens up a bunch of flexibility around these fields.
