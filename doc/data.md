@@ -42,8 +42,6 @@ This page describes the data within Camelot.
 | media-notes | Notes about the media | String | No | No |
 | sighting-id | Unique ID of the sighting | Integer | Yes | No |
 | sighting-quantity | Number of a species in the media | Integer | Yes | Yes |
-| sighting-sex | Sex of the species | String ('M'/'F'/'unidentified') | No | Yes |
-| sighting-lifestage | Life-stage of the species | String ('Adult'/'Juvenile'/'unidentified') | No | Yes |
 | taxonomy-id | Unique ID of a species | Integer | Yes | No |
 | taxonomy-species | Species name | String | Yes | Yes |
 | taxonomy-genus | Genus name | String | Yes | Yes |
@@ -64,6 +62,8 @@ This page describes the data within Camelot.
 | photo-orientation | The camera orientation when the photo was taken | String | No | Yes |
 | photo-resolution-x | The width of the image, in pixels | Integer | No | Yes |
 | photo-resolution-y | The height of the image, in pixels | Integer | No | Yes |
+| field-sex | Default sighting field: sex of the individual(s) in the sighting | String ('Male'/'Female') | No | Yes |
+| field-lifestage | Default sighting field: life-stage of the individual(s) in the sighting | String ('Adult'/'Juvenile') | No | Yes |
 
 ### Bulk Import default mapping column
 
@@ -87,9 +87,7 @@ By using the Default Column Names in a CSV for a Bulk Import, Camelot will autom
 | photo-orientation | Orientation |
 | photo-resolution-x | Image Height |
 | photo-resolution-y | Image Width |
-| sighting-lifestage | Sighting Life Stage |
 | sighting-quantity | Sighting Quantity |
-| sighting-sex | Sighting Sex |
 | site-area | Site Area (km2) |
 | site-city | City |
 | site-country | Country/Primary Location Name |
