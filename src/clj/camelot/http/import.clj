@@ -28,13 +28,13 @@
 
 (def routes
   (context "/import" {session :session state :system}
-           (GET "/import/bulk/template" {params :params}
+           (GET "/bulk/template" {params :params}
                 (metadata-template (assoc state :session session) (:dir params)))
-           (POST "/import/bulk/columnmap" {params :multipart-params}
+           (POST "/bulk/columnmap" {params :multipart-params}
                  (->> (get params "file")
                       (template/column-map-options (assoc state :session session))
                       r/response))
-           (POST "/import/bulk/import" [data]
+           (POST "/bulk/import" [data]
                  (r/response (bulk/import-with-mappings (assoc state :session session) data)))
            (GET "/" [] (r/response (import/importer-state state)))
            (POST "/cancel" [] (r/response (import/cancel-import state)))
