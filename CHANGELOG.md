@@ -1,4 +1,8 @@
 ## ChangeLog
+### 1.4.1
+#### Fixes
+* Fixes a bug which shows "not found" when attempting to use bulk import in 1.4.0
+
 ### 1.4.0
 #### Enhancements
 * Migrate sighting 'sex' and 'lifestage' fields to Sighting Fields.
