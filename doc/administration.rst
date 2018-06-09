@@ -18,8 +18,8 @@ Windows
 -  **Data**: %LOCALAPPDATA%\\camelot
 -  **Config**: %APPDATA%\\camelot
 
-*Entering, for example, ``%LOCALAPPDATA%``, as a folder path may seem unusual,
-though is a valid path under Windows.*
+(Entering, for example, ``%LOCALAPPDATA%``, as a folder path may seem unusual,
+though is a valid path under Windows.)
 
 OSX
 ^^^
