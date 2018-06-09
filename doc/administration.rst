@@ -1,8 +1,7 @@
 Administration and advanced configuration
 -----------------------------------------
 
-*This section is not for the faint-of-heart, and intended for people
-with strong IT knowledge.*
+*This section is intended for people with strong IT knowledge.*
 
 Camelot has two directories: one for configuration, and one for data
 storage. The location of these directories depends on the OS.
@@ -10,11 +9,17 @@ storage. The location of these directories depends on the OS.
 Locations
 ~~~~~~~~~
 
+By default, Camelot stores all data under the current user's home folder for
+the operating system.
+
 Windows
 ^^^^^^^
 
 -  **Data**: %LOCALAPPDATA%\\camelot
 -  **Config**: %APPDATA%\\camelot
+
+*Entering, for example, ``%LOCALAPPDATA%``, as a folder path may seem unusual,
+though is a valid path under Windows.*
 
 OSX
 ^^^
@@ -45,6 +50,38 @@ standard locations (as above).
 
 Each of the ``Database``, ``Media`` and ``FileStore`` directories should
 be backed up routinely.
+
+Storing Media and Database separately
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It can be desirable to store the ``Media`` directory separately from the
+``Database`` directory.  For example, for many GB of images it may be
+desirable to place the images themselves on cheaper storage such as a HDD,
+while keeping the ``Database`` directory on an SSD for fast access.
+
+This can be achieved with Camelot using features provided by the Operating
+System.  The process is as follows:
+
+1. set the datadir to the location you want for your database on the SSD via
+   the CAMELOT_DATADIR environment variable.
+2. move the Media (and optionally FileStore) folder(s) to the locations you
+   want on the HDD.
+3. finally create |linux_symlink| (Linux, MacOS) or |windows_junctions|
+   (Windows) for the moved folders from the datadir to the the location you
+   moved them, ensuring the links are named identically to the original
+   folders in datadir (i.e., ``Media`` and ``FileStore``).
+
+When choosing the locations keep in mind that this data isn't intended to be
+modified outside of Camelot, and thus it is recommended to ensure appropriate
+permissions are set and not to place these inside shared folders.
+
+.. |linux_symlink| raw:: html
+
+   <a href="https://kb.iu.edu/d/abbe" target="_blank">symlinks</a>
+
+.. |windows_junctions| raw:: html
+
+   <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/junction" target="_blank">junctions</a>
 
 Config Directory
 ~~~~~~~~~~~~~~~~
