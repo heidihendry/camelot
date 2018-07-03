@@ -1,4 +1,10 @@
 ## ChangeLog
+
+### 1.4.2 (upcoming)
+#### Fixes
+* Fixes a broken translation when uploading images where the timestamp is outside of the session date range.
+
+
 ### 1.4.1
 #### Fixes
 * Fixes a bug which shows "not found" when attempting to use bulk import in 1.4.0
