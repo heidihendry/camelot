@@ -491,7 +491,7 @@
     :end-date "End date"
     :end-date-description "Date to end the matrix on, inclusive."}
 
-   :camelot.import.capture
+   :camelot.import.core
    {:timestamp-outside-range "Timestamp is outside of the session dates."}
 
    :camelot.component.camera.core
