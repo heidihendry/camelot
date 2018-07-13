@@ -1,9 +1,8 @@
 ## ChangeLog
 
-### 1.4.2 (upcoming)
+### 1.4.2
 #### Fixes
 * Fixes a broken translation when uploading images where the timestamp is outside of the session date range.
-
 
 ### 1.4.1
 #### Fixes
