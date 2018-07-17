@@ -16,10 +16,12 @@
   [data]
   (nav/analytics-event "taxonomy-update" "submit")
   (rest/put-x (str "/taxonomy/" (get-in data [:taxonomy-id :value])),
-              {:data (select-keys (deref data)
-                                  [:taxonomy-species :taxonomy-genus :taxonomy-family
-                                   :taxonomy-order :taxonomy-class :taxonomy-common-name
-                                   :species-mass-id :taxonomy-notes])}
+              {:data (-> data
+                         deref
+                         (select-keys [:taxonomy-species :taxonomy-genus :taxonomy-family
+                                       :taxonomy-order :taxonomy-class :taxonomy-common-name
+                                       :species-mass-id :taxonomy-notes])
+                         (update-in [:species-mass-id :value] #(if (= % "") nil %)))}
               navigate-away))
 
 (defn blank?
@@ -73,10 +75,10 @@
       (dom/select #js {:className "field-input"
                        :onChange #(om/update! data [:data :species-mass-id :value]
                                               (.. % -target -value))
-                       :value (get-in data [:data :species-mass-id :value])}
+                       :value (or (get-in data [:data :species-mass-id :value]) "")}
                   (om/build-all species-mass-option-component
                                 (conj (into '() (reverse (:species-mass-options data)))
-                                      {:species-mass-id "-1"
+                                      {:species-mass-id ""
                                        :species-mass-label ""})
                                 {:key :species-mass-id})))))
 
@@ -88,7 +90,7 @@
       (dom/input #js {:className "field-input"
                       :onChange #(om/update! data [:data field :value]
                                              (.. % -target -value))
-                      :value (get-in data [:data field :value])}))))
+                      :value (or (get-in data [:data field :value]) "")}))))
 
 (defn text-area-component
   [data owner {:keys [field]}]
@@ -100,7 +102,7 @@
                          :cols 48
                          :onChange #(om/update! data [:data field :value]
                                                 (.. % -target -value))
-                         :value (get-in data [:data field :value])}))))
+                         :value (or (get-in data [:data field :value]) "")}))))
 
 (defn form-component
   [data owner]

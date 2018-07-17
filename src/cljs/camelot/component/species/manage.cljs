@@ -143,14 +143,14 @@
                              {:opts {:extch extch}})
                    (dom/select #js {:className "field-input"
                                     :id "identify-species-select"
-                                    :value (get data :selected-species)
+                                    :value (get data :selected-species "")
                                     :onChange #(let [v (.. % -target -value)]
                                                  (if (= v "create")
                                                    (do
                                                      (om/update! data :taxonomy-create-mode true)
                                                      (.focus (om/get-node owner)))
                                                    (do
-                                                     (om/update! data :selected-species nil)
+                                                     (om/update! data :selected-species "")
                                                      (go (>! extch {:type :select :taxonomy-id (cljs.reader/read-string v)})))))}
                                (om/build-all species-option-component
                                              (cons {:taxonomy-id -1

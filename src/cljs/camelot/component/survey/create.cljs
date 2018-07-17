@@ -57,7 +57,8 @@
                             (dom/tbody #js {:className "selectable"}
                                        (om/build-all species-row-component
                                                      (:species data)
-                                                     {:init-state state}))))
+                                                     {:init-state state
+                                                      :key :id}))))
         (dom/div #js {:className "no-species-found"}
                  (dom/p nil
                         (tr/translate ::search-instructions)))))))
@@ -110,14 +111,14 @@
                (dom/input #js {:className "field-input"
                                :type "text"
                                :placeholder (tr/translate ::survey-name-placeholder)
-                               :value (get data :survey-name "")
+                               :value (or (get data :survey-name) "")
                                :onChange #(om/update! data
                                                       :survey-name (.. % -target -value))})
                (dom/label #js {:className "field-label required"}
                           (tr/translate ::survey-description))
                (dom/textarea #js {:className "field-input"
                                   :rows "3"
-                                  :value (get data :survey-notes "")
+                                  :value (or (get data :survey-notes) "")
                                   :onChange #(om/update! data :survey-notes (.. % -target -value))})
                (dom/label #js {:className "field-label"}
                           (tr/translate ::expected-species))

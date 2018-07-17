@@ -1,5 +1,10 @@
 ## ChangeLog
 
+### 1.4.3
+#### Fixes
+* Fixes a bug which prevented use of species search
+* Fixes an error when attempting to clear the value of the species mass field
+
 ### 1.4.2
 #### Fixes
 * Fixes a broken translation when uploading images where the timestamp is outside of the session date range.

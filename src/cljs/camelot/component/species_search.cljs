@@ -46,14 +46,10 @@
                                            (get raw "results")))))))
 
 (defn lookup-species
-  [chan e]
+  [chan search]
   (go
     (>! chan {:busy true})
-    (rest/get-x-raw "/species/search" {:query-params {"search" (-> e
-                                                               .-target
-                                                               array-seq
-                                                               first
-                                                               .-value)}}
+    (rest/get-x-raw "/species/search" {:query-params {"search" search}}
                 #(go
                    (>! chan {:busy false
                              :results (process-all-results (:body %))})))))
@@ -68,7 +64,7 @@
     (render-state [_ state]
       (dom/form #js {:onSubmit #(do (.preventDefault %)
                                     (when-not (:busy data)
-                                      (lookup-species (:result-chan state) %)))
+                                      (lookup-species (:result-chan state) (:search state))))
                      :className "field-input-form"}
                 (dom/input #js {:type "text"
                                 :name "search"
@@ -134,7 +130,8 @@
                               (dom/tbody #js {:className "selectable"}
                                          (om/build-all search-result-component
                                                        (:search-results data)
-                                                       {:state state}))))
+                                                       {:state state
+                                                        :key :id}))))
           (dom/span nil ))))))
 
 (defn citation-modal
