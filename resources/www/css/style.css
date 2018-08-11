@@ -168,6 +168,9 @@ a:hover {
     margin-bottom: 1rem;
     width: 30rem;
 }
+#app .hidden {
+    display: none;
+}
 #app .field-required-label {
     display: none;
     float: right;

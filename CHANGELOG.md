@@ -1,5 +1,10 @@
 ## ChangeLog
 
+### 1.4.4
+#### Fixes
+* Fixes a bug where new drop-down setting fields could not be added
+* Fixes some minor interaction bugs in the sighting fields settings UI
+
 ### 1.4.3
 #### Fixes
 * Fixes a bug which prevented use of species search

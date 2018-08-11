@@ -42,7 +42,7 @@
         vs (-> (data/require-keys sf sighting-field-input-keys)
                (update :sighting-field-key #(or % ""))
                (update :sighting-field-label #(or % ""))
-               (update :sighting-field-options #(or % ""))
+               (update :sighting-field-options #(or % nil))
                (update :sighting-field-default #(or % ""))
                (update :sighting-field-datatype #(or % "text"))
                (update :sighting-field-required #(or % "false"))
@@ -283,28 +283,28 @@ Options for select are given by the `options` option."
       {::text-value ""})
     om/IRenderState
     (render-state [this state]
-      (when (datatype-has-options? data)
-        (letfn [(additem! [] (do (let [v (str/trim (om/get-state owner ::text-value))]
-                                   (when-not (some #{v} (get data field))
-                                     (om/transact! data field #(conj % v))))
-                                 (om/set-state! owner ::text-value "")))]
-          (dom/label #js {:className (str "field-label " (if required "required" ""))}
-                     (tr/translate (field-translation field ".label")))
-          (dom/div #js {:className "list-input"}
-                   (dom/div #js {:className "list-input-add-container"}
-                            (dom/input #js {:type "text" :className "field-input" :placeholder (tr/translate ::add-option)
-                                            :value (get state ::text-value "")
-                                            :required required
-                                            :onKeyDown #(when (= (.-key %) "Enter") (additem!))
-                                            :onChange #(om/set-state! owner ::text-value (.. % -target -value))})
-                            (dom/button #js {:className "btn btn-primary"
-                                             :onClick additem!}
-                                        (tr/translate :words/add)))
-                   (apply dom/div #js {:className "list-input-items"}
-                          (om/build-all string-list-item
-                                        (into [] (map #(hash-map :data data :field field :value %)
-                                                      (sort (get data field))))
-                                        {:key-fn identity}))))))))
+      (dom/div #js {:className (if (datatype-has-options? data) "" "hidden")}
+               (letfn [(additem! [] (do (let [v (str/trim (om/get-state owner ::text-value))]
+                                          (when-not (some #{v} (get data field))
+                                            (om/transact! data field #(conj % v))))
+                                        (om/set-state! owner ::text-value "")))]
+                 (dom/label #js {:className (str "field-label " (if required "required" ""))}
+                            (tr/translate (field-translation field ".label")))
+                 (dom/div #js {:className "list-input"}
+                          (dom/div #js {:className "list-input-add-container"}
+                                   (dom/input #js {:type "text" :className "field-input" :placeholder (tr/translate ::add-option)
+                                                   :value (get state ::text-value "")
+                                                   :required required
+                                                   :onKeyDown #(when (= (.-key %) "Enter") (additem!))
+                                                   :onChange #(om/set-state! owner ::text-value (.. % -target -value))})
+                                   (dom/button #js {:className "btn btn-primary"
+                                                    :onClick additem!}
+                                               (tr/translate :words/add)))
+                          (apply dom/div #js {:className "list-input-items"}
+                                 (om/build-all string-list-item
+                                               (into [] (map #(hash-map :data data :field field :value %)
+                                                             (sort (get data field))))
+                                               {:key-fn identity}))))))))
 
 (defn edit-component
   "Component for editing sighting field details."

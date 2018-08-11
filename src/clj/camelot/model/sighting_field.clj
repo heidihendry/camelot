@@ -112,13 +112,12 @@
 (defn create!
   "Create a sighting field with its configuration as `field-config'."
   [state field-config]
-  (let [sf (->> (update field-config :sighting-field-datatype name)
+  (let [sf-id (->> (update field-config :sighting-field-datatype name)
                 (query state :create<!)
                 :1
-                int
-                (get-specific state))]
-    (create-options! state (:sighting-field-id sf) (:sighting-field-options field-config))
-    sf))
+                int)]
+    (create-options! state sf-id (:sighting-field-options field-config))
+    (get-specific state sf-id)))
 
 (defn- create-select-field!
   [state field-config options]

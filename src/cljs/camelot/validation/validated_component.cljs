@@ -97,17 +97,20 @@
     om/IInitState
     (init-state [_]
       {::validator-failed nil})
-    om/IRenderState
-    (render-state [_ state]
+    om/IDidUpdate
+    (did-update [_ _ state]
       (let [v (get-in data (if (keyword? data-key) [data-key] data-key))]
         (when-not (or (and (or (string? v) (coll? v)) (empty? v)) (nil? v))
-          (om/set-state! owner ::show-messages true)))
+          (when-not (::show-messages state)
+            (om/set-state! owner ::show-messages true))))
       (let [result (reduce-kv (fn [acc k v] (apply-validator (get data data-key)
                                                              acc k v)) nil
                               validators)]
         (when (not= result (om/get-state owner ::validator-failed))
           (om/set-state! owner ::validator-failed result)
-          (go (>! validation-chan {:key data-key :success (nil? result)}))))
+          (go (>! validation-chan {:key data-key :success (nil? result)})))))
+    om/IRenderState
+    (render-state [_ state]
       (let [show-warning (and (::show-messages state)
                               (get-in validators [(::validator-failed state) ::msg]))]
         (dom/div #js {:className "validated-component"}
