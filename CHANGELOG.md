@@ -1,5 +1,9 @@
 ## ChangeLog
 
+### 1.4.5 (upcoming)
+#### Fixes
+* Fixes a missing translation for the "media unrecoverable" column title in reports
+
 ### 1.4.4
 #### Fixes
 * Fixes a bug where new drop-down setting fields could not be added

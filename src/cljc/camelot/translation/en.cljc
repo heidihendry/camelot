@@ -409,6 +409,7 @@
     :trap-station-session-end-date "Trap Station Session End Date"
     :trap-station-session-id "Trap Station Session ID"
     :trap-station-session-camera-id "Trap Station Session Camera ID"
+    :trap-station-session-camera-media-unrecoverable "Trap Station Session Camera Media Unrecoverable"
     :media-id "Media ID"
     :site-count "Number of Sites"
     :trap-station-session-camera-count "Number of Cameras in Sessions"
