@@ -78,7 +78,7 @@
 
 (defn upload-success-handler
   [data r]
-  (rest/get-x (str "/file/survey/" (:survey-id (:response r))
+  (rest/get-x (str "/files/survey/" (:survey-id (:response r))
                    "/file/" (:survey-file-id (:response r)))
               (fn [resp]
                 (om/transact! data :files
