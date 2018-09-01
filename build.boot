@@ -1,4 +1,4 @@
-(def +version+ "1.4.5")
+(def +version+ "1.4.6-SNAPSHOT")
 
 (def dependencies
   '[[org.clojure/test.check "0.9.0" :scope "test"]
