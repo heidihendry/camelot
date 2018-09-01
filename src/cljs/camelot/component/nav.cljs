@@ -4,6 +4,7 @@
             [om.dom :as dom :include-macros true]
             [camelot.component.progress-bar :as progress-bar]
             [cljs.core.async :refer [<! chan >! timeout]]
+            [camelot.state :as state]
             [camelot.rest :as rest]
             [camelot.translation.core :as tr]
             [goog.date.duration :as duration]
@@ -41,7 +42,9 @@
 (defn cancel-import
   [data]
   (rest/post-x-opts "/import/cancel" {}
-                    {:successs #(om/update! data :cancelling-import true)
+                    {:successs #(do
+                                  (om/update! data :cancelling-import true)
+                                  (om/update! (state/bulk-import-state) :polling-active false))
                      :suppress-error-dialog true}))
 
 (defn import-progress
@@ -77,6 +80,10 @@
 (defn bulk-import-details-panel-component
   [data owner]
   (reify
+    om/IDidUpdate
+    (did-update [_ prev-props prev-state]
+      (when (= (import-progress data) 1)
+        (om/update! (state/bulk-import-state) :polling-active false)))
     om/IRender
     (render [_]
       (let [total (reduce + 0 (map (fn [[k v]] v) (get-in data [:import-status :counts])))
@@ -169,8 +176,9 @@
           (if (= port cch)
             (.log js/console "Bulk import poller cleaned up")
             (do
-              (rest/get-x-opts "/import" {:success #(om/update! data :import-status (:body %))
-                                          :suppress-error-dialog true})
+              (when (:polling-active (state/bulk-import-state))
+                (rest/get-x-opts "/import" {:success #(om/update! data :import-status (:body %))
+                                            :suppress-error-dialog true}))
               (let [p (import-progress @data)]
                 (recur (if (and (pos? p) (< p 1))
                          bulk-import-refresh-short-timeout

@@ -31,7 +31,9 @@
   (om/update! data :import-status :initialising)
   (rest/post-x "/import/bulk/import" {:data (get-import-data data)}
                #(if (or (nil? (:body %)) (empty? (:body %)))
-                  (om/update! data :import-status :active)
+                  (do
+                    (om/update! (state/bulk-import-state) :polling-active true)
+                    (om/update! data :import-status :active))
                   (do
                     (om/update! data :import-status :validation-problem)
                     (om/update! data :import-status-details (:body %))))
