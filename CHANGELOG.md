@@ -6,6 +6,7 @@
 * Fixes an error after uploading a related file to a survey
 * Fixes validation problems with lat/long input which can arise when using European locales
 * Fixes warning messages on Camelot startup
+* Fixes the original site being unset when beginning to edit a camera trap station
 
 ### 1.4.4
 #### Fixes

@@ -375,9 +375,15 @@
   (reify
     om/IRender
     (render [_]
-      (if (= (:page data) 1)
-        (om/build important-fields-form data {:opts opts})
-        (om/build extra-fields-form data {:opts opts})))))
+      (if (nil? (:sites data))
+        (dom/div #js {:className "align-center"}
+                 (dom/img #js {:className "spinner"
+                               :src "images/spinner.gif"
+                               :height "32"
+                               :width "32"}))
+        (if (= (:page data) 1)
+          (om/build important-fields-form data {:opts opts})
+          (om/build extra-fields-form data {:opts opts}))))))
 
 (defn section-containers-component
   [data owner opts]
