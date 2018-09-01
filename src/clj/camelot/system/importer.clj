@@ -72,7 +72,7 @@
                   (import! (:state msg) (:record msg))))))
           (recur))
         (catch InterruptedException e
-          (println "Importer stopped."))
+          (log/info "Importer stopped."))
         (catch Exception e
           (log/error "Importer failed with error: " (.getMessage ^Exception e)))))))
 

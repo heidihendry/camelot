@@ -1,5 +1,6 @@
 (ns camelot.system.http.core
   (:require
+   [clojure.tools.logging :as log]
    [camelot.system.http.transit :as transit]
    [camelot.system.state :as state]
    [camelot.http.core :refer [app-routes]]
@@ -59,7 +60,7 @@
   (start [this]
     (if @jetty
       (do
-        (println "Jetty already running; not starting.")
+        (log/warn "Jetty already running; not starting.")
         (assoc this :jetty @jetty))
       (do
         (println (format "Camelot %s started on port %d.\n" (version/get-version) port))

@@ -1,5 +1,6 @@
 (ns camelot.system.config.core
   (:require
+   [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]))
 
 (defrecord Config [store config path]
@@ -11,7 +12,7 @@
   (stop [this]
     (when store
       (reset! store {}))
-    (println "Config stopped.")
+    (log/info "Config stopped.")
     (assoc this
            :store nil
            :config nil

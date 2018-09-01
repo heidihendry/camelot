@@ -29,7 +29,9 @@
     [ring/ring-defaults "0.2.0"]
     [ring "1.4.0"]
     [ring-transit "0.1.4" :exclusions [com.cognitect/transit-clj]]
-    [com.taoensso/tower "3.1.0-beta4"]
+    ;; Required by tower; later version avoids shadowing of clojure.core
+    [com.taoensso/encore "2.97.0"]
+    [com.taoensso/tower "3.1.0-beta4" :exclusions [com.taoensso/encore]]
     [commons-io/commons-io "2.4"]
     [environ "1.0.2"]
     [prismatic/schema "1.1.6"]

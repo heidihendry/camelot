@@ -1,5 +1,6 @@
 (ns camelot.system.db.core
   (:require
+   [clojure.tools.logging :as log]
    [yesql.core :as sql]
    [com.stuartsierra.component :as component]
    [clojure.java.jdbc :as jdbc]
@@ -56,7 +57,7 @@
   (try
     (jdbc/get-connection (assoc (dissoc spec :create) :shutdown true))
     (catch Exception e
-      (println (.getMessage e)))))
+      (log/info (.getMessage e)))))
 
 (s/defrecord Database
     [connection :- clojure.lang.PersistentArrayMap]

@@ -5,6 +5,7 @@
 * Fixes a missing translation for the "media unrecoverable" column title in reports
 * Fixes an error after uploading a related file to a survey
 * Fixes validation problems with lat/long input which can arise when using European locales
+* Fixes warning messages on Camelot startup
 
 ### 1.4.4
 #### Fixes
