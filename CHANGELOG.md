@@ -1,6 +1,10 @@
 ## ChangeLog
 
-### 1.4.5 (upcoming)
+### 1.4.6
+#### Fixes
+* Fixes a bug where the incorrect session details may be displayed for a camera trap
+
+### 1.4.5
 #### Fixes
 * Fixes a missing translation for the "media unrecoverable" column title in reports
 * Fixes an error after uploading a related file to a survey

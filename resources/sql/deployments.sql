@@ -1,10 +1,10 @@
 -- name: get-specific
 SELECT trap_station_session_id, trap_station_session_created,
        trap_station_session_updated, trap_station_id, trap_station_name, site_id,
-       survey_site_id, trap_station_name, trap_station_longitude, trap_station_latitude,
+       survey_site_id, trap_station_longitude, trap_station_latitude,
        trap_station_altitude, trap_station_distance_above_ground, trap_station_distance_to_river,
        trap_station_distance_to_road, trap_station_distance_to_settlement,
-       trap_station_notes, survey_site_id, site_name,
+       trap_station_notes, site_name,
        trap_station_session_start_date, trap_station_session_end_date, camera_id,
        camera_name, camera_status_id, trap_station_session_camera_media_unrecoverable
 FROM trap_station_session
@@ -19,10 +19,10 @@ WHERE trap_station_session_id = :trap_station_session_id
 -- name: get-all
 SELECT trap_station_session_id, trap_station_session_created,
        trap_station_session_updated, trap_station_id, trap_station_name, site_id,
-       survey_site_id, trap_station_name, trap_station_longitude, trap_station_latitude,
+       survey_site_id, trap_station_longitude, trap_station_latitude,
        trap_station_altitude, trap_station_distance_above_ground, trap_station_distance_to_river,
        trap_station_distance_to_road, trap_station_distance_to_settlement,
-       trap_station_notes, survey_site_id, site_name,
+       trap_station_notes, site_name,
        trap_station_session_start_date, trap_station_session_end_date, camera_id,
        camera_name, camera_status_id, trap_station_session_camera_media_unrecoverable
 FROM trap_station_session
@@ -37,10 +37,10 @@ WHERE survey_id = :survey_id
 -- name: get-uploadable
 SELECT trap_station_session_id, trap_station_session_created,
        trap_station_session_updated, trap_station_id, trap_station_name, site_id,
-       survey_site_id, trap_station_name, trap_station_longitude, trap_station_latitude,
+       survey_site_id, trap_station_longitude, trap_station_latitude,
        trap_station_altitude, trap_station_distance_above_ground, trap_station_distance_to_river,
        trap_station_distance_to_road, trap_station_distance_to_settlement,
-       trap_station_notes, survey_site_id, site_name,
+       trap_station_notes, site_name,
        trap_station_session_start_date, trap_station_session_end_date,
        trap_station_session_camera_id, camera_id, camera_name, camera_status_id,
        trap_station_session_camera_media_unrecoverable

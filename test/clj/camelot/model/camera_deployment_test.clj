@@ -1,8 +1,7 @@
 (ns camelot.model.camera-deployment-test
   (:require [camelot.model.camera-deployment :as sut]
             [clojure.test :refer :all]
-            [clj-time.core :as t]
-            [camelot.testutil.state :as state]))
+            [clj-time.core :as t]))
 
 (def default-record
   {:trap-station-session-id 1

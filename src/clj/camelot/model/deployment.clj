@@ -2,6 +2,7 @@
   "Deployment model and data access."
   (:require
    [schema.core :as s]
+   [clj-time.core :as t]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.util.data :as data]
@@ -75,7 +76,7 @@
        dep-util/assoc-cameras
        (group-by :trap-station-id)
        vals
-       (map #(sort-by :trap-station-session-id > %))
+       (map #(sort-by :trap-station-session-end-date t/after? %))
        (map first)
        (mapv deployment)))
 

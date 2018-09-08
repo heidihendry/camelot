@@ -61,10 +61,22 @@
     [reloaded.repl "0.2.3" :scope "test"]
     [org.apache.derby/derbytools "10.12.1.1" :scope "test"]])
 
-(set-env!
- :source-paths #{"src/cljc" "src/clj" "src/cljs"}
- :resource-paths #{"resources"}
- :dependencies dependencies)
+(defn set-dev-env!
+  []
+  (set-env!
+   :source-paths #{"src/cljc" "src/clj" "src/cljs" "test/clj" "test/cljc"}
+   :resource-paths #{"resources"}
+   :dependencies dependencies))
+
+(defn set-prod-env!
+  []
+  (set-env!
+   :source-paths #{"src/cljc" "src/clj" "src/cljs"}
+   :resource-paths #{"resources"}
+   :dependencies dependencies))
+
+;; Use development environment by default.
+(set-dev-env!)
 
 (require '[adzerk.boot-cljs :refer [cljs]]
          '[adzerk.boot-test :refer [test]]
@@ -152,6 +164,7 @@
 (deftask uberjar
   "Build an uberjar."
   []
+  (set-prod-env!)
   (comp
    (aot)
    (cljs)
