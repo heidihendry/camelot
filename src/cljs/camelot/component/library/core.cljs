@@ -18,18 +18,6 @@
   [data e]
   (when-not (:show-identification-panel data)
     (cond
-      ;; >
-      (and (= (.-keyCode e) 190) (.-shiftKey e))
-      (do (.click (.getElementById js/document "next-page"))
-          (nav/analytics-event "library-key" ">")
-          (.preventDefault e))
-
-      ;; <
-      (and (= (.-keyCode e) 188) (.-shiftKey e))
-      (do (.click (.getElementById js/document "prev-page"))
-          (nav/analytics-event "library-key" "<")
-          (.preventDefault e))
-
       ;; ctrl+f
       (and (= (.-keyCode e) 70) (.-ctrlKey e))
       (do (.focus (.getElementById js/document "filter"))
