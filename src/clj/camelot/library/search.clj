@@ -21,8 +21,8 @@
   [search]
   (let [field-expr (honey-util/->qualified-field-query-part search)]
     (if (:negated? search)
-      (honey-util/->negated-field-query-part (:value search) (:field search) field-expr)
-      (honey-util/->field-query-part (:value search) (:field search) field-expr))))
+      (honey-util/->negated-field-query-part search field-expr)
+      (honey-util/->field-query-part search field-expr))))
 
 (defn- search-field-known?
   "Returns `true` if `field-key` is a sighting-field or a field in the schema.
@@ -76,7 +76,7 @@
       acc
       (-> acc
           (update :result
-                  #(concat % (honey-util/->sighting-field-query-part field-key)))
+                  #(concat % (honey-util/->sighting-field-query-part psearch)))
           (update :added-fields #(conj % field-key))))))
 
 (defn- join-sighting-fields

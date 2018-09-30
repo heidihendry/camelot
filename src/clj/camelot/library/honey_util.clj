@@ -26,19 +26,33 @@
   [sval]
   [:lower (str/replace sval "*" "%")])
 
-(defn ->eq-op
-  "Return correct equality operator for `sval`."
-  [sval]
-  (if (re-find #"\*" sval)
-    :like
-    :=))
+(defn ->op
+  "Return correct equality operator for `op` and `sval`."
+  [search]
+  (let [sval (:value search)
+        op (:operator search)]
+    (condp = op
+      :lt :<
+      :le :<=
+      :gt :>
+      :ge :>=
+      (if (re-find #"\*" sval)
+        :like
+        :=))))
 
-(defn ->neq-op
-  "Return correct inequality operator for `sval`."
-  [sval]
-  (if (re-find #"\*" sval)
-    :not-like
-    :<>))
+(defn ->neg-op
+  "Return correct inequality operator for `op` and `sval`."
+  [search]
+  (let [sval (:value search)
+        op (:operator search)]
+    (condp = op
+      :lt :>=
+      :le :>
+      :gt :<=
+      :ge :<
+      (if (re-find #"\*" sval)
+        :not-like
+        :<>))))
 
 (def base-query
   {:select [:trap-station.trap-station-id
@@ -118,32 +132,36 @@
 
 (defn- ->negated-field-equality-query-part
   "Produce a partial query to match a field value based on inequality."
-  [search-val field-key sql-expr]
-  (let [datatype (:datatype (get model/schema-definitions field-key))]
+  [search sql-expr]
+  (let [search-val (:value search)
+        field-key (:field search)
+        datatype (:datatype (get model/schema-definitions field-key))]
     (condp = datatype
-      :integer [:<> sql-expr (edn/read-string search-val)]
-      :readable-integer [:<> sql-expr (edn/read-string search-val)]
-      :number [:<> sql-expr (edn/read-string search-val)]
-      :boolean [:<> sql-expr (edn/read-string search-val)]
+      :integer [(->neg-op search) sql-expr (edn/read-string search-val)]
+      :readable-integer [(->neg-op search) sql-expr (edn/read-string search-val)]
+      :number [(->neg-op search) sql-expr (edn/read-string search-val)]
+      :boolean [(->neg-op search) sql-expr (edn/read-string search-val)]
       ;; TODO TG-485 https://tree.taiga.io/project/cshclm-camelot/us/485
       :timestamp nil
       :date nil
       [:and
-       [:<> [:lower sql-expr] (->matchable search-val)]
-       [:<> sql-expr ""]])))
+       [(->neg-op search) [:lower sql-expr] (->matchable search-val)]
+       [(->neg-op search) sql-expr ""]])))
 
 (defn ->negated-field-query-part
   "Produce a partial query to match a field value via negation."
-  [^String search-val field-key sql-expr]
-  (cond
-    (= search-val "*")
-    (->negated-field-existence-query-part field-key sql-expr)
+  [search sql-expr]
+  (let [search-val (:value search)
+        field-key (:field search)]
+    (cond
+      (= search-val "*")
+      (->negated-field-existence-query-part field-key sql-expr)
 
-    (re-find #"\*" search-val)
-    (->negated-field-like-query-part search-val field-key sql-expr)
+      (re-find #"\*" search-val)
+      (->negated-field-like-query-part search-val field-key sql-expr)
 
-    :default
-    (->negated-field-equality-query-part search-val field-key sql-expr)))
+      :default
+      (->negated-field-equality-query-part search sql-expr))))
 
 (defn- ->field-existence-query-part
   "Produce a partial query to match a field value based on existence."
@@ -161,30 +179,34 @@
 
 (defn- ->field-equality-query-part
   "Produce a partial query to match a field value based on equality."
-  [search-val field-key sql-expr]
-  (let [datatype (:datatype (get model/schema-definitions field-key))]
+  [search sql-expr]
+  (let [search-val (:value search)
+        field-key (:field search)
+        datatype (:datatype (get model/schema-definitions field-key))]
     (condp = datatype
-      :integer [:= sql-expr (edn/read-string search-val)]
-      :readable-integer [:= sql-expr (edn/read-string search-val)]
-      :number [:= sql-expr (edn/read-string search-val)]
-      :boolean [:= sql-expr (= search-val "true")]
+      :integer [(->op search) sql-expr (edn/read-string search-val)]
+      :readable-integer [(->op search) sql-expr (edn/read-string search-val)]
+      :number [(->op search) sql-expr (edn/read-string search-val)]
+      :boolean [(->op search) sql-expr (= search-val "true")]
       ;; TODO TG-485 https://tree.taiga.io/project/cshclm-camelot/us/485
       :timestamp nil
       :date nil
-      [:= [:lower sql-expr] (->matchable search-val)])))
+      [(->op search) [:lower sql-expr] (->matchable search-val)])))
 
 (defn ->field-query-part
   "Produce a partial query to match a field value."
-  [^String search-val field-key sql-expr]
-  (cond
-    (= search-val "*")
-    (->field-existence-query-part field-key sql-expr)
+  [search sql-expr]
+  (let [search-val (:value search)
+        field-key (:field search)]
+    (cond
+      (= search-val "*")
+      (->field-existence-query-part field-key sql-expr)
 
-    (re-find #"\*" search-val)
-    (->field-like-query-part search-val field-key sql-expr)
+      (re-find #"\*" search-val)
+      (->field-like-query-part search-val field-key sql-expr)
 
-    :default
-    (->field-equality-query-part search-val field-key sql-expr)))
+      :default
+      (->field-equality-query-part search sql-expr))))
 
 (defn ->negated-full-text-query-part
   "Full text search with negation.
@@ -199,17 +221,17 @@
        [:or
         [:= :taxonomy.taxonomy-genus nil]
         [:= :taxonomy.taxonomy-species nil]
-        [(->neq-op sval) [:lower [:concat [:concat :taxonomy.taxonomy-genus [:cast " " :char]]
+        [(->neg-op search) [:lower [:concat [:concat :taxonomy.taxonomy-genus [:cast " " :char]]
                                   :taxonomy.taxonomy-species]]
          (->matchable sval)]]]
       (vec (conj
             (map (fn [k]
                    [:or [:= k nil]
-                    [(->neq-op sval) [:lower k] (->matchable sval)]])
+                    [(->neg-op search) [:lower k] (->matchable sval)]])
                  (model/qualified-searchable-field-keys))
             [:or
              [:= :sighting-field-value.sighting-field-value-data nil]
-             [(->neq-op sval) [:lower :sighting-field-value.sighting-field-value-data]
+             [(->neg-op search) [:lower :sighting-field-value.sighting-field-value-data]
               (->matchable sval)]]))))))
 
 (defn ->normal-full-text-query-part
@@ -221,14 +243,14 @@
     (vec
      (concat
       [:or
-       [(->eq-op sval) [:lower [:concat [:concat :taxonomy.taxonomy-genus [:cast " " :char]]
+       [(->op search) [:lower [:concat [:concat :taxonomy.taxonomy-genus [:cast " " :char]]
                                 :taxonomy.taxonomy-species]]
         (->matchable sval)]]
       (vec (conj
             (map (fn [k]
-                   [(->eq-op sval) [:lower k] (->matchable sval)])
+                   [(->op search) [:lower k] (->matchable sval)])
                  (model/qualified-searchable-field-keys))
-            [(->eq-op sval) [:lower :sighting-field-value.sighting-field-value-data]
+            [(->op search) [:lower :sighting-field-value.sighting-field-value-data]
              (->matchable sval)]))))))
 
 (defn ->qualified-field-query-part
@@ -247,8 +269,9 @@
 
 (defn ->sighting-field-query-part
   "Add a partial query to match a given field-key."
-  [field-key]
-  (let [field (name field-key)]
+  [search]
+  (let [field-key (:field search)
+        field (name field-key)]
     [[:sighting-field field-key]
      [:and [:= (keyword (str field ".survey-id")) :survey.survey-id]
       [:= (keyword (str field ".sighting-field-key"))
