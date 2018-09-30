@@ -43,6 +43,7 @@
          (view/navbar)))
   (rest/get-screens
    #(do (om/update! (state/app-state-cursor) :screens (:body %))
+        (om/update! (state/app-state-cursor) :bulk-import {})
         (om/update! (state/app-state-cursor) :library {:search {}
                                                        :search-results {}})
         (rest/get-resource "/surveys"
