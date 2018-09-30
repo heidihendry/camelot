@@ -138,6 +138,16 @@ to complete it for you, and, if you had set up some sublocations for
 sites previously, you'll notice another drop down: all of the
 sublocations in Camelot.
 
+Here `:` means "is equal to", though Camelot supports other search operators
+too. For example:
+
+::
+
+    captured>=2018-01-01
+
+The following operators are available: `:` (aka, `==`), `<`, `<=`, `>=`, `>`,
+and `!=`.
+
 Sometimes you want to search based on more than one thing. For example,
 all photos at a site AND featuring a certain species. Can do:
 
@@ -153,8 +163,8 @@ Camelot can also do searches with disjunctions:
 
 Note the pipe ('\|') in the above example: this means "OR" in a search.
 
-(requires 1.4.0+) Camelot also supports negation. For example, to find all
-photos which are flagged but do not have any species:
+Camelot also supports negation. For example, to find all photos which are
+flagged but do not have any species:
 
 ::
     flagged:true !species:*

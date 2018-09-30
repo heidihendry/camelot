@@ -1,6 +1,10 @@
 ## ChangeLog
 
 ### 1.4.6
+#### Enhancements
+* Adds support for search operators (>, <=, !=, etc.)
+* Adds support for date and timestamp searches in the library
+
 #### Fixes
 * Fixes a bug where the incorrect session details may be displayed for a camera trap
 
