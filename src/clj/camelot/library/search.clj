@@ -103,4 +103,6 @@
         '()))
     (catch Exception e
       (log/error (.getMessage e))
+      (doseq [st (.getStackTrace e)]
+        (log/error (.toString st)))
       '())))

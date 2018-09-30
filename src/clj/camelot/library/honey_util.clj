@@ -5,6 +5,7 @@
   HoneySQL."
   (:require
    [clojure.string :as str]
+   [clj-time.coerce :as tc]
    [clojure.edn :as edn]
    [honeysql.core :as honeysql]
    [honeysql.format :as fmt]
@@ -141,9 +142,8 @@
       :readable-integer [(->neg-op search) sql-expr (edn/read-string search-val)]
       :number [(->neg-op search) sql-expr (edn/read-string search-val)]
       :boolean [(->neg-op search) sql-expr (edn/read-string search-val)]
-      ;; TODO TG-485 https://tree.taiga.io/project/cshclm-camelot/us/485
-      :timestamp nil
-      :date nil
+      :timestamp [(->neg-op search) sql-expr (tc/to-long search-val)]
+      :date [(->neg-op search) sql-expr (tc/to-long search-val)]
       [:and
        [(->neg-op search) [:lower sql-expr] (->matchable search-val)]
        [(->neg-op search) sql-expr ""]])))
@@ -188,9 +188,8 @@
       :readable-integer [(->op search) sql-expr (edn/read-string search-val)]
       :number [(->op search) sql-expr (edn/read-string search-val)]
       :boolean [(->op search) sql-expr (= search-val "true")]
-      ;; TODO TG-485 https://tree.taiga.io/project/cshclm-camelot/us/485
-      :timestamp nil
-      :date nil
+      :timestamp [(->op search) sql-expr (tc/to-long search-val)]
+      :date [(->op search) sql-expr (tc/to-long search-val)]
       [(->op search) [:lower sql-expr] (->matchable search-val)])))
 
 (defn ->field-query-part
