@@ -11,6 +11,9 @@
    :class :taxonomy-class
    :common :taxonomy-common-name
    :site :site-name
+   :session-start :trap-station-session-start-date
+   :session-end :trap-station-session-start-end
+   :captured :media-capture-timestamp
    :camera :camera-name
    :loc :site-sublocation
    :trap :trap-station-name

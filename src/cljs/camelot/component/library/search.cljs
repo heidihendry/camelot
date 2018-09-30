@@ -1,6 +1,7 @@
 (ns camelot.component.library.search
   (:require [om.dom :as dom]
             [om.core :as om]
+            [camelot.util.model :as model]
             [camelot.component.library.util :as util]
             [camelot.state :as state]
             [camelot.rest :as rest]
@@ -106,6 +107,20 @@
   [sighting-field]
   (name (sighting-fields/user-key sighting-field)))
 
+(def aliases-with-operator-overrides
+  {:captured ">"
+   :session-start ">"
+   :session-end ">"})
+
+(def operator-overrides
+  (merge (->> model/schema-definitions
+              vec
+              (filter (fn [[k v]] (contains? #{:date :timestamp} (:datatype v))))
+              (map first)
+              (map (fn [k] [k ">"]))
+              (into {}))
+         aliases-with-operator-overrides))
+
 (defn filter-input-component
   [data owner]
   (reify
@@ -141,7 +156,8 @@
                                        :id "filter"
                                        :onChange #(om/update! data [:search :terms] %)
                                        :onKeyDown #(select-media-collection-container state (:search data) %)}
-                        :multi-term true}
+                        :multi-term true
+                        :operator-overrides operator-overrides}
                  :state {:disabled (get-in data [:search :inprogress])}}))))
 
 (defn filter-survey-component

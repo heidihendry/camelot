@@ -186,13 +186,11 @@
              tail))))
 
 (defn insertion-chars
-  [insertion]
+  [insertion insert-after]
   (let [qd (if (re-matches #".*[\ \|].*" insertion)
              (str "\"" insertion "\"")
              insertion)]
-    (seq (if (= (last insertion) ":")
-           qd
-           (str qd " ")))))
+    (seq (str qd insert-after))))
 
 (defn term-end
   [search term point]
@@ -201,12 +199,13 @@
     (take-while #(= (term-at-point search %) term) (range (inc point) search))))
 
 (defn replace-term
-  [search point insertion multi-term]
+  [search point insertion insert-after multi-term]
   (if multi-term
     (let [term (term-at-point search point)
           term-end (term-end search term point)]
       (let [m (clj->js (seq search))]
-        (.splice m (- term-end (count term)) (count term) (str/join "" (insertion-chars insertion)))
+        (.splice m (- term-end (count term)) (count term)
+                 (str/join "" (insertion-chars insertion insert-after)))
         (.join m "")))
     insertion))
 
@@ -234,7 +233,7 @@
 
 (defn typeahead
   "Input component with typeahead-style completion."
-  [data owner {:keys [create-text create-fn input-config multi-term]}]
+  [data owner {:keys [create-text create-fn input-config multi-term operator-overrides]}]
   (reify
     om/IInitState
     (init-state [_]
@@ -279,10 +278,13 @@
                 (if (::select r)
                   (do
                     (let [props (ifind data (::select r))
+                          suffix (if (:field props)
+                                   (get operator-overrides (keyword (::select r)) ":")
+                                   "")
                           v (replace-term (om/get-state owner ::value)
                                           (om/get-state owner ::cursor-position)
-                                          (str (::select r)
-                                               (if (:field props) ":" ""))
+                                          (str (::select r) suffix)
+                                          (if (empty? suffix) " " "")
                                           multi-term)]
                       (om/set-state! owner ::value v)
                       (om/set-state! owner ::async-pending false)
@@ -303,6 +305,7 @@
                                           (om/set-state! owner ::clear-focus false))))))
     om/IRenderState
     (render-state [_ state]
+      (prn operator-overrides)
       (let [v (::term state)
             ctx (::completions state)]
         (dom/div #js {:className "typeahead"}
