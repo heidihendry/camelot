@@ -340,6 +340,9 @@
                                                                    (when (:onKeyDown input-config)
                                                                      ((:onKeyDown input-config) e)))
                                                                  (om/refresh! owner))))
+                                             :onKeyUp #(let [si (om/get-node owner "search-input")
+                                                             selection-start (.-selectionStart si)]
+                                                         (om/set-state! owner ::cursor-position selection-start))
                                              :onChange #(do
                                                           (let [tv (.. % -target -value)]
                                                             (om/set-state! owner ::value tv)
@@ -350,8 +353,7 @@
                  (when-not (and (empty? v) (empty? ctx))
                    (let [completions (complete (or (and (::context state) ctx)
                                                    data) v)]
-                     (when (and (not (already-complete? completions v))
-                                (::is-focused state))
+                     (when (::is-focused state)
                        (om/build completion-list-component
                                  (map #(hash-map :completion %
                                                  :context nil) completions)
