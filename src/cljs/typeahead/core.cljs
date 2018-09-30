@@ -6,7 +6,11 @@
             [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
-(def term-separator-re #"[|+ :]")
+(def operators
+  #{"<" "<=" ">" ">=" ":" "==" "!="})
+
+(def term-separator-re #"(:?\||\+|\ |:|<=|<|>=|>|==|!=)")
+(def field-value-separator-re #"(:?:|<=|<|>=|>|==|!=)")
 
 (defn ->basic-entry
   [term]
@@ -124,18 +128,28 @@
          (reduce search-reducer index)
          props-for-subtree)))
 
+(defn- separator-positions
+  [point s sep]
+  (loop [pos (- point (count sep)) acc []]
+    (if-let [p (str/index-of s sep pos) ]
+      (recur (inc p) (conj acc p))
+      acc)))
+
+(defn all-separator-positions
+  [point s]
+  (mapcat (partial separator-positions point s) operators))
+
 (defn- term-separators
-  [search]
+  [search point]
   (->> search
        str/lower-case
-       seq
-       (map-indexed #(vector %1 %2))
-       (filter #(re-matches term-separator-re (second %)))
-       (map first)))
+       (all-separator-positions point)
+       sort
+       distinct))
 
 (defn- next-separator
   [search point]
-  (or (first (filter #(>= % point) (term-separators search)))
+  (or (first (term-separators search point))
       (count search)))
 
 (defn remove-negation
@@ -149,15 +163,16 @@
   [search point]
   (let [p (next-separator search (min (count search) point))]
     (if (or (zero? point)
-            (re-matches term-separator-re (str (nth search (dec point)))))
+            (re-matches field-value-separator-re (subs search p point)))
       ""
-      (->> search
-           (split-at p)
-           first
-           (apply str)
-           (#(str/split % term-separator-re))
-           last
-           remove-negation))))
+      (let [v (->> search
+                   (split-at p)
+                   first
+                   (apply str)
+                   (#(str/split % term-separator-re))
+                   last
+                   remove-negation)]
+        v))))
 
 (defn splice
   [all new start end]
@@ -179,14 +194,20 @@
            qd
            (str qd " ")))))
 
+(defn term-end
+  [search term point]
+  (if (= point (count search))
+    point
+    (take-while #(= (term-at-point search %) term) (range (inc point) search))))
+
 (defn replace-term
-  [search point selection-end insertion multi-term]
+  [search point insertion multi-term]
   (if multi-term
-    (if (= point selection-end)
-      (let [term (term-at-point search point)
-            end (next-separator search point)]
-        (apply str (splice (seq search) (insertion-chars insertion) (- end (count term)) end)))
-      (apply str (splice (seq search) (insertion-chars insertion) point selection-end)))
+    (let [term (term-at-point search point)
+          term-end (term-end search term point)]
+      (let [m (clj->js (seq search))]
+        (.splice m (- term-end (count term)) (count term) (str/join "" (insertion-chars insertion)))
+        (.join m "")))
     insertion))
 
 (defn field-context
@@ -199,8 +220,8 @@
                  (or (= c "|") (= c " "))
                  (reduced nil)
 
-                 (= c ":")
-                 (reduced (term-at-point search %2))
+                 (contains? #{":" ">" "<" "="} c)
+                 (reduced (term-at-point search (dec %2)))
 
                  :else nil))
             nil
@@ -231,17 +252,18 @@
           (om/set-state! owner ::completions nil)
           (let [cfn (:completion-fn (ifind data ctx))]
             (and cfn (cfn (str/lower-case ctx) (::completion-chan state)))))
-        (om/set-state! owner
-                       ::term
-                       ((if multi-term
-                          term-at-point
-                          identity) (::value state)
-                          (.-selectionStart si)))
-        (if (= (.-activeElement js/document) si)
-          (om/set-state! owner ::is-focused true)
-          ;; Slightly delay hiding, otherwise we lose the menu as soon as we
-          ;; go to click on something.
-          (go
+        (let [term ((if multi-term
+                      term-at-point
+                      identity) (::value state)
+                    (.-selectionStart si))]
+          (when-not (= (::term state) term)
+            (om/set-state! owner ::term term)))
+        (go
+          (<! (timeout 100))
+          (if (= (.-activeElement js/document) si)
+            (om/set-state! owner ::is-focused true)
+            ;; Slightly delay hiding, otherwise we lose the menu as soon as we
+            ;; go to click on something.
             (<! (timeout 100))
             (om/set-state! owner ::is-focused false)))))
     om/IWillMount
@@ -258,7 +280,6 @@
                           props (ifind data (::select r))
                           v (replace-term (om/get-state owner ::value)
                                           (.-selectionStart si)
-                                          (.-selectionEnd si)
                                           (str (::select r)
                                                (if (:field props) ":" ""))
                                           multi-term)]
