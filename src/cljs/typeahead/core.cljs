@@ -7,9 +7,9 @@
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def operators
-  #{"<" "<=" ">" ">=" ":" "==" "!="})
+  #{"<" "<=" ">" ">=" ":" "==" "!=" " " "|"})
 
-(def term-separator-re #"(:?\||\+|\ |:|<=|<|>=|>|==|!=)")
+(def term-separator-re #"\||\+|\ |\:|<=|<|>=|>|==|!=")
 (def field-value-separator-re #"(:?:|<=|<|>=|>|==|!=)")
 
 (defn ->basic-entry
@@ -130,8 +130,9 @@
 
 (defn- separator-positions
   [point s sep]
-  (loop [pos (- point (count sep)) acc []]
-    (if-let [p (str/index-of s sep pos) ]
+  (loop [pos (- point (count sep))
+         acc []]
+    (if-let [p (str/index-of s sep pos)]
       (recur (inc p) (conj acc p))
       acc)))
 
@@ -162,17 +163,19 @@
   "Return the term at a given cursor position."
   [search point]
   (let [p (next-separator search (min (count search) point))]
-    (if (or (zero? point)
-            (re-matches field-value-separator-re (subs search p point)))
+    (cond
+      (or (zero? point)
+          (contains? operators (subs search (dec point) point)))
       ""
-      (let [v (->> search
-                   (split-at p)
-                   first
-                   (apply str)
-                   (#(str/split % term-separator-re))
-                   last
-                   remove-negation)]
-        v))))
+
+      :default
+      (->> search
+           (split-at p)
+           first
+           (apply str)
+           (#(str/split % term-separator-re))
+           last
+           remove-negation))))
 
 (defn splice
   [all new start end]
@@ -196,7 +199,9 @@
   [search term point]
   (if (= point (count search))
     point
-    (take-while #(= (term-at-point search %) term) (range (inc point) search))))
+    (or (last (take-while #(= (term-at-point search %) term)
+                          (range (inc point) (count search))))
+        point)))
 
 (defn replace-term
   [search point insertion insert-after multi-term]
@@ -204,7 +209,9 @@
     (let [term (term-at-point search point)
           term-end (term-end search term point)]
       (let [m (clj->js (seq search))]
-        (.splice m (- term-end (count term)) (count term)
+        (.splice m
+                 (- term-end (count term))
+                 (count term)
                  (str/join "" (insertion-chars insertion insert-after)))
         (.join m "")))
     insertion))
@@ -305,7 +312,6 @@
                                           (om/set-state! owner ::clear-focus false))))))
     om/IRenderState
     (render-state [_ state]
-      (prn operator-overrides)
       (let [v (::term state)
             ctx (::completions state)]
         (dom/div #js {:className "typeahead"}

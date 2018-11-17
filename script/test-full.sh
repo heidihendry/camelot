@@ -3,13 +3,13 @@
 set -e
 
 echo "Checking binaries in \$PATH... "
-which boot &> /dev/null
+which lein &> /dev/null
 
 echo "Compiling... "
-boot uberjar
+$(dirname "${0}")/build.sh
 
 echo "Running tests... "
-boot test-all
+$(dirname "${0}")/run-tests.sh
 
 echo "Running camelot and ensuring it responds... "
 java -jar target/camelot.jar &

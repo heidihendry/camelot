@@ -139,41 +139,42 @@
            ["hello: world"]))))
 
 (deftest term-at-point-test
-  (testing "Should cater for empty value"
-    (is (= (sut/term-at-point "" 0)
-           "")))
+  (testing "term-at-point"
+    (testing "Should cater for empty value"
+      (is (= (sut/term-at-point "" 0)
+             "")))
 
-  (testing "Should support term with caret at end of string"
-    (is (= (sut/term-at-point "hello" 5)
-           "hello")))
+    (testing "Should support term with caret at end of string"
+      (is (= (sut/term-at-point "hello" 5)
+             "hello")))
 
-  (testing "Should support term with caret at beginning of string"
-    (is (= (sut/term-at-point "hello" 0)
-           "")))
+    (testing "Should support term with caret at beginning of string"
+      (is (= (sut/term-at-point "hello" 0)
+             "")))
 
-  (testing "Should support term with caret in middle of string"
-    (is (= (sut/term-at-point "hello" 3)
-           "hello")))
+    (testing "Should support term with caret in middle of string"
+      (is (= (sut/term-at-point "hello" 3)
+             "hello")))
 
-  (testing "Should support multiple terms"
-    (is (= (sut/term-at-point "hello wor" 9)
-           "wor")))
+    (testing "Should support multiple terms"
+      (is (= (sut/term-at-point "hello wor" 9)
+             "wor")))
 
-  (testing "Should not find any term when starting a new one"
-    (is (= (sut/term-at-point "hello " 6)
-           "")))
+    (testing "Should not find any term when starting a new one"
+      (is (= (sut/term-at-point "hello " 6)
+             "")))
 
-  (testing "Should not find any term when immediately before another term"
-    (is (= (sut/term-at-point "hello world" 6)
-           "")))
+    (testing "Should not find any term when immediately before another term"
+      (is (= (sut/term-at-point "hello world" 6)
+             "")))
 
-  (testing "Should consider a field to be a term at point."
-    (is (= (sut/term-at-point "species:" 6)
-           "species")))
+    (testing "Should consider a field to be a term at point."
+      (is (= (sut/term-at-point "species:" 6)
+             "species")))
 
-  (testing "Should not consider a field to be a term at point when immediately after it."
-    (is (= (sut/term-at-point "species:" 8)
-           ""))))
+    (testing "Should not consider a field to be a term at point when immediately after it."
+      (is (= (sut/term-at-point "species:" 8)
+             "")))))
 
 (deftest splice-test
   (testing "Should allow splice in the middle"
@@ -185,48 +186,49 @@
            (seq "hello everybody")))))
 
 (deftest replace-term-test
-  (testing "Should replace the entire search if not multi-term"
-    (is (= (sut/replace-term "hello world" 5 5 "replacement" false)
-           "replacement")))
+  (testing "replace-term"
+    (testing "Should replace the entire search if not multi-term"
+      (is (= (sut/replace-term "hello world" 5 "replacement" "" false)
+             "replacement")))
 
-  (testing "Should perform basic replacement if multi-term"
-    (is (= (sut/replace-term "hel" 3 3 "hello" true)
-           "hello ")))
+    (testing "Should perform basic replacement if multi-term"
+      (is (= (sut/replace-term "hel" 3 "hello" " " true)
+             "hello ")))
 
-  (testing "Should replace term at point if multi-term"
-    (is (= (sut/replace-term "hello world" 5 5 "replacement" true)
-           "replacement  world")))
+    (testing "Should replace term at point if multi-term"
+      (is (= (sut/replace-term "hello world" 5 "replacement" "" true)
+             "replacement world")))
 
-  (testing "Should append replacement text if starting a new term"
-    (is (= (sut/replace-term "hello " 6 6 "replacement" true)
-           "hello replacement ")))
+    (testing "Should append replacement text if starting a new term"
+      (is (= (sut/replace-term "hello " 6 "replacement" " " true)
+             "hello replacement ")))
 
-  (testing "Should be clever about replacing fields"
-    (is (= (sut/replace-term "test:yes hello:" 10 10 "world:" true)
-           "test:yes world:")))
+    (testing "Should be clever about replacing fields"
+      (is (= (sut/replace-term "test:yes hello:" 10 "world" "" true)
+             "test:yes world:")))
 
-  (testing "Should allow arbitrary replacements"
-    (is (= (sut/replace-term "test:yes hello:" 5 15 "yay" true)
-           "test:yay "))))
+    (testing "Should allow arbitrary replacements"
+      (is (= (sut/replace-term "test:yes hello:" 6 "yay" " " true)
+             "test:yay  hello:")))))
 
 (deftest ifind-test
   (testing "Find"
     (testing "should return properties for an exact match"
       (is (= (sut/ifind {"h" {"e" {"l" {"l" {"o" {:props {:context "xyz"}}
-                                            "" {:props {:context "abc"}}}}}}}
-                       "hello")
+                                             "" {:props {:context "abc"}}}}}}}
+                        "hello")
              {:context "xyz"})))
 
     (testing "should return property corresponding to the search string"
       (is (= (sut/ifind {"h" {"e" {"l" {"l" {"o" {:props {:context "xyz"}}
-                                            "" {:props {:context "abc"}}}}}}}
-                       "hell")
+                                             "" {:props {:context "abc"}}}}}}}
+                        "hell")
              {:context "abc"})))
 
     (testing "should return nil if match is not found"
       (is (= (sut/ifind {"h" {"e" {"l" {"l" {"o" {:props {:context "xyz"}}
-                                            "" {:props {:context "abc"}}}}}}}
-                       "world")
+                                             "" {:props {:context "abc"}}}}}}}
+                        "world")
              nil)))))
 
 (deftest field-context-test

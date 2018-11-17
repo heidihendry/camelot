@@ -109,12 +109,12 @@ There are plenty of resources for working with Clojure; this contribution guide 
 
 There's only a couple of steps to getting Camelot built from sources\*.
 
-1. Camelot uses [Boot](http://boot-clj.com) for managing the project build.  First, follow the [installation instructions](https://github.com/boot-clj/boot#install) for Boot.
+1. Camelot uses [Leiningen](https://leiningen.org/) for managing the project build.  First, follow the [installation instructions](https://leiningen.org/#install) for Leiningen.
 
 2. Once installed, building Camelot is one command\*\*:
 
 ```
-boot uberjar
+lein uberjar
 ```
 
 This will build Camelot and produce a new .jar file, which can be ran with:
@@ -131,26 +131,10 @@ If you encounter problems, raise an issue or reach out via the Google Group.
 
 ### Running tests
 
-Camelot currently has 2 test suites, one for .cljc and clj, and one for cljs. To run the tests use:
+Camelot currently has 2 test suites, one for clj, and one for cljs. To run the tests use:
 
 ```
-boot test-all
-```
-
-### Working at the REPL
-
-Open a terminal and type `boot dev` to start a development environment.  Once
-running, you can connect to it from a different terminal:
-
-```
-boot repl -c -H localhost -p 5600
-```
-
-This will connect to a clj repl.  You can access the cljs repl by:
-
-```
-(in-ns 'boot.user)
-(start-repl)
+./script/run-tests.sh
 ```
 
 ### Emacs/Cider

@@ -8,22 +8,30 @@ stages:
 compile:
   stage: build
   before_script:
-    - export BOOT_AS_ROOT='yes'
+    - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
   script:
-    - boot uberjar
+    - script/build.sh
   artifacts:
     paths:
       - "target/camelot.jar"
     expire_in: 20 minutes
 
-unittest:
+unittest-clj:
   stage: build
   before_script:
-    - export BOOT_AS_ROOT='yes'
+    - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
   script:
-    - boot test-all
+    - script/run-tests.sh clj
+
+unittest-cljs:
+  stage: build
+  before_script:
+    - export LEIN_ROOT=1
+    - export PATH="$HOME/bin:${PATH}"
+  script:
+    - script/run-tests.sh cljs
 
 upgrade:
   stage: test

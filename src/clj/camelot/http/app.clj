@@ -14,6 +14,13 @@
    :headers {"Content-Type" "text/html; charset=utf-8"}
    :body (io/input-stream (io/resource "www/index.html"))})
 
+(defn- retrieve-favicon
+  "Return a response for index.html"
+  []
+  {:status 404
+   :headers {"Content-Type" "application/octet-stream; charset=utf-8"}
+   :body nil})
+
 (defn- heartbeat
   [state]
   (let [conn (get-in state [:database :connection])]
@@ -26,6 +33,7 @@
 (def routes
   (context "" {session :session state :system}
            (GET "/" _ (retrieve-index))
+           (GET "/favicon.ico" _ (retrieve-favicon))
            (GET "/application" []
                 (r/response {:version (version/get-version)
                              :nav (screens/nav-menu (assoc state :session session))}))

@@ -1,16 +1,16 @@
 #!/bin/bash
 
-which boot &> /dev/null
+which lein &> /dev/null
 if [ $? -ne 0 ]; then
     if [ -z $1 ]; then
-        echo "[Error] boot not found in \$PATH."
-        echo "If it's not installed, please install it (http://boot-clj.com/). Otherwise specify the path to boot as an argument."
+        echo "[Error] lein not found in \$PATH."
+        echo "If it's not installed, please install it (https://leiningen.org/). Otherwise specify the path to lein as an argument."
         exit 1
     else
-        BOOT=$1
+        LEIN=$1
     fi
 else
-    BOOT=$(which boot)
+    LEIN=$(which lein)
 fi
 
-$BOOT uberjar
+$LEIN uberjar

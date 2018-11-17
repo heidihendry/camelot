@@ -5,16 +5,22 @@ MAINTAINER Chris Mann <chris@bitpattern.com.au>
 
 RUN apt-get update -y
 RUN apt-get install nodejs nodejs-legacy npm curl -y
-RUN npm install -g phantomjs-prebuilt
 RUN mkdir -p ~/bin
-RUN curl -fsSLo ~/bin/boot https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh
-RUN chmod 755 ~/bin/boot
+RUN apt-get update -y
+RUN apt-get install chromium -y
+RUN curl -fsSLo ~/bin/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+RUN chmod 755 ~/bin/lein
 
 WORKDIR /tmp
-COPY build.boot boot.properties /tmp/
+COPY project.clj /tmp/
 COPY src /tmp/src/
 COPY resources /tmp/resources/
+COPY script /tmp/script
+COPY test /tmp/test
 
-RUN BOOT_AS_ROOT='yes' ~/bin/boot show -d
+RUN LEIN_ROOT='yes' ~/bin/lein check
+
+COPY figwheel-main.edn /tmp/figwheel-main.edn
+RUN script/run-tests.sh cljs
 
 RUN rm -rf /tmp/*

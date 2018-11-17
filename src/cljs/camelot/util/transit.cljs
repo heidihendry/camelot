@@ -25,7 +25,7 @@
   "Transite writers"
   {UtcDateTime transit-date-writer})
 
-(defn- request
+(defn request
   "Make a GET or POST request."
   [method href params]
   (method href

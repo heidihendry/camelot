@@ -91,10 +91,9 @@
         :args (s/cat :state ::sysspec/state :id int?)
         :ret (s/or :not-found nil? :site ::site))
 
-(sch/defn create! :- Site
+(defn create!
   "Create a site from the passed site data."
-  [state :- State
-   data :- TSite]
+  [state data]
   (let [record (query state :create<! data)]
     (site (get-specific state (int (:1 record))))))
 
@@ -102,11 +101,9 @@
         :args (s/cat :state ::sysspec/state :data ::tsite)
         :ret ::site)
 
-(sch/defn update! :- Site
+(defn update!
   "Update the site."
-  [state :- State
-   id :- sch/Int
-   data :- TSite]
+  [state id data]
   (query state :update! (merge data {:site-id id}))
   (site (get-specific state id)))
 

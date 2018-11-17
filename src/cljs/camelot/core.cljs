@@ -6,10 +6,16 @@
             [camelot.state :as state]
             [camelot.rest :as rest]
             [cljs.core.async :refer [<!]]
+            [weasel.repl :as repl]
             [secretary.core :as secretary :refer-macros [defroute]])
   (:import [goog.date UtcDateTime]))
 
+#_(set! *warn-on-infer* true)
+
 (enable-console-print!)
+
+(when-not (repl/alive?)
+  (repl/connect "ws://localhost:9001"))
 
 (defn default-page [hash]
   (if (= hash "")

@@ -47,7 +47,7 @@
         month (.getUTCMonth date)]
     (truncate-tz (js/Date. year month (days-in-month year month)))))
 
-(defn- switch-date!
+(defn switch-date!
   [date offset]
   (.setUTCDate date (+ (.getUTCDate date) offset))
   date)

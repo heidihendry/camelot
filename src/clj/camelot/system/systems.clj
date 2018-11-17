@@ -50,17 +50,19 @@
      (check-and-migrate-db system db-initd?)
      system)))
 
-(defn- camelot-system
-  [{:keys [port browser]}]
+(defn camelot-system
+  [{:keys [port browser options]}]
   (let [smap (component/system-map
               :config (config/map->Config {:store state/config-store
-                                          :config (state/config)
-                                          :path (state/path-map)})
+                                           :config (state/config)
+                                           :path (state/path-map)})
               :database (db/map->Database {:connection state/spec})
               :importer (importer/map->Importer {})
-              :app (http/map->HttpServer
-                    {:port (or port (:port cli/option-defaults))
-                     :browser (or browser (:browser cli/option-defaults))}))]
+              :app (if-let [dsvr (:dev-server options)]
+                     dsvr
+                     (http/map->HttpServer
+                      {:port (or port (:port cli/option-defaults))
+                       :browser (or browser (:browser cli/option-defaults))})))]
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer}

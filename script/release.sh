@@ -3,7 +3,7 @@
 set -e
 
 PROJECT_NAME="camelot"
-BUILD_FILE="build.boot"
+BUILD_FILE="project.clj"
 README_FILE="README.md"
 GETTING_STARTED_DOC="doc/gettingstarted.rst"
 HTML_FILE="resources/www/index.html"
@@ -14,7 +14,7 @@ echo "Ensuring branch is clean..."
 git status | grep -qE 'working tree clean|branch is up-to-date'
 
 echo "Bumping release version... "
-sed -i "s/+version+\s\+\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"/\+version\+ \"\1\"/" ${BUILD_FILE}
+sed -i "s/${PROJECT_NAME}\s\+\"\([0-9]\+\.[0-9]\+\.[0-9]\+\)-SNAPSHOT\"/${PROJECT_NAME} \"\1\"/" ${BUILD_FILE}
 released_version="$(grep -oE [0-9]+\.[0-9]+\.[0-9]+ ${BUILD_FILE} | head -n1)"
 sed -i "s/${PROJECT_NAME}-\([0-9]\+\.[0-9]\+\.[0-9]\+\).zip/${PROJECT_NAME}-${released_version}.zip/" ${README_FILE}
 sed -i "s/\([0-9]\+\.[0-9]\+\.[0-9]\+\)\]/${released_version}\]/" ${README_FILE}
@@ -26,7 +26,7 @@ git commit -a -m "Version bump: $released_version"
 git tag -sa "v$released_version" -m "Release: $released_version"
 
 echo "Running release build... "
-boot uberjar
+$(dirname "${0}")/build.sh
 
 echo "Packaging release"
 mkdir "${PROJECT_NAME}-${released_version}/"

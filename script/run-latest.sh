@@ -5,19 +5,19 @@ if [ $? -ne 0 ]; then
     echo "[Error] git not found in \$PATH (maybe it's not installed?)."
 fi
 
-which boot &> /dev/null
+which lein &> /dev/null
 if [ $? -ne 0 ]; then
     if [ -z $1 ]; then
-        echo "[Error] boot not found in \$PATH (maybe it's not installed)."
+        echo "[Error] lein not found in \$PATH (maybe it's not installed)."
         exit 1
     else
-        BOOT=$1
+        LEIN=$1
     fi
 else
-    BOOT=$(which boot)
+    LEIN=$(which lein)
 fi
 
 git pull | grep "Already up-to-date" > /dev/null
-$(dirname $0)/build.sh
+$(dirname "${0}")/build.sh
 
-$BOOT dev
+$LEIN run
