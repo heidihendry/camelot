@@ -8,7 +8,7 @@
   (:import [goog History]
            [goog.history EventType]))
 
-(defn- get-token
+(defn get-token
   "Get the current location token"
   []
   (str js/window.location.pathname js/window.location.hash))
