@@ -146,4 +146,4 @@
     (->> sightings
          (independent-sightings-by-species state)
          (map total-spp)
-         (remove #(= (:count %) 0)))))
+         (remove #(zero? (:count %))))))

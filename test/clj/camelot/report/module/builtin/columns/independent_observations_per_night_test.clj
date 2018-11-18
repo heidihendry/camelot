@@ -15,13 +15,13 @@
         (is (= (calculate data)
                [{:independent-observations-per-night nil}]))))
 
-    (testing "Should assoc column to "-" if total-nights is nil"
+    (testing "Should assoc column to '-' if total-nights is nil"
       (let [data [{:independent-observations 10}]]
         (is (= (calculate data)
                [{:independent-observations 10
                  :independent-observations-per-night "-"}]))))
 
-    (testing "Should assoc column to "-" if total-nights is nil"
+    (testing "Should assoc column to '-' if total-nights is nil"
        (let [data [{:independent-observations 10
                     :total-nights 0}]]
          (is (= (calculate data)

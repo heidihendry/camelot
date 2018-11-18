@@ -3,15 +3,6 @@
    [camelot.report.module.core :as module]
    [clj-time.core :as t]))
 
-(defn- get-nights-per-independent-observation
-  [record]
-  (let [obs (:independent-observations record)
-        nights (or (:total-nights record) (:nights-elapsed record))]
-    (cond
-        (nil? obs) nil
-        (or (nil? nights) (zero? nights)) "-"
-        :else (format "%.3f" (* 100 (double (/ obs nights)))))))
-
 (defn sighting-time-delta-reducer
   [acc v]
   (if (and (:trap-station-id v) (:taxonomy-id v))

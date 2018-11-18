@@ -163,10 +163,7 @@ direction is considered negative."
    default-column-mappings))
 
 (defn column-map-options
-  [state
-   {:keys [tempfile :- s/Str
-           content-type :- s/Str
-           size :- s/Int]}]
+  [state {:keys [tempfile content-type size]}]
   (let [filedata (slurp tempfile)]
     (cond
       ;; Assume a non-empty file without a null-byte can be treated as a CSV.

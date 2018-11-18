@@ -6,15 +6,17 @@
 
 (def ^:dynamic *invocations* nil)
 
-(defmacro with-spies [[calls] & body]
+(defmacro with-spies
   "Record invocations arguments for mocks created with defmock."
+  [[calls] & body]
   `(let [ts# (atom {})
          ~calls (fn [] (::fns @ts#))]
      (binding [*invocations* ts#]
        ~@body)))
 
-(defmacro defmock [ps & body]
+(defmacro defmock
   "Create a mock with the given params that evaluates `body.'"
+  [ps & body]
   (let [fname# (gensym "mock-")]
     `(fn fname# ~ps
        (swap! ~`*invocations*
@@ -27,8 +29,9 @@
   [acc k v]
   (assoc acc (keyword (string/replace (name k) #"_" "-")) v))
 
-(defn query-params [calls state ks]
+(defn query-params
   "Return arguments for the query function at `ks'."
+  [calls state ks]
   (->> ks
        (concat [:database :queries])
        vec

@@ -95,15 +95,6 @@
                                     :survey-file-size size}))
       (update! state (:survey-file-id rec) size))))
 
-(defn- to-bytes
-  [path]
-  (let [f (io/file path)
-        data (byte-array (file/length f))
-        stream (java.io.FileInputStream. f)]
-    (.read stream data)
-    (.close stream)
-    data))
-
 (s/defn download
   [state :- State
    file-id :- s/Int]

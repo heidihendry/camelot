@@ -60,7 +60,9 @@
             [lein-environ "1.1.0"]]
 
   :min-lein-version "2.6.1"
-  :env {:squiggly "{:checkers [:eastwood :kibit]}"}
+  :env {:squiggly {:checkers [:kibit :eastwood]
+                   :eastwood-options {:exclude-linters [:unlimited-use]
+                                      :add-linters [:unused-private-vars]}}}
 
   :source-paths ["src/cljc" "src/clj" "src/cljs"]
   :test-paths ["test/cljc" "test/clj"]
@@ -78,12 +80,14 @@
              {:dependencies [[figwheel "0.5.17"]
                              [figwheel-sidecar "0.5.17"]
                              [cider/piggieback "0.3.10"]
+                             [org.clojure/core.logic "0.8.11"]
                              [org.clojure/tools.nrepl "0.2.13"]
                              [org.apache.derby/derbytools "10.12.1.1"]]
               :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
               :env {:camelot-dev-mode "true"}
               :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]
               :plugins [[lein-figwheel "0.5.17" :exclusions [org.clojure/clojure]]
+                        [jonase/eastwood "0.3.3"]
                         [com.jakemccrary/lein-test-refresh "0.23.0"]]
               :figwheel {:css-dirs ["resources/www/css"]
                          :ring-handler user/http-handler

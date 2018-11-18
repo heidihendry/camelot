@@ -20,7 +20,6 @@
   (:import
    (clojure.lang IFn)))
 
-
 (defn- fill-keys
   [columns data]
   (map
@@ -31,11 +30,6 @@
             %
             columns)
    data))
-
-(defn- better-for-known-keys
-  [smaller larger]
-  (when (= smaller (select-keys larger (keys smaller)))
-    larger))
 
 (defn- distinct-in-results
   [results]
@@ -82,7 +76,7 @@
 (defn- aggregate-groups
   [state aggregated-columns group]
   (let [col-vals (reduce (partial aggregate-reducer state group) {} aggregated-columns)
-        update-vals #(reduce-kv (fn [acc col v] (assoc acc col v)) % col-vals)]
+        update-vals #(reduce-kv assoc % col-vals)]
     (map update-vals group)))
 
 (defn aggregate-data
@@ -103,7 +97,7 @@
        (map #(% a b))
        vec
        (#(conj % (compare (vec a) (vec b))))
-       (reduce #(if (= 0 %2)
+       (reduce #(if (zero? %2)
                   %1
                   (reduced %2)) 0)))
 
