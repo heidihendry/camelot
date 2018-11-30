@@ -60,9 +60,7 @@
             [lein-environ "1.1.0"]]
 
   :min-lein-version "2.6.1"
-  :env {:squiggly {:checkers [:kibit :eastwood]
-                   :eastwood-options {:exclude-linters [:unlimited-use]
-                                      :add-linters [:unused-private-vars]}}}
+  :env {:squiggly "{:checkers [:kibit :eastwood] :eastwood-options {:exclude-linters [:unlimited-use] :add-linters [:unused-private-vars]}}"}
 
   :source-paths ["src/cljc" "src/clj" "src/cljs"]
   :test-paths ["test/cljc" "test/clj"]
