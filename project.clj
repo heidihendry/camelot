@@ -41,7 +41,7 @@
                  [org.apache.commons/commons-lang3 "3.4"]
                  [com.drewnoakes/metadata-extractor "2.11.0"]
                  [medley "1.0.0"]
-                 [secretary "1.2.3" :exclusions [org.clojure/clojurescript]]
+                 [clj-commons/secretary "1.2.4" :exclusions [org.clojure/clojurescript]]
                  [bk/ring-gzip "0.1.1"]
                  [cheshire "5.8.0"]
                  [clj-http "2.2.0"]
