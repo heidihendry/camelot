@@ -6,6 +6,7 @@
    [camelot.translation.core :as tr]
    [camelot.report.sighting-independence :as indep]
    [camelot.util.config :as config]
+   [camelot.util.file :as futil]
    [camelot.model.survey :as survey]))
 
 (defn report-output
@@ -28,7 +29,9 @@
      :apply-fn (partial indep/->independent-sightings state)
      :transforms [#(update % :media-capture-timestamp
                            (partial tf/unparse (tf/formatters :mysql)))
-                  #(assoc % :media-directory (get-in state [:config :path :media]))
+                  #(assoc % :media-directory (str (get-in state [:config :path :media])
+                                                  (futil/path-separator)
+                                                  (subs (:media-filename %) 0 2)))
                   #(assoc % :trap-camera-pair (format "%s_%s"
                                                       (:trap-station-name %)
                                                       (:trap-station-session-camera-id %)))
