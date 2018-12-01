@@ -42,8 +42,8 @@
    id :- s/Num]
   (map photo (query state :get-all {:media-id id})))
 
-(s/defn get-all* :- [Photo]
-  [state :- State]
+(s/defn get-all*
+  [state]
   (map photo (query state :get-all* {})))
 
 (s/defn get-specific :- Photo
