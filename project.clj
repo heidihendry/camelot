@@ -98,7 +98,7 @@
                                        :asset-path "js/compiled/camelot"
                                        :output-to "resources/www/js/compiled/camelot.js"
                                        :output-dir "resources/www/js/compiled/camelot"
-                                       :externs ["resources/www/lib/ga.js"]
+                                       :externs ["resources/www/js/ga.js"]
                                        :source-map-timestamp true}}]}}
 
              :test

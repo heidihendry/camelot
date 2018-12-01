@@ -1,5 +1,0 @@
-{:require [manager.core]
- :compiler-options {:asset-path "js/compiled/manager.out"
-                    :externs ["resources/www/lib/ga.js"]
-                    :closure-warnings {:externs-validation :off}
-                    :pretty-print false}}

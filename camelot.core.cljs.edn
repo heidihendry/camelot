@@ -1,3 +1,0 @@
-{:require  [camelot.core]
- :init-fns [camelot.core/initialise-application]
- :compiler-options {}}
