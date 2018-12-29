@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/test.check "0.9.0" :scope "test"]
-                 [org.clojure/clojure "1.9.0"]
+                 [org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.439"]
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/data.csv "0.1.3"]
