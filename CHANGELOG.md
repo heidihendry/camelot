@@ -1,11 +1,14 @@
 ## ChangeLog
 
-### 1.4.6
-#### Enhancements
+### [Unreleased]
+#### Added
 * Adds support for search operators (>, <=, !=, etc.)
 * Adds support for date and timestamp searches in the library
 
-#### Fixes
+#### Changed
+* Changes license which Camelot is distributed under from EPL v1.0 to AGPL v3
+
+#### Fixed
 * Fixes a bug where the incorrect session details may be displayed for a camera trap
 
 ### 1.4.5
