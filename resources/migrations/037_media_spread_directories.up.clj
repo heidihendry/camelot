@@ -2,7 +2,7 @@
 (require '[camelot.util.file :as file])
 (require '[clojure.string :as str])
 
-(let [media-dir (file/->file (:media (state/path-map)))
+(let [media-dir (get-in (state/read-config) [:paths :media])
       mfiles (file/list-files media-dir)]
   (dorun (map
           (fn [f]

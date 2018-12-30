@@ -35,9 +35,9 @@
 (defn is-db-initialised?
   "Returns `true` if the database looks initialized. `false` otherwise.
   Based on a simple directory heuristic. Don't trust it with your life."
-  []
+  [config]
   (try
-    (let [path (state/get-db-path)
+    (let [path (get-in config [:paths :database])
           cdir (io/file path derby-container-dir)]
       (and (file/exists? cdir)
            (file/directory? cdir)))
@@ -57,7 +57,7 @@
 (defn backup
   "Back up the database."
   [state]
-  (let [backup-dir (state/generate-backup-dirname)]
+  (let [backup-dir (state/generate-backup-dirname state)]
     (query state :backup! {:path backup-dir})
     (let [zip (compress-dir backup-dir)]
       (file/delete-recursive (io/file backup-dir))

@@ -5,6 +5,7 @@
    [clojure.spec.alpha :as s]
    [camelot.spec.system :as sysspec]
    [camelot.spec.schema.state :refer [State]]
+   [camelot.util.state :as state]
    [camelot.util.db :as db]
    [clojure.java.io :as io]
    [camelot.util.file :as file]
@@ -131,7 +132,7 @@
 (defn path-to-file
   "Return the full path to an image file."
   [state variant filename orig-format]
-  (let [mpath (get-in state [:config :path :media])
+  (let [mpath (state/lookup-path state :media)
         prefix (if (= variant :original) "" (str (name variant) "-"))
         fmt (if (= variant :original) orig-format "png")]
     (io/file mpath (apply str (take 2 filename))

@@ -13,8 +13,7 @@
    [camelot.util.trap-station :as util.ts]
    [camelot.library.search-parser :as sparser]
    [camelot.model.taxonomy :as taxonomy]
-   [clojure.edn :as edn]
-   [camelot.util.config :as config])
+   [clojure.edn :as edn])
   (:import
    (camelot.model.sighting Sighting)))
 

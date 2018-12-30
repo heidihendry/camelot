@@ -5,9 +5,9 @@
    [clj-time.format :as tf]
    [camelot.translation.core :as tr]
    [camelot.report.sighting-independence :as indep]
-   [camelot.util.config :as config]
-   [camelot.util.file :as futil]
-   [camelot.model.survey :as survey]))
+   [camelot.util.state :as state]
+   [camelot.model.survey :as survey]
+   [clojure.java.io :as io]))
 
 (defn report-output
   [state {:keys [survey-id]}]
@@ -29,9 +29,8 @@
      :apply-fn (partial indep/->independent-sightings state)
      :transforms [#(update % :media-capture-timestamp
                            (partial tf/unparse (tf/formatters :mysql)))
-                  #(assoc % :media-directory (str (get-in state [:config :path :media])
-                                                  (futil/path-separator)
-                                                  (subs (:media-filename %) 0 2)))
+                  #(assoc % :media-directory (io/file (state/lookup-path state :media)
+                                                      (subs (:media-filename %) 0 2)))
                   #(assoc % :trap-camera-pair (format "%s_%s"
                                                       (:trap-station-name %)
                                                       (:trap-station-session-camera-id %)))

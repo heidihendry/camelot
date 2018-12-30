@@ -1,7 +1,7 @@
 (require '[camelot.util.state :as state])
 (require '[camelot.util.file :as file])
 
-(let [media-dir (file/->file (:media (state/path-map)))]
+(let [media-dir (get-in (state/read-config) [:paths :media])]
   (dorun (map
           (fn [f]
             (when (and (file/file? f)

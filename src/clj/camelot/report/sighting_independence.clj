@@ -3,7 +3,6 @@
   (:require
    [clj-time.core :as t]
    [schema.core :as s]
-   [camelot.util.config :as config]
    [camelot.util.sighting-fields :as util.sf]
    [clojure.string :as str]))
 
@@ -20,7 +19,6 @@
   "Add a new (i.e., independent) sighting."
   [state previous-sightings this-sighting]
   (let [duration (or (independence-threshold state (:survey-id this-sighting))
-                     (config/lookup state :sighting-independence-minutes-threshold)
                      20)]
     (conj previous-sightings (assoc this-sighting
                                     :sighting-independence-window-end

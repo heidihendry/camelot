@@ -41,5 +41,4 @@
                 (r/response (screens/all-screens (assoc state :session session))))
            (GET "/heartbeat" []
                 (heartbeat state))
-           (POST "/quit" [] (System/exit 0))
-           (GET "/quit" [] (System/exit 0))))
+           (POST "/quit" [] (System/exit 0))))

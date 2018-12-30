@@ -15,7 +15,6 @@
    [camelot.model.camera-status :as camera-status]
    [clojure.core.async :refer [>!!]]
    [clojure.string :as str]
-   [camelot.util.config :as config]
    [clojure.edn :as edn]
    [clojure.tools.logging :as log]
    [camelot.util.data :as data]

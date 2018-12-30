@@ -36,7 +36,7 @@
                  [com.taoensso/encore "2.97.0"]
                  [com.taoensso/tower "3.1.0-beta4" :exclusions [com.taoensso/encore]]
                  [commons-io/commons-io "2.4"]
-                 [environ "1.0.2"]
+                 [environ "1.1.0"]
                  [prismatic/schema "1.1.6"]
                  [org.apache.commons/commons-lang3 "3.4"]
                  [com.drewnoakes/metadata-extractor "2.11.0"]
@@ -62,7 +62,7 @@
   :min-lein-version "2.6.1"
   :env {:squiggly "{:checkers [:kibit :eastwood] :eastwood-options {:exclude-linters [:unlimited-use] :add-linters [:unused-private-vars]}}"}
 
-  :source-paths ["src/cljc" "src/clj" "src/cljs"]
+  :source-paths ["src/cljc" "src/clj" "src/cljs" "modules/market/src"]
   :test-paths ["test/cljc" "test/clj"]
   :test-refresh {:refresh-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]
                  :watch-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]
@@ -83,7 +83,7 @@
                              [org.apache.derby/derbytools "10.12.1.1"]]
               :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
               :env {:camelot-dev-mode "true"}
-              :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]
+              :source-paths ["src/cljc" "src/clj" "src/cljs" "dev" "modules/market/src"]
               :plugins [[lein-figwheel "0.5.17" :exclusions [org.clojure/clojure]]
                         [jonase/eastwood "0.3.3"]
                         [com.jakemccrary/lein-test-refresh "0.23.0"]]
@@ -104,7 +104,7 @@
              :test
              {:dependencies [[ring/ring-jetty-adapter "1.6.3"]
                              [com.bhauman/figwheel-main "0.2.0-SNAPSHOT"]]
-              :source-paths ["src/clj" "src/cljc" "src/cljs" "test/clj" "test/cljc" "test/cljs"]
+              :source-paths ["src/clj" "src/cljc" "src/cljs" "test/clj" "test/cljc" "test/cljs" "modules/market/src"]
               :resource-paths ["target"]
               :cljsbuild {:builds
                           [{:id "test"
@@ -115,7 +115,7 @@
                              :optimizations :none}}]}}
 
              :uberjar
-             {:source-paths ^:replace ["src/clj" "src/cljc"]
+             {:source-paths ^:replace ["src/clj" "src/cljc" "modules/market/src"]
               :hooks [leiningen.cljsbuild]
               :omit-source true
               :global-vars {*warn-on-reflection* true}

@@ -68,6 +68,13 @@
 (def deployment map->Deployment)
 (def tdeployment map->TDeployment)
 
+(defn after?
+  [a b]
+  (cond
+    (nil? a) false
+    (nil? b) true
+    :default (t/after? a b)))
+
 (s/defn get-all :- [Deployment]
   [state :- State
    id :- s/Int]
@@ -76,7 +83,7 @@
        dep-util/assoc-cameras
        (group-by :trap-station-id)
        vals
-       (map #(sort-by :trap-station-session-end-date t/after? %))
+       (map #(sort-by :trap-station-session-end-date after? %))
        (map first)
        (mapv deployment)))
 

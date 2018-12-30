@@ -6,8 +6,8 @@
    [camelot.translation.core :as tr]
    [clj-time.format :as tf]
    [clojure.string :as str]
+   [camelot.util.state :as state]
    [camelot.util.file :as file]
-   [camelot.util.config :as config]
    [clojure.tools.logging :as log]))
 
 (def record-size-safety-threshold
@@ -145,7 +145,7 @@
                          (map :absolute-path)
                          (map file/length)
                          (reduce + 0))
-        avail (->> (get-in state [:config :path :media])
+        avail (->> (state/lookup-path state :media)
                    file/->file
                    file/canonical-path
                    file/->file

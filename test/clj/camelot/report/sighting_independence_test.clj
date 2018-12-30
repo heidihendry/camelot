@@ -42,8 +42,6 @@
 
 (def config
   {:infrared-iso-value-threshold 999
-   :night-end-hour 5
-   :night-start-hour 21
    :erroneous-infrared-threshold 0.5
    :sighting-independence-minutes-threshold 20})
 

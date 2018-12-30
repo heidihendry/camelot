@@ -1,7 +1,6 @@
 (ns camelot.system.systems
   "Available systems."
   (:require
-   [camelot.system.cli :as cli]
    [camelot.system.config.core :as config]
    [camelot.system.http.core :as http]
    [camelot.system.db.core :as db]
@@ -12,14 +11,12 @@
    [clojure.tools.logging :as log]))
 
 (defn- init
-  [{:keys [restore-db]}]
+  [config {:keys [restore-db]}]
   (let [dbspec (if restore-db
                  (assoc state/spec :restoreFrom restore-db)
                  state/spec)
         smap (component/system-map
-              :config (config/map->Config {:store state/config-store
-                                          :config (state/config)
-                                          :path (state/path-map)})
+              :config (config/map->Config config)
               :database (db/map->Database {:connection dbspec}))]
     (component/system-using smap {})))
 
@@ -41,52 +38,44 @@
 
 (defn pre-init
   "Carry out Camelot's pre-flight checks."
-  ([]
-   (pre-init {}))
-  ([payload]
-   (log/info "Checking database...")
-   (let [db-initd? (maintenance/is-db-initialised?)
-         system (component/start (init payload))]
-     (check-and-migrate-db system db-initd?)
-     system)))
+  [config payload]
+  (log/info "Checking database...")
+  (let [db-initd? (maintenance/is-db-initialised? config)
+        system (component/start (init config payload))]
+    (check-and-migrate-db system db-initd?)
+    system))
 
 (defn camelot-system
-  [{:keys [port browser options]}]
+  [config]
   (let [smap (component/system-map
-              :config (config/map->Config {:store state/config-store
-                                           :config (state/config)
-                                           :path (state/path-map)})
+              :config (config/map->Config config)
               :database (db/map->Database {:connection state/spec})
               :importer (importer/map->Importer {})
-              :app (if-let [dsvr (:dev-server options)]
+              :app (if-let [dsvr (:dev-server config)]
                      dsvr
-                     (http/map->HttpServer
-                      {:port (or port (:port cli/option-defaults))
-                       :browser (or browser (:browser cli/option-defaults))})))]
+                     (do
+                       (prn config)
+                       (http/map->HttpServer config))))]
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer}
                                   :importer {:config :config}})))
 
 (defn camelot
-  [opts]
-  (component/start (camelot-system opts)))
+  [config]
+  (component/start (camelot-system config)))
 
 (defn- maintenance-system
-  [{:keys [port browser]}]
+  [config]
   (let [smap (component/system-map
-              :config (config/map->Config {:store state/config-store
-                                          :config (state/config)
-                                          :path (state/path-map)})
+              :config (config/map->Config config)
               :database (db/map->Database {:connection state/spec})
-              :app (http/map->HttpServer
-                    {:port (or port (:port cli/option-defaults))
-                     :browser (or browser (:browser cli/option-defaults))}))]
+              :app (http/map->HttpServer config))]
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer}
                                   :importer {:config :config}})))
 
 (defn maintenance
-  [opts]
-  (component/start (maintenance-system opts)))
+  [config]
+  (component/start (maintenance-system config)))
