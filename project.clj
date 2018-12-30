@@ -69,7 +69,7 @@
                  :changes-only true
                  :quiet true}
 
-  :clean-targets ^{:protect false} [:target-path :compile-path "resources/www/js"]
+  :clean-targets ^{:protect false} [:target-path :compile-path "resources/www/js/compiled"]
   :uberjar-name "camelot.jar"
   :main camelot.core
   :repl-options {:init-ns user}
