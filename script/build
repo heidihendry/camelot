@@ -1,6 +1,11 @@
 #!/bin/bash
 
-$(dirname "${0}")/prepare-repo.sh
+SCRIPT_DIR=$(dirname "${0}")
+PROJECT_DIR="${SCRIPT_DIR}/.."
+DIST_DIR="${PROJECT_DIR}/dist"
+TARGET_DIR="${PROJECT_DIR}/target"
+
+${SCRIPT_DIR}/prepare-repo.sh
 
 which lein &> /dev/null
 if [ $? -ne 0 ]; then
@@ -16,3 +21,5 @@ else
 fi
 
 $LEIN uberjar
+mkdir -p ${DIST_DIR}
+cp ${TARGET_DIR}/camelot-*.jar ${DIST_DIR}
