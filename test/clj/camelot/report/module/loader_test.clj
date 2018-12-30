@@ -13,7 +13,7 @@
 
 (defn gen-state
   []
-  (assoc-in (state/gen-state) [:config :path :config] "/configpath/"))
+  (assoc-in (state/gen-state) [:config :paths :config] (io/file "/configpath/")))
 
 (defmacro with-test-redefs
   [& body]

@@ -109,12 +109,11 @@
         (is (= (:body (sut/create-resource f test-data {})) {:somedata {:value "Hello World"}}))))
 
     (testing "Should parse IDs"
-      (with-redefs [state/config (fn [s] s)]
-        (let [test-data {:parent-id {:value "100"}}
-              f (fn [c data]
-                  (when (= (:parent-id data) 100)
-                    data))]
-          (is (= (:body (sut/create-resource f test-data {})) {:parent-id {:value 100}})))))))
+      (let [test-data {:parent-id {:value "100"}}
+            f (fn [c data]
+                (when (= (:parent-id data) 100)
+                  data))]
+        (is (= (:body (sut/create-resource f test-data {})) {:parent-id {:value 100}}))))))
 
 (deftest test-delete-resource
   (testing "Delete resource"

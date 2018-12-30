@@ -7,7 +7,7 @@
 
 (defn gen-state
   []
-  (assoc (state/gen-state) :config {:path {:media "/mymedia/"}}))
+  (assoc (state/gen-state) :config {:paths {:media "/mymedia/"}}))
 
 (defn path-equal
   [file expect]

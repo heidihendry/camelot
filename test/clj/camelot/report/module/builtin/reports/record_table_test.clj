@@ -8,8 +8,8 @@
 
 (defn- gen-state-helper
   [config]
-  (update (state/gen-state (merge {:language :en} config))
-          :config #(assoc % :path {:media "/path"})))
+  (state/gen-state (merge {:language :en
+                           :paths {:media "/path"}} config)))
 
 (defn report
   [state id data]

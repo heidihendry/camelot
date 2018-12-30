@@ -125,33 +125,6 @@
             result (report state 1 sightings)]
         (is (= result (list ["Survy" "Smiley" "Wolf" 1 2 5 "0.00" 7 (calc-obs-nights 5 7)])))))
 
-    (testing "Should respect independence threshold setting"
-      (let [sightings (list (->record {:taxonomy-id 2
-                                       :taxonomy-genus "Smiley"
-                                       :taxonomy-species "Wolf"
-                                       :sighting-quantity 3
-                                       :media-id 2
-                                       :survey-id 1
-                                       :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
-                                       :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
-                                       :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
-                                       :trap-station-session-id 1
-                                       :trap-station-id 1})
-                            (->record {:taxonomy-id 2
-                                       :taxonomy-genus "Smiley"
-                                       :taxonomy-species "Wolf"
-                                       :sighting-quantity 5
-                                       :media-id 1
-                                       :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
-                                       :survey-id 1
-                                       :trap-station-session-start-date (t/date-time 2015 1 1 0 0 0)
-                                       :trap-station-session-end-date (t/date-time 2015 1 8 0 0 0)
-                                       :trap-station-session-id 1
-                                       :trap-station-id 1}))
-            state (gen-state-helper {:sighting-independence-minutes-threshold 10})
-            result (report state 1 sightings)]
-        (is (= result (list ["Survy" "Smiley" "Wolf" 1 2 8 "0.00" 7 (calc-obs-nights 8 7)])))))
-
     (testing "Should not consider sightings dependent across trap stations"
       (let [sightings (list (->record {:taxonomy-id 2
                                        :taxonomy-genus "Smiley"

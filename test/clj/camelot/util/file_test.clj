@@ -7,7 +7,7 @@
 
 (defn state
   [p]
-  (state/gen-state {:root-path p}))
+  (state/gen-state {:paths {:root p}}))
 
 (deftest test-file-utils
   (testing "File utils"

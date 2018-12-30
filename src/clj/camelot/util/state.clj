@@ -30,8 +30,8 @@
            (tf/unparse backup-timestamp-formatter (t/now))))
 
 (defn spec
-  []
   "JDBC spec for the primary database."
+  []
   {:classname "org.apache.derby.jdbc.EmbeddedDriver",
    :subprotocol "derby",
    :subname (get-in (read-config) [:paths :database]),

@@ -1,5 +1,6 @@
 (ns camelot.util.file
   (:require
+   [camelot.util.state :as state]
    [clojure.java.io :as io]
    [clojure.string :as str])
   (:import
@@ -140,8 +141,7 @@
 (defn rel-path-components
   "Return the relative path to `file' as a list of strings, each string representing a component of the path."
   [state file]
-  (let [store (get-in state [:config :store])
-        crp (if-let [rp (:root-path @store)]
+  (let [crp (if-let [rp (state/lookup-path state :root)]
               (canonical-path (io/file rp))
               "")]
     (str/split (subs (canonical-path file) (inc (count crp)))

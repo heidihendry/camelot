@@ -150,40 +150,6 @@
           (is (= result (list ["Smiley" "Wolf" "Trap1" 5 30 "X" 3 14 (calc-obs-nights 3 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]
                               ["Smiley" "Wolf" "Trap2" 5.5 30.5 "X" 5 14 (calc-obs-nights 5 14) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
 
-    (testing "Should respect independence threshold setting"
-      (with-redefs [taxonomy/get-specific
-                    (fn [state id]
-                      {:taxonomy-genus "Smiley"
-                       :taxonomy-species "Wolf"
-                       :taxonomy-id 1})]
-        (let [sightings (list (as-sample {:taxonomy-genus "Smiley"
-                                          :taxonomy-species "Wolf"
-                                          :sighting-quantity 3
-                                          :media-capture-timestamp (t/date-time 2015 1 3 10 10 15)
-                                          :taxonomy-id 1
-                                          :trap-station-id 1
-                                          :trap-station-session-id 1
-                                          :taxonomy-common-name "Smiley Wolf"
-                                          :taxonomy-family "Wolfos"
-                                          :taxonomy-order "Mammal"
-                                          :taxonomy-class "Animal"
-                                          :species-mass-id 2})
-                              (as-sample {:taxonomy-genus "Smiley"
-                                          :taxonomy-species "Wolf"
-                                          :sighting-quantity 5
-                                          :trap-station-id 1
-                                          :taxonomy-id 1
-                                          :media-capture-timestamp (t/date-time 2015 1 3 10 20 15)
-                                          :trap-station-session-id 1
-                                          :taxonomy-common-name "Smiley Wolf"
-                                          :taxonomy-family "Wolfos"
-                                          :taxonomy-order "Mammal"
-                                          :taxonomy-class "Animal"
-                                          :species-mass-id 2}))
-              state (gen-state-helper {:sighting-independence-minutes-threshold 10})
-              result (report state 1 sightings)]
-          (is (= result (list ["Smiley" "Wolf" "Trap1" 5 30 "X" 8 7 (calc-obs-nights 8 7) "Smiley Wolf" "Wolfos" "Mammal" "Animal" 2]))))))
-
     (testing "Should include entries for locations the species was not found in"
       (with-redefs [taxonomy/get-specific
                     (fn [state id]

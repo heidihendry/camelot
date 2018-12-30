@@ -31,16 +31,12 @@
        :app {}})
   ([config]
    {:config (component/start
-             (config/map->Config {:store (atom {})
-                                 :config (merge default-config config)
-                                 :path {}}))
+             (config/map->Config (merge default-config config)))
     :database {:connection {}}
     :app {}})
   ([config queries]
    {:config (component/start
-             (config/map->Config {:store (atom {})
-                                 :config (merge default-config config)
-                                 :path {}}))
+             (config/map->Config (merge default-config config)))
     :database {:connection {}
                :queries queries}
     :app {}}))

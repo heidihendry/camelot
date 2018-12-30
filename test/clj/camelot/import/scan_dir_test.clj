@@ -8,18 +8,18 @@
   (with-redefs [file/canonical-path file/get-path]
     (testing "Server directory resolution"
       (testing "Should use client directory if root path not set."
-        (let [state (state/gen-state {:root-path nil})]
+        (let [state (state/gen-state {:paths {:root nil}})]
           (is (= (sut/resolve-directory state "/srv/mydata/survey1")
                  "/srv/mydata/survey1"))))
 
       (testing "Should know how to treat Windows drive letters coming from the client when root-path not set."
-        (let [state (state/gen-state {:root-path nil})]
+        (let [state (state/gen-state {:paths {:root nil}})]
           (with-redefs [file/path-separator #(constantly "\\")]
             (is (= (sut/resolve-directory state "G:\\srv\\mydata\\survey1")
                    "G:\\srv\\mydata\\survey1")))))
 
       (testing "Should use root path if unable to resolve directory."
-        (let [state (state/gen-state {:root-path "/my/path"})]
+        (let [state (state/gen-state {:paths {:root "/my/path"}})]
           (is (= (sut/resolve-directory state "/random/non-matching/location")
                  "/my/path"))))
 
