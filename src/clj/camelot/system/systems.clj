@@ -13,8 +13,8 @@
 (defn- init
   [config {:keys [restore-db]}]
   (let [dbspec (if restore-db
-                 (assoc state/spec :restoreFrom restore-db)
-                 state/spec)
+                 (assoc (state/spec) :restoreFrom restore-db)
+                 (state/spec))
         smap (component/system-map
               :config (config/map->Config config)
               :database (db/map->Database {:connection dbspec}))]
@@ -49,7 +49,7 @@
   [config]
   (let [smap (component/system-map
               :config (config/map->Config config)
-              :database (db/map->Database {:connection state/spec})
+              :database (db/map->Database {:connection (state/spec)})
               :importer (importer/map->Importer {})
               :app (if-let [dsvr (:dev-server config)]
                      dsvr
@@ -69,7 +69,7 @@
   [config]
   (let [smap (component/system-map
               :config (config/map->Config config)
-              :database (db/map->Database {:connection state/spec})
+              :database (db/map->Database {:connection (state/spec)})
               :app (http/map->HttpServer config))]
     (component/system-using smap {:app {:config :config
                                         :database :database

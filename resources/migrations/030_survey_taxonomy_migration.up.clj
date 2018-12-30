@@ -25,7 +25,7 @@
   {:survey_id survey
    :taxonomy_id taxonomy})
 
-(db/with-transaction [s {:database {:connection state/spec}}]
+(db/with-transaction [s {:database {:connection (state/spec)}}]
   (let [conn (select-keys (:database s) [:connection])]
     (doseq [p (-m030-all-pairs conn)]
       (-create<! (-m030-->survey-taxonomy p) conn))))

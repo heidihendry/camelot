@@ -45,6 +45,6 @@
                            (str "ALTER TABLE sighting DROP CONSTRAINT "
                                 (:constraintname c))))))
 
-(db/with-transaction [s {:database {:connection state/spec}}]
+(db/with-transaction [s {:database {:connection (state/spec)}}]
   (-m021-remove-unnecessary-constraints s)
   (-m021-species-genus-migration s))

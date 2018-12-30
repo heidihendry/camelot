@@ -6,7 +6,7 @@
 
 (sql/defqueries "sql/migration-helpers/030.sql")
 
-(db/with-transaction [s {:database {:connection state/spec}}]
+(db/with-transaction [s {:database {:connection (state/spec)}}]
   (let [conn (select-keys (:database s) [:connection])]
     (doseq [st (-get-all-survey-taxonomy {} conn)]
       (-delete! {:survey_taxonomy_id st} conn))))

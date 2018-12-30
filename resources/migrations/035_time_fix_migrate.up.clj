@@ -36,7 +36,7 @@
                              conn)
                 s))))
 
-(db/with-transaction [s {:database {:connection state/spec}}]
+(db/with-transaction [s {:database {:connection (state/spec)}}]
   (let [conn (select-keys (:database s) [:connection])]
     (migrate-table! conn -get-surveys -migrate-survey!)
     (migrate-table! conn -get-sites -migrate-site!)

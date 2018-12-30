@@ -5,7 +5,7 @@
 
 (defn- -m021-delete-taxonomies
   []
-  (let [state {:database {:connection state/spec}}]
+  (let [state {:database {:connection (state/spec)}}]
     (db/with-transaction [s state]
       (let [conn(select-keys (:database s) [:connection])
             taxonomies (-get-all {} conn)]

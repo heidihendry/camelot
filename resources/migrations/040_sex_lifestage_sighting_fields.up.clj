@@ -99,7 +99,7 @@
   [conn]
   (map :survey_id (-get-survey-ids {} conn)))
 
-(db/with-transaction [s {:database {:connection state/spec}}]
+(db/with-transaction [s {:database {:connection (state/spec)}}]
   (let [conn (select-keys (:database s) [:connection])]
     (doseq [survey (-m040-get-survey-ids conn)]
       (-m040-migrate-survey-data conn survey))))

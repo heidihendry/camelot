@@ -29,7 +29,8 @@
   (io/file (lookup-path state :backup)
            (tf/unparse backup-timestamp-formatter (t/now))))
 
-(def spec
+(defn spec
+  []
   "JDBC spec for the primary database."
   {:classname "org.apache.derby.jdbc.EmbeddedDriver",
    :subprotocol "derby",
