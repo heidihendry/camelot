@@ -6,10 +6,10 @@ echo "Checking binaries in \$PATH... "
 which lein &> /dev/null
 
 echo "Compiling... "
-$(dirname "${0}")/build.sh
+$(dirname "${0}")/build
 
 echo "Running tests... "
-$(dirname "${0}")/run-tests.sh
+$(dirname "${0}")/test
 
 echo "Running camelot and ensuring it responds... "
 java -jar target/camelot.jar &

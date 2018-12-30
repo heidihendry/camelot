@@ -6,7 +6,7 @@ PROJECT_NAME="camelot"
 BUILD_FILE="project.clj"
 
 echo "Running snapshot build... "
-$(dirname "${0}")/build.sh
+$(dirname "${0}")/build
 
 snapshot_version="$(grep -oE "[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT" ${BUILD_FILE} | head -n1)"
 cp "target/${PROJECT_NAME}.jar" "target/$PROJECT_NAME-${snapshot_version}.jar"

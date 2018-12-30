@@ -26,7 +26,7 @@ git commit -a -m "Version bump: $released_version"
 git tag -sa "v$released_version" -m "Release: $released_version"
 
 echo "Running release build... "
-$(dirname "${0}")/build.sh
+$(dirname "${0}")/build
 
 echo "Packaging release"
 mkdir "${PROJECT_NAME}-${released_version}/"

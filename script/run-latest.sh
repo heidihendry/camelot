@@ -18,6 +18,6 @@ else
 fi
 
 git pull | grep "Already up-to-date" > /dev/null
-$(dirname "${0}")/build.sh
+$(dirname "${0}")/build
 
 $LEIN run
