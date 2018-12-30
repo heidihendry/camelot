@@ -11,7 +11,7 @@ compile:
     - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
   script:
-    - script/build.sh
+    - script/build
   artifacts:
     paths:
       - "target/camelot.jar"
@@ -23,7 +23,7 @@ unittest-clj:
     - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
   script:
-    - script/run-tests.sh clj
+    - script/test clj
 
 unittest-cljs:
   stage: build
@@ -31,7 +31,7 @@ unittest-cljs:
     - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
   script:
-    - script/run-tests.sh cljs
+    - script/test cljs
 
 lint:
   stage: build
@@ -39,7 +39,7 @@ lint:
     - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
   script:
-    - script/lint.sh
+    - script/lint
 
 upgrade:
   stage: test

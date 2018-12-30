@@ -1,3 +1,5 @@
 #!/bin/sh
 
+$(dirname "${0}")/prepare-repo.sh
+
 lein eastwood "{:exclude-linters [:unlimited-use] :add-linters [:unused-private-vars] :parallelism? :naive}"

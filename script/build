@@ -1,5 +1,7 @@
 #!/bin/bash
 
+$(dirname "${0}")/prepare-repo.sh
+
 which lein &> /dev/null
 if [ $? -ne 0 ]; then
     if [ -z $1 ]; then

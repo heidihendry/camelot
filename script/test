@@ -2,6 +2,8 @@
 
 set -e
 
+$(dirname "${0}")/prepare-repo.sh
+
 if [ "$1" = "clj" ]; then
     lein with-profiles +test,-dev test
 elif [ "$1" = "cljs" ]; then
