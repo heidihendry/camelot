@@ -134,7 +134,7 @@ If you encounter problems, raise an issue or reach out via the Google Group.
 Camelot currently has 2 test suites, one for clj, and one for cljs. To run the tests use:
 
 ```
-./script/run-tests.sh
+./script/test
 ```
 
 ### Emacs/Cider

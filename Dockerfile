@@ -21,6 +21,6 @@ COPY test /tmp/test
 RUN LEIN_ROOT='yes' ~/bin/lein check
 
 COPY figwheel-main.edn /tmp/figwheel-main.edn
-RUN script/run-tests.sh cljs
+RUN script/test cljs
 
 RUN rm -rf /tmp/*
