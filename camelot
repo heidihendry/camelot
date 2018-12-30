@@ -11,5 +11,5 @@ fi
 if [ -e "${JAR}" ]; then
     java -jar "${JAR}"
 else
-    script/build.sh && java -jar "target/camelot.jar"
+    script/build && java -jar "target/camelot.jar"
 fi
