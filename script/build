@@ -22,4 +22,4 @@ fi
 
 $LEIN uberjar
 mkdir -p ${DIST_DIR}
-cp ${TARGET_DIR}/camelot-*.jar ${DIST_DIR}
+cp ${TARGET_DIR}/camelot.jar ${DIST_DIR}/camelot-$(git describe).jar
