@@ -1,3 +1,3 @@
 [submodule "modules/market"]
 	path = modules/market
-	url = https://gitlab.com/camelot-project/camelot-market
+	url = https://gitlab.com/camelot-project/camelot-market.git/
