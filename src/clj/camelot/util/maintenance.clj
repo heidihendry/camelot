@@ -58,7 +58,7 @@
   "Back up the database."
   [state]
   (let [backup-dir (state/generate-backup-dirname state)]
-    (query state :backup! {:path backup-dir})
+    (query state :backup! {:path (.getPath backup-dir)})
     (let [zip (compress-dir backup-dir)]
       (file/delete-recursive (io/file backup-dir))
       zip)))
