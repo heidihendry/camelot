@@ -8,49 +8,11 @@ Here's some specific ways you can help:
 
 ### Raising issues for bugs and problems
 
-[Raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues) should you encounter a problem or limitation within Camelot.  When reporting a problem, please give the issue a clear and meaningful subject and try to provide as much information about the problem itself as possible.
-
-The following is a great template to use.  You can copy and paste this in to the issue description to give yourself a head start.
-
-```
-*Please describe clearly what the problem is.  If there are errors provided by Camelot, also include the error in its entirety here.*
-
-**Steps to reproduce**
-
-<i>Give a step by step, what you did to encounter the problem.  For example:
-
-1. Start camelot using the `camelot-desktop.command` file.
-2. Click "Reports"
-3. ...
-
-**The expected behaviour is**
-
-...
-
-**But the actual behaviour was**
-
-...
-
-**Camelot version**
-
-*e.g., 1.0.0*
-
-**Additional information**
-
-<i>Any additional information you think might be helpful or relevant.
-
-For example:
-
-* Operating System & version
-* Web browser & version
-* When you first noticed the problem
-* ...
-</i>
-```
+[Raise an issue](https://gitlab.com/camelot-project/camelot/issues) should you encounter a problem or limitation within Camelot.  When reporting a problem, please give the issue a clear and meaningful subject and try to provide as much information about the problem itself as possible.
 
 ### Requesting features
 
-[Raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues) to suggest a change in Camelot.
+[Raise an feature request](https://tree.taiga.io/project/cshclm-camelot/issues) to suggest a change in Camelot.
 
 When raising a suggestion, give it a clear and meaningful title.  For the description, consider using the following template:
 
@@ -66,7 +28,7 @@ When raising a suggestion, remember the best feature requests clearly capture th
 
 Regardless of how good a piece of software is, it offers no value if it can't be understood.  We want to provide excellent documentation, so if you see a mistake, omission or area it can be improved, please do let us know.
 
-If you're comfortable with git, we gratefully accept [Merge Requests](https://docs.gitlab.com/ce/gitlab-basics/add-merge-request.html) for documentation improvements.  Otherwise please [raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues) describing the documentation change you would like to be included.
+If you're comfortable with git, we gratefully accept [Merge Requests](https://docs.gitlab.com/ce/gitlab-basics/add-merge-request.html) for documentation improvements.  Otherwise please [Raise an issue](https://gitlab.com/camelot-project/camelot/issues) describing the documentation change you would like to be included.
 
 ### Translations
 
@@ -82,13 +44,13 @@ Building a translation simply involves taking the strings in the [English transl
 
 Translations for project files, such as the User Guide or this Contribution Guide, are help to make Camelot more accessible to native speakers of other languages.
 
-To contribute new translations or improvements to existing translations back to the project, please either raise a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests) or [raise an issue](https://tree.taiga.io/project/cshclm-camelot/issues).
+To contribute new translations or improvements to existing translations back to the project, please either raise a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests) or [raise an issue](https://gitlab.com/camelot-project/camelot/issues).
 
 ### Code contributions
 
 And of course we accept code contributions. :-)
 
-If you're looking for something to work on, check to see if there are any [outstanding issues](https://tree.taiga.io/project/cshclm-camelot/issues) or take a look [through our backlog](https://tree.taiga.io/project/cshclm-camelot/backlog).  If you have "scratched your own itch", please do open a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests), as it would be great if we could include your changes in the project.
+If you're looking for something to work on, check to see if there are any [outstanding issues](https://gitlab.com/camelot-project/camelot/issues) or take a look [through our backlog](https://tree.taiga.io/project/cshclm-camelot/backlog).  If you have "scratched your own itch", please do open a [merge request](https://gitlab.com/camelot-project/camelot/merge_requests), as it would be great if we could include your changes in the project.
 
 If you'd like to help, but are not sure where to start, check out Camelot's built-in reports.  These are relatively easy to get started with, and we would love to add better compatibility with more data analysis products used in research.
 
@@ -125,7 +87,7 @@ java -jar target/camelot.jar
 
 If you encounter problems, raise an issue or reach out via the Google Group.
 
-\* Camelot is designed to be developed within a \*nix environment (e.g., Linux or OSX).  It may be possible to follow this process within Windows using tools such as msys2.
+\* Camelot is designed to be developed within a \*nix environment (e.g., Linux or OSX).  It may be possible to follow this process within Windows using tools such as WSL.
 
 \*\* Building and running artifacts probably shouldn't be your normal dev-loop.  Most Clojure developers prefer to work interactively at a REPL.
 
@@ -148,8 +110,8 @@ external browser and you're all set. Happy hacking.
 
 ## Licensing and Ownership
 
-* All code contributed to Camelot will be made available under the same license as Camelot itself (specifically, EPL 1.0 or later).
-* The author of a patch owns the copyright of the contributed code; there is no copyright assignment process.
+* All code contributed to Camelot will be made available under the same license as Camelot itself (specifically, AGPL v3 or later).
+* New code contributors will need confirm that they agree to transfer copyright ownership of their contribution.
 
 ## Questions?
 
