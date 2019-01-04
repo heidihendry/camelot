@@ -53,9 +53,7 @@
               :importer (importer/map->Importer {})
               :app (if-let [dsvr (:dev-server config)]
                      dsvr
-                     (do
-                       (prn config)
-                       (http/map->HttpServer config))))]
+                     (http/map->HttpServer config)))]
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer}

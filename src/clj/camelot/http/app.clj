@@ -1,5 +1,6 @@
 (ns camelot.http.app
   (:require
+   [clojure.data.json :as json]
    [clojure.java.io :as io]
    [ring.util.response :as r]
    [compojure.core :refer [context GET POST]]
@@ -25,10 +26,10 @@
   [state]
   (let [conn (get-in state [:database :connection])]
     {:status 200
-     :headers {"Content-Type" "text/plain; charset=utf-8"}
-     :body (format "Status: OK\nSoftware version: %s\nDatabase version: %s\n"
-                   (version/get-version)
-                   (db-migrate/version conn))}))
+     :headers {"Content-Type" "application/json; charset=utf-8"}
+     :body (json/write-str {:status "OK"
+                            :software-version (version/get-version)
+                            :database-version (db-migrate/version conn)})}))
 
 (def routes
   (context "" {session :session state :system}
