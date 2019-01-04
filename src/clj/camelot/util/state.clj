@@ -8,10 +8,15 @@
 
 (def config-cache (atom nil))
 
+(defn paths-to-file-objects
+  [config]
+  (update config :paths #(into {} (map (fn [[k v]] [k (io/file v)]) %))))
+
 (defn read-config
   []
   (when (nil? @config-cache)
-    (reset! config-cache (market-config/read-config)))
+    (reset! config-cache
+            (paths-to-file-objects (market-config/read-config))))
   @config-cache)
 
 (def ^:private backup-timestamp-formatter
