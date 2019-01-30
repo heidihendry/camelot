@@ -33,14 +33,6 @@ unittest-cljs:
   script:
     - script/test cljs
 
-lint:
-  stage: build
-  before_script:
-    - export LEIN_ROOT=1
-    - export PATH="$HOME/bin:${PATH}"
-  script:
-    - script/lint
-
 upgrade:
   stage: test
   before_script:

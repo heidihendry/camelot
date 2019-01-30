@@ -5,8 +5,6 @@ PROJECT_DIR="${SCRIPT_DIR}/.."
 DIST_DIR="${PROJECT_DIR}/dist"
 TARGET_DIR="${PROJECT_DIR}/target"
 
-${SCRIPT_DIR}/prepare-repo.sh
-
 which lein &> /dev/null
 if [ $? -ne 0 ]; then
     if [ -z $1 ]; then

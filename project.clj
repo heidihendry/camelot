@@ -4,7 +4,7 @@
   :license {:name "AGPL v3"
             :url "https://www.gnu.org/licenses/agpl-3.0.en.html"}
 
-  :plugins [[lein-tools-deps "0.4.1"]
+  :plugins [[lein-tools-deps "0.4.3"]
             [lein-cljsbuild "1.1.7"]
             [lein-environ "1.1.0"]]
   :middleware [lein-tools-deps.plugin/resolve-dependencies-with-deps-edn]

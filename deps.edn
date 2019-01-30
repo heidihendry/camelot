@@ -1,6 +1,6 @@
 {:deps
  {camelot/market {:git/url "https://gitlab.com/camelot-project/camelot-market"
-                  :sha "1cef6badac1677d753d7cc63a4f0517ec26eff52"}
+                  :sha "6b3bfd775d9a99a20621355b2c642e961fb82494"}
 
   org.clojure/test.check {:mvn/version"0.9.0"
                           :mvn/scope "test"}
@@ -46,7 +46,7 @@
   ragtime {:mvn/version "0.5.3"}
   reloaded.repl {:mvn/version "0.2.3" :mvn/scope "test"}
   resauce {:mvn/version "0.1.0"}
-  riddley {:mvn/version "0.1.4"}
+  riddley {:mvn/version "0.2.0"}
   ring {:mvn/version "1.6.3"}
   ring-transit {:mvn/version "0.1.4" :mvn/exclusions [com.cognitect/transit-clj]}
   ring.middleware.logger {:mvn/version "0.5.0" :mvn/exclusions [onelog]}
