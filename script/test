@@ -5,7 +5,7 @@ set -e
 if [ "$1" = "clj" ]; then
     lein with-profiles +test,-dev test
 elif [ "$1" = "cljs" ]; then
-    lein with-profiles +test,-dev run -m figwheel.main -m camelot.test-runner || echo target/public/cljs-out/figwheel-main-option-build/js-environment.log
+    google-chrome --headless --repl --disable-gpu --timeout=30000
 else
     lein with-profiles +test,-dev test
     lein with-profiles +test,-dev run -m figwheel.main -m camelot.test-runner
