@@ -1,4 +1,1 @@
-{:launch-js ["chromium"
-             "--headless" "--repl" "--disable-gpu"
-             "--no-sandbox" "--timeout" "120000"
-             :open-url]}
+{:launch-js ["google-chrome" "--headless" "--repl" "--disable-gpu" :open-url]}
