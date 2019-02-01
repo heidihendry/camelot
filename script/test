@@ -5,7 +5,7 @@ set -e
 if [ "$1" = "clj" ]; then
     lein with-profiles +test,-dev test
 elif [ "$1" = "cljs" ]; then
-    sh -c "sleep 20; cat target/public/cljs-out/figwheel-main-option-build/js-environment.log" &
+    sh -c "sleep 40; cat target/public/cljs-out/figwheel-main-option-build/js-environment.log" &
     lein with-profiles +test,-dev run -m figwheel.main -m camelot.test-runner
 else
     lein with-profiles +test,-dev test
