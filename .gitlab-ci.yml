@@ -25,13 +25,13 @@ unittest-clj:
   script:
     - script/test clj
 
-#unittest-cljs:
-#  stage: build
-#  before_script:
-#    - export LEIN_ROOT=1
-#    - export PATH="$HOME/bin:${PATH}"
-#  script:
-#    - script/test cljs
+unittest-cljs:
+  stage: build
+  before_script:
+    - export LEIN_ROOT=1
+    - export PATH="$HOME/bin:${PATH}"
+  script:
+    - script/test cljs
 
 upgrade:
   stage: test
