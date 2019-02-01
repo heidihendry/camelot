@@ -20,9 +20,9 @@ while [ $i -lt 20 ]; do
     sleep 5
     status="$(curl -s -X GET 'http://localhost:5341/heartbeat' || true)"
     set +e
-    echo $status | grep -q "\"status\": \"OK\""
+    echo $status | grep -q '"status":"OK"'
     if [ $? -eq 0 ]; then
-        actual_db="$(echo -e $status | grep -oE "Database version: [-a-z0-9_]+" | cut -d\: -f2 | tr -d ' ')"
+        actual_db="$(echo -e $status | grep -oE '"database-version":"[-a-z0-9_]+"' | cut -d\: -f2 | tr -d ' ')"
         if [ "${actual_db}"="${expected_db}" ]; then
             echo "Found expected database version: $actual_db"
             failed=0
