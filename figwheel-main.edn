@@ -1,1 +1,1 @@
-{:launch-js ["chromium" "--headless" "--repl" "--disable-gpu" :open-url]}
+{:launch-js ["chromium" "--headless" "--repl" "--disable-gpu" "--no-sandbox" :open-url]}
