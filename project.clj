@@ -26,8 +26,8 @@
   :repl-options {:init-ns user}
 
   :profiles {:dev
-             {:dependencies [[figwheel "0.5.17"]
-                             [figwheel-sidecar "0.5.17"]
+             {:dependencies [[figwheel "0.5.18"]
+                             [figwheel-sidecar "0.5.18"]
                              [cider/piggieback "0.3.10"]
                              [org.clojure/core.logic "0.8.11"]
                              [org.clojure/tools.nrepl "0.2.13"]
@@ -35,7 +35,7 @@
               :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
               :env {:camelot-dev-mode "true"}
               :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]
-              :plugins [[lein-figwheel "0.5.17" :exclusions [org.clojure/clojure]]
+              :plugins [[lein-figwheel "0.5.18" :exclusions [org.clojure/clojure]]
                         [jonase/eastwood "0.3.3"]
                         [com.jakemccrary/lein-test-refresh "0.23.0"]]
               :figwheel {:css-dirs ["resources/www/css"]
