@@ -54,7 +54,7 @@
 
              :test
              {:dependencies [[ring/ring-jetty-adapter "1.6.3"]
-                             [com.bhauman/figwheel-main "0.2.0-SNAPSHOT"]]
+                             [com.bhauman/figwheel-main "0.2.0"]]
               :source-paths ["src/clj" "src/cljc" "src/cljs" "test/clj" "test/cljc" "test/cljs"]
               :resource-paths ["target"]
               :cljsbuild {:builds
