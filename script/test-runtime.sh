@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+set -x
 
 echo "Running camelot and ensuring it responds... "
 
