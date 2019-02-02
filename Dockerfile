@@ -19,6 +19,12 @@ COPY resources /tmp/resources/
 COPY script /tmp/script
 COPY test /tmp/test
 
-RUN LEIN_ROOT='yes' lein check
+RUN LEIN_ROOT='yes' lein with-profiles +test,+dev check
+
+RUN curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install libappindicator3-1 lsb-release -y
+RUN dpkg -i google-chrome-stable_current_amd64.deb
+
+npm install karma karma-cljs-test karma-chrome-launcher --save-dev
 
 RUN rm -rf /tmp/*
