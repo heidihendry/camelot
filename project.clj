@@ -24,6 +24,7 @@
   :uberjar-name "camelot.jar"
   :main camelot.core
   :repl-options {:init-ns user}
+  :doo {:paths {:karma "./node_modules/karma/bin/karma"}}
 
   :profiles {:dev
              {:dependencies [[figwheel "0.5.18"]
