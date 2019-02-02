@@ -13,6 +13,7 @@
     (async-result/throw-ex (ex-info "Tests Failed" test-data))))
 
 (defn -main [& args]
+  (println "Running Camelot tests!")
   (run-tests 'typeahead.core-test 'camelot.nav-test 'camelot.util.trap-station-test)
   ;; return a message to the figwheel process that tells it to wait
   [:figwheel.main.async-result/wait 5000])
