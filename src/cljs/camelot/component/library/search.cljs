@@ -293,12 +293,14 @@
                 (dom/input #js {:type "checkbox"
                                 :value (get-in data [:search (:key state)] "")
                                 :disabled (if (get-in data [:search :inprogress]) "disabled" "")
-                                :onChange #(do (om/update! (:search (state/library-state))
-                                                           (:key state) (.. % -target -checked))
-                                               (go (>! (:search-chan state) {:search (assoc (deref (:search data))
-                                                                                            (:key state) (.. % -target -checked))}))
-                                               (nav/analytics-event "library-search"
-                                                                    (str (str/lower-case (:label state)) "-checkbox-change")))
+                                :onChange (fn [e]
+                                            (.persist e)
+                                            (om/update! (:search (state/library-state))
+                                                        (:key state) (.. e -target -checked))
+                                            (go (>! (:search-chan state) {:search (assoc (deref (:search data))
+                                                                                         (:key state) (.. e -target -checked))}))
+                                            (nav/analytics-event "library-search"
+                                                                 (str (str/lower-case (:label state)) "-checkbox-change")))
                                 :className "field-input"})))))
 
 (defn media-flag-component
