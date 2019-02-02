@@ -24,8 +24,13 @@
   :uberjar-name "camelot.jar"
   :main camelot.core
   :repl-options {:init-ns user}
-  :doo {:paths {:karma "./node_modules/karma/bin/karma"}}
-
+  :doo {:paths {:karma "./node_modules/karma/bin/karma"}
+        :karma
+        {:launchers {:chrome-no-sandbox {:plugin "karma-chrome-launcher"
+                                         :name "ChromeNoSandbox"}}
+         :config {"customLaunchers"
+                  {"ChromeNoSandbox" {"base" "Chrome"
+                                      "flags" ["--headless" "--disable-gpu" "--no-sandbox"]}}}}}
   :profiles {:dev
              {:dependencies [[figwheel "0.5.18"]
                              [figwheel-sidecar "0.5.18"]
