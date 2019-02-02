@@ -5,8 +5,10 @@ set -e
 if [ "$1" = "clj" ]; then
     lein with-profiles +test,-dev test
 elif [ "$1" = "cljs" ]; then
+    npm install
     lein with-profiles +test,-dev doo chrome-headless test once
 else
+    npm install
     lein with-profiles +test,-dev test
     lein with-profiles +test,-dev run -m figwheel.main -m camelot.test-runner
 fi
