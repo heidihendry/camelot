@@ -6,8 +6,7 @@ if [ "$1" = "clj" ]; then
     lein with-profiles +test,-dev test
 elif [ "$1" = "cljs" ]; then
     npm install
-    apt-get install firefox-esr -y
-    lein with-profiles +test,-dev run -m figwheel.main -m camelot.test-runner
+    lein with-profiles +test,-dev doo firefox-headless test once
 else
     npm install
     lein with-profiles +test,-dev test
