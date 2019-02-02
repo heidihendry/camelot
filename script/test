@@ -6,7 +6,8 @@ if [ "$1" = "clj" ]; then
     lein with-profiles +test,-dev test
 elif [ "$1" = "cljs" ]; then
     npm install
-    lein with-profiles +test,-dev doo chrome-no-sandbox test once
+    apt-get install firefox -y
+    lein with-profiles +test,-dev doo firefox-headless test once
 else
     npm install
     lein with-profiles +test,-dev test
