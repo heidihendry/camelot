@@ -16,4 +16,4 @@
   (println "Running Camelot tests!")
   (run-tests 'typeahead.core-test 'camelot.nav-test 'camelot.util.trap-station-test)
   ;; return a message to the figwheel process that tells it to wait
-  [:figwheel.main.async-result/wait 5000])
+  [:figwheel.main.async-result/wait 10000])
