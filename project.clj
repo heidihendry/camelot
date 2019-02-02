@@ -24,13 +24,7 @@
   :uberjar-name "camelot.jar"
   :main camelot.core
   :repl-options {:init-ns user}
-  :doo {:paths {:karma "./node_modules/karma/bin/karma"}
-        :karma
-        {:launchers {:chrome-no-sandbox {:plugin "karma-chrome-launcher"
-                                         :name "ChromeNoSandbox"}}
-         :config {"customLaunchers"
-                  {"ChromeNoSandbox" {"base" "Chrome"
-                                      "flags" ["--headless" "--disable-gpu" "--no-sandbox"]}}}}}
+
   :profiles {:dev
              {:dependencies [[figwheel "0.5.18"]
                              [figwheel-sidecar "0.5.18"]
@@ -59,8 +53,8 @@
                                        :source-map-timestamp true}}]}}
 
              :test
-             {:dependencies [[ring/ring-jetty-adapter "1.6.3"]]
-              :plugins [[lein-doo "0.1.10"]]
+             {:dependencies [[ring/ring-jetty-adapter "1.6.3"]
+                             [com.bhauman/figwheel-main "0.2.0"]]
               :source-paths ["src/clj" "src/cljc" "src/cljs" "test/clj" "test/cljc" "test/cljs"]
               :resource-paths ["target"]
               :cljsbuild {:builds
