@@ -1,6 +1,6 @@
 {:deps
  {camelot/market {:git/url "https://gitlab.com/camelot-project/camelot-market"
-                  :sha "2dd1f992aa66d6ac96fcc41996cb7bcbb02f8a47"}
+                  :sha "9eeba4e8a1b476765971748ef13b2f769ffc9ce7"}
 
   org.clojure/test.check {:mvn/version"0.9.0"
                           :mvn/scope "test"}

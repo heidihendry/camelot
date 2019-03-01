@@ -16,7 +16,7 @@
   [config cmd-chan queue-chan]
   (go
     (let [import! (bulk/import-media-fn
-                   (or (get-in config [:config :media-importers]) 1))]
+                   (or (get-in config [:config :server :media-importers]) 1))]
       (try
         (loop []
           (let [[msg ch] (alts! [cmd-chan queue-chan])]

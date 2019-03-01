@@ -40,6 +40,7 @@
                         [com.jakemccrary/lein-test-refresh "0.23.0"]]
               :figwheel {:css-dirs ["resources/www/css"]
                          :ring-handler user/http-handler
+                         :server-port 5341
                          :server-logfile "log/figwheel.log"}
               :cljsbuild {:builds
                           [{:id "camelot"

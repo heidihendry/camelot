@@ -47,7 +47,8 @@
 
 (defn start []
   (reset! sysstate/system (-> (state/read-config)
-                              (assoc :dev-server (map->DevHttpServer {}))
+                              (assoc-in [:server :dev-server]
+                                        (map->DevHttpServer {}))
                            systems/camelot-system
                            component/start))
   nil)

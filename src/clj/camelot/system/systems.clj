@@ -51,9 +51,9 @@
               :config (config/map->Config config)
               :database (db/map->Database {:connection (state/spec)})
               :importer (importer/map->Importer {})
-              :app (if-let [dsvr (:dev-server config)]
+              :app (if-let [dsvr (get-in config [:server :dev-server])]
                      dsvr
-                     (http/map->HttpServer config)))]
+                     (http/->HttpServer (get-in config [:server :http-port]))))]
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer}
