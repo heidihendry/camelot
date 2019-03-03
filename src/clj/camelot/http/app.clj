@@ -6,7 +6,8 @@
    [compojure.core :refer [context GET POST]]
    [camelot.model.screens :as screens]
    [camelot.util.db-migrate :as db-migrate]
-   [camelot.util.version :as version]))
+   [camelot.util.version :as version]
+   [camelot.util.network :as network]))
 
 (defn- retrieve-index
   "Return a response for index.html"
@@ -31,6 +32,14 @@
                             :software-version (version/get-version)
                             :database-version (db-migrate/version conn)})}))
 
+(defn- runtime
+  [state]
+  (let [port (get-in state [:config :server :http-port])]
+    {:status 200
+     :headers {"Content-Type" "application/json; charset=utf-8"}
+     :body (json/write-str
+            {:alternate-urls (network/canonicalise-addresses port)})}))
+
 (def routes
   (context "" {session :session state :system}
            (GET "/" _ (retrieve-index))
@@ -42,4 +51,6 @@
                 (r/response (screens/all-screens (assoc state :session session))))
            (GET "/heartbeat" []
                 (heartbeat state))
+           (GET "/runtime" []
+                (runtime state))
            (POST "/quit" [] (System/exit 0))))

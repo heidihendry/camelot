@@ -25,10 +25,15 @@
           (swap! check #(conj % r)))))
     (map #(.getHostAddress ^InetAddress %) @check)))
 
-(defn print-network-addresses
+(defn canonicalise-addresses
   [port]
   (->> (get-network-addresses)
        (mapcat #(InetAddress/getAllByName %))
        (map #(.getCanonicalHostName ^InetAddress %))
-       (map #(println (format "  - http://%s:%d/" % port)))
+       (map #(format "http://%s:%d/" % port))))
+
+(defn print-network-addresses
+  [port]
+  (->> (canonicalise-addresses port)
+       (map println)
        (doall)))
