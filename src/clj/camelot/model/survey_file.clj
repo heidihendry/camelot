@@ -89,11 +89,13 @@
   (let [fs (filesystem/filestore-file-path state survey-id filename)
         rec (get-specific-by-details state survey-id filename)]
     (io/copy (file/->file tempfile) (file/->file fs))
-    (if (nil? rec)
-      (create! state (tsurvey-file {:survey-id survey-id
-                                    :survey-file-name filename
-                                    :survey-file-size size}))
-      (update! state (:survey-file-id rec) size))))
+    (let [result (if (nil? rec)
+                   (create! state (tsurvey-file {:survey-id survey-id
+                                                 :survey-file-name filename
+                                                 :survey-file-size size}))
+                   (update! state (:survey-file-id rec) size))]
+      (file/delete tempfile)
+      result)))
 
 (s/defn download
   [state :- State

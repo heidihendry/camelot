@@ -4,6 +4,7 @@
    [schema.core :as s]
    [clj-time.core :as t]
    [camelot.translation.core :as tr]
+   [camelot.util.file :as futil]
    [camelot.import.capture :as capture]
    [camelot.spec.schema.state :refer [State]]
    [camelot.model.trap-station-session :as trap-station-session]))
@@ -28,9 +29,12 @@
   (let [sess (trap-station-session/get-specific-by-trap-station-session-camera-id
               state session-camera-id)
         photo (capture/read-photo state tempfile)]
-    (if (or (nil? photo) (not (valid-session-date? sess (:datetime photo))))
-      {:error (tr/translate state ::timestamp-outside-range)}
-      (capture/create-media-and-image! state content-type tempfile size session-camera-id photo))))
+    (let [result
+          (if (or (nil? photo) (not (valid-session-date? sess (:datetime photo))))
+            {:error (tr/translate state ::timestamp-outside-range)}
+            (capture/create-media-and-image! state content-type tempfile size session-camera-id photo))]
+      (futil/delete tempfile)
+      result)))
 
 (defn importer-state
   "Return the state of the importer."
