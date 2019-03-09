@@ -551,6 +551,8 @@
    :camelot.component.library.preview
    {:photo-not-selected "Photo not selected"
     :species-not-in-survey "[Species not in this survey]"
+    :brightness-label "Brightness"
+    :contrast-label "Contrast"
     :sightings "Sightings"
     :delete-media "Delete selected media"
     :delete-sightings "Delete sightings from selected media"}

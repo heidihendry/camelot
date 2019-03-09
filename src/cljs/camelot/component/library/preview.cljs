@@ -21,17 +21,63 @@
                          (:sightings selected)))
     (rest/delete-resource (str "/sightings/" sighting-id) {} identity)))
 
-(defn mcp-preview
-  [selected owner]
+(defn preview-adjustment-slider
+  [{:keys [label value update!]} owner]
   (reify
     om/IRender
     (render [_]
+      (dom/div #js {:className "slider"}
+               (dom/label nil label)
+               (dom/input #js {:type "range"
+                               :min -2.5
+                               :max 2.5
+                               :step 0.005
+                               :value value
+                               :onClick #(.preventDefault %)
+                               :onChange update!})))))
+
+(defn preview-adjustment-panel
+  [{:keys [brightness update-brightness! contrast update-contrast!]} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "preview-adjustment-panel"}
+               (dom/div #js {:className "panel-background"})
+               (dom/div #js {:className "input-container"}
+                        (om/build preview-adjustment-slider
+                                  {:label (tr/translate ::brightness-label)
+                                   :value brightness
+                                   :update! update-brightness!})
+                        (om/build preview-adjustment-slider
+                                  {:label (tr/translate ::contrast-label)
+                                   :value contrast
+                                   :update! update-contrast!}))))))
+
+(defn mcp-preview
+  [selected owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:brightness 0
+       :contrast 0})
+    om/IRenderState
+    (render-state [_ state]
       (dom/div #js {:className "preview"}
                (if selected
                  (dom/a #js {:href (str (get selected :media-uri))
                              :target "_blank"
                              :rel "noopener noreferrer"}
-                        (dom/img #js {:src (str (get selected :media-uri))}))
+                        (dom/div nil
+                                 (dom/img #js {:src (str (get selected :media-uri))
+                                               :style #js {:filter (str "brightness(" (.exp js/Math (:brightness state)) ") contrast(" (.exp js/Math (:contrast state)) ")")}})
+                                 (om/build preview-adjustment-panel
+                                           {:brightness (:brightness state)
+                                            :update-brightness!
+                                            #(om/set-state! owner :brightness (.. % -target -value))
+
+                                            :contrast (:contrast state)
+                                            :update-contrast!
+                                            #(om/set-state! owner :contrast (.. % -target -value))})))
                  (dom/div #js {:className "none-selected"}
                           (dom/h4 nil photo-not-selected)))))))
 
@@ -185,4 +231,5 @@
         (dom/div #js {:className "media-control-panel"}
                  (om/build media-details-panel-component data)
                  (dom/div #js {:className "mcp-container"}
-                          (om/build mcp-preview media)))))))
+                          (om/build mcp-preview media
+                                    {:react-key (:selected-media-id data)})))))))

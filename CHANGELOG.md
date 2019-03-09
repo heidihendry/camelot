@@ -4,6 +4,7 @@
 #### Added
 * Adds support for search operators (>, <=, !=, etc.)
 * Adds support for date and timestamp searches in the library
+* Adds brightness and contrast controls for images in the library
 
 #### Changed
 * Changes license which Camelot is distributed under from EPL v1.0 to AGPL v3
@@ -12,7 +13,7 @@
 * Fixes a bug where the incorrect session details may be displayed for a camera trap
 * Fixes a bug causing the 'Unprocessed' checkbox in the library to not update
   the search.  https://gitlab.com/camelot-project/camelot/issues/169
-* Clean up temporary files after uploads complete
+* Cleans up temporary files after uploads complete
 
 ### 1.4.5
 #### Fixes

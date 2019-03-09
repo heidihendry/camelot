@@ -1983,3 +1983,49 @@ pre.field-input {
 #app .list-input-items {
     margin-top: -0.5rem;
 }
+
+#app .library .preview-adjustment-panel {
+    opacity: 0;
+    bottom: 0;
+    padding: 1rem;
+    margin: auto;
+    position: absolute;
+    text-align: left;
+    transition: opacity ease-in-out 200ms;
+    width: 35rem;
+}
+
+#app .library .preview-adjustment-panel:hover {
+    opacity: 1.0;
+}
+
+#app .library .preview-adjustment-panel > .panel-background {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #fafafa;
+    border: 1px solid #eee;
+    border-top-right-radius: 2rem;
+    opacity: 0.7;
+}
+
+#app .library .preview-adjustment-panel > .input-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+#app .library .preview-adjustment-panel .input-container > * {
+    margin-right: 1rem;
+}
+
+#app .library .preview-adjustment-panel .input-container:last-child {
+    margin-right: 0;
+}
+
+#app .library .preview-adjustment-panel .slider {
+    flex: 1 1 auto;
+    width: 100%;
+}
