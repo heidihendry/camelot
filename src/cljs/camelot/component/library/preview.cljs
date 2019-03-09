@@ -21,6 +21,9 @@
                          (:sightings selected)))
     (rest/delete-resource (str "/sightings/" sighting-id) {} identity)))
 
+(def preview-adjustment-scale
+  (.toFixed (.log js/Math 10) 8))
+
 (defn preview-adjustment-slider
   [{:keys [label value update!]} owner]
   (reify
@@ -29,12 +32,16 @@
       (dom/div #js {:className "slider"}
                (dom/label nil label)
                (dom/input #js {:type "range"
-                               :min -2.5
-                               :max 2.5
-                               :step 0.005
+                               :min (* -1 preview-adjustment-scale)
+                               :max preview-adjustment-scale
+                               :step (/ preview-adjustment-scale 200)
                                :value value
                                :onClick #(.preventDefault %)
                                :onChange update!})))))
+
+(defn exp-perc
+  [n]
+  (str (int (* (.exp js/Math n) 100)) "%"))
 
 (defn preview-adjustment-panel
   [{:keys [brightness update-brightness! contrast update-contrast!]} owner]
@@ -45,11 +52,11 @@
                (dom/div #js {:className "panel-background"})
                (dom/div #js {:className "input-container"}
                         (om/build preview-adjustment-slider
-                                  {:label (tr/translate ::brightness-label)
+                                  {:label (str (tr/translate ::brightness-label) " (" (exp-perc brightness) ")")
                                    :value brightness
                                    :update! update-brightness!})
                         (om/build preview-adjustment-slider
-                                  {:label (tr/translate ::contrast-label)
+                                  {:label (str (tr/translate ::contrast-label) " (" (exp-perc contrast) ")")
                                    :value contrast
                                    :update! update-contrast!}))))))
 
@@ -69,7 +76,8 @@
                              :rel "noopener noreferrer"}
                         (dom/div nil
                                  (dom/img #js {:src (str (get selected :media-uri))
-                                               :style #js {:filter (str "brightness(" (.exp js/Math (:brightness state)) ") contrast(" (.exp js/Math (:contrast state)) ")")}})
+                                               :style #js {:filter (str "brightness(" (exp-perc (:brightness state)) ") "
+                                                                        "contrast(" (exp-perc (:contrast state)) ")")}})
                                  (om/build preview-adjustment-panel
                                            {:brightness (:brightness state)
                                             :update-brightness!
