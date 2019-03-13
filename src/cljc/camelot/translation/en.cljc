@@ -726,7 +726,6 @@
    :camelot.component.survey.core
    {:create-survey "Create survey"
     :manage-traps "Manage camera trap stations"
-    :confirm-delete "Are you sure you want to delete this survey? This will also delete any associated media and files."
     :upload-captures "Upload media"
     :species "Species"
     :files "Related files"
@@ -736,6 +735,8 @@
    :camelot.component.survey.settings
    {:details "Survey details"
     :sighting-fields "Sighting fields"
+    :delete-survey "Delete survey"
+    :confirm-delete "Are you sure you want to delete this survey? This will also delete any associated media and files."
     :survey-name-placeholder "Survey name..."
     :validation-error-title "Ensure all fields have valid content before updating."
     :validation-survey-name-blank "Survey name must not be blank"

@@ -14,6 +14,15 @@
   [d]
   (or (nil? d) (empty? (.trim d))))
 
+(defn delete
+  "Delete the survey and trigger a removal event."
+  [event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (when (js/confirm (tr/translate ::confirm-delete))
+    (rest/delete-x (str "/surveys/" (state/get-survey-id))
+                   #(nav/nav! "/organisation"))))
+
 (defn validate-form
   [data]
   (cond->> {}
@@ -148,15 +157,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "simple-menu"}
-               (dom/div #js {:className "menu-item"
-                             :onClick #(nav/nav! (str "/" (state/get-survey-id) "/details"))}
-                        (dom/span #js {:className "menu-item-title"}
-                                  (tr/translate ::details)))
-               (dom/div #js {:className "menu-item"
-                             :onClick #(nav/nav! (str "/" (state/get-survey-id) "/sighting-fields"))}
-                        (dom/span #js {:className "menu-item-title"}
-                                  (tr/translate ::sighting-fields)))))))
+      )))
 
 (defn settings-menu-component
   [data owner]
@@ -164,4 +165,16 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "section"}
-               (om/build menu-item-component data)))))
+               (dom/div #js {:className "simple-menu scroll"}
+                        (dom/div #js {:className "menu-item"
+                                      :onClick #(nav/nav! (str "/" (state/get-survey-id) "/details"))}
+                                 (dom/span #js {:className "menu-item-title"}
+                                           (tr/translate ::details)))
+                        (dom/div #js {:className "menu-item"
+                                      :onClick #(nav/nav! (str "/" (state/get-survey-id) "/sighting-fields"))}
+                                 (dom/span #js {:className "menu-item-title"}
+                                           (tr/translate ::sighting-fields))))
+               (dom/div #js {:className "sep"})
+               (dom/button #js {:className "btn btn-dangerous"
+                                :onClick delete}
+                           (tr/translate ::delete-survey))))))

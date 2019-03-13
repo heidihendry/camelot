@@ -33,16 +33,6 @@
    {:action :settings
     :name (tr/translate ::settings)}])
 
-(defn delete
-  "Delete the survey and trigger a removal event."
-  [state data event]
-  (.preventDefault event)
-  (.stopPropagation event)
-  (when (js/confirm (tr/translate ::confirm-delete))
-    (rest/delete-x (str "/surveys/" (:survey-id data))
-                   #(go (>! (:chan state) {:event :delete
-                                           :data data})))))
-
 (defn survey-list-component
   [data owner]
   (reify
@@ -52,8 +42,6 @@
                     :onClick #(do
                                 (nav/nav! (str "/" (:survey-id data)))
                                 (nav/analytics-event "org-survey" "survey-click"))}
-               (dom/div #js {:className "pull-right fa fa-times remove top-corner"
-                             :onClick (partial delete state data)})
                (dom/span #js {:className "menu-item-title"}
                          (:survey-name data))
                (dom/span #js {:className "menu-item-description"}
@@ -86,16 +74,6 @@
     om/IInitState
     (init-state [_]
       {:chan (chan)})
-    om/IDidMount
-    (did-mount [_]
-      (let [ch (om/get-state owner :chan)]
-        (go
-          (loop []
-            (let [r (<! ch)]
-              (cond
-                (= (:event r) :delete)
-                (om/transact! data :list #(remove (fn [x] (= x (:data r))) %))))
-            (recur)))))
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className "section"}
