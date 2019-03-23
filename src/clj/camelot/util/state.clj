@@ -39,5 +39,6 @@
   []
   {:classname "org.apache.derby.jdbc.EmbeddedDriver",
    :subprotocol "derby",
-   :subname (get-in (read-config) [:paths :database]),
+   :subname (.getPath (io/file (get-in (read-config) [:paths :database])
+                               "Database")),
    :create true})
