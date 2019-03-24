@@ -10,9 +10,9 @@
     om/IRender
     (render [_]
       (dom/div #js {:className "about-camelot"}
-               (dom/p nil "Wildlife populations are in rapid decline as the environment around them changes at unprecedented rates. Conservation efforts are critically important towards reversing this trend. However those these efforts must be supported by the right techniques and technologies in order to be successful.")
+               (dom/p nil "Wildlife populations are in rapid decline as the environment around them changes at unprecedented rates. Conservation efforts are critically important towards reversing this trend. However these efforts must be supported by the right techniques and technologies in order to be successful.")
 
-               (dom/p nil "All too often software for scientific research is of poor quality or prohibitively expensive. The lack of access to quality software stalls the discovery of solutions to the challenges we all currently face. These solutions are needed now.")
+               (dom/p nil "All too often software for scientific research is of poor quality or prohibitively expensive. The lack of access to quality software stalls the discovery of solutions to the challenges we all currently face. We need those solutions now.")
 
                (dom/p nil "This software, Camelot, is part of the Camelot Project. The Camelot Project seeks to ensure that high-quality feature-rich software is readily available for conservation research.")
 
