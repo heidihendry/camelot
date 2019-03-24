@@ -887,8 +887,7 @@
     :no-media-found "%s: no media found"}
 
    :camelot.component.about
-   {:title "About"
-    :intro "Camelot is open source software for data management and analysis, designed for researchers and conservationists."}
+   {:title "About"}
 
    :camelot.validation.validated-component
    {:not-empty "Must not be empty"
