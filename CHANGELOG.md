@@ -12,8 +12,8 @@
 
 #### Fixed
 * Fixes a bug where the incorrect session details may be displayed for a camera trap
-* Fixes a bug causing the 'Unprocessed' checkbox in the library to not update
-  the search.  https://gitlab.com/camelot-project/camelot/issues/169
+* Fixes a bug causing the 'Unprocessed' checkbox in the library to not update the search.  https://gitlab.com/camelot-project/camelot/issues/169
+* Fixes a bug which may prevent saving of sighting fields. https://gitlab.com/camelot-project/camelot/issues/167
 * Cleans up temporary files after uploads complete
 
 ### 1.4.5
