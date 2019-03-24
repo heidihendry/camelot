@@ -343,6 +343,7 @@
    {:import "Import"
     :library "Library"
     :organisation "Organisation"
+    :about "About"
     :surveys "Surveys"
     :analysis "Analysis"
     :sites "Sites"
@@ -884,6 +885,10 @@
    {:directory-not-found "%s: Directory not found"
     :directory-not-readable "%s: directory not readable"
     :no-media-found "%s: no media found"}
+
+   :camelot.component.about
+   {:title "About"
+    :intro "Camelot is open source software for data management and analysis, designed for researchers and conservationists."}
 
    :camelot.validation.validated-component
    {:not-empty "Must not be empty"

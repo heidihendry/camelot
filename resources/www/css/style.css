@@ -1406,6 +1406,9 @@ pre.field-input {
     height: calc(100vh - 16rem);
     max-width: 50rem;
 }
+#app .split-menu .text-section {
+    max-width: 65rem;
+}
 #app .split-menu .single-section.long-single {
     height: calc(100vh - 6rem);
 }
@@ -2033,4 +2036,33 @@ pre.field-input {
 #app .btn-dangerous {
     background-color: #cc3311;
     color: #fff;
+}
+
+#app .about-camelot {
+    text-align: justify;
+    color: #444;
+    font-size: 120%;
+    line-height: 2.7rem;
+
+}
+
+#app .about-camelot ol {
+    padding-left: 2rem;
+}
+
+#app .about-camelot p {
+    margin-bottom: 2rem;
+}
+
+#app .about-camelot ol li {
+    padding-bottom: 1rem;
+}
+
+#app .about-camelot .donate-button-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+#app .about-camelot .donate-button-container button {
+    margin: 2rem;
 }

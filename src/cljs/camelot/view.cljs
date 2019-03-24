@@ -7,6 +7,7 @@
             [camelot.component.bulk-import.core :as bulk-import]
             [camelot.component.bulk-import.mapper :as bulk-import-mapper]
             [camelot.component.deployment.core :as deployment]
+            [camelot.component.about :as about]
             [camelot.component.organisation :as organisation]
             [camelot.component.nav :as nav]
             [camelot.util.cursorise :as cursorise]
@@ -334,6 +335,7 @@
 (defroute "/sites" [] (page-content-view :site :create {}))
 (defroute "/cameras" [] (page-content-view :camera :create {}))
 (defroute "/taxonomy" [] (page-content-view :taxonomy :create {}))
+(defroute "/about" [] (generate-view about/about-view))
 (defroute "/library/restricted" [] (generate-view library/library-view-component {:restricted-mode true}))
 (defroute "/library" [] (generate-view library/library-view-component))
 (defroute "/:survey/library" [survey] (generate-view library/library-view-component

@@ -13,6 +13,8 @@
                  :label (tr/translate state :application/organisation)}
                 {:url "/library"
                  :label (tr/translate state :application/library)}
+                {:url "/about"
+                 :label (tr/translate state :application/about)}
                 {:function "bulk-import-progress"}]})
 
 (defn- translate-fn
