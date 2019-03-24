@@ -9,6 +9,7 @@
 #### Changed
 * Changes license which Camelot is distributed under from EPL v1.0 to AGPL v3
 * Moves survey deletion option from the survey list to the survey settings menu
+* Increases library page size from 50 to 150
 
 #### Fixed
 * Fixes a bug where the incorrect session details may be displayed for a camera trap

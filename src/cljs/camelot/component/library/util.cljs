@@ -6,7 +6,7 @@
             [camelot.translation.core :as tr]))
 
 (def collection-columns 3)
-(def page-size 50)
+(def page-size 150)
 
 (defn get-matching
   [data]
