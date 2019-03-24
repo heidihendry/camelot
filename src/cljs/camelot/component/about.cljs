@@ -4,6 +4,18 @@
             [camelot.translation.core :as tr])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
+(defn open-url
+  [url]
+  (.open js/window url "_blank" "nodeIntegration=no"))
+
+(defn find-out-more
+  []
+  (open-url "https://gitlab.com/camelot-project/camelot/blob/master/CONTRIBUTING.md"))
+
+(defn donate
+  []
+  (open-url "https://www.patreon.com/camelot_software"))
+
 (defn blurb
   [app owner]
   (reify
@@ -24,14 +36,14 @@
                        (dom/li nil
                                (dom/strong nil "Contribute to the project") ": "
                                "direct contributions to the project can take many forms, from filing feature requests and bugs, through to documentation, translation and code contributions. "
-                               (dom/a #js {:href "https://gitlab.com/camelot-project/camelot/blob/master/CONTRIBUTING.md" :target "_blank"}
+                               (dom/a #js {:onClick find-out-more}
                                       "Find out more"))
                        (dom/li nil
                                (dom/strong nil "Donate") ": "
                                "with your financial support we will be able to continue expanding the range and capabilities of software and cover server and hosting costs. Organisations may also donate to take advantage of our priority support offering."))
 
                (dom/div #js {:className "donate-button-container"}
-                        (dom/a #js {:href "https://www.patreon.com/camelot_software" :target "_blank"}
+                        (dom/a #js {:onClick donate}
                                (dom/button #js {:className "btn btn-primary"} "Donate now")))
 
                (dom/p nil "Your support is incredibly valuable to us.")
