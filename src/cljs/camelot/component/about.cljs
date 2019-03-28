@@ -14,7 +14,7 @@
 
 (defn donate
   []
-  (open-url "https://www.patreon.com/camelot_software"))
+  (open-url "https://www.patreon.com/join/camelot_software"))
 
 (defn blurb
   [app owner]
@@ -26,9 +26,9 @@
 
                (dom/p nil "Unfortunately, too often software for scientific research is of poor quality or prohibitively expensive. The lack of access to quality software stalls the discovery of solutions to the challenges we all currently face. We need those solutions now.")
 
-               (dom/p nil "This software, Camelot, is part of the Camelot Project. The Camelot Project seeks to ensure that high-quality feature-rich software is readily available for conservation research.")
+               (dom/p nil "This software, Camelot, is part of the Camelot Project, which seeks to ensure that high-quality feature-rich software is readily available for conservation research.")
 
-               (dom/p nil "The Camelot Project is an entirely voluntary initiative to produce this software. Producing high-quality conservation software requires a significant investment of time and skills, which we could not do without the support of the community.")
+               (dom/p nil "The Camelot Project is an entirely voluntary initiative. Producing high-quality conservation software requires a significant investment of time and skills, which we could not do without the support of the community.")
 
                (dom/p nil "You can support us in one of two ways:")
 
