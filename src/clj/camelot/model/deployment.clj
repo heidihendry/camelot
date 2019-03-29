@@ -71,8 +71,8 @@
 (defn after?
   [a b]
   (cond
-    (nil? a) false
-    (nil? b) true
+    (nil? a) true
+    (nil? b) false
     :default (t/after? a b)))
 
 (s/defn get-all :- [Deployment]

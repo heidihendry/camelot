@@ -41,6 +41,22 @@
      :trap-station-session-start-date (t/date-time 2018 3 1)
      :trap-station-session-end-date (t/date-time 2018 4 1)})])
 
+(def get-all-with-incomplete-deployments
+  [(make-deployment
+    {:trap-station-session-id 10
+     :trap-station-session-start-date (t/date-time 2018 3 1)
+     :trap-station-session-end-date (t/date-time 2018 5 1)})
+   (make-deployment
+    {:trap-station-session-id 11
+     :trap-station-session-start-date (t/date-time 2018 1 1)
+     :trap-station-session-end-date (t/date-time 2018 3 1)})
+   (make-deployment
+    {:trap-station-id 23
+     :trap-station-name "Trap 3"
+     :trap-station-session-id 12
+     :trap-station-session-start-date (t/date-time 2018 3 2)
+     :trap-station-session-end-date nil})])
+
 (defn gen-state
   [{:keys [get-all]}]
   (state/gen-state {} {:deployments
@@ -72,11 +88,20 @@
           :trap-station-session-id [10 12]
           :trap-station-session-end-date [(t/date-time 2018 5 1) (t/date-time 2018 4 1)]))))
 
-  (testing "should return the expected trap stations"
+  (testing "should return the expected trap stations when deployments are complete"
     (with-spies [calls]
       (let [state (gen-state {:get-all get-all})
             result (sut/get-all state 1)]
         (are [k expected]
             (= (mapv k result) expected)
           :trap-station-name ["Trap 1" "Trap 2"]
-          :trap-station-id [20 21])))))
+          :trap-station-id [20 21]))))
+
+  (testing "should return the expected trap stations when there are incomplete deployments"
+    (with-spies [calls]
+      (let [state (gen-state {:get-all get-all-with-incomplete-deployments})
+            result (sut/get-all state 1)]
+        (are [k expected]
+            (= (mapv k result) expected)
+          :trap-station-name ["Trap 1" "Trap 3"]
+          :trap-station-id [20 23])))))
