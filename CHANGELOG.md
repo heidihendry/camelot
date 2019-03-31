@@ -1,6 +1,6 @@
 ## ChangeLog
 
-### [Unreleased]
+### 1.5.0
 #### Added
 * Adds support for search operators (>, <=, !=, etc.)
 * Adds support for date and timestamp searches in the library
