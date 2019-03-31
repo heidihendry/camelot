@@ -9,6 +9,7 @@ compile:
   stage: build
   before_script:
     - export LEIN_ROOT=1
+    - export LEIN_SNAPSHOTS_IN_RELEASE=1
     - export PATH="$HOME/bin:${PATH}"
   script:
     - script/build
