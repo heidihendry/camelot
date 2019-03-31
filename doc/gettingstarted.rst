@@ -37,50 +37,66 @@ Camelot supports the latest versions of the following browsers:
 Installation
 ~~~~~~~~~~~~
 
-Download the `latest version of
-Camelot <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.4.5.zip>`__.
+OS-specific releases (recommended)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Unzip the archive. To run Camelot:
+Camelot has OS-specific releases, which are the recommended way to install
+Camelot:
 
-**Windows**: Double click ``camelot-desktop.bat``
+* `Windows <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-win32-x64.zip>`__
+* `MacOS <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-darwin-x64.zip>`__
+* `Linux <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-linux-x64.zip>`__
 
-**OSX**: Double click ``camelot-desktop.command``
+Start Camelot by running "Camelot" application in the extracted archive.
 
-**Linux**: Double click ``camelot-desktop.sh``
+**Note**: Older computers running a 32-bit OS of any of the above must instead
+ use the Java release below.
 
-After 10 seconds, Camelot should appear in a new tab in your web
-browser. If Camelot doesn't open automatically, you can access it via
-your web browser by browsing to:
+Java .jar release
+^^^^^^^^^^^^^^^^^
 
-::
+A Java .jar file is also available:
 
-    http://localhost:5341/
+* `Servers, 32-bit OSs and others <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0.zip>`__
 
-If running Camelot on a server, you can instead use:
+This release can be used on any operating system, though does not feature an
+administrative interface.
 
-::
+On startup
+~~~~~~~~~~
 
-    java -jar /path/to/camelot-<version>.jar -server
+When Camelot is first started, it will open the administration interface &
+begin to start up the main Camelot application, which can take a few seconds.
 
-See the section on 'Networked usage' for more information.
-
-
-Creating a survey
------------------
-
-The first thing you'll see when opening Camelot in the web-browser is the
-"Create Survey" screen.  A survey represents a research project and will
-contain details about your camera traps and uploaded images.
-
-The left hand side is the current survey configuration. You can give a
-survey a name and description. A survey will often start with one or
-more species are expecting to be found over the course of the study.
-Species can be added by searching for the scientific name using the
-right-hand panel. Behind the scenes, Camelot will automatically set
-additional details about the species, including its family and common
-name.
-
-.. figure:: screenshot/survey-create.png
+.. figure:: screenshot/launcher.png
    :alt: 
 
-Once ready, click "Create Survey".
+This interface can be used to start and stop Camelot, view logs and configure
+Camelot.  See |administration_ui| for more information.
+
+Once the main Camelot application starts up, it will be appear immediately.
+You can return to the administration interface at any time by clicking the '←'
+icon in the bottom left hand corner of the screen.
+
+**Note**: This icon will not be available in the .jar version of Camelot, or
+ when Camelot is accessed via a web browser.
+
+.. |administration_ui| raw:: html
+
+   <a href="administration.html">administration</a>
+
+Web-interface
+~~~~~~~~~~~~~
+
+Camelot supports a multi-user environment where multiple other users can
+connect to a main Camelot instance via their web browser.
+
+The URL which web browsers may connect to can be found in the administrative
+interface, under: **Camelot** → **Known URLs**
+
+A user may access Camelot over the network by entering this URL into their web
+browser.
+
+**Note**: In the event that attempting to access Camelot over the network
+fails, confirm Camelot is running and check the firewall rules of the computer
+running Camelot.

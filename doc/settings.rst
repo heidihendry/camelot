@@ -8,16 +8,20 @@ There are two types of settings available in Camelot:
 
 Global settings
 ~~~~~~~~~~~~~~~~~~
-In the top right hand corner of the main navigation is the toggle to show the settings menu. The settings menu in Camelot provides a couple of global options:
 
-.. figure:: screenshot/settings.png
-   :alt: 
+A variety of settings can be customised through Camelot's administration tool.
+See |administration_ui| for more information.
 
-- **Species name style**: Whether species scientific or common names should be shown by default. Default is scientific names.
-- **Send anonymous usage data**: Enabled this option will provide data about how you use Camelot back to the Camelot Project. This data is anonymous and is used only for the purpose of improving Camelot. It is disabled by default, though if you have the consent of others using your Camelot instance, please consider enabling this.
+.. |administration_ui| raw:: html
+
+   <a href="administration.html">administration</a>
+
+Survey settings
+~~~~~~~~~~~~~~~
 
 Survey details
-~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^
+
 A survey can be configured via:
 
 **Settings** → **Survey details**
@@ -30,3 +34,17 @@ For more information about how the sighting independence threshold affects repor
 
    <a href="reports.html#independent-observations">Independent observations</a>
 
+Sighting fields
+^^^^^^^^^^^^^^^
+
+Sighting fields can be configured via:
+
+**Settings** → **Sighting fields**
+
+Sighting fields allow for the recording of additional information along with
+each identification. This is a powerful tool, and is described in much more
+detail |here|.
+
+.. |here| raw:: html
+
+   <a href="sightingfields.html">here</a>

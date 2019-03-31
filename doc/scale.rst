@@ -93,20 +93,14 @@ The JVM heap size should not exceed the size of physical memory available, and
 ideally should not impinge upon the resources required by other applications
 on the machine Camelot is running upon.
 
-There are a number of ways to set the JVM Heap size. We recommend setting it
-via the command line (which may be in a script, such as the `camelot-desktop`
-script for your Operating System, for convenience and consistency).  The java
-command would look as follows:
-
-.. code:: shell
-
-  java -Xms6g -Xmx6g -server -jar path/to/camelot.jar
-
-The above will set the initial heap size (``Xms``) and the maximum heap size
-(``Xmx``) to 6GB.
+Use the |administration_ui| to set the heap size to your needs.
 
 As a (very) rough guide, the authors suggest an additional 800MB of heap space
 for every 100,000 images, with a starting heap space of 1GB.
+
+.. |administration_ui| raw:: html
+
+   <a href="administration.html">administration interface</a>
 
 Storage
 ^^^^^^^

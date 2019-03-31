@@ -1,10 +1,9 @@
 Library
 -------
 
-Okay, so you've had camera traps in the field for a while and collected
-a bunch of photos. Now's where the *library* comes in. All of your
-photos can be viewed, searched, flagged and identified through the
-library.
+So you've had camera traps in the field for a while and collected a bunch of
+photos. Now's where the *library* comes in. All of your photos can be viewed,
+searched, flagged and identified through the library.
 
 Viewing photos
 ~~~~~~~~~~~~~~

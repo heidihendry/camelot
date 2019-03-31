@@ -12,12 +12,13 @@ Camelot Documentation
    surveymanagement
    library
    sightingfields
-   settings
    reports
+   settings
    bulkimport
+   administration
    advancedmenu
    scale
    integration
    network
-   administration
    misc
+   advanced_config

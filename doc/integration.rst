@@ -1,4 +1,4 @@
-Integrating Camelot
+Integrating camelot
 -------------------
 
 Camelot is designed with integration in mind. This page describes the process around some common integrations.

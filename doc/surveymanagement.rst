@@ -1,3 +1,23 @@
+Creating a survey
+-----------------
+
+The first thing you'll see when the main Camelot interface loads is the
+"Create Survey" screen.  A survey represents a research project and will
+contain details about your camera traps and uploaded images.
+
+The left hand side is the current survey configuration. You can give a
+survey a name and description. A survey will often start with one or
+more species are expecting to be found over the course of the study.
+Species can be added by searching for the scientific name using the
+right-hand panel. Behind the scenes, Camelot will automatically set
+additional details about the species, including its family and common
+name.
+
+.. figure:: screenshot/survey-create.png
+   :alt: 
+
+Once ready, click "Create Survey".
+
 Managing surveys
 ----------------
 

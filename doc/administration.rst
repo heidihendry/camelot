@@ -1,186 +1,111 @@
-Administration and advanced configuration
------------------------------------------
+Administration interface
+------------------------
 
-*This section is intended for people with strong IT knowledge.*
+Camelot's administration interface makes it easy to manage Camelot.  This
+includes starting, stopping and accessing Camelot, viewing logs, and making
+configuration changes.
 
-Camelot has two directories: one for configuration, and one for data
-storage. The location of these directories depends on the OS.
+.. figure:: screenshot/launcher.png
+   :alt: 
 
-Locations
-~~~~~~~~~
+We'll walk through each of the menu items in turn.
 
-By default, Camelot stores all data under the current user's home folder for
-the operating system.
+Camelot
+~~~~~~~
 
-Windows
-^^^^^^^
+The Camelot menu allows you to:
 
--  **Data**: %LOCALAPPDATA%\\camelot
--  **Config**: %APPDATA%\\camelot
+* Start and stop Camelot
+* Connect to a already-running Camelot
+* View status information about Camelot, such as which addresses it is accessible from.
 
-(Entering, for example, ``%LOCALAPPDATA%``, as a folder path may seem unusual,
-though is a valid path under Windows.)
+The latter is most helpful when looking to connect to Camelot from |other_computers_in_the_network|.
 
-OSX
-^^^
+.. |other_computers_in_the_network| raw:: html
 
--  **Data**: $HOME/Library/Application Support/camelot
--  **Config**: $HOME/Library/Preferences/camelot
+   <a href="network.html">other computers in the network</a>
 
-Linux
-^^^^^
+System logs
+~~~~~~~~~~~
 
--  **Data**: $HOME/.local/share/camelot
--  **Config**: $HOME/.config/camelot
+Sometimes not everything goes as planned. This is where the system logs may
+prove handy to work out what is going wrong. Should you encounter an error and
+need to raise |a_support_request|, attaching these logs to that request may
+help to get the issue resolved more quickly.
 
-Data Directory
-~~~~~~~~~~~~~~
+.. |a_support_request| raw:: html
 
-The data directory will contain three subdirectories: ``Database``,
-``Media`` and ``FileStore``. Database is an Apache Derby database.
-Imported media is not stored in the database, but in the ``Media``
-folder. Finally, the ``FileStore`` contains files for the Survey's
-"Related files" feature.
+   <a href="https://gitlab.com/camelot-project/camelot/issues">a support request</a>
 
-A custom data directory can be set using the ``CAMELOT_DATADIR``
-environment variable. The Database and Media directories will be created
-(if necessary) and stored within that nominated directory. If
-``CAMELOT_DATADIR`` is not set, Camelot will fall-back to using the
-standard locations (as above).
+Settings
+~~~~~~~~
 
-Each of the ``Database``, ``Media`` and ``FileStore`` directories should
-be backed up routinely.
+Here you may configure Camelot's global settings.  These settings will take
+effect the next time Camelot is started.
 
-Storing Media and Database separately
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+These settings fall into 3 broad categories:
 
-It can be desirable to store the ``Media`` directory separately from the
-``Database`` directory.  For example, for many GB of images it may be
-desirable to place the images themselves on cheaper storage such as a HDD,
-while keeping the ``Database`` directory on an SSD for fast access.
+1. Application configuration
+2. Storage configuration
+3. System configuration
 
-This can be achieved with Camelot using features provided by the Operating
-System.  The process is as follows:
+Application configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. set the datadir to the location you want for your database on the SSD via
-   the CAMELOT_DATADIR environment variable.
-2. move the Media (and optionally FileStore) folder(s) to the locations you
-   want on the HDD.
-3. finally create |linux_symlink| (Linux, MacOS) or |windows_junctions|
-   (Windows) for the moved folders from the datadir to the the location you
-   moved them, ensuring the links are named identically to the original
-   folders in datadir (i.e., ``Media`` and ``FileStore``).
+Allows customisation of the way that the Camelot or its user interface behaves.
 
-When choosing the locations keep in mind that this data isn't intended to be
-modified outside of Camelot, and thus it is recommended to ensure appropriate
-permissions are set and not to place these inside shared folders.
+* **Species name style**: how the name of a species is shown in Camelot's user
+  interface. This can be the scientific name or the common name of a species.
+* **Send anonymous usage data**: if enabled, the Camelot team will receive
+  anonymous data about how the software is being used, in order to help
+  improve the software.
 
-.. |linux_symlink| raw:: html
+Storage configuration
+^^^^^^^^^^^^^^^^^^^^^
 
-   <a href="https://kb.iu.edu/d/abbe" target="_blank">symlinks</a>
+Allows customisation of where Camelot stores its data.
 
-.. |windows_junctions| raw:: html
+* **Media location**: where Camelot's images should be stored.  Note that this
+  should not be the same location as *you* store your images. Camelot will
+  maintain its own copy of any images, folders and images stored in this
+  location **should not** be modified.
+* **Database location**: the folder where Camelot will store its database. The
+  Database folder **must not** be modified.
+* **FileStore location**: any files related to a survey can be uploaded to
+  Camelot under the "survey files" menu. These files will be stored in this
+  folder.  Files and folders in this location **should not** be modified.
+* **Backup location**: Camelot will automatically back up its database before
+  doing a database upgrade. These backups will be stored here.
+* **Installation location**: The folder where the camelot .jar file is
+  stored.
+* **Log file location**: The location where Camelot log files are stored.
 
-   <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/junction" target="_blank">junctions</a>
+**Important**: Camelot will not move your data when customising any of these
+locations. When changing any of these locations, any existing data which
+Camelot is to use must also be moved to this location manually.
 
-Config Directory
-~~~~~~~~~~~~~~~~
+System configuration
+^^^^^^^^^^^^^^^^^^^^
 
-config.clj
-^^^^^^^^^^
+Allows customisation at the system level around how Camelot is started and how it runs.
 
-``config.clj`` is the global camelot configuration file. Some values in
-this file can be set via the Settings menu in Camelot, while others may
-be internal or legacy settings. Care should be taken if editing this
-file manually.\ ``config.clj`` is the global camelot configuration file.
-All configuration values available in this can also be set through the
-settings panel in the UI.
+* **Java command**: the location or name of the "java" command used to run Camelot.
+* **JVM maximum heap size**: the amount of memory to allow Camelot to use in megabytes. This may need to be customised if working with |large_amounts_of_data|.
+* **JVM options**: other options to pass to the "java" command. Refer to the documentation of your JVM for more details.
+* **HTTP port**: the TCP port on which to run Camelot's HTTP server. This may be useful if you need to use a specific port due to firewall rules, for example.
 
-Custom Reports
-~~~~~~~~~~~~~~
+.. |large_amounts_of_data| raw:: html
 
-Custom reports and column definitions for reports can be registered by
-creating a *reports module*. A reports module can also override existing
-reports and columns.
+   <a href="scale.html#memory">large amounts of data</a>
 
-Reports modules are Clojure files (``.clj`` extension) and are stored
-under the ``modules`` subdirectory of Camelot's config directory
-(described above).
+Advanced configuration
+~~~~~~~~~~~~~~~~~~~~~~
 
-All modules in this directory will be loaded before each report is ran.
+Settings can be customised without the aid of the administration UI. This may
+be useful if using the Camelot .jar release alone, or you're looking for some
+very specific settings otherwise not available through the UI.  You can find
+out more about this configuration under the |advanced_configuration| chapter.
 
-Here's an example module to create and register a custom column, and a
-custom report using that column.
+.. |advanced_configuration| raw:: html
 
-.. code:: clojure
-
-    (ns custom.camelot.module.custom_column
-      (:require [camelot.report.module.core :as module]))
-
-    (defn custom-column
-      [state data]
-      (map #(assoc % :custom-column
-                   (if (:survey-id %)
-                     "YES"
-                     "NO"))
-           data))
-
-    (module/register-column
-     :custom-column
-     {:calculate custom-column
-      :heading "Custom Column"})
-
-    (defn report-configuration
-      [state {:keys [survey-id]}]
-      {:columns [:media-id
-                 :taxonomy-label
-                 :trap-station-longitude
-                 :trap-station-latitude
-                 :custom-column]
-       :aggregate-on [:independent-observations
-                      :nights-elapsed]
-       :filters [#(:trap-station-longitude %)
-                 #(:trap-station-latitude %)
-                 #(:species-scientific-name %)
-                 #(= (:survey-id %) survey-id)]
-       :order-by [:species-scientific-name
-                  :trap-station-longitude
-                  :trap-station-latitude]})
-
-    ;; The design of the configuration page for the report.
-    (def form-smith
-      {:resource {}
-       :layout [[:survey-id]]
-       :schema {:survey-id
-                {:label "Survey"
-                 :description "The survey to report on"
-                 :schema {:type :select
-                          :required true
-                          :get-options {:url "/surveys"
-                                        :label :survey-name
-                                        :value :survey-id}}}}})
-
-    (module/register-report
-     :custom-report
-     {:file-prefix "cool custom report"
-      :output report-configuration
-      :title "Cool Custom Report"
-      :description "A very cool report"
-      :form form-smith
-      :by :species
-      :for :survey})
-
-Camelot will treat your field differently when it comes to generating
-the report, depending on how it the field is named.
-
--  Fields ending in "-id" are converted to Java Longs.
--  Fields ending in "-date" are converted to Joda Dates.
--  Fields ending in "-float" are converted to Java Floats.
--  Fields ending in "-num" are converted to a suitable type. Check the
-   ``edn/read-string`` documentation for details.
-
-For more module examples, check out Camelot's |builtin_link|.
-
-.. |builtin_link| raw:: html
-
-   <a href="https://gitlab.com/camelot-project/camelot/tree/master/src/clj/camelot/report/module/builtin/?at=master" target="_blank">built-in reports and columns</a>
+   <a href="advanced_config.html">advanced configuration</a>
