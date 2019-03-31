@@ -39,7 +39,8 @@
                                                         (:media-format %))
                                                    nil))]
      :filters [#(= (:survey-id %) survey-id)]
-     :order-by [:media-capture-timestamp]}))
+     :order-by [:media-capture-timestamp]
+     :repeat-by :sighting-quantity}))
 
 (defn form-smith
   [state]

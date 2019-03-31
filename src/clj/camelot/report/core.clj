@@ -125,27 +125,41 @@
     (f data)
     data))
 
+(defn repeat-rows
+  [repeat-by data]
+  (if repeat-by
+    (letfn [(reducer [acc d]
+              (apply conj acc (repeat (or (get d repeat-by) 0) d)))]
+      (reduce reducer [] data))
+    data))
+
 (s/defn generate-report
   "Generate a report given an output configuration and data."
   [state :- State
    columns
    {:keys [rewrites pre-transforms pre-filters apply-fn
-           transforms filters aggregate-on order-by function]}
+           transforms filters aggregate-on order-by function
+           repeat-by]}
    data :- [{s/Keyword s/Any}]]
   (if function
     (function state data)
-    (->> data
-         (transform-records state rewrites)
-         (add-calculated-columns state columns)
-         (transform-records state pre-transforms)
-         (filter-records state pre-filters)
-         (maybe-apply apply-fn)
-         (aggregate-data state columns aggregate-on)
-         (add-post-aggregate-columns state columns)
-         (transform-records state transforms)
-         (filter-records state filters)
-         (project columns)
-         (sort-result order-by))))
+    (let [projection-columns (if (and repeat-by
+                                      (not (.contains columns repeat-by)))
+                               (conj columns repeat-by)
+                               columns)]
+      (->> data
+           (transform-records state rewrites)
+           (add-calculated-columns state projection-columns)
+           (transform-records state pre-transforms)
+           (filter-records state pre-filters)
+           (maybe-apply apply-fn)
+           (aggregate-data state projection-columns aggregate-on)
+           (add-post-aggregate-columns state projection-columns)
+           (transform-records state transforms)
+           (filter-records state filters)
+           (project projection-columns)
+           (sort-result order-by)
+           (repeat-rows repeat-by)))))
 
 (defn- all-cols?
   [cols]

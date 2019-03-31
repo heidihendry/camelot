@@ -16,6 +16,7 @@
 * Fixes a bug causing the 'Unprocessed' checkbox in the library to not update the search.  https://gitlab.com/camelot-project/camelot/issues/169
 * Fixes a bug which may prevent saving of sighting fields. https://gitlab.com/camelot-project/camelot/issues/167
 * Cleans up temporary files after uploads complete
+* Fixes bug where Record Table export would not account for the number of independent observations. https://gitlab.com/camelot-project/camelot/issues/170
 
 ### 1.4.5
 #### Fixes

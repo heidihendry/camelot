@@ -97,11 +97,11 @@
       (let [records (list (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)})
                           (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)}))
             state (gen-state-helper {})]
-        (is (= (report state 1 records)
-               [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+        (is (= [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
                  "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]
                 ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
-                 "1800" "30" "0.5" "0.0" "/path/fi" "file-id-1.jpg"]]))))
+                 "1800" "30" "0.5" "0.0" "/path/fi" "file-id-1.jpg"]]
+               (report state 1 records)))))
 
     (testing "Should omit records which are dependent"
       (let [records (list (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)})
@@ -110,6 +110,19 @@
             state (gen-state-helper {})]
         (is (= (report state 1 records)
                [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+                 "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]
+                ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
+                 "1800" "30" "0.5" "0.0" "/path/fi" "file-id-1.jpg"]]))))
+
+    (testing "Should duplicate records according to sighting quantity"
+      (let [records (list (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)})
+                          (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 10 0) :sighting-quantity 2})
+                          (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)}))
+            state (gen-state-helper {})]
+        (is (= (report state 1 records)
+               [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+                 "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]
+                ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
                  "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]
                 ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
                  "1800" "30" "0.5" "0.0" "/path/fi" "file-id-1.jpg"]]))))
