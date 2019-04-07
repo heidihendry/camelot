@@ -16,3 +16,4 @@ pom.xml.asc
 derby.log
 doc/_build
 /node_modules
+/.cpcache
