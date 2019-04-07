@@ -9,7 +9,7 @@ You can download it for your operating system below
 * [Windows](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-win32-x64.zip)
 * [MacOS](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-darwin-x64.zip)
 * [Linux](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-linux-x64.zip)
-* [Other](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0.zip)
+* [Other](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.1.zip)
 
 Camelot:
 
