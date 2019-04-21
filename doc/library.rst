@@ -27,7 +27,7 @@ holding the "control" key and clicking a photo. Allowing multiple photos
 to be selected is one technique Camelot uses to make processing of
 photos quicker and easier.
 
-Camelot's media collection shows images in page of 50. Clicking the left
+Camelot's media collection shows 150 images per page. Clicking the left
 and right arrows immediately above will change the page of photos
 displayed. "Selecting all" will select all photos on the page.
 
@@ -40,6 +40,14 @@ around them. A blue border indicates the image is "processed", while a
 red border is "attention needed". If an image is flagged as processed
 and attention needed, the border will be red; attention needed takes
 precedence.
+
+Enhancing photos
+~~~~~~~~~~~~~~~~
+
+Sometimes photos are over- or under-exposed which makes identification
+difficult. Controls for brightness and contrast are available to temporarily
+enhance the image for the purpose of identification by hovering over the
+bottom left hand corner of the currently viewed image.
 
 Flagging photos
 ~~~~~~~~~~~~~~~
