@@ -3,6 +3,7 @@
 ### 1.5.2
 #### Fixed
 * Fixes brief jarring experience moving between images in the library
+* Fixes an error while editing from the advanced UI which prevents saving
 
 ### 1.5.1
 #### Changed

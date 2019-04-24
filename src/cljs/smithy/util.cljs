@@ -56,8 +56,3 @@
     (if (nil? rid)
       base
       (str base "/" rid))))
-
-(defn settings-screen?
-  "Predicate for whether this view-state is for the settings screen."
-  [vs]
-  (= (get-screen-resource vs :type) :settings))

@@ -54,29 +54,6 @@
                                             [:complete :failed :ignored])))
              (max (reduce + 0 (map (fn [[k v]] v) (get-in data [:import-status :counts]))) 1))))
 
-(defn settings-hide!
-  "Hide the settings panel"
-  []
-  (let [navelt (js/document.getElementById "settings-nav")]
-    (aset navelt "className" (clojure.string/replace-first
-                              (aget navelt "className") #"active " ""))
-    (aset (js/document.getElementById "settings") "className" "")))
-
-(defn settings-show!
-  "Show the settings panel"
-  []
-  (let [navelt (js/document.getElementById "settings-nav")]
-    (aset navelt "className" (str "active " (.-className navelt)))
-    (aset (js/document.getElementById "settings") "className" "show")))
-
-(defn toggle-settings!
-  "Toggle the settings panel show state"
-  []
-  (let [navelt (js/document.getElementById "settings-nav")]
-    (if (clojure.string/includes? (.-className navelt) "active")
-      (settings-hide!)
-      (settings-show!))))
-
 (defn bulk-import-details-panel-component
   [data owner]
   (reify
@@ -205,12 +182,6 @@
     om/IRender
     (render [_]
       (cond
-        (= (:function data) "settings")
-        (dom/li #js {:id "settings-nav"
-                     :className "icon-only"
-                     :onClick #(toggle-settings!)}
-                (dom/a nil (dom/span #js {:className "fa fa-cogs fa-2x"})))
-
         (= (:function data) "bulk-import-progress")
         (dom/li #js {:id "bulk-import-progress-nav"
                      :onMouseOver #(om/update! data :show-bulk-import-details true)

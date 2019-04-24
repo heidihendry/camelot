@@ -112,13 +112,11 @@
   (let [cb (get-in vs [:events-ref success-key])]
     (when (validate vs)
       (om/update! resources key (deref (get vs :buffer)))
-      (nav/settings-hide!)
       (cnav/analytics-event "update" (util/get-resource-type-name vs))
       (rest/put-resource (util/get-url vs) {:data (deref (get vs :buffer))}
                          #(do
-                            (when-not (util/settings-screen? vs)
-                              (load-resource-children vs)
-                              (om/update! (get vs :screen) :mode :readonly))
+                            (load-resource-children vs)
+                            (om/update! (get vs :screen) :mode :readonly)
                             (when cb
                               (cb)))))))
 
@@ -127,10 +125,8 @@
   "Revert the buffer state and return to readonly mode."
   (om/update! vs :buffer (deref (get resources key)))
   (om/update! (get vs :selected-resource) :show-validations false)
-  (nav/settings-hide!)
   (cnav/analytics-event "cancel-update" (util/get-resource-type-name vs))
-  (when-not (util/settings-screen? vs)
-    (om/update! (get vs :screen) :mode :readonly))
+  (om/update! (get vs :screen) :mode :readonly)
   (let [cb (get-in vs [:events-ref event-key])]
     (when cb
       (cb))))
@@ -299,10 +295,7 @@
   []
   (om/update! (state/app-state-cursor) :events events)
   (om/update! (state/app-state-cursor) :actions actions)
-  (om/update! (state/app-state-cursor) :generators generators)
-  (when (:settings (:screens (state/app-state-cursor)))
-    (om/root smithy/settings-view-component state/app-state
-             {:target (js/document.getElementById "settings")})))
+  (om/update! (state/app-state-cursor) :generators generators))
 
 (defn page-content-view
   [type mode {:keys [id resource-id]}]
