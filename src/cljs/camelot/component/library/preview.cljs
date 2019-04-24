@@ -67,6 +67,12 @@
     (init-state [_]
       {:brightness 0
        :contrast 0})
+    om/IDidUpdate
+    (did-update [_ {:keys [media-uri]} {:keys [brightness contrast]}]
+      (when (and (not= media-uri (get selected :media-uri))
+                 (or (not (zero? brightness)) (not (zero? contrast))))
+        (om/set-state! owner :brightness 0)
+        (om/set-state! owner :contrast 0)))
     om/IRenderState
     (render-state [_ state]
       (dom/div #js {:className "preview"}
@@ -77,7 +83,9 @@
                         (dom/div nil
                                  (dom/img #js {:src (str (get selected :media-uri))
                                                :style #js {:filter (str "brightness(" (exp-perc (:brightness state)) ") "
-                                                                        "contrast(" (exp-perc (:contrast state)) ")")}})
+                                                                        "contrast(" (exp-perc (:contrast state)) ")")
+                                                           :backgroundImage (str "url("(get selected :media-uri) "/thumb)")
+                                                           :backgroundSize "cover"}})
                                  (om/build preview-adjustment-panel
                                            {:brightness (:brightness state)
                                             :update-brightness!
@@ -239,5 +247,4 @@
         (dom/div #js {:className "media-control-panel"}
                  (om/build media-details-panel-component data)
                  (dom/div #js {:className "mcp-container"}
-                          (om/build mcp-preview media
-                                    {:react-key (:selected-media-id data)})))))))
+                          (om/build mcp-preview media)))))))

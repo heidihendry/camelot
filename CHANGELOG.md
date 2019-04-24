@@ -1,5 +1,13 @@
 ## ChangeLog
 
+### 1.5.2
+#### Fixed
+* Fixes brief jarring experience moving between images in the library
+
+### 1.5.1
+#### Changed
+* Improves packaging for MacOS
+
 ### 1.5.0
 #### Added
 * Adds support for search operators (>, <=, !=, etc.)
