@@ -43,9 +43,9 @@ OS-specific releases (recommended)
 Camelot has OS-specific releases, which are the recommended way to install
 Camelot:
 
-* `Windows <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-win32-x64.zip>`__
-* `MacOS <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-darwin-x64.zip>`__
-* `Linux <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.0-linux-x64.zip>`__
+* `Windows <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2-win32-x64.zip>`__
+* `MacOS <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2-darwin-x64.zip>`__
+* `Linux <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2-linux-x64.zip>`__
 
 Start Camelot by running "Camelot" application in the extracted archive.
 
