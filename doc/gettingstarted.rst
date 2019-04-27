@@ -57,7 +57,7 @@ Java .jar release
 
 A Java .jar file is also available:
 
-* `Servers, 32-bit OSs and others <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.1.zip>`__
+* `Servers, 32-bit OSs and others <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2.zip>`__
 
 This release can be used on any operating system, though does not feature an
 administrative interface.
