@@ -30,12 +30,6 @@
           (nav/analytics-event "library-key" "M-f")
           (.preventDefault e))
 
-      ;; ctrl+m
-      (and (= (.-keyCode e) 77) (.-ctrlKey e))
-      (do (.focus (.getElementById js/document "media-collection-container"))
-          (nav/analytics-event "library-key" "C-m")
-          (.preventDefault e))
-
       ;; ctrl+i
       (and (= (.-keyCode e) 73) (.-ctrlKey e))
       (do (.click (.getElementById js/document "identify-selected"))
@@ -46,7 +40,60 @@
       (and (= (.-keyCode e) 68) (.-ctrlKey e))
       (do (.click (.getElementById js/document "details-panel-toggle"))
           (nav/analytics-event "library-key" "C-d")
-          (.preventDefault e)))))
+          (.preventDefault e))
+
+      ;; >
+      (and (= (.-keyCode e) 190) (.-shiftKey e))
+      (do (.click (.getElementById js/document "next-page"))
+          (nav/analytics-event "library-key" ">")
+          (.preventDefault e))
+
+      ;; <
+      (and (= (.-keyCode e) 188) (.-shiftKey e))
+      (do (.click (.getElementById js/document "prev-page"))
+          (nav/analytics-event "library-key" "<")
+          (.preventDefault e))
+
+      ;; f
+      (and (= (.-keyCode e) 70) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-flag"))
+        (nav/analytics-event "library-key" "f"))
+
+      ;; g
+      (and (= (.-keyCode e) 71) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-processed"))
+        (nav/analytics-event "library-key" "g"))
+
+      ;; r
+      (and (= (.-keyCode e) 82) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-reference-quality"))
+        (nav/analytics-event "library-key" "r"))
+
+      ;; c
+      (and (= (.-keyCode e) 67) (not (.-ctrlKey e)))
+      (do
+        (.click (.getElementById js/document "media-cameracheck"))
+        (nav/analytics-event "library-key" "c"))
+
+      ;; ctrl+a
+      (and (= (.-keyCode e) 65) (.-ctrlKey e))
+      (do
+        (.preventDefault e)
+        (.click (.getElementById js/document "select-all"))
+        (nav/analytics-event "library-key" "C-a"))
+
+      ;; <del>
+      (and (= (.-keyCode e) 46))
+      (do
+        (.preventDefault e)
+        (om/update! data :show-delete-media-prompt true)
+        (nav/analytics-event "library-key" "<del>"))
+
+      :else
+      (util/keyboard-select-media data e))))
 
 (defn tincan-listener
   [data opts]

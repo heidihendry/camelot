@@ -1,6 +1,9 @@
 ## ChangeLog
 
-### 1.5.2
+### 1.5.3
+#### Changed
+* Makes shortcut keys (such as the arrow keys) apply in more places in the library. https://gitlab.com/camelot-project/camelot/issues/180
+
 #### Fixed
 * Fixes bug where library image may be shown out of proportion. https://gitlab.com/camelot-project/camelot/issues/178
 

@@ -210,16 +210,12 @@ Keyboard shortcuts
 So that trap photos can be processed efficiently, the Library has a
 number of keyboard shortcuts:
 
--  **Control + m**: Focus the media collection panel
 -  **Control + d**: Toggle the details panel
 -  **Control + i**: Open the identify panel
 -  **Shift + <**: Go to the previous page of media
 -  **Shift + >**: Go to the next page of media
 -  **Control + f**: Focus the filter text input
 -  **Alt + f**: Reapply the current filter
-
-With the Media Collection panel focused (**Control + m**):
-
 -  **Control + a**: Select all media (or select none, if all are
    selected)
 -  **f**: Flag the currently selected media

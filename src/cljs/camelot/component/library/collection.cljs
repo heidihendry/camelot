@@ -9,56 +9,6 @@
             [clojure.string :as str]
             [camelot.component.library.identify :as identify]))
 
-(defn handle-key-event
-  [data e]
-  (cond
-    ;; >
-    (and (= (.-keyCode e) 190) (.-shiftKey e))
-    (do (.click (.getElementById js/document "next-page"))
-        (nav/analytics-event "library-key" ">")
-        (.preventDefault e))
-
-    ;; <
-    (and (= (.-keyCode e) 188) (.-shiftKey e))
-    (do (.click (.getElementById js/document "prev-page"))
-        (nav/analytics-event "library-key" "<")
-        (.preventDefault e))
-
-    (and (= (.-keyCode e) 70) (not (.-ctrlKey e)))
-    (do
-      (.click (.getElementById js/document "media-flag"))
-      (nav/analytics-event "library-key" "f"))
-
-    (and (= (.-keyCode e) 71) (not (.-ctrlKey e)))
-    (do
-      (.click (.getElementById js/document "media-processed"))
-      (nav/analytics-event "library-key" "g"))
-
-    (and (= (.-keyCode e) 82) (not (.-ctrlKey e)))
-    (do
-      (.click (.getElementById js/document "media-reference-quality"))
-      (nav/analytics-event "library-key" "r"))
-
-    (and (= (.-keyCode e) 67) (not (.-ctrlKey e)))
-    (do
-      (.click (.getElementById js/document "media-cameracheck"))
-      (nav/analytics-event "library-key" "c"))
-
-    (and (= (.-keyCode e) 65) (.-ctrlKey e))
-    (do
-      (.preventDefault e)
-      (.click (.getElementById js/document "select-all"))
-      (nav/analytics-event "library-key" "C-a"))
-
-    (and (= (.-keyCode e) 46))
-    (do
-      (.preventDefault e)
-      (om/update! data :show-delete-media-prompt true)
-      (nav/analytics-event "library-key" "<del>"))
-
-    :else
-    (util/keyboard-select-media data e)))
-
 (defn- media-thumb-class
   [data]
   (str "media"
@@ -363,7 +313,6 @@
         (when (:deferred-hydrate data)
           (util/hydrate-media data (util/media-ids-on-page data) (:metadata data))
           (om/update! data :deferred-hydrate nil))
-        (dom/div #js {:className "media-collection"
-                      :onKeyDown #(handle-key-event data %)}
+        (dom/div #js {:className "media-collection"}
                  (om/build media-collection-content-component data)
                  (om/build identify-selection-bar data))))))
