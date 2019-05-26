@@ -764,7 +764,7 @@ pre.field-input {
 .library .media-control-panel img {
     position: relative;
     float: left;
-    height: calc(100vh - 12rem);
+    max-height: calc(100vh - 12rem);
     max-width: 100%;
     border: 1px solid #999;
     margin-bottom: 0;

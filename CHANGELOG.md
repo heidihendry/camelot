@@ -2,6 +2,10 @@
 
 ### 1.5.2
 #### Fixed
+* Fixes bug where library image may be shown out of proportion. https://gitlab.com/camelot-project/camelot/issues/178
+
+### 1.5.2
+#### Fixed
 * Fixes brief jarring experience moving between images in the library
 * Fixes an error while editing from the advanced UI which prevents saving
 
