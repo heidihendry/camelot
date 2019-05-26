@@ -6,6 +6,7 @@
 
 #### Fixed
 * Fixes bug where library image may be shown out of proportion. https://gitlab.com/camelot-project/camelot/issues/178
+* Fixes scroll position resetting back to position of selected media intermittently. https://gitlab.com/camelot-project/camelot/issues/179
 
 ### 1.5.2
 #### Fixed

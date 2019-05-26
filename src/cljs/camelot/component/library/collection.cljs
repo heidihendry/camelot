@@ -51,13 +51,14 @@
 
 (defn calculate-scroll-update
   [data node]
-  (let [media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
+  (let [identification-panel-clearance 70
+        media-idxs (vec (map-indexed (fn [i e] [i e]) (util/media-ids-on-page data)))
         cur (ffirst (filter #(= (:selected-media-id data) (second %)) media-idxs))
         row (.floor js/Math (/ cur util/collection-columns))
         max-row (/ (count media-idxs) util/collection-columns)
         doc-height (.-scrollHeight node)
         top (.-scrollTop node)
-        elt-height (.-clientHeight node)
+        elt-height (- (.-clientHeight node) identification-panel-clearance)
         bottom (+ elt-height top)
         top-per (/ top doc-height)
         bottom-per (/ bottom doc-height)
@@ -106,7 +107,9 @@
     (did-update
       [this prev-props prev-state]
       (let [node (om/get-node owner)]
-        (set! (.-scrollTop node) (calculate-scroll-update data node))))
+        (when-not (= (:selected-media-id prev-props)
+                     (:selected-media-id data))
+          (set! (.-scrollTop node) (calculate-scroll-update data node)))))
     om/IRender
     (render [_]
       (if-let [ms (util/media-on-page data)]
