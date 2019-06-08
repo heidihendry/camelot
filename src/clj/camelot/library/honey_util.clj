@@ -115,7 +115,8 @@
               :camera.camera-id
               :trap-station-session.trap-station-session-start-date
               :trap-station-session.trap-station-session-id
-              :media.media-capture-timestamp]})
+              :media.media-capture-timestamp
+              :media.media-id]})
 
 (defn- ->negated-field-existence-query-part
   "Produce a partial query to match a field value based on non-existence."

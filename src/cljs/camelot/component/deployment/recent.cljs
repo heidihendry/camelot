@@ -6,7 +6,7 @@
             [camelot.component.survey.create :as create]
             [camelot.component.progress-bar :as progress-bar]
             [om.dom :as dom]
-            [cljs.core.async :refer [<! chan >!]]
+            [cljs.core.async :refer [<! chan >! put!]]
             [camelot.state :as state]
             [camelot.rest :as rest]
             [cljs-time.format :as tf]
@@ -43,18 +43,28 @@
   [file]
   (str (tr/translate ::format-not-supported (.-name file)) "\n"))
 
-(defn- upload-file
-  [sesscam-id owner file chan]
-  (if (is-uploadable? file)
-    (rest/post-x-raw "/import/upload" [["session-camera-id" sesscam-id]
-                                        ["file" file]]
-                     #(go (let [err (:error (:body %))]
-                            (>! chan {:file file
-                                      :success (nil? err)
-                                      :error err})))
-                     #(go (>! chan {:file file :success false})))
-    (add-upload-problem owner ["skipped" (.-type file)]
-                        (unsupported-str file))))
+(defn- upload-files
+  [sesscam-id owner fqueue result-chan]
+  (let [req-chan (chan)]
+    (go
+      (loop []
+        (let [{:keys [remaining]} (<! req-chan)
+              file (peek remaining)]
+          (if (is-uploadable? file)
+            (rest/post-x-raw "/import/upload" [["session-camera-id" sesscam-id]
+                                               ["file" file]]
+                             #(do (let [err (:error (:body %))]
+                                    (put! result-chan {:file file
+                                                       :success (nil? err)
+                                                       :error err})
+                                    (put! req-chan {:remaining (pop remaining)})))
+                             #(do (put! result-chan {:file file :success false})
+                                  (put! req-chan {:remaining (pop remaining)})))
+            (add-upload-problem owner ["skipped" (.-type file)]
+                                (unsupported-str file)))
+          (when (> (count remaining) 1)
+            (recur)))))
+    (put! req-chan {:remaining fqueue})))
 
 (defn- uploadable-count
   [fs]
@@ -90,11 +100,11 @@
               (nav/analytics-event "capture-upload" "success" (.-type (:file r))))
             (handle-upload-failure owner (:file r) (:error r)))
           (recur))))
-    (doseq [idx (range (.-length files))]
-      (upload-file (:trap-station-session-camera-id data)
-                   owner
-                   (aget files idx)
-                   upl-chan))))
+    (let [fqueue (into #queue [] (.from js/Array files))]
+      (upload-files (:trap-station-session-camera-id data)
+                    owner
+                    fqueue
+                    upl-chan))))
 
 (defn recent-deployment-list-component
   [data owner]

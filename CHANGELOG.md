@@ -3,6 +3,7 @@
 ### 1.5.3
 #### Changed
 * Makes shortcut keys (such as the arrow keys) apply in more places in the library. https://gitlab.com/camelot-project/camelot/issues/180
+* Improves ordering guarantees for uploaded images with identical timestamps. https://gitlab.com/camelot-project/camelot/issues/184
 
 #### Fixed
 * Fixes bug where count show for notification messages in the library may be incorrect. https://gitlab.com/camelot-project/camelot/issues/181
