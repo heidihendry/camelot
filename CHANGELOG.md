@@ -9,6 +9,7 @@
 * Fixes bug where count show for notification messages in the library may be incorrect. https://gitlab.com/camelot-project/camelot/issues/181
 * Fixes bug where library image may be shown out of proportion. https://gitlab.com/camelot-project/camelot/issues/178
 * Fixes scroll position resetting back to position of selected media intermittently. https://gitlab.com/camelot-project/camelot/issues/179
+* Fixes a bug which may result in files being incorrectly moved if the media directory is set before starting Camelot for the first time. https://gitlab.com/camelot-project/camelot/issues/182
 
 ### 1.5.2
 #### Fixed
