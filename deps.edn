@@ -19,7 +19,9 @@
   bk/ring-gzip {:mvn/version "0.1.1"}
   cheshire {:mvn/version "5.8.0"}
   cider/piggieback {:mvn/version "0.3.10" :mvn/scope "test" :mvn/exclusions [org.clojure/clojurescript]}
-  clj-commons/secretary {:mvn/version "1.2.4" :mvn/exclusions [org.clojure/clojurescript]}
+  clj-commons/secretary {:mvn/version "1.2.4" :mvn/exclusions [org.clojure/clojurescript com.cemerick/clojurescript.test]}
+  ;; Due to secretary depending on a SNAPSHOT release transitively
+  com.cemerick/clojurescript.test {:mvn/version "0.3.3" :mvn/scope "test"}
   clj-http {:mvn/version "2.2.0"}
   clj-time {:mvn/version "0.14.2"}
   cljs-http {:mvn/version "0.1.45" :mvn/exclusions [com.cognitect/transit-clj]}
