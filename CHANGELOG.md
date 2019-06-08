@@ -5,6 +5,7 @@
 * Makes shortcut keys (such as the arrow keys) apply in more places in the library. https://gitlab.com/camelot-project/camelot/issues/180
 
 #### Fixed
+* Fixes bug where count show for notification messages in the library may be incorrect. https://gitlab.com/camelot-project/camelot/issues/181
 * Fixes bug where library image may be shown out of proportion. https://gitlab.com/camelot-project/camelot/issues/178
 * Fixes scroll position resetting back to position of selected media intermittently. https://gitlab.com/camelot-project/camelot/issues/179
 

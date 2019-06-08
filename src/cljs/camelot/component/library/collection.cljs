@@ -266,15 +266,12 @@
     (render [_]
       (dom/div #js {:className "media-collection-content-wrapper"}
                (om/build subfilter-bar-component data)
-               (when (or (> (count (util/all-media-selected)) 1)
-                         (get-in data [:search :show-select-count-override]))
+               (let [{:keys [num description visible]} (:notification data)]
                  (dom/div #js {:className (str "selected-count"
-                                               (if (or (> (get-in data [:search :show-select-count]) 0)
-                                                       (get-in data [:search :show-select-count-override]))
+                                               (if visible
                                                  ""
                                                  " hide-selected"))}
-                          (str (count (util/all-media-selected)) " "
-                               (get-in data [:search :show-select-action]))))
+                          (str num " " description)))
                (om/build media-item-collection-wrapper data)))))
 
 (defn show-identification-bar?

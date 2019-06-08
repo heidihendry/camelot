@@ -88,25 +88,34 @@
                     :media-reference-quality
                     :media-processed]))
 
-(defn hide-select-message
-  []
-  (om/transact! (:search (state/library-state)) :show-select-count dec)
-  (om/update! (state/library-state) [:search :show-select-count-override] false))
+(defn hide-notification-message
+  [msg]
+  (om/transact! (state/library-state) :notification
+                #(if (= % msg)
+                   (assoc % :visible false)
+                   %)))
+
+(defn show-notification-message
+  [n description]
+  (let [msg {:num n
+             :description description
+             :visible true}]
+    (om/update! (state/library-state) :notification msg)
+    (js/setTimeout #(hide-notification-message msg) 1600)))
 
 (defn show-select-message
   []
-  (om/transact! (:search (state/library-state)) :show-select-count inc)
-  (.setTimeout js/window hide-select-message 1600))
+  (let [n (count (all-media-selected))
+        action (tr/translate ::selected)]
+    (show-notification-message n action)))
 
 (defn show-identified-message
-  []
-  (om/transact! (:search (state/library-state)) :show-select-count inc)
-  (om/update! (state/library-state) [:search :show-select-action] (tr/translate ::identified))
-  (om/update! (state/library-state) [:search :show-select-count-override] true)
-  (.setTimeout js/window hide-select-message 1600))
+  [n]
+  (let [action (tr/translate ::identified)]
+    (show-notification-message n action)))
 
 (defn set-flag-states
-  [flag-state-map]
+  [flag-state-map cb]
   (let [selected (all-media-selected)]
     (rest/post-resource "/library/media/flags"
                         {:data (mapv #(merge (get-media-flags %)
@@ -115,50 +124,47 @@
                         (fn []
                           (doall (map
                                   #(doall (map (fn [[k v]] (om/update! % k v)) (vec flag-state-map)))
-                                  selected))))))
+                                  selected))
+                          (cb (count selected))))))
 
 (defn set-attention-needed
   [flag-state]
-  (om/update! (:search (state/library-state)) :show-select-action
-              (if flag-state
+  (let [action (if flag-state
                 (tr/translate ::flagged)
-                (tr/translate ::unflagged)))
-  (show-select-message)
-  (let [calc-state (if flag-state
+                (tr/translate ::unflagged))
+        calc-state (if flag-state
                      {:media-attention-needed flag-state
                       :media-processed false}
                      {:media-attention-needed flag-state})]
-    (set-flag-states calc-state)))
+    (set-flag-states calc-state
+                     #(show-notification-message % action))))
 
 (defn set-reference-quality
   [flag-state]
-  (om/update! (:search (state/library-state))
-              :show-select-action (if flag-state
-                                    (tr/translate ::reference-quality)
-                                    (tr/translate ::ordinary-quality)))
-  (show-select-message)
-  (set-flag-states {:media-reference-quality flag-state}))
+  (let [action (if flag-state
+                 (tr/translate ::reference-quality)
+                 (tr/translate ::ordinary-quality))]
+    (set-flag-states {:media-reference-quality flag-state}
+                     #(show-notification-message % action))))
 
 (defn set-processed
   [flag-state]
-  (om/update! (:search (state/library-state)) :show-select-action
-              (if flag-state
-                (tr/translate ::processed)
-                (tr/translate ::unprocessed)))
-  (show-select-message)
-  (set-flag-states {:media-processed flag-state}))
+  (let [action (if flag-state
+                 (tr/translate ::processed)
+                 (tr/translate ::unprocessed))]
+    (set-flag-states {:media-processed flag-state}
+                     #(show-notification-message % action))))
 
 (defn set-cameracheck
   [flag-state]
-  (om/update! (:search (state/library-state)) :show-select-action
-              (if flag-state
-                (tr/translate ::test-fires)
-                (tr/translate ::not-test-fires)))
-  (show-select-message)
-  (set-flag-states (if flag-state
-                     {:media-cameracheck true
-                      :media-processed true}
-                     {:media-cameracheck false})))
+  (let [action (if flag-state
+                 (tr/translate ::test-fires)
+                 (tr/translate ::not-test-fires))]
+    (set-flag-states (if flag-state
+                       {:media-cameracheck true
+                        :media-processed true}
+                       {:media-cameracheck false})
+                     #(show-notification-message % action))))
 
 (defn load-taxonomies
   ([data]
@@ -198,17 +204,13 @@
 
 (defn select-all*
   []
-  (om/update! (:search (state/library-state)) :show-select-action
-              (tr/translate ::selected))
-  (show-select-message)
-  (select-all))
+  (select-all)
+  (show-select-message))
 
 (defn deselect-all*
   []
-  (om/update! (:search (state/library-state)) :show-select-action
-              (tr/translate ::selected))
-  (show-select-message)
-  (deselect-all))
+  (deselect-all)
+  (show-select-message))
 
 (defn updated-select-position
   [media-ids e idx]
@@ -246,13 +248,14 @@
           (deselect-all data)
           (dorun (map #(om/update! % :selected true) media-in-range))
           (om/update! data :selected-media-id (second (nth media-idxs new-endpoint)))
-          (om/update! (:search (state/library-state)) :show-select-action (tr/translate ::selected))
           (show-select-message))
         (let [id (second (nth media-idxs new-endpoint))]
           (when-not ctrl
             (deselect-all data))
           (if ctrl
-            (om/transact! (find-with-id data id) :selected not)
+            (do
+              (om/transact! (find-with-id data id) :selected not)
+              (show-select-message))
             (om/update! (find-with-id data id) :selected true))
           (om/update! data :selected-media-id id)
           (om/update! data :anchor-media-id id))))

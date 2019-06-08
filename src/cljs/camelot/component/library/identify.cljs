@@ -63,7 +63,7 @@
                                                              (key-by-user-key @sighting-fields))))
                                     (om/update! (second %) :media-processed true))
                                (zipmap (:body resp) all-selected)))
-          (util/show-identified-message))
+          (util/show-identified-message (count all-selected)))
         update-sighting
         (fn [resp] (om/transact! (util/find-with-id (state/library-state) selected)
                                  :sightings
