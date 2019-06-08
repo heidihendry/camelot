@@ -6,10 +6,10 @@ The latest version of Camelot is: **1.5.2**
 
 You can download it for your operating system below
 
-* [Windows](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2-win32-x64.zip)
-* [MacOS](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2-darwin-x64.zip)
-* [Linux](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2-linux-x64.zip)
-* [Other](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.2.zip)
+* [Windows](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.3-win32-x64.zip)
+* [MacOS](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.3-darwin-x64.zip)
+* [Linux](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.3-linux-x64.zip)
+* [Other](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.5.3.zip)
 
 Camelot:
 
