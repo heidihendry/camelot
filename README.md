@@ -2,7 +2,7 @@
 
 Camelot is open-source camera trapping software for wildlife researchers and conservationists.
 
-The latest version of Camelot is: **1.5.2**
+The latest version of Camelot is: **1.5.3**
 
 You can download it for your operating system below
 
