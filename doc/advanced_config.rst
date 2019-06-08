@@ -1,5 +1,9 @@
-Advanced configuration
-----------------------
+Configuration Internals
+-----------------------
+
+This setting describes the internals of Camelot's data storage locations and
+configuration files. This is intended as a resource for very specialised use
+cases and for IT professionals.
 
 Camelot has two directories: one for configuration, and one for data
 storage. The location of these directories depends on the OS.
@@ -24,7 +28,7 @@ Configuration
 -  **MacOS**: $HOME/Library/Preferences/camelot
 -  **Linux**: $HOME/.config/camelot
 
-Data Directory
+Data directory
 ~~~~~~~~~~~~~~
 
 The data directory will, by default, contain three subdirectories:
@@ -43,7 +47,7 @@ alternate directories, as described below.
 Each of the ``Database``, ``Media`` and ``FileStore`` directories should
 be backed up routinely.
 
-Config Directory
+Config directory
 ~~~~~~~~~~~~~~~~
 
 config.json

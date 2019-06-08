@@ -45,12 +45,11 @@ effect the next time Camelot is started.
 
 These settings fall into 3 broad categories:
 
-1. Application configuration
-2. Storage configuration
-3. System configuration
+1. Application settings
+2. Advanced settings
 
-Application configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Application settings
+^^^^^^^^^^^^^^^^^^^^
 
 Allows customisation of the way that the Camelot or its user interface behaves.
 
@@ -60,17 +59,37 @@ Allows customisation of the way that the Camelot or its user interface behaves.
   anonymous data about how the software is being used, in order to help
   improve the software.
 
-Storage configuration
-^^^^^^^^^^^^^^^^^^^^^
+Advanced settings
+^^^^^^^^^^^^^^^^^
 
-Allows customisation of where Camelot stores its data.
+Advanced settings are described below. These are considered advanced as they
+provide a great deal of flexibility, however may have surprising or
+undesirable results.
 
-* **Media location**: where Camelot's images should be stored.  Note that this
+Should you have any doubts about these settings please reach out via the
+|group_link|.
+
+.. |group_link| raw:: html
+
+   <a href="https://groups.google.com/forum/#!forum/camelot-project" target="_blank">forums</a>
+
+Storage locations
+=================
+
+These settings allows customisation of where Camelot stores its data.
+
+**Important**: Camelot will not move your data when customising any of these
+locations. When changing any of these locations, any existing data you wish to
+continue to use **must** be moved to this location manually.
+
+* **Media location**: where Camelot's images should be stored. **Note** that this
   should not be the same location as *you* store your images. Camelot will
   maintain its own copy of any images, folders and images stored in this
   location **should not** be modified.
 * **Database location**: the folder where Camelot will store its database. The
-  Database folder **must not** be modified.
+  Database folder **must not** be modified.  If you have an existing database
+  you wish to use, this should be set to the **parent** of the "Database"
+  folder.
 * **FileStore location**: any files related to a survey can be uploaded to
   Camelot under the "survey files" menu. These files will be stored in this
   folder.  Files and folders in this location **should not** be modified.
@@ -80,12 +99,8 @@ Allows customisation of where Camelot stores its data.
   stored.
 * **Log file location**: The location where Camelot log files are stored.
 
-**Important**: Camelot will not move your data when customising any of these
-locations. When changing any of these locations, any existing data which
-Camelot is to use must also be moved to this location manually.
-
 System configuration
-^^^^^^^^^^^^^^^^^^^^
+====================
 
 Allows customisation at the system level around how Camelot is started and how it runs.
 
@@ -97,15 +112,3 @@ Allows customisation at the system level around how Camelot is started and how i
 .. |large_amounts_of_data| raw:: html
 
    <a href="scale.html#memory">large amounts of data</a>
-
-Advanced configuration
-~~~~~~~~~~~~~~~~~~~~~~
-
-Settings can be customised without the aid of the administration UI. This may
-be useful if using the Camelot .jar release alone, or you're looking for some
-very specific settings otherwise not available through the UI.  You can find
-out more about this configuration under the |advanced_configuration| chapter.
-
-.. |advanced_configuration| raw:: html
-
-   <a href="advanced_config.html">advanced configuration</a>
