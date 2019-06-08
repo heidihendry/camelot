@@ -8,13 +8,32 @@
   (:import
    (org.apache.commons.lang3 SystemUtils)))
 
+(def timestamp-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
+
+(def timestamp-columns
+  [:media-capture-timestamp
+   :media-updated
+   :media-created
+   :sighting-updated
+   :sighting-created
+   :taxonomy-created
+   :taxonomy-updated
+   :trap-station-session-start-date
+   :trap-station-session-end-date])
+
+(defn- format-timestamps
+  [record]
+  (reduce #(update %1 %2 (partial tf/unparse timestamp-formatter))
+          record timestamp-columns))
+
 (defn report-output
   [state {:keys [survey-id]}]
   {:columns [:all]
    :filters [#(not (nil? (:media-id %)))
              #(= (:survey-id %) survey-id)]
    :transforms [#(assoc % :absolute-path
-                        (media/path-to-media state :original %))]
+                        (media/path-to-media state :original %))
+                format-timestamps]
    :options {:leave-blank-fields-empty true}})
 
 (defn form-smith
