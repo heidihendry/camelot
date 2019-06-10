@@ -3,12 +3,18 @@
    [clojure.tools.logging :as log]
    [camelot.system.http.transit :as transit]
    [camelot.system.state :as state]
-   [camelot.http.core :refer [app-routes]]
+   [compojure.core :as compojure]
+   [camelot.http.core :as http]
+   [camelot.http.api.core :as api]
    [camelot.util.network :as network]
    [camelot.util.desktop :as desktop]
    [camelot.util.version :as version]
+   [clj-time.coerce :as c]
    [com.stuartsierra.component :as component]
    [ring.adapter.jetty :refer [run-jetty]]
+   [muuntaja.middleware :as muuntaja-middleware]
+   [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
+   [ring.middleware.keyword-params :refer [wrap-keyword-params]]
    [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
    [ring.middleware.params :refer [wrap-params]]
@@ -42,18 +48,30 @@
 (defn http-handler
   "Handler for HTTP requests"
   []
-  (-> app-routes
-      wrap-params
-      wrap-system
-      errors-to-internal-server-error
-      wrap-multipart-params
-      (wrap-session {:store (cookie-store {:key cookie-store-key})})
-      (wrap-transit-response {:encoding :json, :opts transit/transit-write-options})
-      (wrap-transit-params {:opts transit/transit-read-options})
-      wrap-stacktrace-log
-      (wrap-defaults api-defaults)
-      wrap-with-logger
-      wrap-gzip))
+  (compojure/routes
+   (-> http/app-routes
+       wrap-params
+       wrap-system
+       errors-to-internal-server-error
+       wrap-multipart-params
+       (wrap-session {:store (cookie-store {:key cookie-store-key})})
+       (wrap-transit-response {:encoding :json, :opts transit/transit-write-options})
+       (wrap-transit-params {:opts transit/transit-read-options})
+       wrap-stacktrace-log
+       (wrap-defaults api-defaults)
+       wrap-with-logger
+       wrap-gzip)
+   (-> api/core-api
+       wrap-system
+       muuntaja-middleware/wrap-format
+       errors-to-internal-server-error
+       wrap-multipart-params
+       (wrap-session {:store (cookie-store {:key cookie-store-key})})
+       wrap-stacktrace-log
+       wrap-json-response
+       (wrap-defaults api-defaults)
+       wrap-with-logger
+       wrap-gzip)))
 
 (defrecord HttpServer [http-port]
   component/Lifecycle

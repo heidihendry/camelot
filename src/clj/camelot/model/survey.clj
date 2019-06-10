@@ -1,7 +1,9 @@
 (ns camelot.model.survey
   "Survey data model and persistence."
   (:require
+   [cats.monad.either :as either]
    [schema.core :as s]
+   [clojure.tools.logging :as log]
    [camelot.util.db :as db]
    [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
@@ -65,13 +67,25 @@
   (let [ts (trap-station/get-all-for-survey state (:survey-id survey))]
     (assoc survey :survey-bulk-import-available (empty? ts))))
 
-(s/defn get-specific :- (s/maybe Survey)
-  [state :- State
-   id :- s/Int]
+(defn get-specific
+  [state id]
   (some->> {:survey-id id}
            (query state :get-specific)
            first
            (assoc-bulk-import-available state)
+           survey))
+
+(defn get-single
+  [state id]
+  (if-let [s (get-specific state id)]
+    (either/right s)
+    (either/left {:error/type :error.type/not-found})))
+
+(defn get-specific-by-name
+  [state data]
+  (some->> data
+           (query state :get-specific-by-name)
+           first
            survey))
 
 (s/defn create! :- Survey
@@ -82,12 +96,28 @@
     (sighting-field/create-default-fields! state (:survey-id s))
     s))
 
-(s/defn update! :- Survey
-  [state :- State
-   id :- s/Int
-   data :- TSurvey]
+(defn update!
+  [state id data]
   (query state :update! (merge data {:survey-id id}))
   (survey (get-specific state id)))
+
+(defn patch!
+  [state id data]
+  (if-let [entity (get-specific state id)]
+    (let [named (get-specific-by-name state (select-keys data [:survey-name]))]
+      (if (and named (not= (:survey-id named) id))
+        (either/left {:error/type :error.type/conflict})
+        (either/right (->> data
+                           (merge entity)
+                           tsurvey
+                           (update! state id)))))
+    (either/left {:error/type :error.type/not-found})))
+
+(defn post!
+  [state data]
+  (if (get-specific-by-name state (select-keys data [:survey-name]))
+    (either/left {:error/type :error.type/conflict})
+    (either/right (create! state (tsurvey data)))))
 
 (defn- get-active-cameras
   [state params]
@@ -96,25 +126,23 @@
        (map :camera-id)
        (remove nil?)))
 
-(s/defn delete!
-  [state :- State
-   id :- s/Int]
-  (let [fs (media/get-all-files-by-survey state id)
-        ps {:survey-id id}
-        cams (get-active-cameras state ps)]
-    (media/delete-files! state fs)
-    (file/delete-recursive (filesystem/filestore-survey-directory state id))
-    (camera/make-available state cams)
-    (query state :delete! ps))
-  nil)
+(defn delete!
+  [state id]
+  (if-let [survey (get-specific state id)]
+    (let [fs (media/get-all-files-by-survey state id)
+          ps {:survey-id id}
+          cams (get-active-cameras state ps)]
+      (media/delete-files! state fs)
+      (file/delete-recursive (filesystem/filestore-survey-directory state id))
+      (camera/make-available state cams)
+      (query state :delete! ps)
+      id)))
 
-(s/defn get-specific-by-name :- (s/maybe Survey)
-  [state :- State
-   data :- {:survey-name s/Str}]
-  (some->> data
-           (query state :get-specific-by-name)
-           (first)
-           (survey)))
+(defn mdelete!
+  [state id]
+  (if (delete! state id)
+    (either/right id)
+    (either/left {:error/type :error.type/not-found})))
 
 (s/defn get-or-create! :- Survey
   [state :- State

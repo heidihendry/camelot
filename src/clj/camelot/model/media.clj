@@ -62,9 +62,8 @@
   [state :- State]
   (map media (query state :get-all*)))
 
-(sch/defn get-all-files-by-survey :- [sch/Str]
-  [state :- State
-   id :- sch/Int]
+(defn get-all-files-by-survey
+  [state id]
   (map :media-file (query state :get-all-files-by-survey {:survey-id id})))
 
 (defn get-with-ids
@@ -132,11 +131,14 @@
 (defn path-to-file
   "Return the full path to an image file."
   [state variant filename orig-format]
-  (let [mpath (state/lookup-path state :media)
-        prefix (if (= variant :original) "" (str (name variant) "-"))
-        fmt (if (= variant :original) orig-format "png")]
-    (io/file mpath (apply str (take 2 filename))
-             (str prefix filename "." fmt))))
+  (try
+    (let [mpath (state/lookup-path state :media)
+          prefix (if (= variant :original) "" (str (name variant) "-"))
+          fmt (if (= variant :original) orig-format "png")]
+      (io/file mpath (apply str (take 2 filename))
+               (str prefix filename "." fmt)))
+    (catch Exception e
+      "")))
 
 (defn path-to-media
   "Return the path to a file given a media record"

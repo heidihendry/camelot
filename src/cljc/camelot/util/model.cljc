@@ -151,6 +151,14 @@
                   :unmappable true
                   :table :survey
                   :export-excluded true}
+   :survey-created {:datatype :timestamp
+                    :required true
+                    :table :survey
+                    :unmappable true}
+   :survey-updated {:datatype :timestamp
+                    :required true
+                    :table :survey
+                    :unmappable true}
    :survey-site-id {:datatype :integer
                     :required true
                     :table :survey-site
