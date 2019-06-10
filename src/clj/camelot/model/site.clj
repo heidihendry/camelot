@@ -107,7 +107,7 @@
 (s/fdef patch!
         :args (s/cat :state ::sysspec/state
                      :id int?
-                     :data ::site-spec/tsite)
+                     :data ::site-spec/psite)
         :ret (cats-spec/either? ::error-spec/error
                                 ::site-spec/site))
 

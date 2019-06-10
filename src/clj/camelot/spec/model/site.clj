@@ -14,9 +14,18 @@
 (s/def ::site-area (s/nilable number?))
 (s/def ::site-notes (s/nilable string?))
 
-(s/def ::tsite
+(s/def ::psite
   (s/keys :opt-un [::site-name
                    ::site-sublocation
+                   ::site-city
+                   ::site-state-province
+                   ::site-country
+                   ::site-area
+                   ::site-notes]))
+
+(s/def ::tsite
+  (s/keys :req-un [::site-name]
+          :opt-un [::site-sublocation
                    ::site-city
                    ::site-state-province
                    ::site-country
