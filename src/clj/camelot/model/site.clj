@@ -1,36 +1,19 @@
 (ns camelot.model.site
   "Site models and data access."
   (:require
-   [schema.core :as sch]
+   [camelot.spec.model.site :as site-spec]
+   [camelot.spec.error :as error-spec]
    [camelot.spec.system :as sysspec]
-   [clojure.spec.alpha :as s]
-   [clj-time.spec :as tspec]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
-   [camelot.model.camera :as camera]))
+   [camelot.model.camera :as camera]
+   [camelot.spec.cats :as cats-spec]
+   [cats.monad.either :as either]
+   [schema.core :as sch]
+   [clojure.spec.alpha :as s]))
 
 (def query (db/with-db-keys :sites))
-
-(s/def ::site-id int?)
-(s/def ::site-created ::tspec/date-time)
-(s/def ::site-updated ::tspec/date-time)
-(s/def ::site-name string?)
-(s/def ::site-sublocation (s/nilable string?))
-(s/def ::site-city (s/nilable string?))
-(s/def ::site-state-province (s/nilable string?))
-(s/def ::site-country (s/nilable string?))
-(s/def ::site-area (s/nilable number?))
-(s/def ::site-notes (s/nilable string?))
-
-(s/def ::tsite
-  (s/keys :req-un [::site-name]
-          :opt-un [::site-sublocation
-                   ::site-city
-                   ::site-state-province
-                   ::site-country
-                   ::site-area
-                   ::site-notes]))
 
 (sch/defrecord TSite
     [site-name :- sch/Str
@@ -41,18 +24,6 @@
      site-area :- (sch/maybe sch/Num)
      site-notes :- (sch/maybe sch/Str)]
   {sch/Any sch/Any})
-
-(s/def ::site
-  (s/keys :req-un [::site-id
-                   ::site-created
-                   ::site-updated
-                   ::site-name]
-          :opt-un [::site-sublocation
-                   ::site-city
-                   ::site-state-province
-                   ::site-country
-                   ::site-area
-                   ::site-notes]))
 
 (sch/defrecord Site
     [site-id :- sch/Int
@@ -77,7 +48,7 @@
 
 (s/fdef get-all
         :args (s/cat :state ::sysspec/state)
-        :ret (s/coll-of ::site))
+        :ret (s/coll-of ::site-spec/site))
 
 (sch/defn get-specific :- (sch/maybe Site)
   [state :- State
@@ -89,7 +60,18 @@
 
 (s/fdef get-specific
         :args (s/cat :state ::sysspec/state :id int?)
-        :ret (s/or :not-found nil? :site ::site))
+        :ret (s/or :not-found nil? :site ::site-spec/site))
+
+(defn get-single
+  [state id]
+  (if-let [s (get-specific state id)]
+    (either/right s)
+    (either/left {:error/type :error.type/not-found})))
+
+(s/fdef get-single
+        :args (s/cat :state ::sysspec/state :id int?)
+        :ret (cats-spec/either? ::error-spec/error
+                                ::site-spec/site))
 
 (defn create!
   "Create a site from the passed site data."
@@ -98,8 +80,8 @@
     (site (get-specific state (int (:1 record))))))
 
 (s/fdef create!
-        :args (s/cat :state ::sysspec/state :data ::tsite)
-        :ret ::site)
+        :args (s/cat :state ::sysspec/state :data ::site-spec/tsite)
+        :ret ::site-spec/site)
 
 (defn update!
   "Update the site."
@@ -110,8 +92,34 @@
 (s/fdef update!
         :args (s/cat :state ::sysspec/state
                      :id int?
-                     :data ::tsite)
-        :ret ::site)
+                     :data ::site-spec/tsite)
+        :ret ::site-spec/site)
+
+(defn patch!
+  "Update properties of a site."
+  [state id data]
+  (if-let [entity (get-specific state id)]
+    (either/right (->> data
+                       (merge entity)
+                       (update! state id)))
+    (either/left {:error/type :error.type/not-found})))
+
+(s/fdef patch!
+        :args (s/cat :state ::sysspec/state
+                     :id int?
+                     :data ::site-spec/tsite)
+        :ret (cats-spec/either? ::error-spec/error
+                                ::site-spec/site))
+
+(defn post!
+  [state data]
+  (either/right (create! state (tsite data))))
+
+(s/fdef post!
+        :args (s/cat :state ::sysspec/state
+                     :data ::site-spec/tsite)
+        :ret (cats-spec/either? ::error-spec/error
+                                ::site-spec/site))
 
 (defn- get-active-cameras
   [state params]
@@ -120,21 +128,34 @@
        (map :camera-id)
        (remove nil?)))
 
-(sch/defn delete!
-  [state :- State
-   id :- sch/Int]
-  (let [fs (media/get-all-files-by-site state id)
-        ps {:site-id id}
-        cams (get-active-cameras state ps)]
-    (query state :delete! ps)
-    (media/delete-files! state fs)
-    (camera/make-available state cams))
-  nil)
+(defn delete!
+  [state id]
+  (if-let [site (get-specific state id)]
+    (let [fs (media/get-all-files-by-site state id)
+          ps {:site-id id}
+          cams (get-active-cameras state ps)]
+      (query state :delete! ps)
+      (media/delete-files! state fs)
+      (camera/make-available state cams)
+      id)))
 
 (s/fdef delete!
         :args (s/cat :state ::sysspec/state
                      :id int?)
-        :ret nil?)
+        :ret (s/nilable int?))
+
+(sch/defn mdelete!
+  [state :- State
+   id :- sch/Int]
+  (if (delete! state id)
+    (either/right id)
+    (either/left {:error/type :error.type/not-found})))
+
+(s/fdef mdelete!
+        :args (s/cat :state ::sysspec/state
+                     :id int?)
+        :ret (cats-spec/either? ::error-spec/error
+                                int?))
 
 (defn- get-specific-by-name
   [state data]
@@ -150,5 +171,5 @@
       (create! state data)))
 
 (s/fdef get-or-create!
-        :args (s/cat :state ::sysspec/state :data ::tsite)
-        :ret ::site)
+        :args (s/cat :state ::sysspec/state :data ::site-spec/tsite)
+        :ret ::site-spec/site)
