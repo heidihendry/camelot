@@ -4,7 +4,7 @@
    [camelot.util.state :as state]
    [camelot.system.core :as system]
    [environ.core :refer [env]]
-   [clojure.tools.nrepl.server :as nrepl]
+   [nrepl.server :as nrepl]
    [clojure.tools.cli :refer [parse-opts]])
   (:gen-class))
 

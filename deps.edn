@@ -52,6 +52,7 @@
   riddley {:mvn/version "0.2.0"}
   ring {:mvn/version "1.6.3"}
   ring-transit {:mvn/version "0.1.4" :mvn/exclusions [com.cognitect/transit-clj]}
+  nrepl/nrepl {:mvn/version "0.6.0"}
   funcool/cats {:mvn/version "2.3.2"}
   metosin/muuntaja {:mvn/version "0.6.4"}
   ring-middleware-format {:mvn/version "0.7.4"}
