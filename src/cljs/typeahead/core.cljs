@@ -320,25 +320,20 @@
                                              :ref "search-input"
                                              :disabled (if (:disabled state) "disabled" "")
                                              :onKeyDown (fn [e]
+                                                          (.stopPropagation e)
                                                           (cond
-                                                            (and (= (.-keyCode e) 65) (.-ctrlKey e))
-                                                            (.stopPropagation e)
-
                                                             (= (.-keyCode e) 38)
                                                             (do (om/update-state! owner ::selection-index dec)
                                                                 (.preventDefault e)
-                                                                (.stopPropagation e)
                                                                 (om/refresh! owner))
 
                                                             (= (.-keyCode e) 40)
                                                             (do (om/update-state! owner ::selection-index inc)
                                                                 (.preventDefault e)
-                                                                (.stopPropagation e)
                                                                 (om/refresh! owner))
 
                                                             (= (.-keyCode e) 13)
                                                             (do (.preventDefault e)
-                                                                (.stopPropagation e)
                                                                 (if (not (and (empty? v) (empty? ctx)))
                                                                   (let [comps (complete (or (and (::context state) ctx)
                                                                                             data) v)]
