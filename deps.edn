@@ -1,4 +1,5 @@
-{:deps
+{:paths ["src/clj" "src/cljc" "src"]
+ :deps
  {camelot/market {:git/url "https://gitlab.com/camelot-project/camelot-market"
                   :sha "e477ffca34c42e6be1012fb875f34812d221ebbd"}
 
@@ -12,7 +13,7 @@
   org.clojure/java.jdbc {:mvn/version "0.4.2"}
   org.clojure/math.combinatorics {:mvn/version "0.1.4"}
   org.clojure/tools.namespace {:mvn/version "0.2.11"}
-  org.clojure/tools.cli {:mvn/version "0.3.5"}
+  org.clojure/tools.cli {:mvn/version "0.3.7"}
 
   ;; Required by tower; later version avoids shadowing of clojure.core
   bk/ring-gzip {:mvn/version "0.1.1"}
@@ -60,4 +61,6 @@
   ring/ring-defaults {:mvn/version "0.3.2"}
   ring/ring-json {:mvn/version "0.4.0"}
   weasel {:mvn/version "0.7.0" :mvn/scope "test" :mvn/exclusions [org.clojure/clojurescript]}
-  yesql {:mvn/version "0.5.2"}}}
+  yesql {:mvn/version "0.5.2"}}
+ :aliases
+ {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-418"}}}}}
