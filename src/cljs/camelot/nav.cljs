@@ -1,10 +1,11 @@
 (ns camelot.nav
-  (:require [goog.events :as events]
-            [goog.history.EventType :as EventType]
-            [secretary.core :as secretary :refer-macros [defroute]]
-            [om.core :as om]
-            [camelot.state :as state]
-            [clojure.string :as str])
+  (:require
+   [camelot.nav-util :as navutil]
+   [goog.events :as events]
+   [goog.history.EventType :as EventType]
+   [secretary.core :as secretary :refer-macros [defroute]]
+   [om.core :as om]
+   [camelot.state :as state])
   (:import [goog History]
            [goog.history EventType]))
 
@@ -88,15 +89,7 @@
   (om/update! (state/app-state-cursor) :nav-history [])
   (set-token! history token))
 
-(defn nav-up-url
-  [token levels]
-  {:pre [(and (string? token) (number? levels))]}
-  (let [url (reduce #(str/replace % #"(.*)/.+?$" "$1") token (range levels))]
-    (if (or (= url "/#") (= url ""))
-      "/#/organisation"
-      url)))
-
 (defn nav-up!
   "Navigate up 1 or more levels."
   ([] (nav-up! 1))
-  ([levels] (nav! (nav-up-url (get-token) levels))))
+  ([levels] (nav! (navutil/nav-up-url (get-token) levels))))

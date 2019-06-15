@@ -7,7 +7,7 @@
       [cljs.test :refer-macros [deftest is testing use-fixtures]])
    [schema.test :as st]))
 
-(use-fixtures :once st/validate-schemas)
+#?(:clj (use-fixtures :once st/validate-schemas))
 
 (deftest test-latitude
   (testing "Latitude"

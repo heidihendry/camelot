@@ -1,7 +1,7 @@
-(ns camelot.nav-test
+(ns camelot.nav-util-test
   (:require-macros [cljs.test :refer (is deftest testing)])
   (:require [cljs.test]
-            [camelot.nav :as sut]))
+            [camelot.nav-util :as sut]))
 
 (deftest nav-url-test
   (testing "Nav Up"
