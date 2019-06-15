@@ -2,8 +2,7 @@
   "name": "camelot",
   "version": "0.1.0",
   "devDependencies": {
-    "karma": "4.0.0",
-    "karma-cljs-test": "0.1.0",
-    "karma-firefox-launcher": "1.1.0"
+    "isomorphic-ws": "^4.0.1",
+    "ws": "^7.0.0"
   }
 }

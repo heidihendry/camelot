@@ -1,14 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 if [ "$1" = "clj" ]; then
-    lein with-profiles +test,-dev test
+    clojure -A:test -m kaocha.runner unit "${@:2}"
 elif [ "$1" = "cljs" ]; then
     npm install
-    lein with-profiles +test,-dev doo firefox-headless test once
+    clojure -A:test -m kaocha.runner unit-cljs
 else
     npm install
-    lein with-profiles +test,-dev test
-    lein with-profiles +test,-dev run -m figwheel.main -m camelot.test-runner
+    clojure -A:test -m kaocha.runner unit unit-cljs "${@:2}"
 fi

@@ -8,7 +8,6 @@
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
    [schema.core :as s]
-   [ring.middleware.reload :refer [wrap-reload]]
    [figwheel-sidecar.repl-api :as figwheel]))
 
 ;; Let Clojure warn you when it needs to reflect on types, or when it does math
@@ -18,9 +17,6 @@
 (set! *unchecked-math* :warn-on-boxed)
 
 (s/set-fn-validation! true)
-
-(def http-handler
-  (wrap-reload (http/http-handler)))
 
 (defn migrate
   [state]
