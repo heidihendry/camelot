@@ -25,19 +25,19 @@
     (testing "Should resolve from initial path with single field"
       (let [rorder [[:field-a :field-a]]
             data {:field-a {:field-a {1 [{:field-a 1}]}}}]
-        (= (sut/build-records rorder data) [{:field-a 1}])))
+        (is (= (sut/build-records rorder data) [{:field-a 1}]))))
 
     (testing "Should resolve from initial path with field relationship"
       (let [rorder [[:field-a :field-b]]
             data {:field-a {:field-b {1 [{:field-a 2 :field-b 1}]}}}]
-        (= (sut/build-records rorder data) [{:field-a 2 :field-b 1}])))
+        (is (= (sut/build-records rorder data) [{:field-a 2 :field-b 1}]))))
 
     (testing "Should resolve a second field using data from the initial record"
       (let [rorder [[:field-a :field-a]
                     [:field-b :field-a]]
             data {:field-a {:field-a {1 [{:field-a 1}]}}
                   :field-b {:field-a {1 [{:field-a 1 :field-b 2}]}}}]
-        (= (sut/build-records rorder data) [{:field-a 1 :field-b 2}])))
+        (is (= (sut/build-records rorder data) [{:field-a 1 :field-b 2}]))))
 
     (testing "Should treat initial record as a basis for multiple records if available"
       (let [rorder [[:field-a :field-a]
@@ -45,8 +45,8 @@
             data {:field-a {:field-a {1 [{:field-a 1}]}}
                   :field-b {:field-a {1 [{:field-a 1 :field-b 2}
                                          {:field-a 1 :field-b 3}]}}}]
-        (= (sut/build-records rorder data) [{:field-a 1 :field-b 2}
-                                            {:field-a 1 :field-b 3}])))
+        (is (= (sut/build-records rorder data) [{:field-a 1 :field-b 2}
+                                                {:field-a 1 :field-b 3}]))))
 
     (testing "Should treat initial record as a basis for multiple records if available"
       (let [rorder [[:field-a :field-a]
@@ -54,5 +54,5 @@
             data {:field-a {:field-a {1 [{:field-a 1}]}}
                   :field-b {:field-a {1 [{:field-a 1 :field-b 2}
                                          {:field-a 1 :field-b 3}]}}}]
-        (= (sut/build-records rorder data) [{:field-a 1 :field-b 2}
-                                            {:field-a 1 :field-b 3}])))))
+        (is (= (sut/build-records rorder data) [{:field-a 1 :field-b 2}
+                                                {:field-a 1 :field-b 3}]))))))
