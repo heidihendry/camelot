@@ -10,6 +10,7 @@
             [camelot.nav :as nav]
             [camelot.util.search :as search]
             [camelot.util.sighting-fields :as sighting-fields]
+            [cljss.reagent :refer-macros [defstyled]]
             [bitpattern.simql.typeahead.core :as sta]
             [bitpattern.simql.typeahead.matcher.core :as sta-matcher]
             [clojure.string :as str]
@@ -98,6 +99,16 @@
   [sighting-field]
   (name (sighting-fields/user-key sighting-field)))
 
+(defstyled custom-completion-list :ul
+  {:position "absolute"
+   :background "white"
+   :z-index 1000
+   :list-style "none"
+   :padding 0
+   :border "1px solid #eee"
+   :min-width "30rem"
+   :margin-top "-0.6rem"})
+
 (def typeahead-input (reagent/reactify-component sta/typeahead-input))
 
 (defn filter-input-component
@@ -123,6 +134,7 @@
       (let [props #js {:inner-ref #(om/update! data [:search :input-ref] %)
                        :query (:query state)
                        :matcher (:matcher state)
+                       :completion-list-base custom-completion-list
                        :disabled (get-in data [:search :inprogress])
                        :placeholder (tr/translate ::filter-placeholder)
                        :title (tr/translate ::filter-title)

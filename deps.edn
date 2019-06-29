@@ -58,6 +58,7 @@
   org.apache.derby/derbytools {:mvn/version "10.12.1.1" :mvn/scope "test"}
   org.omcljs/om {:mvn/version "1.0.0-beta1"
                  :mvn/exclusions [com.cognitect/transit-clj com.cognitect/transit-cljs cljsjs/react cljsjs/react-dom]}
+  clj-commons/cljss {:mvn/version "1.6.4"}
   prismatic/schema {:mvn/version "1.1.6"}
   ragtime {:mvn/version "0.5.3"}
   reloaded.repl {:mvn/version "0.2.3" :mvn/scope "test"}
