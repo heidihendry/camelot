@@ -1,5 +1,6 @@
 (ns camelot.nav
   (:require
+   [clojure.string :as str]
    [camelot.nav-util :as navutil]
    [goog.events :as events]
    [goog.history.EventType :as EventType]

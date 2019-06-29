@@ -7,6 +7,7 @@
    [camelot.util.db-migrate :as db-migrate]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
+   [ring.middleware.reload :refer [wrap-reload]]
    [schema.core :as s]
    [figwheel-sidecar.repl-api :as figwheel]))
 
@@ -17,6 +18,9 @@
 (set! *unchecked-math* :warn-on-boxed)
 
 (s/set-fn-validation! true)
+
+(def http-handler
+  (wrap-reload #'http/http-handler))
 
 (defn migrate
   [state]

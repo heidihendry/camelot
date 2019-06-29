@@ -1,6 +1,8 @@
 (ns camelot.component.library.search
   (:require [om.dom :as dom]
             [om.core :as om]
+            [react :as react]
+            [reagent.core :as reagent]
             [camelot.util.model :as model]
             [camelot.component.library.util :as util]
             [camelot.state :as state]
@@ -8,7 +10,8 @@
             [camelot.nav :as nav]
             [camelot.util.search :as search]
             [camelot.util.sighting-fields :as sighting-fields]
-            [typeahead.core :as typeahead]
+            [bitpattern.simql.typeahead.core :as sta]
+            [bitpattern.simql.typeahead.matcher.core :as sta-matcher]
             [clojure.string :as str]
             [cljs.core.async :refer [<! chan >! timeout sliding-buffer]]
             [camelot.util.cursorise :as cursorise]
@@ -46,13 +49,11 @@
                                            :width "22"})))))))
 
 (defn select-media-collection-container
-  [state data e]
-  (.persist e)
-  (when (= (.-keyCode e) 13)
-    (let [node (.getElementById js/document "media-collection-container")]
-      (go (>! (:search-chan state)
-              {:search (assoc (deref data) :terms (.. e -target -value))}))
-      (.focus node))))
+  [data state query]
+  (let [node (.getElementById js/document "media-collection-container")]
+    (go (>! (:search-chan state)
+            {:search (assoc @data :terms query)}))
+    (.focus node)))
 
 (defn completion-field
   [ctx]
@@ -70,95 +71,68 @@
    "taxonomy" "/taxonomy"
    "field" "/sighting-field-values"})
 
-(defn basic-word-index
-  [xs]
-  (->> xs
-       (mapv typeahead/->basic-entry)
-       typeahead/word-index))
+(defn add-completions
+  [matcher ctx]
+  (if-let [field (-> ctx :context :field)]
+    (let [cf (completion-field field)
+          ep (get prefix-endpoints (first (str/split cf #"-")))]
+      (cond
+        (some #(= field %) '("flagged" "processed" "testfire" "reference-quality"))
+        (sta-matcher/add-completions matcher
+                                     (assoc ctx
+                                            :completions ["true" "false"]
+                                            :complete? true))
 
-(defn completions
-  [ctx ch]
-  (let [cf (completion-field ctx)
-        ep (get prefix-endpoints (first (str/split cf #"-")))]
-    (cond
-      (some #(= ctx %) '("flagged" "processed" "testfire" "reference-quality"))
-      (go
-        (->> ["true" "false"]
-             basic-word-index
-             (>! ch)))
+        (or (nil? cf) (nil? ep)) nil
 
-      (or (nil? cf) (nil? ep)) nil
-
-      :else
-      (rest/get-x ep
-                  #(go (>! ch (->> (:body %)
-                                   (mapv (keyword cf))
-                                   (filter (complement nil?))
-                                   (mapv typeahead/->basic-entry)
-                                   typeahead/phrase-index)))))))
-
-(defn update-terms
-  [data terms]
-  (om/update! data :terms terms)
-  (om/update! data :page 1)
-  (om/update! data :dirty-state true))
+        :else
+        (rest/get-x ep
+                    #(let [completions (->> (:body %)
+                                            (mapv (keyword cf))
+                                            (filter (complement nil?)))]
+                       (sta-matcher/add-completions matcher (assoc ctx
+                                                                   :completions completions
+                                                                   :complete? true))))))))
 
 (defn sighting-field-to-field-user-key
   [sighting-field]
   (name (sighting-fields/user-key sighting-field)))
 
-(def aliases-with-operator-overrides
-  {:captured ">"
-   :session-start ">"
-   :session-end ">"})
-
-(def operator-overrides
-  (merge (->> model/schema-definitions
-              vec
-              (filter (fn [[k v]] (contains? #{:date :timestamp} (:datatype v))))
-              (map first)
-              (map (fn [k] [k ">"]))
-              (into {}))
-         aliases-with-operator-overrides))
+(def typeahead-input (reagent/reactify-component sta/typeahead-input))
 
 (defn filter-input-component
   [data owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:typeahead-index (typeahead/phrase-index
-                         (apply conj (map #(hash-map :term %
-                                                     :props {:field true
-                                                             :completion-fn completions})
-                                          (apply conj
-                                                 (apply conj (map name (keys search/field-keys))
-                                                        search/model-fields)
-                                                 (map sighting-field-to-field-user-key
-                                                      (apply concat (map (fn [[k v]] v) (:sighting-fields data))))))
-                                (if (get-in data [:search :taxonomy-completions :species])
-                                  (mapv typeahead/->basic-entry
-                                        (apply conj (get-in data [:search :taxonomy-completions :species])
-                                               (get-in data [:search :taxonomy-completions :common-names])))
-                                  [])))})
-    om/IWillMount
-    (will-mount [_]
-      (let [rf #(filter (complement nil?) (mapv %1 %2))]
-        (rest/get-x "/taxonomy"
-                    #(om/update! data :taxonomy-completions
-                                 {:species (rf :taxonomy-label (:body %))
-                                  :common-names (rf :taxonomy-common-name (:body %))}))))
+      {:matcher (sta-matcher/create-matcher)
+       :query ""})
+    om/IDidMount
+    (did-mount [_]
+      (let [completions (concat (map name (keys search/field-keys))
+                                search/model-fields
+                                (map sighting-field-to-field-user-key
+                                     (apply concat (map (fn [[k v]] v) (:sighting-fields data)))))]
+        (sta-matcher/add-completions (om/get-state owner :matcher)
+                                     {:type :field
+                                      :string-to-point ""
+                                      :completions completions
+                                      :complete? true})))
     om/IRenderState
     (render-state [_ state]
-      (om/build typeahead/typeahead (:typeahead-index state)
-                {:opts {:input-config {:placeholder (tr/translate ::filter-placeholder)
-                                       :className "field-input search"
-                                       :title (tr/translate ::filter-title)
-                                       :id "filter"
-                                       :onChange #(om/update! data [:search :terms] %)
-                                       :onKeyDown #(select-media-collection-container state (:search data) %)}
-                        :multi-term true
-                        :operator-overrides operator-overrides}
-                 :state {:disabled (get-in data [:search :inprogress])}}))))
+      (let [props #js {:inner-ref #(om/update! data [:search :input-ref] %)
+                       :query (:query state)
+                       :matcher (:matcher state)
+                       :disabled (get-in data [:search :inprogress])
+                       :placeholder (tr/translate ::filter-placeholder)
+                       :title (tr/translate ::filter-title)
+                       :on-change (fn [{:keys [query complete-for]}]
+                                    (let [m (:matcher state)]
+                                      (when-not (sta-matcher/complete? m complete-for)
+                                        (add-completions m complete-for)))
+                                    (om/set-state! owner :query query))
+                       :on-submit #(select-media-collection-container data state %)}]
+        (js/React.createElement typeahead-input props)))))
 
 (defn filter-survey-component
   [data owner]

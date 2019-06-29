@@ -2,10 +2,21 @@
  :deps
  {camelot/market {:git/url "https://gitlab.com/camelot-project/camelot-market"
                   :sha "e477ffca34c42e6be1012fb875f34812d221ebbd"}
+  camelot/simql-parser {:git/url "https://gitlab.com/cshclm/simql-parser"
+                        :sha "788ac13b0eca7cc32b485c454aab62fdd5308df6"}
+
+  camelot/simql-typeahead {:git/url "https://gitlab.com/cshclm/simql-typeahead"
+                           :sha "21307a2f440273da025e0f99a15999abb3395115"}
+
+  ;; Bridging for typeahead which uses reagent. Reagent 0.8.1 expects cljsjs
+  ;; React 16.4, and om depends on React 15.5.4. This is part of making
+  ;; everyone happy.
+  cljsjs/react {:mvn/version "15.5.4-0"}
+  cljsjs/react-dom {:mvn/version "15.5.4-0"}
 
   org.clojure/test.check {:mvn/version"0.9.0"
                           :mvn/scope "test"}
-  org.clojure/clojure {:mvn/version "1.10.0"}
+  org.clojure/clojure {:mvn/version "1.10.1"}
   org.clojure/clojurescript {:mvn/version "1.10.439"}
   org.clojure/core.async {:mvn/version "0.3.443"}
   org.clojure/data.csv {:mvn/version "0.1.3"}
@@ -45,7 +56,8 @@
   org.apache.commons/commons-lang3 {:mvn/version "3.4"}
   org.apache.derby/derby {:mvn/version "10.12.1.1"}
   org.apache.derby/derbytools {:mvn/version "10.12.1.1" :mvn/scope "test"}
-  org.omcljs/om {:mvn/version "1.0.0-beta1" :mvn/exclusions [com.cognitect/transit-clj com.cognitect/transit-cljs]}
+  org.omcljs/om {:mvn/version "1.0.0-beta1"
+                 :mvn/exclusions [com.cognitect/transit-clj com.cognitect/transit-cljs cljsjs/react cljsjs/react-dom]}
   prismatic/schema {:mvn/version "1.1.6"}
   ragtime {:mvn/version "0.5.3"}
   reloaded.repl {:mvn/version "0.2.3" :mvn/scope "test"}

@@ -20,9 +20,10 @@
     (cond
       ;; ctrl+f
       (and (= (.-keyCode e) 70) (.-ctrlKey e))
-      (do (.focus (.getElementById js/document "filter"))
-          (nav/analytics-event "library-key" "C-f")
-          (.preventDefault e))
+      (if-let [ref (get-in @data [:search :input-ref])]
+        (do (.focus ref)
+            (nav/analytics-event "library-key" "C-f")
+            (.preventDefault e)))
 
       ;; alt+f
       (and (= (.-keyCode e) 70) (.-altKey e))

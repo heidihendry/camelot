@@ -1076,7 +1076,6 @@ pre.field-input {
     padding-bottom: 0;
     height: 33px;
     width: 50px;
-    margin-top: -2px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -1231,6 +1230,9 @@ pre.field-input {
     background: none;
     border: 1px solid #ccc;
     opacity: 0.5;
+    position: relative;
+    top: -2px;
+    left: -1px;
 }
 #app .library .btn.search-dirty {
     color: #4090c5;
