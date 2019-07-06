@@ -7,8 +7,8 @@
 (def routes
   (context "/library" {session :session state :system}
            (POST "/" [data]
-                 (r/response (library/search-media (assoc state :session session)
-                                                   (:search data))))
+                 (r/response (library/query-media (assoc state :session session)
+                                                  (:search data))))
            (GET "/metadata" [] (r/response (library/build-library-metadata
                                             (assoc state :session session))))
            (POST "/hydrate" [data]

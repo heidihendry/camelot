@@ -5,7 +5,6 @@
    [medley.core :as medley]
    [camelot.util.db :as db]
    [clojure.tools.logging :as log]
-   [camelot.library.search :as search]
    [camelot.util.datatype :as datatype]
    [camelot.model.sighting :as sighting]
    [camelot.model.media :as media]
@@ -13,11 +12,12 @@
    [camelot.util.trap-station :as util.ts]
    [camelot.library.search-parser :as sparser]
    [camelot.model.taxonomy :as taxonomy]
-   [clojure.edn :as edn])
+   [clojure.edn :as edn]
+   [camelot.library.query.core :as query])
   (:import
    (camelot.model.sighting Sighting)))
 
-(def query (db/with-db-keys :library))
+(def sqlquery (db/with-db-keys :library))
 
 (defrecord LibraryMetadata
     [trap-station-session-camera-id
@@ -42,24 +42,14 @@
 
 (defn build-library-metadata
   [state]
-  (->> (query state :hierarchy-data {})
+  (->> (sqlquery state :hierarchy-data {})
        (group-by :trap-station-session-camera-id)
        (map (fn [[k v]] (vector k (map->LibraryMetadata (first v)))))
        (into {})))
 
-(defn search-media
-  [state search]
-  (let [psearch (sparser/parse search)]
-    (cond
-      (sparser/match-all? psearch)
-      (map :media-id (query state :all-media-ids {}))
-
-      (sparser/match-all-in-survey? psearch)
-      (map :media-id (query state :all-media-ids-for-survey
-                       {:field-value (:value (ffirst psearch))}))
-
-      :else
-      (search/media state psearch))))
+(defn query-media
+  [state qstr]
+  (query/query-media state qstr))
 
 (s/defn build-records
   [state sightings media]
