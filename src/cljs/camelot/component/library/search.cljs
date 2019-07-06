@@ -2,7 +2,6 @@
   (:require [om.dom :as dom]
             [om.core :as om]
             [react :as react]
-            [reagent.core :as reagent]
             [camelot.util.model :as model]
             [camelot.component.library.util :as util]
             [camelot.state :as state]
@@ -91,9 +90,9 @@
                     #(let [completions (->> (:body %)
                                             (mapv (keyword cf))
                                             (filter (complement nil?)))]
-                       (sta-matcher/add-completions matcher (assoc ctx
-                                                                   :completions completions
-                                                                   :hydrated? true))))))))
+                       (sta-matcher/add! matcher (assoc ctx
+                                                        :completions completions
+                                                        :hydrated? true))))))))
 
 (defn sighting-field-to-field-user-key
   [sighting-field]
