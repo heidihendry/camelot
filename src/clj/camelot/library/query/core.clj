@@ -5,7 +5,7 @@
             [camelot.library.query.sighting-fields :as sighting-fields]
             [camelot.library.query.util :as qutil]
             [camelot.util.db :as db]
-            [bitpattern.simql.core :as simql-parser]
+            [bitpattern.simql.parser.core :as simql-parser]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]))
 

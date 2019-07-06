@@ -12,7 +12,7 @@
             [camelot.util.sighting-fields :as sighting-fields]
             [cljss.reagent :refer-macros [defstyled]]
             [bitpattern.simql.typeahead.core :as sta]
-            [bitpattern.simql.typeahead.matcher.core :as sta-matcher]
+            [bitpattern.simql.typeahead.matcher :as sta-matcher]
             [clojure.string :as str]
             [cljs.core.async :refer [<! chan >! timeout sliding-buffer]]
             [camelot.util.cursorise :as cursorise]
@@ -79,10 +79,10 @@
           ep (get prefix-endpoints (first (str/split cf #"-")))]
       (cond
         (some #(= field %) '("flagged" "processed" "testfire" "reference-quality"))
-        (sta-matcher/add-completions matcher
-                                     (assoc ctx
-                                            :completions ["true" "false"]
-                                            :complete? true))
+        (sta-matcher/add! matcher
+                          (assoc ctx
+                                 :completions ["true" "false"]
+                                 :hydrated? true))
 
         (or (nil? cf) (nil? ep)) nil
 
@@ -93,7 +93,7 @@
                                             (filter (complement nil?)))]
                        (sta-matcher/add-completions matcher (assoc ctx
                                                                    :completions completions
-                                                                   :complete? true))))))))
+                                                                   :hydrated? true))))))))
 
 (defn sighting-field-to-field-user-key
   [sighting-field]
@@ -109,14 +109,12 @@
    :min-width "30rem"
    :margin-top "-0.6rem"})
 
-(def typeahead-input (reagent/reactify-component sta/typeahead-input))
-
 (defn filter-input-component
   [data owner]
   (reify
     om/IInitState
     (init-state [_]
-      {:matcher (sta-matcher/create-matcher)
+      {:matcher (sta-matcher/create)
        :query ""})
     om/IDidMount
     (did-mount [_]
@@ -124,11 +122,11 @@
                                 search/model-fields
                                 (map sighting-field-to-field-user-key
                                      (apply concat (map (fn [[k v]] v) (:sighting-fields data)))))]
-        (sta-matcher/add-completions (om/get-state owner :matcher)
-                                     {:type :field
-                                      :string-to-point ""
-                                      :completions completions
-                                      :complete? true})))
+        (sta-matcher/add! (om/get-state owner :matcher)
+                          {:type :field
+                           :string-to-point ""
+                           :completions completions
+                           :complete? true})))
     om/IRenderState
     (render-state [_ state]
       (let [props #js {:inner-ref #(om/update! data [:search :input-ref] %)
@@ -138,13 +136,13 @@
                        :disabled (get-in data [:search :inprogress])
                        :placeholder (tr/translate ::filter-placeholder)
                        :title (tr/translate ::filter-title)
-                       :on-change (fn [{:keys [query complete-for]}]
+                       :on-change (fn [query ctx]
                                     (let [m (:matcher state)]
-                                      (when-not (sta-matcher/complete? m complete-for)
-                                        (add-completions m complete-for)))
+                                      (when-not (sta-matcher/hydrated? m ctx)
+                                        (sta-matcher/add! m ctx)))
                                     (om/set-state! owner :query query))
                        :on-submit #(select-media-collection-container data state %)}]
-        (js/React.createElement typeahead-input props)))))
+        (js/React.createElement sta/typeahead-input-react props)))))
 
 (defn filter-survey-component
   [data owner]
