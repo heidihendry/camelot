@@ -10,7 +10,6 @@
    [camelot.model.media :as media]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.trap-station :as util.ts]
-   [camelot.library.search-parser :as sparser]
    [camelot.model.taxonomy :as taxonomy]
    [clojure.edn :as edn]
    [camelot.library.query.core :as query])
