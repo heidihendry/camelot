@@ -11,7 +11,7 @@
             [camelot.util.sighting-fields :as sighting-fields]
             [cljss.reagent :refer-macros [defstyled]]
             [bitpattern.simql.typeahead.core :as sta]
-            [bitpattern.simql.typeahead.matcher :as sta-matcher]
+            [bitpattern.simql.typeahead.completion :as stacomp]
             [clojure.string :as str]
             [cljs.core.async :refer [<! chan >! timeout sliding-buffer]]
             [camelot.util.cursorise :as cursorise]
@@ -72,16 +72,15 @@
    "field" "/sighting-field-values"})
 
 (defn add-completions
-  [matcher ctx]
+  [idx ctx]
   (if-let [field (-> ctx :context :field)]
     (let [cf (completion-field field)
           ep (get prefix-endpoints (first (str/split cf #"-")))]
       (cond
         (some #(= field %) '("flagged" "processed" "testfire" "reference-quality"))
-        (sta-matcher/add! matcher
-                          (assoc ctx
-                                 :completions ["true" "false"]
-                                 :hydrated? true))
+        (do
+          (stacomp/index! idx ctx ["true" "false"])
+          (stacomp/set-props! idx ctx {:hydrated? true}))
 
         (or (nil? cf) (nil? ep)) nil
 
@@ -90,9 +89,8 @@
                     #(let [completions (->> (:body %)
                                             (mapv (keyword cf))
                                             (filter (complement nil?)))]
-                       (sta-matcher/add! matcher (assoc ctx
-                                                        :completions completions
-                                                        :hydrated? true))))))))
+                       (stacomp/index! idx ctx completions)
+                       (stacomp/set-props! idx ctx {:hydrated? true})))))))
 
 (defn sighting-field-to-field-user-key
   [sighting-field]
@@ -113,32 +111,31 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:matcher (sta-matcher/create)
+      {:idx (stacomp/create)
        :query ""})
     om/IDidMount
     (did-mount [_]
       (let [completions (concat (map name (keys search/field-keys))
                                 search/model-fields
                                 (map sighting-field-to-field-user-key
-                                     (apply concat (map (fn [[k v]] v) (:sighting-fields data)))))]
-        (sta-matcher/add! (om/get-state owner :matcher)
-                          {:type :field
-                           :string-to-point ""
-                           :completions completions
-                           :complete? true})))
+                                     (apply concat (map (fn [[k v]] v) (:sighting-fields data)))))
+            idx (om/get-state owner :idx)
+            ctx {:type :field :string-to-point ""}]
+        (stacomp/index! idx ctx completions)
+        (stacomp/set-props! idx ctx {:hydrated? true})))
     om/IRenderState
     (render-state [_ state]
       (let [props #js {:inner-ref #(om/update! data [:search :input-ref] %)
                        :query (:query state)
-                       :matcher (:matcher state)
+                       :idx (:idx state)
                        :completion-list-base custom-completion-list
                        :disabled (get-in data [:search :inprogress])
                        :placeholder (tr/translate ::filter-placeholder)
                        :title (tr/translate ::filter-title)
                        :on-change (fn [query ctx]
-                                    (let [m (:matcher state)]
-                                      (when-not (sta-matcher/hydrated? m ctx)
-                                        (sta-matcher/add! m ctx)))
+                                    (let [idx (:idx state)]
+                                      (when-not (stacomp/prop idx ctx :hydrated?)
+                                        (add-completions idx ctx)))
                                     (om/set-state! owner :query query))
                        :on-submit #(select-media-collection-container data state %)}]
         (js/React.createElement sta/typeahead-input-react props)))))

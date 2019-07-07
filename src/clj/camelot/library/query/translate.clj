@@ -1,6 +1,25 @@
 (ns camelot.library.query.translate
   (:require [camelot.library.query.fields :as fields]
-            [camelot.library.query.sighting-fields :as sighting-fields]))
+            [camelot.library.query.sighting-fields :as sighting-fields]
+            [camelot.util.datatype :as datatype-util]
+            [bitpattern.simql.parser.datatypes :as simql-dt]
+            [clj-time.coerce :as tc]))
+
+(defmethod simql-dt/read-value :date
+  [k vs]
+  (let [v (first (filter string? vs))]
+    (if (datatype-util/could-be-date? v)
+      [k (datatype-util/as-date v)]
+      (throw (ex-info (str "A date was required but was not found")
+                      {:field-value vs})))))
+
+(defmethod simql-dt/read-value :timestamp
+  [k vs]
+  (simql-dt/read-value :date vs))
+
+(defmethod simql-dt/read-value :readable-integer
+  [k vs]
+  (simql-dt/read-value :integer vs))
 
 (def ^:dynamic *complement* false)
 
@@ -67,6 +86,14 @@
 (defmethod datatype->sql :string
   [[_ & vs]]
   [:lower (apply str (mapv value->fragment vs))])
+
+(defmethod datatype->sql :timestamp
+  [[_ v]]
+  (tc/to-long v))
+
+(defmethod datatype->sql :date
+  [[_ v]]
+  (tc/to-long v))
 
 (defmethod datatype->sql :default
   [[_ & vs]]
