@@ -1,5 +1,9 @@
 ## ChangeLog
 
+### [Unreleased]
+#### Changed
+* Add a new icons and branding c/o Stef Hendry. https://gitlab.com/camelot-project/camelot/issues/189
+
 ### 1.5.3
 #### Changed
 * Makes shortcut keys (such as the arrow keys) apply in more places in the library. https://gitlab.com/camelot-project/camelot/issues/180
