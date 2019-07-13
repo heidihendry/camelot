@@ -20,9 +20,6 @@
   font-weight: 600;
   src: local('OpenSans-Semibold'), url('../fonts/opensans-semibold.woff') format('woff');
 }
-html {
-    min-width: 1200px;
-}
 html > body {
   font-family: 'Open Sans', Arial, sans-serif;
   background-color: #fff;
@@ -336,22 +333,23 @@ pre.field-input {
     margin-top: 0;
 }
 #loading p {
-    opacity: 0.5;
     width: 100%;
     position: relative;
-    margin: -48px;
-    padding-top: 16rem;
+    padding-top: 12rem;
     font-size: 40pt;
     font-weight: 100;
     text-align: center;
 }
 .supported-by {
-    position: fixed;
+    left: calc(50% - 125px);
+    position: absolute;
+    text-align: center;
+    margin: auto;
     bottom: 10vh;
-    left: calc(50vw - 125px);
     font-style:italic;
 }
 .supported-by .supported-by-text {
+    text-align: left;
     position: relative;
     top: 45px;
     left: 30px;
