@@ -2,6 +2,7 @@
   (:require [camelot.import.scan-dir :as sut]
             [clojure.test :refer :all]
             [camelot.testutil.state :as state]
+            [clojure.java.io :as io]
             [camelot.util.file :as file]))
 
 (deftest test-resolve-server-directory
@@ -19,7 +20,7 @@
                    "G:\\srv\\mydata\\survey1")))))
 
       (testing "Should use root path if unable to resolve directory."
-        (let [state (state/gen-state {:paths {:root "/my/path"}})]
+        (let [state (state/gen-state {:paths {:root (io/file "/my/path")}})]
           (is (= (sut/resolve-directory state "/random/non-matching/location")
                  "/my/path"))))
 
