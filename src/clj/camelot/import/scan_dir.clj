@@ -41,7 +41,7 @@
   [server-base-dir client-dir]
   (let [svr-sep (detect-separator server-base-dir)
         svr-path (str/split (or server-base-dir "")
-                                       (re-pattern (str "\\" svr-sep)))]
+                            (re-pattern (str "\\" svr-sep)))]
     (->> client-dir
          detect-separator
          (str "\\")
@@ -73,11 +73,16 @@
         s-can))
     client-dir))
 
+(defn- file-to-string
+  [file]
+  (when file
+    (.getPath file)))
+
 (defn resolve-directory
   "Resolve a corresponding server directory for a given 'client' directory."
   [state client-dir]
   {:pre [(not (nil? client-dir))]}
-  (let [root (state/lookup-path state :root)
+  (let [root (file-to-string (state/lookup-path state :root))
         res (resolve-server-directory root client-dir)]
     (cond
       (and (empty? res) (nil? root)) client-dir
