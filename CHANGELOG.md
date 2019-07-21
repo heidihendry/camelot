@@ -1,8 +1,15 @@
 ## ChangeLog
 
-### [Unreleased]
+### 1.5.5
 #### Changed
 * Add a new icons and branding c/o Stef Hendry. https://gitlab.com/camelot-project/camelot/issues/189
+
+#### Fixed
+* Fixes a bug preventing creation of templates for bulk import. https://gitlab.com/camelot-project/camelot/issues/192
+
+### 1.5.4
+#### Fixed
+* Fixes keyboard shortcuts propagating up from the library search input. https://gitlab.com/camelot-project/camelot/issues/187
 
 ### 1.5.3
 #### Changed
