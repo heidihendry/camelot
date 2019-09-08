@@ -1,5 +1,9 @@
 ## ChangeLog
 
+### [Unreleased]
+#### Changed
+* Makes library search query language much more powerful
+
 ### 1.5.5
 #### Changed
 * Add a new icons and branding c/o Stef Hendry. https://gitlab.com/camelot-project/camelot/issues/189
