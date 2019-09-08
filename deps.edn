@@ -3,9 +3,9 @@
  {camelot/market {:git/url "https://gitlab.com/camelot-project/camelot-market"
                   :sha "771a566f79120a50b4d437a0375c6e78a8eb1099"}
   camelot/simql-parser {:git/url "https://gitlab.com/cshclm/simql-parser"
-                        :sha "c1b01d5e3ee8e6b39a627c72c06d835b5f505c37"}
+                        :sha "c1107948e7f851713c07dd99182037b628de887c"}
   camelot/simql-typeahead {:git/url "https://gitlab.com/cshclm/simql-typeahead"
-                           :sha "2312b2e4e5aa0331bdd357c144dd8c936ef1455c"}
+                           :sha "1ffa6c3eabbd922b9d4cb48c065721d48e048cc5"}
 
   ;; Bridging for typeahead which uses reagent. Reagent 0.8.1 expects cljsjs
   ;; React 16.4, and om depends on React 15.5.4. This is part of making
