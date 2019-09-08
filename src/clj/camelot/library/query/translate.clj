@@ -119,7 +119,8 @@
 
 (defn- existence?
   [vs]
-  (= vs [[:wildcard]]))
+  (or (= vs [[:wildcard]])
+      (= vs [[:dblquote] [:wildcard] [:dblquote]])))
 
 (defn- existence
   [fc dt]

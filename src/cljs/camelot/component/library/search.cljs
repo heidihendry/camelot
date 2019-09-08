@@ -10,7 +10,7 @@
             [camelot.util.search :as search]
             [camelot.util.sighting-fields :as sighting-fields]
             [cljss.reagent :refer-macros [defstyled]]
-            [bitpattern.simql.typeahead.core :as sta]
+            [bitpattern.simql.typeahead.react :as sta-react]
             [bitpattern.simql.typeahead.completion :as stacomp]
             [clojure.string :as str]
             [cljs.core.async :refer [<! chan >! timeout sliding-buffer]]
@@ -138,7 +138,7 @@
                                         (add-completions idx ctx)))
                                     (om/set-state! owner :query query))
                        :on-submit #(select-media-collection-container data state %)}]
-        (js/React.createElement sta/typeahead-input-react props)))))
+        (js/React.createElement sta-react/TypeaheadInput props)))))
 
 (defn filter-survey-component
   [data owner]
