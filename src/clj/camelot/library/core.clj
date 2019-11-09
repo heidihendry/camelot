@@ -2,15 +2,10 @@
   "Library models and data access."
   (:require
    [schema.core :as s]
-   [medley.core :as medley]
    [camelot.util.db :as db]
-   [clojure.tools.logging :as log]
-   [camelot.util.datatype :as datatype]
    [camelot.model.sighting :as sighting]
    [camelot.model.media :as media]
    [camelot.spec.schema.state :refer [State]]
-   [camelot.util.trap-station :as util.ts]
-   [camelot.model.taxonomy :as taxonomy]
    [clojure.edn :as edn]
    [camelot.library.query.core :as query])
   (:import

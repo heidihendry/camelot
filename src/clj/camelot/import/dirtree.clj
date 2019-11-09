@@ -106,7 +106,7 @@
   (let [reader #(ImageMetadataReader/readMetadata ^File %)]
     (try
       (extract-file-metadata reader file)
-      (catch java.lang.Exception e {}))))
+      (catch java.lang.Exception _ {}))))
 
 (s/defn path-components :- ImportRawMetadata
   "Extract a map of components of the path, relative to the root directory."
@@ -156,7 +156,7 @@
          (file/->file)
          (file-seq)
          (group-by dirname)
-         (filter (fn [[k v]] (album-dir? v)))
+         (filter (fn [[_ v]] (album-dir? v)))
          (keys))))
 
 (defn- dir-raw-album-pair

@@ -8,7 +8,6 @@
    [camelot.model.photo :as photo]
    [camelot.util.capture :as capture]
    [camelot.util.db :as db]
-   [clj-time.core :as t]
    [clojure.string :as str]))
 
 (defn create-media!

@@ -1,7 +1,6 @@
 (ns camelot.spec.model.site
   (:require [clojure.spec.alpha :as s]
-            [clj-time.spec :as tspec]
-            [clj-time.spec :as ts]))
+            [clj-time.spec :as tspec]))
 
 (s/def ::site-id int?)
 (s/def ::site-created ::tspec/date-time)

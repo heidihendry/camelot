@@ -7,15 +7,13 @@
    [camelot.util.db :as db]
    [camelot.util.data :as data]
    [camelot.model.trap-station :as trap-station]
-   [camelot.util.trap-station :as util.ts]
+   [camelot.util.trap-station :as utilts]
    [camelot.model.trap-station-session :as trap-station-session]
    [camelot.model.trap-station-session-camera :as trap-station-session-camera]
    [camelot.util.deployment :as dep-util]
    [camelot.model.survey-site :as survey-site]
    [camelot.model.camera-status :as camera-status]
-   [camelot.model.camera :as camera]
-   [camelot.util.trap-station :as util.ts]
-   [clojure.set :as set])
+   [camelot.model.camera :as camera])
   (:import
    (camelot.model.trap_station_session_camera TrapStationSessionCamera)))
 
@@ -47,8 +45,8 @@
      site-id :- s/Int
      survey-site-id :- s/Int
      site-name :- s/Str
-     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
-     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
+     trap-station-longitude :- (s/pred utilts/valid-longitude?)
+     trap-station-latitude :- (s/pred utilts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-distance-above-ground :- (s/maybe s/Num)
      trap-station-distance-to-river :- (s/maybe s/Num)
@@ -73,7 +71,7 @@
   (cond
     (nil? a) true
     (nil? b) false
-    :default (t/after? a b)))
+    :else (t/after? a b)))
 
 (s/defn get-all :- [Deployment]
   [state :- State

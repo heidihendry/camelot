@@ -5,7 +5,7 @@
    [camelot.util.db :as db]
    [camelot.spec.schema.state :refer [State]]
    [clj-time.core :as t]
-   [camelot.util.trap-station :as util.ts]
+   [camelot.util.trap-station :as utilts]
    [camelot.model.camera :as camera]
    [camelot.model.camera-status :as camera-status]
    [camelot.model.trap-station-session :as trap-station-session]
@@ -52,8 +52,8 @@
      site-id :- s/Int
      survey-site-id :- s/Int
      site-name :- s/Str
-     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
-     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
+     trap-station-longitude :- (s/pred utilts/valid-longitude?)
+     trap-station-latitude :- (s/pred utilts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-distance-above-ground :- (s/maybe s/Num)
      trap-station-distance-to-river :- (s/maybe s/Num)

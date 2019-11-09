@@ -2,7 +2,6 @@
   (:require
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
-   [resauce.core :as resauce]
    [ragtime.core :as rtc]
    [ragtime.protocols :as rtp])
   (:use

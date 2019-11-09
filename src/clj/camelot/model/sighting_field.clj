@@ -3,8 +3,7 @@
   (:require
    [schema.core :as s]
    [camelot.util.sighting-fields :as util.sf]
-   [camelot.util.db :as db]
-   [clj-time.core :as t]))
+   [camelot.util.db :as db]))
 
 (def query (db/with-db-keys :sighting-field))
 

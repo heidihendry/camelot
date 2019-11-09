@@ -12,14 +12,8 @@
    [camelot.model.taxonomy :as taxonomy]
    [camelot.model.site :as site]
    [camelot.model.camera :as camera]
-   [camelot.model.camera-status :as camera-status]
-   [clojure.core.async :refer [>!!]]
-   [clojure.string :as str]
-   [clojure.edn :as edn]
-   [clojure.tools.logging :as log]
    [camelot.util.data :as data]
-   [camelot.model.survey-taxonomy :as survey-taxonomy]
-   [camelot.util.db :as db]))
+   [camelot.model.survey-taxonomy :as survey-taxonomy]))
 
 (defn get-survey
   [state record]

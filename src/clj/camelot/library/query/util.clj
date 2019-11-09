@@ -9,7 +9,7 @@
   (cond
     (not (coll? pt)) []
     (pred pt) [pt]
-    :default (mapcat (partial filter-nodes pred) pt)))
+    :else (mapcat (partial filter-nodes pred) pt)))
 
 (defn field-names
   [pt]

@@ -7,14 +7,11 @@
    [camelot.http.core :as http]
    [camelot.http.api.core :as api]
    [camelot.util.network :as network]
-   [camelot.util.desktop :as desktop]
    [camelot.util.version :as version]
-   [clj-time.coerce :as c]
    [com.stuartsierra.component :as component]
    [ring.adapter.jetty :refer [run-jetty]]
    [muuntaja.middleware :as muuntaja-middleware]
-   [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-   [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+   [ring.middleware.json :refer [wrap-json-response]]
    [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
    [ring.middleware.params :refer [wrap-params]]
@@ -23,8 +20,7 @@
    [ring.middleware.session :refer [wrap-session]]
    [ring.middleware.session.cookie :refer [cookie-store]]
    [ring.middleware.gzip :refer [wrap-gzip]]
-   [ring.middleware.logger :refer [wrap-with-logger]]
-   [ring.util.response :as r])
+   [ring.middleware.logger :refer [wrap-with-logger]])
   (:import (org.eclipse.jetty.server Server)))
 
 (defonce jetty (atom nil))

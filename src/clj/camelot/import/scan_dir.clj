@@ -1,6 +1,5 @@
 (ns camelot.import.scan-dir
   (:require
-   [schema.core :as s]
    [camelot.util.file :as file]
    [clojure.string :as str]
    [camelot.util.state :as state])

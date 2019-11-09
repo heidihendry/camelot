@@ -4,8 +4,7 @@
    [camelot.util.file :as file]
    [clojure.java.io :as io]
    [clojure.string :as str]
-   [mikera.image.core :as image]
-   [clojure.tools.logging :as log])
+   [mikera.image.core :as image])
   (:import
    (org.apache.commons.lang3 SystemUtils)
    (java.util UUID)

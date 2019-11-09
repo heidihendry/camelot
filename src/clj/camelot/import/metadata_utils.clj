@@ -30,10 +30,9 @@ Important: Timezone information will be discarded."
   [str]
   (when str
     (try (edn/read-string str)
-         (catch java.lang.Exception e
-           (do
-             (log/warn "read-metadata-string: Attempt to read-string on '" str "'")
-             nil)))))
+         (catch java.lang.Exception _
+           (log/warn "read-metadata-string: Attempt to read-string on '" str "'")
+           nil))))
 
 (s/defn valid-raw-data?
   "Check the minimum required fields are present in the metadata, returning an

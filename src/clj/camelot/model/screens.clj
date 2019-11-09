@@ -1,8 +1,7 @@
 (ns camelot.model.screens
   (:require
    [smithy.core :refer [defsmith] :as smithy]
-   [camelot.translation.core :as tr]
-   [clojure.string :as str]))
+   [camelot.translation.core :as tr]))
 
 (def smiths (atom {}))
 

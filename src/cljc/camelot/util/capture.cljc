@@ -1,5 +1,4 @@
-(ns camelot.util.capture
-  )
+(ns camelot.util.capture)
 
 (def image-mimes
   {"image/jpeg" "jpg"

@@ -1,13 +1,10 @@
 (ns camelot.util.maintenance
   (:require
-   [yesql.core :as sql]
-   [clojure.string :as cstr]
    [camelot.util.file :as file]
    [clojure.java.io :as io]
    [camelot.util.db :as dbutil]
    [camelot.util.state :as state]
-   [camelot.util.db-migrate :as db-migrate]
-   [com.stuartsierra.component :as component])
+   [camelot.util.db-migrate :as db-migrate])
   (:import
    (java.io IOException)
    (java.util.zip ZipEntry ZipOutputStream)))
@@ -41,7 +38,7 @@
           cdir (io/file path derby-container-dir)]
       (and (file/exists? cdir)
            (file/directory? cdir)))
-    (catch IOException e
+    (catch IOException _
       false)))
 
 (defn- compress-dir

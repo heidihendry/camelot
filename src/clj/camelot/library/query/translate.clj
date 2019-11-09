@@ -1,6 +1,5 @@
 (ns camelot.library.query.translate
   (:require [camelot.library.query.fields :as fields]
-            [camelot.library.query.sighting-fields :as sighting-fields]
             [camelot.util.datatype :as datatype-util]
             [bitpattern.simql.parser.datatypes :as simql-dt]
             [clj-time.coerce :as tc]))
@@ -14,11 +13,11 @@
                       {:field-value vs})))))
 
 (defmethod simql-dt/read-value :timestamp
-  [k vs]
+  [_ vs]
   (simql-dt/read-value :date vs))
 
 (defmethod simql-dt/read-value :readable-integer
-  [k vs]
+  [_ vs]
   (simql-dt/read-value :integer vs))
 
 (def ^:dynamic *complement* false)
@@ -129,7 +128,7 @@
     (cond
       (= dt :integer) [rel [op fc nil] [op fc 0]]
       (= dt :boolean) [op fc nil]
-      :default [rel [op fc nil] [op fc ""]])))
+      :else [rel [op fc nil] [op fc ""]])))
 
 (defmethod parse->sql :field-value
   [[_ fv]]
@@ -148,7 +147,7 @@
     (cond
       (existence? vs) (existence fc dt)
       (like? vs) (like fc (parse->sql v))
-      :default [(parse->sql op) fc (parse->sql v)])))
+      :else [(parse->sql op) fc (parse->sql v)])))
 
 (defmethod parse->sql :string-search
   [[_ sv]]
@@ -174,5 +173,5 @@
   (with-complement (parse->sql r)))
 
 (defmethod parse->sql :default
-  [[k & r]]
+  [[_ & r]]
   (vec (mapcat parse->sql r)))

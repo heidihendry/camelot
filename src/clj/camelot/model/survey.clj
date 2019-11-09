@@ -3,13 +3,11 @@
   (:require
    [cats.monad.either :as either]
    [schema.core :as s]
-   [clojure.tools.logging :as log]
    [camelot.util.db :as db]
    [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
    [camelot.util.file :as file]
    [camelot.util.filesystem :as filesystem]
-   [clojure.java.io :as io]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera]
    [camelot.model.trap-station :as trap-station]))
@@ -128,7 +126,7 @@
 
 (defn delete!
   [state id]
-  (if-let [survey (get-specific state id)]
+  (when (get-specific state id)
     (let [fs (media/get-all-files-by-survey state id)
           ps {:survey-id id}
           cams (get-active-cameras state ps)]

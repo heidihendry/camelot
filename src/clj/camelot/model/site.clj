@@ -130,7 +130,7 @@
 
 (defn delete!
   [state id]
-  (if-let [site (get-specific state id)]
+  (when (get-specific state id)
     (let [fs (media/get-all-files-by-site state id)
           ps {:site-id id}
           cams (get-active-cameras state ps)]

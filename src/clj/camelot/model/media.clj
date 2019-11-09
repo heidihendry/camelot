@@ -9,7 +9,6 @@
    [camelot.util.db :as db]
    [clojure.java.io :as io]
    [camelot.util.file :as file]
-   [clojure.string :as str]
    [clj-time.format :as tf]
    [clojure.tools.logging :as log])
   (:import
@@ -137,7 +136,7 @@
           fmt (if (= variant :original) orig-format "png")]
       (io/file mpath (apply str (take 2 filename))
                (str prefix filename "." fmt)))
-    (catch Exception e
+    (catch Exception _
       "")))
 
 (defn path-to-media
@@ -209,8 +208,7 @@
    filename :- sch/Str
    variant :- (sch/enum :thumb :preview :original)]
   (if-let [media (get-specific-by-filename state filename)]
-    (let [format (:media-format media)
-          fpath (path-to-media state variant media)]
+    (let [fpath (path-to-media state variant media)]
       (if (and (file/exists? fpath) (file/readable? fpath) (file/file? fpath))
         (io/input-stream fpath)
         (log/warn "File not found: " (file/get-path fpath))))))

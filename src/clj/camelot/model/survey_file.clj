@@ -3,7 +3,6 @@
    [camelot.spec.schema.state :refer [State]]
    [schema.core :as s]
    [camelot.util.db :as db]
-   [camelot.translation.core :as tr]
    [clojure.java.io :as io]
    [ring.util.response :as r]
    [camelot.util.file :as file]

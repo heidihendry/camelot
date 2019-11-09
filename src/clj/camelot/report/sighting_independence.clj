@@ -3,8 +3,7 @@
   (:require
    [clj-time.core :as t]
    [schema.core :as s]
-   [camelot.util.sighting-fields :as util.sf]
-   [clojure.string :as str]))
+   [camelot.util.sighting-fields :as util.sf]))
 
 (defn sighting-fields
   [state survey-id]
@@ -89,8 +88,7 @@
 (defn- independence-reducer
   "Reducing function, adding or updating the sightings based on their dependence."
   [state acc this-sighting]
-  (let [datetime (:media-capture-timestamp this-sighting)
-        species (:taxonomy-id this-sighting)
+  (let [species (:taxonomy-id this-sighting)
         previous-sighting (first-dependent-sighting state this-sighting (get acc species))
         known-sightings (get acc species)]
     (if (nil? species)

@@ -3,7 +3,6 @@
   (:require
    [camelot.system.systems :as systems]
    [camelot.system.state :as state]
-   [camelot.util.maintenance :as maintenance]
    [com.stuartsierra.component :as component]
    [clojure.core.async :refer [>!! <! chan go-loop]]))
 

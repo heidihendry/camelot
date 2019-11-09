@@ -3,7 +3,7 @@
   (:require
    [com.stuartsierra.component :as component]
    [camelot.import.bulk :as bulk]
-   [clojure.core.async :refer [<! chan >! alts! go-loop go close!] :as async]
+   [clojure.core.async :refer [chan >! alts! go close!] :as async]
    [clojure.tools.logging :as log]
    [clj-time.core :as t]))
 
@@ -46,7 +46,7 @@
                               (when-not (zero? (count b))
                                 (try
                                   (.remove! b)
-                                  (catch java.util.NoSuchElementException e
+                                  (catch java.util.NoSuchElementException _
                                     (log/warn "Tried to remove element from buffer, but buffer already empty.")))
                                 (recur))))
                           (catch Exception e
@@ -71,7 +71,7 @@
                    (alter (get-in (:state msg) [:importer :pending]) inc))
                   (import! (:state msg) (:record msg))))))
           (recur))
-        (catch InterruptedException e
+        (catch InterruptedException _
           (log/info "Importer stopped."))
         (catch Exception e
           (log/error "Importer failed with error: " (.getMessage ^Exception e)))))))

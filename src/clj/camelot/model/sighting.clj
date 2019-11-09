@@ -94,7 +94,7 @@
   [state :- State
    id :- s/Int]
   (db/with-transaction [s state]
-    (sighting-field-value/delete-for-sighting! state id)
+    (sighting-field-value/delete-for-sighting! s id)
     (query state :delete! {:sighting-id id})))
 
 (s/defn delete-with-media-ids!

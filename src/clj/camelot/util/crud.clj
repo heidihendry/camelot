@@ -21,9 +21,8 @@
            (re-find #"[0-9]" v))
     (try (edn/read-string v)
          (catch java.lang.Exception e
-           (do
-             (log/warn "as-long: Attempt to read-string on " v)
-             v)))
+           (log/warn "as-long: Attempt to read-string on " v)
+           v))
     v))
 
 (defn- as-date

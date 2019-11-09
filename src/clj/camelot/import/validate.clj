@@ -7,8 +7,7 @@
    [clj-time.format :as tf]
    [clojure.string :as str]
    [camelot.util.state :as state]
-   [camelot.util.file :as file]
-   [clojure.tools.logging :as log]))
+   [camelot.util.file :as file]))
 
 (def record-size-safety-threshold
   "Disk space relative to the raw file size required to upload."

@@ -2,7 +2,7 @@
   (:require
    [schema.core :as s]
    [camelot.spec.schema.state :refer [State]]
-   [camelot.util.trap-station :as util.ts]
+   [camelot.util.trap-station :as utilts]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
    [camelot.model.camera :as camera])
@@ -15,8 +15,8 @@
 (s/defrecord TTrapStation
     [trap-station-name :- s/Str
      survey-site-id :- s/Num
-     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
-     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
+     trap-station-longitude :- (s/pred utilts/valid-longitude?)
+     trap-station-latitude :- (s/pred utilts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-distance-above-ground :- (s/maybe s/Num)
@@ -31,8 +31,8 @@
      trap-station-updated :- org.joda.time.DateTime
      trap-station-name :- s/Str
      survey-site-id :- s/Num
-     trap-station-longitude :- (s/pred util.ts/valid-longitude?)
-     trap-station-latitude :- (s/pred util.ts/valid-latitude?)
+     trap-station-longitude :- (s/pred utilts/valid-longitude?)
+     trap-station-latitude :- (s/pred utilts/valid-latitude?)
      trap-station-altitude :- (s/maybe s/Num)
      trap-station-notes :- (s/maybe s/Str)
      trap-station-distance-above-ground :- (s/maybe s/Num)

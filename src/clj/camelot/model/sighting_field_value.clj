@@ -6,8 +6,7 @@
    [clojure.string :as str]
    [camelot.model.sighting-field :as sighting-field]
    [camelot.util.sighting-fields :as util.sf]
-   [camelot.util.db :as db]
-   [clj-time.core :as t]))
+   [camelot.util.db :as db]))
 
 (def query (db/with-db-keys :sighting-field-value))
 
@@ -88,13 +87,13 @@
   (let [survey-sf (survey-fields-by-key state survey-id)
         user-key-re (re-pattern (str "^" util.sf/user-key-prefix))]
     (dorun (->> data
-                (filter (fn [[k v]] (re-find user-key-re (name k))))
+                (filter (fn [[k _]] (re-find user-key-re (name k))))
                 (map
                  (fn [[k v]]
                    (let [sf (get survey-sf
                                  (str/replace (name k) user-key-re ""))]
                      [(:sighting-field-id sf) v])))
-                (filter (fn [[k v]] (not (nil? k))))
+                (filter (fn [[k _]] (not (nil? k))))
                 (map (fn [[k v]] (create! state sighting-id k v)))))))
 
 (defn update!

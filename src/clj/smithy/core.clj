@@ -1,5 +1,4 @@
-(ns smithy.core
-  )
+(ns smithy.core)
 
 (defmacro defsmith
   [smith-name smiths-atom vars mould]

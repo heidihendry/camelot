@@ -7,8 +7,7 @@
    [clj-time.format :as tf]
    [clojure.edn :as edn]
    [camelot.util.trap-station :as trap]
-   [camelot.util.file :as file]
-   [clojure.tools.logging :as log]))
+   [camelot.util.file :as file]))
 
 (defn read-metadata-string
   "Read str as edn, or :error if not readable."
@@ -16,7 +15,7 @@
   (when str
     (try
       (edn/read-string str)
-      (catch java.lang.Exception e
+      (catch java.lang.Exception _
         :error))))
 
 (def timestamp-formatters

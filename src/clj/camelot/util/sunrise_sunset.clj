@@ -2,7 +2,6 @@
   (:require
    [schema.core :as s]
    [clj-time.coerce :as tc]
-   [clj-time.local :as tl]
    [clj-time.core :as t])
   (:import
    (com.luckycatlabs.sunrisesunset SunriseSunsetCalculator)

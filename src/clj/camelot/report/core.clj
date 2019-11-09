@@ -1,7 +1,6 @@
 (ns camelot.report.core
   "Generate a report from a DSL."
   (:require
-   [camelot.util.db :as db]
    [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
    [camelot.util.sighting-fields :as util.sf]
@@ -15,7 +14,6 @@
    [clojure.set :as set]
    [ring.util.response :as r]
    [schema.core :as s]
-   [yesql.core :as sql]
    [camelot.util.model :as model])
   (:import
    (clojure.lang IFn)))
@@ -33,7 +31,7 @@
 
 (defn- distinct-in-results
   [results]
-  (loop [{:keys [acc check against] :as ps} {:acc [] :against {} :check results}]
+  (loop [{:keys [acc check against]} {:acc [] :against {} :check results}]
     (if (empty? check)
       acc
       (if-let [cur (first check)]

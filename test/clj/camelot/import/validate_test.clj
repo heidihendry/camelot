@@ -21,7 +21,7 @@
   []
   (update-in (state/gen-state {:language :en})
              [:config :paths :media]
-             (fn [x] "/path/to/media")))
+             (constantly "/path/to/media")))
 
 (defn check-within-session-date
   [data]

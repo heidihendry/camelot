@@ -1,7 +1,6 @@
 (ns camelot.services.species-search
   (:require
    [clj-http.client :as http]
-   [clojure.core.async :refer [go <!]]
    [cheshire.core :as json]
    [camelot.model.taxonomy :as taxonomy]
    [camelot.model.associated-taxonomy :as ataxonomy]))
@@ -87,11 +86,11 @@
 (defn get-or-create-species
   [state survey-id details]
   (let [ttax (taxonomy/ttaxonomy {:taxonomy-species (:species details)
-                                  :taxonomy-genus (:genus details)})]
-    (let [ts (taxonomy/get-specific-by-taxonomy state ttax)]
-      (if ts
-        (ataxonomy/ensure-associated state survey-id (:taxonomy-id ts))
-        (create-taxonomy-with-id state survey-id (:id details))))))
+                                  :taxonomy-genus (:genus details)})
+        ts (taxonomy/get-specific-by-taxonomy state ttax)]
+    (if ts
+      (ataxonomy/ensure-associated state survey-id (:taxonomy-id ts))
+      (create-taxonomy-with-id state survey-id (:id details)))))
 
 (defn ensure-survey-species-known
   [state species survey-id]

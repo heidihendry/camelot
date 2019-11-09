@@ -2,8 +2,7 @@
   (:require
    [camelot.spec.schema.state :refer [State]]
    [schema.core :as s]
-   [camelot.util.db :as db]
-   [camelot.translation.core :as tr]))
+   [camelot.util.db :as db]))
 
 ;; NOTE: 030_survey_taxonomy_migration needs to be updated should this model
 ;; change.

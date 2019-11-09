@@ -8,13 +8,11 @@
    [camelot.util.file :as file]
    [camelot.util.model :as model]
    [camelot.util.bulk-import :refer [default-column-mappings]]
-   [clj-time.format :as tf]
    [clojure.data.csv :as csv]
    [clojure.edn :as edn]
    [clojure.java.io :as io]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
-   [ring.util.response :as r]
    [schema.core :as s]))
 
 (s/defn gps-parts-to-decimal :- s/Num
@@ -53,10 +51,9 @@ direction is considered negative."
    lon-ref :- (s/maybe s/Str)]
   (when-not (or (nil? lon) (nil? lon-ref))
     (try (parse-gps "E" lon lon-ref)
-         (catch java.lang.Exception e
-           (do
-             (log/warn "to-longitude: Attempt to parse " lon " as GPS")
-             nil)))))
+         (catch java.lang.Exception _
+           (log/warn "to-longitude: Attempt to parse " lon " as GPS")
+           nil))))
 
 (s/defn to-latitude :- (s/maybe s/Num)
   "Convert latitude in degrees and a latitude reference to a decimal."
@@ -64,10 +61,9 @@ direction is considered negative."
    lat-ref :- (s/maybe s/Str)]
   (when-not (or (nil? lat) (nil? lat-ref))
     (try (parse-gps "N" lat lat-ref)
-         (catch java.lang.Exception e
-           (do
-             (log/warn "to-latitude: Attempt to parse " lat " as GPS")
-             nil)))))
+         (catch java.lang.Exception _
+           (log/warn "to-latitude: Attempt to parse " lat " as GPS")
+           nil))))
 
 (defn calculate-gps-latitude
   [data]
