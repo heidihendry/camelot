@@ -19,7 +19,7 @@
                (dom/p #js {:className "error-summary"}
                       (tr/translate ::generic-error))
                (dom/textarea #js {:className "error-text"
-                                  :disabled "disabled"
+                                  :readonly "readonly"
                                   :rows 12
                                   :cols 55
                                   :value (:error data)})
@@ -50,7 +50,7 @@
                (dom/h3 #js {:className "info-title"}
                        (tr/translate ::problems))
                (dom/textarea #js {:className "info-text"
-                                  :disabled "disabled"
+                                  :readonly "readonly"
                                   :rows 12
                                   :cols 55
                                   :value (get-in data [:notification :info])})
