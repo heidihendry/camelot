@@ -26,6 +26,17 @@ LEFT JOIN bounding_box USING (bounding_box_id)
 LEFT JOIN taxonomy USING (taxonomy_id)
 WHERE media_id = :media_id
 
+-- name: get-all-for-media-ids
+SELECT sighting_id, sighting_created, sighting_updated, sighting_quantity,
+       taxonomy_id, media_id, taxonomy_genus,
+       taxonomy_species, bounding_box_id,
+       bounding_box_dimension_type, bounding_box_min_x, bounding_box_min_y,
+       bounding_box_width, bounding_box_height
+FROM sighting
+LEFT JOIN bounding_box USING (bounding_box_id)
+LEFT JOIN taxonomy USING (taxonomy_id)
+WHERE media_id IN (:media_ids)
+
 -- name: set-bounding-box!
 UPDATE sighting
 SET bounding_box_id = :bounding_box_id

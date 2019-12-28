@@ -16,6 +16,14 @@ SELECT media_id, media_created, media_updated, media_filename,
 FROM media
 WHERE media_id = :media_id
 
+-- name: get-list
+SELECT media_id, media_created, media_updated, media_filename,
+       media_notes, media_cameracheck, media_attention_needed,
+       media_processed, media_capture_timestamp, media_reference_quality,
+       trap_station_session_camera_id, media_format
+FROM media
+WHERE media_id IN (:media_ids)
+
 -- name: get-all
 SELECT media_id, media_created, media_updated, media_filename,
        media_notes, media_cameracheck, media_attention_needed,

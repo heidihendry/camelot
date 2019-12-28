@@ -57,9 +57,9 @@
 
 (s/defn hydrate-media
   [state ids]
-  (->> ids
-       (map #(media/get-specific state %))
-       (build-records state (sighting/get-all* state))))
+  (let [media (media/get-list state ids)
+        sightings (sighting/get-all-for-media-ids state ids)]
+    (build-records state sightings media)))
 
 (s/defn update-bulk-media-flags
   [state :- State

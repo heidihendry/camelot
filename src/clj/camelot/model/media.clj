@@ -107,6 +107,12 @@
            first
            media))
 
+(defn get-list
+  [state ids]
+  (->> {:media-ids ids}
+       (query state :get-list)
+       (map media)))
+
 (sch/defn get-specific-by-filename :- (sch/maybe Media)
   [state :- State
    filename :- sch/Str]
