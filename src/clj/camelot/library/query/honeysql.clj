@@ -54,6 +54,9 @@
                :sighting
                [:= :sighting.media-id :media.media-id]
 
+               :suggestion
+               [:= :suggestion.media-id :media.media-id]
+
                :taxonomy
                [:= :taxonomy.taxonomy-id :sighting.taxonomy-id]
 

@@ -1,10 +1,15 @@
 (ns camelot.model.sighting
   "Sighting models and data access."
   (:require
+   [camelot.util.data :as data-util]
    [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field-value :as sighting-field-value]
+   [camelot.model.bounding-box :as bounding-box]
+   [camelot.model.suggestion :as suggestion]
    [camelot.util.db :as db]
-   [schema.core :as s]))
+   [schema.core :as s])
+  (:import
+   (camelot.model.bounding_box BoundingBox)))
 
 (def query (db/with-db-keys :sightings))
 
@@ -12,6 +17,7 @@
     [sighting-quantity :- s/Int
      taxonomy-id :- s/Int
      media-id :- s/Int
+     bounding-box-id :- s/Int
      sighting-fields :- (s/maybe {s/Int s/Str})]
   {s/Any s/Any})
 
@@ -26,17 +32,21 @@
      sighting-created :- org.joda.time.DateTime
      sighting-updated :- org.joda.time.DateTime
      sighting-quantity :- s/Int
+     bounding-box :- (s/maybe BoundingBox)
      taxonomy-id :- (s/maybe s/Int)
      media-id :- s/Int
      sighting-label :- s/Str]
   {s/Any s/Any})
 
-(s/defn sighting :- Sighting
+(defn sighting
   [data]
-  (map->Sighting (-> data
-                     (assoc :sighting-label (str (:sighting-quantity data) "x "
-                                                 (:taxonomy-genus data) " "
-                                                 (:taxonomy-species data))))))
+  (-> data
+      (assoc :sighting-label (str (:sighting-quantity data) "x "
+                                  (:taxonomy-genus data) " "
+                                  (:taxonomy-species data)))
+      (data-util/key-prefix-to-map [:bounding-box])
+      (data-util/dissoc-if :bounding-box #(nil? (-> % :bounding-box :id)))
+      map->Sighting))
 
 (s/defn tsighting :- TSighting
   [data]
@@ -73,13 +83,26 @@
             (map (fn [[k v]]
                    (sighting-field-value/create! state sighting-id k v))))))
 
+(defn set-bounding-box!
+  "Set the bounding box for `sighting-id`. `bounding-box-id` may be `nil`."
+  [state sighting-id bounding-box-id]
+  (let [sighting (sighting (get-specific state sighting-id))]
+    (db/with-transaction [s state]
+      (if-let [bounding-box-id (:bounding-box-id sighting)]
+        (bounding-box/delete! s bounding-box-id))
+      (query s :set-bounding-box! {:sighting-id sighting-id
+                                       :bounding-box-id bounding-box-id}))))
+
 (s/defn create!
-  [state :- State
-   data :- TSighting]
-  (let [record (query state :create<! data)
-        sighting-id (int (:1 record))]
-    (create-sighting-field-value! state sighting-id (:sighting-fields data))
-    (sighting (get-specific state sighting-id))))
+  [state data]
+  (db/with-transaction [s state]
+    (let [record (query s :create<! data)
+          sighting-id (int (:1 record))]
+      (create-sighting-field-value! s sighting-id (:sighting-fields data))
+      (let [sighting (get-specific s sighting-id)]
+        (if-let [bounding-box-id (:bounding-box-id sighting)]
+          (suggestion/delete-with-bounding-box! s bounding-box-id))
+        sighting))))
 
 (s/defn update!
   [state :- State
@@ -93,9 +116,12 @@
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (db/with-transaction [s state]
-    (sighting-field-value/delete-for-sighting! s id)
-    (query state :delete! {:sighting-id id})))
+  (let [sighting (get-specific state id)]
+    (db/with-transaction [s state]
+      (if-let [bounding-box-id (get-in sighting [:bounding-box :id])]
+        (bounding-box/delete! s bounding-box-id))
+      (sighting-field-value/delete-for-sighting! s id)
+      (query s :delete! {:sighting-id id}))))
 
 (s/defn delete-with-media-ids!
   [state :- State

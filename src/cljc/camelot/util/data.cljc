@@ -48,6 +48,7 @@
       (assoc acc k v))))
 
 (defn key-prefix-to-map
+  "Return the map `d` with submaps for keys prefixed by the name of a key in `ks`."
   [d ks]
   (reduce-kv (partial key-prefix-reducer-fn ks) {} d))
 
@@ -108,3 +109,10 @@
    (assign-keys smap keyseq nil))
   ([smap keyseq default]
    (require-keys (select-keys smap keyseq) keyseq default)))
+
+(defn dissoc-if
+  "Remove a `k` from `data` when `data` matches `pred`."
+  [data k pred]
+  (if (pred data)
+    (dissoc data k)
+    data))
