@@ -61,8 +61,8 @@
                                    :value contrast
                                    :update! update-contrast!}))))))
 
-(defn suggestion-bounding-box
-  [suggestion owner]
+(defn bounding-box
+  [bounding-box owner]
   (reify
     om/IInitState
     (init-state [_]
@@ -80,22 +80,33 @@
                                           (fn [] (om/set-state! owner :just-mounted false)))))))
     om/IRenderState
     (render-state [_ state]
-      (when (and (:bounding-box suggestion) (:width state) (:height state))
-        (let [area (* (get-in suggestion [:bounding-box :width])
-                      (get-in suggestion [:bounding-box :height]))
-              base-styles {:left (str (* (get-in suggestion [:bounding-box :min-x])
-                                         (:width state)) "px")
-                           :top (str (* (get-in suggestion [:bounding-box :min-y])
-                                        (:height state)) "px")
-                           :width (str (* (get-in suggestion [:bounding-box :width])
-                                          (:width state)) "px")
-                           :height (str (* (get-in suggestion [:bounding-box :height])
-                                           (:width state)) "px")
+      (when (and (:width state) (:height state))
+        (let [area (* (:width bounding-box) (:height bounding-box))
+              base-styles {:left (str (* (:min-x bounding-box) (:width state)) "px")
+                           :top (str (* (:min-y bounding-box) (:width state)) "px")
+                           :width (str (* (:width bounding-box) (:width state)) "px")
+                           :height (str (* (:height bounding-box) (:width state)) "px")
                            :zIndex (int (- 20 (* area 10)))}]
           (dom/div #js {:className "bounding-box"
                         :style (clj->js (if (:just-mounted state)
                                           (assoc base-styles :opacity "0.7")
                                           base-styles))}))))))
+
+(defn suggestion-bounding-box
+  [suggestion owner]
+  (reify
+    om/IRender
+    (render [_]
+      (if-let [bb (:bounding-box suggestion)]
+        (om/build bounding-box bb)))))
+
+(defn sighting-bounding-box
+  [sighting owner]
+  (reify
+    om/IRender
+    (render [_]
+      (if-let [bb (:bounding-box sighting)]
+        (om/build bounding-box bb)))))
 
 (defn mcp-preview
   [selected owner]
@@ -120,6 +131,8 @@
                         (dom/div nil
                                  (om/build-all suggestion-bounding-box (:suggestions selected)
                                                {:key :suggestion-id})
+                                 (om/build-all sighting-bounding-box (:sightings selected)
+                                               {:key :sighting-id})
                                  (dom/img #js {:id "camelot-preview-image"
                                                :src (str (get selected :media-uri))
                                                :style #js {:filter (str "brightness(" (exp-perc (:brightness state)) ") "
