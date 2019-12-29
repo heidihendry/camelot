@@ -23,8 +23,8 @@
      bounding-box
      media-id])
 
-(defn ^:private suggestion
-  [_ data]
+(defn suggestion
+  [data]
   (-> data
       (data-util/key-prefix-to-map [:bounding-box])
       (data-util/dissoc-if :bounding-box #(nil? (-> % :bounding-box :id)))
@@ -39,14 +39,14 @@
   [state media-id]
   (->> {:media-id media-id}
        (query state :get-all)
-       (map (partial suggestion state))))
+       (map suggestion)))
 
 (defn get-all-for-media-ids
   "Retrieve all suggestions for the given collection of `media-ids`."
   [state media-ids]
   (->> {:media-ids media-ids}
        (query state :get-all-for-media-ids)
-       (map (partial suggestion state))))
+       (map suggestion)))
 
 (defn get-specific
   "Retrieve a suggestion with the given `id`."
@@ -54,7 +54,7 @@
   (some->> {:suggestion-id id}
            (query state :get-specific)
            first
-           (suggestion state)))
+           suggestion))
 
 (defn create!
   "Create a suggestion with the given data."
