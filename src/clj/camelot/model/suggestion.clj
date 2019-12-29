@@ -41,6 +41,13 @@
        (query state :get-all)
        (map (partial suggestion state))))
 
+(defn get-all-for-media-ids
+  "Retrieve all suggestions for the given collection of `media-ids`."
+  [state media-ids]
+  (->> {:media-ids media-ids}
+       (query state :get-all-for-media-ids)
+       (map (partial suggestion state))))
+
 (defn get-specific
   "Retrieve a suggestion with the given `id`."
   [state id]

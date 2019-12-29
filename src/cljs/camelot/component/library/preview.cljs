@@ -1,6 +1,7 @@
 (ns camelot.component.library.preview
   "Component for Library media preview with details panel."
-  (:require [om.dom :as dom]
+  (:require [goog.object :as object]
+            [om.dom :as dom]
             [camelot.state :as state]
             [om.core :as om]
             [camelot.component.library.util :as util]
@@ -60,6 +61,42 @@
                                    :value contrast
                                    :update! update-contrast!}))))))
 
+(defn suggestion-bounding-box
+  [suggestion owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:width nil
+       :height nil
+       :just-mounted true})
+    om/IDidMount
+    (did-mount [_]
+      (.addEventListener (.getElementById js/document "camelot-preview-image") "load"
+                         (fn [evt]
+                           (let [rect (.getBoundingClientRect (.-target evt))]
+                             (om/set-state! owner :width (object/get rect "width"))
+                             (om/set-state! owner :height (object/get rect "height"))
+                             (.requestAnimationFrame js/window
+                                          (fn [] (om/set-state! owner :just-mounted false)))))))
+    om/IRenderState
+    (render-state [_ state]
+      (when (and (:bounding-box suggestion) (:width state) (:height state))
+        (let [area (* (get-in suggestion [:bounding-box :width])
+                      (get-in suggestion [:bounding-box :height]))
+              base-styles {:left (str (* (get-in suggestion [:bounding-box :min-x])
+                                         (:width state)) "px")
+                           :top (str (* (get-in suggestion [:bounding-box :min-y])
+                                        (:height state)) "px")
+                           :width (str (* (get-in suggestion [:bounding-box :width])
+                                          (:width state)) "px")
+                           :height (str (* (get-in suggestion [:bounding-box :height])
+                                           (:width state)) "px")
+                           :zIndex (int (- 20 (* area 10)))}]
+          (dom/div #js {:className "bounding-box"
+                        :style (clj->js (if (:just-mounted state)
+                                          (assoc base-styles :opacity "0.7")
+                                          base-styles))}))))))
+
 (defn mcp-preview
   [selected owner]
   (reify
@@ -81,7 +118,10 @@
                              :target "_blank"
                              :rel "noopener noreferrer"}
                         (dom/div nil
-                                 (dom/img #js {:src (str (get selected :media-uri))
+                                 (om/build-all suggestion-bounding-box (:suggestions selected)
+                                               {:key :suggestion-id})
+                                 (dom/img #js {:id "camelot-preview-image"
+                                               :src (str (get selected :media-uri))
                                                :style #js {:filter (str "brightness(" (exp-perc (:brightness state)) ") "
                                                                         "contrast(" (exp-perc (:contrast state)) ")")
                                                            :backgroundImage (str "url("(get selected :media-uri) "/thumb)")

@@ -4,6 +4,7 @@
    [schema.core :as s]
    [camelot.util.db :as db]
    [camelot.model.sighting :as sighting]
+   [camelot.model.suggestion :as suggestion]
    [camelot.model.media :as media]
    [camelot.spec.schema.state :refer [State]]
    [clojure.edn :as edn]
@@ -46,20 +47,24 @@
   (query/query-media state qstr))
 
 (s/defn build-records
-  [state sightings media]
+  [state sightings suggestions media]
   (let [media-sightings (group-by :media-id sightings)
+        media-suggestions (group-by :media-id suggestions)
         media-uri #(format "/media/photo/%s" (:media-filename %))
-        sightings-for #(get media-sightings (:media-id %))]
+        sightings-for #(get media-sightings (:media-id %))
+        suggestions-for #(get media-suggestions (:media-id %))]
     (map #(assoc %
                  :sightings (vec (sightings-for %))
+                 :suggestions (vec (suggestions-for %))
                  :media-uri (media-uri %))
          media)))
 
 (s/defn hydrate-media
   [state ids]
   (let [media (media/get-list state ids)
-        sightings (sighting/get-all-for-media-ids state ids)]
-    (build-records state sightings media)))
+        sightings (sighting/get-all-for-media-ids state ids)
+        suggestions (suggestion/get-all-for-media-ids state ids)]
+    (build-records state sightings suggestions media)))
 
 (s/defn update-bulk-media-flags
   [state :- State
