@@ -68,7 +68,7 @@
                     (analytics/track-timing state {:hit-type "timing"
                                                    :category "detector"
                                                    :variable "poll-task-scheduled-to-completed"
-                                                   :time (- (tc/long (:created v)) (tc/long (t/now)))
+                                                   :time (- (tc/long (t/now)) (tc/long (:created v)))
                                                    :ni true})
                     (log/info "Found results for " task-id)
                     (doseq [image (-> resp :result :images)]
@@ -78,9 +78,26 @@
                             (let [payload (build-payload (:result resp) image)]
                               (log/info "Scheduling result processing for" media-id)
                               (async/>! result-ch (event/to-image-detection-event media-id payload)))
-                            (log/error "Could not find media ID in" file))
-                          (log/error "Could not find file in image detection data" image))
+                            (do
+                              (analytics/track state {:category "detector"
+                                                      :action "poll-media-id-not-found"
+                                                      :label "media"
+                                                      :label-value media-id
+                                                      :ni true})
+                              (log/error "Could not find media ID in" file)))
+                          (do
+                            (analytics/track state {:category "detector"
+                                                    :action "poll-image-file-data-missing"
+                                                    :label "task"
+                                                    :label-value task-id
+                                                    :ni true})
+                            (log/error "Could not find file in image detection data" image)))
                         (catch Exception e
+                          (analytics/track state {:category "detector"
+                                                  :action "poll-suggestion-creation-exception"
+                                                  :label "task"
+                                                  :label-value task-id
+                                                  :ni true})
                           (log/error "Could not find media ID in" (:file image) e)))))
 
                   "FAILED"
