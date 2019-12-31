@@ -55,6 +55,7 @@
       (str/split #"\|")
       (non-empty-list)
       (append-to-strings (if (:unprocessed-only search-conf) " processed:false" ""))
+      (append-to-strings (if (:animals-only search-conf) " (suggestion-key:animal or sighting-id:*)" ""))
       (append-to-strings (if (valid-id? (:trap-station-id search-conf))
                            (str " trapid:" (:trap-station-id search-conf))
                            ""))

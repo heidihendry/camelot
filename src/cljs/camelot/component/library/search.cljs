@@ -349,7 +349,12 @@
                 (om/build subfilter-checkbox-component data
                           {:init-state {:key :unprocessed-only
                                         :label (tr/translate ::filter-unprocessed-label)
-                                        :search-chan (:search-chan state)}})))))
+                                        :search-chan (:search-chan state)}})
+                (when (-> (state/settings) :detector :enabled)
+                  (om/build subfilter-checkbox-component data
+                            {:init-state {:key :animals-only
+                                          :label (tr/translate ::filter-animals-label)
+                                          :search-chan (:search-chan state)}}))))))
 
 (defn search-bar-component
   [data owner]

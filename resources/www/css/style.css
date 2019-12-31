@@ -1120,11 +1120,11 @@ pre.field-input {
     top: 0.6rem;
 }
 .library .search-bar .checkbox-container {
+    position: relative;
     display: inline-block;
-    position: absolute;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
-    margin-top: -0.6rem;
+    top: -1rem;
     padding-top: 0;
 }
 #app .library .search-bar .checkbox-container label {

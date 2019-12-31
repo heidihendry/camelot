@@ -574,7 +574,8 @@
     :media-cameracheck-title "Mark the selected media as a human-caused test fire."
     :media-processed-title "Set the selected media as processed or unprocessed."
     :media-reference-quality-title "Indicates the selected media are high quality and should be used as a reference."
-    :filter-unprocessed-label "Unprocessed"}
+    :filter-unprocessed-label "Unprocessed"
+    :filter-animals-label "Animals"}
 
    :camelot.component.albums
    {:num-nights "%d nights"
