@@ -1,5 +1,6 @@
 (ns camelot.detection.prepare
   (:require
+   [camelot.services.analytics :as analytics]
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
@@ -46,10 +47,14 @@
             (let [scid (:subject-id v)]
               (log/info "Preparing task with scid " scid)
               (if (state/submitted-task? @detector-state-ref scid)
-                (do
+                (let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]
                   (log/info "Task already submitted. Starting poll.")
-                  (let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]
-                    (async/>! poll-ch (event/to-check-result-event task-id))))
+                  (analytics/track state {:category "detector"
+                                          :action "prepare-skip-task-submission"
+                                          :label "task"
+                                          :label-value task-id
+                                          :ni true})
+                  (async/>! poll-ch (event/to-check-result-event task-id)))
                 (let [media (retrieve state @detector-state-ref scid)]
                   (if (seq media)
                     (do
@@ -58,7 +63,12 @@
                         (if-let [task (client/create-task state)]
                           (do
                             (log/info "Created task " (:id task))
-                            (state/add-task-to-state detector-state-ref scid task))
+                            (state/add-task-to-state detector-state-ref scid task)
+                            (analytics/track state {:category "detector"
+                                                    :action "prepare-task-created"
+                                                    :label "task"
+                                                    :label-value (:id task)
+                                                    :ni true}))
                           (log/warn "Failed to create task")))
                       (if-let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]
                         (do

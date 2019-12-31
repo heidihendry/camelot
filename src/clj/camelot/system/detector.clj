@@ -1,6 +1,7 @@
 (ns camelot.system.detector
   "Wildlife detector component."
   (:require
+   [camelot.services.analytics :as analytics]
    [duratom.core :as duratom]
    [com.stuartsierra.component :as component]
    [clojure.core.async :as async]
@@ -19,7 +20,6 @@
   (let [file (io/file (-> state :config :path :database) detector-filename)]
     (.getCanonicalPath ^File file)))
 
-;; TODO add an endpoint for surfacing the event status
 (defrecord Detector [config database]
   component/Lifecycle
   (start [this]
@@ -30,6 +30,9 @@
         (if (:cmd-chan this)
           this
           (do
+            (analytics/track state {:category "detector"
+                                    :action "startup"
+                                    :ni true})
             (log/info "Starting detector...")
             (let [detector-state (duratom/duratom :local-file
                                                   :file-path (detector-path state)

@@ -8,6 +8,7 @@
    (sch/required-key :database) sch/Any
    (sch/optional-key :app) sch/Any
    (sch/optional-key :importer) sch/Any
+   (sch/optional-key :detector) sch/Any
    (sch/optional-key :figwheel) sch/Any
    (sch/optional-key :session) sch/Any
    (sch/optional-key :jetty) sch/Any

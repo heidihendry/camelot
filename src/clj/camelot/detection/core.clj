@@ -11,6 +11,7 @@
 
 ;; TODO check container expiry and recreat task if necessary
 ;; TODO implement mechanism to force-scheduling of newly finalised TS sessions
+;; TODO consider connection pooling
 (defn run
   "Run the detector"
   [state detector-state-ref cmd-mult]

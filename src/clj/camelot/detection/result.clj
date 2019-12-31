@@ -1,5 +1,6 @@
 (ns camelot.detection.result
   (:require
+   [camelot.services.analytics :as analytics]
    [camelot.detection.state :as state]
    [camelot.model.suggestion :as suggestion]
    [camelot.model.bounding-box :as bounding-box]
@@ -47,6 +48,18 @@
           (do
             (async/>! event-ch v)
             (log/info "Creating suggestions for media-id" (:subject-id v))
+            (let [detections (-> v :payload :image :detections)
+                  avg-confidence (/ (reduce + 0 (map :conf detections))
+                                    (count detections))]
+              (analytics/track state {:category "detector"
+                                      :action "result-create-suggestions"
+                                      :label "media"
+                                      :label-value (:subject-id v)
+                                      :dimension1 "suggestions"
+                                      :metric1 (count (-> v :payload :image :detections))
+                                      :dimension2 "average-confidence"
+                                      :metric2 avg-confidence
+                                      :ni true}))
             (let [media-id (:subject-id v)]
               (doseq [detection (-> v :payload :image :detections)]
                 (log/info "Creating suggestion for media-id" (:subject-id v))
@@ -57,6 +70,11 @@
                        state
                        (build-suggestion media-id bb (:payload v) detection))))
                   (catch Exception e
+                    (analytics/track state {:category "detector"
+                                            :action "result-create-suggestion-failed"
+                                            :label "media"
+                                            :label-value media-id
+                                            :ni true})
                     (log/error "Error while creating suggestion " media-id detection e))))
               (state/set-media-processing-status! detector-state-ref media-id "completed"))
             (recur)))))

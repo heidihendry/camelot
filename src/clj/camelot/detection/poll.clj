@@ -1,5 +1,6 @@
 (ns camelot.detection.poll
   (:require
+   [camelot.services.analytics :as analytics]
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
@@ -8,6 +9,8 @@
    [clojure.tools.logging :as log]
    [clj-time.core :as t]
    [clj-time.coerce :as tc]))
+
+(def ^:private retry-limit 20)
 
 (defn- build-payload
   [result image]
@@ -33,15 +36,40 @@
           (let [task-id (:subject-id v)]
             (async/>! event-ch v)
             (when (:valid-at v)
-              (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
-                (log/info "Retrying poll with task id" task-id "in" (/ delay 1000.0) "seconds")
-                (async/<! (async/timeout delay))))
+              (if (< (:retries v) retry-limit)
+                (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
+                  (analytics/track state {:category "detector"
+                                          :action "poll-task-retried"
+                                          :label "task"
+                                          :label-value task-id
+                                          :dimension1 "retries"
+                                          :metric1 (:retries v)
+                                          :ni true})
+                  (log/info "Retrying poll with task id" task-id "in" (/ delay 1000.0) "seconds")
+                  (async/<! (async/timeout delay)))
+                (analytics/track state {:category "detector"
+                                        :action "poll-task-retry-limit-reached"
+                                        :label "task"
+                                        :label-value task-id
+                                        :ni true})))
             (log/info "Fetching results for task id" task-id)
             (try
               (let [resp (client/get-task state task-id)]
                 (condp = (:status resp)
                   "COMPLETED"
                   (do
+                    (analytics/track state {:category "detector"
+                                            :action "poll-task-completed"
+                                            :label "task"
+                                            :label-value task-id
+                                            :dimension1 "images"
+                                            :metric1 (count (-> resp :result :images))
+                                            :ni true})
+                    (analytics/track-timing state {:hit-type "timing"
+                                                   :category "detector"
+                                                   :variable "poll-task-scheduled-to-completed"
+                                                   :time (- (tc/long (:created v)) (tc/long (t/now)))
+                                                   :ni true})
                     (log/info "Found results for " task-id)
                     (doseq [image (-> resp :result :images)]
                       (try
@@ -55,11 +83,19 @@
                         (catch Exception e
                           (log/error "Could not find media ID in" (:file image) e)))))
 
-                  ;; TODO distinguish retryable and non-retryable failures
                   "FAILED"
                   (do
+                    (analytics/track state {:category "detector"
+                                            :action "poll-task-failed"
+                                            :label "task"
+                                            :label-value task-id
+                                            :ni true})
                     (log/info "Failed to get results for" task-id)
                     (state/set-task-status! detector-state-ref task-id "failed"))
+
+                  ;; TODO distinguish retryable and non-retryable failures
+                  "PROBLEM"
+                  nil
 
                   "SUBMITTED"
                   (async/go (async/>! ch (assoc v :valid-at (t/plus (t/now) (t/minutes 1))

@@ -1,5 +1,6 @@
 (ns camelot.detection.submit
   (:require
+   [camelot.services.analytics :as analytics]
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
@@ -42,16 +43,29 @@
           retry-ch
           (let [task-id (:subject-id v)]
             (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
-              (log/info "Retrying check with task id" (:subject-id v)
+              (log/info "Retrying check with task id" task-id
                         "in" (/ delay 1000.0) "seconds")
               (async/<! (async/timeout delay)))
             (when (< (:retries v) retry-limit)
               (if (pending? @detector-state-ref task-id)
-                (async/go (async/>! retry-ch (-> v
-                                                 (assoc :valid-at (t/plus (t/now) (t/minutes 1)))
-                                                 (update :retries inc))))
-                (when (some-completed? @detector-state-ref task-id)
-                  (async/go (async/>! int-ch v)))))
+                (do
+                  (analytics/track state {:category "detector"
+                                          :action "submit-retry"
+                                          :label "task"
+                                          :label-value task-id
+                                          :ni true})
+                  (async/go (async/>! retry-ch (-> v
+                                                   (assoc :valid-at (t/plus (t/now) (t/minutes 1)))
+                                                   (update :retries inc)))))
+                (if (some-completed? @detector-state-ref task-id)
+                  (async/go (async/>! int-ch v))
+                  (do
+                    (analytics/track state {:category "detector"
+                                            :action "submit-no-completed-uploads"
+                                            :label "task"
+                                            :label-value task-id
+                                            :ni true})
+                    (log/warn "No uploads completed for" task-id)))))
             (recur))
 
           ch
@@ -60,6 +74,11 @@
             (if (pending? @detector-state-ref task-id)
               (do
                 (log/info "Scheduling retry")
+                (analytics/track state {:category "detector"
+                                        :action "submit-retry"
+                                        :label "task"
+                                        :label-value task-id
+                                        :ni true})
                 (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 1))
                                                      :retries 1)))
                 (log/info "Scheduled retry"))
@@ -68,16 +87,40 @@
                   (log/info "Placing on internal channel" task-id)
                   (async/go (async/>! int-ch (event/to-submit-event task-id)))
                   (log/info "Placed on internal channel" task-id))
-                (log/warn "No uploads completed for" task-id)))
+                (do
+                  (analytics/track state {:category "detector"
+                                          :action "submit-no-completed-uploads"
+                                          :label "task"
+                                          :label-value task-id
+                                          :ni true})
+                  (log/warn "No uploads completed for" task-id))))
             (recur))
 
           int-ch
           (do
             (async/>! event-ch v)
             (let [task-id (:subject-id v)]
-              (log/info "Submit task with id" task-id)
-              (client/submit-task state task-id)
-              (state/set-task-status! detector-state-ref task-id "submitted")
-              (async/>! poll-ch (event/to-check-result-event task-id)))
+              (try
+                (log/info "Submit task with id" task-id)
+                (analytics/track state {:category "detector"
+                                        :action "submit-task-called"
+                                        :label "task"
+                                        :label-value task-id
+                                        :ni true})
+                (client/submit-task state task-id)
+                (state/set-task-status! detector-state-ref task-id "submitted")
+                (analytics/track state {:category "detector"
+                                        :action "submit-task-call-success"
+                                        :label "task"
+                                        :label-value task-id
+                                        :ni true})
+                (async/>! poll-ch (event/to-check-result-event task-id))
+                (catch Exception e
+                  (log/info "Submit call for task" task-id "failed with exception" e)
+                  (analytics/track state {:category "detector"
+                                          :action "submit-task-call-failed"
+                                          :label "task"
+                                          :label-value task-id
+                                          :ni true}))))
             (recur)))))
     ch))
