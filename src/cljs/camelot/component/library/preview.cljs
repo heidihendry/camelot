@@ -83,9 +83,9 @@
       (when (and (:width state) (:height state))
         (let [area (* (:width bounding-box) (:height bounding-box))
               base-styles {:left (str (* (:min-x bounding-box) (:width state)) "px")
-                           :top (str (* (:min-y bounding-box) (:width state)) "px")
+                           :top (str (* (:min-y bounding-box) (:height state)) "px")
                            :width (str (* (:width bounding-box) (:width state)) "px")
-                           :height (str (* (:height bounding-box) (:width state)) "px")
+                           :height (str (* (:height bounding-box) (:height state)) "px")
                            :zIndex (int (- 20 (* area 10)))}]
           (dom/div #js {:className "bounding-box"
                         :style (clj->js (if (:just-mounted state)
