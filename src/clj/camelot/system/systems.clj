@@ -5,6 +5,7 @@
    [camelot.system.http.core :as http]
    [camelot.system.db.core :as db]
    [camelot.system.importer :as importer]
+   [camelot.system.detector :as detector]
    [camelot.util.maintenance :as maintenance]
    [camelot.util.state :as state]
    [com.stuartsierra.component :as component]
@@ -51,13 +52,17 @@
               :config (config/map->Config config)
               :database (db/map->Database {:connection (state/spec)})
               :importer (importer/map->Importer {})
+              :detector (detector/map->Detector {})
               :app (if-let [dsvr (get-in config [:server :dev-server])]
                      dsvr
                      (http/->HttpServer (get-in config [:server :http-port]))))]
     (component/system-using smap {:app {:config :config
                                         :database :database
-                                        :importer :importer}
-                                  :importer {:config :config}})))
+                                        :importer :importer
+                                        :detector :detector}
+                                  :importer {:config :config}
+                                  :detector {:config :config
+                                             :database :database}})))
 
 (defn camelot
   [config]

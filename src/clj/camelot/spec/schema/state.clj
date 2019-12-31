@@ -6,7 +6,7 @@
 (def State
   {(sch/required-key :config) sch/Any
    (sch/required-key :database) sch/Any
-   (sch/required-key :app) sch/Any
+   (sch/optional-key :app) sch/Any
    (sch/optional-key :importer) sch/Any
    (sch/optional-key :figwheel) sch/Any
    (sch/optional-key :session) sch/Any

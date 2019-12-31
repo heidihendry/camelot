@@ -5,7 +5,8 @@
    [com.stuartsierra.component :as component]
    [clojure.core.async :as async]
    [camelot.detection.core :as detection]
-   [clojure.java.io :as io])
+   [clojure.java.io :as io]
+   [clojure.tools.logging :as log])
   (:import
    (java.io File)))
 
@@ -14,40 +15,49 @@
   "detector.clj")
 
 (defn- detector-path
-  [config]
-  (let [file (io/file (-> config :config :path :database) detector-filename)]
+  [state]
+  (let [file (io/file (-> state :config :path :database) detector-filename)]
     (.getCanonicalPath ^File file)))
 
 ;; TODO add an endpoint for surfacing the event status
-(defrecord Detector [config]
+(defrecord Detector [config database]
   component/Lifecycle
   (start [this]
-    (when (-> config :config :detector :enabled)
-      (if (:cmd-chan this)
-        this
-        (let [detector-state (duratom/duratom :local-file
-                                              :file-path (detector-path config)
-                                              :init {})
-              cmd-chan (async/chan)
-              event-chan (detection/run config detector-state cmd-chan)
-              events (atom {})]
-          (let [kf (juxt :subject :action)]
-            (async/go-loop []
-              (let [[v port] (async/alts! [cmd-chan event-chan])]
-                (condp = port
-                  cmd-chan
-                  (when-not (= (:cmd v) :stop)
-                    (recur))
+    (log/warn config)
+    (log/warn database)
+    (let [state {:config config :database database}]
+      (if (-> state :config :detector :enabled)
+        (if (:cmd-chan this)
+          this
+          (do
+            (log/info "Starting detector...")
+            (let [detector-state (duratom/duratom :local-file
+                                                  :file-path (detector-path state)
+                                                  :init {})
+                  cmd-chan (async/chan)
+                  cmd-mult (async/mult cmd-chan)
+                  event-chan (detection/run state detector-state cmd-mult)
+                  events (atom {})]
+              (let [kf (juxt :subject :action)
+                    int-cmd-ch (async/chan)]
+                (async/tap cmd-mult int-cmd-ch)
+                (async/go-loop []
+                  (let [[v port] (async/alts! [int-cmd-ch event-chan])]
+                    (condp = port
+                      int-cmd-ch
+                      (when-not (= (:cmd v) :stop)
+                        (recur))
 
-                  event-chan
-                  (do
-                    (swap! events update-in (kf v) inc)
-                    (recur))))))
-          (assoc this
-                 :state detector-state
-                 :cmd-chan cmd-chan
-                 :event-chan event-chan
-                 :events events)))))
+                      event-chan
+                      (do
+                        (swap! events update-in (kf v) (fnil inc 0))
+                        (recur))))))
+              (assoc this
+                     :state detector-state
+                     :cmd-chan cmd-chan
+                     :event-chan event-chan
+                     :events events))))
+        this)))
 
   (stop [this]
     (when (:cmd-chan this)
