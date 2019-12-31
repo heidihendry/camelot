@@ -1,6 +1,5 @@
 (ns camelot.detection.upload
   (:require
-   [camelot.services.analytics :as analytics]
    [clojure.string :as cstr]
    [clj-http.client :as http]
    [camelot.model.media :as model.media]
@@ -62,61 +61,50 @@
             (recur))
 
           ch
-          (do
-            (async/>! event-ch v)
-            (condp = (:action v)
-              :upload
-              (do
-                (log/info "Uploading media with id" (:subject-id v) "and scid" (:container-id v))
-                (when (not (state/upload-completed? @detector-state-ref (:subject-id v)))
-                  (if (state/upload-retry-limit-reached? @detector-state-ref (:subject-id v))
-                    (do
-                      (analytics/track state {:category "detector"
-                                              :action "upload-retry-limit-reached"
-                                              :label "media"
-                                              :label-value (:subject-id v)
-                                              :ni true})
-                      (log/warn "Retry limit reached. Abandoning attempt to upload " (:subject-id v)))
-                    (let [task (state/get-task-for-session-camera-id @detector-state-ref (:container-id v))
-                          upload-v (upload-sas state (get-in task [:container :readwrite_sas]) (:payload v))]
-                      (log/info "Upload result: " (:result upload-v))
-                      (condp = (:result upload-v)
-                        :success
-                        (do
-                          (log/info "Upload of " (:subject-id v) " complete.")
-                          (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "completed")
-                          (analytics/track state {:category "detector"
-                                                  :action "upload-succeeded"
-                                                  :label "media"
-                                                  :label-value (:subject-id v)
-                                                  :ni true}))
+          (condp = (:action v)
+            :upload
+            (do
+              (log/info "Uploading media with id" (:subject-id v) "and scid" (:container-id v))
+              (when (not (state/upload-completed? @detector-state-ref (:subject-id v)))
+                (if (state/upload-retry-limit-reached? @detector-state-ref (:subject-id v))
+                  (do
+                    (async/>! event-ch {:action :upload-retry-limit-reached
+                                        :subject :media
+                                        :subject-id (:subject-id v)})
+                    (log/warn "Retry limit reached. Abandoning attempt to upload " (:subject-id v)))
+                  (let [task (state/get-task-for-session-camera-id @detector-state-ref (:container-id v))
+                        upload-v (upload-sas state (get-in task [:container :readwrite_sas]) (:payload v))]
+                    (log/info "Upload result: " (:result upload-v))
+                    (condp = (:result upload-v)
+                      :success
+                      (do
+                        (log/info "Upload of " (:subject-id v) " complete.")
+                        (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "completed")
+                        (async/>! event-ch {:action :upload-succeeded
+                                            :subject :media
+                                            :subject-id (:subject-id v)}))
 
-                        :skipped
-                        (do
-                          (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "skipped")
-                          (analytics/track state {:category "detector"
-                                                  :action "upload-skipped"
-                                                  :label "media"
-                                                  :label-value (:subject-id v)
-                                                  :ni true}))
+                      :skipped
+                      (do
+                        (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "skipped")
+                        (async/>! event-ch {:action :upload-skipped
+                                            :subject :media
+                                            :subject-id (:subject-id v)}))
 
-                        :error
-                        (do
-                          (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "failed")
-                          (analytics/track state {:category "detector"
-                                                  :action "upload-failed"
-                                                  :label "media"
-                                                  :label-value (:subject-id v)
-                                                  :ni true})
-                          (log/warn "media " (:subject-id v) " failed with exception: " (:value upload-v))
-                          (log/warn "scheduling retry for " (:subject-id v))
-                          (async/go (async/>! ch v)))))))
-                (recur))
+                      :error
+                      (do
+                        (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "failed")
+                        (async/>! event-ch {:action :upload-failed
+                                            :subject :media
+                                            :subject-id (:subject-id v)})
+                        (log/warn "media " (:subject-id v) " failed with exception: " (:value upload-v))
+                        (log/warn "scheduling retry for " (:subject-id v))
+                        (async/go (async/>! ch v)))))))
+              (recur))
 
-              :presubmit-check
-              (do
-                (log/info "Scheduling submit check")
-                (async/>! submit-ch v)
-                (log/info "Scheduled submit check")
-                (recur)))))))
+            :presubmit-check
+            (do
+              (async/>! submit-ch v)
+              (log/info "Scheduled presubmit check")
+              (recur))))))
     ch))

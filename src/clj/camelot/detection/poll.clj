@@ -20,7 +20,7 @@
 
 (defn run
   "Create suggestions for values placed on the returned channel."
-  [state detector-state-ref cmd-mult result-ch event-ch]
+  [state detector-state-ref cmd-mult result-ch archive-ch event-ch]
   (let [cmd-ch (async/chan)
         ch (async/chan (async/sliding-buffer 10000))]
     (async/tap cmd-mult cmd-ch)
@@ -38,39 +38,32 @@
             (when (:valid-at v)
               (if (< (:retries v) retry-limit)
                 (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
-                  (analytics/track state {:category "detector"
-                                          :action "poll-task-retried"
-                                          :label "task"
-                                          :label-value task-id
-                                          :dimension1 "retries"
-                                          :metric1 (:retries v)
-                                          :ni true})
+                  (async/>! event-ch {:action :poll-task-retried
+                                      :subject :task
+                                      :subject-id task-id
+                                      :meta {:dimension1 "retries" :metric1 (:retries v)}})
                   (log/info "Retrying poll with task id" task-id "in" (/ delay 1000.0) "seconds")
                   (async/<! (async/timeout delay)))
-                (analytics/track state {:category "detector"
-                                        :action "poll-task-retry-limit-reached"
-                                        :label "task"
-                                        :label-value task-id
-                                        :ni true})))
+                (async/>! event-ch {:action :poll-task-retry-limit-reached
+                                    :subject :task
+                                    :subject-id task-id})))
             (log/info "Fetching results for task id" task-id)
             (try
               (let [resp (client/get-task state task-id)]
                 (condp = (:status resp)
                   "COMPLETED"
                   (do
-                    (analytics/track state {:category "detector"
-                                            :action "poll-task-completed"
-                                            :label "task"
-                                            :label-value task-id
-                                            :dimension1 "images"
-                                            :metric1 (count (-> resp :result :images))
-                                            :ni true})
+                    (async/>! event-ch {:action :poll-task-completed
+                                        :subject :task
+                                        :subject-id task-id
+                                        :meta {:dimension1 "images"
+                                               :metric1 (count (-> resp :result :images))}})
                     (analytics/track-timing state {:hit-type "timing"
                                                    :category "detector"
                                                    :variable "poll-task-scheduled-to-completed"
                                                    :time (- (tc/long (t/now)) (tc/long (:created v)))
                                                    :ni true})
-                    (log/info "Found results for " task-id)
+                    (log/info "Found results for" task-id)
                     (doseq [image (-> resp :result :images)]
                       (try
                         (if-let [file (:file image)]
@@ -79,34 +72,27 @@
                               (log/info "Scheduling result processing for" media-id)
                               (async/>! result-ch (event/to-image-detection-event media-id payload)))
                             (do
-                              (analytics/track state {:category "detector"
-                                                      :action "poll-media-id-not-found"
-                                                      :label "media"
-                                                      :label-value media-id
-                                                      :ni true})
+                              (async/>! event-ch {:action :poll-media-id-missing
+                                                  :subject :task
+                                                  :subject-id task-id})
                               (log/error "Could not find media ID in" file)))
                           (do
-                            (analytics/track state {:category "detector"
-                                                    :action "poll-image-file-data-missing"
-                                                    :label "task"
-                                                    :label-value task-id
-                                                    :ni true})
+                            (async/>! event-ch {:action :poll-image-file-data-missing
+                                                :subject :task
+                                                :subject-id task-id})
                             (log/error "Could not find file in image detection data" image)))
                         (catch Exception e
-                          (analytics/track state {:category "detector"
-                                                  :action "poll-suggestion-creation-exception"
-                                                  :label "task"
-                                                  :label-value task-id
-                                                  :ni true})
-                          (log/error "Could not find media ID in" (:file image) e)))))
+                          (async/>! event-ch {:action :poll-suggestion-creation-exception
+                                              :subject :task
+                                              :subject-id task-id})
+                          (log/error "Could not find media ID in" (:file image) e))))
+                    (async/>! archive-ch (event/to-archive-task-event task-id)))
 
                   "FAILED"
                   (do
-                    (analytics/track state {:category "detector"
-                                            :action "poll-task-failed"
-                                            :label "task"
-                                            :label-value task-id
-                                            :ni true})
+                    (async/>! event-ch {:action :poll-task-failed
+                                        :subject :task
+                                        :subject-id task-id})
                     (log/info "Failed to get results for" task-id)
                     (state/set-task-status! detector-state-ref task-id "failed"))
 

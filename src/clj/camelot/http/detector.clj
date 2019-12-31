@@ -5,10 +5,10 @@
 
 (defn- detector-status
   [state]
-  (if-let [events-atom (-> state :detector :events)]
+  (if-let [events-atom (-> state :detector :state deref :events)]
     {:status 200
      :headers {"Content-Type" "application/json; charset=utf-8"}
-     :body (json/write-str @events-atom)}
+     :body (json/write-str events-atom)}
     {:status 200
      :headers {"Content-Type" "application/json; charset=utf-8"}
      :body {:status :offline}}))

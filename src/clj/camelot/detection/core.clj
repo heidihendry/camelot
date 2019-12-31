@@ -16,10 +16,11 @@
   "Run the detector"
   [state detector-state-ref cmd-mult]
   (let [event-ch (async/chan (async/sliding-buffer 1000))
+        archive-ch (result/run state detector-state-ref cmd-mult event-ch)
         result-ch (result/run state detector-state-ref cmd-mult event-ch)
-        poll-ch (poll/run state detector-state-ref cmd-mult result-ch event-ch)
+        poll-ch (poll/run state detector-state-ref cmd-mult result-ch archive-ch event-ch)
         submit-ch (submit/run state detector-state-ref cmd-mult poll-ch event-ch)
         upload-ch (upload/run state detector-state-ref cmd-mult submit-ch event-ch)
         prepare-ch (prepare/run state detector-state-ref cmd-mult upload-ch poll-ch event-ch)]
-    (bootstrap/run state detector-state-ref cmd-mult prepare-ch)
+    (bootstrap/run state detector-state-ref cmd-mult prepare-ch event-ch)
     event-ch))

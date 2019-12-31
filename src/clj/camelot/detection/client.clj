@@ -47,3 +47,9 @@
   "Get a task."
   [state task-id]
   (http-get state (format "/task/%s" task-id)))
+
+(defn archive-task
+  "Archive a task."
+  [state task-id]
+  ;; TODO implement me
+  nil)

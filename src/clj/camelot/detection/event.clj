@@ -47,3 +47,10 @@
    :action :detection
    :payload payload
    :created (t/now)})
+
+(defn to-archive-task-event
+  [task-id]
+  {:subject :task
+   :action :archive
+   :subject-id task-id
+   :created (t/now)})

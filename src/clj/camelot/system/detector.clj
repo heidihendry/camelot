@@ -20,6 +20,16 @@
   (let [file (io/file (-> state :config :path :database) detector-filename)]
     (.getCanonicalPath ^File file)))
 
+(defn- event-to-analytics
+  [v]
+  (merge
+   {:category "detector"
+    :action (name (:action v))
+    :label (name (:subject v))
+    :label-value (:subject-id v)
+    :ni true}
+   (:meta v)))
+
 (defrecord Detector [config database]
   component/Lifecycle
   (start [this]
@@ -39,9 +49,8 @@
                                                   :init {})
                   cmd-chan (async/chan)
                   cmd-mult (async/mult cmd-chan)
-                  event-chan (detection/run state detector-state cmd-mult)
-                  events (atom {})]
-              (let [kf (juxt :subject :action)
+                  event-chan (detection/run state detector-state cmd-mult)]
+              (let [kf (juxt (constantly :events) :subject :action)
                     int-cmd-ch (async/chan)]
                 (async/tap cmd-mult int-cmd-ch)
                 (async/go-loop []
@@ -53,13 +62,13 @@
 
                       event-chan
                       (do
-                        (swap! events update-in (kf v) (fnil inc 0))
+                        (swap! detector-state update-in (kf v) (fnil inc 0))
+                        (analytics/track state (event-to-analytics v))
                         (recur))))))
               (assoc this
                      :state detector-state
                      :cmd-chan cmd-chan
-                     :event-chan event-chan
-                     :events events))))
+                     :event-chan event-chan))))
         this)))
 
   (stop [this]

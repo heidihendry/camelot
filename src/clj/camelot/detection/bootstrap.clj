@@ -27,27 +27,25 @@
   [state detector-state]
   (->> (session-camera/get-all* state)
        (filter (partial eligible-for-detection? state))
+       (remove #(= (state/session-camera-status detector-state (:trap-station-session-camera-id %))
+                   :no-action))
        (remove #(state/completed-task? detector-state (:trap-station-session-camera-id %)))
        (map event/to-prepare-task-event)))
 
 (defn run
   "Queue session cameras for preparation."
-  [state detector-state-ref cmd-mult prepare-ch]
+  [state detector-state-ref cmd-mult prepare-ch event-ch]
   (let [cmd-ch (async/chan)]
     (async/tap cmd-mult cmd-ch)
     (async/go-loop []
       (log/info "Queuing session cameras")
-      (analytics/track state {:category "detector"
-                              :action "bootstrap-retrieve"
-                              :label "retrieve"
-                              :ni true})
+      (async/>! event-ch {:action :bootstrap-retrieve
+                          :subject :global})
       (doseq [batch (retrieve-tasks state @detector-state-ref)]
         (log/info "Session camera queued " (:subject-id batch))
-        (analytics/track state {:category "detector"
-                                :action "bootstrap-schedule"
-                                :label "session-camera"
-                                :label-value (:subject-id batch)
-                                :ni true})
+        (async/>! event-ch {:action :bootstrap-schedule
+                            :subject :session-camera
+                            :subject-id (:subject-id batch)})
         (async/>! prepare-ch batch))
 
       (let [timeout-ch (async/timeout reschedule-all)

@@ -113,3 +113,11 @@
                   (or (= (:status task) "failed")
                       (every? #(= (media-processing-status detector-state %) "completed")
                               (:media-ids task)))))))
+
+(defn record-session-camera-status!
+  [detector-state-ref scid status]
+  (swap! detector-state-ref assoc-in [:session-cameras scid :status] status))
+
+(defn session-camera-status
+  [detector-state scid]
+  (get-in detector-state [:session-cameras scid :status]))

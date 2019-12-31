@@ -1,6 +1,5 @@
 (ns camelot.detection.prepare
   (:require
-   [camelot.services.analytics :as analytics]
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
@@ -43,33 +42,32 @@
 
           ch
           (do
-            (async/>! event-ch v)
             (let [scid (:subject-id v)]
               (log/info "Preparing task with scid " scid)
               (if (state/submitted-task? @detector-state-ref scid)
                 (let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]
                   (log/info "Task already submitted. Starting poll.")
-                  (analytics/track state {:category "detector"
-                                          :action "prepare-skip-task-submission"
-                                          :label "task"
-                                          :label-value task-id
-                                          :ni true})
+                  (async/>! event-ch {:action :prepare-skip-task-submission
+                                      :subject :task
+                                      :subject-id task-id})
                   (async/>! poll-ch (event/to-check-result-event task-id)))
                 (let [media (retrieve state @detector-state-ref scid)]
                   (if (seq media)
                     (do
                       (when-not (state/get-task-for-session-camera-id @detector-state-ref scid)
                         (log/info "Creating a new task...")
-                        (if-let [task (client/create-task state)]
-                          (do
+                        (try
+                          (let [task (client/create-task state)]
                             (log/info "Created task " (:id task))
                             (state/add-task-to-state detector-state-ref scid task)
-                            (analytics/track state {:category "detector"
-                                                    :action "prepare-task-created"
-                                                    :label "task"
-                                                    :label-value (:id task)
-                                                    :ni true}))
-                          (log/warn "Failed to create task")))
+                            (async/>! event-ch {:action :prepare-task-created
+                                                :subject :task
+                                                :subject-id (:id task)}))
+                          (catch Exception e
+                            (async/>! event-ch {:action :prepare-task-create-failed
+                                                :subject :trap-station-session-camera
+                                                :subject-id scid})
+                            (log/warn "Failed to create task:" e))))
                       (if-let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]
                         (do
                           (doseq [m media]
@@ -79,7 +77,16 @@
                               (async/>! upload-ch event)))
                           (log/info "Queuing presubmit check for task: " task-id)
                           (async/>! upload-ch (event/to-presubmit-check-event task-id)))
-                        (log/warn "Could not find task for session-camera" scid)))
-                    (log/warn "No media needing upload. Skipping session camera " scid)))))
+                        (do
+                          (async/>! event-ch {:action :prepare-task-not-found
+                                              :subject :trap-station-session-camera
+                                              :subject-id scid})
+                          (log/warn "Could not find task for session-camera" scid))))
+                    (do
+                      (state/record-session-camera-status! detector-state-ref scid :no-action)
+                      (async/>! event-ch {:action :prepare-skip-due-to-no-media
+                                          :subject :trap-station-session-camera
+                                          :subject-id scid})
+                      (log/warn "No media needing upload. Skipping session camera " scid))))))
             (recur)))))
     ch))
