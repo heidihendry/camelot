@@ -64,7 +64,7 @@
           (do
             (async/>! event-ch v)
             (condp = (:action v)
-              :process
+              :upload
               (do
                 (log/info "Uploading media with id" (:subject-id v) "and scid" (:container-id v))
                 (when (not (state/upload-completed? @detector-state-ref (:subject-id v)))

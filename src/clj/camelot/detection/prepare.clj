@@ -64,7 +64,7 @@
                         (do
                           (doseq [m media]
                             (state/record-media-upload! detector-state-ref scid (:media-id m) "pending")
-                            (let [event (event/to-process-media-event m scid)]
+                            (let [event (event/to-upload-media-event m scid)]
                               (log/info "Queuing media for upload: " (:subject-id event))
                               (async/>! upload-ch event)))
                           (log/info "Queuing presubmit check for task: " task-id)

@@ -7,12 +7,12 @@
    :action :prepare
    :payload batch})
 
-(defn to-process-media-event
+(defn to-upload-media-event
   [m scid]
   {:subject :media
    :subject-id (:media-id m)
    :container-id scid
-   :action :process
+   :action :upload
    :payload m})
 
 (defn to-presubmit-check-event
