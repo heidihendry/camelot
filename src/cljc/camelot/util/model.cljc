@@ -312,7 +312,14 @@
    :photo-resolution-y {:datatype :readable-integer
                         :required false
                         :table :photo
-                        :order 77}})
+                        :order 77}
+   :suggestion-id {:datatype :integer
+                   :required true
+                   :table :suggestion
+                   :unmappable true}
+   :suggestion-key {:datatype :string
+                    :table :suggestion
+                    :unmappable true}})
 
 (def absolute-path {:absolute-path {:datatype :file
                                     :required true

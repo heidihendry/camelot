@@ -12,7 +12,8 @@
 (defmethod fmt/fn-handler "not like" [_ a b]
   (str (fmt/to-sql-value a) " NOT LIKE " (fmt/to-sql-value b)))
 
-(def base-query
+(defn base-query
+  [state]
   {:select [:trap-station.trap-station-id
             :camera.camera-id
             :trap-station-session.trap-station-session-start-date
@@ -55,7 +56,8 @@
                [:= :sighting.media-id :media.media-id]
 
                :suggestion
-               [:= :suggestion.media-id :media.media-id]
+               [:and [:= :suggestion.media-id :media.media-id]
+                [:>= :suggestion.suggestion-confidence (-> state :config :detector :confidence-threshold)]]
 
                :taxonomy
                [:= :taxonomy.taxonomy-id :sighting.taxonomy-id]
@@ -84,6 +86,6 @@
                     :from [[query :result]]}))
 
 (defn build-query
-  [pt]
-  (-> base-query
+  [state pt]
+  (-> (base-query state)
       (honeyhelpers/where pt)))

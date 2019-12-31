@@ -25,7 +25,7 @@
   [state pt]
   (->> pt
        translate/parse->sql
-       honeysql/build-query
+       (honeysql/build-query state)
        (sighting-fields/join-fields pt)
        honeysql/finalise-query
        (jdbc/query (get-in state [:database :connection]))

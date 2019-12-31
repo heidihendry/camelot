@@ -61,10 +61,12 @@
 
 (s/defn hydrate-media
   [state ids]
-  (let [media (media/get-list state ids)
-        sightings (sighting/get-all-for-media-ids state ids)
-        suggestions (suggestion/get-all-for-media-ids state ids)]
-    (build-records state sightings suggestions media)))
+  (if (seq ids)
+    (let [media (media/get-list state ids)
+          sightings (sighting/get-all-for-media-ids state ids)
+          suggestions (suggestion/get-all-for-media-ids state ids)]
+      (build-records state sightings suggestions media))
+    []))
 
 (s/defn update-bulk-media-flags
   [state :- State

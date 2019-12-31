@@ -46,6 +46,8 @@
   [state media-ids]
   (->> {:media-ids media-ids}
        (query state :get-all-for-media-ids)
+       (filter #(> (:suggestion-confidence %)
+                   (get-in state [:config :detector :confidence-threshold])))
        (map suggestion)))
 
 (defn get-specific
