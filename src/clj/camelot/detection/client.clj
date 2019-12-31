@@ -1,6 +1,7 @@
 (ns camelot.detection.client
   "Client for the detection API."
   (:require
+   [camelot.util.version :as version]
    [clojure.tools.logging :as log]
    [clj-http.client :as http]
    [cheshire.core :as json]))
@@ -9,9 +10,6 @@
 (def connection-timeout (* 5 1000))
 
 ;; TODO handle failure / retry
-;;
-;; TODO include UA (camelot version) in header for handling misbehaviour.
-;; Better to disable old clients than be stuck with misbehaving ones.
 (defn- http-get
   [state endpoint]
   (let [resp (http/get (str (-> state :config :detector :api-url) endpoint)
@@ -19,27 +17,21 @@
                         :socket-timeout socket-timeout
                         :connection-timeout connection-timeout
                         :basic-auth [(-> state :config :detector :username)
-                                     (-> state :config :detector :password)]})]
+                                     (-> state :config :detector :password)]
+                        :headers {"x-camelot-version" (version/get-version)}})]
     (json/parse-string (:body resp) true)))
 
 (defn- http-post
   [state endpoint]
-  (println "POST")
-  (log/info "Starting request")
-  (println (str (-> state :config :detector :api-url) endpoint))
-  (try
-    (let [resp (http/post (str (-> state :config :detector :api-url) endpoint)
-                          {:accept "json"
-                           :socket-timeout socket-timeout
-                           :connection-timeout connection-timeout
-                           :basic-auth [(-> state :config :detector :username)
-                                        (-> state :config :detector :password)]})]
-      (println "got it?")
-      (log/error "Request succeeded")
-      (json/parse-string (:body resp) true))
-    (catch Exception e
-      (println "Failed")
-      (println e))))
+  (let [resp (http/post (str (-> state :config :detector :api-url) endpoint)
+                        {:accept "json"
+                         :socket-timeout socket-timeout
+                         :connection-timeout connection-timeout
+                         :basic-auth [(-> state :config :detector :username)
+                                      (-> state :config :detector :password)]
+                         :headers {"x-camelot-version" (version/get-version)}})]
+    (log/error "Request succeeded")
+    (json/parse-string (:body resp) true)))
 
 (defn create-task
   "Create a task."
