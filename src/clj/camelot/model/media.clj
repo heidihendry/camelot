@@ -57,6 +57,13 @@
   [state id]
   (map media (query state :get-all {:trap-station-session-camera-id id})))
 
+(defn get-most-recent-upload
+  [state id]
+  (->> {:trap-station-session-camera-id id}
+       (query state :get-most-recent-upload)
+       (map media)
+       first))
+
 (sch/defn get-all* :- [Media]
   [state :- State]
   (map media (query state :get-all*)))
@@ -142,8 +149,9 @@
           fmt (if (= variant :original) orig-format "png")]
       (io/file mpath (apply str (take 2 filename))
                (str prefix filename "." fmt)))
-    (catch Exception _
-      "")))
+    (catch Exception e
+      (log/error "Could not get path to file" filename e)
+      nil)))
 
 (defn path-to-media
   "Return the path to a file given a media record"
