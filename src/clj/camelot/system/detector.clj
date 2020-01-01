@@ -90,9 +90,7 @@
                       (if (= (:cmd v) :stop)
                         (do
                           (if-let [[file data] (async/poll! latest-state)]
-                            (do
-                              (nippy/freeze-to-file file data)
-                              (log/info "Updated state file due to shutdown")))
+                            (nippy/freeze-to-file file data))
                           (swap! detector-state assoc-in [:system-status] :offline))
                         (recur))
 
@@ -100,9 +98,7 @@
                       (let [_ (async/<! timeout-ch)]
                         (try
                           (if-let [[file data] (async/poll! latest-state)]
-                            (do
-                              (nippy/freeze-to-file file data)
-                              (log/info "Updated state file")))
+                            (nippy/freeze-to-file file data))
                           (catch Exception e
                             (log/error "Exception while writing state file" e)))
                         (recur))))))
