@@ -39,6 +39,14 @@
                           (assoc task :session-camera session-camera-id))))]
     (swap! detector-state-ref assoc-task)))
 
+(defn archive-task!
+  [detector-state-ref task-id]
+  (letfn [(archive! [detector-state]
+            (-> detector-state
+                (select-keys [:session-camera :media-ids])
+                (assoc :status "archived")))]
+    (swap! detector-state-ref update-in [:tasks task-id] archive!)))
+
 (def ^:private upload-retry-limit 3)
 
 (defn media-for-task

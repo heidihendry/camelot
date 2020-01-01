@@ -55,5 +55,4 @@
 (defn archive-task
   "Archive a task."
   [state task-id]
-  ;; TODO implement me
-  nil)
+  (http-post state (format "/task/%s/archive" task-id)))

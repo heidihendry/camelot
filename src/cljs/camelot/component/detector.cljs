@@ -56,6 +56,8 @@
                       ["Image batch submissions completed" [:task :submit-task-call-success]]
                       ["Image batch submissions deferred" [:task :submit-retry-limit-reached]]
                       ["Image batch submissions failed" [:task :submit-task-call-failed]]
+                      ["Image batch archivals completed" [:task :archive-success]]
+                      ["Image batch archivals failed" [:task :archive-failed]]
                       ["Image uploads completed" [:media :upload-succeeded]]
                       ["Image uploads skipped" [:media :upload-skipped]]
                       ["Image uploads failed" [:media :upload-retry-limit-reached]]]]
