@@ -1,7 +1,7 @@
 {:paths ["src/clj" "src/cljc" "src"]
  :deps
  {camelot/market {:git/url "https://gitlab.com/camelot-project/camelot-market"
-                  :sha "17d951b3ea4bd20b0ca3bb7a59cfaf57e6bd0b56"}
+                  :sha "30c3ed90a371d530215599150cb6bfe430a19fe2"}
   camelot/simql-parser {:git/url "https://gitlab.com/cshclm/simql-parser"
                         :sha "feda193187a80d2da33636d5b4ea610ed52003c8"}
   camelot/simql-typeahead {:git/url "https://gitlab.com/cshclm/simql-typeahead"
