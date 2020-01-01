@@ -30,8 +30,12 @@
                          :basic-auth [(-> state :config :detector :username)
                                       (-> state :config :detector :password)]
                          :headers {"x-camelot-version" (version/get-version)}})]
-    (log/error "Request succeeded")
     (json/parse-string (:body resp) true)))
+
+(defn account-auth
+  "Verify the user can authenticate with the given credentials."
+  [state]
+  (http-post state "/account/auth"))
 
 (defn create-task
   "Create a task."
