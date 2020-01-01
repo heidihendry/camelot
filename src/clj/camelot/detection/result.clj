@@ -48,10 +48,10 @@
             (async/>! event-ch v)
             (log/info "Creating suggestions for media-id" (:subject-id v))
             (let [detections (-> v :payload :image :detections)
-                  avg-confidence (if (zero? detections)
-                                   0
+                  avg-confidence (if (seq detections)
                                    (/ (reduce + 0 (map :conf detections))
-                                      (count detections)))]
+                                      (count detections))
+                                   0)]
               (async/>! event-ch {:action :result-create-suggestions
                                   :subject :media
                                   :subject-id (:subject-id v)
