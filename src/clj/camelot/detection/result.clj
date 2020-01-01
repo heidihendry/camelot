@@ -22,7 +22,7 @@
 (defn- build-suggestion
   [media-id bb payload detection]
   (suggestion/tsuggestion
-   (let [key (get-in payload [:result :detection_categories (:category detection)])]
+   (let [key (get-in payload [:detection_categories (keyword (str (:category detection)))])]
      (merge (select-keys bb [:bounding-box-id])
             {:suggestion-key key
              :suggestion-label key
