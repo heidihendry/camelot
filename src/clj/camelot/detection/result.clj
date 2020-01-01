@@ -64,10 +64,10 @@
                 (log/info "Creating suggestion for media-id" (:subject-id v))
                 (try
                   (db/with-transaction [s state]
-                    (let [bb (bounding-box/create! state (build-bounding-box detection))]
-                      (suggestion/delete-for-media-id! state media-id)
+                    (suggestion/delete-for-media-id! s media-id)
+                    (let [bb (bounding-box/create! s (build-bounding-box detection))]
                       (suggestion/create!
-                       state
+                       s
                        (build-suggestion media-id bb (:payload v) detection))))
                   (if (>= (:conf detection)
                           (-> state :config :detector :confidence-threshold))
