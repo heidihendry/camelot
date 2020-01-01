@@ -1,6 +1,7 @@
 (ns camelot.detection.core
   "Wildlife detection."
   (:require
+   [camelot.detection.archive :as archive]
    [camelot.detection.client :as client]
    [camelot.detection.submit :as submit]
    [camelot.detection.poll :as poll]
@@ -19,10 +20,10 @@
   (let [event-ch (async/chan (async/sliding-buffer 1000))]
     (try
       (client/account-auth state)
-      (let [archive-ch (result/run state detector-state-ref cmd-mult event-ch)
+      (let [archive-ch (archive/run state detector-state-ref cmd-mult event-ch)
             result-ch (result/run state detector-state-ref cmd-mult event-ch)
             poll-ch (poll/run state detector-state-ref cmd-mult result-ch archive-ch event-ch)
-            submit-ch (submit/run state detector-state-ref cmd-mult poll-ch event-ch)
+            submit-ch (submit/run state detector-state-ref cmd-mult poll-ch archive-ch event-ch)
             upload-ch (upload/run state detector-state-ref cmd-mult submit-ch event-ch)
             prepare-ch (prepare/run state detector-state-ref cmd-mult upload-ch poll-ch event-ch)]
         (bootstrap/run state detector-state-ref cmd-mult prepare-ch event-ch))

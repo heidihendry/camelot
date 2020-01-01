@@ -63,6 +63,7 @@
                 (try
                   (db/with-transaction [s state]
                     (let [bb (bounding-box/create! state (build-bounding-box detection))]
+                      (suggestion/delete-for-media-id! state media-id)
                       (suggestion/create!
                        state
                        (build-suggestion media-id bb (:payload v) detection))))

@@ -7,7 +7,8 @@
    [clojure.core.async :as async]
    [camelot.detection.core :as detection]
    [clojure.java.io :as io]
-   [clojure.tools.logging :as log])
+   [clojure.tools.logging :as log]
+   [taoensso.nippy :as nippy])
   (:import
    (java.io File)))
 
@@ -46,7 +47,9 @@
             (log/info "Starting detector...")
             (let [detector-state (duratom/duratom :local-file
                                                   :file-path (detector-path state)
-                                                  :init {})
+                                                  :init {}
+                                                  :rw {:read nippy/thaw-from-file
+                                                       :write nippy/freeze-to-file})
                   cmd-chan (async/chan)
                   cmd-mult (async/mult cmd-chan)
                   event-chan (detection/run state detector-state cmd-mult)]

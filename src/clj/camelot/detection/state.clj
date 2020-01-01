@@ -3,8 +3,7 @@
 ;; TODO write a spec for the detector-state
 #_{:tasks {120 {:status "pending"
                :media-ids [1201 ...]}}
-   :media {1201 {:upload-status "completed"
-                 :session-camera-id 1}}
+   :media {1201 {:status "completed"}}
    :session-cameras {1 {:task 120}}}
 
 (defn get-task
@@ -28,6 +27,13 @@
   [detector-state media-id]
   (get-in detector-state [:media media-id]))
 
+(defn- narrow-task
+  [task]
+  (let [container (select-keys (:container task) [:readwrite_sas])]
+    (-> task
+        (select-keys [:status])
+        (assoc :container container))))
+
 (defn add-task-to-state
   "Add a new `task` into state for `session-camera-id`."
   [detector-state-ref session-camera-id task]
@@ -36,7 +42,9 @@
             (-> detector-state
                 (assoc-in [:session-cameras session-camera-id :task] (:id task))
                 (assoc-in [:tasks (:id task)]
-                          (assoc task :session-camera session-camera-id))))]
+                          (-> task
+                              narrow-task
+                              (assoc :session-camera session-camera-id)))))]
     (swap! detector-state-ref assoc-task)))
 
 (defn archive-task!
@@ -56,9 +64,9 @@
 (defn- update-upload-status
   [detector-state media-id status]
   (if (not= status "failed")
-    (assoc-in detector-state [:media media-id :upload-status] status)
+    (assoc-in detector-state [:media media-id :status] status)
     (-> detector-state
-        (assoc-in [:media media-id :upload-status] "failed")
+        (assoc-in [:media media-id :status] "failed")
         (update-in [:media media-id :retries] (fnil inc 0)))))
 
 (defn record-media-upload!
@@ -68,27 +76,26 @@
     (swap! detector-state-ref
            #(-> %
                 (update-upload-status media-id status)
-                (update-in [:tasks task-id :media-ids] conj media-id)
-                (assoc-in [:media media-id :session-camera-id] scid)))))
+                (update-in [:tasks task-id :media-ids] conj media-id)))))
 
 (defn upload-retry-limit-reached?
   "Predicate returning `true` if the retry limit has been reached for the given `media-id`."
   [detector-state media-id]
   (let [media (get-media-state detector-state media-id)]
-    (and (= (:upload-status media) "failed")
+    (and (= (:status media) "failed")
          (>= (:retries media) upload-retry-limit))))
 
 (defn upload-pending?
   [detector-state media-id]
   (let [media (get-in detector-state [:media media-id])]
-    (or (= (:upload-status media) "pending")
-        (and (= (:upload-status media) "failed")
+    (or (= (:status media) "pending")
+        (and (= (:status media) "failed")
              (not (upload-retry-limit-reached? detector-state media-id))))))
 
 (defn upload-completed?
   [detector-state media-id]
   (let [media (get-in detector-state [:media media-id])]
-    (= (:upload-status media) "completed")))
+    (= (:status media) "completed")))
 
 (defn set-task-status!
   [detector-state-ref task-id status]

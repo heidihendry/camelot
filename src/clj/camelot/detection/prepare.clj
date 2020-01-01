@@ -10,7 +10,7 @@
 (defn- unprocessed-media?
   [detector-state media]
   (letfn [(unprocessed? [media-state]
-            (let [status (:upload-status media-state)]
+            (let [status (:status media-state)]
               (and (not= (:media-processed media) true)
                    (or (nil? status)
                        (= status "pending")

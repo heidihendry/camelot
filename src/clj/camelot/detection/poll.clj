@@ -61,7 +61,7 @@
                     (analytics/track-timing state {:hit-type "timing"
                                                    :category "detector"
                                                    :variable "poll-task-scheduled-to-completed"
-                                                   :time (- (tc/long (t/now)) (tc/long (:created v)))
+                                                   :time (- (tc/to-long (t/now)) (tc/to-long (:created v)))
                                                    :ni true})
                     (log/info "Found results for" task-id)
                     (doseq [image (-> resp :result :images)]

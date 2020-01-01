@@ -71,6 +71,11 @@
   ;; TODO Delete suggestion data from module
   (query state :delete! {:suggestion-id id}))
 
+(defn delete-for-media-id!
+  "Delete all suggestions for `media-idid`."
+  [state media-id]
+  (query state :delete-for-media-id! {:media-id media-id}))
+
 (defn delete-with-bounding-box!
   "Delete a suggestion with the given `bounding-box-id`."
   [state bounding-box-id]

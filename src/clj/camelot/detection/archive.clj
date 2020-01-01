@@ -1,4 +1,4 @@
-(ns camelot.detection.result
+(ns camelot.detection.archive
   (:require
    [camelot.detection.client :as client]
    [camelot.detection.state :as state]

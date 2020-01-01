@@ -37,6 +37,10 @@ WHERE media_id IN (:media_ids)
 DELETE FROM suggestion
 WHERE suggestion_id = :suggestion_id
 
+-- name: delete-for-media-id!
+DELETE FROM suggestion
+WHERE media_id = :media_id
+
 -- name: delete-with-bounding-box!
 DELETE FROM suggestion
 WHERE bounding_box_id = :bounding_box_id

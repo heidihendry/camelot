@@ -25,7 +25,7 @@
 
 (defn run
   "Submit tasks for processing."
-  [state detector-state-ref cmd-mult poll-ch event-ch]
+  [state detector-state-ref cmd-mult poll-ch archive-ch event-ch]
   (let [cmd-ch (async/chan)
         retry-ch (async/chan (async/sliding-buffer 10000))
         ch (async/chan (async/sliding-buffer 10000))
@@ -89,7 +89,8 @@
                   (async/>! event-ch {:action :submit-no-completed-uploads
                                       :subject :task
                                       :subject-id task-id})
-                  (log/warn "No uploads completed for" task-id))))
+                  (log/warn "No uploads completed for" task-id)
+                  (async/>! archive-ch (event/to-archive-task-event task-id)))))
             (recur))
 
           int-ch

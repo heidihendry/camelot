@@ -55,6 +55,7 @@
   org.apache.commons/commons-lang3 {:mvn/version "3.4"}
   org.apache.derby/derby {:mvn/version "10.12.1.1"}
   org.apache.derby/derbytools {:mvn/version "10.12.1.1" :mvn/scope "test"}
+  com.taoensso/nippy {:mvn/version "2.14.0"}
   duratom {:mvn/version "0.5.1"}
 
   org.omcljs/om {:mvn/version "1.0.0-beta1"
