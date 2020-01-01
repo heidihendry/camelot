@@ -26,8 +26,12 @@
             upload-ch (upload/run state detector-state-ref cmd-mult submit-ch event-ch)
             prepare-ch (prepare/run state detector-state-ref cmd-mult upload-ch poll-ch event-ch)]
         (bootstrap/run state detector-state-ref cmd-mult prepare-ch event-ch))
+      (async/go
+        (async/>! event-ch {:action :running
+                            :subject :system-status}))
       (catch Exception e
         (log/error "Authentication for detector failed:" e)
-        (async/>! event-ch {:action :detector-authentication-failed
-                            :subject :global})))
+        (async/go
+          (async/>! event-ch {:action :detector-authentication-failed
+                              :subject :system-status}))))
     event-ch))

@@ -1,6 +1,5 @@
 (ns camelot.detection.bootstrap
   (:require
-   [camelot.services.analytics :as analytics]
    [camelot.model.trap-station-session-camera :as session-camera]
    [camelot.model.media :as media]
    [camelot.detection.state :as state]
@@ -42,7 +41,7 @@
       (async/>! event-ch {:action :bootstrap-retrieve
                           :subject :global})
       (doseq [batch (retrieve-tasks state @detector-state-ref)]
-        (log/info "Session camera queued " (:subject-id batch))
+        (log/info "Session camera queued" (:subject-id batch))
         (async/>! event-ch {:action :bootstrap-schedule
                             :subject :session-camera
                             :subject-id (:subject-id batch)})

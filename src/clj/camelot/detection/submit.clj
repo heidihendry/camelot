@@ -45,7 +45,7 @@
               (log/info "Retrying check with task id" task-id
                         "in" (/ delay 1000.0) "seconds")
               (async/<! (async/timeout delay)))
-            (when (< (:retries v) retry-limit)
+            (if (< (:retries v) retry-limit)
               (if (pending? @detector-state-ref task-id)
                 (do
                   (async/>! event-ch {:action :submit-retry
@@ -60,7 +60,12 @@
                     (async/>! event-ch {:action :submit-no-completed-uploads
                                         :subject :task
                                         :subject-id task-id})
-                    (log/warn "No uploads completed for" task-id)))))
+                    (log/warn "No uploads completed for" task-id))))
+              (do
+                (log/warn "Retry limit reached for" task-id)
+                (async/>! event-ch {:action :submit-retry-limit-reached
+                                    :subject :task
+                                    :subject-id task-id})))
             (recur))
 
           ch

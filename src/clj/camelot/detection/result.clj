@@ -66,6 +66,14 @@
                       (suggestion/create!
                        state
                        (build-suggestion media-id bb (:payload v) detection))))
+                  (if (>= (:conf detection)
+                          (-> state :config :detector :confidence-threshold))
+                    (async/>! event-ch {:action :result-high-confidence-suggestion-added
+                                        :subject :media
+                                        :subject-id media-id})
+                    (async/>! event-ch {:action :result-low-confidence-suggestion-added
+                                        :subject :media
+                                        :subject-id media-id}))
                   (catch Exception e
                     (async/>! event-ch {:action :result-create-suggestion-failed
                                         :subject :media

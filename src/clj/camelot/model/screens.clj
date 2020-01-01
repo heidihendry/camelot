@@ -12,6 +12,9 @@
                  :label (tr/translate state :application/organisation)}
                 {:url "/library"
                  :label (tr/translate state :application/library)}
+                (when (-> state :config :detector :enabled)
+                  {:url "/detector"
+                   :label (tr/translate state :application/detector)})
                 {:url "/about"
                  :label (tr/translate state :application/about)}
                 {:function "bulk-import-progress"}]})

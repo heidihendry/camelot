@@ -13,7 +13,7 @@
 
 (def detector-filename
   "Name of the detector state file."
-  "detector.clj")
+  "detector.edn")
 
 (defn- detector-path
   [state]
@@ -57,18 +57,20 @@
                   (let [[v port] (async/alts! [int-cmd-ch event-chan])]
                     (condp = port
                       int-cmd-ch
-                      (when-not (= (:cmd v) :stop)
+                      (if (= (:cmd v) :stop)
+                        (swap! detector-state assoc-in [:system-status] :offline)
                         (recur))
 
                       event-chan
                       (do
-                        (swap! detector-state update-in (kf v) (fnil inc 0))
+                        (if (= (:subject v) :system-status)
+                          (swap! detector-state assoc :system-status (:action v))
+                          (swap! detector-state update-in (kf v) (fnil inc 0)))
                         (analytics/track state (event-to-analytics v))
                         (recur))))))
               (assoc this
                      :state detector-state
-                     :cmd-chan cmd-chan
-                     :event-chan event-chan))))
+                     :cmd-chan cmd-chan))))
         this)))
 
   (stop [this]
@@ -76,6 +78,4 @@
       (async/put! (:cmd-chan this) {:cmd :stop}))
     (assoc this
            :state nil
-           :cmd-chan nil
-           :event-chan nil
-           :events nil)))
+           :cmd-chan nil)))
