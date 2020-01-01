@@ -49,6 +49,7 @@
               status (:system-status (:stats state))
               schema [["Suggestions added (high confidence)" [:media :result-high-confidence-suggestion-added]]
                       ["Suggestions added (low confidence)" [:media :result-low-confidence-suggestion-added]]
+                      ["Suggestion creation failed" [:media :result-create-suggestion-failed]]
                       ["Media with suggestions" [:media :result-create-suggestions]]
                       ["Image batch suggestions completed" [:task :poll-task-completed]]
                       ["Image batch suggestions failed" [:task :poll-task-fialed]]
@@ -57,8 +58,7 @@
                       ["Image batch submissions failed" [:task :submit-task-call-failed]]
                       ["Image uploads completed" [:media :upload-succeeded]]
                       ["Image uploads skipped" [:media :upload-skipped]]
-                      ["Image uploads failed" [:media :upload-retry-limit-reached]]
-                      ["Suggestion creation failed" [:media :result-create-suggestion-failed]]]]
+                      ["Image uploads failed" [:media :upload-retry-limit-reached]]]]
           (dom/div #js {:className "detector-status"}
                    (dom/p nil
                           (dom/strong nil "Status: ")
