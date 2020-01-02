@@ -8,7 +8,7 @@
    [clojure.java.io :as io]
    [clojure.tools.logging :as log]))
 
-(def ^:private socket-timeout (* 30 1000))
+(def ^:private socket-timeout (* 300 1000))
 (def ^:private connection-timeout (* 5 1000))
 
 (defn- slurp-bytes
