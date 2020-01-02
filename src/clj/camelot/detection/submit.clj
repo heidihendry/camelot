@@ -26,17 +26,26 @@
 (defn run
   "Submit tasks for processing."
   [state detector-state-ref cmd-mult poll-ch archive-ch event-ch]
-  (let [cmd-ch (async/chan)
+  (let [cmd-ch (async/tap cmd-mult (async/chan))
         retry-ch (async/chan (async/sliding-buffer 10000))
         ch (async/chan (async/sliding-buffer 10000))
         int-ch (async/chan)]
-    (async/tap cmd-mult cmd-ch)
     (async/go-loop []
       (let [[v port] (async/alts! [cmd-ch retry-ch ch int-ch] :priority true)]
         (condp = port
           cmd-ch
-          (if (= (:cmd v) :stop)
+          (condp = (:cmd v)
+            :stop
             (log/info "Detector submit stopped")
+
+            :pause
+            (do
+              (loop []
+                (let [{:keys [cmd]} (async/<! cmd-ch)]
+                  (when-not (= cmd :resume)
+                    (recur))))
+              (recur))
+
             (recur))
 
           retry-ch

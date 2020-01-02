@@ -49,15 +49,24 @@
 (defn run
   "Upload all media receeived on the returned channel."
   [state detector-state-ref cmd-mult submit-ch event-ch]
-  (let [cmd-ch (async/chan)
+  (let [cmd-ch (async/tap cmd-mult (async/chan))
         ch (async/chan 1000)]
-    (async/tap cmd-mult cmd-ch)
     (async/go-loop []
       (let [[v port] (async/alts! [cmd-ch ch] :priority true)]
         (condp = port
           cmd-ch
-          (if (= (:cmd v) :stop)
+          (condp = (:cmd v)
+            :stop
             (log/info "Detector upload stopped")
+
+            :pause
+            (do
+              (loop []
+                (let [{:keys [cmd]} (async/<! cmd-ch)]
+                  (when-not (= cmd :resume)
+                    (recur))))
+              (recur))
+
             (recur))
 
           ch

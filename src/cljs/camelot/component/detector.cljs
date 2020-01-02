@@ -1,6 +1,7 @@
 (ns camelot.component.detector
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
+   [camelot.rest :as rest]
    [camelot.util.misc :as misc]
    [cljs-http.client :as http]
    [cljs.core.async :refer [<!]]
@@ -49,38 +50,50 @@
               status (:system-status (:stats state))
               schema [["Suggestions added (high confidence)" [:media :result-high-confidence-suggestion-added]]
                       ["Suggestions added (low confidence)" [:media :result-low-confidence-suggestion-added]]
-                      ["Suggestion creation failed" [:media :result-create-suggestion-failed]]
                       ["Media with suggestions" [:media :result-create-suggestions]]
                       ["Image batch results retrieved" [:task :poll-task-completed]]
-                      ["Image batch results failed" [:task :poll-task-failed]]
-                      ["Image batch submissions started" [:task :prepare-task-created]]
+                      ["Image batch creations completed" [:task :prepare-task-created]]
                       ["Image batch empty submissions" [:task :submit-no-completed-uploads]]
                       ["Image batch submissions completed" [:task :submit-task-call-success]]
-                      ["Image batch submissions deferred" [:task :submit-retry-limit-reached]]
-                      ["Image batch submissions failed" [:task :submit-task-call-failed]]
                       ["Image batch archivals completed" [:task :archive-success]]
-                      ["Image batch archivals failed" [:task :archive-failed]]
                       ["Image uploads completed" [:media :upload-succeeded]]
-                      ["Image uploads skipped" [:media :upload-skipped]]
-                      ["Image uploads failed" [:media :upload-retry-limit-reached]]]]
-          (dom/div #js {:className "detector-status"}
-                   (dom/p nil
-                          (dom/strong nil "Status: ")
-                          (condp = status
-                            "offline"
-                            (dom/span #js {:className "status-down"}
-                                      "Offline")
+                      ["Image uploads skipped" [:media :upload-skipped]]]
+              error-schema [["Suggestion creation failed" [:media :result-create-suggestion-failed]]
+                            ["Image batch results failed" [:task :poll-task-failed]]
+                            ["Image batch creations failed (retried)"
+                             [:trap-station-session-camera :prepare-task-create-failed]]
+                            ["Image batch submissions failed" [:task :submit-retry-limit-reached]]
+                            ["Image batch archivals failed" [:task :archive-failed]]
+                            ["Image uploads failed" [:media :upload-retry-limit-reached]]]]
+          (dom/div nil
+                   (dom/h4 nil "Activity")
+                   (dom/span #js {:className "detector-status"}
+                            (condp = status
+                              "stopped"
+                              (dom/span #js {:className "status-down"} "Stopped")
 
-                            "detector-authentication-failed"
-                            (dom/span #js {:className "status-down"}
-                                      "Authentication failed")
+                              "paused"
+                              (dom/span nil
+                                        (dom/span #js {:className "status-paused"}
+                                                  "Status: Paused")
+                                        (dom/button #js {:className "btn btn-default"
+                                                         :onClick #(rest/post-x "/detector/command"
+                                                                                {:data {:cmd :resume}} identity)}
+                                                    "▶"))
 
-                            "running"
-                            (dom/span #js {:className "status-up"}
-                                      "Running")
+                              "detector-authentication-failed"
+                              (dom/span #js {:className "status-down"} "Authentication failed")
+                              "running"
+                              (dom/span nil
+                                        (dom/span #js {:className "status-up"}
+                                                  "Status: Running")
+                                        (dom/button #js {:className "btn btn-default"
+                                                         :onClick #(rest/post-x "/detector/command"
+                                                                                {:data {:cmd :pause}} identity)}
+                                                    "⏸"))
 
-                            (dom/span {:className "status-down"}
-                                      status)))
+                              (dom/span {:className "status-down"}
+                                        status)))
                    (dom/table nil
                               (dom/thead nil
                                          (dom/tr #js {:className "table-heading"}
@@ -90,6 +103,19 @@
                                          (om/build-all table-row
                                                        (mapv (fn [[l p]]
                                                                (vector l p (get-in stats p 0))) schema)
+                                                       {:key-fn (fn [data]
+                                                                  (-> data second second name))})))
+                   (dom/br nil)
+                   (dom/h4 nil "Errors")
+                   (dom/table nil
+                              (dom/thead nil
+                                         (dom/tr #js {:className "table-heading"}
+                                                 (dom/th nil "Event")
+                                                 (dom/th nil "Count")))
+                              (dom/tbody nil
+                                         (om/build-all table-row
+                                                       (mapv (fn [[l p]]
+                                                               (vector l p (get-in stats p 0))) error-schema)
                                                        {:key-fn (fn [data]
                                                                   (-> data second second name))})))))))))
 
@@ -101,7 +127,7 @@
     (render [_]
       (dom/div #js {:className "split-menu"}
                (dom/div #js {:className "intro"}
-                        (dom/h4 nil "Detector statistics"))
+                        (dom/h4 nil "Detector"))
                (dom/div #js {:className "single-section text-section"}
                         (om/build describe-stats {}))))))
 

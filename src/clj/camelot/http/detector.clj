@@ -1,7 +1,10 @@
 (ns camelot.http.detector
   (:require
+   [clojure.core.async :as async]
    [clojure.data.json :as json]
-   [compojure.core :refer [context GET]]))
+   [ring.util.http-response :as hr]
+   [compojure.core :refer [context GET POST]]
+   [clojure.tools.logging :as log]))
 
 (defn- detector-status
   [state]
@@ -11,8 +14,17 @@
      :body (json/write-str (select-keys detector-state [:system-status :events]))}
     {:status 200
      :headers {"Content-Type" "application/json; charset=utf-8"}
-     :body {:system-status :offline}}))
+     :body {:system-status :stopped}}))
 
 (def routes
   (context "/detector" {state :system}
-           (GET "/status" [] (detector-status state))))
+           (GET "/status" [] (detector-status state))
+           (POST "/command" [data]
+                 (do
+                   (log/error "Error!" data)
+                   (let [{:keys [cmd]} data]
+                     (if (and (#{:pause :resume} cmd) (-> state :detector :cmd-chan))
+                       (do
+                         (async/put! (-> state :detector :cmd-chan) {:cmd cmd})
+                         (hr/no-content))
+                       (hr/bad-request)))))))

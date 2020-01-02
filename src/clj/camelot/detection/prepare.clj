@@ -29,17 +29,13 @@
 (defn run
   "Create tasks and queue media for upload."
   [state detector-state-ref cmd-mult upload-ch poll-ch event-ch]
-  (let [cmd-ch (async/chan)
+  (let [cmd-ch (async/tap cmd-mult (async/chan))
         ch (async/chan 1)]
-    (async/tap cmd-mult cmd-ch)
     (async/go-loop []
-      (let [[v port] (async/alts! [cmd-ch ch] :priority true)]
+      ;; take from ch before cmd-ch; this prevents bootstrap from blocking
+      ;; when executing commands.
+      (let [[v port] (async/alts! [ch cmd-ch] :priority true)]
         (condp = port
-          cmd-ch
-          (if (= (:cmd v) :stop)
-            (log/info "Detector prepare stopped")
-            (recur))
-
           ch
           (do
             (let [scid (:subject-id v)]
@@ -88,5 +84,20 @@
                                           :subject :trap-station-session-camera
                                           :subject-id scid})
                       (log/warn "No media needing upload. Skipping session camera " scid))))))
+            (recur))
+
+          cmd-ch
+          (condp = (:cmd v)
+            :stop
+            (log/info "Detector prepare stopped")
+
+            :pause
+            (do
+              (loop []
+                (let [{:keys [cmd]} (async/<! cmd-ch)]
+                  (when-not (= cmd :resume)
+                    (recur))))
+              (recur))
+
             (recur)))))
     ch))
