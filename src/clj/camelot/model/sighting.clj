@@ -17,7 +17,7 @@
     [sighting-quantity :- s/Int
      taxonomy-id :- s/Int
      media-id :- s/Int
-     bounding-box-id :- s/Int
+     bounding-box-id :- (s/maybe s/Int)
      sighting-fields :- (s/maybe {s/Int s/Str})]
   {s/Any s/Any})
 
@@ -122,12 +122,9 @@
 (s/defn delete!
   [state :- State
    id :- s/Int]
-  (let [sighting (get-specific state id)]
-    (db/with-transaction [s state]
-      (if-let [bounding-box-id (get-in sighting [:bounding-box :id])]
-        (bounding-box/delete! s bounding-box-id))
-      (sighting-field-value/delete-for-sighting! s id)
-      (query s :delete! {:sighting-id id}))))
+  (db/with-transaction [s state]
+    (sighting-field-value/delete-for-sighting! s id)
+    (query s :delete! {:sighting-id id})))
 
 (s/defn delete-with-media-ids!
   [state :- State
