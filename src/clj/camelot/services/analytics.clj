@@ -1,10 +1,11 @@
 (ns camelot.services.analytics
   (:require
+   [clojure.tools.logging :as log]
    [camelot.util.version :as version]
    [clj-http.client :as http]))
 
-(def socket-timeout (* 1 1000))
-(def connection-timeout (* 1 1000))
+(def socket-timeout (* 2 1000))
+(def connection-timeout (* 2 1000))
 
 (def tracking-id "UA-77556072-2")
 
@@ -19,10 +20,14 @@
                           "&av=" (version/get-version)
                           "&ec=" category
                           "&ea=" action
-                          "&el=" label
-                          "&ev=" label-value
-                          "&cd1=" dimension1
-                          "&cm1=" metric1)
+                          (when label
+                            (str "&el=" label))
+                          (when label-value
+                            (str "&ev=" label-value))
+                          (when dimension1
+                            (str "&cd1=" dimension1))
+                          (when metric1
+                            (str "&cm1=" metric1)))
                      {:socket-timeout socket-timeout
                       :connection-timeout connection-timeout})))
 
@@ -39,7 +44,9 @@
                           "&utv=" variable
                           "&utl=" label
                           "&utt=" time
-                          "&cd1=" dimension1
-                          "&cm1=" metric1)
+                          (when dimension1
+                            (str "&cd1=" dimension1))
+                          (when metric1
+                            (str "&cm1=" metric1)))
                      {:socket-timeout socket-timeout
                       :connection-timeout connection-timeout})))

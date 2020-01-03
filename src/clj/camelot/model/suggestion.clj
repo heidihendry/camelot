@@ -41,13 +41,20 @@
        (query state :get-all)
        (map suggestion)))
 
+(defn get-all*
+  "Retrieve all suggestions."
+  [state]
+  (->> {}
+       (query state :get-all*)
+       (map suggestion)))
+
 (defn get-all-for-media-ids
   "Retrieve all suggestions for the given collection of `media-ids`."
   [state media-ids]
   (->> {:media-ids media-ids}
        (query state :get-all-for-media-ids)
-       (filter #(> (:suggestion-confidence %)
-                   (get-in state [:config :detector :confidence-threshold])))
+       (filter #(>= (:suggestion-confidence %)
+                    (get-in state [:config :detector :confidence-threshold])))
        (map suggestion)))
 
 (defn get-specific
@@ -69,6 +76,7 @@
   "Delete a suggestion with the given `id`."
   [state id]
   ;; TODO Delete suggestion data from module
+  ;; TODO Delete dangling bounding boxes
   (query state :delete! {:suggestion-id id}))
 
 (defn delete-for-media-id!

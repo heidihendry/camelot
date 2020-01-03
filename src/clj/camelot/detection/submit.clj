@@ -21,7 +21,7 @@
        (state/media-for-task detector-state)
        (some (partial state/upload-completed? detector-state))))
 
-(def retry-limit 3)
+(def ^:private retry-limit 3)
 
 (defn run
   "Submit tasks for processing."

@@ -48,49 +48,57 @@
                                :width "32"}))
         (let [stats (:events (:stats state))
               status (:system-status (:stats state))
-              schema [["Suggestions added (high confidence)" [:media :result-high-confidence-suggestion-added]]
-                      ["Suggestions added (low confidence)" [:media :result-low-confidence-suggestion-added]]
-                      ["Media with suggestions" [:media :result-create-suggestions]]
-                      ["Image batch results retrieved" [:task :poll-task-completed]]
-                      ["Image batch creations completed" [:task :prepare-task-created]]
-                      ["Image batch empty submissions" [:task :submit-no-completed-uploads]]
-                      ["Image batch submissions completed" [:task :submit-task-call-success]]
-                      ["Image batch archivals completed" [:task :archive-success]]
-                      ["Image uploads completed" [:media :upload-succeeded]]
-                      ["Image uploads skipped" [:media :upload-skipped]]]
-              error-schema [["Suggestion creation failed" [:media :result-create-suggestion-failed]]
-                            ["Image batch results failed" [:task :poll-task-failed]]
-                            ["Image batch creations failed (retried)"
+              schema [["Media with suggestions (high confidence)" [:media :result-media-with-high-confidence-suggestion]]
+                      ["Media with suggestions (all)" [:media :result-create-suggestions]]
+                      ["Image batches created" [:task :prepare-task-created]]
+                      ["… uploads completed" [:media :upload-succeeded]]
+                      ["… uploads skipped" [:media :upload-skipped]]
+                      ["… batches found empty" [:task :submit-no-completed-uploads]]
+                      ["Image batches submitted" [:task :submit-task-call-success]]
+                      ["Image batches processed" [:task :poll-task-completed]]
+                      ["Image batches archived" [:task :archive-success]]]
+              error-schema [["Image batch creations failed (retried)"
                              [:trap-station-session-camera :prepare-task-create-failed]]
+                            ["Image uploads failed" [:media :upload-retry-limit-reached]]
                             ["Image batch submissions failed" [:task :submit-retry-limit-reached]]
+                            ["Image batch processing failed" [:task :poll-task-failed]]
                             ["Image batch archivals failed" [:task :archive-failed]]
-                            ["Image uploads failed" [:media :upload-retry-limit-reached]]]]
+                            ["Suggestion creation failed" [:media :result-create-suggestion-failed]]]]
           (dom/div nil
                    (dom/h4 nil "Activity")
                    (dom/span #js {:className "detector-status"}
                             (condp = status
                               "stopped"
-                              (dom/span #js {:className "status-down"} "Stopped")
+                              (dom/span #js {:className "status-down"} "Status: stopped")
 
                               "paused"
                               (dom/span nil
                                         (dom/span #js {:className "status-paused"}
-                                                  "Status: Paused")
+                                                  "Status: paused")
                                         (dom/button #js {:className "btn btn-default"
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :resume}} identity)}
-                                                    "▶"))
+                                                    "▶")
+                                        (dom/button #js {:className "btn btn-default"
+                                                         :onClick #(rest/post-x "/detector/command"
+                                                                                {:data {:cmd :rerun}} identity)
+                                                         :disabled "disabled"}
+                                                    "↻"))
 
                               "detector-authentication-failed"
-                              (dom/span #js {:className "status-down"} "Authentication failed")
+                              (dom/span #js {:className "status-down"} "Status: authentication failed")
                               "running"
                               (dom/span nil
                                         (dom/span #js {:className "status-up"}
-                                                  "Status: Running")
+                                                  "Status: running")
                                         (dom/button #js {:className "btn btn-default"
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :pause}} identity)}
-                                                    "⏸"))
+                                                    "⏸")
+                                        (dom/button #js {:className "btn btn-default"
+                                                         :onClick #(rest/post-x "/detector/command"
+                                                                                {:data {:cmd :rerun}} identity)}
+                                                    "↻"))
 
                               (dom/span {:className "status-down"}
                                         status)))
@@ -106,7 +114,7 @@
                                                        {:key-fn (fn [data]
                                                                   (-> data second second name))})))
                    (dom/br nil)
-                   (dom/h4 nil "Errors")
+                   (dom/h5 nil "Errors")
                    (dom/table nil
                               (dom/thead nil
                                          (dom/tr #js {:className "table-heading"}

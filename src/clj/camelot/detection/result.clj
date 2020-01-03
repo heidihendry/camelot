@@ -29,6 +29,11 @@
              :suggestion-confidence (:conf detection)
              :media-id media-id}))))
 
+(defn- satisfies-confidence-threshold?
+  [state detection]
+  (>= (:conf detection)
+      (-> state :config :detector :confidence-threshold)))
+
 (defn run
   "Create suggestions for values placed on the returned channel."
   [state detector-state-ref cmd-mult event-ch]
@@ -68,16 +73,20 @@
                                          :metric1 (count (-> v :payload :image :detections))
                                          :dimension2 "average-confidence"
                                          :metric2 avg-confidence}}))
-            (let [media-id (:subject-id v)]
-              (doseq [detection (-> v :payload :image :detections)]
+            (let [media-id (:subject-id v)
+                  detections (-> v :payload :image :detections)]
+              (when (some (partial satisfies-confidence-threshold? state) detections)
+                (async/>! event-ch {:action :result-media-with-high-confidence-suggestion
+                                    :subject :media
+                                    :subject-id media-id}))
+              (suggestion/delete-for-media-id! state media-id)
+              (doseq [detection detections]
                 (log/info "Creating suggestion for media-id" (:subject-id v))
                 (try
-                  (db/with-transaction [s state]
-                    (suggestion/delete-for-media-id! s media-id)
-                    (let [bb (bounding-box/create! s (build-bounding-box detection))]
-                      (suggestion/create!
-                       s
-                       (build-suggestion media-id bb (:payload v) detection))))
+                  (let [bb (bounding-box/create! state (build-bounding-box detection))]
+                    (suggestion/create!
+                     state
+                     (build-suggestion media-id bb (:payload v) detection)))
                   (if (>= (:conf detection)
                           (-> state :config :detector :confidence-threshold))
                     (async/>! event-ch {:action :result-high-confidence-suggestion-added

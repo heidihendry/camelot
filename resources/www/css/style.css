@@ -2110,3 +2110,8 @@ pre.field-input {
     border-radius: 0.5rem;
     background-color: #aa3311;
 }
+
+#app h5 {
+    font-size: 120%;
+    font-weight: bold;
+}

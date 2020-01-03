@@ -8,7 +8,7 @@
    [clojure.tools.logging :as log]
    [clj-time.core :as t]))
 
-(def ^:private reschedule-all (* 60 1000))
+(def ^:private reschedule-all (* 600 1000))
 
 (defn- upload-complete?
   [media]
@@ -36,13 +36,13 @@
   [state detector-state-ref cmd-mult prepare-ch event-ch]
   (let [cmd-ch (async/tap cmd-mult (async/chan))
         int-ch (async/chan (async/dropping-buffer 100000))]
-    (async/go-loop []
-      (log/info "Queuing session cameras")
+    (log/info "Queuing session cameras")
+    (async/go
       (async/>! event-ch {:action :bootstrap-retrieve
                           :subject :global})
       (doseq [batch (retrieve-tasks state @detector-state-ref)]
-        (async/>! int-ch batch))
-
+        (async/>! int-ch batch)))
+    (async/go-loop []
       (let [timeout-ch (async/timeout reschedule-all)
             [v port] (async/alts! [cmd-ch int-ch timeout-ch] :priority true)]
         (condp = port
@@ -59,6 +59,13 @@
                     (recur))))
               (recur))
 
+            :rerun
+            (do
+              (log/info "Queuing session cameras via rerun")
+              (doseq [batch (retrieve-tasks state @detector-state-ref)]
+                (async/>! int-ch batch))
+              (recur))
+
             (recur))
 
           int-ch
@@ -73,4 +80,8 @@
           timeout-ch
           (do
             (log/info "Re-queuing session cameras")
+            (doseq [batch (retrieve-tasks state @detector-state-ref)]
+              (async/>! int-ch batch))
+            (async/>! event-ch {:action :bootstrap-timeout
+                                :subject :global})
             (recur)))))))

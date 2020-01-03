@@ -23,7 +23,7 @@
                  (do
                    (log/error "Error!" data)
                    (let [{:keys [cmd]} data]
-                     (if (and (#{:pause :resume} cmd) (-> state :detector :cmd-chan))
+                     (if (and (#{:pause :resume :rerun} cmd) (-> state :detector :cmd-chan))
                        (do
                          (async/put! (-> state :detector :cmd-chan) {:cmd cmd})
                          (hr/no-content))

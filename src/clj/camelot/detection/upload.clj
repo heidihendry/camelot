@@ -33,7 +33,7 @@
         (let [filename (format "%s.%s" (:media-id media) (:media-format media))]
           {:result :success
            :value (http/put (container-sas-to-blob-sas sas filename)
-                            {:socket-timeout (* 180 1000)
+                            {:socket-timeout socket-timeout
                              :connection-timeout connection-timeout
                              :headers {"x-ms-blob-content-disposition"
                                        (format "attachment; filename=\"%s""\"" filename)
