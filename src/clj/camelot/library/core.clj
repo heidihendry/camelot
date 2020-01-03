@@ -55,7 +55,9 @@
         suggestions-for #(get media-suggestions (:media-id %))]
     (map #(assoc %
                  :sightings (vec (sightings-for %))
-                 :suggestions (vec (suggestions-for %))
+                 :suggestions (if (:media-processed %)
+                                []
+                                (vec (suggestions-for %)))
                  :media-uri (media-uri %))
          media)))
 
