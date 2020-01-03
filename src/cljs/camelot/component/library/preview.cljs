@@ -71,13 +71,19 @@
        :just-mounted true})
     om/IDidMount
     (did-mount [_]
-      (.addEventListener (.getElementById js/document "camelot-preview-image") "load"
-                         (fn [evt]
-                           (let [rect (.getBoundingClientRect (.-target evt))]
-                             (om/set-state! owner :width (object/get rect "width"))
-                             (om/set-state! owner :height (object/get rect "height"))
-                             (.requestAnimationFrame js/window
-                                          (fn [] (om/set-state! owner :just-mounted false)))))))
+      (letfn [(set-dimensions! [rect]
+                (om/set-state! owner :width (object/get rect "width"))
+                (om/set-state! owner :height (object/get rect "height"))
+                (.requestAnimationFrame js/window
+                                        (fn [] (om/set-state! owner :just-mounted false))))
+              (image-loaded? [rect]
+                (and (> (object/get rect "width") 20) (> (object/get rect "height") 20)))]
+        (let [rect (.getBoundingClientRect (.getElementById js/document "camelot-preview-image"))]
+          (if (image-loaded? rect)
+            (set-dimensions! rect)
+            (.addEventListener (.getElementById js/document "camelot-preview-image") "load"
+                               (fn [evt]
+                                 (set-dimensions! (.getBoundingClientRect (.-target evt)))))))))
     om/IRenderState
     (render-state [_ state]
       (when (and (:width state) (:height state))
@@ -87,10 +93,18 @@
                            :width (str (* (:width bounding-box) (:width state)) "px")
                            :height (str (* (:height bounding-box) (:height state)) "px")
                            :zIndex (int (- 20 (* area 10)))}]
-          (dom/div #js {:className "bounding-box"
-                        :style (clj->js (if (:just-mounted state)
-                                          (assoc base-styles :opacity "0.7")
-                                          base-styles))}))))))
+          (dom/button #js {:className "bounding-box"
+                           :title (:label bounding-box)
+                           :style (clj->js (if (:just-mounted state)
+                                             (assoc base-styles :opacity "0.7")
+                                             base-styles))
+                           :onClick #(do (om/transact! (state/library-state) :show-identification-panel not)
+                                         (om/update! (state/library-state) :identify-single-image
+                                                     (:selected-media-id (state/library-state)))
+                                         (om/update! (state/library-state) :identification-bounding-box
+                                                     (dissoc bounding-box :label))
+                                         (.preventDefault %)
+                                         (.stopPropagation %))}))))))
 
 (defn suggestion-bounding-box
   [suggestion owner]
@@ -98,7 +112,7 @@
     om/IRender
     (render [_]
       (if-let [bb (:bounding-box suggestion)]
-        (om/build bounding-box bb)))))
+        (om/build bounding-box (assoc bb :label "Unidentified"))))))
 
 (defn sighting-bounding-box
   [sighting owner]
@@ -106,7 +120,12 @@
     om/IRender
     (render [_]
       (if-let [bb (:bounding-box sighting)]
-        (om/build bounding-box bb)))))
+        (om/build bounding-box (assoc bb :label
+                                      (str
+                                       (:sighting-quantity sighting) "x "
+                                       (or (:taxonomy-label (get (:species (state/library-state))
+                                                                 (:taxonomy-id sighting)))
+                                           (tr/translate ::species-not-in-survey)))))))))
 
 (defn mcp-preview
   [selected owner]

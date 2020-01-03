@@ -49,20 +49,32 @@
         sighting-fields (get-in (state/library-state) [:identification :sighting-fields])
         selected (:selected-media-id (state/library-state))
         sighting-id (get-in (state/library-state) [:identification :sighting-id])
-        all-selected (util/all-media-selected)
+        bounding-box (:identification-bounding-box (state/library-state))
+        all-selected (if-let [si (:identify-single-image (state/library-state))]
+                       [(util/find-with-id (state/library-state) si)]
+                       (util/all-media-selected))
         identification {:quantity qty
                         :species spp
-                        :sighting-fields @sighting-fields}
+                        :sighting-fields @sighting-fields
+                        :bounding-box-id (:id bounding-box)}
         add-sighting
         (fn [resp] (dorun (map #(do (om/update! (second %)
                                                 :sightings
                                                 (conj (:sightings (second %))
                                                       (merge {:taxonomy-id spp
                                                               :sighting-id (first %)
-                                                              :sighting-quantity qty}
+                                                              :sighting-quantity qty
+                                                              :bounding-box (:identification-bounding-box (state/library-state))}
                                                              (key-by-user-key @sighting-fields))))
+                                    (om/transact! (second %) :suggestions
+                                                  (fn [suggestions]
+                                                    (remove (fn [x]
+                                                              (= (get-in x [:bounding-box :id]) (:id bounding-box)))
+                                                            suggestions)))
                                     (om/update! (second %) :media-processed true))
                                (zipmap (:body resp) all-selected)))
+          (om/update! (state/library-state) :identify-single-image nil)
+          (om/update! (state/library-state) :identification-bounding-box nil)
           (util/show-identified-message (count all-selected)))
         update-sighting
         (fn [resp] (om/transact! (util/find-with-id (state/library-state) selected)

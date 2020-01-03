@@ -2073,6 +2073,7 @@ pre.field-input {
     opacity: 0.15;
     border-radius: 0.5rem;
     transition: opacity ease-out 500ms;
+    background: none;
 }
 
 #app .bounding-box:hover {
