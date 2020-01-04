@@ -20,11 +20,9 @@
   (context "/detector" {state :system}
            (GET "/status" [] (detector-status state))
            (POST "/command" [data]
-                 (do
-                   (log/error "Error!" data)
-                   (let [{:keys [cmd]} data]
-                     (if (and (#{:pause :resume :rerun} cmd) (-> state :detector :cmd-chan))
-                       (do
-                         (async/put! (-> state :detector :cmd-chan) {:cmd cmd})
-                         (hr/no-content))
-                       (hr/bad-request)))))))
+                 (let [{:keys [cmd]} data]
+                   (if (and (#{:pause :resume :rerun} cmd) (-> state :detector :cmd-chan))
+                     (do
+                       (async/put! (-> state :detector :cmd-chan) {:cmd cmd})
+                       (hr/no-content))
+                     (hr/bad-request))))))

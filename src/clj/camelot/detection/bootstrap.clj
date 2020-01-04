@@ -62,8 +62,9 @@
             :rerun
             (do
               (log/info "Queuing session cameras via rerun")
-              (doseq [batch (retrieve-tasks state @detector-state-ref)]
-                (async/>! int-ch batch))
+              (async/go
+                (doseq [batch (retrieve-tasks state @detector-state-ref)]
+                  (async/>! int-ch batch)))
               (recur))
 
             (recur))
@@ -80,8 +81,9 @@
           timeout-ch
           (do
             (log/info "Re-queuing session cameras")
-            (doseq [batch (retrieve-tasks state @detector-state-ref)]
-              (async/>! int-ch batch))
+            (async/go
+              (doseq [batch (retrieve-tasks state @detector-state-ref)]
+                (async/>! int-ch batch)))
             (async/>! event-ch {:action :bootstrap-timeout
                                 :subject :global})
             (recur)))))))

@@ -344,7 +344,7 @@
     :library "Library"
     :organisation "Organisation"
     :about "About"
-    :detector "Detector"
+    :detector "Detection"
     :surveys "Surveys"
     :analysis "Analysis"
     :sites "Sites"

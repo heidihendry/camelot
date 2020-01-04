@@ -72,7 +72,8 @@
                         (condp = (:cmd v)
                           :stop (swap! detector-state assoc-in [:system-status] :stopped)
                           :pause (swap! detector-state assoc-in [:system-status] :paused)
-                          :resume (swap! detector-state assoc-in [:system-status] :running))
+                          :resume (swap! detector-state assoc-in [:system-status] :running)
+                          nil)
                         (recur))
 
                       event-chan
