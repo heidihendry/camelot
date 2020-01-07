@@ -79,7 +79,7 @@
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :resume}} identity)}
                                                     "▶")
-                                        (dom/button #js {:className "btn btn-default"
+                                        #_(dom/button #js {:className "btn btn-default"
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :rerun}} identity)
                                                          :disabled "disabled"}
@@ -95,7 +95,7 @@
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :pause}} identity)}
                                                     "⏸")
-                                        (dom/button #js {:className "btn btn-default"
+                                        #_(dom/button #js {:className "btn btn-default"
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :rerun}} identity)}
                                                     "↻"))
