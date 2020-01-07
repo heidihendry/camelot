@@ -28,17 +28,15 @@
   [state sas media]
   (try
     (if-let [stream (model.media/read-media-file state (:media-filename media) :original)]
-      (do
-        (log/warn "Uploading " (:media-id media) "...")
-        (let [filename (format "%s.%s" (:media-id media) (:media-format media))]
-          {:result :success
-           :value (http/put (container-sas-to-blob-sas sas filename)
-                            {:socket-timeout socket-timeout
-                             :connection-timeout connection-timeout
-                             :headers {"x-ms-blob-content-disposition"
-                                       (format "attachment; filename=\"%s""\"" filename)
-                                       "x-ms-blob-type" "BlockBlob"}
-                             :body (slurp-bytes stream)})}))
+      (let [filename (format "%s.%s" (:media-id media) (:media-format media))]
+        {:result :success
+         :value (http/put (container-sas-to-blob-sas sas filename)
+                          {:socket-timeout socket-timeout
+                           :connection-timeout connection-timeout
+                           :headers {"x-ms-blob-content-disposition"
+                                     (format "attachment; filename=\"%s""\"" filename)
+                                     "x-ms-blob-type" "BlockBlob"}
+                           :body (slurp-bytes stream)})})
       (do (log/warn "Skipping upload of " (:media-id media) " as input file was not found.")
           {:result :skipped}))
     (catch Exception e
