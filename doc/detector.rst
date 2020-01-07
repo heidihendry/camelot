@@ -134,5 +134,5 @@ Errors reported on this page are not necessarily a indication that something
 is wrong: a small number of errors are to be expected due to events such as
 network disruption. Some errors may mean that suggestions for a small number
 of images are not created where they otherwise could have been, though
-typically these are not worth worrying about; false positives can be assumed
+typically these are not worth worrying about; false negatives can be assumed
 to exist in the suggestions anyway.
