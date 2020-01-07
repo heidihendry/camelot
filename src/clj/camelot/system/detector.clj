@@ -23,7 +23,7 @@
 
 (defn- detector-path
   [state]
-  (let [file (io/file (-> state :config :path :database) detector-filename)]
+  (let [file (io/file (-> state :config :paths :database) detector-filename)]
     (.getCanonicalPath ^File file)))
 
 (defn- event-to-analytics
@@ -39,8 +39,6 @@
 (defrecord Detector [config database]
   component/Lifecycle
   (start [this]
-    (log/warn config)
-    (log/warn database)
     (let [state {:config config :database database}]
       (if (-> state :config :detector :enabled)
         (if (:cmd-chan this)
