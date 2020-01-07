@@ -576,7 +576,7 @@
     :media-processed-title "Set the selected media as processed or unprocessed."
     :media-reference-quality-title "Indicates the selected media are high quality and should be used as a reference."
     :filter-unprocessed-label "Unprocessed"
-    :filter-animals-label "Has wildlife"}
+    :filter-animals-label "Has animal?"}
 
    :camelot.component.albums
    {:num-nights "%d nights"

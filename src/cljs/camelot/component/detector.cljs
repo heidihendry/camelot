@@ -48,8 +48,8 @@
                                :width "32"}))
         (let [stats (:events (:stats state))
               status (:system-status (:stats state))
-              schema [["Media with detections (high confidence)" [:media :result-media-with-high-confidence-suggestion]]
-                      ["Media with detections (all)" [:media :result-create-suggestions]]
+              schema [["Images with detections (high confidence)" [:media :result-media-with-high-confidence-suggestion]]
+                      ["Images with detections (all)" [:media :result-create-suggestions]]
                       ["Image batches created" [:task :prepare-task-created]]
                       ["… uploads completed" [:media :upload-succeeded]]
                       ["… uploads skipped" [:media :upload-skipped]]
@@ -135,7 +135,7 @@
     (render [_]
       (dom/div #js {:className "split-menu"}
                (dom/div #js {:className "intro"}
-                        (dom/h4 nil "Wildlife detection"))
+                        (dom/h4 nil "Animal detection"))
                (dom/div #js {:className "single-section text-section"}
                         (om/build describe-stats {}))))))
 

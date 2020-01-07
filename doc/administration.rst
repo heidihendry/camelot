@@ -59,6 +59,17 @@ Allows customisation of the way that the Camelot or its user interface behaves.
   anonymous data about how the software is being used, in order to help
   improve the software.
 
+Wildlife detection
+^^^^^^^^^^^^^^^^^^
+
+This enables the wildlife detection capabilities of Camelot. See
+|wildlife_detection| for more information.
+
+.. |wildlife_detection| raw:: html
+
+   <a href="detector.html">wildlife detection</a>
+
+
 Advanced settings
 ^^^^^^^^^^^^^^^^^
 
