@@ -91,7 +91,6 @@
                 (log/info "Scheduled retry"))
               (if (some-completed? @detector-state-ref task-id)
                 (do
-                  (log/info "Placing on internal channel" task-id)
                   (async/go (async/>! int-ch (event/to-submit-event task-id)))
                   (log/info "Placed on internal channel" task-id))
                 (do
