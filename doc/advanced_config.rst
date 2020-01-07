@@ -75,6 +75,13 @@ taken if editing this file manually.
   * ``max-heap-size``: a number representing the desired maximum heap size (in MB) for the Camelot server JVM (default: <blank>)
   * ``jvm-extra-args``: additional arguments you wish to pass to ``java`` when starting the Camelot server. (default: <blank>)
 
+* ``detector``: an object describing Camelot wildlife detection specific configuration
+
+  * ``enabled``: a boolean representing whether the feature is enabled
+  * ``username``: the username registered for the service
+  * ``password``: the password belonging to that registered user
+  * ``confidence-threshold``: a number between `0` and `1` indicating a lower-bound for the confidence level that a suggestion is correct (default: 0.9)
+
 * ``java-command``: the path to the ``java`` executable on this system (default: ``java``)
 * ``open-browser-on-startup``: whether the Camelot administration software should automatically view Camelot after startup (default: ``true``)
 * ``send-usage-data``: whether to publish anonymous usage data to the Camelot team for helping to improve the software (default: ``false``)
