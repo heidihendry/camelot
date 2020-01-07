@@ -4,8 +4,8 @@ Animal detection
 *The features described on this page are coming in Camelot 1.6.0.*
 
 Typically most images captured by motion-triggered cameras are do not have
-valuable content, as the motion sensor was triggered for reasons other than
-some nearby animal, such as the wind.  The result is that much time tends to
+valuable content, as the motion sensor was triggered by causes other than some
+nearby animal, such as a gust of wind. The result is that much time tends to
 be spent sifting through images to find those that actually have interesting
 content.
 
@@ -72,22 +72,26 @@ image filtering, and with bounding boxes.
 
 Whether a suggestion is considered "high-confidence" is determined by the
 "Confidence threshold" setting in the Administration UI, which is a number
-between `0` and `1` indicating the likelihood of the suggestion being correct.
+between ``0`` and ``1`` indicating the likelihood of the suggestion being correct.
 Suggestions made at or beyond this level of confidence are "high-confidence".
 
 The threshold can be changed at any time. All suggestions are stored by
 Camelot regardless of the confidence threshold, so changes to the threshold
 apply retrospectively.
 
+.. |ai_for_earth| raw:: html
+
+   <a href="https://www.microsoft.com/en-us/ai/ai-for-earth">AI for Earth</a>
+
 Filtering
 ~~~~~~~~~
 
-Suggestions created by animal detection include whether the an `animal` or
-`person` was detected. The "Has animal?" filter in the Library shows only
-those images that have a high-confidence `animal` suggestion, or has an
+Suggestions created by animal detection include whether the an ``animal`` or
+``person`` was detected. The "Has animal?" filter in the Library shows only
+those images that have a high-confidence ``animal`` suggestion, or has an
 identification.
 
 Images with high-confidence suggestions that they contain people can be shown
 using the filter:
 
-`suggestion-key:person`
+``suggestion-key:person``
