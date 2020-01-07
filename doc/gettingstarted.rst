@@ -7,7 +7,7 @@ Prerequisites
 Java Runtime
 ^^^^^^^^^^^^
 
-Camelot requires Java 8u91 (on later) to be installed on the system it
+Camelot requires Java 8u101 (on later) to be installed on the system it
 will run on before it can be used.
 
 Java can be downloaded here:
