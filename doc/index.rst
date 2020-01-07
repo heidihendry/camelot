@@ -15,6 +15,7 @@ Camelot Documentation
    reports
    settings
    bulkimport
+   detector
    administration
    advancedmenu
    scale
