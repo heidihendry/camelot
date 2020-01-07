@@ -95,3 +95,29 @@ Images with high-confidence suggestions that they contain people can be shown
 using the filter:
 
 ``suggestion-key:person``
+
+Statuses
+~~~~~~~~
+
+The current detector status is reflected to the right of the "Activity"
+section.  The detector can be paused, running or in an offline status.
+
+The detector can be paused at any time. This can be particularly useful for
+slower connections, where the network bandwidth required to upload images may
+noticably degrade the connection. In this event, the detector can be paused
+which will prevent any new uploads taking place until it is resumed again.
+
+While paused, the detector will take no further action, including creating
+suggestions from any newly-processed images. All such actions will be queued
+until the detector is resumed again.
+
+When toggling between running and paused it may take several seconds before
+Camelot reflects the new status. This is normal: the status is only reflected
+once it is actually processed, which means the current activities (e.g.,
+upload of the current image) will need to complete before the new status is in
+effect.
+
+Camelot may signal here that the authentication failed if the configured
+username and password are rejected.  In this event, the detector is
+effectively offline and Camelot will need to be restarted before the detector
+will attempt to recheck the credentials and run again.
