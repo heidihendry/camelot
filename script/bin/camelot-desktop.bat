@@ -1,3 +1,3 @@
 @echo off
-java -jar camelot-1.5.4.jar --browser
+java -jar camelot-1.6.0-beta1.jar --browser
 pause
