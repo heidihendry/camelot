@@ -113,6 +113,10 @@
   [detector-state scid]
   (= (task-status-by-session-camera-id detector-state scid) "submitted"))
 
+(defn completed-task?
+  [detector-state task-id]
+  (= (get-task detector-state task-id) "completed"))
+
 (defn media-processing-status
   [detection-state media-id]
   (get-in detection-state [:media media-id :processing-status]))
@@ -121,7 +125,7 @@
   [detector-state-ref media-id status]
   (swap! detector-state-ref assoc-in [:media media-id :processing-status] status))
 
-(defn completed-task?
+(defn all-processing-completed-for-task?
   [detector-state scid]
   (let [task (get-task-for-session-camera-id detector-state scid)]
     (boolean (and (not (nil? task))

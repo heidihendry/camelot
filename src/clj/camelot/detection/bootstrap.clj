@@ -28,7 +28,7 @@
        (filter (partial eligible-for-detection? state))
        (remove #(= (state/session-camera-status detector-state (:trap-station-session-camera-id %))
                    :no-action))
-       (remove #(state/completed-task? detector-state (:trap-station-session-camera-id %)))
+       (remove #(state/all-processing-completed-for-task? detector-state (:trap-station-session-camera-id %)))
        (map event/to-prepare-task-event)))
 
 (defn run
