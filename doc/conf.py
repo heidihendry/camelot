@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Camelot'
-copyright = '2019, Bit Pattern'
+copyright = '2020, Bit Pattern'
 author = 'Chris Mann'
 
 # The version info for the project you're documenting, acts as replacement for
