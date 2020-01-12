@@ -119,6 +119,9 @@
                       "PROBLEM"
                       nil
 
+                      "ARCHIVED"
+                      nil
+
                       "SUBMITTED"
                       (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 1))
                                                           :retries (if-let [r (:retries v)] (inc r) 1))))

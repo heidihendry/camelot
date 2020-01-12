@@ -120,7 +120,8 @@
 
 (defn completed-task?
   [detector-state task-id]
-  (= (get-task detector-state task-id) "completed"))
+  (or (= (get-task detector-state task-id) "completed")
+      (= (get-task detector-state task-id) "archived")))
 
 (defn submitted-task-for-session-camera?
   [detector-state scid]
@@ -153,6 +154,7 @@
   (let [task (get-task-for-session-camera-id detector-state scid)]
     (boolean (and task
                   (or (= (:status task) "failed")
+                      (= (:status task) "archived")
                       (and (= (:status task) "completed")
                            (every? #(media-processing-completed? detector-state %)
                                    (:media-ids task))))))))
