@@ -32,7 +32,7 @@
    {:category "detector"
     :action (name (:action v))
     :label (name (:subject v))
-    :label-value (if-let [lv (int? (:subject-id v))] lv)
+    :label-value (let [lv (:subject-id v)] (when (int? lv) lv))
     :ni true}
    (:meta v)))
 
