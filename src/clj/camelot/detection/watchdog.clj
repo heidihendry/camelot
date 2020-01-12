@@ -54,6 +54,6 @@
                   (let [cmd (status-command-map desired)]
                     (async/go
                       (async/>! cmd-pub-ch {:cmd cmd})
-                      (async/>! event-ch {:action (keyword (str "system-initiated-" (name cmd)))
+                      (async/>! event-ch {:action (keyword (str "watchdog-initiated-" (name cmd)))
                                           :subject :global}))))))
             (recur)))))))

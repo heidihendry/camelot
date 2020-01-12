@@ -31,9 +31,17 @@
   (merge
    {:category "detector"
     :action (name (:action v))
-    :label (name (:subject v))
+    :label (if-let [s (:subject v)] (name s))
     :label-value (let [lv (:subject-id v)] (when (int? lv) lv))
     :ni true}
+   (:meta v)))
+
+(defn- command-to-analytics
+  [v]
+  (merge
+   {:category "detector"
+    :action (str (name (:cmd v)) "-command")
+    :ni (= (:set-by v) :user)}
    (:meta v)))
 
 (defn- command-to-status
@@ -84,15 +92,22 @@
                           :pause (swap! detector-state assoc :system (event-to-system-status v))
                           :resume (swap! detector-state assoc :system (event-to-system-status v))
                           nil)
+                        (async/go (async/>! event-chan v))
                         (recur))
 
                       event-chan
                       (do
-                        (if (= (:subject v) :system-status)
+                        (cond
+                          (= (:subject v) :system-status)
                           (swap! detector-state assoc :system {:status (:action v)})
+
+                          (nil? (:cmd v))
                           (swap! detector-state update-in (kf v) (fnil inc 0)))
+
                         (log/info "Publishing analytics for " (:action v))
-                        (analytics/track state (event-to-analytics v))
+                        (if (:cmd v)
+                          (analytics/track state (command-to-analytics v))
+                          (analytics/track state (event-to-analytics v)))
                         (recur))))))
 
               (let [int-cmd-ch (async/tap cmd-mult (async/chan))]
