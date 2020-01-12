@@ -8,12 +8,14 @@
    [clojure.tools.logging :as log]
    [clj-time.core :as t]))
 
-(def ^:private reschedule-all (* 600 1000))
+(def ^:private max-timeout-ms (* 900 1000))
+(def ^:private base-timeout-ms (* 300 1000))
+(def ^:private min-timeout-ms (* 60 1000))
 
 (defn- upload-complete?
   [media]
-  (let [thresh (t/minus (t/now) (t/minutes 2))]
-    (t/before? (:media-created media) thresh)))
+  (let [thresh (t/minus (t/now) (t/seconds 60))]
+    (t/after? thresh (:media-created media))))
 
 (defn- eligible-for-detection?
   [state session-camera]
@@ -25,10 +27,10 @@
 (defn- retrieve-tasks
   [state detector-state]
   (->> (session-camera/get-all* state)
-       (filter (partial eligible-for-detection? state))
        (remove #(= (state/session-camera-status detector-state (:trap-station-session-camera-id %))
                    :no-action))
        (remove #(state/all-processing-completed-for-task? detector-state (:trap-station-session-camera-id %)))
+       (filter (partial eligible-for-detection? state))
        (map event/to-prepare-task-event)))
 
 (defn run
@@ -43,8 +45,8 @@
       (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
       (doseq [batch (retrieve-tasks state @detector-state-ref)]
         (async/>! int-ch batch)))
-    (async/go-loop []
-      (let [timeout-ch (async/timeout reschedule-all)
+    (async/go-loop [timeout-ms base-timeout-ms]
+      (let [timeout-ch (async/timeout timeout-ms)
             [v port] (async/alts! [cmd-ch int-ch timeout-ch] :priority true)]
         (condp = port
           cmd-ch
@@ -58,17 +60,14 @@
                 (let [{:keys [cmd]} (async/<! cmd-ch)]
                   (when-not (= cmd :resume)
                     (recur))))
-              (recur))
+              (recur base-timeout-ms))
 
             :rerun
             (do
               (log/info "Queuing session cameras via rerun")
-              (async/go
-                (doseq [batch (retrieve-tasks state @detector-state-ref)]
-                  (async/>! int-ch batch)))
-              (recur))
+              (recur min-timeout-ms))
 
-            (recur))
+            (recur timeout-ms))
 
           int-ch
           (do
@@ -77,7 +76,7 @@
             (async/>! event-ch {:action :bootstrap-schedule
                                 :subject :session-camera
                                 :subject-id (:subject-id v)})
-            (recur))
+            (recur timeout-ms))
 
           timeout-ch
           (do
@@ -87,4 +86,4 @@
                 (async/>! int-ch batch)))
             (async/>! event-ch {:action :bootstrap-timeout
                                 :subject :global})
-            (recur)))))))
+            (recur (min (* timeout-ms 1.2) max-timeout-ms))))))))

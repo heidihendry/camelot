@@ -43,6 +43,8 @@
   [file]
   (str (tr/translate ::format-not-supported (.-name file)) "\n"))
 
+(defonce signal-detector-timeout (atom nil))
+
 (defn- upload-files
   [sesscam-id owner fqueue result-chan]
   (let [req-chan (chan)]
@@ -62,8 +64,17 @@
                                   (put! req-chan {:remaining (pop remaining)})))
             (add-upload-problem owner ["skipped" (.-type file)]
                                 (unsupported-str file)))
-          (when (> (count remaining) 1)
-            (recur)))))
+          (if (> (count remaining) 1)
+            (recur)
+            (do
+              (when @signal-detector-timeout
+                (swap! signal-detector-timeout #(.clearTimeout js/window %)))
+              (reset! signal-detector-timeout
+                      (.setTimeout js/window
+                                   #(do
+                                      (rest/post-x "/detector/command" {:data {:cmd :rerun}} identity)
+                                      (reset! signal-detector-timeout nil))
+                                   5000)))))))
     (put! req-chan {:remaining fqueue})))
 
 (defn- uploadable-count
