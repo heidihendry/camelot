@@ -122,6 +122,21 @@ username and password are rejected.  In this event, the detector is
 effectively offline and Camelot will need to be restarted before the detector
 will attempt to recheck the credentials and run again.
 
+Connectivity detection
+^^^^^^^^^^^^^^^^^^^^^^
+
+What we would not want is for the internet to go down for an hour or two, and
+find a large number of batches and image uploads have failed as a result.
+
+In the event Camelot cannot access the online services it needs, it will pause
+the processing automatically. Once the connection is restored, processing will
+be automatically resumed.
+
+If the system is paused through the user interface, Camelot will respect this
+even if the internet connection cuts out and comes back. Camelot will always
+pause the animal detection system in the event it cannot communicate with the
+systems it needs to.
+
 Activity
 ~~~~~~~~
 

@@ -5,8 +5,7 @@
    [clj-http.client :as http]
    [clj-http.conn-mgr :as conn-mgr]
    [cheshire.core :as json]
-   [diehard.core :as dh])
-  (:import [net.jodah.failsafe CircuitBreakerOpenException]))
+   [diehard.core :as dh]))
 
 (defonce ^:private connection-manager
   (conn-mgr/make-reusable-conn-manager {}))
@@ -26,11 +25,15 @@
    :backoff-ms [1000 10000 2.0]
    :jitter-factor 0.1})
 
+(defn- http-get-raw
+  [state endpoint]
+  (dh/with-retry retry-policy
+    (http/get (str (-> state :config :detector :api-url) endpoint)
+              (request-config state))))
+
 (defn- http-get
   [state endpoint]
-  (let [resp (dh/with-retry retry-policy
-               (http/get (str (-> state :config :detector :api-url) endpoint)
-                         (request-config state)))]
+  (let [resp (http-get-raw state endpoint)]
     (json/parse-string (:body resp) true)))
 
 (defn- http-post
@@ -64,3 +67,12 @@
   "Archive a task."
   [state task-id]
   (http-post state (format "/task/%s/archive" task-id)))
+
+(defn healthy?
+  "Check service health."
+  [state]
+  (try
+    (http-get-raw state "/healthcheck")
+    true
+    (catch Exception _
+      false)))

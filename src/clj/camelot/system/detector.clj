@@ -36,6 +36,18 @@
     :ni true}
    (:meta v)))
 
+(defn- command-to-status
+  [cmd]
+  (condp = cmd
+    :stop :stopped
+    :pause :paused
+    :resume :running))
+
+(defn- event-to-system-status
+  [evt]
+  {:status (command-to-status (:cmd evt))
+   :set-by (:set-by evt)})
+
 (defrecord Detector [config database]
   component/Lifecycle
   (start [this]
@@ -60,7 +72,7 @@
 
               (let [kf (juxt (constantly :events) :subject :action)
                     int-cmd-ch (async/tap cmd-mult (async/chan))
-                    event-chan (detection/run state detector-state cmd-mult)]
+                    event-chan (detection/run state detector-state cmd-chan cmd-mult)]
                 (async/go-loop []
                   (let [[v port] (async/alts! [int-cmd-ch event-chan])]
                     (condp = port
@@ -68,16 +80,16 @@
                       (do
                         (log/info "Received event to state mgr" v)
                         (condp = (:cmd v)
-                          :stop (swap! detector-state assoc-in [:system-status] :stopped)
-                          :pause (swap! detector-state assoc-in [:system-status] :paused)
-                          :resume (swap! detector-state assoc-in [:system-status] :running)
+                          :stop (swap! detector-state assoc :system (event-to-system-status v))
+                          :pause (swap! detector-state assoc :system (event-to-system-status v))
+                          :resume (swap! detector-state assoc :system (event-to-system-status v))
                           nil)
                         (recur))
 
                       event-chan
                       (do
                         (if (= (:subject v) :system-status)
-                          (swap! detector-state assoc :system-status (:action v))
+                          (swap! detector-state assoc :system {:status (:action v)})
                           (swap! detector-state update-in (kf v) (fnil inc 0)))
                         (log/info "Publishing analytics for " (:action v))
                         (analytics/track state (event-to-analytics v))
@@ -94,7 +106,7 @@
                         (do
                           (if-let [[file data] (async/poll! latest-state)]
                             (nippy/freeze-to-file file data))
-                          (swap! detector-state assoc-in [:system-status] :stopped))
+                          (swap! detector-state assoc :system {:status :stopped}))
 
                         (do
                           (log/info "Command received:" v)

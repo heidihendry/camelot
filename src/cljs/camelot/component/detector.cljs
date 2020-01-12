@@ -47,7 +47,7 @@
                                :height "32"
                                :width "32"}))
         (let [stats (:events (:stats state))
-              status (:system-status (:stats state))
+              status (get-in state [:stats :system :status])
               schema [["Images with detections (high confidence)" [:media :result-media-with-high-confidence-suggestion]]
                       ["Images with detections (all)" [:media :result-create-suggestions]]
                       ["Image batches created" [:task :prepare-task-created]]

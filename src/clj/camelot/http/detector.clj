@@ -11,10 +11,10 @@
   (if-let [detector-state (-> state :detector :state deref)]
     {:status 200
      :headers {"Content-Type" "application/json; charset=utf-8"}
-     :body (json/write-str (select-keys detector-state [:system-status :events]))}
+     :body (json/write-str (select-keys detector-state [:system :events]))}
     {:status 200
      :headers {"Content-Type" "application/json; charset=utf-8"}
-     :body {:system-status :stopped}}))
+     :body {:system {:status :stopped}}}))
 
 (def routes
   (context "/detector" {state :system}
@@ -23,6 +23,7 @@
                  (let [{:keys [cmd]} data]
                    (if (and (#{:pause :resume :rerun} cmd) (-> state :detector :cmd-chan))
                      (do
-                       (async/put! (-> state :detector :cmd-chan) {:cmd cmd})
+                       (async/put! (-> state :detector :cmd-chan) {:cmd cmd
+                                                                   :set-by :user})
                        (hr/no-content))
                      (hr/bad-request))))))

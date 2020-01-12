@@ -9,6 +9,7 @@
    [camelot.detection.bootstrap :as bootstrap]
    [camelot.detection.upload :as upload]
    [camelot.detection.result :as result]
+   [camelot.detection.watchdog :as watchdog]
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
 
@@ -16,7 +17,7 @@
 ;; TODO consider connection pooling
 (defn run
   "Run the detector"
-  [state detector-state-ref cmd-mult]
+  [state detector-state-ref cmd-pub-ch cmd-mult]
   (let [event-ch (async/chan (async/sliding-buffer 1000))]
     (try
       (client/account-auth state)
@@ -26,7 +27,8 @@
             submit-ch (submit/run state detector-state-ref cmd-mult poll-ch archive-ch event-ch)
             upload-ch (upload/run state detector-state-ref cmd-mult submit-ch event-ch)
             prepare-ch (prepare/run state detector-state-ref cmd-mult upload-ch poll-ch event-ch)]
-        (bootstrap/run state detector-state-ref cmd-mult prepare-ch event-ch))
+        (bootstrap/run state detector-state-ref cmd-mult prepare-ch event-ch)
+        (watchdog/run state detector-state-ref cmd-mult cmd-pub-ch event-ch))
       (async/go
         (async/>! event-ch {:action :running
                             :subject :system-status}))
