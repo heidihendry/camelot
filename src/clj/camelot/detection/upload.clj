@@ -109,10 +109,11 @@
                       (log/warn "scheduling upload retry for" (:subject-id v))
                       (async/go (async/>! ch v)))))
                 (do
-                  (async/>! event-ch {:action :upload-retry-limit-reached
-                                      :subject :media
-                                      :subject-id (:subject-id v)})
-                  (log/warn "Media no longer eligible for upload. Abandoning attempt to upload" (:subject-id v))))
+                  (when (state/media-upload-failed? @detector-state-ref (:subject-id v))
+                    (async/>! event-ch {:action :upload-retry-limit-reached
+                                        :subject :media
+                                        :subject-id (:subject-id v)}))
+                  (log/info "Media longer eligible for upload." (:subject-id v))))
               (recur))
 
             :presubmit-check

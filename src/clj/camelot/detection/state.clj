@@ -86,11 +86,15 @@
     (swap! detector-state-ref
            #(-> %
                 (update-upload-status media-id status)
-                (update-in [:tasks task-id :media-ids] conj media-id)))))
+                (update-in [:tasks task-id :media-ids] (fnil conj #{}) media-id)))))
 
 (defn- upload-retry-limit-reached?
   [media]
   (>= (:retries media) upload-retry-limit))
+
+(defn media-upload-failed?
+  [detector-state media-id]
+  (= (:status (get-media-state detector-state media-id)) "failed"))
 
 (defn can-upload?
   "Predicate returning `true` if the media can be uploaded. False otherwise."
