@@ -40,6 +40,7 @@
     (async/go
       (async/>! event-ch {:action :bootstrap-retrieve
                           :subject :global})
+      (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
       (doseq [batch (retrieve-tasks state @detector-state-ref)]
         (async/>! int-ch batch)))
     (async/go-loop []

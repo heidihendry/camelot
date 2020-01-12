@@ -16,6 +16,11 @@
   [detector-state session-camera-id]
   (get-in detector-state [:session-cameras session-camera-id]))
 
+(defn get-task-id-for-session-camera-id
+  "Return the task-id for the given `session-camera-id`."
+  [detector-state session-camera-id]
+  (:task (get-session-camera-state detector-state session-camera-id)))
+
 (defn get-task-for-session-camera-id
   "Return the task for the given `session-camera-id`."
   [detector-state session-camera-id]
@@ -26,6 +31,11 @@
   "Return the state for a given media"
   [detector-state media-id]
   (get-in detector-state [:media media-id]))
+
+(defn media-uploaded?
+  "Return `true` if the media has been uploaded"
+  [detector-state media-id]
+  (= (:status (get-media-state detector-state media-id)) "completed"))
 
 (defn- narrow-task
   [task]
@@ -78,19 +88,18 @@
                 (update-upload-status media-id status)
                 (update-in [:tasks task-id :media-ids] conj media-id)))))
 
-(defn upload-retry-limit-reached?
-  "Predicate returning `true` if the retry limit has been reached for the given `media-id`."
+(defn- upload-retry-limit-reached?
+  [media]
+  (>= (:retries media) upload-retry-limit))
+
+(defn can-upload?
+  "Predicate returning `true` if the media can be uploaded. False otherwise."
   [detector-state media-id]
   (let [media (get-media-state detector-state media-id)]
-    (and (= (:status media) "failed")
-         (>= (:retries media) upload-retry-limit))))
-
-(defn upload-pending?
-  [detector-state media-id]
-  (let [media (get-in detector-state [:media media-id])]
-    (or (= (:status media) "pending")
-        (and (= (:status media) "failed")
-             (not (upload-retry-limit-reached? detector-state media-id))))))
+    (boolean
+     (or (= (:status media) "pending")
+         (and (= (:status media) "failed")
+              (not (upload-retry-limit-reached? media)))))))
 
 (defn upload-completed?
   [detector-state media-id]
@@ -105,21 +114,35 @@
   [detector-state scid]
   (:status (get-task-for-session-camera-id detector-state scid)))
 
-(defn unprocessed-task?
-  [detector-state scid]
-  (= (task-status-by-session-camera-id detector-state scid) "pending"))
-
 (defn submitted-task?
-  [detector-state scid]
-  (= (task-status-by-session-camera-id detector-state scid) "submitted"))
+  [detector-state task-id]
+  (= (get-task detector-state task-id) "submitted"))
 
 (defn completed-task?
   [detector-state task-id]
   (= (get-task detector-state task-id) "completed"))
 
+(defn submitted-task-for-session-camera?
+  [detector-state scid]
+  (submitted-task? detector-state (get-task-id-for-session-camera-id detector-state scid)))
+
 (defn media-processing-status
   [detection-state media-id]
   (get-in detection-state [:media media-id :processing-status]))
+
+(defn- media-fully-processed?
+  [media]
+  (and (= (:status media) "completed")
+       (= (:processing-status media) "completed")))
+
+(defn media-processing-completed?
+  [detection-state media-id]
+  (boolean
+   (if-let [media (get-media-state detection-state media-id)]
+     (or (and (= (:status media) "failed")
+              (upload-retry-limit-reached? media))
+         (= (:status media) "skipped")
+         (media-fully-processed? media)))))
 
 (defn set-media-processing-status!
   [detector-state-ref media-id status]
@@ -128,10 +151,11 @@
 (defn all-processing-completed-for-task?
   [detector-state scid]
   (let [task (get-task-for-session-camera-id detector-state scid)]
-    (boolean (and (not (nil? task))
+    (boolean (and task
                   (or (= (:status task) "failed")
-                      (every? #(= (media-processing-status detector-state %) "completed")
-                              (:media-ids task)))))))
+                      (and (= (:status task) "completed")
+                           (every? #(media-processing-completed? detector-state %)
+                                   (:media-ids task))))))))
 
 (defn record-session-camera-status!
   [detector-state-ref scid status]

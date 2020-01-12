@@ -7,24 +7,11 @@
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
 
-(defn- unprocessed-media?
-  [detector-state media]
-  (letfn [(unprocessed? [media-state]
-            (let [status (:status media-state)]
-              (and (not= (:media-processed media) true)
-                   (or (nil? status)
-                       (= status "pending")
-                       (and (= status "failed")
-                            (< (:retries media-state) 3))))))]
-    (->> (:media-id media)
-         (state/get-media-state detector-state)
-         unprocessed?)))
-
 (defn- retrieve
   [state detector-state session-camera-id]
   (->> session-camera-id
        (media/get-all state)
-       (filter (partial unprocessed-media? detector-state))))
+       (remove #(state/media-processing-completed? detector-state (:media-id %)))))
 
 (defn run
   "Create tasks and queue media for upload."
@@ -40,7 +27,7 @@
           (do
             (let [scid (:subject-id v)]
               (log/info "Preparing task with scid " scid)
-              (if (state/submitted-task? @detector-state-ref scid)
+              (if (state/submitted-task-for-session-camera? @detector-state-ref scid)
                 (let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]
                   (log/info "Task already submitted. Starting poll.")
                   (async/>! event-ch {:action :prepare-skip-task-submission
@@ -67,11 +54,13 @@
                       (if-let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]
                         (do
                           (doseq [m media]
-                            (state/record-media-upload! detector-state-ref scid (:media-id m) "pending")
-                            (let [event (event/to-upload-media-event m scid)]
-                              (log/info "Queuing media for upload: " (:subject-id event))
-                              (async/>! upload-ch event)))
-                          (log/info "Queuing presubmit check for task: " task-id)
+                            (let [media-id (:media-id m)]
+                              (when-not (state/media-uploaded? @detector-state-ref media-id)
+                                (state/record-media-upload! detector-state-ref scid media-id "pending")
+                                (let [event (event/to-upload-media-event m scid)]
+                                  (log/info "Queuing media for upload:" media-id)
+                                  (async/>! upload-ch event)))))
+                          (log/info "Queuing presubmit check for task:" task-id)
                           (async/>! upload-ch (event/to-presubmit-check-event task-id)))
                         (do
                           (async/>! event-ch {:action :prepare-task-not-found

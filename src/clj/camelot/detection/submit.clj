@@ -12,7 +12,7 @@
   [detector-state task-id]
   (let [pending (->> task-id
                      (state/media-for-task detector-state)
-                     (filter (partial state/upload-pending? detector-state)))]
+                     (filter (partial state/can-upload? detector-state)))]
     (boolean (seq pending))))
 
 (defn- some-completed?
@@ -105,18 +105,20 @@
           (do
             (async/>! event-ch v)
             (let [task-id (:subject-id v)]
-              (try
-                (log/info "Submit task with id" task-id)
-                (client/submit-task state task-id)
-                (state/set-task-status! detector-state-ref task-id "submitted")
-                (async/>! event-ch {:action :submit-task-call-success
-                                    :subject :task
-                                    :subject-id task-id})
-                (async/>! poll-ch (event/to-check-result-event task-id))
-                (catch Exception e
-                  (log/info "Submit call for task" task-id "failed with exception" e)
-                  (async/>! event-ch {:action :submit-task-call-failed
+              (if (state/submitted-task? @detector-state-ref task-id)
+                (log/warn "Skipping submission. Task already submitted:" task-id)
+                (try
+                  (log/info "Submit task with id" task-id)
+                  (client/submit-task state task-id)
+                  (state/set-task-status! detector-state-ref task-id "submitted")
+                  (async/>! event-ch {:action :submit-task-call-success
                                       :subject :task
-                                      :subject-id task-id}))))
+                                      :subject-id task-id})
+                  (async/>! poll-ch (event/to-check-result-event task-id))
+                  (catch Exception e
+                    (log/info "Submit call for task" task-id "failed with exception" e)
+                    (async/>! event-ch {:action :submit-task-call-failed
+                                        :subject :task
+                                        :subject-id task-id})))))
             (recur)))))
     ch))
