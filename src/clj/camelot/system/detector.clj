@@ -12,9 +12,10 @@
   (:import
    (java.io File)))
 
-(def detector-filename
+(defn detector-filename
   "Name of the detector state file."
-  "detector.edn")
+  [state]
+  (str (-> state :config :detector :username) "-detector.edn"))
 
 (def state-serialisation-backoff
   "Delay in ms between attempts to write out the current detector state.
@@ -23,7 +24,8 @@
 
 (defn- detector-path
   [state]
-  (let [file (io/file (-> state :config :paths :database) detector-filename)]
+  (let [file (io/file (-> state :config :paths :database)
+                      (detector-filename state))]
     (.getCanonicalPath ^File file)))
 
 (defn- event-to-analytics
@@ -86,7 +88,7 @@
                     (condp = port
                       int-cmd-ch
                       (do
-                        (log/info "Received event to state mgr" v)
+                        (log/info "Received event to detector command handler" v)
                         (condp = (:cmd v)
                           :stop (swap! detector-state assoc :system (event-to-system-status v))
                           :pause (swap! detector-state assoc :system (event-to-system-status v))
@@ -104,7 +106,7 @@
                           (nil? (:cmd v))
                           (swap! detector-state update-in (kf v) (fnil inc 0)))
 
-                        (log/info "Publishing analytics for " (:action v))
+                        (log/info "Publishing analytics for" (:action v))
                         (if (:cmd v)
                           (analytics/track state (command-to-analytics v))
                           (analytics/track state (event-to-analytics v)))
