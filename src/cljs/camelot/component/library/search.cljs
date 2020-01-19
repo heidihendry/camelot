@@ -82,6 +82,11 @@
           (stacomp/index! idx ctx ["true" "false"])
           (stacomp/set-props! idx ctx {:hydrated? true}))
 
+        (= field "suggestion-key")
+        (do
+          (stacomp/index! idx ctx ["person" "animal"])
+          (stacomp/set-props! idx ctx {:hydrated? true}))
+
         (or (nil? cf) (nil? ep)) nil
 
         :else
