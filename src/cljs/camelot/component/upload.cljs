@@ -48,6 +48,5 @@
       (dom/div nil
                (dom/input #js {:type "file"
                                :value ""
-                               :ref "file-input"
                                :className "btn btn-primary file-input-field"
                                :onChange #(upload-file endpoint (:chan state) %)})))))
