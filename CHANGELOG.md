@@ -1,5 +1,12 @@
 ## ChangeLog
 
+### 1.5.6
+#### Changed
+* Trap station name is now treated as identifying for bulk imports
+
+#### Fixed
+* Fixes a bug causing independence calculations to fail to account for sighting fields or customised independence thresholds.
+
 ### 1.5.5
 #### Changed
 * Add a new icons and branding c/o Stef Hendry. https://gitlab.com/camelot-project/camelot/issues/189
