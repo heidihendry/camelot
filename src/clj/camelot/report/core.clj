@@ -137,14 +137,16 @@
    columns
    {:keys [rewrites pre-transforms pre-filters apply-fn
            transforms filters aggregate-on order-by function
-           repeat-by]}
+           repeat-by identified-by]}
    data :- [{s/Keyword s/Any}]]
   (if function
     (function state data)
-    (let [projection-columns (if (and repeat-by
-                                      (not (.contains columns repeat-by)))
-                               (conj columns repeat-by)
-                               columns)]
+    (let [projection-columns (cond-> columns
+                               (and repeat-by (not (.contains columns repeat-by)))
+                               (conj repeat-by)
+
+                               (and identified-by (not (.contains columns identified-by)))
+                               (concat identified-by))]
       (->> data
            (transform-records state rewrites)
            (add-calculated-columns state projection-columns)

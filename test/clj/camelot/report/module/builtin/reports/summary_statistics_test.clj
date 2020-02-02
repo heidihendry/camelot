@@ -727,7 +727,7 @@
                                        :trap-station-session-id 1
                                        :trap-station-id 1}))
             state (gen-state-helper {})
-            result (report state 1 sightings {:survey-settings {1 {:survey-sighting-independence-threshold 60
+            result (report state 1 sightings {:survey-settings {1 {:survey-sighting-independence-threshold 20
                                                                    :sighting-fields [{:sighting-field-id 1
                                                                                       :sighting-field-key "sex"
                                                                                       :sighting-field-datatype "select"
