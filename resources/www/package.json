@@ -1,5 +1,5 @@
 {
   "name"    : "camelot",
-  "version" : "1.5.6-SNAPSHOT",
+  "version" : "1.5.6",
   "main"    : "manager.js"
 }
