@@ -40,7 +40,7 @@ SELECT trap_station_id, survey_site_id, trap_station_created, trap_station_updat
 FROM trap_station
 WHERE trap_station_id = :trap_station_id
 
--- name: get-specific-by-location
+-- name: get-specific-by-name-and-location
 SELECT trap_station_id, survey_site_id, trap_station_created, trap_station_updated,
        trap_station_name, trap_station_longitude, trap_station_latitude,
        trap_station_altitude, trap_station_notes, trap_station_distance_above_ground,
@@ -48,6 +48,7 @@ SELECT trap_station_id, survey_site_id, trap_station_created, trap_station_updat
        trap_station_distance_to_settlement
 FROM trap_station
 WHERE survey_site_id = :survey_site_id
+      AND trap_station_name = :trap_station_name
       AND trap_station_longitude = :trap_station_longitude
       AND trap_station_latitude = :trap_station_latitude
 
