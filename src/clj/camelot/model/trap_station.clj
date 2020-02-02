@@ -83,11 +83,11 @@
            (first)
            (trap-station)))
 
-(s/defn get-specific-by-location :- (s/maybe TrapStation)
+(s/defn get-specific-by-name-and-location :- (s/maybe TrapStation)
   [state :- State
    data :- TTrapStation]
   (some->> data
-           (query state :get-specific-by-location)
+           (query state :get-specific-by-name-and-location)
            (first)
            (trap-station)))
 
@@ -125,5 +125,5 @@
 (s/defn get-or-create! :- TrapStation
   [state :- State
    data :- TTrapStation]
-  (or (get-specific-by-location state data)
+  (or (get-specific-by-name-and-location state data)
       (create! state data)))
