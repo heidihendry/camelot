@@ -26,10 +26,10 @@
                :sighting-time-delta-days
                :media-directory
                :media-full-filename]
-     :apply-fn (partial indep/->independent-sightings state)
+     :apply-fn (partial indep/->independent-sightings s)
      :transforms [#(update % :media-capture-timestamp
                            (partial tf/unparse (tf/formatters :mysql)))
-                  #(assoc % :media-directory (.getPath (io/file (state/lookup-path state :media)
+                  #(assoc % :media-directory (.getPath (io/file (state/lookup-path s :media)
                                                                 (subs (:media-filename %) 0 2))))
                   #(assoc % :trap-camera-pair (format "%s_%s"
                                                       (:trap-station-name %)
@@ -40,6 +40,7 @@
                                                    nil))]
      :filters [#(= (:survey-id %) survey-id)]
      :order-by [:media-capture-timestamp]
+     :identified-by [:sighting-id]
      :repeat-by :sighting-quantity}))
 
 (defn form-smith

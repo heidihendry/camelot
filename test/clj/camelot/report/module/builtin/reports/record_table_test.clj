@@ -12,10 +12,15 @@
                            :paths {:media "/path"}} config)))
 
 (defn report
-  [state id data]
-  (with-redefs [camelot.model.sighting-field/get-all (constantly [])
-                camelot.model.survey/survey-settings (constantly {})]
-    (report/report :record-table state {:survey-id id} data)))
+  ([state id data]
+   (report state id data {}))
+  ([state id data {:keys [sighting-fields survey-settings]
+                   :or {sighting-fields []
+                        survey-settings {1 {:survey-sighting-independence-threshold 20}}}}]
+   (with-redefs [camelot.model.sighting-field/get-all (constantly sighting-fields)
+                 camelot.model.survey/survey-settings (constantly survey-settings)
+                 camelot.model.survey/get-specific (constantly {:survey-name "Survy"})]
+     (report/report :record-table state {:survey-id id} data))))
 
 (defn csv-report
   [state id data]
@@ -51,6 +56,7 @@
    :trap-station-name "Trap1"
    :trap-station-latitude -25
    :trap-station-longitude 130
+   :field-lifestage "Adult"
    :survey-id 1
    :survey-site-id 1
    :media-id 1
@@ -105,7 +111,7 @@
 
     (testing "Should omit records which are dependent"
       (let [records (list (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)})
-                          (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 10 0)})
+                          (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)})
                           (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 30 0)}))
             state (gen-state-helper {})]
         (is (= (report state 1 records)
@@ -126,6 +132,46 @@
                  "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]
                 ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:30:00" "2015-01-07" "05:30:00"
                  "1800" "30" "0.5" "0.0" "/path/fi" "file-id-1.jpg"]]))))
+
+    (testing "Should repeat dependent sightings as expected"
+      (let [records (list (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)
+                                     :field-lifestage "Juvenile"
+                                     :sighting-id 1})
+                          (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 1 0)
+                                     :field-lifestage "Adult"
+                                     :sighting-quantity 2
+                                     :sighting-id 2}))
+            state (gen-state-helper {})]
+        (is (= [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+                 "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]
+                ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+                 "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]]
+               (report state 1 records {:survey-settings {1 {:survey-sighting-independence-threshold 30
+                                                             :sighting-fields [{:sighting-field-id 1
+                                                                                :sighting-field-key "lifestage"
+                                                                                :sighting-field-datatype "select"
+                                                                                :sighting-field-affects-independence false
+                                                                                :survey-id 1}]}}})))))
+
+    (testing "Should repeat independent sightings as expected"
+      (let [records (list (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)
+                                     :field-lifestage "Juvenile"
+                                     :sighting-id 1})
+                          (->record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)
+                                     :field-lifestage "Adult"
+                                     :sighting-quantity 1
+                                     :sighting-id 2}))
+            state (gen-state-helper {})]
+        (is (= [["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+                 "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]
+                ["Trap1" 1 "CAM1" "Cat Yellow Spotted" "Trap1_1" "2015-01-07 05:00:00" "2015-01-07" "05:00:00"
+                 "0" "0" "0.0" "0.0" "/path/fi" "file-id-1.jpg"]]
+               (report state 1 records {:survey-settings {1 {:survey-sighting-independence-threshold 30
+                                                             :sighting-fields [{:sighting-field-id 1
+                                                                                :sighting-field-key "lifestage"
+                                                                                :sighting-field-datatype "select"
+                                                                                :sighting-field-affects-independence true
+                                                                                :survey-id 1}]}}})))))
 
     (testing "Should allow for a mix of trap stations and species"
       (let [records (list (->alt-record {:media-capture-timestamp (t/date-time 2015 01 07 5 0 0)})
