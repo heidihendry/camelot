@@ -67,6 +67,7 @@ taken if editing this file manually.
   * ``backup``: the folder path to where Camelot stores backups.
   * ``log``: the folder path to where Camelot should store its logs.
   * ``application``: the folder path to where Camelot can find a Camelot .jar file.
+  * ``root``: the root folder which Camelot can search for external data. For example, for scanning for bulk import
 
 * ``server``: an object describing Camelot server-specific configuration
 
