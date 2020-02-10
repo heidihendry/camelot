@@ -2103,7 +2103,7 @@ pre.field-input {
 #app .detector-status .status-paused {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    background-color: #cccc00;
+    background-color: #dfba00;
 }
 
 #app .detector-status .status-down {
