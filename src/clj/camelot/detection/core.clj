@@ -13,6 +13,8 @@
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
 
+(defonce ^:private bootstrap-ch (atom nil))
+
 ;; TODO implement mechanism to force-scheduling of newly finalised TS sessions
 ;; TODO consider connection pooling
 (defn run
@@ -21,13 +23,13 @@
   (let [event-ch (async/chan (async/sliding-buffer 1000))]
     (try
       (client/account-auth state)
-      (let [archive-ch (archive/run state detector-state-ref cmd-mult event-ch)
-            result-ch (result/run state detector-state-ref cmd-mult event-ch)
-            poll-ch (poll/run state detector-state-ref cmd-mult result-ch archive-ch event-ch)
-            submit-ch (submit/run state detector-state-ref cmd-mult poll-ch archive-ch event-ch)
-            upload-ch (upload/run state detector-state-ref cmd-mult submit-ch event-ch)
-            prepare-ch (prepare/run state detector-state-ref cmd-mult upload-ch poll-ch event-ch)]
-        (bootstrap/run state detector-state-ref cmd-mult prepare-ch event-ch)
+      (swap! bootstrap-ch #(or % (bootstrap/run state detector-state-ref event-ch)))
+      (let [archive-chans (archive/run state detector-state-ref event-ch)
+            result-chans (result/run state detector-state-ref event-ch)
+            poll-chans (poll/run state detector-state-ref result-chans archive-chans event-ch)
+            submit-chans (submit/run state detector-state-ref poll-chans archive-chans event-ch)
+            upload-chans (upload/run state detector-state-ref submit-chans event-ch)]
+        (prepare/run state detector-state-ref @bootstrap-ch cmd-mult upload-chans poll-chans event-ch)
         (watchdog/run state detector-state-ref cmd-mult cmd-pub-ch event-ch))
       (async/go
         (async/>! event-ch {:action :running

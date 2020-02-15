@@ -4,13 +4,14 @@
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
+   [camelot.detection.util :as util]
    [clojure.edn :as edn]
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]
    [clj-time.core :as t]
    [clj-time.coerce :as tc]))
 
-(def ^:private retry-limit 20)
+(def ^:private retry-limit 30)
 
 (defn- build-payload
   [result image]
@@ -20,44 +21,50 @@
 
 (defn run
   "Create suggestions for values placed on the returned channel."
-  [state detector-state-ref cmd-mult result-ch archive-ch event-ch]
-  (let [cmd-ch (async/tap cmd-mult (async/chan))
+  [state detector-state-ref [result-ch result-cmd-ch] [archive-ch archive-cmd-ch] event-ch]
+  (let [cmd-ch (async/chan (async/dropping-buffer 100))
         retry-ch (async/chan (async/sliding-buffer 10000))
         ch (async/chan (async/sliding-buffer 10000))]
+
     (async/go-loop []
-      (let [[v port] (async/alts! [cmd-ch ch retry-ch] :priority true)]
+      (let [v (async/<! retry-ch)
+            task-id (:subject-id v)]
+        (when (:valid-at v)
+          (if (< (:retries v) retry-limit)
+            (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
+              (async/>! event-ch {:action :poll-task-retried
+                                  :subject :task
+                                  :subject-id task-id
+                                  :meta {:dimension1 "retries" :metric1 (:retries v)}})
+              (log/info "Retrying poll with task id" task-id "in" (/ delay 1000.0) "seconds")
+              (async/<! (async/timeout delay))
+              (async/go (async/>! ch v)))
+            (async/>! event-ch {:action :poll-task-retry-limit-reached
+                                :subject :task
+                                :subject-id task-id})))
+        (recur)))
+
+    (async/go-loop []
+      (let [[v port] (async/alts! [cmd-ch ch] :priority true)]
         (condp = port
           cmd-ch
-          (condp = (:cmd v)
-            :stop
-            (log/info "Detector poll stopped")
+          (let [propagate-cmd (fn [v]
+                                (async/put! result-cmd-ch v)
+                                (async/put! archive-cmd-ch v))]
+            (condp = (:cmd v)
+              :stop
+              (do
+                (log/info "Detector poll stopped")
+                (propagate-cmd v))
 
-            :pause
-            (do
-              (loop []
-                (let [{:keys [cmd]} (async/<! cmd-ch)]
-                  (when-not (= cmd :resume)
-                    (recur))))
-              (recur))
+              :pause
+              (do
+                (propagate-cmd v)
+                (util/pause cmd-ch #(propagate-cmd %)))
 
-            (recur))
-
-          retry-ch
-          (let [task-id (:subject-id v)]
-            (when (:valid-at v)
-              (if (< (:retries v) retry-limit)
-                (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
-                  (async/>! event-ch {:action :poll-task-retried
-                                      :subject :task
-                                      :subject-id task-id
-                                      :meta {:dimension1 "retries" :metric1 (:retries v)}})
-                  (log/info "Retrying poll with task id" task-id "in" (/ delay 1000.0) "seconds")
-                  (async/<! (async/timeout delay))
-                  (async/go (async/>! ch v)))
-                (async/>! event-ch {:action :poll-task-retry-limit-reached
-                                    :subject :task
-                                    :subject-id task-id})))
-            (recur))
+              (do
+                (propagate-cmd v)
+                (recur))))
 
           ch
           (let [task-id (:subject-id v)]
@@ -123,13 +130,13 @@
                       nil
 
                       "SUBMITTED"
-                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 1))
+                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 5))
                                                           :retries (if-let [r (:retries v)] (inc r) 1))))
 
                       "RUNNING"
-                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 1))
+                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 5))
                                                           :retries (if-let [r (:retries v)] (inc r) 1))))))
                   (catch Exception e
                     (log/warn "Error while fetching data for" task-id ". " e)))))
             (recur)))))
-    ch))
+    [ch cmd-ch]))

@@ -2,13 +2,14 @@
   (:require
    [camelot.detection.client :as client]
    [camelot.detection.state :as state]
+   [camelot.detection.util :as util]
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
 
 (defn run
   "Archive tasks."
-  [state detector-state-ref cmd-mult event-ch]
-  (let [cmd-ch (async/tap cmd-mult (async/chan))
+  [state detector-state-ref event-ch]
+  (let [cmd-ch (async/chan (async/dropping-buffer 100))
         ch (async/chan)]
     (async/go-loop []
       (let [[v port] (async/alts! [cmd-ch ch] :priority true)]
@@ -19,12 +20,7 @@
             (log/info "Detector archive stopped")
 
             :pause
-            (do
-              (loop []
-                (let [{:keys [cmd]} (async/<! cmd-ch)]
-                  (when-not (= cmd :resume)
-                    (recur))))
-              (recur))
+            (util/pause cmd-ch identity)
 
             (recur))
 
@@ -45,5 +41,4 @@
                                       :subject :task
                                       :subject-id task-id}))))
             (recur)))))
-    ch))
-
+    [ch cmd-ch]))

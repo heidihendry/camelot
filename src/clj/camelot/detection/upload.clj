@@ -4,6 +4,7 @@
    [clj-http.client :as http]
    [camelot.model.media :as model.media]
    [camelot.detection.state :as state]
+   [camelot.detection.util :as util]
    [clojure.core.async :as async]
    [clojure.java.io :as io]
    [clojure.tools.logging :as log]
@@ -53,8 +54,8 @@
 
 (defn run
   "Upload all media receeived on the returned channel."
-  [state detector-state-ref cmd-mult submit-ch event-ch]
-  (let [cmd-ch (async/tap cmd-mult (async/chan))
+  [state detector-state-ref [submit-ch submit-cmd-ch] event-ch]
+  (let [cmd-ch (async/chan (async/dropping-buffer 100))
         ch (async/chan 1000)]
     (async/go-loop []
       (let [[v port] (async/alts! [cmd-ch ch] :priority true)]
@@ -62,17 +63,18 @@
           cmd-ch
           (condp = (:cmd v)
             :stop
-            (log/info "Detector upload stopped")
+            (do
+              (log/info "Detector upload stopped")
+              (async/put! submit-cmd-ch v))
 
             :pause
             (do
-              (loop []
-                (let [{:keys [cmd]} (async/<! cmd-ch)]
-                  (when-not (= cmd :resume)
-                    (recur))))
-              (recur))
+              (async/put! submit-cmd-ch v)
+              (util/pause cmd-ch #(async/put! submit-cmd-ch %)))
 
-            (recur))
+            (do
+              (async/put! submit-cmd-ch v)
+              (recur)))
 
           ch
           (condp = (:action v)
@@ -121,4 +123,4 @@
               (async/>! submit-ch v)
               (log/info "Scheduled presubmit check")
               (recur))))))
-    ch))
+    [ch cmd-ch]))

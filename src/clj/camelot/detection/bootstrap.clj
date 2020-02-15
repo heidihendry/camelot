@@ -35,8 +35,8 @@
 
 (defn run
   "Queue session cameras for preparation."
-  [state detector-state-ref cmd-mult prepare-ch event-ch]
-  (let [cmd-ch (async/tap cmd-mult (async/chan))
+  [state detector-state-ref event-ch]
+  (let [ch (async/chan 1)
         int-ch (async/chan (async/dropping-buffer 100000))]
     (log/info "Queuing session cameras")
     (async/go
@@ -47,31 +47,11 @@
         (async/>! int-ch batch)))
     (async/go-loop [timeout-ms base-timeout-ms]
       (let [timeout-ch (async/timeout timeout-ms)
-            [v port] (async/alts! [cmd-ch int-ch timeout-ch] :priority true)]
+            [v port] (async/alts! [int-ch timeout-ch] :priority true)]
         (condp = port
-          cmd-ch
-          (condp = (:cmd v)
-            :stop
-            (log/info "Detector bootstrap stopped")
-
-            :pause
-            (do
-              (loop []
-                (let [{:keys [cmd]} (async/<! cmd-ch)]
-                  (when-not (= cmd :resume)
-                    (recur))))
-              (recur base-timeout-ms))
-
-            :rerun
-            (do
-              (log/info "Queuing session cameras via rerun")
-              (recur min-timeout-ms))
-
-            (recur timeout-ms))
-
           int-ch
           (do
-            (async/>! prepare-ch v)
+            (async/>! ch v)
             (log/info "Session camera queued" (:subject-id v))
             (async/>! event-ch {:action :bootstrap-schedule
                                 :subject :session-camera
@@ -86,4 +66,5 @@
                 (async/>! int-ch batch)))
             (async/>! event-ch {:action :bootstrap-timeout
                                 :subject :global})
-            (recur (min (* timeout-ms 1.2) max-timeout-ms))))))))
+            (recur (min (* timeout-ms 1.2) max-timeout-ms))))))
+    ch))

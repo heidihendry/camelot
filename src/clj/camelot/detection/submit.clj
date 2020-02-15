@@ -3,6 +3,7 @@
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
+   [camelot.detection.util :as util]
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]
    [clj-time.core :as t]
@@ -25,8 +26,8 @@
 
 (defn run
   "Submit tasks for processing."
-  [state detector-state-ref cmd-mult poll-ch archive-ch event-ch]
-  (let [cmd-ch (async/tap cmd-mult (async/chan))
+  [state detector-state-ref [poll-ch poll-cmd-ch] [archive-ch _] event-ch]
+  (let [cmd-ch (async/chan (async/dropping-buffer 100))
         retry-ch (async/chan (async/sliding-buffer 10000))
         ch (async/chan (async/sliding-buffer 10000))
         int-ch (async/chan)]
@@ -34,19 +35,21 @@
       (let [[v port] (async/alts! [cmd-ch retry-ch ch int-ch] :priority true)]
         (condp = port
           cmd-ch
-          (condp = (:cmd v)
-            :stop
-            (log/info "Detector submit stopped")
+          (let [propagate-cmd (fn [v] (async/put! poll-cmd-ch v))]
+            (condp = (:cmd v)
+              :stop
+              (do
+                (log/info "Detector submit stopped")
+                (propagate-cmd v))
 
-            :pause
-            (do
-              (loop []
-                (let [{:keys [cmd]} (async/<! cmd-ch)]
-                  (when-not (= cmd :resume)
-                    (recur))))
-              (recur))
+              :pause
+              (do
+                (propagate-cmd v)
+                (util/pause cmd-ch #(propagate-cmd %)))
 
-            (recur))
+              (do
+                (propagate-cmd v)
+                (recur))))
 
           retry-ch
           (let [task-id (:subject-id v)]
@@ -121,4 +124,4 @@
                                         :subject :task
                                         :subject-id task-id})))))
             (recur)))))
-    ch))
+    [ch cmd-ch]))

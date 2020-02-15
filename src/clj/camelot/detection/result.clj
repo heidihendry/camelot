@@ -3,7 +3,7 @@
    [camelot.detection.state :as state]
    [camelot.model.suggestion :as suggestion]
    [camelot.model.bounding-box :as bounding-box]
-   [camelot.util.db :as db]
+   [camelot.detection.util :as util]
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
 
@@ -36,8 +36,8 @@
 
 (defn run
   "Create suggestions for values placed on the returned channel."
-  [state detector-state-ref cmd-mult event-ch]
-  (let [cmd-ch (async/tap cmd-mult (async/chan))
+  [state detector-state-ref event-ch]
+  (let [cmd-ch (async/chan (async/dropping-buffer 100))
         ch (async/chan)]
     (async/go-loop []
       (let [[v port] (async/alts! [cmd-ch ch] :priority true)]
@@ -48,12 +48,7 @@
             (log/info "Detector result stopped")
 
             :pause
-            (do
-              (loop []
-                (let [{:keys [cmd]} (async/<! cmd-ch)]
-                  (when-not (= cmd :resume)
-                    (recur))))
-               (recur))
+            (util/pause cmd-ch identity)
 
             (recur))
 
@@ -102,4 +97,4 @@
                     (log/error "Error while creating suggestion " media-id detection e))))
               (state/set-media-processing-status! detector-state-ref media-id "completed"))
             (recur)))))
-    ch))
+    [ch cmd-ch]))

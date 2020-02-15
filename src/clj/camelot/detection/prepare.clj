@@ -3,6 +3,7 @@
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
+   [camelot.detection.util :as util]
    [camelot.model.media :as media]
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
@@ -15,14 +16,34 @@
 
 (defn run
   "Create tasks and queue media for upload."
-  [state detector-state-ref cmd-mult upload-ch poll-ch event-ch]
+  [state detector-state-ref ch cmd-mult [upload-ch upload-cmd-ch] [poll-ch _] event-ch]
   (let [cmd-ch (async/tap cmd-mult (async/chan))
-        ch (async/chan 1)]
+        int-ch (async/chan (async/dropping-buffer 20000))]
     (async/go-loop []
-      ;; take from ch before cmd-ch; this prevents bootstrap from blocking
-      ;; when executing commands.
-      (let [[v port] (async/alts! [ch cmd-ch] :priority true)]
+      (let [[v port] (async/alts! [cmd-ch int-ch ch] :priority true)]
         (condp = port
+          cmd-ch
+          (let [propagate-cmd (fn [v] (async/put! upload-cmd-ch v))]
+            (condp = (:cmd v)
+              :stop
+              (do
+                (log/info "Detector prepare stopped")
+                (propagate-cmd v))
+
+              :pause
+              (do
+                (propagate-cmd v)
+                (util/pause cmd-ch #(propagate-cmd %)))
+
+              (do
+                (propagate-cmd v)
+                (recur))))
+
+          int-ch
+          (do
+            (async/>! upload-ch v)
+            (recur))
+
           ch
           (do
             (let [scid (:subject-id v)]
@@ -59,9 +80,9 @@
                                 (state/record-media-upload! detector-state-ref scid media-id "pending")
                                 (let [event (event/to-upload-media-event m scid)]
                                   (log/info "Queuing media for upload:" media-id)
-                                  (async/>! upload-ch event)))))
+                                  (async/>! int-ch event)))))
                           (log/info "Queuing presubmit check for task:" task-id)
-                          (async/>! upload-ch (event/to-presubmit-check-event task-id)))
+                          (async/>! int-ch (event/to-presubmit-check-event task-id)))
                         (do
                           (async/>! event-ch {:action :prepare-task-not-found
                                               :subject :trap-station-session-camera
@@ -73,20 +94,4 @@
                                           :subject :trap-station-session-camera
                                           :subject-id scid})
                       (log/warn "No media needing upload. Skipping session camera " scid))))))
-            (recur))
-
-          cmd-ch
-          (condp = (:cmd v)
-            :stop
-            (log/info "Detector prepare stopped")
-
-            :pause
-            (do
-              (loop []
-                (let [{:keys [cmd]} (async/<! cmd-ch)]
-                  (when-not (= cmd :resume)
-                    (recur))))
-              (recur))
-
-            (recur)))))
-    ch))
+            (recur)))))))
