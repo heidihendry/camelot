@@ -8,8 +8,7 @@
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
 
-(def ^:private media-per-task-limit 100000
-  "Limit for the media which may be uploaded per trap-station-session-camera")
+(def ^:private media-per-task-limit 100000)
 
 (defn- retrieve
   [state detector-state session-camera-id]
