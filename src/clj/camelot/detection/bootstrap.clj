@@ -10,7 +10,6 @@
 
 (def ^:private max-timeout-ms (* 900 1000))
 (def ^:private base-timeout-ms (* 300 1000))
-(def ^:private min-timeout-ms (* 60 1000))
 
 (defn- upload-complete?
   [media]
