@@ -11,7 +11,8 @@
    [clj-time.core :as t]
    [clj-time.coerce :as tc]))
 
-(def ^:private retry-limit 30)
+(def ^:private retry-limit 72)
+(def ^:private retry-timeout (t/minutes 10))
 
 (defn- build-payload
   [result image]
@@ -130,11 +131,11 @@
                       nil
 
                       "SUBMITTED"
-                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 5))
+                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) retry-timeout)
                                                           :retries (if-let [r (:retries v)] (inc r) 1))))
 
                       "RUNNING"
-                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 5))
+                      (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) retry-timeout)
                                                           :retries (if-let [r (:retries v)] (inc r) 1))))))
                   (catch Exception e
                     (log/warn "Error while fetching data for" task-id ". " e)))))
