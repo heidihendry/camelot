@@ -8,7 +8,6 @@
    [clojure.tools.logging :as log]
    [clj-time.core :as t]))
 
-(def ^:private max-timeout-ms (* 900 1000))
 (def ^:private base-timeout-ms (* 300 1000))
 
 (defn- upload-complete?
@@ -44,8 +43,8 @@
       (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
       (doseq [batch (retrieve-tasks state @detector-state-ref)]
         (async/>! int-ch batch)))
-    (async/go-loop [timeout-ms base-timeout-ms]
-      (let [timeout-ch (async/timeout timeout-ms)
+    (async/go-loop []
+      (let [timeout-ch (async/timeout base-timeout-ms)
             [v port] (async/alts! [int-ch timeout-ch] :priority true)]
         (condp = port
           int-ch
@@ -55,7 +54,7 @@
             (async/>! event-ch {:action :bootstrap-schedule
                                 :subject :session-camera
                                 :subject-id (:subject-id v)})
-            (recur timeout-ms))
+            (recur))
 
           timeout-ch
           (do
@@ -65,5 +64,5 @@
                 (async/>! int-ch batch)))
             (async/>! event-ch {:action :bootstrap-timeout
                                 :subject :global})
-            (recur (min (* timeout-ms 1.2) max-timeout-ms))))))
+            (recur)))))
     ch))
