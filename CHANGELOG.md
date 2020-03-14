@@ -1,5 +1,9 @@
 ## ChangeLog
 
+### 1.5.7
+#### Fixed
+* "Unprocessed?" search only finding those which had never been processed.
+
 ### 1.5.6
 #### Changed
 * Trap station name is now treated as identifying for bulk imports

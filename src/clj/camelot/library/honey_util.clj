@@ -142,7 +142,7 @@
       :integer [(->neg-op search) sql-expr (edn/read-string search-val)]
       :readable-integer [(->neg-op search) sql-expr (edn/read-string search-val)]
       :number [(->neg-op search) sql-expr (edn/read-string search-val)]
-      :boolean [(->neg-op search) sql-expr (edn/read-string search-val)]
+      :boolean [(->neg-op search) [:coalesce sql-expr false] (edn/read-string search-val)]
       :timestamp [(->neg-op search) sql-expr (tc/to-long search-val)]
       :date [(->neg-op search) sql-expr (tc/to-long search-val)]
       [:and
@@ -188,7 +188,7 @@
       :integer [(->op search) sql-expr (edn/read-string search-val)]
       :readable-integer [(->op search) sql-expr (edn/read-string search-val)]
       :number [(->op search) sql-expr (edn/read-string search-val)]
-      :boolean [(->op search) sql-expr (= search-val "true")]
+      :boolean [(->op search) [:coalesce sql-expr false] (= search-val "true")]
       :timestamp [(->op search) sql-expr (tc/to-long search-val)]
       :date [(->op search) sql-expr (tc/to-long search-val)]
       [(->op search) [:lower sql-expr] (->matchable search-val)])))
