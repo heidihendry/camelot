@@ -1,4 +1,4 @@
-(defproject camelot "1.5.7"
+(defproject camelot "1.5.8-SNAPSHOT"
   :description "Manage and analyse camera trap data. Designed for researchers and conservationists."
   :url "http://gitlab.com/camelot-project/camelot"
   :license {:name "AGPL v3"
