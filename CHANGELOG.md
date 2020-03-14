@@ -1,8 +1,15 @@
 ## ChangeLog
 
-### [Unreleased]
+### 1.6.0 [Unreleased]
+#### Added
+* Automated animal detection.
+
 #### Changed
-* Makes library search query language much more powerful
+* Library search query language is now much more powerful and much faster.
+
+### 1.5.7
+#### Fixed
+* "Unprocessed?" search only finding those which had never been processed.
 
 ### 1.5.6
 #### Changed
