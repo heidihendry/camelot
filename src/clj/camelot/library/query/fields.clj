@@ -50,3 +50,12 @@
   (merge (sighting-fields/sighting-field-datatypes state)
          computed-field-datatypes
          base-field-datatypes))
+
+(defn auto-coalesce-field
+  [dt fc]
+  (condp = dt
+    :boolean
+    [:coalesce fc false]
+
+    :default
+    fc))

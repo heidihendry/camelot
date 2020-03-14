@@ -147,7 +147,9 @@
     (cond
       (existence? vs) (existence fc dt)
       (like? vs) (like fc (parse->sql v))
-      :else [(parse->sql op) fc (parse->sql v)])))
+      :else [(parse->sql op)
+             (fields/auto-coalesce-field dt fc)
+             (parse->sql v)])))
 
 (defmethod parse->sql :string-search
   [[_ sv]]
