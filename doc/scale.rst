@@ -116,9 +116,6 @@ where its database resides.
 That said, much of the volume of data for an installation of Camelot is
 occupied by images.  Images may reside on lower-throughput and higher latency
 storage as it does not impact significantly on Camelot's performance profile.
-A mechanism for storing the ``Database`` and ``Media`` directories on separate
-filesystems is not provided by Camelot directly.  It is however possible on
-most Operating Systems with some technical trickery.
 
 Concurrent users
 ^^^^^^^^^^^^^^^^
