@@ -111,8 +111,12 @@
     (= (:status media) "completed")))
 
 (defn set-task-status!
-  [detector-state-ref task-id status]
-  (swap! detector-state-ref assoc-in [:tasks task-id :status] status))
+  ([detector-state-ref task-id status]
+   (set-task-status! detector-state-ref task-id status {}))
+  ([detector-state-ref task-id status extra]
+   (-> detector-state-ref
+       (swap! update-in [:tasks task-id] #(merge % extra))
+       (swap! assoc-in [:tasks task-id :status] status))))
 
 (defn task-status-by-session-camera-id
   [detector-state scid]

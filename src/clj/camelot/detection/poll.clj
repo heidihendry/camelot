@@ -121,14 +121,23 @@
                                             :subject :task
                                             :subject-id task-id})
                         (log/info "Failed to get results for" task-id)
-                        (state/set-task-status! detector-state-ref task-id "failed"))
+                        (state/set-task-status! detector-state-ref task-id "failed" {:can-retry? true}))
 
-                      ;; TODO distinguish retryable and non-retryable failures
                       "PROBLEM"
-                      nil
+                      (do
+                        (async/>! event-ch {:action :poll-task-problem
+                                            :subject :task
+                                            :subject-id task-id})
+                        (log/info "Problem getting results for" task-id)
+                        (state/set-task-status! detector-state-ref task-id "failed" {:can-retry? false}))
 
                       "ARCHIVED"
-                      nil
+                      (do
+                        (state/archive-task! detector-state-ref task-id)
+                        (log/info "Archival successful for task" task-id)
+                        (async/>! event-ch {:action :poll-archive-success
+                                            :subject :task
+                                            :subject-id task-id}))
 
                       "SUBMITTED"
                       (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) retry-timeout)

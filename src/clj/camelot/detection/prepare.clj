@@ -21,7 +21,7 @@
   "Create tasks and queue media for upload."
   [state detector-state-ref ch cmd-mult [upload-ch upload-cmd-ch] [poll-ch _] event-ch]
   (let [cmd-ch (async/tap cmd-mult (async/chan))
-        int-ch (async/chan (async/dropping-buffer 20000))]
+        int-ch (async/chan (async/dropping-buffer (inc media-per-task-limit)))]
     (async/go-loop []
       (let [[v port] (async/alts! [cmd-ch int-ch ch] :priority true)]
         (condp = port
