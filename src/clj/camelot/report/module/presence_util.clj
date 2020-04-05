@@ -90,11 +90,11 @@
         day-list (list-days start-date end-date)]
     (survey/with-survey-settings [s state]
       (->> data
-           (indep/->independent-sightings state)
+           (indep/->independent-sightings s)
            (group-by :trap-station-id)
            vals
            (map #(cons (:trap-station-name (first %))
-                       (generate-row state value-fn taxonomy-id start-date end-excl
+                       (generate-row s value-fn taxonomy-id start-date end-excl
                                      (session-date-ranges %) day-list %)))
            (add-date-header day-list)))))
 
