@@ -7,6 +7,10 @@
 #### Changed
 * Library search query language is now much more powerful and much faster.
 
+### 1.5.8
+#### Fixed
+* Fixes a bug which could cause incorrect independence calculations in occupancy matrix reports
+
 ### 1.5.7
 #### Fixed
 * "Unprocessed?" search only finding those which had never been processed.
