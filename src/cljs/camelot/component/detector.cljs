@@ -57,13 +57,13 @@
                       ["Image batches submitted" [:task :submit-task-call-success]]
                       ["Image batches processed" [:task :poll-task-completed]]
                       ["Image batches archived" [:task :archive-success]]]
-              error-schema [["Image batch creations failed (retried)"
+              error-schema [["Image batch creations suspended"
                              [:trap-station-session-camera :prepare-task-create-failed]]
                             ["Image uploads failed" [:media :upload-retry-limit-reached]]
-                            ["Image batch submissions failed" [:task :submit-retry-limit-reached]]
-                            ["Image batch processing failed" [:task :poll-task-failed]]
-                            ["Image batch archivals failed" [:task :archive-failed]]
-                            ["Suggestion creation failed" [:media :result-create-suggestion-failed]]]]
+                            ["Image batch submissions suspended" [:task :submit-retry-limit-reached]]
+                            ["Image batch processing suspended" [:task :poll-task-failed]]
+                            ["Suggestion creation failed" [:media :result-create-suggestion-failed]]
+                            ["Image batch archivals suspended" [:task :archive-failed]]]]
           (dom/div nil
                    (dom/h4 nil "Activity")
                    (dom/span #js {:className "detector-status"}
@@ -114,7 +114,7 @@
                                                        {:key-fn (fn [data]
                                                                   (-> data second second name))})))
                    (dom/br nil)
-                   (dom/h5 nil "Errors")
+                   (dom/h5 nil "Failures and suspended tasks")
                    (dom/table nil
                               (dom/thead nil
                                          (dom/tr #js {:className "table-heading"}

@@ -145,9 +145,13 @@ the activity page described above. This gives an overview of what is happening
 within Camelot, and provides visibility in to any errors which may be
 occurring.
 
-Errors reported on this page are not necessarily a indication that something
-is wrong: a small number of errors are to be expected due to events such as
-network disruption. Some errors may mean that suggestions for a small number
-of images are not created where they otherwise could have been, though
-typically these are not worth worrying about; false negatives can be assumed
-to exist in the suggestions anyway.
+This page reports failures and suspended tasks.  A failure is a step which
+cannot be completed, whereas a a step which has been suspend will be retried
+again after other batches have been processed.
+
+Failures and suspensions happen for a variety of reasons, including network
+disruptions or delays from processing particularly large batches.  Some errors
+may mean that suggestions for a small number of images are not created where
+they otherwise could have been, though typically these are not worth worrying
+about; false negatives can be assumed to exist in the suggestions anyway, and
+thus you should treat failures as potential false-negative.
