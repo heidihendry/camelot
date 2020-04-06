@@ -52,13 +52,15 @@ time via the top "Detection" menu:
 .. figure:: screenshot/detection-activity.png
    :alt: 
 
+Detection is performed by following the steps described below.
+
 The detection starts by retrieving the cameras for each session of all trap
 stations.  A batch of images is formed for each of these cameras, which is
 referred to as a 'image batch creation'.
 
-Once a batch is created, images will be uploaded to secure cloud storage
-location dedicated to this image batch.  When all images have been uploaded,
-this batch is submitted for processing.
+Images will be uploaded to secure cloud storage location dedicated to this
+image batch.  When all images have been uploaded, this batch is submitted for
+processing.
 
 Camelot has partnered with Microsoft's |ai_for_earth| team, who at this stage,
 perform the image processing using their machine learning models. Processing
