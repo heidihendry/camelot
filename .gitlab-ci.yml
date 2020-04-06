@@ -11,6 +11,7 @@ compile:
     - export LEIN_ROOT=1
     - export LEIN_SNAPSHOTS_IN_RELEASE=1
     - export PATH="$HOME/bin:${PATH}"
+    - git config --global http.sslVerify "false"  # hack around SSL issues https://gitlab.com/camelot-project/camelot/-/jobs/500013241
   script:
     - script/build
   artifacts:
@@ -23,6 +24,7 @@ unittest-clj:
   before_script:
     - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
+    - git config --global http.sslVerify "false"
   script:
     - script/test clj
 
@@ -31,6 +33,7 @@ unittest-cljs:
   before_script:
     - export LEIN_ROOT=1
     - export PATH="$HOME/bin:${PATH}"
+    - git config --global http.sslVerify "false"
   script:
     - script/test cljs
 
