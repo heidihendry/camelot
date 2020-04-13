@@ -89,6 +89,6 @@
   weasel {:mvn/version "0.7.0" :mvn/scope "test" :mvn/exclusions [org.clojure/clojurescript]}
   yesql {:mvn/version "0.5.2"}}
  :aliases
- {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "0.0-418"}
-                      lambdaisland/kaocha-cljs {:mvn/version "0.0-32"}}
+ {:test {:extra-deps {lambdaisland/kaocha {:mvn/version "1.0-612"}
+                      lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}}
          :extra-paths ["src/cljs" "src/cljc" "test/cljs" "test/cljc"]}}}
