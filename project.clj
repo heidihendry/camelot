@@ -6,15 +6,17 @@
 
   :plugins [[lein-tools-deps "0.4.5"]
             [lein-cljsbuild "1.1.7"]
-            [lein-environ "1.1.0"]]
+            [lein-environ "1.1.0"]
+            [lein-nvd "1.4.0"]]
   :middleware [lein-tools-deps.plugin/resolve-dependencies-with-deps-edn]
   :lein-tools-deps/config {:config-files [:install :user :project]}
 
   :min-lein-version "2.6.1"
   :env {:squiggly "{:checkers [:kibit :eastwood] :eastwood-options {:exclude-linters [:unlimited-use] :add-linters [:unused-private-vars]}}"}
-
   :source-paths ["src/cljc" "src/clj" "src/cljs"]
   :test-paths ["test/cljc" "test/clj"]
+  :resource-paths ["resources"]
+
   :test-refresh {:refresh-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]
                  :watch-dirs ["test/clj" "test/cljc" "src/clj" "src/cljc"]
                  :changes-only true
