@@ -1,7 +1,7 @@
 (ns camelot.model.camera-deployment
   "Camera deployment / camera check model and data access."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.db :as db]
    [camelot.spec.schema.state :refer [State]]
    [clj-time.core :as t]
@@ -16,64 +16,64 @@
 
 (def query (db/with-db-keys :deployments))
 
-(s/defrecord TCameraDeployment
-    [trap-station-session-id :- s/Int
-     trap-station-name :- s/Str
-     site-id :- s/Int
-     trap-station-id :- s/Int
+(sch/defrecord TCameraDeployment
+    [trap-station-session-id :- sch/Int
+     trap-station-name :- sch/Str
+     site-id :- sch/Int
+     trap-station-id :- sch/Int
      trap-station-longitude
      trap-station-latitude
-     trap-station-altitude :- (s/maybe s/Num)
-     trap-station-distance-above-ground :- (s/maybe s/Num)
-     trap-station-distance-to-river :- (s/maybe s/Num)
-     trap-station-distance-to-road :- (s/maybe s/Num)
-     trap-station-distance-to-settlement :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)
+     trap-station-altitude :- (sch/maybe sch/Num)
+     trap-station-distance-above-ground :- (sch/maybe sch/Num)
+     trap-station-distance-to-river :- (sch/maybe sch/Num)
+     trap-station-distance-to-road :- (sch/maybe sch/Num)
+     trap-station-distance-to-settlement :- (sch/maybe sch/Num)
+     trap-station-notes :- (sch/maybe sch/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- org.joda.time.DateTime
-     primary-camera-id :- s/Int
-     primary-camera-name :- s/Str
-     primary-camera-original-id :- s/Int
-     primary-camera-status-id :- s/Int
-     primary-camera-media-unrecoverable :- s/Bool
-     secondary-camera-id :- (s/maybe s/Int)
-     secondary-camera-name :- (s/maybe s/Str)
-     secondary-camera-original-id :- (s/maybe s/Int)
-     secondary-camera-status-id :- (s/maybe s/Int)
-     secondary-camera-media-unrecoverable :- (s/maybe s/Bool)]
-  {s/Any s/Any})
+     primary-camera-id :- sch/Int
+     primary-camera-name :- sch/Str
+     primary-camera-original-id :- sch/Int
+     primary-camera-status-id :- sch/Int
+     primary-camera-media-unrecoverable :- sch/Bool
+     secondary-camera-id :- (sch/maybe sch/Int)
+     secondary-camera-name :- (sch/maybe sch/Str)
+     secondary-camera-original-id :- (sch/maybe sch/Int)
+     secondary-camera-status-id :- (sch/maybe sch/Int)
+     secondary-camera-media-unrecoverable :- (sch/maybe sch/Bool)]
+  {sch/Any sch/Any})
 
-(s/defrecord CameraDeployment
-    [trap-station-session-id :- s/Int
+(sch/defrecord CameraDeployment
+    [trap-station-session-id :- sch/Int
      trap-station-session-created :- org.joda.time.DateTime
      trap-station-session-updated :- org.joda.time.DateTime
-     trap-station-id :- s/Int
-     trap-station-name :- s/Str
-     site-id :- s/Int
-     survey-site-id :- s/Int
-     site-name :- s/Str
-     trap-station-longitude :- (s/pred utilts/valid-longitude?)
-     trap-station-latitude :- (s/pred utilts/valid-latitude?)
-     trap-station-altitude :- (s/maybe s/Num)
-     trap-station-distance-above-ground :- (s/maybe s/Num)
-     trap-station-distance-to-river :- (s/maybe s/Num)
-     trap-station-distance-to-road :- (s/maybe s/Num)
-     trap-station-distance-to-settlement :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)
+     trap-station-id :- sch/Int
+     trap-station-name :- sch/Str
+     site-id :- sch/Int
+     survey-site-id :- sch/Int
+     site-name :- sch/Str
+     trap-station-longitude :- (sch/pred utilts/valid-longitude?)
+     trap-station-latitude :- (sch/pred utilts/valid-latitude?)
+     trap-station-altitude :- (sch/maybe sch/Num)
+     trap-station-distance-above-ground :- (sch/maybe sch/Num)
+     trap-station-distance-to-river :- (sch/maybe sch/Num)
+     trap-station-distance-to-road :- (sch/maybe sch/Num)
+     trap-station-distance-to-settlement :- (sch/maybe sch/Num)
+     trap-station-notes :- (sch/maybe sch/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
      trap-station-session-end-date :- org.joda.time.DateTime
-     trap-station-session-camera-id :- s/Int
-     trap-station-session-camera-media-unrecoverable :- s/Bool
-     camera-id :- s/Int
-     camera-name :- s/Str
-     camera-status-id :- s/Int
-     has-uploaded-media :- s/Bool]
-  {s/Any s/Any})
+     trap-station-session-camera-id :- sch/Int
+     trap-station-session-camera-media-unrecoverable :- sch/Bool
+     camera-id :- sch/Int
+     camera-name :- sch/Str
+     camera-status-id :- sch/Int
+     has-uploaded-media :- sch/Bool]
+  {sch/Any sch/Any})
 
 (def camera-deployment map->CameraDeployment)
 (def tcamera-deployment map->TCameraDeployment)
 
-(s/defn update-used-cameras!
+(sch/defn update-used-cameras!
   "Update the status of cameras and the media recoverability flag."
   [state :- State
    data]
@@ -87,7 +87,7 @@
        state (:camera-original-id c) (:trap-station-session-id data)
        (:camera-media-unrecoverable c)))))
 
-(s/defn maybe-create-new-session-and-cameras!
+(sch/defn maybe-create-new-session-and-cameras!
   [state :- State
    data]
   {:pre [(data/nat? (:trap-station-session-id data))]}
@@ -97,7 +97,7 @@
     (when (seq (:cameras d))
       (deployment/create-new-session-and-cameras! state d))))
 
-(s/defn get-uploaded-status
+(sch/defn get-uploaded-status
   [state rec]
   (assoc rec :has-uploaded-media
          (or (->> rec
@@ -107,9 +107,9 @@
                   :has-uploaded-media)
              false)))
 
-(s/defn get-uploadable :- [CameraDeployment]
+(sch/defn get-uploadable :- [CameraDeployment]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (->> {:survey-id id}
        (query state :get-uploadable)
        (map (partial get-uploaded-status state))
@@ -123,7 +123,7 @@
        (not (t/after? (:trap-station-session-start-date data)
                       (:trap-station-session-end-date data)))))
 
-(s/defn create-camera-check!
+(sch/defn create-camera-check!
   [state :- State
    data :- TCameraDeployment]
   {:pre [(valid-camera-check? data)]}

@@ -1,6 +1,6 @@
 (ns camelot.util.sunrise-sunset
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [clj-time.coerce :as tc]
    [clj-time.core :as t])
   (:import
@@ -52,18 +52,18 @@
             (calendar-fn (->calendar-for-date date))
             (truncate-tz date tz))))
 
-(s/defn sunrise-time :- (s/maybe DateTime)
+(sch/defn sunrise-time :- (sch/maybe DateTime)
   [tz :- TimeZone
-   lat :- s/Str
-   lon :- s/Str
+   lat :- sch/Str
+   lon :- sch/Str
    date :- DateTime]
   (let [f (build-sunrise-sunset-time ->sunrise-calendar)]
     (f tz lat lon date)))
 
-(s/defn sunset-time :- (s/maybe DateTime)
+(sch/defn sunset-time :- (sch/maybe DateTime)
   [tz :- TimeZone
-   lat :- s/Str
-   lon :- s/Str
+   lat :- sch/Str
+   lon :- sch/Str
    date :- DateTime]
   (let [f (build-sunrise-sunset-time ->sunset-calendar)]
     (f tz lat lon date)))

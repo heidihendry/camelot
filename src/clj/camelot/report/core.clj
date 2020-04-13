@@ -13,7 +13,7 @@
    [clojure.data.csv :as csv]
    [clojure.set :as set]
    [ring.util.response :as r]
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.model :as model])
   (:import
    (clojure.lang IFn)))
@@ -105,11 +105,11 @@
     (apply sorted-set-by (partial compare-records order-by) data)
     data))
 
-(s/defn transform-records :- [{s/Keyword s/Any}]
+(sch/defn transform-records :- [{sch/Keyword sch/Any}]
   "Apply a series of transformation functions to each record."
   [state :- State
    transforms :- [IFn]
-   data :- [{s/Keyword s/Any}]]
+   data :- [{sch/Keyword sch/Any}]]
   (if (seq transforms)
     (map (fn [r] (reduce #(%2 %1) r transforms)) data)
     data))
@@ -131,14 +131,14 @@
       (reduce reducer [] data))
     data))
 
-(s/defn generate-report
+(sch/defn generate-report
   "Generate a report given an output configuration and data."
   [state :- State
    columns
    {:keys [rewrites pre-transforms pre-filters apply-fn
            transforms filters aggregate-on order-by function
            repeat-by identified-by]}
-   data :- [{s/Keyword s/Any}]]
+   data :- [{sch/Keyword sch/Any}]]
   (if function
     (function state data)
     (let [projection-columns (cond-> columns
@@ -282,12 +282,12 @@
            (cons-headings state sf cols (custom-titles state column-title-fn))
            (to-csv-string)))))
 
-(s/defn report :- [s/Any]
+(sch/defn report :- [sch/Any]
   "Produce a report, with each record represented as a vector."
-  [report-key :- s/Keyword
+  [report-key :- sch/Keyword
    state :- State
    configuration
-   data :- [{s/Keyword s/Any}]]
+   data :- [{sch/Keyword sch/Any}]]
   (loader/load-user-modules state)
   (let [report (module/get-report state report-key)
         conf ((:output report) state configuration)
@@ -297,12 +297,12 @@
          (generate-report state cols conf)
          (as-rows state cols))))
 
-(s/defn csv-report
+(sch/defn csv-report
   "Produce the report as a CSV."
-  [report-key :- s/Keyword
+  [report-key :- sch/Keyword
    state :- State
    configuration
-   data :- [{s/Keyword s/Any}]]
+   data :- [{sch/Keyword sch/Any}]]
   (let [report (module/get-report state report-key)]
     (exportable-report
      state
@@ -318,10 +318,10 @@
           (get report :file-prefix)
           (tf/unparse time-formatter (tl/local-now))))
 
-(s/defn export
+(sch/defn export
   "Handler for an export request."
   [state :- State
-   report-key :- s/Keyword
+   report-key :- sch/Keyword
    configuration]
   (loader/load-user-modules state)
   (if-let [report (module/get-report state report-key)]
@@ -343,18 +343,18 @@
   [acc k v]
   (conj acc (->report-descriptor v k)))
 
-(s/defn refresh-reports
+(sch/defn refresh-reports
   "Rediscover and evaluate report modules."
   [state]
   (loader/load-user-modules state))
 
-(s/defn available-reports
+(sch/defn available-reports
   "Map of all available reports."
   [state]
   (loader/load-user-modules state)
   (reduce-kv report-configuration-reducer [] (module/all-reports state)))
 
-(s/defn get-configuration
+(sch/defn get-configuration
   "Configuration of the given report."
   [state report-key]
   (loader/load-user-modules state)

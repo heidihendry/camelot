@@ -4,7 +4,7 @@
    [yesql.core :as sql]
    [com.stuartsierra.component :as component]
    [clojure.java.jdbc :as jdbc]
-   [schema.core :as s])
+   [schema.core :as sch])
   (:import
    (java.io IOException)))
 
@@ -61,7 +61,7 @@
     (catch Exception e
       (log/info (.getMessage e)))))
 
-(s/defrecord Database
+(sch/defrecord Database
     [connection :- clojure.lang.PersistentArrayMap]
 
   component/Lifecycle

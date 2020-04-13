@@ -1,37 +1,37 @@
 (ns camelot.model.sighting-field
   "Additional fields for sighting records."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.sighting-fields :as util.sf]
    [camelot.util.db :as db]))
 
 (def query (db/with-db-keys :sighting-field))
 
-(s/defrecord TSightingField
-    [sighting-field-key :- s/Str
-     sighting-field-label :- s/Str
-     sighting-field-datatype :- s/Keyword
-     sighting-field-required :- s/Bool
-     sighting-field-default :- s/Str
-     sighting-field-affects-independence :- s/Bool
-     sighting-field-ordering :- s/Int
-     survey-id :- s/Int]
-  {s/Any s/Any})
+(sch/defrecord TSightingField
+    [sighting-field-key :- sch/Str
+     sighting-field-label :- sch/Str
+     sighting-field-datatype :- sch/Keyword
+     sighting-field-required :- sch/Bool
+     sighting-field-default :- sch/Str
+     sighting-field-affects-independence :- sch/Bool
+     sighting-field-ordering :- sch/Int
+     survey-id :- sch/Int]
+  {sch/Any sch/Any})
 
-(s/defrecord SightingField
-    [sighting-field-id :- s/Int
+(sch/defrecord SightingField
+    [sighting-field-id :- sch/Int
      sighting-field-created :- org.joda.time.DateTime
      sighting-field-updated :- org.joda.time.DateTime
-     sighting-field-key :- s/Str
-     sighting-field-label :- s/Str
-     sighting-field-datatype :- s/Keyword
-     sighting-field-options :- (s/maybe [s/Str])
-     sighting-field-default :- (s/maybe s/Str)
-     sighting-field-required :- s/Bool
-     sighting-field-affects-independence :- s/Bool
-     sighting-field-ordering :- s/Int
-     survey-id :- s/Int]
-  {s/Any s/Any})
+     sighting-field-key :- sch/Str
+     sighting-field-label :- sch/Str
+     sighting-field-datatype :- sch/Keyword
+     sighting-field-options :- (sch/maybe [sch/Str])
+     sighting-field-default :- (sch/maybe sch/Str)
+     sighting-field-required :- sch/Bool
+     sighting-field-affects-independence :- sch/Bool
+     sighting-field-ordering :- sch/Int
+     survey-id :- sch/Int]
+  {sch/Any sch/Any})
 
 (defn sighting-field
   [data]

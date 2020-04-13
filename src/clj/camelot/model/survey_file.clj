@@ -1,7 +1,7 @@
 (ns camelot.model.survey-file
   (:require
    [camelot.spec.schema.state :refer [State]]
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.db :as db]
    [clojure.java.io :as io]
    [ring.util.response :as r]
@@ -10,81 +10,81 @@
 
 (def query (db/with-db-keys :survey-file))
 
-(s/defrecord TSurveyFile
-    [survey-id :- s/Int
-     survey-file-name :- s/Str
-     survey-file-size :- s/Int]
-  {s/Any s/Any})
+(sch/defrecord TSurveyFile
+    [survey-id :- sch/Int
+     survey-file-name :- sch/Str
+     survey-file-size :- sch/Int]
+  {sch/Any sch/Any})
 
-(s/defrecord SurveyFile
-    [survey-id :- s/Int
-     survey-file-id :- s/Int
-     survey-file-name :- s/Str
-     survey-file-size :- s/Int
+(sch/defrecord SurveyFile
+    [survey-id :- sch/Int
+     survey-file-id :- sch/Int
+     survey-file-name :- sch/Str
+     survey-file-size :- sch/Int
      survey-file-created :- org.joda.time.DateTime
      survey-file-updated :- org.joda.time.DateTime]
-  {s/Any s/Any})
+  {sch/Any sch/Any})
 
 (def survey-file map->SurveyFile)
 (def tsurvey-file map->TSurveyFile)
 
-(s/defn get-all :- [SurveyFile]
+(sch/defn get-all :- [SurveyFile]
   "Retrieve all available files for the given survey."
   [state :- State
-   survey-id :- s/Int]
+   survey-id :- sch/Int]
   (->> {:survey-id survey-id}
        (query state :get-all)
        (map survey-file)))
 
-(s/defn get-specific :- (s/maybe SurveyFile)
+(sch/defn get-specific :- (sch/maybe SurveyFile)
   "Retrieve the file with the given ID."
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (->> {:survey-file-id id}
        (query state :get-specific)
        (map survey-file)
        first))
 
-(s/defn get-specific-by-details :- (s/maybe SurveyFile)
+(sch/defn get-specific-by-details :- (sch/maybe SurveyFile)
   "Retrieve the file with the given ID."
   [state :- State
-   survey-id :- s/Int
-   filename :- s/Str]
+   survey-id :- sch/Int
+   filename :- sch/Str]
   (->> {:survey-file-name filename
         :survey-id survey-id}
        (query state :get-specific-by-details)
        (map survey-file)
        first))
 
-(s/defn create! :- SurveyFile
+(sch/defn create! :- SurveyFile
   [state :- State
    data :- TSurveyFile]
   (let [record (query state :create<! data)]
     (survey-file (get-specific state (int (:1 record))))))
 
-(s/defn update! :- SurveyFile
+(sch/defn update! :- SurveyFile
   [state :- State
-   id :- s/Int
-   file-size :- s/Int]
+   id :- sch/Int
+   file-size :- sch/Int]
   (query state :update! {:survey-file-id id
                                    :survey-file-size file-size})
   (survey-file (get-specific state id)))
 
-(s/defn delete!
+(sch/defn delete!
   [state :- State
-   file-id :- s/Int]
+   file-id :- sch/Int]
   (if-let [r (get-specific state file-id)]
     (let [fs (filesystem/filestore-file-path state (:survey-id r)
                                              (:survey-file-name r))]
       (query state :delete! {:survey-file-id file-id})
       (io/delete-file fs))))
 
-(s/defn upload!
+(sch/defn upload!
   [state :- State
-   survey-id :- s/Int
-   {:keys [tempfile :- s/Str
-           filename :- s/Str
-           size :- s/Int]}]
+   survey-id :- sch/Int
+   {:keys [tempfile :- sch/Str
+           filename :- sch/Str
+           size :- sch/Int]}]
   (let [fs (filesystem/filestore-file-path state survey-id filename)
         rec (get-specific-by-details state survey-id filename)]
     (io/copy (file/->file tempfile) (file/->file fs))
@@ -96,9 +96,9 @@
       (file/delete tempfile)
       result)))
 
-(s/defn download
+(sch/defn download
   [state :- State
-   file-id :- s/Int]
+   file-id :- sch/Int]
   (if-let [r (get-specific state file-id)]
     (let [fs (filesystem/filestore-file-path state (:survey-id r)
                                              (:survey-file-name r))

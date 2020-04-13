@@ -1,7 +1,7 @@
 (ns camelot.library.core
   "Library models and data access."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.db :as db]
    [camelot.model.sighting :as sighting]
    [camelot.model.suggestion :as suggestion]
@@ -46,7 +46,7 @@
   [state qstr]
   (query/query-media state qstr))
 
-(s/defn build-records
+(sch/defn build-records
   [state sightings suggestions media]
   (let [media-sightings (group-by :media-id sightings)
         media-suggestions (group-by :media-id suggestions)
@@ -61,7 +61,7 @@
                  :media-uri (media-uri %))
          media)))
 
-(s/defn hydrate-media
+(sch/defn hydrate-media
   [state ids]
   (if (seq ids)
     (let [media (media/get-list state ids)
@@ -70,7 +70,7 @@
       (build-records state sightings suggestions media))
     []))
 
-(s/defn update-bulk-media-flags
+(sch/defn update-bulk-media-flags
   [state :- State
    data]
   (db/with-transaction [s state]
@@ -87,7 +87,7 @@
                                                :sighting-fields (reduce-kv #(assoc %1 %2 (str %3))
                                                                            {} sighting-fields)})))
 
-(s/defn identify
+(sch/defn identify
   "Creates identification data as sightings for each media ID given."
   [state {:keys [identification media]}]
   (let [media (media/get-with-ids state media)]
@@ -96,7 +96,7 @@
   (db/with-transaction [s state]
     (map :sighting-id (doall (map (partial identify-media s identification) media)))))
 
-(s/defn update-identification!
+(sch/defn update-identification!
   "Update sighting information for the given sighting ID."
   [state id {:keys [quantity species sighting-fields]}]
   (sighting/update! state (edn/read-string id)

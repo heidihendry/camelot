@@ -2,7 +2,7 @@
   "Species mass models and data access."
   (:require
    [camelot.spec.schema.state :refer [State]]
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.db :as db]))
 
 (def query (db/with-db-keys :species-mass))
@@ -15,16 +15,16 @@
                     (:species-mass-end %) " kg"))
        data))
 
-(s/defrecord SpeciesMass
-    [species-mass-id :- s/Num
-     species-mass-start :- s/Int
-     species-mass-end :- s/Int
-     species-mass-label :- s/Str]
-  {s/Any s/Any})
+(sch/defrecord SpeciesMass
+    [species-mass-id :- sch/Num
+     species-mass-start :- sch/Int
+     species-mass-end :- sch/Int
+     species-mass-label :- sch/Str]
+  {sch/Any sch/Any})
 
 (def species-mass map->SpeciesMass)
 
-(s/defn get-all :- [SpeciesMass]
+(sch/defn get-all :- [SpeciesMass]
   "Retrieve, translate and return all species mass brackets."
   [state :- State]
   (->> (query state :get-all)

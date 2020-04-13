@@ -1,7 +1,7 @@
 (ns camelot.model.deployment
   "Deployment model and data access."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [clj-time.core :as t]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
@@ -19,49 +19,49 @@
 
 (def query (db/with-db-keys :deployments))
 
-(s/defrecord TDeployment
-    [survey-id :- s/Int
-     site-id :- s/Int
-     trap-station-name :- s/Str
-     trap-station-longitude :- s/Num
-     trap-station-latitude :- s/Num
-     trap-station-altitude :- (s/maybe s/Num)
-     trap-station-distance-above-ground :- (s/maybe s/Num)
-     trap-station-distance-to-river :- (s/maybe s/Num)
-     trap-station-distance-to-road :- (s/maybe s/Num)
-     trap-station-distance-to-settlement :- (s/maybe s/Num)
+(sch/defrecord TDeployment
+    [survey-id :- sch/Int
+     site-id :- sch/Int
+     trap-station-name :- sch/Str
+     trap-station-longitude :- sch/Num
+     trap-station-latitude :- sch/Num
+     trap-station-altitude :- (sch/maybe sch/Num)
+     trap-station-distance-above-ground :- (sch/maybe sch/Num)
+     trap-station-distance-to-river :- (sch/maybe sch/Num)
+     trap-station-distance-to-road :- (sch/maybe sch/Num)
+     trap-station-distance-to-settlement :- (sch/maybe sch/Num)
      trap-station-session-start-date :- org.joda.time.DateTime
-     trap-station-notes :- (s/maybe s/Str)
-     primary-camera-id :- s/Int
-     secondary-camera-id :- (s/maybe s/Int)]
-  {s/Any s/Any})
+     trap-station-notes :- (sch/maybe sch/Str)
+     primary-camera-id :- sch/Int
+     secondary-camera-id :- (sch/maybe sch/Int)]
+  {sch/Any sch/Any})
 
-(s/defrecord Deployment
-    [trap-station-session-id :- s/Int
+(sch/defrecord Deployment
+    [trap-station-session-id :- sch/Int
      trap-station-session-created :- org.joda.time.DateTime
      trap-station-session-updated :- org.joda.time.DateTime
-     trap-station-id :- s/Int
-     trap-station-name :- s/Str
-     site-id :- s/Int
-     survey-site-id :- s/Int
-     site-name :- s/Str
-     trap-station-longitude :- (s/pred utilts/valid-longitude?)
-     trap-station-latitude :- (s/pred utilts/valid-latitude?)
-     trap-station-altitude :- (s/maybe s/Num)
-     trap-station-distance-above-ground :- (s/maybe s/Num)
-     trap-station-distance-to-river :- (s/maybe s/Num)
-     trap-station-distance-to-road :- (s/maybe s/Num)
-     trap-station-distance-to-settlement :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)
+     trap-station-id :- sch/Int
+     trap-station-name :- sch/Str
+     site-id :- sch/Int
+     survey-site-id :- sch/Int
+     site-name :- sch/Str
+     trap-station-longitude :- (sch/pred utilts/valid-longitude?)
+     trap-station-latitude :- (sch/pred utilts/valid-latitude?)
+     trap-station-altitude :- (sch/maybe sch/Num)
+     trap-station-distance-above-ground :- (sch/maybe sch/Num)
+     trap-station-distance-to-river :- (sch/maybe sch/Num)
+     trap-station-distance-to-road :- (sch/maybe sch/Num)
+     trap-station-distance-to-settlement :- (sch/maybe sch/Num)
+     trap-station-notes :- (sch/maybe sch/Str)
      trap-station-session-start-date :- org.joda.time.DateTime
-     trap-station-session-end-date :- (s/maybe org.joda.time.DateTime)
-     primary-camera-id :- (s/maybe s/Int)
-     primary-camera-name :- (s/maybe s/Str)
-     primary-camera-status-id :- (s/maybe s/Int)
-     secondary-camera-id :- (s/maybe s/Num)
-     secondary-camera-name :- (s/maybe s/Str)
-     secondary-camera-status-id :- (s/maybe s/Int)]
-  {s/Any s/Any})
+     trap-station-session-end-date :- (sch/maybe org.joda.time.DateTime)
+     primary-camera-id :- (sch/maybe sch/Int)
+     primary-camera-name :- (sch/maybe sch/Str)
+     primary-camera-status-id :- (sch/maybe sch/Int)
+     secondary-camera-id :- (sch/maybe sch/Num)
+     secondary-camera-name :- (sch/maybe sch/Str)
+     secondary-camera-status-id :- (sch/maybe sch/Int)]
+  {sch/Any sch/Any})
 
 (def deployment map->Deployment)
 (def tdeployment map->TDeployment)
@@ -73,9 +73,9 @@
     (nil? b) false
     :else (t/after? a b)))
 
-(s/defn get-all :- [Deployment]
+(sch/defn get-all :- [Deployment]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (->> {:survey-id id}
        (query state :get-all)
        dep-util/assoc-cameras
@@ -85,18 +85,18 @@
        (map first)
        (mapv deployment)))
 
-(s/defn get-specific :- (s/maybe Deployment)
+(sch/defn get-specific :- (sch/maybe Deployment)
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (some->> {:trap-station-session-id id}
            (query state :get-specific)
            dep-util/assoc-cameras
            first
            deployment))
 
-(s/defn activate-camera!
+(sch/defn activate-camera!
   [state :- State
-   camera-id :- s/Int]
+   camera-id :- sch/Int]
   (let [active-id (:camera-status-active-id state)]
     (camera/set-camera-status! state camera-id active-id)))
 
@@ -106,7 +106,7 @@
        trap-station-session-camera/ttrap-station-session-camera
        (trap-station-session-camera/create!* state)))
 
-(s/defn create-new-session!
+(sch/defn create-new-session!
   [state :- State
    data]
   (let [new-start (or (:trap-station-session-end-date data)
@@ -117,7 +117,7 @@
          trap-station-session/ttrap-station-session
          (trap-station-session/create! state))))
 
-(s/defn create-new-session-and-cameras!
+(sch/defn create-new-session-and-cameras!
   [state :- State
    data]
   (let [s (create-new-session! state data)]
@@ -135,10 +135,10 @@
        trap-station/ttrap-station
        (trap-station/update! s id)))
 
-(s/defn update!
+(sch/defn update!
   "Update trap station details for a deployment."
   [state :- State
-   id :- s/Int
+   id :- sch/Int
    data :- TDeployment]
   (db/with-transaction [s state]
     (->> (get-or-create-survey-site! s data)
@@ -152,7 +152,7 @@
        trap-station/ttrap-station
        (trap-station/create! s)))
 
-(s/defn create!
+(sch/defn create!
   [state :- State
    data :- TDeployment]
   (db/with-transaction [s (assoc state :camera-status-active-id

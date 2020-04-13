@@ -1,7 +1,7 @@
 (ns camelot.model.sighting-field-value
   "User-defined fields for sighting data."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.datatype :as datatype]
    [clojure.string :as str]
    [camelot.model.sighting-field :as sighting-field]
@@ -10,14 +10,14 @@
 
 (def query (db/with-db-keys :sighting-field-value))
 
-(s/defrecord SightingFieldValue
-    [sighting-field-value-id :- s/Int
+(sch/defrecord SightingFieldValue
+    [sighting-field-value-id :- sch/Int
      sighting-field-value-created :- org.joda.time.DateTime
      sighting-field-value-updated :- org.joda.time.DateTime
-     sighting-field-value-data :- s/Any
-     sighting-field-id :- s/Int
-     sighting-id :- s/Int]
-  {s/Any s/Any})
+     sighting-field-value-data :- sch/Any
+     sighting-field-id :- sch/Int
+     sighting-id :- sch/Int]
+  {sch/Any sch/Any})
 
 (defn- deserialiser-datatype
   "Return the datatype for the deserialiser."

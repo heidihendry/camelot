@@ -13,31 +13,31 @@
    [clojure.java.io :as io]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
-   [schema.core :as s]))
+   [schema.core :as sch]))
 
-(s/defn gps-parts-to-decimal :- s/Num
+(sch/defn gps-parts-to-decimal :- sch/Num
   "Return the GPS parts as a decimal."
-  [parts :- [s/Num]]
+  [parts :- [sch/Num]]
   {:pre [(= (count parts) 3)]}
   (let [exact (+ (first parts)
                  (/ (nth parts 1) 0.6 100)
                  (/ (nth parts 2) 0.36 10000))]
     (trap-station/round-gps exact)))
 
-(s/defn gps-degrees-as-parts
+(sch/defn gps-degrees-as-parts
   "Return the numeric parts of a GPS location as a vector, given a string in degrees."
   [deg]
   (->> (str/split deg #" ")
        (map #(str/replace % #"[^\.0-9]" ""))
        (mapv edn/read-string)))
 
-(s/defn parse-gps :- s/Num
+(sch/defn parse-gps :- sch/Num
   "Convert degrees string with a reference to a decimal.
 `pos-ref' is the reference direction which is positive; any other
 direction is considered negative."
-  [pos-ref :- s/Str
-   mag :- s/Str
-   mag-ref :- s/Str]
+  [pos-ref :- sch/Str
+   mag :- sch/Str
+   mag-ref :- sch/Str]
   (let [decimal (-> mag
                     gps-degrees-as-parts
                     gps-parts-to-decimal)]
@@ -45,20 +45,20 @@ direction is considered negative."
       decimal
       (* -1 decimal))))
 
-(s/defn to-longitude :- (s/maybe s/Num)
+(sch/defn to-longitude :- (sch/maybe sch/Num)
   "Convert longitude in degrees and a longitude reference to a decimal."
-  [lon :- (s/maybe s/Str)
-   lon-ref :- (s/maybe s/Str)]
+  [lon :- (sch/maybe sch/Str)
+   lon-ref :- (sch/maybe sch/Str)]
   (when-not (or (nil? lon) (nil? lon-ref))
     (try (parse-gps "E" lon lon-ref)
          (catch java.lang.Exception _
            (log/warn "to-longitude: Attempt to parse " lon " as GPS")
            nil))))
 
-(s/defn to-latitude :- (s/maybe s/Num)
+(sch/defn to-latitude :- (sch/maybe sch/Num)
   "Convert latitude in degrees and a latitude reference to a decimal."
-  [lat :- (s/maybe s/Str)
-   lat-ref :- (s/maybe s/Str)]
+  [lat :- (sch/maybe sch/Str)
+   lat-ref :- (sch/maybe sch/Str)]
   (when-not (or (nil? lat) (nil? lat-ref))
     (try (parse-gps "N" lat lat-ref)
          (catch java.lang.Exception _

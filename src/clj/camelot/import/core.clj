@@ -1,7 +1,7 @@
 (ns camelot.import.core
   (:require
    [clojure.core.async :refer [>!!]]
-   [schema.core :as s]
+   [schema.core :as sch]
    [clj-time.core :as t]
    [camelot.translation.core :as tr]
    [camelot.util.file :as futil]
@@ -20,12 +20,12 @@
            (t/after? date (t/plus (:trap-station-session-end-date sess)
                                   (t/days 1))))))
 
-(s/defn import-capture!
+(sch/defn import-capture!
   [state :- State
-   session-camera-id :- s/Int
-   {:keys [content-type :- s/Str
-           tempfile :- s/Str
-           size :- s/Int]}]
+   session-camera-id :- sch/Int
+   {:keys [content-type :- sch/Str
+           tempfile :- sch/Str
+           size :- sch/Int]}]
   (let [sess (trap-station-session/get-specific-by-trap-station-session-camera-id
               state session-camera-id)
         photo (capture/read-photo state tempfile)]

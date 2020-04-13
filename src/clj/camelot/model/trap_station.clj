@@ -1,6 +1,6 @@
 (ns camelot.model.trap-station
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.trap-station :as utilts]
    [camelot.util.db :as db]
@@ -12,34 +12,34 @@
 
 (def query (db/with-db-keys :trap-stations))
 
-(s/defrecord TTrapStation
-    [trap-station-name :- s/Str
-     survey-site-id :- s/Num
-     trap-station-longitude :- (s/pred utilts/valid-longitude?)
-     trap-station-latitude :- (s/pred utilts/valid-latitude?)
-     trap-station-altitude :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)
-     trap-station-distance-above-ground :- (s/maybe s/Num)
-     trap-station-distance-to-road :- (s/maybe s/Num)
-     trap-station-distance-to-river :- (s/maybe s/Num)
-     trap-station-distance-to-settlement :- (s/maybe s/Num)]
-  {s/Any s/Any})
+(sch/defrecord TTrapStation
+    [trap-station-name :- sch/Str
+     survey-site-id :- sch/Num
+     trap-station-longitude :- (sch/pred utilts/valid-longitude?)
+     trap-station-latitude :- (sch/pred utilts/valid-latitude?)
+     trap-station-altitude :- (sch/maybe sch/Num)
+     trap-station-notes :- (sch/maybe sch/Str)
+     trap-station-distance-above-ground :- (sch/maybe sch/Num)
+     trap-station-distance-to-road :- (sch/maybe sch/Num)
+     trap-station-distance-to-river :- (sch/maybe sch/Num)
+     trap-station-distance-to-settlement :- (sch/maybe sch/Num)]
+  {sch/Any sch/Any})
 
-(s/defrecord TrapStation
-    [trap-station-id :- s/Num
+(sch/defrecord TrapStation
+    [trap-station-id :- sch/Num
      trap-station-created :- org.joda.time.DateTime
      trap-station-updated :- org.joda.time.DateTime
-     trap-station-name :- s/Str
-     survey-site-id :- s/Num
-     trap-station-longitude :- (s/pred utilts/valid-longitude?)
-     trap-station-latitude :- (s/pred utilts/valid-latitude?)
-     trap-station-altitude :- (s/maybe s/Num)
-     trap-station-notes :- (s/maybe s/Str)
-     trap-station-distance-above-ground :- (s/maybe s/Num)
-     trap-station-distance-to-road :- (s/maybe s/Num)
-     trap-station-distance-to-river :- (s/maybe s/Num)
-     trap-station-distance-to-settlement :- (s/maybe s/Num)]
-  {s/Any s/Any})
+     trap-station-name :- sch/Str
+     survey-site-id :- sch/Num
+     trap-station-longitude :- (sch/pred utilts/valid-longitude?)
+     trap-station-latitude :- (sch/pred utilts/valid-latitude?)
+     trap-station-altitude :- (sch/maybe sch/Num)
+     trap-station-notes :- (sch/maybe sch/Str)
+     trap-station-distance-above-ground :- (sch/maybe sch/Num)
+     trap-station-distance-to-road :- (sch/maybe sch/Num)
+     trap-station-distance-to-river :- (sch/maybe sch/Num)
+     trap-station-distance-to-settlement :- (sch/maybe sch/Num)]
+  {sch/Any sch/Any})
 
 (defn round-gps
   "Round GPS coordinates to 6dp (accurate to 1 meter)."
@@ -59,31 +59,31 @@
        (update :trap-station-latitude round-gps)
        (update :trap-station-longitude round-gps))))
 
-(s/defn get-all :- [TrapStation]
+(sch/defn get-all :- [TrapStation]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (->> {:survey-site-id id}
        (query state :get-all)
        (map trap-station)))
 
-(s/defn get-all* :- [TrapStation]
+(sch/defn get-all* :- [TrapStation]
   [state :- State]
   (map trap-station (query state :get-all*)))
 
-(s/defn get-all-for-survey :- [TrapStation]
+(sch/defn get-all-for-survey :- [TrapStation]
   [state :- State
-   survey-id :- s/Int]
+   survey-id :- sch/Int]
   (map trap-station (query state :get-all-for-survey {:survey-id survey-id})))
 
-(s/defn get-specific :- (s/maybe TrapStation)
+(sch/defn get-specific :- (sch/maybe TrapStation)
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (some->> {:trap-station-id id}
            (query state :get-specific)
            (first)
            (trap-station)))
 
-(s/defn get-specific-by-name-and-location :- (s/maybe TrapStation)
+(sch/defn get-specific-by-name-and-location :- (sch/maybe TrapStation)
   [state :- State
    data :- TTrapStation]
   (some->> data
@@ -91,15 +91,15 @@
            (first)
            (trap-station)))
 
-(s/defn create! :- TrapStation
+(sch/defn create! :- TrapStation
   [state :- State
    data :- TTrapStation]
   (let [record (query state :create<! data)]
     (trap-station (get-specific state (int (:1 record))))))
 
-(s/defn update! :- TrapStation
+(sch/defn update! :- TrapStation
   [state :- State
-   id :- s/Int
+   id :- sch/Int
    data :- TTrapStation]
   (query state :update! (merge data {:trap-station-id id}))
   (trap-station (get-specific state id)))
@@ -111,9 +111,9 @@
        (map :camera-id)
        (remove nil?)))
 
-(s/defn delete!
+(sch/defn delete!
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [fs (media/get-all-files-by-trap-station state id)
         ps {:trap-station-id id}
         cams (get-active-cameras state ps)]
@@ -122,7 +122,7 @@
     (camera/make-available state cams))
   nil)
 
-(s/defn get-or-create! :- TrapStation
+(sch/defn get-or-create! :- TrapStation
   [state :- State
    data :- TTrapStation]
   (or (get-specific-by-name-and-location state data)

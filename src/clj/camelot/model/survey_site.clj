@@ -1,6 +1,6 @@
 (ns camelot.model.survey-site
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
@@ -8,22 +8,22 @@
 
 (def query (db/with-db-keys :survey-sites))
 
-(s/defrecord TSurveySite
-    [survey-id :- s/Int
-     site-id :- s/Int
-     site-name :- (s/maybe s/Str)]
-  {s/Any s/Any})
+(sch/defrecord TSurveySite
+    [survey-id :- sch/Int
+     site-id :- sch/Int
+     site-name :- (sch/maybe sch/Str)]
+  {sch/Any sch/Any})
 
-(s/defrecord SurveySite
-    [survey-site-id :- s/Int
+(sch/defrecord SurveySite
+    [survey-site-id :- sch/Int
      survey-site-created :- org.joda.time.DateTime
      survey-site-updated :- org.joda.time.DateTime
-     survey-id :- s/Int
-     site-id :- s/Int
-     survey-name :- (s/maybe s/Str)
-     site-name :- (s/maybe s/Str)
-     survey-site-label :- (s/maybe s/Str)]
-  {s/Any s/Any})
+     survey-id :- sch/Int
+     site-id :- sch/Int
+     survey-name :- (sch/maybe sch/Str)
+     site-name :- (sch/maybe sch/Str)
+     survey-site-label :- (sch/maybe sch/Str)]
+  {sch/Any sch/Any})
 
 (defn- format-survey-site-label
   [data]
@@ -40,24 +40,24 @@
 
 (def tsurvey-site map->TSurveySite)
 
-(s/defn get-all :- [SurveySite]
+(sch/defn get-all :- [SurveySite]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (map survey-site (query state :get-all {:survey-id id})))
 
-(s/defn get-all* :- [SurveySite]
+(sch/defn get-all* :- [SurveySite]
   [state :- State]
   (map survey-site (query state :get-all*)))
 
-(s/defn get-specific :- (s/maybe SurveySite)
+(sch/defn get-specific :- (sch/maybe SurveySite)
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (some->>  {:survey-site-id id}
             (query state :get-specific)
             (first)
             (survey-site)))
 
-(s/defn get-specific-by-site :- (s/maybe SurveySite)
+(sch/defn get-specific-by-site :- (sch/maybe SurveySite)
   [state :- State
    data :- TSurveySite]
   (some->> data
@@ -65,15 +65,15 @@
            (first)
            (survey-site)))
 
-(s/defn create! :- SurveySite
+(sch/defn create! :- SurveySite
   [state :- State
    data :- TSurveySite]
   (let [record (query state :create<! data)]
     (survey-site (get-specific state (int (:1 record))))))
 
-(s/defn update! :- SurveySite
+(sch/defn update! :- SurveySite
   [state :- State
-   id :- s/Int
+   id :- sch/Int
    data :- TSurveySite]
   (query state :update! (merge data {:survey-site-id id}))
   (survey-site (get-specific state id)))
@@ -85,9 +85,9 @@
        (map :camera-id)
        (remove nil?)))
 
-(s/defn delete!
+(sch/defn delete!
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [fs (media/get-all-files-by-survey-site state id)
         ps {:survey-site-id id}
         cams (get-active-cameras state ps)]
@@ -96,20 +96,20 @@
     (camera/make-available state cams))
   nil)
 
-(s/defn get-available
+(sch/defn get-available
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (query state :get-available {:survey-id id}))
 
-(s/defn get-alternatives
+(sch/defn get-alternatives
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [res (get-specific state id)]
     (if res
       (query state :get-alternatives res)
       [])))
 
-(s/defn get-or-create! :- SurveySite
+(sch/defn get-or-create! :- SurveySite
   [state :- State
    data :- TSurveySite]
   (or (get-specific-by-site state data)

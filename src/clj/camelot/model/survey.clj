@@ -2,7 +2,7 @@
   "Survey data model and persistence."
   (:require
    [cats.monad.either :as either]
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.db :as db]
    [camelot.spec.schema.state :refer [State]]
    [camelot.model.sighting-field :as sighting-field]
@@ -14,24 +14,24 @@
 
 (def query (db/with-db-keys :surveys))
 
-(s/defrecord TSurvey
-    [survey-name :- s/Str
-     survey-sighting-independence-threshold :- s/Num
-     survey-directory :- (s/maybe s/Str)
-     survey-sampling-point-density :- (s/maybe s/Num)
-     survey-notes :- (s/maybe s/Str)]
-  {s/Any s/Any})
+(sch/defrecord TSurvey
+    [survey-name :- sch/Str
+     survey-sighting-independence-threshold :- sch/Num
+     survey-directory :- (sch/maybe sch/Str)
+     survey-sampling-point-density :- (sch/maybe sch/Num)
+     survey-notes :- (sch/maybe sch/Str)]
+  {sch/Any sch/Any})
 
-(s/defrecord Survey
-    [survey-id :- s/Int
+(sch/defrecord Survey
+    [survey-id :- sch/Int
      survey-created :- org.joda.time.DateTime
      survey-updated :- org.joda.time.DateTime
-     survey-name :- s/Str
-     survey-sighting-independence-threshold :- s/Num
-     survey-directory :- (s/maybe s/Str)
-     survey-sampling-point-density :- (s/maybe s/Num)
-     survey-notes :- (s/maybe s/Str)]
-  {s/Any s/Any})
+     survey-name :- sch/Str
+     survey-sighting-independence-threshold :- sch/Num
+     survey-directory :- (sch/maybe sch/Str)
+     survey-sampling-point-density :- (sch/maybe sch/Num)
+     survey-notes :- (sch/maybe sch/Str)]
+  {sch/Any sch/Any})
 
 (defn survey
   [ks]
@@ -41,7 +41,7 @@
   [ks]
   (map->TSurvey (update ks :survey-sighting-independence-threshold #(or % 20))))
 
-(s/defn get-all :- [Survey]
+(sch/defn get-all :- [Survey]
   [state :- State]
   (map survey (query state :get-all)))
 
@@ -86,7 +86,7 @@
            first
            survey))
 
-(s/defn create! :- Survey
+(sch/defn create! :- Survey
   [state :- State
    data :- TSurvey]
   (let [record (query state :create<! data)
@@ -142,7 +142,7 @@
     (either/right id)
     (either/left {:error/type :error.type/not-found})))
 
-(s/defn get-or-create! :- Survey
+(sch/defn get-or-create! :- Survey
   [state :- State
    data :- TSurvey]
   (or (get-specific-by-name state (select-keys data [:survey-name]))

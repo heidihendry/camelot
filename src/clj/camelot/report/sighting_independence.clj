@@ -2,7 +2,7 @@
   "Sighting independence transformations."
   (:require
    [clj-time.core :as t]
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.util.sighting-fields :as util.sf]))
 
 (defn sighting-fields
@@ -101,13 +101,13 @@
                 previous-sighting this-sighting)
                (add-sighting state known-sightings this-sighting))))))
 
-(s/defn datetime-comparison :- s/Bool
+(sch/defn datetime-comparison :- sch/Bool
   "Predicate for whether photo-a is prior to photo-b.
 `f' is a function applied to both prior to the comparison."
   [f ta tb]
   (t/after? (get tb f) (get ta f)))
 
-(s/defn independent-sightings-by-species
+(sch/defn independent-sightings-by-species
   [state sightings]
   (let [indep-reducer (partial independence-reducer state)]
     (->> sightings
@@ -115,7 +115,7 @@
          (sort (partial datetime-comparison :media-capture-timestamp))
          (reduce indep-reducer {}))))
 
-(s/defn sighting-group-independence
+(sch/defn sighting-group-independence
   "Check independence of a group of sightings where they may be considered dependent based on time and sighting information."
   [state sightings]
   (->> (independent-sightings-by-species state sightings)
@@ -123,7 +123,7 @@
        flatten
        (sort-by :media-capture-timestamp)))
 
-(s/defn ->independent-sightings
+(sch/defn ->independent-sightings
   "Process all records, subdividing by trap station session ID before checking
   independence."
   [state sightings]
@@ -133,7 +133,7 @@
        (map (partial sighting-group-independence state))
        (flatten)))
 
-(s/defn extract-independent-sightings
+(sch/defn extract-independent-sightings
   "Extract the sightings, accounting for the independence threshold, for an album."
   [state sightings]
   (let [total-spp (fn [[spp data]] {:species-id spp

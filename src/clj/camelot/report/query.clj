@@ -1,7 +1,7 @@
 (ns camelot.report.query
   "Efficiently perform large queries."
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [medley.core :as medley]
    [camelot.spec.schema.state :refer [State]]
    [camelot.model.camera :as camera]
@@ -111,10 +111,10 @@
                      grorder)]
     (build-records rorder data)))
 
-(s/defn get-by :- [{s/Keyword s/Any}]
+(sch/defn get-by :- [{sch/Keyword sch/Any}]
   "Retrieve the data for the given report type."
   [state :- State
-   by :- s/Keyword]
+   by :- sch/Keyword]
   (if (= by :none)
     []
     (join-all state (if (= by :all)

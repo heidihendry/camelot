@@ -1,6 +1,6 @@
 (ns camelot.model.trap-station-session-camera
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.model.trap-station-session :as trap-station-session]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
@@ -9,23 +9,23 @@
 
 (def query (db/with-db-keys :trap-station-session-cameras))
 
-(s/defrecord TrapStationSessionCamera
-    [trap-station-session-camera-id :- s/Int
+(sch/defrecord TrapStationSessionCamera
+    [trap-station-session-camera-id :- sch/Int
      trap-station-session-camera-created :- org.joda.time.DateTime
      trap-station-session-camera-updated :- org.joda.time.DateTime
-     camera-id :- s/Int
-     trap-station-session-id :- s/Int
-     trap-station-session-camera-media-unrecoverable :- s/Bool
-     trap-station-session-camera-import-path :- (s/maybe s/Str)
-     camera-name :- (s/maybe s/Str)]
-  {s/Any s/Any})
+     camera-id :- sch/Int
+     trap-station-session-id :- sch/Int
+     trap-station-session-camera-media-unrecoverable :- sch/Bool
+     trap-station-session-camera-import-path :- (sch/maybe sch/Str)
+     camera-name :- (sch/maybe sch/Str)]
+  {sch/Any sch/Any})
 
-(s/defrecord TTrapStationSessionCamera
-    [camera-id :- s/Int
-     trap-station-session-id :- s/Int
-     trap-station-session-camera-media-unrecoverable :- s/Bool
-     trap-station-session-camera-import-path :- (s/maybe s/Str)]
-  {s/Any s/Any})
+(sch/defrecord TTrapStationSessionCamera
+    [camera-id :- sch/Int
+     trap-station-session-id :- sch/Int
+     trap-station-session-camera-media-unrecoverable :- sch/Bool
+     trap-station-session-camera-import-path :- (sch/maybe sch/Str)]
+  {sch/Any sch/Any})
 
 (defn trap-station-session-camera
   [ks]
@@ -39,39 +39,39 @@
    (update ks :trap-station-session-camera-media-unrecoverable
            #(or % false))))
 
-(s/defn get-all :- [TrapStationSessionCamera]
+(sch/defn get-all :- [TrapStationSessionCamera]
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (->> {:trap-station-session-id id}
        (query state :get-all)
        (map trap-station-session-camera)))
 
-(s/defn get-all* :- [TrapStationSessionCamera]
+(sch/defn get-all* :- [TrapStationSessionCamera]
   [state :- State]
   (map trap-station-session-camera (query state :get-all* {})))
 
-(s/defn get-specific :- (s/maybe TrapStationSessionCamera)
+(sch/defn get-specific :- (sch/maybe TrapStationSessionCamera)
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (some->> {:trap-station-session-camera-id id}
            (query state :get-specific )
            first
            trap-station-session-camera))
 
-(s/defn get-specific-with-camera-and-session :- (s/maybe TrapStationSessionCamera)
+(sch/defn get-specific-with-camera-and-session :- (sch/maybe TrapStationSessionCamera)
   "Return a session camera given a camera and session ID."
   [state :- State
-   camera-id :- s/Int
-   session-id :- s/Int]
+   camera-id :- sch/Int
+   session-id :- sch/Int]
   (some->> {:trap-station-session-id session-id
             :camera-id camera-id}
            (query state :get-specific-with-camera-and-session)
            first
            trap-station-session-camera))
 
-(s/defn get-specific-by-import-path :- (s/maybe TrapStationSessionCamera)
+(sch/defn get-specific-by-import-path :- (sch/maybe TrapStationSessionCamera)
   [state :- State
-   path :- s/Str]
+   path :- sch/Str]
   (some->> {:trap-station-session-camera-import-path path}
            (query state :get-specific-by-import-path)
            (first)
@@ -83,14 +83,14 @@
         active-sess (trap-station-session/get-active state tid)]
     (not-any? #(= % (:camera-id data)) active-sess)))
 
-(s/defn create!* :- TrapStationSessionCamera
+(sch/defn create!* :- TrapStationSessionCamera
   "Create without checking camera availability."
   [state :- State
    data :- TTrapStationSessionCamera]
   (let [record (query state :create<! data)]
     (trap-station-session-camera (get-specific state (int (:1 record))))))
 
-(s/defn create! :- TrapStationSessionCamera
+(sch/defn create! :- TrapStationSessionCamera
   [state :- State
    data :- TTrapStationSessionCamera]
   {:pre [(camera-available? state data)]}
@@ -102,9 +102,9 @@
         active-sess (trap-station-session/get-active state tid id)]
     (not-any? #(= % (:camera-id data)) active-sess)))
 
-(s/defn update! :- TrapStationSessionCamera
+(sch/defn update! :- TrapStationSessionCamera
   [state :- State
-   id :- s/Int
+   id :- sch/Int
    data :- TTrapStationSessionCamera]
   {:pre [(camera-available-for-update? state id data)]}
   (query state :update!
@@ -118,9 +118,9 @@
        (map :camera-id)
        (remove nil?)))
 
-(s/defn delete!
+(sch/defn delete!
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [fs (media/get-all-files-by-trap-station-session-camera state id)
         ps {:trap-station-session-camera-id id}
         cams (get-active-cameras state ps)]
@@ -129,50 +129,50 @@
     (camera/make-available state cams))
   nil)
 
-(s/defn delete-media!
+(sch/defn delete-media!
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [fs (media/get-all-files-by-trap-station-session-camera state id)]
     (query state :delete-media! {:trap-station-session-camera-id id})
     (media/delete-files! state fs))
   nil)
 
-(s/defn get-available
+(sch/defn get-available
   "Return the available cameras, factoring in whether they're in use elsewhere."
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (query state :get-available))
 
-(s/defn get-alternatives
+(sch/defn get-alternatives
   "Return the current and alternative cameras, factoring in whether they're in
   use elsewhere."
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [res (get-specific state id)]
     (some->> res
              (query state :get-alternatives))))
 
-(s/defn get-or-create-with-camera-and-session! :- TrapStationSessionCamera
+(sch/defn get-or-create-with-camera-and-session! :- TrapStationSessionCamera
   [state :- State
    data :- TTrapStationSessionCamera]
   (or (get-specific-with-camera-and-session
        state (:camera-id data) (:trap-station-session-id data))
       (create!* state data)))
 
-(s/defn get-or-create! :- TrapStationSessionCamera
+(sch/defn get-or-create! :- TrapStationSessionCamera
   [state :- State
    data :- TTrapStationSessionCamera]
   (or (get-specific-by-import-path
        state (:trap-station-session-camera-import-path data))
       (create! state data)))
 
-(s/defn update-media-unrecoverable! :- TrapStationSessionCamera
+(sch/defn update-media-unrecoverable! :- TrapStationSessionCamera
   "Set the media recoverable flag for a given camera and session.  Returns the
   updated session camera."
   [state :- State
-   camera-id :- s/Int
-   trap-station-session-id :- s/Int
-   media-unrecoverable :- s/Bool]
+   camera-id :- sch/Int
+   trap-station-session-id :- sch/Int
+   media-unrecoverable :- sch/Bool]
   (query state :update-media-unrecoverable!
     {:camera-id camera-id
      :trap-station-session-id trap-station-session-id

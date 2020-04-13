@@ -1,37 +1,37 @@
 (ns camelot.model.taxonomy
   (:require
-   [schema.core :as s]
+   [schema.core :as sch]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.util.state :as state]))
 
 (def query (db/with-db-keys :taxonomy))
 
-(s/defrecord TTaxonomy
-    [taxonomy-class :- (s/maybe s/Str)
-     taxonomy-order :- (s/maybe s/Str)
-     taxonomy-family :- (s/maybe s/Str)
-     taxonomy-genus :- (s/maybe s/Str)
-     taxonomy-species :- s/Str
-     taxonomy-common-name :- (s/maybe s/Str)
-     species-mass-id :- (s/maybe s/Int)
-     taxonomy-notes :- (s/maybe s/Str)]
-  {s/Any s/Any})
+(sch/defrecord TTaxonomy
+    [taxonomy-class :- (sch/maybe sch/Str)
+     taxonomy-order :- (sch/maybe sch/Str)
+     taxonomy-family :- (sch/maybe sch/Str)
+     taxonomy-genus :- (sch/maybe sch/Str)
+     taxonomy-species :- sch/Str
+     taxonomy-common-name :- (sch/maybe sch/Str)
+     species-mass-id :- (sch/maybe sch/Int)
+     taxonomy-notes :- (sch/maybe sch/Str)]
+  {sch/Any sch/Any})
 
-(s/defrecord Taxonomy
-    [taxonomy-id :- s/Int
+(sch/defrecord Taxonomy
+    [taxonomy-id :- sch/Int
      taxonomy-created :- org.joda.time.DateTime
      taxonomy-updated :- org.joda.time.DateTime
-     taxonomy-class :- (s/maybe s/Str)
-     taxonomy-order :- (s/maybe s/Str)
-     taxonomy-family :- (s/maybe s/Str)
-     taxonomy-genus :- (s/maybe s/Str)
-     taxonomy-species :- s/Str
-     taxonomy-common-name :- (s/maybe s/Str)
-     species-mass-id :- (s/maybe s/Int)
-     taxonomy-notes :- (s/maybe s/Str)
-     taxonomy-label :- s/Str]
-  {s/Any s/Any})
+     taxonomy-class :- (sch/maybe sch/Str)
+     taxonomy-order :- (sch/maybe sch/Str)
+     taxonomy-family :- (sch/maybe sch/Str)
+     taxonomy-genus :- (sch/maybe sch/Str)
+     taxonomy-species :- sch/Str
+     taxonomy-common-name :- (sch/maybe sch/Str)
+     species-mass-id :- (sch/maybe sch/Int)
+     taxonomy-notes :- (sch/maybe sch/Str)
+     taxonomy-label :- sch/Str]
+  {sch/Any sch/Any})
 
 (def taxonomy map->Taxonomy)
 (def ttaxonomy map->TTaxonomy)
@@ -44,29 +44,29 @@
            (:taxonomy-common-name rec)
            (format "%s %s" (:taxonomy-genus rec) (:taxonomy-species rec)))))
 
-(s/defn get-all :- [Taxonomy]
+(sch/defn get-all :- [Taxonomy]
   [state :- State]
   (map (comp taxonomy (partial add-label state))
        (query state :get-all)))
 
-(s/defn get-all-for-survey :- [Taxonomy]
+(sch/defn get-all-for-survey :- [Taxonomy]
   [state :- State
-   survey-id :- s/Int]
+   survey-id :- sch/Int]
   (some->> {:survey-id survey-id}
            (query state :get-all-for-survey)
            (map (partial add-label state))
            (map taxonomy)))
 
-(s/defn get-specific :- (s/maybe Taxonomy)
+(sch/defn get-specific :- (sch/maybe Taxonomy)
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (some->> {:taxonomy-id id}
            (query state :get-specific)
            first
            (add-label state)
            taxonomy))
 
-(s/defn get-specific-by-taxonomy :- (s/maybe Taxonomy)
+(sch/defn get-specific-by-taxonomy :- (sch/maybe Taxonomy)
   [state :- State
    data :- TTaxonomy]
   (some->> data
@@ -75,39 +75,39 @@
            (add-label state)
            taxonomy))
 
-(s/defn create! :- Taxonomy
+(sch/defn create! :- Taxonomy
   [state :- State
    data :- TTaxonomy]
   (let [record (query state :create<! data)]
     (taxonomy (add-label state (get-specific state (int (:1 record)))))))
 
-(s/defn clone! :- Taxonomy
+(sch/defn clone! :- Taxonomy
   [state :- State
    data :- Taxonomy]
   (let [record (query state :clone<! data)]
     (taxonomy (add-label state (get-specific state (int (:1 record)))))))
 
-(s/defn update! :- Taxonomy
+(sch/defn update! :- Taxonomy
   [state :- State
-   id :- s/Int
+   id :- sch/Int
    data :- TTaxonomy]
   (query state :update! (merge data {:taxonomy-id id}))
   (taxonomy (add-label state (get-specific state id))))
 
-(s/defn delete!
+(sch/defn delete!
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (query state :delete! {:taxonomy-id id})
   nil)
 
-(s/defn delete-from-survey!
+(sch/defn delete-from-survey!
   [state :- State
    {:keys [survey-id taxonomy-id]}]
   (query state :delete-from-survey!
     {:survey-id survey-id :taxonomy-id taxonomy-id})
   nil)
 
-(s/defn get-or-create! :- Taxonomy
+(sch/defn get-or-create! :- Taxonomy
   [state :- State
    data :- TTaxonomy]
   (or (get-specific-by-taxonomy state data)

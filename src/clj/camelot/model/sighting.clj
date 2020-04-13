@@ -7,36 +7,36 @@
    [camelot.model.bounding-box :as bounding-box]
    [camelot.model.suggestion :as suggestion]
    [camelot.util.db :as db]
-   [schema.core :as s])
+   [schema.core :as sch])
   (:import
    (camelot.model.bounding_box BoundingBox)))
 
 (def query (db/with-db-keys :sightings))
 
-(s/defrecord TSighting
-    [sighting-quantity :- s/Int
-     taxonomy-id :- s/Int
-     media-id :- s/Int
-     bounding-box-id :- (s/maybe s/Int)
-     sighting-fields :- (s/maybe {s/Int s/Str})]
-  {s/Any s/Any})
+(sch/defrecord TSighting
+    [sighting-quantity :- sch/Int
+     taxonomy-id :- sch/Int
+     media-id :- sch/Int
+     bounding-box-id :- (sch/maybe sch/Int)
+     sighting-fields :- (sch/maybe {sch/Int sch/Str})]
+  {sch/Any sch/Any})
 
-(s/defrecord TSightingUpdate
-    [sighting-quantity :- s/Int
-     taxonomy-id :- s/Int
-     sighting-fields :- (s/maybe {s/Int s/Str})]
-  {s/Any s/Any})
+(sch/defrecord TSightingUpdate
+    [sighting-quantity :- sch/Int
+     taxonomy-id :- sch/Int
+     sighting-fields :- (sch/maybe {sch/Int sch/Str})]
+  {sch/Any sch/Any})
 
-(s/defrecord Sighting
-    [sighting-id :- s/Int
+(sch/defrecord Sighting
+    [sighting-id :- sch/Int
      sighting-created :- org.joda.time.DateTime
      sighting-updated :- org.joda.time.DateTime
-     sighting-quantity :- s/Int
-     bounding-box :- (s/maybe BoundingBox)
-     taxonomy-id :- (s/maybe s/Int)
-     media-id :- s/Int
-     sighting-label :- s/Str]
-  {s/Any s/Any})
+     sighting-quantity :- sch/Int
+     bounding-box :- (sch/maybe BoundingBox)
+     taxonomy-id :- (sch/maybe sch/Int)
+     media-id :- sch/Int
+     sighting-label :- sch/Str]
+  {sch/Any sch/Any})
 
 (defn sighting
   [data]
@@ -48,20 +48,20 @@
       (data-util/dissoc-if :bounding-box #(nil? (-> % :bounding-box :id)))
       map->Sighting))
 
-(s/defn tsighting :- TSighting
+(sch/defn tsighting :- TSighting
   [data]
   (map->TSighting data))
 
-(s/defn tsighting-update :- TSightingUpdate
+(sch/defn tsighting-update :- TSightingUpdate
   [data]
   (map->TSightingUpdate data))
 
-(s/defn get-all
+(sch/defn get-all
   [state :- State
-   id :- s/Num]
+   id :- sch/Num]
   (map sighting (query state :get-all {:media-id id})))
 
-(s/defn get-all*
+(sch/defn get-all*
   [state :- State]
   (let [sf (sighting-field-value/query-all state)]
     (->> (query state :get-all*)
@@ -73,9 +73,9 @@
     (->> (query state :get-all-for-media-ids {:media-ids media-ids})
          (map #(sighting (merge (get sf (:sighting-id %)) %))))))
 
-(s/defn get-specific
+(sch/defn get-specific
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (some->> {:sighting-id id}
            (query state :get-specific)
            (first)
@@ -99,7 +99,7 @@
       (query s :set-bounding-box! {:sighting-id sighting-id
                                        :bounding-box-id bounding-box-id}))))
 
-(s/defn create!
+(sch/defn create!
   [state data]
   (db/with-transaction [s state]
     (let [record (query s :create<! data)
@@ -110,23 +110,23 @@
           (suggestion/delete-with-bounding-box! s bounding-box-id))
         sighting))))
 
-(s/defn update!
+(sch/defn update!
   [state :- State
-   id :- s/Int
+   id :- sch/Int
    data :- TSightingUpdate]
   (db/with-transaction [s state]
     (query s :update! (merge data {:sighting-id id}))
     (sighting-field-value/update-for-sighting! s id (:sighting-fields data))
     (sighting (get-specific s id))))
 
-(s/defn delete!
+(sch/defn delete!
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (db/with-transaction [s state]
     (sighting-field-value/delete-for-sighting! s id)
     (query s :delete! {:sighting-id id})))
 
-(s/defn delete-with-media-ids!
+(sch/defn delete-with-media-ids!
   [state :- State
    media-ids]
   (->> media-ids
@@ -134,13 +134,13 @@
        (map :sighting-id)
        (map (partial delete! state))))
 
-(s/defn get-available
+(sch/defn get-available
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (query state :get-available {:sighting-id id}))
 
-(s/defn get-alternatives
+(sch/defn get-alternatives
   [state :- State
-   id :- s/Int]
+   id :- sch/Int]
   (let [res (get-specific state id)]
     (query state :get-alternatives res)))

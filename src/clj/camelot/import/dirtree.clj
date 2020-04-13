@@ -3,13 +3,13 @@
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.file :as file]
    [clojure.string :as str]
-   [schema.core :as s])
+   [schema.core :as sch])
   (:import
    (com.drew.imaging ImageMetadataReader)
    (com.drew.metadata Metadata Directory Tag)
    (java.io File)))
 
-(def ImportRawMetadata {s/Str s/Str})
+(def ImportRawMetadata {sch/Str sch/Str})
 (def RawAlbum {java.io.File ImportRawMetadata})
 
 (def RawAlbumSet {java.io.File RawAlbum})
@@ -44,7 +44,7 @@
   [metadata]
   (.getDirectories ^Metadata metadata))
 
-(s/defn exif-file? :- s/Bool
+(sch/defn exif-file? :- sch/Bool
   "Predicate for whether a given file is a usable, exif-containing file."
   [file]
   (or (and (file/file? file)
@@ -83,7 +83,7 @@
   [metadata]
   (map get-tags (get-directories metadata)))
 
-(s/defn extract-file-metadata :- ImportRawMetadata
+(sch/defn extract-file-metadata :- ImportRawMetadata
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map"
   [reader file]
   (or (some->> file
@@ -93,22 +93,22 @@
                (into {}))
       ""))
 
-(s/defn exif-files-in-dir :- [File]
+(sch/defn exif-files-in-dir :- [File]
   "Return a list of the exif files in dir."
-  [dir :- s/Str]
+  [dir :- sch/Str]
   (->> dir
        (file/->file)
        (file-seq)
        (filter exif-file?)))
 
-(s/defn file-raw-metadata :- ImportRawMetadata
+(sch/defn file-raw-metadata :- ImportRawMetadata
   [state file]
   (let [reader #(ImageMetadataReader/readMetadata ^File %)]
     (try
       (extract-file-metadata reader file)
       (catch java.lang.Exception _ {}))))
 
-(s/defn path-components :- ImportRawMetadata
+(sch/defn path-components :- ImportRawMetadata
   "Extract a map of components of the path, relative to the root directory."
   [state :- State
    file :- File]
@@ -118,7 +118,7 @@
          (map-indexed segfn)
          (apply merge))))
 
-(s/defn file-metadata :- ImportRawMetadata
+(sch/defn file-metadata :- ImportRawMetadata
   "Return a pair of the file and its raw metadata."
   [state :- State
    file :- File]
@@ -126,22 +126,22 @@
          (path-components state file)
          {absolute-path-key (file/canonical-path file)}))
 
-(s/defn file-metadata-pair
+(sch/defn file-metadata-pair
   [state :- State
    file :- File]
   (vector file (file-metadata state file)))
 
-(s/defn directory-metadata-collection :- [ImportRawMetadata]
+(sch/defn directory-metadata-collection :- [ImportRawMetadata]
   [state :- State
-   dir :- s/Str]
+   dir :- sch/Str]
   (->> dir
        exif-files-in-dir
        (map (partial file-metadata state))))
 
-(s/defn album-dir-raw-metadata :- RawAlbum
+(sch/defn album-dir-raw-metadata :- RawAlbum
   "Return the raw exif data for files in `dir'."
   [state :- State
-   dir :- s/Str]
+   dir :- sch/Str]
   (->> dir
        (exif-files-in-dir)
        (map (partial file-metadata-pair state))
@@ -164,7 +164,7 @@
   [state dir]
   (vector dir (album-dir-raw-metadata state dir)))
 
-(s/defn read-tree :- RawAlbumSet
+(sch/defn read-tree :- RawAlbumSet
   "Extract photo metadata from all directories in the root.
 Result is grouped by directory.  Only leaves containing (EXIF) photos are
 considered valid.  Result is Either an error or a map with the directory name
