@@ -31,3 +31,13 @@
                                               (:stest/val failure#))})))
                             checks-passed?#)))
         (fn [] (t/test-var (var ~name)))))))
+
+(defmacro with-stubs
+  "Instrument stubs"
+  [stubs & body]
+  `(do
+     (letfn [(instrument-stub# [stub#]
+               (stest/instrument stub# {:stub #{stub#}}))]
+       (doall (map instrument-stub# ~stubs)))
+     ~@body
+     (doall (map stest/unstrument ~stubs))))

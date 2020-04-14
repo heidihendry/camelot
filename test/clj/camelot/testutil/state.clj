@@ -28,15 +28,15 @@
                                     :config default-config
                                     :path {}}))
        :database {:connection {}}
-       :app {}})
+       :app {:port 5341 :browser false}})
   ([config]
    {:config (component/start
              (config/map->Config (merge default-config config)))
     :database {:connection {}}
-    :app {}})
+    :app {:port 5341 :browser false}})
   ([config queries]
    {:config (component/start
              (config/map->Config (merge default-config config)))
     :database {:connection {}
                :queries queries}
-    :app {}}))
+    :app {:port 5341 :browser false}}))

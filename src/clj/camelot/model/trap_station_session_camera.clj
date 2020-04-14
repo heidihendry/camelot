@@ -1,11 +1,15 @@
 (ns camelot.model.trap-station-session-camera
   (:require
+   [camelot.spec.system :as sysspec]
+   [clojure.spec.alpha :as s]
    [schema.core :as sch]
    [camelot.model.trap-station-session :as trap-station-session]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
    [camelot.model.media :as media]
-   [camelot.model.camera :as camera]))
+   [camelot.model.camera :as camera]
+   [clj-time.core :as t]
+   [clj-time.coerce :as tc]))
 
 (def query (db/with-db-keys :trap-station-session-cameras))
 
@@ -179,3 +183,37 @@
      :trap-station-session-camera-media-unrecoverable media-unrecoverable})
   (get-specific-with-camera-and-session state camera-id
                                         trap-station-session-id))
+
+(s/def ::trap-station-session-summary
+  (s/keys :req-un [::survey-id
+                   ::trap-station-id
+                   ::trap-station-name
+                   ::camera-id
+                   ::trap-station-session-id
+                   ::trap-station-session-start-date]
+          :opt-un [::trap-station-session-end-date]))
+
+(s/def ::trap-station-session-summaries
+  (s/coll-of ::trap-station-session-summary :kind vector?))
+
+(s/def ::camera-usage
+  (s/keys :req-un [::trap-station-session-summaries]))
+
+(s/fdef get-camera-usage
+  :args (s/cat :state ::sysspec/state
+               :camera-id int?)
+  :ret ::camera-usage
+  :fn (fn [{:keys [ret]}]
+        (let [summaries (:trap-station-session-summaries ret)]
+          (and (coll? summaries)
+               (let [start-times (map #(-> % :trap-station-session-start-date tc/to-long) summaries)]
+                 (= start-times (sort start-times)))))))
+
+(defn get-camera-usage
+  "Return a chronology for the usage of a camera"
+  [state camera-id]
+  (->> {:camera-id camera-id}
+       (query state :get-camera-usage)
+       (sort-by :trap-station-session-start-date)
+       (vec)
+       (hash-map :trap-station-session-summaries)))

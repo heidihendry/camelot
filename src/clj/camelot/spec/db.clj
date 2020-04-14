@@ -1,8 +1,14 @@
 (ns camelot.spec.db
-  (:require [clojure.spec.alpha :as s]))
+  (:require
+   [clojure.spec.alpha :as s]
+   [clj-time.spec :as tspec]))
 
 (s/def ::1 pos-int?)
 (s/def ::execution-result (s/keys :req-un [::1]))
+
+;; Survey
+
+(s/def ::survey_id int?)
 
 ;; Site
 
@@ -52,3 +58,14 @@
 
 (s/def ::camera_id int?)
 (s/def ::camera-ids (s/keys :req-un [::camera_id]))
+
+;; Trap Station
+
+(s/def ::trap_station_id int?)
+(s/def ::trap_station_name string?)
+
+;; Trap Station Session
+
+(s/def ::trap_station_session_id int?)
+(s/def ::trap_station_session_start_date ::tspec/date-time)
+(s/def ::trap_station_session_end_date (s/nilable ::tspec/date-time))

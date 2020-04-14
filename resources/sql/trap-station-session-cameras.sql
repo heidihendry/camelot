@@ -73,3 +73,12 @@ FROM trap_station_session_camera
 LEFT JOIN trap_station_session USING (trap_station_session_id)
 WHERE trap_station_session_end_date IS NULL AND
       trap_station_session_camera_id = :trap_station_session_camera_id
+
+-- name: get-camera-usage
+SELECT camera_id, trap_station_id, trap_station_name, trap_station_session_id, trap_station_session_start_date,
+       trap_station_session_end_date, survey_id
+FROM trap_station_session_camera
+LEFT JOIN trap_station_session USING (trap_station_session_id)
+LEFT JOIN trap_station USING (trap_station_id)
+LEFT JOIN survey_site USING (survey_site_id)
+WHERE camera_id = :camera_id
