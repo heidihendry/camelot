@@ -23,6 +23,8 @@
     :done "Done"
     :edit "Edit"
     :hide "Hide"
+    :present "Present"
+    :history "History"
     :import "Import"
     :in "in"
     :name "Name"
@@ -507,7 +509,10 @@
 
    :camelot.component.camera.manage
    {:validation-failure-title "Fix the errors above before submitting."
-    :update-camera "Update Camera"}
+    :update-camera "Update camera"
+    :trap-station-column "Trap station"
+    :trap-station-session-start-date-column "Session start date"
+    :trap-station-session-end-date-column "Session end date"}
 
    :camelot.component.library.core
    {:delete-media-question "Do you really want to delete all selected media?"

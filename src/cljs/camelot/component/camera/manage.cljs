@@ -3,7 +3,11 @@
             [camelot.rest :as rest]
             [om.dom :as dom]
             [camelot.nav :as nav]
-            [camelot.translation.core :as tr]))
+            [camelot.translation.core :as tr]
+            [clojure.string :as str]
+            [cljs-time.format :as tf]))
+
+(def ^:private day-formatter (tf/formatter "yyyy-MM-dd"))
 
 (defn form-textarea
   [data owner {:keys [label value-key]}]
@@ -102,6 +106,65 @@
                         (om/build cancel-button (:data data))
                         (om/build submit-button (:data data)))))))
 
+(defn history-table-row
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/tr nil
+              (dom/td nil (dom/a #js {:href (str "/#/" (:survey-id data)
+                                                 "/deployments/"
+                                                 (:trap-station-session-id data))}
+                                 (:trap-station-name data)))
+              (dom/td nil (tf/unparse day-formatter (:trap-station-session-start-date data)))
+              (dom/td nil (let [end (:trap-station-session-end-date data)]
+                            (if end
+                              (tf/unparse day-formatter end)
+                              (tr/translate :words/present))))))))
+
+(defn history-table
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/table #js {:style #js {:table-layout "fixed"}
+                      :className "history-table"}
+                 (dom/thead nil
+                            (dom/tr #js {:className "table-heading"}
+                                    (dom/td nil (tr/translate ::trap-station-column))
+                                    (dom/td nil (tr/translate ::trap-station-session-start-date-column))
+                                    (dom/td nil (tr/translate ::trap-station-session-end-date-column))))
+                 (dom/tbody nil
+                            (om/build-all history-table-row data))))))
+
+(defn history-section
+  [data owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:loading? true})
+    om/IDidMount
+    (did-mount [_]
+      (println (:data data))
+      (let [camera-id (get-in data [:data :camera-id :value])]
+        (rest/get-x (str "/trap-station-session-cameras/camera/" camera-id)
+                    #(do
+                       (println (:body %))
+                       (om/set-state! owner :history (get-in (:body %) [:trap-station-session-summaries :value]))
+                       (om/set-state! owner :loading? false)))))
+    om/IRenderState
+    (render-state [_ state]
+      (dom/div nil
+               (dom/br nil)
+               (dom/h5 nil (tr/translate :words/history))
+               (if (:loading? state)
+                 (dom/div #js {:className "align-center"}
+                          (dom/img #js {:className "spinner"
+                                        :src "images/spinner.gif"
+                                        :height "32"
+                                        :width "32"}))
+                 (om/build history-table (:history state)))))))
+
 (defn manage-component
   [data owner]
   (reify
@@ -114,4 +177,5 @@
                                         (tr/translate ::update-camera)
                                         v))))
                (dom/div #js {:className "single-section"}
-                        (om/build form-component data))))))
+                        (om/build form-component data)
+                        (om/build history-section data))))))

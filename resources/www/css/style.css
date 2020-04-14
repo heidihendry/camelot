@@ -1476,6 +1476,13 @@ pre.field-input {
     text-align: right;
     width: 22rem;
 }
+
+#app .split-menu .history-table td:last-child,
+#app .split-menu .history-table th:last-child {
+    width: auto;
+    text-align: left;
+}
+
 #app .split-menu .survey-details-pane {
     display: flex;
     flex-direction: column;
