@@ -61,7 +61,7 @@
 (defn- get-status-by-name
   "Get the status ID given the status's name."
   [state status]
-  (->> (str "camera-statusch/" status)
+  (->> (str "camera-status/" status)
        (get-specific-with-description state)
        :camera-status-id))
 
