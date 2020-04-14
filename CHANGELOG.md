@@ -2,7 +2,8 @@
 
 ### 1.6.0 [Unreleased]
 #### Added
-* Automated animal detection.
+* Adds automated animal detection.
+* Adds historic camera usage to camera details page.
 
 #### Changed
 * Library search query language is now much more powerful and much faster.
