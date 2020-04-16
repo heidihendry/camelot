@@ -99,7 +99,13 @@
   [conn]
   (map :survey_id (-get-survey-ids {} conn)))
 
-(db/with-transaction [s {:database {:connection (state/spec)}}]
-  (let [conn (select-keys (:database s) [:connection])]
-    (doseq [survey (-m040-get-survey-ids conn)]
-      (-m040-migrate-survey-data conn survey))))
+(defn- -m040-upgrade
+  [state]
+  (db/with-transaction [s state]
+    (let [conn (state/lookup-connection s)]
+      (doseq [survey (-m040-get-survey-ids conn)]
+        (-m040-migrate-survey-data conn survey)))))
+
+(let [system-config (state/system-config)
+      system-state (state/config->state system-config)]
+  (dorun (state/map-datasets -m040-upgrade system-state)))

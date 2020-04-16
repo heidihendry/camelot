@@ -9,7 +9,13 @@
   (let [q {:sighting_field_keys ["lifestage" "sex"]}]
     (map :sighting_field_id (-get-migrated-sighting-fields q conn))))
 
-(db/with-transaction [s {:database {:connection (state/spec)}}]
-  (let [conn (select-keys (:database s) [:connection])]
-    (doseq [sighting-field (-m040-get-migrated-sighting-fields conn)]
-      (-delete-field! {:sighting_field_id sighting-field} conn))))
+(defn- -m040-downgrade
+  [state]
+  (db/with-transaction [s state]
+    (let [conn (state/lookup-connection s)]
+      (doseq [sighting-field (-m040-get-migrated-sighting-fields conn)]
+        (-delete-field! {:sighting_field_id sighting-field} conn)))))
+
+(let [system-config (state/system-config)
+      system-state (state/config->state system-config)]
+  (dorun (state/map-datasets -m040-downgrade system-state)))

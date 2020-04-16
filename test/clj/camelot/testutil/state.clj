@@ -25,18 +25,21 @@
 (defn gen-state
   ([] {:config (component/start
                 (config/map->Config {:store (atom {})
-                                    :config default-config
-                                    :path {}}))
-       :database {:connection {}}
-       :app {:port 5341 :browser false}})
+                                     :config default-config
+                                     :path {}}))
+       :database {:connections {:default {}}}
+       :app {:port 5341 :browser false}
+       :session {:dataset-id :default}})
   ([config]
    {:config (component/start
              (config/map->Config (merge default-config config)))
-    :database {:connection {}}
-    :app {:port 5341 :browser false}})
+    :database {:connections {:default {}}}
+    :app {:port 5341 :browser false}
+    :session {:dataset-id :default}})
   ([config queries]
    {:config (component/start
              (config/map->Config (merge default-config config)))
-    :database {:connection {}
+    :database {:connections {:default {}}
                :queries queries}
-    :app {:port 5341 :browser false}}))
+    :app {:port 5341 :browser false}
+    :session {:dataset-id :default}}))

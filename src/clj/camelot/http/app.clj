@@ -5,6 +5,7 @@
    [ring.util.response :as r]
    [compojure.core :refer [context GET POST]]
    [camelot.model.screens :as screens]
+   [camelot.util.state :as state]
    [camelot.util.db-migrate :as db-migrate]
    [camelot.util.version :as version]
    [camelot.util.network :as network]))
@@ -23,14 +24,22 @@
    :headers {"Content-Type" "application/octet-stream; charset=utf-8"}
    :body nil})
 
+(defn- db-versions
+  [state]
+  (into {}
+        (state/map-datasets
+         (fn [s]
+           (let [conn (state/lookup-connection s)]
+             [(state/get-dataset-id s) (db-migrate/version conn)]))
+         state)))
+
 (defn- heartbeat
   [state]
-  (let [conn (get-in state [:database :connection])]
-    {:status 200
-     :headers {"Content-Type" "application/json; charset=utf-8"}
-     :body (json/write-str {:status "OK"
-                            :software-version (version/get-version)
-                            :database-version (db-migrate/version conn)})}))
+  {:status 200
+   :headers {"Content-Type" "application/json; charset=utf-8"}
+   :body (json/write-str {:status "OK"
+                          :software-version (version/get-version)
+                          :database-versions (db-versions state)})})
 
 (defn- runtime
   [state]
