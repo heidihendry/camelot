@@ -9,10 +9,8 @@
 (defn- -m030-downgrade
   [state]
   (db/with-transaction [s state]
-    (let [conn (state/lookup-connection s)]
+    (let [conn {:connection (state/lookup-connection s)}]
       (doseq [st (-get-all-survey-taxonomy {} conn)]
         (-delete! {:survey_taxonomy_id st} conn)))))
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m030-downgrade system-state)))
+(-m030-downgrade camelot.system.db.core/*migration-state*)

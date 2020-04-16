@@ -38,6 +38,4 @@
                      (file/rename f (file/->file prefix-dir
                                                  (file/get-name f))))))))))
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m038-upgrade system-state)))
+(-m038-upgrade camelot.system.db.core/*migration-state*)

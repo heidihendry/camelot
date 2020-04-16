@@ -4,7 +4,7 @@
    [camelot.util.state :as state]
    [camelot.system.state :as sysstate]
    [camelot.system.systems :as systems]
-   [camelot.util.db-migrate :as db-migrate]
+   [camelot.util.maintenance :as maintenance]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
    [ring.middleware.reload :refer [wrap-reload]]
@@ -25,11 +25,11 @@
 ;; TODO these are no longer so convenient.  May want to add dataset-id param?
 (defn migrate
   [state]
-  (db-migrate/migrate (state/lookup-connection state)))
+  (maintenance/migrate state))
 
 (defn rollback
   [state]
-  (db-migrate/rollback (state/lookup-connection state)))
+  (maintenance/rollback state))
 
 (defn runprod []
   (camelot.core/start-prod))

@@ -102,10 +102,8 @@
 (defn- -m040-upgrade
   [state]
   (db/with-transaction [s state]
-    (let [conn (state/lookup-connection s)]
+    (let [conn {:connection (state/lookup-connection s)}]
       (doseq [survey (-m040-get-survey-ids conn)]
         (-m040-migrate-survey-data conn survey)))))
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m040-upgrade system-state)))
+(-m040-upgrade camelot.system.db.core/*migration-state*)

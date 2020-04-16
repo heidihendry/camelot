@@ -6,10 +6,8 @@
 (defn- -m021-delete-taxonomies
   [state]
   (db/with-transaction [s state]
-    (let [conn (state/lookup-connection s)
+    (let [conn {:connection (state/lookup-connection s)}
           taxonomies (-get-all {} conn)]
       (dorun (map #(-delete! {:taxonomy_id %} conn) taxonomies)))))
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m021-delete-taxonomies system-state)))
+(-m021-delete-taxonomies camelot.system.db.core/*migration-state*)

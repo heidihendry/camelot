@@ -12,10 +12,8 @@
 (defn- -m040-downgrade
   [state]
   (db/with-transaction [s state]
-    (let [conn (state/lookup-connection s)]
+    (let [conn {:connection (state/lookup-connection s)}]
       (doseq [sighting-field (-m040-get-migrated-sighting-fields conn)]
         (-delete-field! {:sighting_field_id sighting-field} conn)))))
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m040-downgrade system-state)))
+(-m040-downgrade camelot.system.db.core/*migration-state*)

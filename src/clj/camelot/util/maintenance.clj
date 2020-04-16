@@ -1,5 +1,6 @@
 (ns camelot.util.maintenance
   (:require
+   [camelot.system.db.core :as sysdb]
    [camelot.util.file :as file]
    [clojure.java.io :as io]
    [camelot.util.db :as dbutil]
@@ -63,5 +64,13 @@
 (defn migrate
   "Upgrade the database."
   [state]
-  (if-let [db-conn (state/lookup-connection state)]
-    (db-migrate/migrate db-conn)))
+  (binding [sysdb/*migration-state* state]
+    (if-let [db-conn (state/lookup-connection state)]
+      (db-migrate/migrate db-conn))))
+
+(defn rollback
+  "Rollback the database."
+  [state]
+  (binding [sysdb/*migration-state* state]
+    (if-let [db-conn (state/lookup-connection state)]
+      (db-migrate/rollback db-conn))))

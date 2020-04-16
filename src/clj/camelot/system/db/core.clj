@@ -8,6 +8,8 @@
   (:import
    (java.io IOException)))
 
+(def ^:dynamic *migration-state* nil)
+
 (def query-files
   ["bounding-box"
    "camera-status"

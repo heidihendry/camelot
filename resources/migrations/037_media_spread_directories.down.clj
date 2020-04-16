@@ -17,6 +17,4 @@
             (file-seq media-dir)))))
 
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m037-migrate system-state)))
+(-m037-migrate camelot.system.db.core/*migration-state*)

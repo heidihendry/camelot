@@ -67,10 +67,10 @@
 (defn with-connection
   "Run a query with the given connection, if any."
   ([ks state q]
-   (if-let [conn (state/lookup-connection state)]
+   (if-let [conn {:connection (state/lookup-connection state)}]
      (q ks conn)))
   ([state q]
-   (if-let [conn (state/lookup-connection state)]
+   (if-let [conn {:connection (state/lookup-connection state)}]
      (q {} conn))))
 
 (defn get-query

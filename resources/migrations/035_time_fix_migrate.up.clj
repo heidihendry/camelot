@@ -40,7 +40,7 @@
   [state]
   (db/with-transaction [s state]
     ;; TODO
-    (let [conn (state/lookup-connection s)]
+    (let [conn {:connection (state/lookup-connection s)}]
       (migrate-table! conn -get-surveys -migrate-survey!)
       (migrate-table! conn -get-sites -migrate-site!)
       (migrate-table! conn -get-survey-sites -migrate-survey-site!)
@@ -56,6 +56,4 @@
       (migrate-table! conn -get-photos -migrate-photo!))
     nil))
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m035-upgrade system-state)))
+(-m035-upgrade camelot.system.db.core/*migration-state*)

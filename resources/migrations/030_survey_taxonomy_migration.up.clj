@@ -29,10 +29,8 @@
   [state]
   (db/with-transaction [s state]
     ;; TODO and all like this
-    (let [conn (state/lookup-connection s)]
+    (let [conn {:connection (state/lookup-connection s)}]
       (doseq [p (-m030-all-pairs conn)]
         (-create<! (-m030-->survey-taxonomy p) conn)))))
 
-(let [system-config (state/system-config)
-      system-state (state/config->state system-config)]
-  (dorun (state/map-datasets -m030-upgrade system-state)))
+(-m030-upgrade camelot.system.db.core/*migration-state*)
