@@ -7,6 +7,7 @@
    [camelot.http.camera :as camera]
    [camelot.http.camera-status :as camera-status]
    [camelot.http.camera-deployment :as camera-deployment]
+   [camelot.http.dataset :as dataset]
    [camelot.http.deployment :as deployment]
    [camelot.http.detector :as detector]
    [camelot.http.import :as import]
@@ -36,6 +37,7 @@
   camera/routes
   camera-deployment/routes
   camera-status/routes
+  dataset/routes
   deployment/routes
   detector/routes
   import/routes

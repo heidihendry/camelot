@@ -1905,6 +1905,18 @@ pre.field-input {
     color: #fafafa;
     border-right: none;
 }
+#navigation .nav li#dataset-selection-nav:hover {
+  background: none;
+}
+#navigation li#dataset-selection-nav {
+    float: right;
+    position: relative;
+}
+#navigation #dataset-selection-nav select {
+    position: relative;
+    margin-top: 0.7rem;
+    opacity: 0.7;
+}
 #bulk-import-progress-nav .bulk-import-progress {
     padding-top: 1.2rem;
 }

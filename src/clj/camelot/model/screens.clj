@@ -17,6 +17,7 @@
                    :label (tr/translate state :application/detector)})
                 {:url "/about"
                  :label (tr/translate state :application/about)}
+                {:function "dataset-selection"}
                 {:function "bulk-import-progress"}]})
 
 (defn- translate-fn
