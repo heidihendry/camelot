@@ -4,7 +4,8 @@
    [camelot.market.config :as market-config]
    [clj-time.core :as t]
    [clj-time.format :as tf]
-   [clojure.java.io :as io]))
+   [clojure.java.io :as io]
+   [clojure.string :as str]))
 
 (defn- deep-merge
   "Merge maps in `ms` recursively"
@@ -42,9 +43,9 @@
   []
   (let [config (read-config)]
     (-> config
-        (assoc :dataset-ids (set (keys (:datasets config)))))))
+        (assoc :dataset-ids (sort-by str/lower-case (keys (:datasets config)))))))
 
-(defn- get-dataset-ids
+(defn get-dataset-ids
   [state]
   (-> state :config :dataset-ids))
 

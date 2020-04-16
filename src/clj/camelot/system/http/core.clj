@@ -12,12 +12,14 @@
    [ring.adapter.jetty :refer [run-jetty]]
    [muuntaja.middleware :as muuntaja-middleware]
    [camelot.system.http.log :refer [wrap-with-logger]]
+   [camelot.system.http.dataset :refer [wrap-dataset-selection]]
    [ring.middleware.json :refer [wrap-json-response]]
    [ring.middleware.stacktrace :refer [wrap-stacktrace-log]]
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
    [ring.middleware.params :refer [wrap-params]]
    [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
    [ring.middleware.transit :refer [wrap-transit-response wrap-transit-params]]
+   [ring.middleware.cookies :refer [wrap-cookies]]
    [ring.middleware.session :refer [wrap-session]]
    [ring.middleware.session.cookie :refer [cookie-store]]
    [ring.middleware.gzip :refer [wrap-gzip]])
@@ -44,6 +46,7 @@
 (def http-handler
   (compojure/routes
    (-> http/app-routes
+       wrap-dataset-selection
        wrap-params
        wrap-system
        errors-to-internal-server-error
@@ -56,6 +59,7 @@
        wrap-with-logger
        wrap-gzip)
    (-> api/core-api
+       wrap-dataset-selection
        wrap-system
        muuntaja-middleware/wrap-format
        errors-to-internal-server-error
