@@ -7,26 +7,18 @@
 
 (def default-config
   "Return the default configuration."
-  {:erroneous-infrared-threshold 0.2
-   :infrared-iso-value-threshold 999
-   :language :en
-   :root-path "/path/to/root"
-   :night-end-hour 5
+  {:language :en
    :send-usage-data false
-   :night-start-hour 21
-   :project-start (t/date-time 2012 12 12 12 12 12)
-   :project-end (t/date-time 2015 3 15 15 15 15)
-   :sighting-independence-minutes-threshold 20
-   :surveyed-species []
+   :server {:http-port 5341}
    :required-fields [[:headline] [:artist] [:phase] [:copyright]
                      [:location :gps-longitude] [:location :gps-latitude]
-                     [:datetime] [:filename]]})
+                     [:datetime] [:filename]]
+   :paths {:root "/path/to/root"}
+   :datasets {:default {}}})
 
 (defn gen-state
   ([] {:config (component/start
-                (config/map->Config {:store (atom {})
-                                     :config default-config
-                                     :path {}}))
+                (config/map->Config default-config))
        :database {:connections {:default {}}}
        :app {:port 5341 :browser false}
        :session {:dataset-id :default}})
