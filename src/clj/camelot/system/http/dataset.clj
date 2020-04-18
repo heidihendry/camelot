@@ -20,7 +20,9 @@
 
 (defn- scoped-to-dataset?
   [request]
-  (boolean (get-in request [:session :dataset-id])))
+  (let [dataset-id (get-in request [:session :dataset-id])]
+    (and (boolean dataset-id)
+         ((set (state/get-dataset-ids (:system request))) dataset-id))))
 
 (defn- scope-to-default-dataset
   [handler request]
