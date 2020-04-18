@@ -126,12 +126,12 @@
 
 (defn submitted-task?
   [detector-state task-id]
-  (= (get-task detector-state task-id) "submitted"))
+  (= (:status (get-task detector-state task-id)) "submitted"))
 
 (defn completed-task?
   [detector-state task-id]
-  (or (= (get-task detector-state task-id) "completed")
-      (= (get-task detector-state task-id) "archived")))
+  (or (= (:status (get-task detector-state task-id)) "completed")
+      (= (:status (get-task detector-state task-id)) "archived")))
 
 (defn submitted-task-for-session-camera?
   [detector-state scid]
