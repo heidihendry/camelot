@@ -4,11 +4,10 @@
 (sql/defqueries "sql/migration-helpers/021.sql")
 
 (defn- -m021-delete-taxonomies
-  []
-  (let [state {:database {:connection (state/spec)}}]
-    (db/with-transaction [s state]
-      (let [conn(select-keys (:database s) [:connection])
-            taxonomies (-get-all {} conn)]
-        (dorun (map #(-delete! {:taxonomy_id %} conn) taxonomies))))))
+  [state]
+  (db/with-transaction [s state]
+    (let [conn {:connection (state/lookup-connection s)}
+          taxonomies (-get-all {} conn)]
+      (dorun (map #(-delete! {:taxonomy_id %} conn) taxonomies)))))
 
-(-m021-delete-taxonomies)
+(-m021-delete-taxonomies camelot.system.db.core/*migration-state*)

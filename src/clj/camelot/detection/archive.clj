@@ -1,5 +1,6 @@
 (ns camelot.detection.archive
   (:require
+   [camelot.detection.datasets :as datasets]
    [camelot.detection.client :as client]
    [camelot.detection.state :as state]
    [camelot.detection.util :as util]
@@ -8,7 +9,7 @@
 
 (defn run
   "Archive tasks."
-  [state detector-state-ref event-ch]
+  [system-state detector-state-ref event-ch]
   (let [cmd-ch (async/chan (async/dropping-buffer 100))
         ch (async/chan)]
     (async/go-loop []
@@ -25,12 +26,14 @@
             (recur))
 
           ch
-          (do
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [state]
             (async/>! event-ch v)
             (let [task-id (:subject-id v)]
               (try
                 (client/archive-task state task-id)
-                (state/archive-task! detector-state-ref task-id)
+                (state/archive-task! (datasets/detector-state state detector-state-ref) task-id)
                 (log/info "Archival successful for task" task-id)
                 (async/>! event-ch {:action :archive-success
                                     :subject :task

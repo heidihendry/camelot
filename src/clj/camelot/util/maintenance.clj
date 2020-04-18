@@ -1,5 +1,6 @@
 (ns camelot.util.maintenance
   (:require
+   [camelot.system.db.core :as sysdb]
    [camelot.util.file :as file]
    [clojure.java.io :as io]
    [camelot.util.db :as dbutil]
@@ -16,7 +17,7 @@
   "Returns `true` if a migration with a newer version than currently applied
   to the database is available. `false` otherwise."
   [state]
-  (let [conn (-> state :database :connection)]
+  (let [conn (state/lookup-connection state)]
     (db-migrate/migrations-available? conn)))
 
 (defn upgrade-plan
@@ -25,16 +26,16 @@
   `:to`, which is the version the latest version the database can be upgraded
   to."
   [state]
-  (let [conn (-> state :database :connection)]
+  (let [conn (state/lookup-connection state)]
     {:from (db-migrate/version conn)
      :to (db-migrate/latest-available-version conn)}))
 
 (defn is-db-initialised?
   "Returns `true` if the database looks initialized. `false` otherwise.
   Based on a simple directory heuristic. Don't trust it with your life."
-  [config]
+  [state]
   (try
-    (let [path (get-in config [:paths :database])
+    (let [path (state/lookup-path state :database)
           cdir (io/file path derby-container-dir)]
       (and (file/exists? cdir)
            (file/directory? cdir)))
@@ -63,4 +64,13 @@
 (defn migrate
   "Upgrade the database."
   [state]
-  (db-migrate/migrate (-> state :database :connection)))
+  (binding [sysdb/*migration-state* state]
+    (if-let [db-conn (state/lookup-connection state)]
+      (db-migrate/migrate db-conn))))
+
+(defn rollback
+  "Rollback the database."
+  [state]
+  (binding [sysdb/*migration-state* state]
+    (if-let [db-conn (state/lookup-connection state)]
+      (db-migrate/rollback db-conn))))

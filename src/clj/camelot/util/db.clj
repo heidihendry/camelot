@@ -1,6 +1,7 @@
 (ns camelot.util.db
   (:require
    [clojure.spec.alpha :as s]
+   [camelot.util.state :as state]
    [camelot.spec.system :as sysspec]
    [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
@@ -11,21 +12,23 @@
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]
-  `(jdbc/with-db-transaction [tx# (get-in ~state [:database :connection])]
-     (let [~bind (assoc-in (assoc-in ~state [:database :default-connection]
-                                     (get-in ~state [:database :connection]))
-                           [:database :connection] tx#)]
-       ~@body)))
+  `(let [dataset-id# (state/get-dataset-id ~state)]
+     (jdbc/with-db-transaction [tx# (get-in ~state [:database :connections dataset-id#])]
+       (let [~bind (assoc-in (assoc-in ~state [:database :default-connections dataset-id#]
+                                       (get-in ~state [:database :connections dataset-id#]))
+                             [:database :connections dataset-id#] tx#)]
+         ~@body))))
 
 (defmacro async-with-transaction
   "Run `body' with a new transaction, created from the default connection.
 
-Intended for async operations which are already running within a transaction."
+  Intended for async operations which are already running within a transaction."
   [[bind state] & body]
-  `(jdbc/with-db-transaction [tx# (get-in ~state [:database :connection])]
-     (let [~bind (assoc-in ~state [:database :connection]
-                         (get-in ~state [:database :default-connection]))]
-     ~@body)))
+  `(let [dataset-id# (state/get-dataset-id ~state)]
+     (jdbc/with-db-transaction [tx# (get-in ~state [:database :connections dataset-id#])]
+       (let [~bind (assoc-in ~state [:database :connections dataset-id#]
+                             (get-in ~state [:database :default-connections dataset-id#]))]
+         ~@body))))
 
 (defn- clj-key
   "Reducer for translating from database types.
@@ -64,11 +67,11 @@ Intended for async operations which are already running within a transaction."
 (defn with-connection
   "Run a query with the given connection, if any."
   ([ks state q]
-   (if-let [conn (get-in state [:database :connection])]
-     (q ks {:connection conn})))
+   (if-let [conn {:connection (state/lookup-connection state)}]
+     (q ks conn)))
   ([state q]
-   (if-let [conn (get-in state [:database :connection])]
-     (q {} {:connection conn}))))
+   (if-let [conn {:connection (state/lookup-connection state)}]
+     (q {} conn))))
 
 (defn get-query
   [state scope qkey]

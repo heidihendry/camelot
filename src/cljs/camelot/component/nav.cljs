@@ -5,10 +5,12 @@
             [camelot.component.progress-bar :as progress-bar]
             [cljs.core.async :refer [<! chan >! timeout]]
             [camelot.state :as state]
+            [camelot.init :as init]
             [camelot.rest :as rest]
             [camelot.translation.core :as tr]
             [goog.date.duration :as duration]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [secretary.core :as secretary])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
 (def bulk-import-refresh-long-timeout 5000)
@@ -175,6 +177,43 @@
                             " "
                             (dom/span nil (int (* p 100)) "%"))))))))
 
+(defn render-dataset-option
+  [data owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/option #js {:value (name data)
+                       :key data} (name data)))))
+
+(defn navigate-home
+  []
+  (-> (nav/nav! "/organisation")
+      (secretary/dispatch!)))
+
+(defn dataset-selection-component
+  [_ owner]
+  (reify
+    om/IInitState
+    (init-state [_]
+      {:dataset-ids []})
+    om/IDidMount
+    (did-mount [_]
+      (rest/get-x "/dataset"
+                  #(do
+                     (om/set-state! owner :dataset-ids (:dataset-ids (:body %)))
+                     (om/set-state! owner :selected-dataset (:selected-dataset (:body %))))))
+    om/IRenderState
+    (render-state [_ state]
+      (let [options (:dataset-ids state)]
+        (when (> (count options) 1)
+          (dom/div nil
+                   (dom/select #js {:value (name (:selected-dataset state))
+                                    :title "Select a dataset"
+                                    :onChange #(let [dataset-id (.. % -target -value)]
+                                                 (rest/post-x (str "/dataset/select/" dataset-id) {}
+                                                              (fn [_] (init/init-screen-state navigate-home))))}
+                               (om/build-all render-dataset-option options))))))))
+
 (defn nav-item-component
   "Render a list item for an item in the navigation bar."
   [data owner]
@@ -188,6 +227,10 @@
                      :onMouseOut #(om/update! data :show-bulk-import-details false)}
                 (dom/div #js {:className "bulk-import-progress-container"}
                          (om/build bulk-import-progress-component data)))
+
+        (= (:function data) "dataset-selection")
+        (dom/li #js {:id "dataset-selection-nav"}
+                (om/build dataset-selection-component data))
 
         :else
         (dom/li #js {:className (if (:experimental data) "experimental"

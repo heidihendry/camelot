@@ -8,6 +8,8 @@
   (:import
    (java.io IOException)))
 
+(def ^:dynamic *migration-state* nil)
+
 (def query-files
   ["bounding-box"
    "camera-status"
@@ -61,17 +63,14 @@
     (catch Exception e
       (log/info (.getMessage e)))))
 
-(sch/defrecord Database
-    [connection :- clojure.lang.PersistentArrayMap]
-
+(defrecord Database [connections]
   component/Lifecycle
   (start [this]
-    (connect connection)
+    (doall (map connect (vals connections)))
     (assoc this :queries (build-queries)))
 
   (stop [this]
-    (when connection
-      (close connection))
+    (doall (map close (vals connections)))
     (-> this
-        (assoc :connection nil)
+        (assoc :connections nil)
         (assoc :queries nil))))

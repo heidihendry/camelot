@@ -10,13 +10,13 @@
 
 (defn start-prod
   ([]
-   (start-prod (state/read-config)))
+   (start-prod (state/system-config)))
   ([config]
    (system/begin config)
    (system/user-mode!)))
 
 (defn -main [& args]
-  (let [config (state/read-config)]
+  (let [config (state/system-config)]
     (if-let [port (:debugger-port config)]
       (nrepl/start-server :port port))
     (start-prod config)))

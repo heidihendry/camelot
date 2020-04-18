@@ -93,19 +93,6 @@ These settings allows customisation of where Camelot stores its data.
 locations. When changing any of these locations, any existing data you wish to
 continue to use **must** be moved to this location manually.
 
-* **Media location**: where Camelot's images should be stored. **Note** that this
-  should not be the same location as *you* store your images. Camelot will
-  maintain its own copy of any images, folders and images stored in this
-  location **should not** be modified.
-* **Database location**: the folder where Camelot will store its database. The
-  Database folder **must not** be modified.  If you have an existing database
-  you wish to use, this should be set to the **parent** of the "Database"
-  folder.
-* **FileStore location**: any files related to a survey can be uploaded to
-  Camelot under the "survey files" menu. These files will be stored in this
-  folder.  Files and folders in this location **should not** be modified.
-* **Backup location**: Camelot will automatically back up its database before
-  doing a database upgrade. These backups will be stored here.
 * **Installation location**: The folder where the camelot .jar file is
   stored.
 * **Log file location**: The location where Camelot log files are stored.

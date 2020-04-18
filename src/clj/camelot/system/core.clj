@@ -18,13 +18,9 @@
 
 (defn- switch-mode
   "Switch Camelot's lifecycle to the given mode."
-  ([chan new-mode]
-   (>!! chan {:action new-mode})
-   (wait chan))
-  ([chan new-mode payload]
-   (>!! chan {:action new-mode
-              :payload payload})
-   (wait chan)))
+  [chan new-mode]
+  (>!! chan {:action new-mode})
+  (wait chan))
 
 (defprotocol Lifecycle
   (user-mode [_]
@@ -49,25 +45,25 @@
     (swap! state/system component/stop)))
 
 (defn- build-lifecycle
-  [config]
+  [system-config]
   (let [ch (chan lifecycle-chan-buf-size)]
     (go-loop []
-      (let [{:keys [action payload]} (<! ch)]
+      (let [{:keys [action]} (<! ch)]
         (condp = action
           :pre-init
           (do
             (stop-running-system)
-            (reset! state/system (systems/pre-init config payload)))
+            (reset! state/system (systems/pre-init system-config)))
 
           :user
           (do
             (stop-running-system)
-            (reset! state/system (systems/camelot config)))
+            (reset! state/system (systems/camelot system-config)))
 
           :maintenance
           (do
             (stop-running-system)
-            (reset! state/system (systems/maintenance config)))
+            (reset! state/system (systems/maintenance system-config)))
           nil))
       (recur))
     (LifecycleImpl. ch)))
@@ -86,7 +82,7 @@
   "Create the application lifecycle."
   ([]
    (begin {}))
-  ([config]
+  ([system-config]
    (when-not lifecycle
      (alter-var-root #'lifecycle
-                     (fn [_] (build-lifecycle config))))))
+                     (fn [_] (build-lifecycle system-config))))))

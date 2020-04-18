@@ -26,25 +26,25 @@
 
 (defn- -m021-species-genus-migration
   [s]
-  (let [spps (-get-all-species {} (select-keys (:database s) [:connection]))
-        build (comp #(-create-taxonomy<! % (select-keys (:database s) [:connection]))
+  (let [spps (-get-all-species {} {:connection (state/lookup-connection s)})
+        build (comp #(-create-taxonomy<! % {:connection (state/lookup-connection s)})
                     -m021-create-taxonomy)]
     (->> spps
          (map #(hash-map :species_id (:species_id %)
                          :taxonomy_id (int (:1 (build %)))))
-         (map #(-update-sightings! % (select-keys (:database s) [:connection])))
+         (map #(-update-sightings! % {:connection (state/lookup-connection s)}))
          (doall))))
 
 (defn- -m021-remove-unnecessary-constraints
   [s]
   (let [constraints (-get-constraints {:source_table "SIGHTING"
                                        :relation_table "SPECIES"}
-                                      (select-keys (:database s) [:connection]))]
+                                      {:connection (state/lookup-connection s)})]
     (doseq [c constraints]
-      (jdbc/db-do-commands (get-in s [:database :connection])
+      (jdbc/db-do-commands (state/lookup-connection s)
                            (str "ALTER TABLE sighting DROP CONSTRAINT "
                                 (:constraintname c))))))
 
-(db/with-transaction [s {:database {:connection (state/spec)}}]
+(db/with-transaction [s camelot.system.db.core/*migration-state*]
   (-m021-remove-unnecessary-constraints s)
   (-m021-species-genus-migration s))

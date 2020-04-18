@@ -1,5 +1,7 @@
 (ns camelot.detection.bootstrap
   (:require
+   [camelot.util.state :as util.state]
+   [camelot.detection.datasets :as datasets]
    [camelot.model.trap-station-session-camera :as session-camera]
    [camelot.model.media :as media]
    [camelot.detection.state :as state]
@@ -33,22 +35,29 @@
 
 (defn run
   "Queue session cameras for preparation."
-  [state detector-state-ref event-ch]
+  [system-state detector-state-ref event-ch]
   (let [ch (async/chan 1)
         int-ch (async/chan (async/dropping-buffer 100000))]
     (log/info "Queuing session cameras")
     (async/go
       (async/>! event-ch {:action :bootstrap-retrieve
                           :subject :global})
-      (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
-      (doseq [batch (retrieve-tasks state @detector-state-ref)]
-        (async/>! int-ch batch)))
+      (doseq [dataset-id (util.state/get-dataset-ids system-state)]
+        (datasets/with-context {:system-state system-state
+                                :ctx {:dataset-id dataset-id}}
+          [state]
+          (let [detector-state-ref (datasets/detector-state state detector-state-ref)]
+            (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
+            (doseq [batch (retrieve-tasks state @detector-state-ref)]
+              (async/>! int-ch batch))))))
     (async/go-loop []
       (let [timeout-ch (async/timeout base-timeout-ms)
             [v port] (async/alts! [int-ch timeout-ch] :priority true)]
         (condp = port
           int-ch
-          (do
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [_]
             (async/>! ch v)
             (log/info "Session camera queued" (:subject-id v))
             (async/>! event-ch {:action :bootstrap-schedule
@@ -60,8 +69,13 @@
           (do
             (log/info "Re-queuing session cameras")
             (async/go
-              (doseq [batch (retrieve-tasks state @detector-state-ref)]
-                (async/>! int-ch batch)))
+              (doseq [dataset-id (util.state/get-dataset-ids system-state)]
+                (datasets/with-context {:system-state system-state
+                                        :ctx {:dataset-id dataset-id}}
+                  [state]
+                  (let [detector-state-ref (datasets/detector-state state detector-state-ref)]
+                    (doseq [batch (retrieve-tasks state @detector-state-ref)]
+                      (async/>! int-ch batch))))))
             (async/>! event-ch {:action :bootstrap-timeout
                                 :subject :global})
             (recur)))))

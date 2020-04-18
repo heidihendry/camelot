@@ -4,7 +4,7 @@
    [camelot.util.state :as state]
    [camelot.system.state :as sysstate]
    [camelot.system.systems :as systems]
-   [camelot.util.db-migrate :as db-migrate]
+   [camelot.util.maintenance :as maintenance]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
    [ring.middleware.reload :refer [wrap-reload]]
@@ -22,13 +22,14 @@
 (def http-handler
   (wrap-reload #'http/http-handler))
 
+;; TODO these are no longer so convenient.  May want to add dataset-id param?
 (defn migrate
   [state]
-  (db-migrate/migrate (get-in state [:database :connection])))
+  (maintenance/migrate state))
 
 (defn rollback
   [state]
-  (db-migrate/rollback (get-in state [:database :connection])))
+  (maintenance/rollback state))
 
 (defn runprod []
   (camelot.core/start-prod))
@@ -45,11 +46,11 @@
       (assoc this :figwheel nil))))
 
 (defn start []
-  (reset! sysstate/system (-> (state/read-config)
+  (reset! sysstate/system (-> (state/system-config)
                               (assoc-in [:server :dev-server]
                                         (map->DevHttpServer {}))
-                           systems/camelot-system
-                           component/start))
+                              systems/camelot-system
+                              component/start))
   nil)
 
 (defn stop []

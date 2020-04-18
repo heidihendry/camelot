@@ -11,51 +11,61 @@
    [com.stuartsierra.component :as component]
    [clojure.tools.logging :as log]))
 
+(defn- init-dbs
+  [system-config]
+  (let [state-like-unscoped (state/config->state system-config)]
+    (letfn [(reducer [acc dataset-id]
+              (let [state-like (state/with-dataset state-like-unscoped dataset-id)]
+                (assoc acc dataset-id (state/spec state-like))))]
+      (reduce reducer {} (:dataset-ids system-config)))))
+
 (defn- init
-  [config {:keys [restore-db]}]
-  (let [dbspec (if restore-db
-                 (assoc (state/spec) :restoreFrom restore-db)
-                 (state/spec))
+  [system-config]
+  (let [db-specs (init-dbs system-config)
         smap (component/system-map
-              :config (config/map->Config config)
-              :database (db/map->Database {:connection dbspec}))]
+              :config (config/map->Config system-config)
+              :database (db/map->Database {:connections db-specs}))]
     (component/system-using smap {})))
 
-(defn- check-and-migrate-db
+(defn- check-and-migrate-db!
   [state db-initd?]
   (if (maintenance/migrations-available? state)
     (do
       (when db-initd?
         (let [plan (maintenance/upgrade-plan state)]
           (log/info (format
-                     "Database requires an upgrade (%s => %s). Taking a backup..."
+                     "Database %s requires an upgrade (%s => %s). Taking a backup..."
+                     (state/get-dataset-id state)
                      (:from plan)
                      (:to plan))))
         (maintenance/backup state))
-      (log/info "Upgrading database...")
+      (log/info (format "Upgrading database %s..." (state/get-dataset-id state)))
       (maintenance/migrate state))
-    (log/info (format "Database up-to-date (%s)."
+    (log/info (format "Database %s up-to-date (%s)."
+                      (state/get-dataset-id state)
                       (:from (maintenance/upgrade-plan state))))))
 
 (defn pre-init
   "Carry out Camelot's pre-flight checks."
-  [config payload]
-  (log/info "Checking database...")
-  (let [db-initd? (maintenance/is-db-initialised? config)
-        system (component/start (init config payload))]
-    (check-and-migrate-db system db-initd?)
+  [system-config]
+  (log/info "Checking databases...")
+  (let [system (component/start (init system-config))]
+    (doseq [dataset-id (:dataset-ids system-config)]
+      (let [state (state/with-dataset system dataset-id)
+            db-initd? (maintenance/is-db-initialised? state)]
+        (check-and-migrate-db! state db-initd?)))
     system))
 
 (defn camelot-system
-  [config]
+  [system-config]
   (let [smap (component/system-map
-              :config (config/map->Config config)
-              :database (db/map->Database {:connection (state/spec)})
+              :config (config/map->Config system-config)
+              :database (db/map->Database {:connections (init-dbs system-config)})
               :importer (importer/map->Importer {})
               :detector (detector/map->Detector {})
-              :app (if-let [dsvr (get-in config [:server :dev-server])]
+              :app (if-let [dsvr (get-in system-config [:server :dev-server])]
                      dsvr
-                     (http/->HttpServer (get-in config [:server :http-port]))))]
+                     (http/->HttpServer (get-in system-config [:server :http-port]))))]
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer
@@ -65,15 +75,15 @@
                                              :database :database}})))
 
 (defn camelot
-  [config]
-  (component/start (camelot-system config)))
+  [system-config]
+  (component/start (camelot-system system-config)))
 
 (defn- maintenance-system
-  [config]
+  [system-config]
   (let [smap (component/system-map
-              :config (config/map->Config config)
-              :database (db/map->Database {:connection (state/spec)})
-              :app (http/map->HttpServer config))]
+              :config (config/map->Config system-config)
+              :database (db/map->Database {:connections (init-dbs system-config)})
+              :app (http/map->HttpServer system-config))]
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer}

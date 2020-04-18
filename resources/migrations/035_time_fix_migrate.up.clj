@@ -36,19 +36,24 @@
                              conn)
                 s))))
 
-(db/with-transaction [s {:database {:connection (state/spec)}}]
-  (let [conn (select-keys (:database s) [:connection])]
-    (migrate-table! conn -get-surveys -migrate-survey!)
-    (migrate-table! conn -get-sites -migrate-site!)
-    (migrate-table! conn -get-survey-sites -migrate-survey-site!)
-    (migrate-table! conn -get-trap-stations -migrate-trap-station!)
-    (migrate-table! conn -get-trap-station-sessions -migrate-trap-station-session!)
-    (migrate-table! conn -get-trap-station-session-cameras -migrate-trap-station-session-camera!)
-    (migrate-table! conn -get-cameras -migrate-camera!)
-    (migrate-table! conn -get-taxonomies -migrate-taxonomy!)
-    (migrate-table! conn -get-survey-taxonomies -migrate-survey-taxonomy!)
-    (migrate-table! conn -get-survey-files -migrate-survey-file!)
-    (migrate-table! conn -get-media -migrate-media!)
-    (migrate-table! conn -get-sightings -migrate-sighting!)
-    (migrate-table! conn -get-photos -migrate-photo!))
-  nil)
+(defn -m035-upgrade
+  [state]
+  (db/with-transaction [s state]
+    ;; TODO
+    (let [conn {:connection (state/lookup-connection s)}]
+      (migrate-table! conn -get-surveys -migrate-survey!)
+      (migrate-table! conn -get-sites -migrate-site!)
+      (migrate-table! conn -get-survey-sites -migrate-survey-site!)
+      (migrate-table! conn -get-trap-stations -migrate-trap-station!)
+      (migrate-table! conn -get-trap-station-sessions -migrate-trap-station-session!)
+      (migrate-table! conn -get-trap-station-session-cameras -migrate-trap-station-session-camera!)
+      (migrate-table! conn -get-cameras -migrate-camera!)
+      (migrate-table! conn -get-taxonomies -migrate-taxonomy!)
+      (migrate-table! conn -get-survey-taxonomies -migrate-survey-taxonomy!)
+      (migrate-table! conn -get-survey-files -migrate-survey-file!)
+      (migrate-table! conn -get-media -migrate-media!)
+      (migrate-table! conn -get-sightings -migrate-sighting!)
+      (migrate-table! conn -get-photos -migrate-photo!))
+    nil))
+
+(-m035-upgrade camelot.system.db.core/*migration-state*)

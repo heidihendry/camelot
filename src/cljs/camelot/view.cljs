@@ -270,6 +270,20 @@
   (om/root cnotif/notification-dialog-component state/app-state
            {:target (js/document.getElementById "notification-dialog")}))
 
+(defn view-wrapper
+  [data _ {:keys [view] :as opts}]
+  (reify
+    om/IRender
+    (render [_]
+      (println (:invalidate-full-page (state/app-state-cursor)))
+      (if (:invalidate-full-page (state/app-state-cursor))
+        (dom/div #js {:className "align-center"}
+                 (dom/img #js {:className "spinner"
+                               :src "images/spinner.gif"
+                               :height "32"
+                               :width "32"}))
+        (om/build view data {:opts opts})))))
+
 (defn generate-view
   "Render the main page content"
   [view & [{:keys [survey-id page-id report-key camera-id site-id taxonomy-id
@@ -283,9 +297,10 @@
                        (om/update! (state/app-state-cursor) :page-id page-id)
                        (om/root view state/app-state
                                 {:target (js/document.getElementById "page-content")}))))
-    (om/root view state/app-state
+    (om/root view-wrapper state/app-state
              {:target (js/document.getElementById "page-content")
-              :opts {:report-key report-key
+              :opts {:view view
+                     :report-key report-key
                      :camera-id camera-id
                      :taxonomy-id taxonomy-id
                      :restricted-mode restricted-mode

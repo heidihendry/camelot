@@ -1,6 +1,7 @@
 (ns camelot.detection.prepare
   (:require
    [camelot.detection.client :as client]
+   [camelot.detection.datasets :as datasets]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
    [camelot.detection.util :as util]
@@ -19,7 +20,7 @@
 
 (defn run
   "Create tasks and queue media for upload."
-  [state detector-state-ref ch cmd-mult [upload-ch upload-cmd-ch] [poll-ch _] event-ch]
+  [system-state detector-state-ref ch cmd-mult [upload-ch upload-cmd-ch] [poll-ch _] event-ch]
   (let [cmd-ch (async/tap cmd-mult (async/chan))
         int-ch (async/chan (async/dropping-buffer (inc media-per-task-limit)))]
     (async/go-loop []
@@ -48,8 +49,11 @@
             (recur))
 
           ch
-          (do
-            (let [scid (:subject-id v)]
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [state]
+            (let [scid (:subject-id v)
+                  detector-state-ref (datasets/detector-state state detector-state-ref)]
               (log/info "Preparing task with scid " scid)
               (if (state/submitted-task-for-session-camera? @detector-state-ref scid)
                 (let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]

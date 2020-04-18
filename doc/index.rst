@@ -17,6 +17,7 @@ Camelot Documentation
    bulkimport
    detector
    administration
+   datasets
    advancedmenu
    scale
    integration

@@ -9,7 +9,11 @@
   (let [q {:sighting_field_keys ["lifestage" "sex"]}]
     (map :sighting_field_id (-get-migrated-sighting-fields q conn))))
 
-(db/with-transaction [s {:database {:connection (state/spec)}}]
-  (let [conn (select-keys (:database s) [:connection])]
-    (doseq [sighting-field (-m040-get-migrated-sighting-fields conn)]
-      (-delete-field! {:sighting_field_id sighting-field} conn))))
+(defn- -m040-downgrade
+  [state]
+  (db/with-transaction [s state]
+    (let [conn {:connection (state/lookup-connection s)}]
+      (doseq [sighting-field (-m040-get-migrated-sighting-fields conn)]
+        (-delete-field! {:sighting_field_id sighting-field} conn)))))
+
+(-m040-downgrade camelot.system.db.core/*migration-state*)
