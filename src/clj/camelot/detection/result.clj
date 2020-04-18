@@ -1,11 +1,11 @@
 (ns camelot.detection.result
-  (:require
-   [camelot.detection.state :as state]
-   [camelot.model.suggestion :as suggestion]
-   [camelot.model.bounding-box :as bounding-box]
-   [camelot.detection.util :as util]
-   [clojure.core.async :as async]
-   [clojure.tools.logging :as log]))
+  (:require [camelot.detection.datasets :as datasets]
+            [camelot.detection.state :as state]
+            [camelot.detection.util :as util]
+            [camelot.model.bounding-box :as bounding-box]
+            [camelot.model.suggestion :as suggestion]
+            [clojure.core.async :as async]
+            [clojure.tools.logging :as log]))
 
 (defn- build-bounding-box
   [detection]
@@ -36,7 +36,7 @@
 
 (defn run
   "Create suggestions for values placed on the returned channel."
-  [state detector-state-ref event-ch]
+  [system-state detector-state-ref event-ch]
   (let [cmd-ch (async/chan (async/dropping-buffer 100))
         ch (async/chan)]
     (async/go-loop []
@@ -53,7 +53,9 @@
             (recur))
 
           ch
-          (do
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [state]
             (async/>! event-ch v)
             (log/info "Creating suggestions for media-id" (:subject-id v))
             (let [detections (-> v :payload :image :detections)

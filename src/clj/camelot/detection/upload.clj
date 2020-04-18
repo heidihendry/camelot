@@ -1,5 +1,6 @@
 (ns camelot.detection.upload
   (:require
+   [camelot.detection.datasets :as datasets]
    [clojure.string :as cstr]
    [clj-http.client :as http]
    [camelot.model.media :as model.media]
@@ -54,7 +55,7 @@
 
 (defn run
   "Upload all media receeived on the returned channel."
-  [state detector-state-ref [submit-ch submit-cmd-ch] event-ch]
+  [system-state detector-state-ref [submit-ch submit-cmd-ch] event-ch]
   (let [cmd-ch (async/chan (async/dropping-buffer 100))
         ch (async/chan 1000)]
     (async/go-loop []
@@ -77,50 +78,53 @@
               (recur)))
 
           ch
-          (condp = (:action v)
-            :upload
-            (do
-              (log/info "Uploading media with id" (:subject-id v) "and scid" (:container-id v))
-              (if (state/can-upload? @detector-state-ref (:subject-id v))
-                (let [task (state/get-task-for-session-camera-id @detector-state-ref (:container-id v))
-                      upload-v (upload-sas state (get-in task [:container :readwrite_sas]) (:payload v))]
-                  (log/info "Upload result: " (:result upload-v))
-                  (condp = (:result upload-v)
-                    :success
-                    (do
-                      (log/info "Upload of" (:subject-id v) "complete.")
-                      (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "completed")
-                      (async/>! event-ch {:action :upload-succeeded
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [state]
+            (condp = (:action v)
+              :upload
+              (do
+                (log/info "Uploading media with id" (:subject-id v) "and scid" (:container-id v))
+                (if (state/can-upload? @detector-state-ref (:subject-id v))
+                  (let [task (state/get-task-for-session-camera-id @detector-state-ref (:container-id v))
+                        upload-v (upload-sas state (get-in task [:container :readwrite_sas]) (:payload v))]
+                    (log/info "Upload result: " (:result upload-v))
+                    (condp = (:result upload-v)
+                      :success
+                      (do
+                        (log/info "Upload of" (:subject-id v) "complete.")
+                        (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "completed")
+                        (async/>! event-ch {:action :upload-succeeded
+                                            :subject :media
+                                            :subject-id (:subject-id v)}))
+
+                      :skipped
+                      (do
+                        (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "skipped")
+                        (async/>! event-ch {:action :upload-skipped
+                                            :subject :media
+                                            :subject-id (:subject-id v)}))
+
+                      :error
+                      (do
+                        (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "failed")
+                        (async/>! event-ch {:action :upload-failed
+                                            :subject :media
+                                            :subject-id (:subject-id v)})
+                        (log/warn "media" (:subject-id v) "failed with exception:" (:value upload-v))
+                        (log/warn "scheduling upload retry for" (:subject-id v))
+                        (async/go (async/>! ch v)))))
+                  (do
+                    (when (state/media-upload-failed? @detector-state-ref (:subject-id v))
+                      (async/>! event-ch {:action :upload-retry-limit-reached
                                           :subject :media
                                           :subject-id (:subject-id v)}))
+                    (log/info "Media longer eligible for upload." (:subject-id v))))
+                (recur))
 
-                    :skipped
-                    (do
-                      (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "skipped")
-                      (async/>! event-ch {:action :upload-skipped
-                                          :subject :media
-                                          :subject-id (:subject-id v)}))
-
-                    :error
-                    (do
-                      (state/record-media-upload! detector-state-ref (:container-id v) (:subject-id v) "failed")
-                      (async/>! event-ch {:action :upload-failed
-                                          :subject :media
-                                          :subject-id (:subject-id v)})
-                      (log/warn "media" (:subject-id v) "failed with exception:" (:value upload-v))
-                      (log/warn "scheduling upload retry for" (:subject-id v))
-                      (async/go (async/>! ch v)))))
-                (do
-                  (when (state/media-upload-failed? @detector-state-ref (:subject-id v))
-                    (async/>! event-ch {:action :upload-retry-limit-reached
-                                        :subject :media
-                                        :subject-id (:subject-id v)}))
-                  (log/info "Media longer eligible for upload." (:subject-id v))))
-              (recur))
-
-            :presubmit-check
-            (do
-              (async/>! submit-ch v)
-              (log/info "Scheduled presubmit check")
-              (recur))))))
+              :presubmit-check
+              (do
+                (async/>! submit-ch v)
+                (log/info "Scheduled presubmit check")
+                (recur)))))))
     [ch cmd-ch]))

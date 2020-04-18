@@ -1,5 +1,6 @@
 {:lint-as {camelot.util.db/with-transaction clojure.core/let
            schema.core/defrecord clojure.core/defrecord
            camelot.model.survey/with-survey-settings clojure.core/let
-           clojure.java.jdbc/with-db-transaction clojure.core/let}
+           clojure.java.jdbc/with-db-transaction clojure.core/let
+           camelot.detection.datasets/with-context clojure.core/fn}
  :linters {:missing-docstring {:level :warning}}}

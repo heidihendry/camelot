@@ -1,5 +1,6 @@
 (ns camelot.detection.submit
   (:require
+   [camelot.detection.datasets :as datasets]
    [camelot.detection.client :as client]
    [camelot.detection.event :as event]
    [camelot.detection.state :as state]
@@ -26,7 +27,7 @@
 
 (defn run
   "Submit tasks for processing."
-  [state detector-state-ref [poll-ch poll-cmd-ch] [archive-ch _] event-ch]
+  [system-state detector-state-ref [poll-ch poll-cmd-ch] [archive-ch _] event-ch]
   (let [cmd-ch (async/chan (async/dropping-buffer 100))
         retry-ch (async/chan (async/sliding-buffer 10000))
         ch (async/chan (async/sliding-buffer 10000))
@@ -52,60 +53,68 @@
                 (recur))))
 
           retry-ch
-          (let [task-id (:subject-id v)]
-            (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
-              (log/info "Retrying check with task id" task-id
-                        "in" (/ delay 1000.0) "seconds")
-              (async/<! (async/timeout delay)))
-            (if (< (:retries v) retry-limit)
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [state]
+            (let [task-id (:subject-id v)]
+              (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
+                (log/info "Retrying check with task id" task-id
+                          "in" (/ delay 1000.0) "seconds")
+                (async/<! (async/timeout delay)))
+              (if (< (:retries v) retry-limit)
+                (if (pending? @detector-state-ref task-id)
+                  (do
+                    (async/>! event-ch {:action :submit-retry
+                                        :subject :task
+                                        :subject-id task-id})
+                    (async/go (async/>! retry-ch (-> v
+                                                     (assoc :valid-at (t/plus (t/now) (t/minutes 1)))
+                                                     (update :retries inc)))))
+                  (if (some-completed? @detector-state-ref task-id)
+                    (async/go (async/>! int-ch v))
+                    (do
+                      (async/>! event-ch {:action :submit-no-completed-uploads
+                                          :subject :task
+                                          :subject-id task-id})
+                      (log/warn "No uploads completed for" task-id))))
+                (do
+                  (log/warn "Retry limit reached for" task-id)
+                  (async/>! event-ch {:action :submit-retry-limit-reached
+                                      :subject :task
+                                      :subject-id task-id})))
+              (recur)))
+
+          ch
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [state]
+            (let [task-id (:subject-id v)]
+              (log/info "Presubmit check with task id" (:subject-id v))
               (if (pending? @detector-state-ref task-id)
                 (do
+                  (log/info "Scheduling retry")
                   (async/>! event-ch {:action :submit-retry
                                       :subject :task
                                       :subject-id task-id})
-                  (async/go (async/>! retry-ch (-> v
-                                                   (assoc :valid-at (t/plus (t/now) (t/minutes 1)))
-                                                   (update :retries inc)))))
+                  (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 1))
+                                                      :retries 1)))
+                  (log/info "Scheduled retry"))
                 (if (some-completed? @detector-state-ref task-id)
-                  (async/go (async/>! int-ch v))
+                  (do
+                    (async/go (async/>! int-ch (event/to-submit-event task-id)))
+                    (log/info "Placed on internal channel" task-id))
                   (do
                     (async/>! event-ch {:action :submit-no-completed-uploads
                                         :subject :task
                                         :subject-id task-id})
-                    (log/warn "No uploads completed for" task-id))))
-              (do
-                (log/warn "Retry limit reached for" task-id)
-                (async/>! event-ch {:action :submit-retry-limit-reached
-                                    :subject :task
-                                    :subject-id task-id})))
-            (recur))
-
-          ch
-          (let [task-id (:subject-id v)]
-            (log/info "Presubmit check with task id" (:subject-id v))
-            (if (pending? @detector-state-ref task-id)
-              (do
-                (log/info "Scheduling retry")
-                (async/>! event-ch {:action :submit-retry
-                                    :subject :task
-                                    :subject-id task-id})
-                (async/go (async/>! retry-ch (assoc v :valid-at (t/plus (t/now) (t/minutes 1))
-                                                     :retries 1)))
-                (log/info "Scheduled retry"))
-              (if (some-completed? @detector-state-ref task-id)
-                (do
-                  (async/go (async/>! int-ch (event/to-submit-event task-id)))
-                  (log/info "Placed on internal channel" task-id))
-                (do
-                  (async/>! event-ch {:action :submit-no-completed-uploads
-                                      :subject :task
-                                      :subject-id task-id})
-                  (log/warn "No uploads completed for" task-id)
-                  (async/>! archive-ch (event/to-archive-task-event task-id)))))
-            (recur))
+                    (log/warn "No uploads completed for" task-id)
+                    (async/>! archive-ch (event/to-archive-task-event task-id)))))
+              (recur)))
 
           int-ch
-          (do
+          (datasets/with-context {:system-state system-state
+                                  :ctx v}
+            [state]
             (async/>! event-ch v)
             (let [task-id (:subject-id v)]
               (if (state/submitted-task? @detector-state-ref task-id)

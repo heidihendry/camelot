@@ -7,8 +7,8 @@
 (def ^:private check-health-timeout (* 30 1000))
 
 (defn- desired-state
-  [state]
-  (if (client/healthy? state)
+  [system-state]
+  (if (client/healthy? system-state)
     :running
     :paused))
 
@@ -34,7 +34,7 @@
 
 (defn run
   "Pause and resume the system according to connectivity."
-  [state detector-state-ref cmd-mult cmd-pub-ch event-ch]
+  [system-state detector-state-ref cmd-mult cmd-pub-ch event-ch]
   (let [cmd-ch (async/tap cmd-mult (async/chan))]
     (async/go-loop []
       (let [timeout-ch (async/timeout check-health-timeout)
@@ -48,7 +48,7 @@
           timeout-ch
           (do
             (when (overridable-status? @detector-state-ref)
-              (let [desired (desired-state state)
+              (let [desired (desired-state system-state)
                     actual (get-in @detector-state-ref [:system :status])]
                 (when (not= desired actual)
                   (let [cmd (status-command-map desired)]
