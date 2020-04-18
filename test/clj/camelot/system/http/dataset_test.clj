@@ -11,7 +11,7 @@
         (with-spies [calls]
           (let [handler (defmock [r] nil)
                 request {:session {:dataset-id :special}
-                         :system {:config {:dataset-ids [:default]}}}]
+                         :system {:config {:dataset-ids [:default :special]}}}]
             ((sut/wrap-dataset-selection handler) request)
             (t/is (= [request] (first (get (calls) handler)))))))
 
@@ -27,7 +27,7 @@
       (t/testing "should be left alone if a dataset-id is set in the request"
         (let [handler (constantly {})
               request {:session {:dataset-id :special}
-                       :system {:config {:dataset-ids [:default]}}}
+                       :system {:config {:dataset-ids [:default :special]}}}
               response ((sut/wrap-dataset-selection handler) request)]
           (t/is (= {} response))))
 
