@@ -7,6 +7,8 @@
 (def routes
   (context "/settings" {session :session state :system}
            (GET "/" [] (-> (get state :config)
+                           ;; contains credentials
+                           (dissoc :detector)
                            (merge session)
                            cursorise/cursorise
                            r/response))))
