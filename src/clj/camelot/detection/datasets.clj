@@ -49,3 +49,8 @@
      (state->context state#
        (let [~state state#]
          ~@body))))
+
+(defn detector-state
+  [state full-detector-state]
+  (let [dataset-id (state/get-dataset-id state)]
+    (get-in full-detector-state [:datasets dataset-id])))

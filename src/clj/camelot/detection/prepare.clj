@@ -52,7 +52,8 @@
           (datasets/with-context {:system-state system-state
                                   :ctx v}
             [state]
-            (let [scid (:subject-id v)]
+            (let [scid (:subject-id v)
+                  detector-state-ref (datasets/detector-state state detector-state-ref)]
               (log/info "Preparing task with scid " scid)
               (if (state/submitted-task-for-session-camera? @detector-state-ref scid)
                 (let [task-id (:task (state/get-session-camera-state @detector-state-ref scid))]

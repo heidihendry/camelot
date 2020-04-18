@@ -56,7 +56,8 @@
           (datasets/with-context {:system-state system-state
                                   :ctx v}
             [state]
-            (let [task-id (:subject-id v)]
+            (let [task-id (:subject-id v)
+                  detector-state-ref (datasets/detector-state state detector-state-ref)]
               (let [delay (max 0 (- (tc/to-long (:valid-at v)) (tc/to-long (t/now))))]
                 (log/info "Retrying check with task id" task-id
                           "in" (/ delay 1000.0) "seconds")
@@ -88,7 +89,8 @@
           (datasets/with-context {:system-state system-state
                                   :ctx v}
             [state]
-            (let [task-id (:subject-id v)]
+            (let [task-id (:subject-id v)
+                  detector-state-ref (datasets/detector-state state detector-state-ref)]
               (log/info "Presubmit check with task id" (:subject-id v))
               (if (pending? @detector-state-ref task-id)
                 (do
@@ -116,7 +118,8 @@
                                   :ctx v}
             [state]
             (async/>! event-ch v)
-            (let [task-id (:subject-id v)]
+            (let [task-id (:subject-id v)
+                  detector-state-ref (datasets/detector-state state detector-state-ref)]
               (if (state/submitted-task? @detector-state-ref task-id)
                 (log/warn "Skipping submission. Task already submitted:" task-id)
                 (try

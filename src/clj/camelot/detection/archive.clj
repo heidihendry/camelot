@@ -33,7 +33,7 @@
             (let [task-id (:subject-id v)]
               (try
                 (client/archive-task state task-id)
-                (state/archive-task! detector-state-ref task-id)
+                (state/archive-task! (datasets/detector-state state detector-state-ref) task-id)
                 (log/info "Archival successful for task" task-id)
                 (async/>! event-ch {:action :archive-success
                                     :subject :task

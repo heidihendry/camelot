@@ -75,7 +75,8 @@
           (datasets/with-context {:system-state system-state
                                   :ctx v}
             [state]
-            (let [task-id (:subject-id v)]
+            (let [task-id (:subject-id v)
+                  detector-state-ref (datasets/detector-state state detector-state-ref)]
               (if (state/completed-task? @detector-state-ref task-id)
                 (log/warn "Processing task already found to be completed. Skipping." task-id)
                 (do

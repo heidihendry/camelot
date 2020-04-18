@@ -46,9 +46,10 @@
         (datasets/with-context {:system-state system-state
                                 :ctx {:dataset-id dataset-id}}
           [state]
-          (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
-          (doseq [batch (retrieve-tasks state @detector-state-ref)]
-            (async/>! int-ch batch)))))
+          (let [detector-state-ref (datasets/detector-state state detector-state-ref)]
+            (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
+            (doseq [batch (retrieve-tasks state @detector-state-ref)]
+              (async/>! int-ch batch))))))
     (async/go-loop []
       (let [timeout-ch (async/timeout base-timeout-ms)
             [v port] (async/alts! [int-ch timeout-ch] :priority true)]
@@ -72,8 +73,9 @@
                 (datasets/with-context {:system-state system-state
                                         :ctx {:dataset-id dataset-id}}
                   [state]
-                  (doseq [batch (retrieve-tasks state @detector-state-ref)]
-                    (async/>! int-ch batch)))))
+                  (let [detector-state-ref (datasets/detector-state state detector-state-ref)]
+                    (doseq [batch (retrieve-tasks state @detector-state-ref)]
+                      (async/>! int-ch batch))))))
             (async/>! event-ch {:action :bootstrap-timeout
                                 :subject :global})
             (recur)))))

@@ -19,18 +19,18 @@
 ;; TODO consider connection pooling
 (defn run
   "Run the detector"
-  [state detector-state-ref cmd-pub-ch cmd-mult]
+  [system-state detector-state-ref cmd-pub-ch cmd-mult]
   (let [event-ch (async/chan (async/sliding-buffer 1000))]
     (try
-      (client/account-auth state)
-      (swap! bootstrap-ch #(or % (bootstrap/run state detector-state-ref event-ch)))
-      (let [archive-chans (archive/run state detector-state-ref event-ch)
-            result-chans (result/run state detector-state-ref event-ch)
-            poll-chans (poll/run state detector-state-ref result-chans archive-chans event-ch)
-            submit-chans (submit/run state detector-state-ref poll-chans archive-chans event-ch)
-            upload-chans (upload/run state detector-state-ref submit-chans event-ch)]
-        (prepare/run state detector-state-ref @bootstrap-ch cmd-mult upload-chans poll-chans event-ch)
-        (watchdog/run state detector-state-ref cmd-mult cmd-pub-ch event-ch))
+      (client/account-auth system-state)
+      (swap! bootstrap-ch #(or % (bootstrap/run system-state detector-state-ref event-ch)))
+      (let [archive-chans (archive/run system-state detector-state-ref event-ch)
+            result-chans (result/run system-state detector-state-ref event-ch)
+            poll-chans (poll/run system-state detector-state-ref result-chans archive-chans event-ch)
+            submit-chans (submit/run system-state detector-state-ref poll-chans archive-chans event-ch)
+            upload-chans (upload/run system-state detector-state-ref submit-chans event-ch)]
+        (prepare/run system-state detector-state-ref @bootstrap-ch cmd-mult upload-chans poll-chans event-ch)
+        (watchdog/run system-state detector-state-ref cmd-mult cmd-pub-ch event-ch))
       (async/go
         (async/>! event-ch {:action :running
                             :subject :system-status}))

@@ -13,19 +13,17 @@
     :paused))
 
 (defn- overridable-paused-status?
-  [detector-state]
-  (let [sys (:system detector-state)]
-    (and (= (:status sys) :paused)
-         (not= (:set-by sys) :user))))
+  [sys]
+  (and (= (:status sys) :paused)
+       (not= (:set-by sys) :user)))
 
 (defn- running-status?
-  [detector-state]
-  (let [sys (:system detector-state)]
-    (= (:status sys) :running)))
+  [sys]
+  (= (:status sys) :running))
 
 (defn- overridable-status?
-  [detector-state]
-  (some #(% detector-state)
+  [sys]
+  (some #(% sys)
         [running-status? overridable-paused-status?]))
 
 (def ^:private status-command-map
@@ -47,13 +45,14 @@
 
           timeout-ch
           (do
-            (when (overridable-status? @detector-state-ref)
-              (let [desired (desired-state system-state)
-                    actual (get-in @detector-state-ref [:system :status])]
-                (when (not= desired actual)
-                  (let [cmd (status-command-map desired)]
-                    (async/go
-                      (async/>! cmd-pub-ch {:cmd cmd})
-                      (async/>! event-ch {:action (keyword (str "watchdog-initiated-" (name cmd)))
-                                          :subject :global}))))))
+            (let [system @(:system detector-state-ref)]
+              (when (overridable-status? system)
+                (let [desired (desired-state system-state)
+                      actual (:status system)]
+                  (when (not= desired actual)
+                    (let [cmd (status-command-map desired)]
+                      (async/go
+                        (async/>! cmd-pub-ch {:cmd cmd})
+                        (async/>! event-ch {:action (keyword (str "watchdog-initiated-" (name cmd)))
+                                            :subject :global})))))))
             (recur)))))))
