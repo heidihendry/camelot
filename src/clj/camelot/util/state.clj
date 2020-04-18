@@ -117,12 +117,19 @@
   [config]
   {:config config})
 
+;; This was automagically appended for a long time. Now it exists only for
+;; backwards compatibility.
+(defn database-path
+  [state]
+  (let [path (lookup-path state :database)]
+    (if (re-matches #".*/Database$" (.getPath path))
+      path
+      (io/file path "Database"))))
+
 (defn spec
   "JDBC spec for the database."
   [state]
   {:classname "org.apache.derby.jdbc.EmbeddedDriver",
    :subprotocol "derby",
-   :subname (.getPath (io/file (lookup-path state :database)
-                               ;; TODO this should be in camelot market
-                               "Database")),
+   :subname (.getPath (database-path state)),
    :create true})
