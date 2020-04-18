@@ -36,8 +36,8 @@
                       r/response))
            (POST "/bulk/import" [data]
                  (r/response (bulk/import-with-mappings (assoc state :session session) data)))
-           (GET "/" [] (r/response (import/importer-state state)))
-           (POST "/cancel" [] (r/response (import/cancel-import state)))
+           (GET "/" [] (r/response (import/importer-state (assoc state :session session))))
+           (POST "/cancel" [] (r/response (import/cancel-import (assoc state :session session))))
            (POST "/upload" {params :multipart-params}
                  (r/response (import/import-capture! (assoc state :session session)
                                                       (edn/read-string (get params "session-camera-id"))
