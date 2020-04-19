@@ -201,17 +201,32 @@
       (rest/get-x "/dataset"
                   #(do
                      (om/set-state! owner :dataset-ids (:dataset-ids (:body %)))
-                     (om/set-state! owner :selected-dataset (:selected-dataset (:body %))))))
+                     (om/set-state! owner :selected-dataset (name (:selected-dataset (:body %))))))
+      (letfn [(focus-handler []
+                (rest/get-x "/dataset"
+                            #(let [prev-selected-dataset (om/get-state owner :selected-dataset)
+                                   next-selected-dataset (name (:selected-dataset (:body %)))]
+                               (when-not (= next-selected-dataset prev-selected-dataset)
+                                 (om/set-state! owner :selected-dataset next-selected-dataset)
+                                 (init/init-screen-state navigate-home)))))]
+        (om/set-state! owner :focus-handler focus-handler)
+        (.addEventListener js/window "focus" focus-handler)))
+    om/IWillUnmount
+    (will-unmount [_]
+      (when-let [focus-handler (om/get-state owner :focus-handler)]
+        (.removeEventListener js/window "focus" focus-handler)))
     om/IRenderState
     (render-state [_ state]
       (let [options (:dataset-ids state)]
         (when (> (count options) 1)
           (dom/div nil
-                   (dom/select #js {:value (name (:selected-dataset state))
+                   (dom/select #js {:value (:selected-dataset state)
                                     :title "Select a dataset"
                                     :onChange #(let [dataset-id (.. % -target -value)]
                                                  (rest/post-x (str "/dataset/select/" dataset-id) {}
-                                                              (fn [_] (init/init-screen-state navigate-home))))}
+                                                              (fn [_]
+                                                                (om/set-state! owner :selected-dataset dataset-id)
+                                                                (init/init-screen-state navigate-home))))}
                                (om/build-all render-dataset-option options))))))))
 
 (defn nav-item-component
