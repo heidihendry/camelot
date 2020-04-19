@@ -5,5 +5,5 @@
    [camelot.model.sighting-field-value :as sighting-field-value]))
 
 (def routes
-  (context "/sighting-field-values" {session :session state :system}
-           (GET "/" [] (r/response (vals (sighting-field-value/query-all (assoc state :session session)))))))
+  (context "/sighting-field-values" {state :state}
+           (GET "/" [] (r/response (vals (sighting-field-value/query-all state))))))

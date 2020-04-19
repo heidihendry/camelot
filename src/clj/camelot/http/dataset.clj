@@ -12,9 +12,9 @@
      :body nil}))
 
 (def routes
-  (context "/dataset" {session :session state :system}
+  (context "/dataset" {state :state}
            (GET "/" _
-                (r/response {:dataset-ids (state/get-dataset-ids (assoc state :session session))
-                             :selected-dataset (state/get-dataset-id (assoc state :session session))}))
+                (r/response {:dataset-ids (state/get-dataset-ids state)
+                             :selected-dataset (state/get-dataset-id state)}))
            (POST "/select/:id" [id]
-                 (select-dataset (assoc state :session session) (keyword id)))))
+                 (select-dataset state (keyword id)))))

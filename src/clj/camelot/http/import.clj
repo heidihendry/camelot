@@ -27,18 +27,18 @@
                   (content-disposition)))))
 
 (def routes
-  (context "/import" {session :session state :system}
+  (context "/import" {state :state}
            (GET "/bulk/template" {params :params}
-                (metadata-template (assoc state :session session) (:dir params)))
+                (metadata-template state (:dir params)))
            (POST "/bulk/columnmap" {params :multipart-params}
                  (->> (get params "file")
-                      (template/column-map-options (assoc state :session session))
+                      (template/column-map-options state)
                       r/response))
            (POST "/bulk/import" [data]
-                 (r/response (bulk/import-with-mappings (assoc state :session session) data)))
-           (GET "/" [] (r/response (import/importer-state (assoc state :session session))))
-           (POST "/cancel" [] (r/response (import/cancel-import (assoc state :session session))))
+                 (r/response (bulk/import-with-mappings state data)))
+           (GET "/" [] (r/response (import/importer-state state)))
+           (POST "/cancel" [] (r/response (import/cancel-import state)))
            (POST "/upload" {params :multipart-params}
-                 (r/response (import/import-capture! (assoc state :session session)
+                 (r/response (import/import-capture! state
                                                       (edn/read-string (get params "session-camera-id"))
                                                       (get params "file"))))))

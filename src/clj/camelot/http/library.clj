@@ -5,22 +5,22 @@
    [camelot.library.core :as library]))
 
 (def routes
-  (context "/library" {session :session state :system}
+  (context "/library" {state :state}
            (POST "/" [data]
-                 (r/response (library/query-media (assoc state :session session)
+                 (r/response (library/query-media state
                                                   (:search data))))
            (GET "/metadata" [] (r/response (library/build-library-metadata
-                                            (assoc state :session session))))
+                                            state)))
            (POST "/hydrate" [data]
-                 (r/response (library/hydrate-media (assoc state :session session)
+                 (r/response (library/hydrate-media state
                                                     (:media-ids data))))
            (POST "/media/flags" [data] (r/response (library/update-bulk-media-flags
-                                                    (assoc state :session session)
+                                                    state
                                                     data)))
-           (POST "/identify" [data] (r/response (library/identify (assoc state :session session)
+           (POST "/identify" [data] (r/response (library/identify state
                                                                   data)))
            (PUT "/identify/:id" [id data] (r/response (library/update-identification!
-                                                       (assoc state :session session)
+                                                       state
                                                        id (:identification data))))))
 
 

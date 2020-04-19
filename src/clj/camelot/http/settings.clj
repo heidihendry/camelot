@@ -5,10 +5,9 @@
    [camelot.util.cursorise :as cursorise]))
 
 (def routes
-  (context "/settings" {session :session state :system}
+  (context "/settings" {state :state}
            (GET "/" [] (-> (get state :config)
                            ;; contains credentials
                            (dissoc :detector)
-                           (merge session)
                            cursorise/cursorise
                            r/response))))

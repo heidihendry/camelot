@@ -5,6 +5,6 @@
    [camelot.util.crud :as crud]))
 
 (def routes
-  (context "/camera-statuses" {session :session state :system}
-           (GET "/available/" [] (crud/list-resources camera-status/get-all :camera-status (assoc state :session session)))
-           (GET "/alternatives/:id" [id] (crud/list-resources camera-status/get-all :camera-status (assoc state :session session)))))
+  (context "/camera-statuses" {state :state}
+           (GET "/available/" [] (crud/list-resources camera-status/get-all :camera-status state))
+           (GET "/alternatives/:id" [id] (crud/list-resources camera-status/get-all :camera-status state))))

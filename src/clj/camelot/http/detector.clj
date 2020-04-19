@@ -21,8 +21,8 @@
      :body {:system {:status :stopped}}}))
 
 (def routes
-  (context "/detector" {session :session state :system}
-           (GET "/status" [] (detector-status (assoc state :session session)))
+  (context "/detector" {state :state}
+           (GET "/status" [] (detector-status state))
            (POST "/command" [data]
                  (let [{:keys [cmd]} data]
                    (if (and (#{:pause :resume :rerun} cmd))

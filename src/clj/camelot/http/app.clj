@@ -50,14 +50,14 @@
             {:alternate-urls (network/canonicalise-addresses port)})}))
 
 (def routes
-  (context "" {session :session state :system}
+  (context "" {state :state}
            (GET "/" _ (retrieve-index))
            (GET "/favicon.ico" _ (retrieve-favicon))
            (GET "/application" []
                 (r/response {:version (version/get-version)
-                             :nav (screens/nav-menu (assoc state :session session))}))
+                             :nav (screens/nav-menu state)}))
            (GET "/screens" []
-                (r/response (screens/all-screens (assoc state :session session))))
+                (r/response (screens/all-screens state)))
            (GET "/heartbeat" []
                 (heartbeat state))
            (GET "/runtime" []

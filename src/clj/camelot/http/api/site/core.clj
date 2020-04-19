@@ -7,7 +7,7 @@
    [clojure.spec.alpha :as s]))
 
 (def routes
-  (context "/sites" {session :session state :system}
+  (context "/sites" {state :state}
            :tags ["sites"]
 
     (GET "/:id" [id]
@@ -15,14 +15,14 @@
       :return (s/merge
                ::api-core/json-api-without-data
                (s/keys :req-un [::spec/data]))
-      (resources/get-with-id (assoc state :session session) id))
+      (resources/get-with-id state id))
 
     (GET "/" []
       :summary "Retrieve all sites"
       :return (s/merge
                ::api-core/json-api-without-data
                (s/keys :req-un [:camelot.http.api.site.get-all/data]))
-      (resources/get-all (assoc state :session session)))
+      (resources/get-all state))
 
     (PATCH "/:id" [id]
       :summary "Update a site"
@@ -30,7 +30,7 @@
       :return (s/merge
                ::api-core/json-api-without-data
                (s/keys :req-un [::spec/data]))
-      (resources/patch! (assoc state :session session) id data))
+      (resources/patch! state id data))
 
     (POST "/" []
       :summary "Create a new site"
@@ -38,8 +38,8 @@
       :return (s/merge
                ::api-core/json-api-without-data
                (s/keys :req-un [::spec/data]))
-      (resources/post! (assoc state :session session) data))
+      (resources/post! state data))
 
     (DELETE "/:id" [id]
       :summary "Delete a site"
-      (resources/delete! (assoc state :session session) id))))
+      (resources/delete! state id))))

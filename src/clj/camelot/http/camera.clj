@@ -5,12 +5,12 @@
    [camelot.util.crud :as crud]))
 
 (def routes
-  (context "/cameras" {session :session state :system}
-           (GET "/" [] (crud/list-resources camera/get-all :camera (assoc state :session session)))
-           (GET "/available" [] (crud/list-resources camera/get-available :camera (assoc state :session session)))
-           (GET "/:id" [id] (crud/specific-resource camera/get-specific id (assoc state :session session)))
+  (context "/cameras" {state :state}
+           (GET "/" [] (crud/list-resources camera/get-all :camera state))
+           (GET "/available" [] (crud/list-resources camera/get-available :camera state))
+           (GET "/:id" [id] (crud/specific-resource camera/get-specific id state))
            (PUT "/:id" [id data] (crud/update-resource camera/update! id
-                                                       camera/tcamera data (assoc state :session session)))
+                                                       camera/tcamera data state))
            (POST "/" [data] (crud/create-resource camera/create!
-                                                  camera/tcamera data (assoc state :session session)))
-           (DELETE "/:id" [id] (crud/delete-resource camera/delete! id (assoc state :session session)))))
+                                                  camera/tcamera data state))
+           (DELETE "/:id" [id] (crud/delete-resource camera/delete! id state))))

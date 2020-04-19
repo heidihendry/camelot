@@ -5,9 +5,9 @@
    [camelot.util.crud :as crud]))
 
 (def routes
-  (context "/camera-deployment" {session :session state :system}
+  (context "/camera-deployment" {state :state}
            (GET "/survey/:id/recent" [id] (crud/list-resources camera-deployment/get-uploadable
-                                                               :trap-station-session id (assoc state :session session)))
+                                                               :trap-station-session id state))
            (POST "/" [data] (crud/create-resource camera-deployment/create-camera-check!
-                                                  camera-deployment/tcamera-deployment data (assoc state :session session)))))
+                                                  camera-deployment/tcamera-deployment data state))))
 

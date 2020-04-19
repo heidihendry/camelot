@@ -5,16 +5,16 @@
    [camelot.util.crud :as crud]))
 
 (def routes
-  (context "/trap-stations" {session :session state :system}
+  (context "/trap-stations" {state :state}
            (GET "/site/:id" [id]
-                (crud/list-resources trap-station/get-all :trap-station id (assoc state :session session)))
+                (crud/list-resources trap-station/get-all :trap-station id state))
            (GET "/survey/:id" [id]
-                (crud/list-resources trap-station/get-all-for-survey :trap-station id (assoc state :session session)))
+                (crud/list-resources trap-station/get-all-for-survey :trap-station id state))
            (GET "/" []
-                (crud/list-resources trap-station/get-all* :trap-station (assoc state :session session)))
-           (GET "/:id" [id] (crud/specific-resource trap-station/get-specific id (assoc state :session session)))
+                (crud/list-resources trap-station/get-all* :trap-station state))
+           (GET "/:id" [id] (crud/specific-resource trap-station/get-specific id state))
            (PUT "/:id" [id data] (crud/update-resource trap-station/update! id
-                                                       trap-station/ttrap-station data (assoc state :session session)))
+                                                       trap-station/ttrap-station data state))
            (POST "/" [data] (crud/create-resource trap-station/create!
-                                                  trap-station/ttrap-station data (assoc state :session session)))
-           (DELETE "/:id" [id] (crud/delete-resource trap-station/delete! id (assoc state :session session)))))
+                                                  trap-station/ttrap-station data state))
+           (DELETE "/:id" [id] (crud/delete-resource trap-station/delete! id state))))

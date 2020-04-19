@@ -5,12 +5,12 @@
    [camelot.util.crud :as crud]))
 
 (def routes
-  (context "/photos" {session :session state :system}
-           (GET "/media/:id" [id] (crud/list-resources photo/get-all :photo id (assoc state :session session)))
-           (GET "/:id" [id] (crud/specific-resource photo/get-specific id (assoc state :session session)))
+  (context "/photos" {state :state}
+           (GET "/media/:id" [id] (crud/list-resources photo/get-all :photo id state))
+           (GET "/:id" [id] (crud/specific-resource photo/get-specific id state))
            (PUT "/:id" [id data] (crud/update-resource photo/update! id
-                                                       photo/tphoto data (assoc state :session session)))
+                                                       photo/tphoto data state))
            (POST "/" [data] (crud/create-resource photo/create!
-                                                  photo/tphoto data (assoc state :session session)))
-           (DELETE "/:id" [id] (crud/delete-resource photo/delete! id (assoc state :session session)))))
+                                                  photo/tphoto data state))
+           (DELETE "/:id" [id] (crud/delete-resource photo/delete! id state))))
 

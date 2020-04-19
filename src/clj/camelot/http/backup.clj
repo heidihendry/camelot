@@ -4,7 +4,7 @@
    [camelot.backup.core :as backup]))
 
 (def routes
-  (context "/backup" {session :session state :system}
+  (context "/backup" {state :state}
            (GET "/file/:filename" [filename] (backup/download state filename))
            (GET "/manifest" [] (backup/manifest state))))
 
