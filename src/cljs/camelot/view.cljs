@@ -275,7 +275,6 @@
   (reify
     om/IRender
     (render [_]
-      (println (:invalidate-full-page (state/app-state-cursor)))
       (if (:invalidate-full-page (state/app-state-cursor))
         (dom/div #js {:className "align-center"}
                  (dom/img #js {:className "spinner"

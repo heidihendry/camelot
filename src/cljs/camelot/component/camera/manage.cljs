@@ -145,11 +145,9 @@
       {:loading? true})
     om/IDidMount
     (did-mount [_]
-      (println (:data data))
       (let [camera-id (get-in data [:data :camera-id :value])]
         (rest/get-x (str "/trap-station-session-cameras/camera/" camera-id)
                     #(do
-                       (println (:body %))
                        (om/set-state! owner :history (get-in (:body %) [:trap-station-session-summaries :value]))
                        (om/set-state! owner :loading? false)))))
     om/IRenderState
