@@ -31,7 +31,7 @@
          (fn [s]
            (let [conn (state/lookup-connection s)]
              [(state/get-dataset-id s) (db-migrate/version conn)]))
-         state)))
+         (state/dissoc-dataset state))))
 
 (defn- heartbeat
   [state]

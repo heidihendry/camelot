@@ -112,6 +112,10 @@
           (f state))
        (get-dataset-ids system-state)))
 
+(defn dissoc-dataset
+  [state]
+  (update state :session dissoc :dataset-id))
+
 (defn config->state
   "Lift config to a state-like map."
   [config]
