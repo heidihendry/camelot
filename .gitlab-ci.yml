@@ -52,6 +52,17 @@ new-install:
   script:
     - script/test-runtime.sh
 
+securityscan:
+  stage: test
+  before_script:
+    - export LEIN_ROOT=1
+    - export LEIN_SNAPSHOTS_IN_RELEASE=1
+    - export PATH="$HOME/bin:${PATH}"
+  only:
+    - schedules
+  script:
+    - lein with-profile test nvd check
+
 package:
   stage: package
   script:
