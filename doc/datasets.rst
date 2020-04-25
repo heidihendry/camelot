@@ -63,7 +63,7 @@ locations, and calls out particular problematic configurations which must be avo
 
 * **DO** store **Database** on high-throughput, low latency storage, such as an SSD, if available.
 * **DO** store **Media** on larger, slower storage (e.g., HDDs or network storage), if available.
-* **DO** store **Backups** separately to **Database** and store.
+* **DO** store **Backups** separately to **Database**.
 * **DO** take your own backups, ensuring backups are taken for all storage
   involved and ensuring Camelot is stopped before these backups are taken.
 * **DO** store your backups separately to all Camelot storage locations.
