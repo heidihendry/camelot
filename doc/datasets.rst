@@ -68,9 +68,10 @@ locations, and calls out particular problematic configurations which must be avo
   involved and ensuring Camelot is stopped before these backups are taken.
 * **DO** store your backups separately to all Camelot storage locations.
 
-* **DO NOT** store **Database** on storage crossing a WAN (e.g., cloud storage
-  over the internet). This will severely degrade Camelot's performance and
-  poses a **high risk of unrecoverable data corruption**.
+* **DO NOT** store **Database** on storage crossing a WAN (e.g., Google Drive,
+  OneDrive, Dropbox and other online storage). This will severely degrade
+  Camelot's performance and poses a **high risk of unrecoverable data
+  corruption**.
 * **DO NOT** store **Database** on local network storage unless disk write
   caching for that volume is disabled. (This is typically not the default.)
 * **DO NOT** rely on Camelot's backups alone; they are intended for recovery
