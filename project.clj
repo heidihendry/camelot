@@ -62,8 +62,9 @@
                             :compiler
                             {:output-to "resources/www/js/compiled/testable.js"
                              :main camelot.test-runner
-                             :optimizations :none}}]}}
-
+                             :optimizations :none}}]}
+              :nvd {:fail-threshold 7
+                    :verbose-summary true}}
              :uberjar
              {:source-paths ^:replace ["src/clj" "src/cljc"]
               :hooks [leiningen.cljsbuild]

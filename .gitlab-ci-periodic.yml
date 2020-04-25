@@ -1,0 +1,15 @@
+image: registry.gitlab.com/camelot-project/camelot/image
+
+stages:
+  - build
+  - test
+  - package
+
+variables:
+  GIT_SSL_NO_VERIFY: "1"   # hack around SSL issues https://gitlab.com/camelot-project/camelot/-/jobs/500013241
+
+securityscan:
+  stage: test
+  before_script:
+  script:
+    - lein with-profile test nvd check
