@@ -64,19 +64,18 @@ locations, and calls out particular problematic configurations which must be avo
 * **DO** feel free to store **Media** on larger, slower storage (e.g., HDDs or network storage).
 * **DO** store **Database** on high-throughput, low latency storage, such as an
   SSD.
-  backups on separate devices to all Camelot storage locations.
 * **DO** store **Media** and **Database** folders separately if working with
   large datasets and you have different types of storage available to achieve
   a good balance of performance.
 * **DO** ensure backups are taken for all storage involved and ensure Camelot
   is stopped before these backups are taken.
 * **DO** store **Backups** separately to **Database** and store your own
-
+  backups on separate devices to all Camelot storage locations.
 * **DO NOT** store **Database** on storage crossing a WAN (e.g., cloud storage
   over the internet). This will severely degrade Camelot's performance and
   poses a **high risk of unrecoverable data corruption**.
 * **DO NOT** store **Database** on local network storage unless disk write
-  caching for that volume is disabled. (This is typically not the default).
+  caching for that volume is disabled. (This is typically not the default.)
 * **DO NOT** rely on Camelot's backups alone; they are intended for recovery
   from a limited set of problems only.
 * **DO NOT** use "incremental" backups. Any backups taken of **Database** MUST
