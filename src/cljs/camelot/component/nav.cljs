@@ -182,8 +182,9 @@
   (reify
     om/IRender
     (render [_]
-      (dom/option #js {:value (name data)
-                       :key data} (name data)))))
+      (dom/option #js {:value (name (:dataset-id data))
+                       :key data}
+                  (:dataset-name data)))))
 
 (defn navigate-home
   []
@@ -200,7 +201,7 @@
     (did-mount [_]
       (rest/get-x "/dataset"
                   #(do
-                     (om/set-state! owner :dataset-ids (:dataset-ids (:body %)))
+                     (om/set-state! owner :datasets (:datasets (:body %)))
                      (om/set-state! owner :selected-dataset (name (:selected-dataset (:body %))))))
       (letfn [(focus-handler []
                 (rest/get-x "/dataset"
@@ -217,7 +218,7 @@
         (.removeEventListener js/window "focus" focus-handler)))
     om/IRenderState
     (render-state [_ state]
-      (let [options (:dataset-ids state)]
+      (let [options (:datasets state)]
         (when (> (count options) 1)
           (dom/div nil
                    (dom/select #js {:value (:selected-dataset state)

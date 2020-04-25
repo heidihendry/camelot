@@ -11,10 +11,16 @@
      :session {:dataset-id dataset-id}
      :body nil}))
 
+(defn get-datasets
+  [state]
+  (map (fn [x] {:dataset-id x
+                :dataset-name (:name (state/get-dataset state x))})
+   (state/get-dataset-ids state)))
+
 (def routes
   (context "/dataset" {state :state}
            (GET "/" _
-                (r/response {:dataset-ids (state/get-dataset-ids state)
+                (r/response {:datasets (get-datasets state)
                              :selected-dataset (state/get-dataset-id state)}))
            (POST "/select/:id" [id]
                  (select-dataset state (keyword id)))))
