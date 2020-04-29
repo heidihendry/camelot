@@ -6,10 +6,9 @@
 
 set -e
 
-TMP_DERBY_BACKUP=$(mktemp -d ij-recover-db.XXXXXX)
-DERBY_DB_NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
-
 if [ $# -eq 1 ]; then
+    TMP_DERBY_BACKUP=$(mktemp -d ij-recover-db.XXXXXX)
+    DERBY_DB_NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
     SCRIPT="
 CONNECT 'jdbc:derby:/tmp/${DERBY_DB_NAME};create=true';
 CALL SYSCS_UTIL.SYSCS_BACKUP_DATABASE_AND_ENABLE_LOG_ARCHIVE_MODE('${TMP_DERBY_BACKUP}',0);
@@ -27,4 +26,8 @@ fi
 RESTORE_SCRIPT=$(mktemp restore-derby-db.XXXXXX)
 echo "${SCRIPT}" > "${RESTORE_SCRIPT}"
 java -Dij.protocol=jdbc:derby: -cp $(lein classpath) org.apache.derby.tools.ij "${RESTORE_SCRIPT}"
+
 rm "${RESTORE_SCRIPT}"
+if [ -n "${TMP_DERBY_BACKUP}" ] && [ -e "${TMP_DERBY_BACKUP}" ]; then
+    rm -rf "${TMP_DERBY_BACKUP}"
+fi
