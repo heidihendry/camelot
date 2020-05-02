@@ -1,6 +1,6 @@
 ## ChangeLog
 
-### 1.6.0 [Unreleased]
+### 1.6.0
 #### Added
 * Adds automated animal detection.
 * Adds support for multiple datasets within a single camelot instance

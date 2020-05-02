@@ -1,8 +1,6 @@
 Multiple datasets
 -----------------
 
-*The features described on this page are coming in Camelot 1.6.0.*
-
 Camelot offers the ability to manage multiple isolated collections of data (a
 "dataset") within a single running Camelot.
 

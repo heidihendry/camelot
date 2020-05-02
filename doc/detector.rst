@@ -1,7 +1,7 @@
 Animal detection
 ------------------
 
-*The features described on this page are coming in Camelot 1.6.0.*
+*The features described on this page require a registration, which is coming soon!*
 
 Typically most images captured by motion-triggered cameras are do not have
 valuable content, as the motion sensor was triggered by causes other than some
