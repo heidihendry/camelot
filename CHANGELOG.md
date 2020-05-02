@@ -7,7 +7,8 @@
 * Adds historic camera usage to camera details page.
 
 #### Changed
-* Library search query language is now much more powerful and much faster.
+* Library now loads and searches much faster
+* Library search query language is now much more powerful
 
 ### 1.5.8
 #### Fixed
