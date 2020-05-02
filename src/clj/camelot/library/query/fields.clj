@@ -57,5 +57,4 @@
     :boolean
     [:coalesce fc false]
 
-    :default
     fc))
