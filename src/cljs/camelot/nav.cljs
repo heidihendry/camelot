@@ -36,6 +36,10 @@
             "/"
             (str/join "/" paths))))))
 
+(defn time-now
+  []
+  (Math/round (.. js/window -performance now)))
+
 (defn- fire-analytics
   [& args]
   (when (:send-usage-data (state/settings))
@@ -49,6 +53,11 @@
    (fire-analytics "send" "event" component action))
   ([component action label]
    (fire-analytics "send" "event" component action label)))
+
+(defn analytics-timing
+  "Trigger timing analytics."
+  [category var value]
+  (fire-analytics "send" "timing" category var value))
 
 (defn analytics-pageview
   "Trigger a pageview analytics event."

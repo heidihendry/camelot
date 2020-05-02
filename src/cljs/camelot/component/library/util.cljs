@@ -67,18 +67,20 @@
 
 (defn hydrate-media
   [data media md & [cb]]
-  (rest/post-x "/library/hydrate" {:data {:media-ids media}}
-               #(do
-                  (om/update! (state/library-state) :records
-                              (->> (:body %)
-                                   (reduce (fn [acc x]
-                                             (assoc acc (:media-id x)
-                                                    (assoc (merge (om/value (get md (:trap-station-session-camera-id x))) x)
-                                                           :selected false)))
-                                           {})))
-                  (select-media-id (state/library-state) (first media))
-                  (when cb
-                    (cb (state/library-state))))))
+  (let [start (nav/time-now)]
+    (rest/post-x "/library/hydrate" {:data {:media-ids media}}
+                 #(do
+                    (nav/analytics-timing "library" "hydrate-loaded" (- (nav/time-now) start))
+                    (om/update! (state/library-state) :records
+                                (->> (:body %)
+                                     (reduce (fn [acc x]
+                                               (assoc acc (:media-id x)
+                                                      (assoc (merge (om/value (get md (:trap-station-session-camera-id x))) x)
+                                                             :selected false)))
+                                             {})))
+                    (select-media-id (state/library-state) (first media))
+                    (when cb
+                      (cb (state/library-state)))))))
 
 (defn get-media-flags
   [rec]
@@ -301,11 +303,13 @@
   ([data]
    (load-library data ""))
   ([data search]
-   (om/update! data [:search :inprogress] true)
-   (rest/get-x-opts "/library/metadata"
-                    {:success (fn [md]
-                                (rest/post-x-opts "/library" {:search search}
-                                                  {:success (fn [resp]
-                                                              (load-library-callback (state/library-state) (:body md) resp))
-                                                   :always (fn [x] (om/update!  (state/library-state) [:search :inprogress] false))}))
-                     :failure (fn [x] (om/update! data [:search :inprogress] false))})))
+   (let [start (nav/time-now)]
+     (om/update! data [:search :inprogress] true)
+     (rest/get-x-opts "/library/metadata"
+                      {:success (fn [md]
+                                  (rest/post-x-opts "/library" {:search search}
+                                                    {:success (fn [resp]
+                                                                (nav/analytics-timing "library" "search-loaded" (- (nav/time-now) start))
+                                                                (load-library-callback (state/library-state) (:body md) resp))
+                                                     :always (fn [x] (om/update!  (state/library-state) [:search :inprogress] false))}))
+                       :failure (fn [x] (om/update! data [:search :inprogress] false))}))))
