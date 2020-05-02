@@ -57,12 +57,14 @@
        (group-by :sighting-id)
        (reduce-kv sighting-field-query-reducer {})))
 
-(defn get-all-by-media-ids
-  "Return all sighting field values for a given `media-id`."
-  [state media-id]
-  (->> (query state :get-all-by-media-ids {:media-ids media-id})
-       (group-by :sighting-id)
-       (reduce-kv sighting-field-query-reducer {})))
+(defn get-all-by-sighting-ids
+  "Return all sighting field values for a given `sighting-ids`."
+  [state sighting-ids]
+  (if (seq sighting-ids)
+    (->> (query state :get-all-by-sighting-ids {:sighting-ids sighting-ids})
+         (group-by :sighting-id)
+         (reduce-kv sighting-field-query-reducer {}))
+    {}))
 
 (defn get-specific
   "Return a specific sighting field value."

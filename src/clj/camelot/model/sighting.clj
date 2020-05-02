@@ -69,9 +69,9 @@
 
 (defn get-all-for-media-ids
   [state media-ids]
-  (let [sf (sighting-field-value/get-all-by-media-ids state media-ids)]
-    (->> (query state :get-all-for-media-ids {:media-ids media-ids})
-         (map #(sighting (merge (get sf (:sighting-id %)) %))))))
+  (let [sightings (query state :get-all-for-media-ids {:media-ids media-ids})
+        sf (sighting-field-value/get-all-by-sighting-ids state (map :sighting-id sightings))]
+    (map #(sighting (merge (get sf (:sighting-id %)) %)) sightings)))
 
 (sch/defn get-specific
   [state :- State
