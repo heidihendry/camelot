@@ -1,5 +1,13 @@
 ## ChangeLog
 
+### 1.6.2
+#### Fixed
+* Fixes a couple of bugs causing library searches not to be requested correctly.
+
+### 1.6.1
+#### Fixed
+* Fixes the location of the Database directory when a configuration is upgraded.
+
 ### 1.6.0
 #### Added
 * Adds automated animal detection.
