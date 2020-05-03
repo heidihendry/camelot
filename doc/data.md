@@ -136,4 +136,3 @@ The library supports filtering on the vast majority of fields in Camelot.  Some 
 | species | taxonomy-label |
 | testfire | media-cameracheck |
 | trap | trap-station-name |
-| trapid | trap-station-id |

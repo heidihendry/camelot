@@ -21,7 +21,6 @@
    :lat :trap-station-latitude
    :model :camera-model
    :make :camera-make
-   :trapid :trap-station-id
    :flagged :media-attention-needed
    :processed :media-processed
    :testfire :media-cameracheck
@@ -57,7 +56,7 @@
       (append-to-strings (if (:unprocessed-only search-conf) " processed:false" ""))
       (append-to-strings (if (:animals-only search-conf) " (suggestion-key:animal or sighting-id:*)" ""))
       (append-to-strings (if (valid-id? (:trap-station-id search-conf))
-                           (str " trapid:" (:trap-station-id search-conf))
+                           (str " trap-station-id:" (:trap-station-id search-conf))
                            ""))
       (append-to-strings (if (valid-id? (:survey-id search-conf))
                            (str " survey-id:" (:survey-id search-conf))
