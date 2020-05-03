@@ -141,7 +141,9 @@
                                     (let [idx (:idx state)]
                                       (when-not (stacomp/prop idx ctx :hydrated?)
                                         (add-completions idx ctx)))
-                                    (om/set-state! owner :query query))
+                                    (om/set-state! owner :query query)
+                                    ;; Facilitate additional batching of updates
+                                    (js/setTimeout #(om/update! data [:search :terms] query) 0))
                        :on-submit #(select-media-collection-container data state %)}]
         (js/React.createElement sta-react/TypeaheadInput props)))))
 
