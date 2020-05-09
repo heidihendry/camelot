@@ -27,4 +27,6 @@ All units in USD.
 | 2020/04 | AWS Hosting        |        |   5.55 |  -22.53 |
 | 2020/05 | AWS Hosting        |        |   5.66 |  -28.19 |
 | 2020/05 | Donation           |  12.19 |        |   -16.0 |
+|---------+--------------------+--------+--------+---------|
+|         | *Total*            |        |        |   -16.0 |
 #+TBLFM: $5='(if (string= @-1 "Balance") 0.00 (* 0.01 (round (* 100 (- (+ (string-to-number @-1) (string-to-number $3))  (string-to-number $4))))))
