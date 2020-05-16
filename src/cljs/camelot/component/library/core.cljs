@@ -153,12 +153,14 @@
           (do
             (util/load-taxonomies (:library data) sid)
             (util/load-trap-stations (:library data) sid)
-            (when-not (:restricted-mode @data)
+            (if (:restricted-mode @data)
+              (util/load-library (:library data) (str "reference-quality:true survey-id:" sid))
               (util/load-library (:library data) (str "survey-id:" sid))))
           (do
             (util/load-taxonomies (:library data))
             (util/load-trap-stations (:library data))
-            (when-not (:restricted-mode @data)
+            (if (:restricted-mode @data)
+              (util/load-library (:library data) "reference-quality:true")
               (util/load-library (:library data)))))))
     om/IRender
     (render [_]
