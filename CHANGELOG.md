@@ -1,5 +1,9 @@
 ## ChangeLog
 
+### 1.6.3 [Unreleased]
+#### Fixed
+* Fixes a bug in the reference window where the reference quality images may not be loaded initially.
+
 ### 1.6.2
 #### Fixed
 * Fixes a couple of bugs causing library searches not to be requested correctly.
