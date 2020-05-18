@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
+  <Properties>
+    <Property name="camelot.log.path">log</Property>
+  </Properties>
   <Appenders>
-    <RollingFile name="RollingFile" fileName="log/camelot.log" filePattern="log/camelot-%d{yyyy-MM-dd}.log" bufferedIO="true" advertiseURI="file://logs/camelot.log" ignoreExceptions="false" advertise="true">
+    <RollingFile name="RollingFile" fileName="${sys:camelot.log.path}/camelot.log" filePattern="${sys:camelot.log.path}/camelot-%d{yyyy-MM-dd}.log" bufferedIO="true" advertiseURI="file://${sys:camelot.log.path}/camelot.log" ignoreExceptions="false" advertise="true">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
       <TimeBasedTriggeringPolicy />
     </RollingFile>
