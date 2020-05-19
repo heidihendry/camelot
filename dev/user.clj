@@ -1,9 +1,8 @@
 (ns user
   (:require
    [camelot.core]
-   [camelot.util.state :as state]
    [camelot.system.state :as sysstate]
-   [camelot.system.systems :as systems]
+   [camelot.system.core :as system]
    [camelot.util.maintenance :as maintenance]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
@@ -46,11 +45,7 @@
       (assoc this :figwheel nil))))
 
 (defn start []
-  (reset! sysstate/system (-> (state/system-config)
-                              (assoc-in [:server :dev-server]
-                                        (map->DevHttpServer {}))
-                              systems/camelot-system
-                              component/start))
+  (reset! sysstate/system (system/camelot {:app (map->DevHttpServer {})}))
   nil)
 
 (defn stop []

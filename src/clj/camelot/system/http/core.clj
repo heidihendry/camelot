@@ -72,14 +72,14 @@
        wrap-with-logger
        wrap-gzip)))
 
-(defrecord HttpServer [http-port]
+(defrecord HttpServer [config]
   component/Lifecycle
   (start [this]
     (if @jetty
       (do
         (log/warn "Jetty already running; not starting.")
         (assoc this :jetty @jetty))
-      (do
+      (let [http-port (get-in config [:server :http-port])]
         (println (format "Camelot %s started on port %d.\n" (version/get-version)
                          http-port))
         (println "You might be able to connect to it from the following addresses:")

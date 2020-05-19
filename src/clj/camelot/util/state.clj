@@ -2,10 +2,10 @@
   "Application state."
   (:require
    [camelot.market.config :as market-config]
-   [clj-time.core :as t]
-   [clj-time.format :as tf]
    [clojure.java.io :as io]
-   [clojure.string :as str]))
+   [clojure.string :as str])
+  (:import
+   (java.io File)))
 
 (defn- deep-merge
   "Merge maps in `ms` recursively"
@@ -60,9 +60,6 @@
   [state]
   (-> state :config :dataset-ids))
 
-(def ^:private backup-timestamp-formatter
-  (tf/formatter "YYYYMMddHHmmss"))
-
 (defn get-dataset
   [state dataset-id]
   (if-let [dataset (get-in state [:config :datasets dataset-id])]
@@ -82,16 +79,32 @@
 (defn lookup-path [state k]
   (get (lookup state :paths) k))
 
-(defn lookup-connection [state]
-  (let [dataset-id (get-dataset-id state)]
-    (if-let [conn (get-in state [:database :connections dataset-id])]
-      conn
-      (throw (ex-info "Database connection not found" {:dataset-id dataset-id})))))
+;; TODO move these to some suitable database'y namespace
+(defn spec-for-database
+  "JDBC spec for the database."
+  [^File database]
+  {:classname "org.apache.derby.jdbc.EmbeddedDriver",
+   :subprotocol "derby",
+   :subname (io/file (.getPath database)
+                     ;; TODO this should be in camelot market
+                     "Database"),
+   :create true})
 
-(defn generate-backup-dirname
+(defn spec-for-dataset
+  "JDBC spec for a dataset."
+  [dataset]
+  (spec-for-database (-> dataset :paths :database)))
+
+(defn spec
+  "JDBC spec for the database."
   [state]
-  (io/file (lookup-path state :backup)
-           (tf/unparse backup-timestamp-formatter (t/now))))
+  (spec-for-database (lookup-path state :database)))
+
+;; TODO kill this in favour of `spec`
+(defn lookup-connection [state]
+  (if (get-dataset-id state)
+    (spec state)
+    (throw (ex-info "Database connection not found" {}))))
 
 (defn with-session
   "Return a copy of `state` with `session-data` added to the session."
@@ -120,13 +133,3 @@
   "Lift config to a state-like map."
   [config]
   {:config config})
-
-(defn spec
-  "JDBC spec for the database."
-  [state]
-  {:classname "org.apache.derby.jdbc.EmbeddedDriver",
-   :subprotocol "derby",
-   :subname (.getPath (io/file (lookup-path state :database)
-                               ;; TODO this should be in camelot market
-                               "Database")),
-   :create true})
