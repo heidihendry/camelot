@@ -1,6 +1,12 @@
 ## ChangeLog
 
-### 1.6.3 [Unreleased]
+### 1.6.4 [Unreleased]
+* Fix cut/copy/paste keyboard shortcuts under MacOS
+
+### 1.6.3
+#### Changed
+* Include cause chain in admin UI stacktraces
+
 #### Fixed
 * Fixes a bug in the reference window where the reference quality images may not be loaded initially.
 
