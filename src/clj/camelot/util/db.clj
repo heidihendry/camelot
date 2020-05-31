@@ -13,7 +13,7 @@
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]
   `(let [dataset-id# (state/get-dataset-id ~state)]
-     (jdbc/with-db-transaction [tx# (datasets/lookup-connection (:datasets state))]
+     (jdbc/with-db-transaction [tx# (datasets/lookup-connection (:datasets ~state))]
        (let [~bind (update-in ~state :datasets datasets/assoc-connection-context tx#)]
          ~@body))))
 
