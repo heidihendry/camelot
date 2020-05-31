@@ -1,7 +1,7 @@
 (require '[clojure.math.combinatorics :as combinatorics])
 (require '[yesql.core :as sql])
 (require '[camelot.util.db :as db])
-(require '[camelot.util.state :as state])
+(require '[camelot.state.datasets :as datasets])
 (require '[schema.core :as s])
 
 (sql/defqueries "sql/migration-helpers/030.sql")
@@ -28,8 +28,8 @@
 (defn- -m030-upgrade
   [state]
   (db/with-transaction [s state]
-    ;; TODO and all like this
-    (let [conn {:connection (state/lookup-connection s)}]
+    ;; TODO #217 and all like this
+    (let [conn {:connection (datasets/lookup-connection (:datasets s))}]
       (doseq [p (-m030-all-pairs conn)]
         (-create<! (-m030-->survey-taxonomy p) conn)))))
 

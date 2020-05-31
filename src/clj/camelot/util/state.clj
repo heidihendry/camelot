@@ -1,115 +1,49 @@
 (ns camelot.util.state
-  "Application state."
   (:require
-   [camelot.market.config :as market-config]
-   [clojure.java.io :as io]
-   [clojure.string :as str])
-  (:import
-   (java.io File)))
+   [camelot.state.datasets :as datasets]
+   [camelot.state.database :as database]))
 
-(defn- deep-merge
-  "Merge maps in `ms` recursively"
-  [& ms]
-  (apply merge-with (fn [x y]
-                      (if (map? y)
-                        (deep-merge x y)
-                        y))
-         ms))
-
-(def config-cache (atom nil))
-
-(defn paths-to-file-objects
-  [m]
-  (letfn [(to-file-objects [p] (into {} (map (fn [[k v]] [k (io/file v)]) p)))]
-    (update m :paths to-file-objects)))
-
-(defn config-file-objects
-  [config]
-  (letfn [(dataset-paths-to-file-objects [ds]
-            (reduce-kv (fn [acc k v] (assoc acc k (paths-to-file-objects v)))
-                       {} ds))]
-    (-> config
-        paths-to-file-objects
-        (update :datasets dataset-paths-to-file-objects))))
-
-(defn- select-config
-  [config dataset]
-  (-> config
-      (dissoc :datasets)
-      (merge (get-in config [:datasets dataset]))))
-
-(defn- read-config
-  []
-  (when (nil? @config-cache)
-    (reset! config-cache
-            (config-file-objects (market-config/read-config))))
-  @config-cache)
-
-(defn get-config
-  [dataset]
-  (select-config (read-config) dataset))
-
-(defn system-config
-  []
-  (let [config (read-config)]
-    (-> config
-        (assoc :dataset-ids (sort-by (comp str/lower-case name)
-                                     (keys (:datasets config)))))))
-
+;; TODO #217 remove from this ns
 (defn get-dataset-ids
   [state]
   (-> state :config :dataset-ids))
 
+;; TODO #217 remove from this ns
 (defn get-dataset
   [state dataset-id]
   (if-let [dataset (get-in state [:config :datasets dataset-id])]
     dataset
     (throw (ex-info "Dataset not found" {:dataset-id dataset-id}))))
 
+;; TODO #217 remove from this ns
 (defn get-dataset-id [state]
   (if-let [dataset-id (get-in state [:session :dataset-id])]
     dataset-id
     (throw (ex-info "Dataset ID not set" {}))))
 
+;; TODO #217 remove dataset concern from this ns
 (defn lookup [state k]
   (let [dataset-id (get-dataset-id state)
         dataset (get-dataset state dataset-id)]
     (get (merge (:config state) dataset (or (:session state) {})) k)))
 
-(defn lookup-path [state k]
-  (get (lookup state :paths) k))
-
-;; TODO move these to some suitable database'y namespace
-(defn spec-for-database
-  "JDBC spec for the database."
-  [^File database]
-  {:classname "org.apache.derby.jdbc.EmbeddedDriver",
-   :subprotocol "derby",
-   :subname (io/file (.getPath database)
-                     ;; TODO this should be in camelot market
-                     "Database"),
-   :create true})
-
+;; TODO #217 move these to some suitable database'y namespace
 (defn spec-for-dataset
   "JDBC spec for a dataset."
   [dataset]
-  (spec-for-database (-> dataset :paths :database)))
+  (database/spec (-> dataset :paths :database)))
 
 (defn spec
   "JDBC spec for the database."
   [state]
-  (spec-for-database (lookup-path state :database)))
+  ;; TODO #217 remove usage of lookup-path / move this call
+  (database/spec (datasets/lookup-path (:datasets state) :database)))
 
-;; TODO kill this in favour of `spec`
+;; TODO #217 kill this in favour of `spec`
 (defn lookup-connection [state]
   (if (get-dataset-id state)
     (spec state)
     (throw (ex-info "Database connection not found" {}))))
-
-(defn with-session
-  "Return a copy of `state` with `session-data` added to the session."
-  [state session-data]
-  (update state :session #(merge % session-data)))
 
 (defn with-dataset
   "Return a copy of `state` with the `dataset-id` set."
@@ -128,8 +62,3 @@
 (defn dissoc-dataset
   [state]
   (update state :session dissoc :dataset-id))
-
-(defn config->state
-  "Lift config to a state-like map."
-  [config]
-  {:config config})

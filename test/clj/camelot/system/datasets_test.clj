@@ -57,7 +57,7 @@
                                              :database (map->MockDatabase
                                                         {:connect-fn connect
                                                          :disconnect-fn identity})})]
-            (t/is (= #{:default :special} (.inspect (.start datasets))))))
+            (t/is (= #{:default :special} (:datasets/available (.inspect (.start datasets)))))))
 
         (t/testing "throws if unable to connect to any databases"
           (let [connect #(throw (ex-info "Throws" {}))
@@ -80,7 +80,7 @@
                                  {:connect-fn connect
                                   :disconnect-fn identity})}
                 datasets (sut/map->Datasets deps)]
-            (t/is (= #{:default} (.inspect (.start datasets)))))))
+            (t/is (= #{:default} (:datasets/available (.inspect (.start datasets))))))))
 
       (t/testing "stop"
         (t/testing "invokes Database#disconnect"

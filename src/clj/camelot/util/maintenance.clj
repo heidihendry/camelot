@@ -6,6 +6,7 @@
    [clj-time.format :as tf]
    [clojure.java.io :as io]
    [camelot.util.db :as dbutil]
+   [camelot.state.datasets :as datasets]
    [camelot.util.state :as state]
    [camelot.util.db-migrate :as db-migrate]
    [clojure.tools.logging :as log]
@@ -22,12 +23,12 @@
 (def ^:private derby-container-dir "seg0")
 (def ^:private query (dbutil/with-db-keys :maintenance))
 
-;; TODO kill this
+;; TODO #217 kill this
 (defn migrations-available?
   "Returns `true` if a migration with a newer version than currently applied
   to the database is available. `false` otherwise."
   [state]
-  (let [conn (state/lookup-connection state)]
+  (let [conn (datasets/lookup-connection (:datasets state))]
     (db-migrate/migrations-available? conn)))
 
 (defn migrations-available-for-spec?
@@ -42,17 +43,17 @@
   `:to`, which is the version the latest version the database can be upgraded
   to."
   [state]
-  (let [conn (state/lookup-connection state)]
+  (let [conn (datasets/lookup-connection (:datasets state))]
     {:from (db-migrate/version conn)
      :to (db-migrate/latest-available-version conn)}))
 
-;; TODO kill this
+;; TODO #217 kill this
 (defn is-db-initialised?
   "Returns `true` if the database looks initialized. `false` otherwise.
   Based on a simple directory heuristic. Don't trust it with your life."
   [state]
   (try
-    (let [path (state/lookup-path state :database)
+    (let [path (datasets/lookup-path (:datasets state) :database)
           cdir (io/file path derby-container-dir)]
       (and (file/exists? cdir)
            (file/directory? cdir)))
@@ -110,7 +111,7 @@
 (defn migrate
   "Upgrade the database."
   [state]
-  ;; TODO kill migration state
+  ;; TODO #217 kill migration state
   (binding [sysdb/*migration-state* state]
     (when-let [db-conn (state/lookup-connection state)]
       (db-migrate/migrate db-conn))))
@@ -118,7 +119,7 @@
 (defn migrate-dataset
   "Upgrade the database."
   [dataset]
-  ;; TODO kill migration state
+  ;; TODO #217 kill migration state
   (binding [sysdb/*migration-state* {}]
     (when-let [db-conn (state/spec-for-dataset dataset)]
       (db-migrate/migrate db-conn))))
@@ -126,7 +127,7 @@
 (defn rollback
   "Rollback the database."
   [state]
-  ;; TODO kill migration state
+  ;; TODO #217 kill migration state
   (binding [sysdb/*migration-state* state]
     (when-let [db-conn (state/lookup-connection state)]
       (db-migrate/rollback db-conn))))
@@ -134,7 +135,7 @@
 (defn rollback-dataset
   "Rollback the database."
   [dataset]
-  ;; TODO kill migration state
+  ;; TODO #217 kill migration state
   (binding [sysdb/*migration-state* {}]
     (when-let [db-conn (state/spec-for-dataset dataset)]
       (db-migrate/rollback db-conn))))
@@ -144,7 +145,7 @@
   (let [plan (upgrade-plan-for-spec (state/spec-for-dataset dataset))]
     (assoc plan :backup (not= (:from plan) (:to plan)))))
 
-;; TODO flesh this out to actually backup the dataset
+;; TODO #217 flesh this out to actually backup the dataset
 (defn- plan-backup-dataset!
   [plan dataset]
   (when (:backup plan)

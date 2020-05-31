@@ -1,6 +1,6 @@
 (require '[yesql.core :as sql])
 (require '[clojure.string :as str])
-(require '[camelot.util.state :as state])
+(require '[camelot.state.datasets :as datasets])
 (require '[clojure.java.jdbc :as jdbc])
 (require '[camelot.util.db :as db])
 
@@ -26,22 +26,24 @@
 
 (defn- -m021-species-genus-migration
   [s]
-  (let [spps (-get-all-species {} {:connection (state/lookup-connection s)})
-        build (comp #(-create-taxonomy<! % {:connection (state/lookup-connection s)})
+  (let [conn {:connection (datasets/lookup-connection (:datasets s))}
+        spps (-get-all-species {} conn)
+        build (comp #(-create-taxonomy<! % conn)
                     -m021-create-taxonomy)]
     (->> spps
          (map #(hash-map :species_id (:species_id %)
                          :taxonomy_id (int (:1 (build %)))))
-         (map #(-update-sightings! % {:connection (state/lookup-connection s)}))
+         (map #(-update-sightings! % conn))
          (doall))))
 
 (defn- -m021-remove-unnecessary-constraints
   [s]
-  (let [constraints (-get-constraints {:source_table "SIGHTING"
+  (let [conn {:connection (datasets/lookup-connection (:datasets s))}
+        constraints (-get-constraints {:source_table "SIGHTING"
                                        :relation_table "SPECIES"}
-                                      {:connection (state/lookup-connection s)})]
+                                      conn)]
     (doseq [c constraints]
-      (jdbc/db-do-commands (state/lookup-connection s)
+      (jdbc/db-do-commands (:connection conn)
                            (str "ALTER TABLE sighting DROP CONSTRAINT "
                                 (:constraintname c))))))
 

@@ -19,19 +19,18 @@
 (defn gen-state
   ([] {:config (component/start
                 (config/map->Config default-config))
-       :database {:connections {:default {}}}
+       :database {}
        :app {:port 5341 :browser false}
        :session {:dataset-id :default}})
   ([config]
    {:config (component/start
              (config/map->Config (merge default-config config)))
-    :database {:connections {:default {}}}
+    :database {}
     :app {:port 5341 :browser false}
     :session {:dataset-id :default}})
   ([config queries]
    {:config (component/start
              (config/map->Config (merge default-config config)))
-    :database {:connections {:default {}}
-               :queries queries}
+    :database {:queries queries}
     :app {:port 5341 :browser false}
     :session {:dataset-id :default}}))

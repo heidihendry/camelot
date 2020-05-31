@@ -5,6 +5,7 @@
    [ring.util.response :as r]
    [compojure.core :refer [context GET POST]]
    [camelot.model.screens :as screens]
+   [camelot.state.datasets :as datasets]
    [camelot.util.state :as state]
    [camelot.util.db-migrate :as db-migrate]
    [camelot.util.version :as version]
@@ -26,10 +27,11 @@
 
 (defn- db-versions
   [state]
+  ;; TODO #217 Kill map-datasets
   (into {}
         (state/map-datasets
          (fn [s]
-           (let [conn (state/lookup-connection s)]
+           (let [conn (datasets/lookup-connection (:datasets s))]
              [(state/get-dataset-id s) (db-migrate/version conn)]))
          (state/dissoc-dataset state))))
 

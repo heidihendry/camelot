@@ -5,7 +5,7 @@
             [camelot.library.query.sighting-fields :as sighting-fields]
             [camelot.library.query.util :as qutil]
             [camelot.util.db :as db]
-            [camelot.util.state :as state]
+            [camelot.state.datasets :as datasets]
             [bitpattern.simql.parser.core :as simql-parser]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]))
@@ -29,7 +29,7 @@
        (honeysql/build-query state)
        (sighting-fields/join-fields pt)
        honeysql/finalise-query
-       (jdbc/query (state/lookup-connection state))
+       (jdbc/query (datasets/lookup-connection (:datasets state)))
        (map :media_id)))
 
 (defn create-parser

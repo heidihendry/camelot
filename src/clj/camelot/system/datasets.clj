@@ -1,61 +1,90 @@
 (ns camelot.system.datasets
   (:require
+   [camelot.state.util :as state.util]
    [camelot.system.protocols :as protocols]
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]))
 
-;; TODO allow reloading of definitions
+(defn- connect* [ref id {:keys [database migrater]}]
+  (if-let [dataset (-> @ref :datasets/definitions id)]
+    (do
+      (log/info "Connecting to" (name id) "...")
+      (try
+        (.connect database (get-in dataset [:paths :database]))
+        (.migrate migrater dataset)
+        true
+        (catch Exception e
+          (log/error e)
+          false)))
+    (do
+      (log/error "Dataset not defined")
+      false)))
+
+(defn- disconnect* [ref id {:keys [database]}]
+  (if-let [dataset (-> @ref :datasets/definitions id)]
+    (do
+      (log/info "Disconnecting from" (name id) "...")
+      (try
+        (.disconnect database (get-in dataset [:paths :database]))
+        true
+        (catch Exception e
+          (log/error e)
+          false)))
+    (do
+      (log/error "Dataset not defined")
+      false)))
+
+(defn- init-datasets
+  [datasets]
+  (into {}
+        (reduce-kv (fn [acc k v]
+                     (assoc acc k (state.util/paths-to-file-objects v)))
+                   {} datasets)))
+
 (defrecord Datasets [config database migrater ref]
   protocols/Connectable
   (connect [this id]
-    (if-let [dataset (-> @ref :definitions id)]
-      (do
-        (log/info "Connecting to" (name id) "...")
-        (try
-          (.connect database (get-in dataset [:paths :database]))
-          (.migrate migrater dataset)
-          (swap! (:ref this) update :available conj id)
-          true
-          (catch Exception e
-            (log/error e)
-            false)))
-      (do
-        (log/error "Dataset not defined")
-        false)))
-
+    (let [opts {:database database
+                :migrater migrater}]
+      (when (connect* ref id opts)
+        (swap! (:ref this) update :datasets/available conj id))))
 
   (disconnect [this id]
-    (if-let [dataset (-> @ref :definitions id)]
-      (do
-        (log/info "Disconnecting from" (name id) "...")
-        (try
-          (.disconnect database (get-in dataset [:paths :database]))
-          (swap! (:ref this) update :available disj id)
-          true
-          (catch Exception e
-            (log/error e)
-            false)))
-      (do
-        (log/error "Dataset not defined")
-        false)))
+    (let [opts {:database database}]
+      (when (disconnect* ref id opts)
+        (swap! (:ref this) update :datasets/available disj id))))
 
   protocols/Inspectable
   (inspect [this]
     (when-let [ref (:ref this)]
-      (:available @ref)))
+      @ref))
+
+  protocols/Contextual
+  (set-context [this k dataset-id]
+    (assoc-in this [::context k] dataset-id))
+
+  (context [this k]
+    (get-in this [::context k]))
+
+  protocols/Reloadable
+  (reload [this]
+    ;; TODO #217 allow reloading of definitions. Consider what should happen
+    ;; when reloading disconnected datasets.  Presumably they should stay
+    ;; disconnected?
+    (throw (Exception. "Not implemented")))
 
   component/Lifecycle
   (start [this]
     (log/info config)
     (let [datasets (keys (:datasets config))
-          next (assoc this :ref (atom {:definitions (:datasets config)
-                                       :available #{}}))]
+          next (assoc this :ref (atom {:datasets/definitions (init-datasets (:datasets config))
+                                       :datasets/available #{}}))]
       (doall (map #(.connect next %) datasets))
-      (if (empty? (.inspect next))
+      (if (empty? (:datasets/available (.inspect next)))
         (throw (ex-info "Unable to connect to any Databases" {:tried datasets}))
         next)))
 
   (stop [this]
     (log/info "Stopping datasets...")
-    (doall (map #(.disconnect this %) (.inspect this)))
+    (doall (map #(.disconnect this %) (:datasets/available (.inspect this))))
     (assoc this :ref nil)))

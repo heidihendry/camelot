@@ -1,6 +1,6 @@
 (require '[yesql.core :as sql])
 (require '[camelot.util.db :as db])
-(require '[camelot.util.state :as state])
+(require '[camelot.state.datasets :as datasets])
 (require '[schema.core :as s])
 (require '[clj-time.core :as t])
 (require '[clj-time.coerce :as tc])
@@ -102,7 +102,7 @@
 (defn- -m040-upgrade
   [state]
   (db/with-transaction [s state]
-    (let [conn {:connection (state/lookup-connection s)}]
+    (let [conn {:connection (datasets/lookup-connection (:datasets s))}]
       (doseq [survey (-m040-get-survey-ids conn)]
         (-m040-migrate-survey-data conn survey)))))
 

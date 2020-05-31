@@ -1,13 +1,13 @@
 (ns camelot.system.config.core
   (:require
-   [camelot.util.state :as state]
+   [camelot.state.config :as config]
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]))
 
 (defrecord Config [config]
   component/Lifecycle
   (start [this]
-    (merge this (state/system-config)))
+    (merge this (config/read-config)))
 
   (stop [this]
     (log/info "Config stopped.")

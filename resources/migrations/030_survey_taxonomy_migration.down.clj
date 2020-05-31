@@ -1,5 +1,5 @@
 (require '[yesql.core :as sql])
-(require '[camelot.util.state :as state])
+(require '[camelot.state.datasets :as datasets])
 (require '[clojure.java.jdbc :as jdbc])
 (require '[schema.core :as s])
 (require '[camelot.util.db :as db])
@@ -9,7 +9,7 @@
 (defn- -m030-downgrade
   [state]
   (db/with-transaction [s state]
-    (let [conn {:connection (state/lookup-connection s)}]
+    (let [conn {:connection (datasets/lookup-connection (:datasets s))}]
       (doseq [st (-get-all-survey-taxonomy {} conn)]
         (-delete! {:survey_taxonomy_id st} conn)))))
 

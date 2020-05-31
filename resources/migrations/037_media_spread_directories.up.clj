@@ -1,10 +1,10 @@
-(require '[camelot.util.state :as state])
+(require '[camelot.state.datasets :as datasets])
 (require '[camelot.util.file :as file])
 (require '[clojure.string :as str])
 
 (defn- -m037-upgrade
   [state]
-  (let [media-dir (state/lookup-path state :media)
+  (let [media-dir (datasets/lookup-path (:datasets state) :media)
         mfiles (file/list-files media-dir)]
     (dorun (map
             (fn [f]

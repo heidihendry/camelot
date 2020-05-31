@@ -3,14 +3,13 @@
   (:require
    [clojure.spec.alpha :as s]))
 
-(s/def ::connections (s/with-gen (s/keys) #(s/gen #{{:default {}}})))
 (s/def ::figwheel boolean?)
 (s/def ::browser boolean?)
 (s/def ::port number?)
 
 ;; should use the real things, but currently causes cyclic dep.
 (s/def ::config  (s/keys))
-(s/def ::database (s/keys :req-un [::connections]))
+(s/def ::database (s/keys :req-un []))
 (s/def ::app (s/keys :req-un [::port ::browser] :opt-un [::figwheel]))
 (s/def ::jetty (s/keys))
 (s/def ::importer (s/keys))

@@ -1,6 +1,6 @@
 (ns camelot.detection.bootstrap
   (:require
-   [camelot.util.state :as util.state]
+   [camelot.state.datasets :as state.datasets]
    [camelot.detection.datasets :as datasets]
    [camelot.model.trap-station-session-camera :as session-camera]
    [camelot.model.media :as media]
@@ -42,7 +42,7 @@
     (async/go
       (async/>! event-ch {:action :bootstrap-retrieve
                           :subject :global})
-      (doseq [dataset-id (util.state/get-dataset-ids system-state)]
+      (doseq [dataset-id (state.datasets/get-available (:datasets system-state))]
         (datasets/with-context {:system-state system-state
                                 :ctx {:dataset-id dataset-id}}
           [state]
@@ -69,7 +69,7 @@
           (do
             (log/info "Re-queuing session cameras")
             (async/go
-              (doseq [dataset-id (util.state/get-dataset-ids system-state)]
+              (doseq [dataset-id (state.datasets/get-available (:datasets system-state))]
                 (datasets/with-context {:system-state system-state
                                         :ctx {:dataset-id dataset-id}}
                   [state]

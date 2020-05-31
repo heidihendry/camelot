@@ -1,7 +1,8 @@
 (ns camelot.backup.core
   (:require
    [camelot.util.maintenance :as maintenance]
-   [camelot.util.state :as state]
+   [camelot.state.config :as config]
+   [camelot.state.datasets :as datasets]
    [camelot.util.file :as file]
    [clojure.java.io :as io]))
 
@@ -16,9 +17,9 @@
 
 (defn manifest
   [state]
-  {:config (rel-file-seq (state/lookup-path state :config))
-   :media (rel-file-seq (state/lookup-path state :media))
-   :filestore-base (rel-file-seq (state/lookup-path state :filestore-base))
+  {:config (rel-file-seq (config/lookup-path (:config state) :config))
+   :media (rel-file-seq (datasets/lookup-path (:datasets state) :media))
+   :filestore-base (rel-file-seq (datasets/lookup-path (:datasets state) :filestore-base))
    :database (maintenance/backup state)})
 
 (defn download

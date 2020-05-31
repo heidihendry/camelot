@@ -26,7 +26,8 @@
     (component/system-using smap {:app {:config :config
                                         :database :database
                                         :importer :importer
-                                        :detector :detector}
+                                        :detector :detector
+                                        :datasets :datasets}
                                   :config {}
                                   :database {}
                                   :migrater {}
@@ -35,7 +36,8 @@
                                              :migrater :migrater}
                                   :importer {:config :config}
                                   :detector {:config :config
-                                             :database :database}})))
+                                             :database :database
+                                             :datasets :datasets}})))
 
 (defn camelot
   [system-overrides]

@@ -1,4 +1,4 @@
-(require '[camelot.util.state :as state])
+(require '[camelot.state.datasets :as datasets])
 (require '[camelot.util.db :as db])
 (require '[yesql.core :as sql])
 (require '[clj-time.core :as t])
@@ -39,8 +39,8 @@
 (defn -m035-upgrade
   [state]
   (db/with-transaction [s state]
-    ;; TODO
-    (let [conn {:connection (state/lookup-connection s)}]
+    ;; TODO #217
+    (let [conn {:connection (datasets/lookup-connection (:datasets s))}]
       (migrate-table! conn -get-surveys -migrate-survey!)
       (migrate-table! conn -get-sites -migrate-site!)
       (migrate-table! conn -get-survey-sites -migrate-survey-site!)

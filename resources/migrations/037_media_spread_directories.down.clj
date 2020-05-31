@@ -1,8 +1,8 @@
-(require '[camelot.util.state :as state])
+(require '[camelot.state.datasets :as datasets])
 (require '[camelot.util.file :as file])
 
 (defn- -m037-migrate [state]
-  (let [media-dir (state/lookup-path state :media)]
+  (let [media-dir (datasets/lookup-path (:datasets state) :media)]
     (dorun (map
             (fn [f]
               (when (and (file/file? f)

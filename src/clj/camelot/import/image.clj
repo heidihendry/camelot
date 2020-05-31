@@ -1,6 +1,6 @@
 (ns camelot.import.image
   (:require
-   [camelot.util.state :as state]
+   [camelot.state.datasets :as datasets]
    [camelot.util.file :as file]
    [clojure.java.io :as io]
    [clojure.string :as str]
@@ -38,7 +38,7 @@
 
 (defn- create-image
   [state path file-basename extension variant width]
-  (let [fdir (io/file (state/lookup-path state :media)
+  (let [fdir (io/file (datasets/lookup-path (:datasets state) :media)
                       (subs (str/lower-case file-basename) 0 2))]
     (when-not (file/exists? fdir)
       (file/mkdir fdir))

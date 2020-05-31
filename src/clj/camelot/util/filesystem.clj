@@ -1,7 +1,7 @@
 (ns camelot.util.filesystem
   (:require
    [clojure.java.io :as io]
-   [camelot.util.state :as state]
+   [camelot.state.datasets :as datasets]
    [camelot.util.file :as file]
    [clojure.string :as str])
   (:import
@@ -28,7 +28,7 @@
 (defn filestore-survey-directory
   "Return the path to the survey's filestore directory."
   [state survey-id]
-  (io/file (state/lookup-path state :filestore-base) (str survey-id)))
+  (io/file (datasets/lookup-path (:datasets state) :filestore-base) (str survey-id)))
 
 (defn filestore-file-path
   "Return the path to a file in the survey's filestore directory."

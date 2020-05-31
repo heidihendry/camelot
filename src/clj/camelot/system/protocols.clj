@@ -15,3 +15,13 @@
 (defprotocol Inspectable
   (inspect [this]
     "Return the state."))
+
+(defprotocol Contextual
+  (set-context [this ctx k]
+    "Set the given context")
+  (context [this k]
+    "Get the given context."))
+
+(defprotocol Reloadable
+  (reload [this]
+    "Reload."))

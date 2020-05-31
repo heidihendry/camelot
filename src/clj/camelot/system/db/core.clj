@@ -1,6 +1,6 @@
 (ns camelot.system.db.core
   (:require
-   [camelot.util.state :as state]
+   [camelot.state.database :as database]
    [camelot.system.protocols :as protocols]
    [clojure.tools.logging :as log]
    [yesql.core :as sql]
@@ -70,18 +70,15 @@
 (defrecord Database [config]
   protocols/Connectable
   (connect [this database]
-    (let [spec (state/spec-for-database database)]
+    (let [spec (database/spec database)]
       (connect spec)))
 
   (disconnect [this database]
-    (close (state/spec-for-database database)))
+    (close (database/spec database)))
 
   component/Lifecycle
   (start [this]
-    (assoc this
-           :queries (build-queries)
-           ;; TODO remove this
-           :connections (map state/spec-for-dataset (vals (-> config :datasets)))))
+    (assoc this :queries (build-queries)))
 
   (stop [this]
     (assoc this :queries nil)))
