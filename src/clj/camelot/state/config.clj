@@ -5,10 +5,6 @@
 
 (def config-cache (atom nil))
 
-(defn- update-vals
-  [m f]
-  (into {} (map (juxt first (comp f second)) m)))
-
 (defn- paths-to-file-objects
   "Transform all values under :paths to `File` objects."
   [m]

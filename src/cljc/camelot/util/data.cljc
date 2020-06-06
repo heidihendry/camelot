@@ -116,3 +116,8 @@
   (if (pred data)
     (dissoc data k)
     data))
+
+(defn update-vals
+  "Update vals in map `m` by calling `f` on each."
+  [m f]
+  (into {} (map (juxt first (comp f second)) m)))
