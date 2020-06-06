@@ -1,7 +1,7 @@
 (ns camelot.core
   "Camelot - Camera Trap management software for conservation research."
   (:require
-   [camelot.system.config.core :as config]
+   [camelot.system.config :as config]
    [camelot.system.http.core :as http]
    [camelot.system.db :as db]
    [camelot.system.migrater :as migrater]

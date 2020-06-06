@@ -1,4 +1,4 @@
-(ns camelot.system.config.core
+(ns camelot.system.config
   (:require
    [camelot.state.config :as config]
    [clojure.tools.logging :as log]

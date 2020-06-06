@@ -2,7 +2,7 @@
   (:require
    [clj-time.coerce :as tc]
    [clj-time.core :as t]
-   [camelot.system.config.core :as config]
+   [camelot.system.config :as config]
    [com.stuartsierra.component :as component]))
 
 (def default-config
