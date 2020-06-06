@@ -1,7 +1,5 @@
-(require '[camelot.state.datasets :as datasets])
-(require '[camelot.util.db :as db])
+(require '[clojure.java.jdbc :as jdbc])
 (require '[yesql.core :as sql])
-(require '[clj-time.core :as t])
 (require '[clj-time.coerce :as tc])
 
 (sql/defqueries "sql/migration-helpers/035.sql")
@@ -37,10 +35,9 @@
                 s))))
 
 (defn -m035-upgrade
-  [state]
-  (db/with-transaction [s state]
-    ;; TODO #217
-    (let [conn {:connection (datasets/lookup-connection (:datasets s))}]
+  [conn]
+  (jdbc/with-db-transaction [tx conn]
+    (let [conn {:connection tx}]
       (migrate-table! conn -get-surveys -migrate-survey!)
       (migrate-table! conn -get-sites -migrate-site!)
       (migrate-table! conn -get-survey-sites -migrate-survey-site!)
@@ -56,4 +53,4 @@
       (migrate-table! conn -get-photos -migrate-photo!))
     nil))
 
-(-m035-upgrade camelot.system.db.core/*migration-state*)
+(-m035-upgrade camelot.migration/*connection*)

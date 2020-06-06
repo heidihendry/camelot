@@ -1,8 +1,6 @@
+(require '[clojure.java.jdbc :as jdbc])
 (require '[yesql.core :as sql])
 (require '[clojure.string :as str])
-(require '[camelot.state.datasets :as datasets])
-(require '[clojure.java.jdbc :as jdbc])
-(require '[camelot.util.db :as db])
 
 (sql/defqueries "sql/migration-helpers/021.sql")
 (sql/defqueries "sql/migration-helpers/db.sql")
@@ -25,8 +23,8 @@
                          (str/join " " (rest name-parts)))}))
 
 (defn- -m021-species-genus-migration
-  [s]
-  (let [conn {:connection (datasets/lookup-connection (:datasets s))}
+  [conn]
+  (let [conn {:connection conn}
         spps (-get-all-species {} conn)
         build (comp #(-create-taxonomy<! % conn)
                     -m021-create-taxonomy)]
@@ -37,8 +35,8 @@
          (doall))))
 
 (defn- -m021-remove-unnecessary-constraints
-  [s]
-  (let [conn {:connection (datasets/lookup-connection (:datasets s))}
+  [conn]
+  (let [conn {:connection conn}
         constraints (-get-constraints {:source_table "SIGHTING"
                                        :relation_table "SPECIES"}
                                       conn)]
@@ -47,6 +45,6 @@
                            (str "ALTER TABLE sighting DROP CONSTRAINT "
                                 (:constraintname c))))))
 
-(db/with-transaction [s camelot.system.db.core/*migration-state*]
-  (-m021-remove-unnecessary-constraints s)
-  (-m021-species-genus-migration s))
+(jdbc/with-db-transaction [conn camelot.migration/*connection*]
+  (-m021-remove-unnecessary-constraints conn)
+  (-m021-species-genus-migration conn))

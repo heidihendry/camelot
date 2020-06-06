@@ -2,7 +2,6 @@
   (:require
    [clojure.spec.alpha :as s]
    [camelot.state.datasets :as datasets]
-   [camelot.util.state :as state]
    [camelot.spec.system :as sysspec]
    [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
@@ -12,10 +11,9 @@
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]
-  `(let [dataset-id# (state/get-dataset-id ~state)]
-     (jdbc/with-db-transaction [tx# (datasets/lookup-connection (:datasets ~state))]
-       (let [~bind (update-in ~state :datasets datasets/assoc-connection-context tx#)]
-         ~@body))))
+  `(jdbc/with-db-transaction [tx# (datasets/lookup-connection (:datasets ~state))]
+     (let [~bind (update ~state :datasets datasets/assoc-connection-context tx#)]
+       ~@body)))
 
 (defn- clj-key
   "Reducer for translating from database types.

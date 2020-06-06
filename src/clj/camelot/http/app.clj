@@ -6,7 +6,6 @@
    [compojure.core :refer [context GET POST]]
    [camelot.model.screens :as screens]
    [camelot.state.datasets :as datasets]
-   [camelot.util.state :as state]
    [camelot.util.db-migrate :as db-migrate]
    [camelot.util.version :as version]
    [camelot.util.network :as network]))
@@ -25,15 +24,27 @@
    :headers {"Content-Type" "application/octet-stream; charset=utf-8"}
    :body nil})
 
+(defn- with-dataset
+  [datasets f dataset-id]
+  (-> datasets
+      (datasets/assoc-dataset-context dataset-id)
+      f))
+
+(defn- map-datasets
+  [f datasets]
+  (map #(with-dataset datasets f %) (datasets/get-available datasets)))
+
+(defn- dataset-connection
+  [datasets]
+  [(datasets/get-dataset-context datasets)
+   (db-migrate/version (datasets/lookup-connection datasets))])
+
 (defn- db-versions
   [state]
-  ;; TODO #217 Kill map-datasets
-  (into {}
-        (state/map-datasets
-         (fn [s]
-           (let [conn (datasets/lookup-connection (:datasets s))]
-             [(state/get-dataset-id s) (db-migrate/version conn)]))
-         (state/dissoc-dataset state))))
+  (->> state
+       :datasets
+       (map-datasets dataset-connection)
+       (into {})))
 
 (defn- heartbeat
   [state]

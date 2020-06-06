@@ -1,10 +1,9 @@
-(require '[camelot.state.datasets :as datasets])
 (require '[camelot.util.file :as file])
 (require '[clojure.string :as str])
 
 (defn- -m037-upgrade
-  [state]
-  (let [media-dir (datasets/lookup-path (:datasets state) :media)
+  [dataset]
+  (let [media-dir (-> dataset :paths :media)
         mfiles (file/list-files media-dir)]
     (dorun (map
             (fn [f]
@@ -14,4 +13,4 @@
                 (file/rename f (file/->file prefix-dir (file/get-name f)))))
             mfiles))))
 
-(-m037-upgrade camelot.system.db.core/*migration-state*)
+(-m037-upgrade camelot.migration/*dataset*)

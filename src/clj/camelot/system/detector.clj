@@ -3,7 +3,6 @@
   (:require
    [camelot.services.analytics :as analytics]
    [camelot.state.datasets :as datasets]
-   [camelot.util.state :as state]
    [duratom.core :as duratom]
    [com.stuartsierra.component :as component]
    [clojure.core.async :as async]
@@ -139,7 +138,7 @@
             detector-state
             (reduce
              (fn [acc dataset-id]
-               (let [state (state/with-dataset system-state dataset-id)]
+               (let [state (update system-state :datasets datasets/assoc-dataset-context dataset-id)]
                  (assoc-in acc [:datasets dataset-id]
                            (duratom/duratom :local-file
                                             :file-path (detector-path state)

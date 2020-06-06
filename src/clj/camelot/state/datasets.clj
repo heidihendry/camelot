@@ -40,6 +40,7 @@
 
 (defn lookup-connection
   [datasets]
-  (if (.context datasets ::dataset)
-    (database/spec (lookup-path datasets :database))
+  (if (get-dataset-context datasets)
+    (or (get-connection-context datasets)
+        (database/spec (lookup-path datasets :database)))
     (throw (ex-info "Database connection not found" {}))))

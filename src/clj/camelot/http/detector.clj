@@ -1,13 +1,13 @@
 (ns camelot.http.detector
   (:require
-   [camelot.util.state :as state]
    [clojure.data.json :as json]
    [ring.util.http-response :as hr]
-   [compojure.core :refer [context GET POST]]))
+   [compojure.core :refer [context GET POST]]
+   [camelot.state.datasets :as datasets]))
 
 (defn get-detector-for-dataset
   [state]
-  (let [dataset-id (state/get-dataset-id state)]
+  (let [dataset-id (datasets/get-dataset-context (:datasets state))]
     @(-> state :detector :state :datasets dataset-id)))
 
 (defn- detector-status

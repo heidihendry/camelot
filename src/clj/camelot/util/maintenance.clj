@@ -1,19 +1,23 @@
 (ns camelot.util.maintenance
   (:require
-   [camelot.system.db.core :as sysdb]
    [camelot.util.file :as file]
    [clj-time.core :as t]
    [clj-time.format :as tf]
    [clojure.java.io :as io]
    [camelot.util.db :as dbutil]
+   [camelot.state.database :as database]
    [camelot.state.datasets :as datasets]
-   [camelot.util.state :as state]
    [camelot.util.db-migrate :as db-migrate]
    [clojure.tools.logging :as log]
    [yesql.core :as sql])
   (:import
    (java.io IOException)
    (java.util.zip ZipEntry ZipOutputStream)))
+
+(do
+  (create-ns 'camelot.migration)
+  (.setDynamic (intern 'camelot.migration '*dataset*))
+  (.setDynamic (intern 'camelot.migration '*connection*)))
 
 (sql/defqueries (str "sql/maintenance.sql"))
 
@@ -47,20 +51,7 @@
     {:from (db-migrate/version conn)
      :to (db-migrate/latest-available-version conn)}))
 
-;; TODO #217 kill this
 (defn is-db-initialised?
-  "Returns `true` if the database looks initialized. `false` otherwise.
-  Based on a simple directory heuristic. Don't trust it with your life."
-  [state]
-  (try
-    (let [path (datasets/lookup-path (:datasets state) :database)
-          cdir (io/file path derby-container-dir)]
-      (and (file/exists? cdir)
-           (file/directory? cdir)))
-    (catch IOException _
-      false)))
-
-(defn is-db-initialised-for-spec?
   "Returns `true` if the database looks initialized. `false` otherwise.
   Based on a simple directory heuristic. Don't trust it with your life."
   [spec]
@@ -78,7 +69,7 @@
   `:to`, which is the version the latest version the database can be upgraded
   to."
   [spec]
-  (if (is-db-initialised-for-spec? spec)
+  (if (is-db-initialised? spec)
     {:from (db-migrate/version spec)
      :to (db-migrate/latest-available-version spec)}
     {:to (db-migrate/latest-available-version spec)}))
@@ -98,11 +89,16 @@
   (io/file (-> dataset :paths :backup)
            (tf/unparse backup-timestamp-formatter (t/now))))
 
+(defn- spec-for-dataset
+  "JDBC spec for a dataset."
+  [dataset]
+  (database/spec (-> dataset :paths :database)))
+
 (defn backup
   "Back up the database."
   [dataset]
   (let [backup-dir (generate-backup-dirname dataset)
-        spec (state/spec-for-dataset dataset)]
+        spec (spec-for-dataset dataset)]
     (backup! {:path (.getPath backup-dir)} {:connection spec})
     (let [zip (compress-dir backup-dir)]
       (file/delete-recursive (io/file backup-dir))
@@ -110,39 +106,23 @@
 
 (defn migrate
   "Upgrade the database."
-  [state]
-  ;; TODO #217 kill migration state
-  (binding [sysdb/*migration-state* state]
-    (when-let [db-conn (state/lookup-connection state)]
-      (db-migrate/migrate db-conn))))
-
-(defn migrate-dataset
-  "Upgrade the database."
   [dataset]
-  ;; TODO #217 kill migration state
-  (binding [sysdb/*migration-state* {}]
-    (when-let [db-conn (state/spec-for-dataset dataset)]
+  (when-let [db-conn (spec-for-dataset dataset)]
+    (binding [camelot.migration/*dataset* dataset
+              camelot.migration/*connection* db-conn]
       (db-migrate/migrate db-conn))))
 
 (defn rollback
   "Rollback the database."
-  [state]
-  ;; TODO #217 kill migration state
-  (binding [sysdb/*migration-state* state]
-    (when-let [db-conn (state/lookup-connection state)]
-      (db-migrate/rollback db-conn))))
-
-(defn rollback-dataset
-  "Rollback the database."
   [dataset]
-  ;; TODO #217 kill migration state
-  (binding [sysdb/*migration-state* {}]
-    (when-let [db-conn (state/spec-for-dataset dataset)]
+  (when-let [db-conn (spec-for-dataset dataset)]
+    (binding [camelot.migration/*dataset* dataset
+              camelot.migration/*connection* db-conn]
       (db-migrate/rollback db-conn))))
 
 (defn- prepare-migration-plan
   [dataset]
-  (let [plan (upgrade-plan-for-spec (state/spec-for-dataset dataset))]
+  (let [plan (upgrade-plan-for-spec (spec-for-dataset dataset))]
     (assoc plan :backup (not= (:from plan) (:to plan)))))
 
 ;; TODO #217 flesh this out to actually backup the dataset
@@ -158,7 +138,7 @@
     (migrate dataset)
     (log/info (format "Dataset %s up-to-date (%s)."
                       (:name dataset)
-                      (let [spec (state/spec-for-dataset dataset)]
+                      (let [spec (spec-for-dataset dataset)]
                         (:to (upgrade-plan-for-spec spec)))))))
 
 (defn safe-migrate!

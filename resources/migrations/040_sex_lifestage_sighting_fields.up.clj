@@ -106,4 +106,4 @@
       (doseq [survey (-m040-get-survey-ids conn)]
         (-m040-migrate-survey-data conn survey)))))
 
-(-m040-upgrade camelot.system.db.core/*migration-state*)
+(-m040-upgrade camelot.migration/*dataset*)

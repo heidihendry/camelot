@@ -1,6 +1,5 @@
 (ns camelot.util.crud-test
   (:require
-   [camelot.util.state :as state]
    [camelot.util.crud :as sut]
    [clojure.test :refer :all]))
 

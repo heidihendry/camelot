@@ -2,7 +2,6 @@
   (:require
    [clojure.tools.logging :as log]
    [camelot.system.http.transit :as transit]
-   [camelot.system.state :as state]
    [compojure.core :as compojure]
    [camelot.http.core :as http]
    [camelot.http.api.core :as api]
@@ -29,9 +28,11 @@
 (defonce cookie-store-key "insecureinsecure")
 
 (defn wrap-system
-  [handler & [options]]
-  (fn [request]
-    (handler (merge-with merge request {:system @state/system}))))
+  [state]
+  (fn [handler & [options]]
+    (fn [request]
+      (log/info "Test")
+      (handler (merge-with merge request {:system state})))))
 
 (defn errors-to-internal-server-error
   [handler & options]
@@ -43,13 +44,14 @@
            :headers {}
            :body (.getMessage e)}))))
 
-(def http-handler
+(defn http-handler
+  [state]
   (compojure/routes
    (-> http/app-routes
        wrap-state
        wrap-dataset-selection
        wrap-params
-       wrap-system
+       ((wrap-system state))
        errors-to-internal-server-error
        wrap-multipart-params
        (wrap-session {:store (cookie-store {:key cookie-store-key})})
@@ -84,7 +86,7 @@
                          http-port))
         (println "You might be able to connect to it from the following addresses:")
         (network/print-network-addresses http-port)
-        (let [j (run-jetty #'http-handler {:port http-port :join? false})]
+        (let [j (run-jetty #(http-handler this) {:port http-port :join? false})]
           (reset! jetty j)
           (assoc this :jetty j)))))
 

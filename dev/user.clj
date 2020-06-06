@@ -1,7 +1,6 @@
 (ns user
   (:require
    [camelot.core]
-   [camelot.system.state :as sysstate]
    [camelot.system.core :as system]
    [camelot.util.maintenance :as maintenance]
    [camelot.system.http.core :as http]
@@ -19,33 +18,33 @@
 
 (s/set-fn-validation! true)
 
+(def http-handler nil)
+
 (defrecord DevHttpServer [database config]
   component/Lifecycle
   (start [this]
-    (figwheel/start-figwheel!)
-    (assoc this :figwheel true))
+    (if (:figwheel this)
+      this
+      (do
+        (let [hf (http/http-handler this)]
+          (alter-var-root #'http-handler (constantly hf)))
+        (figwheel/start-figwheel!)
+        (assoc this :figwheel true))))
 
   (stop [this]
     (when (get this :figwheel)
       (figwheel/stop-figwheel!)
       (assoc this :figwheel nil))))
 
-(def http-handler
-  (wrap-reload #'http/http-handler))
-
 (reloaded.repl/set-init! #(system/camelot-system {:app (map->DevHttpServer {})}))
 
-;; TODO #217 these are no longer so convenient.  May want to add dataset-id param?
 (defn migrate
-  [state]
-  (maintenance/migrate state))
+  [dataset]
+  (maintenance/migrate dataset))
 
 (defn rollback
-  [state]
-  (maintenance/rollback state))
+  [dataset]
+  (maintenance/rollback dataset))
 
 (defn runprod []
   (camelot.core/start-prod))
-
-(defn state []
-  @sysstate/system)

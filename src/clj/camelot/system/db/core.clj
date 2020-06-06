@@ -5,12 +5,7 @@
    [clojure.tools.logging :as log]
    [yesql.core :as sql]
    [com.stuartsierra.component :as component]
-   [clojure.java.jdbc :as jdbc]
-   [schema.core :as sch])
-  (:import
-   (java.io IOException)))
-
-(def ^:dynamic *migration-state* nil)
+   [clojure.java.jdbc :as jdbc]))
 
 (def query-files
   ["bounding-box"

@@ -38,7 +38,3 @@
                                   :detector {:config :config
                                              :database :database
                                              :datasets :datasets}})))
-
-(defn camelot
-  [system-overrides]
-  (component/start (camelot-system system-overrides)))
