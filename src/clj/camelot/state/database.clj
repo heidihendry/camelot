@@ -13,3 +13,8 @@
                      ;; TODO this should be in camelot market
                      "Database"),
    :create true})
+
+(defn spec-for-dataset
+  "JDBC spec for a dataset."
+  [dataset]
+  (spec (-> dataset :paths :database)))

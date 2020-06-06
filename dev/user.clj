@@ -2,7 +2,6 @@
   (:require
    [camelot.core]
    [camelot.system.core :as system]
-   [camelot.util.maintenance :as maintenance]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
    [ring.middleware.reload :refer [wrap-reload]]
@@ -40,11 +39,11 @@
 
 (defn migrate
   [dataset]
-  (maintenance/migrate dataset))
+  (.migrate (:migrater system) dataset))
 
 (defn rollback
   [dataset]
-  (maintenance/rollback dataset))
+  (.rollback (:migrater system) dataset))
 
 (defn runprod []
   (camelot.core/start-prod))

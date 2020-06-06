@@ -1,5 +1,9 @@
 (ns camelot.system.protocols)
 
+(defprotocol BackupManager
+  (backup [this x]
+    "Take a backup of the given thing."))
+
 (defprotocol Migratable
   (migrate [this x]
     "Migrate `x`.")

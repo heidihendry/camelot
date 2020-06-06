@@ -27,7 +27,6 @@
 (defn- -m030-upgrade
   [conn]
   (jdbc/with-db-transaction [tx conn]
-    ;; TODO #217 and all like this
     (let [conn {:connection tx}]
       (doseq [p (-m030-all-pairs conn)]
         (-create<! (-m030-->survey-taxonomy p) conn)))))

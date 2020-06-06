@@ -111,13 +111,6 @@ This will return nil if a migration has never been applied."
              (take-while #(not= % \-))
              (str/join ""))))
 
-(defn migrations-available?
-  "Returns `true` if a migration with a newer version than currently applied
-  to the database is available. `false` otherwise."
-  [connection]
-  (not= (version connection)
-        (latest-available-version connection)))
-
 (defn rollback
   "Rollback the last migration."
   ([connection]

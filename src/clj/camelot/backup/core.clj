@@ -1,6 +1,5 @@
 (ns camelot.backup.core
   (:require
-   [camelot.util.maintenance :as maintenance]
    [camelot.state.config :as config]
    [camelot.state.datasets :as datasets]
    [camelot.util.file :as file]
@@ -20,7 +19,8 @@
   {:config (rel-file-seq (config/lookup-path (:config state) :config))
    :media (rel-file-seq (datasets/lookup-path (:datasets state) :media))
    :filestore-base (rel-file-seq (datasets/lookup-path (:datasets state) :filestore-base))
-   :database (maintenance/backup state)})
+   ;; TOGO #217 implement backups
+   :database nil})
 
 (defn download
   [state filename]

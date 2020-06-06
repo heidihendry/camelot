@@ -5,6 +5,7 @@
    [camelot.system.http.core :as http]
    [camelot.system.db.core :as db]
    [camelot.system.migrater :as migrater]
+   [camelot.system.backup-manager :as backup-manager]
    [camelot.system.datasets :as datasets]
    [camelot.system.importer :as importer]
    [camelot.system.detector :as detector]
@@ -17,6 +18,7 @@
                (apply concat
                       (merge {:config (config/map->Config {})
                               :database (db/map->Database {})
+                              :backup-manager (backup-manager/map->BackupManager {})
                               :datasets (datasets/map->Datasets {})
                               :migrater (migrater/map->Migrater {})
                               :importer (importer/map->Importer {})
@@ -27,10 +29,11 @@
                                         :database :database
                                         :importer :importer
                                         :detector :detector
-                                        :datasets :datasets}
+                                        :datasets :datasets
+                                        :backup-manager :backup-manager}
                                   :config {}
                                   :database {}
-                                  :migrater {}
+                                  :migrater {:backup-manager :backup-manager}
                                   :datasets {:config :config
                                              :database :database
                                              :migrater :migrater}
