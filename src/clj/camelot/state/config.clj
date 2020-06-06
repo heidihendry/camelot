@@ -1,14 +1,27 @@
 (ns camelot.state.config
-  (:require [camelot.state.util :as util]
+  (:require [camelot.util.data :as datautil]
+            [clojure.java.io :as io]
             [camelot.market.config :as market-config]))
 
 (def config-cache (atom nil))
+
+(defn- update-vals
+  [m f]
+  (into {} (map (juxt first (comp f second)) m)))
+
+(defn- paths-to-file-objects
+  "Transform all values under :paths to `File` objects."
+  [m]
+  (letfn [(to-file-objects [p] (into {} (map (fn [[k v]] [k (io/file v)]) p)))]
+    (update m :paths to-file-objects)))
 
 (defn read-config
   []
   (when (nil? @config-cache)
     (reset! config-cache
-            (util/paths-to-file-objects (market-config/read-config))))
+            (-> (market-config/read-config)
+                (paths-to-file-objects)
+                (update :datasets datautil/update-vals paths-to-file-objects))))
   @config-cache)
 
 (defn lookup [config k]

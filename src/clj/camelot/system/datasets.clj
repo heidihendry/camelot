@@ -1,6 +1,5 @@
 (ns camelot.system.datasets
   (:require
-   [camelot.state.util :as state.util]
    [camelot.system.protocols :as protocols]
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]))
@@ -33,13 +32,6 @@
     (do
       (log/error "Dataset not defined")
       false)))
-
-(defn- init-datasets
-  [datasets]
-  (into {}
-        (reduce-kv (fn [acc k v]
-                     (assoc acc k (state.util/paths-to-file-objects v)))
-                   {} datasets)))
 
 (defrecord Datasets [config database migrater ref]
   protocols/Connectable
@@ -77,7 +69,7 @@
   (start [this]
     (log/info config)
     (let [datasets (keys (:datasets config))
-          next (assoc this :ref (atom {:datasets/definitions (init-datasets (:datasets config))
+          next (assoc this :ref (atom {:datasets/definitions (:datasets config)
                                        :datasets/available #{}}))]
       (doall (map #(.connect next %) datasets))
       (if (empty? (:datasets/available (.inspect next)))
