@@ -30,7 +30,8 @@
              {:dependencies [[figwheel "0.5.18"]
                              [figwheel-sidecar "0.5.18"]
                              [org.apache.derby/derbytools "10.12.1.1"]
-                             [cider/piggieback "0.4.1"]]
+                             [cider/piggieback "0.4.1"]
+                             [reloaded.repl "0.2.4"]]
               :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
               :env {:camelot-dev-mode "true"}
               :source-paths ["src/cljc" "src/clj" "src/cljs" "dev"]

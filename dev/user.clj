@@ -8,7 +8,8 @@
    [com.stuartsierra.component :as component]
    [ring.middleware.reload :refer [wrap-reload]]
    [schema.core :as s]
-   [figwheel-sidecar.repl-api :as figwheel]))
+   [figwheel-sidecar.repl-api :as figwheel]
+   [reloaded.repl :refer [go start stop reset system]]))
 
 ;; Let Clojure warn you when it needs to reflect on types, or when it does math
 ;; on unboxed numbers. In both cases you should add type annotations to prevent
@@ -17,21 +18,6 @@
 (set! *unchecked-math* :warn-on-boxed)
 
 (s/set-fn-validation! true)
-
-(def http-handler
-  (wrap-reload #'http/http-handler))
-
-;; TODO #217 these are no longer so convenient.  May want to add dataset-id param?
-(defn migrate
-  [state]
-  (maintenance/migrate state))
-
-(defn rollback
-  [state]
-  (maintenance/rollback state))
-
-(defn runprod []
-  (camelot.core/start-prod))
 
 (defrecord DevHttpServer [database config]
   component/Lifecycle
@@ -44,18 +30,22 @@
       (figwheel/stop-figwheel!)
       (assoc this :figwheel nil))))
 
-(defn start []
-  (reset! sysstate/system (system/camelot {:app (map->DevHttpServer {})}))
-  nil)
+(def http-handler
+  (wrap-reload #'http/http-handler))
 
-(defn stop []
-  (swap! sysstate/system component/stop)
-  nil)
+(reloaded.repl/set-init! #(system/camelot-system {:app (map->DevHttpServer {})}))
 
-(defn restart
-  []
-  (stop)
-  (start))
+;; TODO #217 these are no longer so convenient.  May want to add dataset-id param?
+(defn migrate
+  [state]
+  (maintenance/migrate state))
+
+(defn rollback
+  [state]
+  (maintenance/rollback state))
+
+(defn runprod []
+  (camelot.core/start-prod))
 
 (defn state []
   @sysstate/system)
