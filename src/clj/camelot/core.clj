@@ -3,7 +3,7 @@
   (:require
    [camelot.system.config.core :as config]
    [camelot.system.http.core :as http]
-   [camelot.system.db.core :as db]
+   [camelot.system.db :as db]
    [camelot.system.migrater :as migrater]
    [camelot.system.backup-manager :as backup-manager]
    [camelot.system.datasets :as datasets]

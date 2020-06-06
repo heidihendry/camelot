@@ -1,4 +1,4 @@
-(ns camelot.system.db.core
+(ns camelot.system.db
   (:require
    [camelot.state.database :as database]
    [camelot.system.protocols :as protocols]
