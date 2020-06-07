@@ -86,7 +86,7 @@
                          http-port))
         (println "You might be able to connect to it from the following addresses:")
         (network/print-network-addresses http-port)
-        (let [j (run-jetty #(http-handler this) {:port http-port :join? false})]
+        (let [j (run-jetty (http-handler this) {:port http-port :join? false})]
           (reset! jetty j)
           (assoc this :jetty j)))))
 
