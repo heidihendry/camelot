@@ -34,6 +34,7 @@
                                         :backup-manager :backup-manager}
                                   :config {}
                                   :database {}
+                                  :backup-manager {:database :database}
                                   :migrater {:backup-manager :backup-manager}
                                   :datasets {:config :config
                                              :database :database

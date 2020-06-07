@@ -6,12 +6,9 @@
    [camelot.state.database :as database]
    [clj-time.core :as t]
    [clj-time.format :as tf]
-   [clojure.java.io :as io]
-   [yesql.core :as sql])
+   [clojure.java.io :as io])
   (:import
    (java.util.zip ZipEntry ZipOutputStream)))
-
-(sql/defqueries (str "sql/maintenance.sql"))
 
 (def ^:private backup-timestamp-formatter
   (tf/formatter "YYYYMMddHHmmss"))
@@ -31,10 +28,11 @@
   (io/file (-> dataset :paths :backup)
            (tf/unparse backup-timestamp-formatter (t/now))))
 
-(defrecord BackupManager []
+(defrecord BackupManager [database]
   protocols/BackupManager
   (backup [this dataset]
-    (let [backup-dir (generate-backup-dirname dataset)
+    (let [backup! (-> database :queries :maintenance)
+          backup-dir (generate-backup-dirname dataset)
           spec (database/spec-for-dataset dataset)]
       (backup! {:path (.getPath backup-dir)} {:connection spec})
       (let [zip (compress-dir backup-dir)]

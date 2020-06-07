@@ -43,4 +43,4 @@
   (if (get-dataset-context datasets)
     (or (get-connection-context datasets)
         (database/spec (lookup-path datasets :database)))
-    (throw (ex-info "Database connection not found" {}))))
+    (throw (ex-info "Database connection not found" {:datasets datasets}))))

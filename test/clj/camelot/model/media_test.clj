@@ -1,14 +1,16 @@
 (ns camelot.model.media-test
-  (:require [camelot.model.media :as sut]
-            [clojure.test :refer :all]
-            [camelot.util.file :as file]
-            [camelot.testutil.state :as state]
-            [clojure.java.io :as io]))
+  (:require
+   [camelot.model.media :as sut]
+   [clojure.test :refer :all]
+   [camelot.util.file :as file]
+   [camelot.testutil.state :as state]
+   [camelot.testutil.mock :as mock]
+   [clojure.java.io :as io]))
 
 (defn gen-state
   []
-  (assoc (state/gen-state) :config
-         {:datasets {:default {:paths {:media "/mymedia/"}}}}))
+  (assoc (state/gen-state) :datasets
+         (mock/datasets {:default {:paths {:media "/mymedia"}}} :default)))
 
 (defn path-equal
   [file expect]

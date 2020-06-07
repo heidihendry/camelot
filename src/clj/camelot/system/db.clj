@@ -29,7 +29,8 @@
    "taxonomy"
    "trap-station-session-cameras"
    "trap-station-sessions"
-   "trap-stations"])
+   "trap-stations"
+   "maintenance"])
 
 (defn queries
   [name]

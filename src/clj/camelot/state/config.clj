@@ -5,7 +5,7 @@
 
 (def config-cache (atom nil))
 
-(defn- paths-to-file-objects
+(defn paths-to-file-objects
   "Transform all values under :paths to `File` objects."
   [m]
   (letfn [(to-file-objects [p] (into {} (map (fn [[k v]] [k (io/file v)]) p)))]
