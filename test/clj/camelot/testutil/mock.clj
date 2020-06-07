@@ -53,6 +53,10 @@
     (is (= (filter (set fns) (::order @*invocations*)) fns))))
 
 (defrecord MockDatasets [datasets]
+  protocols/Reloadable
+  (reload [this]
+    this)
+
   protocols/Inspectable
   (inspect [this]
     {:datasets/available (set (keys datasets))

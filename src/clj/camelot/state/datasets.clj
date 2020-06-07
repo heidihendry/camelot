@@ -44,3 +44,14 @@
     (or (get-connection-context datasets)
         (database/spec (lookup-path datasets :database)))
     (throw (ex-info "Database connection not found" {:datasets datasets}))))
+
+(defn reload
+  [datasets]
+  (let [ctx (get-dataset-context datasets)
+        next (.reload datasets)
+        available (get-available next)]
+    (when (and ctx (not (available ctx)))
+      (throw (ex-info "Currently selected dataset was disconnected during reload"
+                      {:context ctx
+                       :datasets available})))
+    next))
