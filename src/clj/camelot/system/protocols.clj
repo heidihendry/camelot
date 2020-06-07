@@ -29,3 +29,7 @@
 (defprotocol Reloadable
   (reload [this]
     "Reload."))
+
+(defprotocol Configurable
+  (config [this]
+    "Get configuration."))

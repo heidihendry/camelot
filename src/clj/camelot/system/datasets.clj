@@ -2,7 +2,8 @@
   (:require
    [camelot.system.protocols :as protocols]
    [clojure.tools.logging :as log]
-   [com.stuartsierra.component :as component]))
+   [com.stuartsierra.component :as component]
+   [clojure.set :as set]))
 
 (defn- connect* [ref id {:keys [database migrater]}]
   (if-let [dataset (-> @ref :datasets/definitions id)]
@@ -60,20 +61,24 @@
 
   protocols/Reloadable
   (reload [this]
-    ;; TODO #217 allow reloading of definitions. Consider what should happen
-    ;; when reloading disconnected datasets.  Presumably they should stay
-    ;; disconnected?
-    (throw (Exception. "Not implemented")))
+    (let [datasets (:datasets (.config config))
+          cur-available-datasets (:datasets/available (.inspect this))
+          next-available-datasets (set (keys datasets))
+          removed-datasets (set/difference cur-available-datasets next-available-datasets)]
+      (doseq [dataset removed-datasets]
+        (.disconnect this dataset))
+      (swap! (:ref this) #(assoc % :datasets/definitions datasets))
+      this))
 
   component/Lifecycle
   (start [this]
     (log/info config)
-    (let [datasets (keys (:datasets config))
+    (let [dataset-ids (keys (:datasets config))
           next (assoc this :ref (atom {:datasets/definitions (:datasets config)
                                        :datasets/available #{}}))]
-      (doall (map #(.connect next %) datasets))
+      (doall (map #(.connect next %) dataset-ids))
       (if (empty? (:datasets/available (.inspect next)))
-        (throw (ex-info "Unable to connect to any Databases" {:tried datasets}))
+        (throw (ex-info "Unable to connect to any Databases" {:tried dataset-ids}))
         next)))
 
   (stop [this]
