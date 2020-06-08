@@ -1,8 +1,10 @@
 (ns camelot.http.api.dataset.core
   (:require
+   [clojure.spec.alpha :as s]
+   [camelot.http.api.dataset.spec :as spec]
    [camelot.http.api.dataset.resources :as resources]
    [camelot.http.api.spec.core :as api-core]
-   [compojure.api.sweet :refer [context POST]]))
+   [compojure.api.sweet :refer [context GET POST]]))
 
 (def routes
   (context "/dataset" {state :state}
@@ -21,4 +23,11 @@
     (POST "/reload" []
       :summary "Reload dataset definitions"
       :return ::api-core/json-api-without-data
-      (resources/reload! state))))
+      (resources/reload! state))
+
+    (GET "/" []
+      :summary "Retrieve the loaded datasets"
+      :return (s/merge
+               ::api-core/json-api-without-data
+               (s/keys :req-un [:camelot.http.api.dataset.get/data]))
+      (resources/get-datasets state))))
