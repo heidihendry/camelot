@@ -75,7 +75,8 @@
 (defn- plan-backup-dataset!
   [plan backup]
   (when (:backup plan)
-    (backup)))
+    (backup))
+  plan)
 
 (defn- plan-migrate-dataset!
   [plan dataset]
@@ -85,7 +86,8 @@
     (log/info (format "Dataset %s up-to-date (%s)."
                       (:name dataset)
                       (let [spec (database/spec-for-dataset dataset)]
-                        (:to (upgrade-plan-for-spec spec)))))))
+                        (:to (upgrade-plan-for-spec spec))))))
+  plan)
 
 (defrecord Migrater [backup-manager]
   protocols/Migratable

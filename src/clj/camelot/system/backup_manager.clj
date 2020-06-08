@@ -23,8 +23,9 @@
         (.closeEntry zip)))
     zip-path))
 
-(defn generate-backup-dirname
+(defn- generate-backup-dirname
   [dataset]
+  (file/mkdirs (-> dataset :paths :backup))
   (io/file (-> dataset :paths :backup)
            (tf/unparse backup-timestamp-formatter (t/now))))
 
