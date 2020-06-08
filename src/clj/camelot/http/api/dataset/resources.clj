@@ -30,6 +30,18 @@
    (catch Object e
      (api-util/handle-error-response e))))
 
+(defn backup! [state id]
+  (ss/try+
+   (let [definitions (datasets/get-definitions (:datasets state))
+         dataset-id (keyword id)]
+     (if-let [dataset (get definitions dataset-id)]
+       (do
+         (.backup (:backup-manager state) dataset)
+         (hr/no-content))
+       (hr/not-found)))
+   (catch Object e
+     (api-util/handle-error-response e))))
+
 (defn get-datasets [state]
   (ss/try+
    (let [ds (:datasets state)

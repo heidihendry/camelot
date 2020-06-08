@@ -35,6 +35,7 @@
     (let [backup! (-> database :queries :maintenance)
           backup-dir (generate-backup-dirname dataset)
           spec (database/spec-for-dataset dataset)]
+      ;; TODO #217 this is very broken
       (backup! {:path (.getPath backup-dir)} {:connection spec})
       (let [zip (compress-dir backup-dir)]
         (file/delete-recursive (io/file backup-dir))

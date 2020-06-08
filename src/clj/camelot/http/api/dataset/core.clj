@@ -1,7 +1,6 @@
 (ns camelot.http.api.dataset.core
   (:require
    [clojure.spec.alpha :as s]
-   [camelot.http.api.dataset.spec :as spec]
    [camelot.http.api.dataset.resources :as resources]
    [camelot.http.api.spec.core :as api-core]
    [compojure.api.sweet :refer [context GET POST]]))
@@ -19,6 +18,11 @@
       :summary "Connect to a dataset with the given ID"
       :return ::api-core/json-api-without-data
       (resources/connect! state id))
+
+    (POST "/:id/backup" [id]
+      :summary "Backup the dataset with the given ID"
+      :return ::api-core/json-api-without-data
+      (resources/backup! state id))
 
     (POST "/reload" []
       :summary "Reload dataset definitions"
