@@ -67,8 +67,12 @@
 (defn transform-response
   [type spec x]
   (if (and (not (map? x)) (coll? x))
-    (either/right {:data (map (partial to-data type spec) x)})
-    (either/right {:data (to-data type spec x)})))
+    {:data (map (partial to-data type spec) x)}
+    {:data (to-data type spec x)}))
+
+(defn mtransform-response
+  [type spec x]
+  (either/right (transform-response type spec x)))
 
 (defn- ednize-key [type k]
   (as-> k $
