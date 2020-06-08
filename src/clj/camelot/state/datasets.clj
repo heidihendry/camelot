@@ -26,6 +26,10 @@
   [datasets]
   (:datasets/available (.inspect datasets)))
 
+(defn get-definitions
+  [datasets]
+  (:datasets/definitions (.inspect datasets)))
+
 (defn lookup
   [datasets k]
   (if-let [ctx (.context datasets ::dataset)]

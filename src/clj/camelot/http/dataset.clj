@@ -15,7 +15,7 @@
   [state]
   (let [datasets (:datasets state)]
     (map (fn [x] {:dataset-id x
-                  :dataset-name (datasets/lookup (datasets/assoc-dataset-context datasets x) :name)})
+                  :dataset-name (get-in (datasets/get-definitions datasets) [x :name])})
          (datasets/get-available datasets))))
 
 (def routes
