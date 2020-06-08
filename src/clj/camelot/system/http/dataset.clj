@@ -1,6 +1,8 @@
 (ns camelot.system.http.dataset
   "Ring middleware for dataset selection."
   (:require
+   [clojure.string :as str]
+   [clojure.tools.logging :as log]
    [camelot.state.datasets :as datasets]))
 
 (defn assoc-context
@@ -14,9 +16,8 @@
 
 (defn- select-default-dataset
   [request]
-  (if-let [dataset-id (first (datasets/get-available (:datasets (:system request))))]
-    dataset-id
-    (throw (ex-info "No datasets were found" {}))))
+  (when-let [dataset-id (first (datasets/get-available (:datasets (:system request))))]
+    dataset-id))
 
 (defn- requested-dataset-scope
   [request]
@@ -28,16 +29,19 @@
 
 (defn- scope-to-default-dataset
   [handler request]
-  (let [dataset-id (select-default-dataset request)]
+  (if-let [dataset-id (select-default-dataset request)]
     (-> request
          (assoc-context dataset-id)
          handler
-         (inject-dataset-to-response dataset-id))))
+         (inject-dataset-to-response dataset-id))
+    (handler request)))
 
 (defn wrap-dataset-selection
   "Dataset selection."
   [handler]
   (fn [request]
-    (if-let [dataset-id (requested-dataset-scope request)]
-      (handler (assoc-context request dataset-id))
-      (scope-to-default-dataset handler request))))
+    (if (str/starts-with? (:uri request) "/api")
+      (handler request)
+      (if-let [dataset-id (requested-dataset-scope request)]
+        (handler (assoc-context request dataset-id))
+        (scope-to-default-dataset handler request)))))

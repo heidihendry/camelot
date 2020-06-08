@@ -142,7 +142,7 @@
      (either/right (from-request resource-type spec id data))
      (either/left {:error/type :error.type/bad-request}))))
 
-(defn- handle-error-response
+(defn handle-error-response
   [e]
   (condp = (:error/type e)
     :error.type/bad-request

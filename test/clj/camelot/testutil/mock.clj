@@ -71,8 +71,7 @@
 
 (defn datasets
   ([ds]
-   (let [ctx (first (keys ds))]
-     (datasets ds ctx)))
+   (map->MockDatasets {:datasets ds}))
   ([ds context]
    (let [record (map->MockDatasets {:datasets ds})]
      (if context

@@ -45,7 +45,15 @@
         (database/spec (lookup-path datasets :database)))
     (throw (ex-info "Database connection not found" {:datasets datasets}))))
 
-(defn reload
+(defn connect!
+  [datasets id]
+  (.connect datasets id))
+
+(defn disconnect!
+  [datasets id]
+  (.disconnect datasets id))
+
+(defn reload!
   [datasets]
   (let [ctx (get-dataset-context datasets)
         next (.reload datasets)

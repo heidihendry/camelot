@@ -1,12 +1,14 @@
 (ns camelot.http.api.core
   (:require
-   [compojure.api.sweet :refer [defroutes api context]]
+   [compojure.api.sweet :refer [api context]]
    [camelot.http.api.survey.core :as survey]
-   [camelot.http.api.site.core :as site]))
+   [camelot.http.api.site.core :as site]
+   [camelot.http.api.dataset.core :as dataset]))
 
 (def routes
   (context "/api/v1" []
     :coercion :spec
+    dataset/routes
     survey/routes
     site/routes))
 

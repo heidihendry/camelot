@@ -2,6 +2,7 @@
   (:require
    [camelot.system.protocols :as protocols]
    [clojure.tools.logging :as log]
+   [slingshot.slingshot :as ss]
    [com.stuartsierra.component :as component]
    [clojure.set :as set]))
 
@@ -12,13 +13,18 @@
       (try
         (.connect database (get-in dataset [:paths :database]))
         (.migrate migrater dataset)
-        true
+        dataset
         (catch Exception e
           (log/error e)
-          false)))
+          (ss/throw+ {:error/type :error.type/internal
+                      :error/exception e
+                      :entity/type :dataset
+                      :entity/id id}))))
     (do
       (log/error "Dataset not defined")
-      false)))
+      (ss/throw+ {:error/type :error.type/not-found
+                  :entity/type :dataset
+                  :entity/id id}))))
 
 (defn- disconnect* [ref id {:keys [database]}]
   (if-let [dataset (-> @ref :datasets/definitions id)]
@@ -26,13 +32,18 @@
       (log/info "Disconnecting from" (name id) "...")
       (try
         (.disconnect database (get-in dataset [:paths :database]))
-        true
+        dataset
         (catch Exception e
           (log/error e)
-          false)))
+          (ss/throw+ {:error/type :error.type/internal
+                      :error/exception e
+                      :entity/type :dataset
+                      :entity/id id}))))
     (do
       (log/error "Dataset not defined")
-      false)))
+      (ss/throw+ {:error/type :error.type/not-found
+                  :entity/type :dataset
+                  :entity/id id}))))
 
 (defrecord Datasets [config database migrater ref]
   protocols/Connectable
@@ -40,7 +51,9 @@
     (let [opts {:database database
                 :migrater migrater}]
       (when (connect* ref id opts)
-        (swap! (:ref this) update :datasets/available conj id))))
+        (swap! (:ref this) update :datasets/available conj id)
+        true)
+      false))
 
   (disconnect [this id]
     (let [opts {:database database}]
@@ -76,7 +89,12 @@
     (let [dataset-ids (keys (:datasets config))
           next (assoc this :ref (atom {:datasets/definitions (:datasets config)
                                        :datasets/available #{}}))]
-      (doall (map #(.connect next %) dataset-ids))
+      (doseq [id dataset-ids]
+        (ss/try+
+         (.connect next id)
+         (catch Object _
+           ;; ignored
+           nil)))
       (if (empty? (:datasets/available (.inspect next)))
         (throw (ex-info "Unable to connect to any Databases" {:tried dataset-ids}))
         next)))

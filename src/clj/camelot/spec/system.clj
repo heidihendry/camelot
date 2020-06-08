@@ -30,7 +30,8 @@
     #(gen/fmap (fn [x] (datautil/update-vals x paths-to-file-objects))
                (s/gen :dataset/datasets))))
 (s/def ::datasets (s/with-gen map?
-                    #(gen/fmap mock/datasets (s/gen ::non-empty-datasets))))
+                    #(gen/fmap (fn [d] (mock/datasets d (first (keys d))))
+                               (s/gen ::non-empty-datasets))))
 
 (s/def ::state
   (s/keys :req-un [::config ::database ::app ::datasets]
