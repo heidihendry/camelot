@@ -12,7 +12,7 @@
    [com.stuartsierra.component :as component])
   (:gen-class))
 
-(defn- camelot-system
+(defn camelot-system
   [system-overrides]
   (let [smap
         (apply component/system-map

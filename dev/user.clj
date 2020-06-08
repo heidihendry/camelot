@@ -1,7 +1,6 @@
 (ns user
   (:require
-   [camelot.core]
-   [camelot.system.core :as system]
+   [camelot.core :as camelot]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
    [ring.middleware.reload :refer [wrap-reload]]
@@ -35,7 +34,7 @@
       (figwheel/stop-figwheel!)
       (assoc this :figwheel nil))))
 
-(reloaded.repl/set-init! #(system/camelot-system {:app (map->DevHttpServer {})}))
+(reloaded.repl/set-init! #(camelot/camelot-system {:app (map->DevHttpServer {})}))
 
 (defn migrate
   [dataset]

@@ -63,7 +63,8 @@
        wrap-gzip)
    (-> api/core-api
        wrap-state
-       wrap-system
+       wrap-dataset-selection
+       ((wrap-system state))
        muuntaja-middleware/wrap-format
        errors-to-internal-server-error
        wrap-multipart-params
