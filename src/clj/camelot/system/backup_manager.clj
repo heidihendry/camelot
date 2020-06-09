@@ -25,18 +25,18 @@
 
 (defn- generate-backup-dirname
   [dataset]
-  (file/mkdirs (-> dataset :paths :backup))
-  (io/file (-> dataset :paths :backup)
-           (tf/unparse backup-timestamp-formatter (t/now))))
+  (let [d (io/file (-> dataset :paths :backup)
+                   (tf/unparse backup-timestamp-formatter (t/now)))]
+    (file/mkdirs d)
+    d))
 
 (defrecord BackupManager [database]
   protocols/BackupManager
   (backup [this dataset]
-    (let [backup! (-> database :queries :maintenance)
+    (let [backup! (-> database :queries :maintenance :backup!)
           backup-dir (generate-backup-dirname dataset)
           spec (database/spec-for-dataset dataset)]
-      ;; TODO #217 this is very broken
-      (backup! {:path (.getPath backup-dir)} {:connection spec})
+      (backup! {:backup_path (.getPath backup-dir)} {:connection spec})
       (let [zip (compress-dir backup-dir)]
         (file/delete-recursive (io/file backup-dir))
         zip)))
