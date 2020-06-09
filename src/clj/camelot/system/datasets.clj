@@ -95,9 +95,9 @@
          (catch Object _
            ;; ignored
            nil)))
-      (if (empty? (:datasets/available (.inspect next)))
-        (throw (ex-info "Unable to connect to any Databases" {:tried dataset-ids}))
-        next)))
+      (when (empty? (:datasets/available (.inspect next)))
+        (log/warn "Unable to connect to any Databases" {:tried dataset-ids}))
+      next))
 
   (stop [this]
     (log/info "Stopping datasets...")

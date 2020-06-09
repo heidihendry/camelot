@@ -67,16 +67,6 @@
                                                        :disconnect-fn identity})})]
           (t/is (= #{:default :special} (:datasets/available (.inspect (.start datasets)))))))
 
-      (t/testing "throws if unable to connect to any databases"
-        (let [connect #(throw (ex-info "Throws" {}))
-              deps {:config {:datasets config}
-                    :migrater (->MockMigrater)
-                    :database (map->MockDatabase
-                               {:connect-fn connect
-                                :disconnect-fn identity})}
-              datasets (sut/map->Datasets deps)]
-          (t/is (thrown? RuntimeException (.start datasets)))))
-
       (t/testing "returns only the databases to which it can connect"
         (let [connect (fn [database]
                         (if (= "/special/Database" database)
