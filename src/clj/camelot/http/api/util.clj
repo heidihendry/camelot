@@ -158,7 +158,7 @@
     :error.type/conflict
     (hr/conflict)
 
-    (hr/internal-server-error)))
+    (throw e)))
 
 (defn created [base-uri response]
   (let [location (str base-uri "/" (get-in response [:data :id]))]
