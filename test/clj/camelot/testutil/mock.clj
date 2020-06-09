@@ -1,6 +1,8 @@
 (ns camelot.testutil.mock
   "Function stubs and mocks."
   (:require
+   [camelot.system.protocols :as protocols]
+   [camelot.state.datasets :as datasets]
    [clojure.string :as string]
    [clojure.test :refer :all]))
 
@@ -49,3 +51,29 @@
                  (map #(get-in state %)))]
     (is (= (count ks) (count fns)))
     (is (= (filter (set fns) (::order @*invocations*)) fns))))
+
+(defrecord MockDatasets [datasets]
+  protocols/Reloadable
+  (reload [this]
+    this)
+
+  protocols/Inspectable
+  (inspect [this]
+    {:datasets/available (set (keys datasets))
+     :datasets/definitions datasets})
+
+  protocols/Contextual
+  (set-context [this k v]
+    (assoc-in this [::context k] v))
+
+  (context [this k]
+    (get-in this [::context k])))
+
+(defn datasets
+  ([ds]
+   (map->MockDatasets {:datasets ds}))
+  ([ds context]
+   (let [record (map->MockDatasets {:datasets ds})]
+     (if context
+       (datasets/assoc-dataset-context record context)
+       record))))

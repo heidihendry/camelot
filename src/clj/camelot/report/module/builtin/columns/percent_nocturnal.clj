@@ -4,7 +4,7 @@
    [camelot.util.sunrise-sunset :as sun]
    [camelot.report.module.core :as module]
    [clj-time.core :as t]
-   [camelot.util.state :as state]
+   [camelot.state.config :as config]
    [camelot.report.module.column-util :as col-util]
    [camelot.report.sighting-independence :as indep]
    [camelot.model.survey :as survey])
@@ -15,7 +15,7 @@
 (defn- get-timezone
   "Return a timezone from the configuration, or the default (system) timezone if unavailable."
   [state]
-  (let [tz-str (state/lookup state :timezone)]
+  (let [tz-str (config/lookup (:config state) :timezone)]
     (if tz-str
       (TimeZone/getTimeZone ^String tz-str)
       (TimeZone/getDefault))))

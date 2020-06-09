@@ -3,7 +3,7 @@
    [camelot.translation.en :refer :all]
    [camelot.translation.vn :refer :all]
    [taoensso.tower :as tower]
-   [camelot.util.state :as state]))
+   [camelot.state.config :as config]))
 
 (def tconfig
   "Configuration for translations."
@@ -16,5 +16,5 @@
 (defn translate
   "Create a translator for the user's preferred language."
   [state tkey & vars]
-  (let [tlookup (partial (tower/make-t tconfig) (state/lookup state :language))]
+  (let [tlookup (partial (tower/make-t tconfig) (config/lookup (:config state) :language))]
     (apply format (tlookup tkey) vars)))

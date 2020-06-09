@@ -1,22 +1,52 @@
 (ns camelot.core
   "Camelot - Camera Trap management software for conservation research."
   (:require
-   [camelot.util.state :as state]
-   [camelot.system.core :as system]
-   [environ.core :refer [env]]
-   [nrepl.server :as nrepl]
-   [clojure.tools.cli :refer [parse-opts]])
+   [camelot.system.config :as config]
+   [camelot.system.http.core :as http]
+   [camelot.system.db :as db]
+   [camelot.system.migrater :as migrater]
+   [camelot.system.backup-manager :as backup-manager]
+   [camelot.system.datasets :as datasets]
+   [camelot.system.importer :as importer]
+   [camelot.system.detector :as detector]
+   [com.stuartsierra.component :as component])
   (:gen-class))
 
-(defn start-prod
-  ([]
-   (start-prod (state/system-config)))
-  ([config]
-   (system/begin config)
-   (system/user-mode!)))
+(defn camelot-system
+  [system-overrides]
+  (let [smap
+        (apply component/system-map
+               (apply concat
+                      (merge {:config (config/map->Config {})
+                              :database (db/map->Database {})
+                              :backup-manager (backup-manager/map->BackupManager {})
+                              :datasets (datasets/map->Datasets {})
+                              :migrater (migrater/map->Migrater {})
+                              :importer (importer/map->Importer {})
+                              :detector (detector/map->Detector {})
+                              :app (http/->HttpServer {})}
+                             system-overrides)))]
+    (component/system-using smap {:app {:config :config
+                                        :database :database
+                                        :importer :importer
+                                        :detector :detector
+                                        :datasets :datasets
+                                        :backup-manager :backup-manager}
+                                  :config {}
+                                  :database {}
+                                  :backup-manager {:database :database}
+                                  :migrater {:backup-manager :backup-manager}
+                                  :datasets {:config :config
+                                             :database :database
+                                             :migrater :migrater}
+                                  :importer {:config :config}
+                                  :detector {:config :config
+                                             :database :database
+                                             :datasets :datasets}})))
 
-(defn -main [& args]
-  (let [config (state/system-config)]
-    (if-let [port (:debugger-port config)]
-      (nrepl/start-server :port port))
-    (start-prod config)))
+(defn start-prod
+  []
+  (component/start (camelot-system {})))
+
+(defn -main [& _]
+  (start-prod))

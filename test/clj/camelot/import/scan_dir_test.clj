@@ -10,56 +10,56 @@
     (testing "Server directory resolution"
       (testing "Should use client directory if root path not set."
         (let [state (state/gen-state {:paths {:root nil}})]
-          (is (= (sut/resolve-directory state "/srv/mydata/survey1")
-                 "/srv/mydata/survey1"))))
+          (is (= "/srv/mydata/survey1"
+                 (sut/resolve-directory state "/srv/mydata/survey1")))))
 
       (testing "Should know how to treat Windows drive letters coming from the client when root-path not set."
         (let [state (state/gen-state {:paths {:root nil}})]
           (with-redefs [file/path-separator #(constantly "\\")]
-            (is (= (sut/resolve-directory state "G:\\srv\\mydata\\survey1")
-                   "G:\\srv\\mydata\\survey1")))))
+            (is (= "G:\\srv\\mydata\\survey1"
+                   (sut/resolve-directory state "G:\\srv\\mydata\\survey1"))))))
 
       (testing "Should use root path if unable to resolve directory."
         (let [state (state/gen-state {:paths {:root (io/file "/my/path")}})]
-          (is (= (sut/resolve-directory state "/random/non-matching/location")
-                 "/my/path"))))
+          (is (= "/my/path"
+                 (sut/resolve-directory state "/random/non-matching/location")))))
 
       (testing "Should know be able to resolve simple directories on nix with nix client."
-        (is (= (sut/resolve-server-directory "/srv/research data/camelot"
-                                             "/mnt/server/research data/camelot/survey1")
-               "/srv/research data/camelot/survey1")))
+        (is (= "/srv/research data/camelot/survey1"
+               (sut/resolve-server-directory "/srv/research data/camelot"
+                                             "/mnt/server/research data/camelot/survey1"))))
 
       (testing "Should know be able to resolve simple directories on nix with Windows."
-        (is (= (sut/resolve-server-directory "/srv/research data/camelot"
-                                             "G:\\camelot\\survey1")
-               "/srv/research data/camelot/survey1")))
+        (is (= "/srv/research data/camelot/survey1"
+               (sut/resolve-server-directory "/srv/research data/camelot"
+                                             "G:\\camelot\\survey1"))))
 
       (testing "Should know be able to resolve simple directories on Windows with nix client."
-        (is (= (sut/resolve-server-directory "G:\\research data\\camelot"
-                                             "/srv/camelot/survey1")
-               "G:\\research data\\camelot\\survey1")))
+        (is (= "G:\\research data\\camelot\\survey1"
+               (sut/resolve-server-directory "G:\\research data\\camelot"
+                                             "/srv/camelot/survey1"))))
 
       (testing "Should know be able to resolve simple directories on Windows with Windows client."
-        (is (= (sut/resolve-server-directory "G:\\research data\\camelot"
-                                             "G:\\camelot\\survey1")
-               "G:\\research data\\camelot\\survey1")))
+        (is (= "G:\\research data\\camelot\\survey1"
+               (sut/resolve-server-directory "G:\\research data\\camelot"
+                                             "G:\\camelot\\survey1"))))
 
       (testing "Should handle trailing separators for the server."
-        (is (= (sut/resolve-server-directory "/srv/research data/camelot/"
-                                             "/srv/camelot/survey1")
-               "/srv/research data/camelot/survey1")))
+        (is (= "/srv/research data/camelot/survey1"
+               (sut/resolve-server-directory "/srv/research data/camelot/"
+                                             "/srv/camelot/survey1"))))
 
       (testing "Should handle trailing separators for the client."
-        (is (= (sut/resolve-server-directory "/srv/research data/camelot"
-                                             "/srv/camelot/survey1/")
-               "/srv/research data/camelot/survey1")))
+        (is (= "/srv/research data/camelot/survey1"
+               (sut/resolve-server-directory "/srv/research data/camelot"
+                                             "/srv/camelot/survey1/"))))
 
       (testing "Should resolve relative pathnames."
-        (is (= (sut/resolve-server-directory "/srv/research data/camelot"
-                                             "survey1/something")
-               "/srv/research data/camelot/survey1/something")))
+        (is (= "/srv/research data/camelot/survey1/something"
+               (sut/resolve-server-directory "/srv/research data/camelot"
+                                             "survey1/something"))))
 
       (testing "Should resolve relative pathnames from Windows cliet."
-        (is (= (sut/resolve-server-directory "/srv/research data/camelot"
-                                             "survey1\\something")
-               "/srv/research data/camelot/survey1/something"))))))
+        (is (= "/srv/research data/camelot/survey1/something"
+               (sut/resolve-server-directory "/srv/research data/camelot"
+                                             "survey1\\something")))))))

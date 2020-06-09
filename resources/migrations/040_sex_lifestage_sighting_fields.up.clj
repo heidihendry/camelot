@@ -1,7 +1,5 @@
 (require '[yesql.core :as sql])
-(require '[camelot.util.db :as db])
-(require '[camelot.util.state :as state])
-(require '[schema.core :as s])
+(require '[clojure.java.jdbc :as jdbc])
 (require '[clj-time.core :as t])
 (require '[clj-time.coerce :as tc])
 (require '[clojure.string :as cstr])
@@ -84,7 +82,7 @@
 (defn- -m040-migrate-lifestage-fields!
   [conn sightings field-id]
   (-m040-migrate-sighting-fields! conn sightings field-id
-                                  #(if-let [v (:sighting_lifestage %)]
+                                  #(when-let [v (:sighting_lifestage %)]
                                      (cstr/capitalize v))))
 
 (defn- -m040-migrate-survey-data
@@ -100,10 +98,10 @@
   (map :survey_id (-get-survey-ids {} conn)))
 
 (defn- -m040-upgrade
-  [state]
-  (db/with-transaction [s state]
-    (let [conn {:connection (state/lookup-connection s)}]
+  [conn]
+  (jdbc/with-db-transaction [tx conn]
+    (let [conn {:connection tx}]
       (doseq [survey (-m040-get-survey-ids conn)]
         (-m040-migrate-survey-data conn survey)))))
 
-(-m040-upgrade camelot.system.db.core/*migration-state*)
+(-m040-upgrade camelot.migration/*connection*)

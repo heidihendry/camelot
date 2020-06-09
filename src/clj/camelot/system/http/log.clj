@@ -1,6 +1,7 @@
 (ns camelot.system.http.log
   "Ring handler for request logging."
   (:require
+   [clojure.string :as str]
    [clojure.tools.logging :as log]))
 
 (defn- log-response
@@ -14,7 +15,7 @@
 (defn- stacktrace
   "Converts a Throwable into a sequence of strings with the stacktrace."
   [^Throwable throwable]
-  (clojure.string/join "\n" (doall (map str (.getStackTrace throwable)))))
+  (str/join "\n" (doall (map str (.getStackTrace throwable)))))
 
 (defn- log-exception
   "Logging for exceptinos"

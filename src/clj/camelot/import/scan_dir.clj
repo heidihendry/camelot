@@ -2,7 +2,7 @@
   (:require
    [camelot.util.file :as file]
    [clojure.string :as str]
-   [camelot.util.state :as state])
+   [camelot.state.config :as config])
   (:import
    (java.util.regex Pattern)))
 
@@ -81,7 +81,7 @@
   "Resolve a corresponding server directory for a given 'client' directory."
   [state client-dir]
   {:pre [(not (nil? client-dir))]}
-  (let [root (file-to-string (state/lookup-path state :root))
+  (let [root (file-to-string (config/lookup-path (:config state) :root))
         res (resolve-server-directory root client-dir)]
     (cond
       (and (empty? res) (nil? root)) client-dir

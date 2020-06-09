@@ -67,8 +67,12 @@
 (defn transform-response
   [type spec x]
   (if (and (not (map? x)) (coll? x))
-    (either/right {:data (map (partial to-data type spec) x)})
-    (either/right {:data (to-data type spec x)})))
+    {:data (map (partial to-data type spec) x)}
+    {:data (to-data type spec x)}))
+
+(defn mtransform-response
+  [type spec x]
+  (either/right (transform-response type spec x)))
 
 (defn- ednize-key [type k]
   (as-> k $
@@ -142,7 +146,7 @@
      (either/right (from-request resource-type spec id data))
      (either/left {:error/type :error.type/bad-request}))))
 
-(defn- handle-error-response
+(defn handle-error-response
   [e]
   (condp = (:error/type e)
     :error.type/bad-request
@@ -154,7 +158,7 @@
     :error.type/conflict
     (hr/conflict)
 
-    (hr/internal-server-error)))
+    (throw e)))
 
 (defn created [base-uri response]
   (let [location (str base-uri "/" (get-in response [:data :id]))]

@@ -1,15 +1,12 @@
 (ns user
   (:require
-   [camelot.core]
-   [camelot.util.state :as state]
-   [camelot.system.state :as sysstate]
-   [camelot.system.systems :as systems]
-   [camelot.util.maintenance :as maintenance]
+   [camelot.core :as camelot]
    [camelot.system.http.core :as http]
    [com.stuartsierra.component :as component]
    [ring.middleware.reload :refer [wrap-reload]]
    [schema.core :as s]
-   [figwheel-sidecar.repl-api :as figwheel]))
+   [figwheel-sidecar.repl-api :as figwheel]
+   [reloaded.repl :refer [go start stop reset system]]))
 
 ;; Let Clojure warn you when it needs to reflect on types, or when it does math
 ;; on unboxed numbers. In both cases you should add type annotations to prevent
@@ -19,48 +16,33 @@
 
 (s/set-fn-validation! true)
 
-(def http-handler
-  (wrap-reload #'http/http-handler))
-
-;; TODO these are no longer so convenient.  May want to add dataset-id param?
-(defn migrate
-  [state]
-  (maintenance/migrate state))
-
-(defn rollback
-  [state]
-  (maintenance/rollback state))
-
-(defn runprod []
-  (camelot.core/start-prod))
+(def http-handler nil)
 
 (defrecord DevHttpServer [database config]
   component/Lifecycle
   (start [this]
-    (figwheel/start-figwheel!)
-    (assoc this :figwheel true))
+    (if (:figwheel this)
+      this
+      (do
+        (let [hf (http/http-handler this)]
+          (alter-var-root #'http-handler (constantly hf)))
+        (figwheel/start-figwheel!)
+        (assoc this :figwheel true))))
 
   (stop [this]
     (when (get this :figwheel)
       (figwheel/stop-figwheel!)
       (assoc this :figwheel nil))))
 
-(defn start []
-  (reset! sysstate/system (-> (state/system-config)
-                              (assoc-in [:server :dev-server]
-                                        (map->DevHttpServer {}))
-                              systems/camelot-system
-                              component/start))
-  nil)
+(reloaded.repl/set-init! #(camelot/camelot-system {:app (map->DevHttpServer {})}))
 
-(defn stop []
-  (swap! sysstate/system component/stop)
-  nil)
+(defn migrate
+  [dataset]
+  (.migrate (:migrater system) dataset))
 
-(defn restart
-  []
-  (stop)
-  (start))
+(defn rollback
+  [dataset]
+  (.rollback (:migrater system) dataset))
 
-(defn state []
-  @sysstate/system)
+(defn runprod []
+  (camelot.core/start-prod))

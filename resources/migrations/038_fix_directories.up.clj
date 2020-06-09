@@ -1,4 +1,3 @@
-(require '[camelot.util.state :as state])
 (require '[camelot.util.file :as file])
 (require '[clojure.string :as str])
 
@@ -24,8 +23,8 @@
   (apply str (take 2 (seq (-m038-remove-filename-prefix (file/get-name f))))))
 
 (defn- -m038-upgrade
-  [state]
-  (let [media-dir (state/lookup-path state :media)
+  [dataset]
+  (let [media-dir (-> dataset :paths :media)
         mfiles (file/list-files media-dir)]
     (dorun (->> mfiles
                 (filter #(-m038-is-movable-file? %))
@@ -38,4 +37,4 @@
                      (file/rename f (file/->file prefix-dir
                                                  (file/get-name f))))))))))
 
-(-m038-upgrade camelot.system.db.core/*migration-state*)
+(-m038-upgrade camelot.migration/*dataset*)

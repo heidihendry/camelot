@@ -1,17 +1,15 @@
 (ns camelot.report.module.loader
   (:require
    [camelot.util.file :as file]
-   [camelot.util.state :as state]
-   [camelot.report.module.builtin.core])
-  (:import
-   (org.apache.commons.lang3 SystemUtils)))
+   [camelot.state.config :as config]
+   [camelot.report.module.builtin.core]))
 
 (def clj-file-re #"(?i)\.clj$")
 
 (defn module-path
   "Return the module path."
   [state]
-  (file/->file (state/lookup-path state :config) "modules"))
+  (file/->file (config/lookup-path (:config state) :config) "modules"))
 
 (defn- clj-file?
   "Predicate for whether a given file is a clojure file."

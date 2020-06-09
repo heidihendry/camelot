@@ -1,5 +1,5 @@
 (ns camelot.detection.datasets
-  (:require [camelot.util.state :as state]
+  (:require [camelot.state.datasets :as datasets]
             [clojure.core.async :as async]
             [clojure.walk :as walk]))
 
@@ -7,7 +7,7 @@
   {:style/indent [2 [:defn]]}
   [{:keys [system-state ctx]} [state-binding] & body]
   `(let [id# (:dataset-id ~ctx)
-         ~state-binding (state/with-dataset ~system-state id#)]
+         ~state-binding (update ~system-state :datasets datasets/assoc-dataset-context id#)]
      ~@body))
 
 (def async-put-fns
@@ -35,7 +35,7 @@
   {:style/indent [1 [:defn]]}
   [state & body]
   `(do
-     ~@(map #(let [tf (build-transform-async-put-call `(state/get-dataset-id ~state))]
+     ~@(map #(let [tf (build-transform-async-put-call `(datasets/get-dataset-context (:datasets ~state)))]
                (walk/postwalk (create-form-transformer should-transform? tf) %))
             body)))
 
@@ -52,5 +52,5 @@
 
 (defn detector-state
   [state full-detector-state]
-  (let [dataset-id (state/get-dataset-id state)]
+  (let [dataset-id (datasets/get-dataset-context (:datasets state))]
     (get-in full-detector-state [:datasets dataset-id])))

@@ -104,7 +104,7 @@ Camelot currently has 2 test suites, one for clj, and one for cljs. To run the t
 Start a repl in the context of your project with `M-x cider-jack-in`.
 
 Switch to repl-buffer with `C-c C-z` and start the development environment by
-typing `(start`) at the prompt, After a minute you'll see that Camelot has
+typing `(go)` at the prompt, After a minute you'll see that Camelot has
 started up.  Load [http://localhost:5341](http://localhost:5341) in an
 external browser and you're all set. Happy hacking.
 

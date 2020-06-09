@@ -3,7 +3,7 @@
    [schema.core :as sch]
    [camelot.spec.schema.state :refer [State]]
    [camelot.util.db :as db]
-   [camelot.util.state :as state]))
+   [camelot.state.config :as config]))
 
 (def query (db/with-db-keys :taxonomy))
 
@@ -40,7 +40,7 @@
   "Assoc a key for the label, which is a computed value."
   [state rec]
   (assoc rec :taxonomy-label
-         (if (= :common-name (state/lookup state :species-name-style))
+         (if (= :common-name (config/lookup (:config state) :species-name-style))
            (:taxonomy-common-name rec)
            (format "%s %s" (:taxonomy-genus rec) (:taxonomy-species rec)))))
 

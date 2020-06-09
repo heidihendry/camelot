@@ -3,7 +3,6 @@
    [compojure.core :refer [defroutes]]
    [compojure.route :as route]
    [camelot.http.app :as app]
-   [camelot.http.backup :as backup]
    [camelot.http.camera :as camera]
    [camelot.http.camera-status :as camera-status]
    [camelot.http.camera-deployment :as camera-deployment]
@@ -33,7 +32,6 @@
 (defroutes app-routes
   (route/resources "/" {:root "www"})
   app/routes
-  backup/routes
   camera/routes
   camera-deployment/routes
   camera-status/routes

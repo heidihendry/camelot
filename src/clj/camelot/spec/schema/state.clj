@@ -6,6 +6,9 @@
 (def State
   {(sch/required-key :config) sch/Any
    (sch/required-key :database) sch/Any
+   (sch/required-key :datasets) sch/Any
+   (sch/optional-key :migrater) sch/Any
+   (sch/optional-key :backup-manager) sch/Any
    (sch/optional-key :app) sch/Any
    (sch/optional-key :importer) sch/Any
    (sch/optional-key :detector) sch/Any

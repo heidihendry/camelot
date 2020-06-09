@@ -17,7 +17,7 @@
            (either/right data)
            (api-util/transform-request resource-type :camelot.http.api.survey.patch/attributes id)
            (survey/patch! state (edn/read-string id))
-           (api-util/transform-response resource-type ::spec/attributes))]
+           (api-util/mtransform-response resource-type ::spec/attributes))]
     (->> mr
          (m/fmap hr/ok)
          (api-util/to-response))))
@@ -27,7 +27,7 @@
             (either/right data)
             (api-util/transform-request resource-type :camelot.http.api.survey.post/attributes)
             (survey/post! state)
-            (api-util/transform-response resource-type ::spec/attributes))]
+            (api-util/mtransform-response resource-type ::spec/attributes))]
     (->> mr
          (m/fmap #(api-util/created resource-base-uri %))
          (api-util/to-response))))
@@ -36,14 +36,14 @@
   (let [mr (m/->>= (either/right id)
                    (api-util/transform-id)
                    (survey/get-single state)
-                   (api-util/transform-response resource-type ::spec/attributes))]
+                   (api-util/mtransform-response resource-type ::spec/attributes))]
     (->> mr
          (m/fmap hr/ok)
          (api-util/to-response))))
 
 (defn get-all [state]
   (let [mr (m/->>= (either/right (survey/get-all state))
-                   (api-util/transform-response resource-type ::spec/attributes))]
+                   (api-util/mtransform-response resource-type ::spec/attributes))]
     (->> mr
          (m/fmap hr/ok)
          (api-util/to-response))))

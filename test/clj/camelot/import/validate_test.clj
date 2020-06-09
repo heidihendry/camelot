@@ -2,6 +2,7 @@
   (:require [camelot.import.validate :as sut]
             [clojure.test :refer :all]
             [clj-time.core :as t]
+            [camelot.testutil.mock :as mock]
             [camelot.testutil.state :as state]
             [clojure.string :as str]
             [clojure.java.io :as io]))
@@ -19,9 +20,8 @@
 
 (defn gen-state
   []
-  (update-in (state/gen-state {:language :en})
-             [:config :paths :media]
-             (constantly "/path/to/media")))
+  (assoc (state/gen-state {:language :en})
+         :datasets (mock/datasets {:default {:paths {:media "/path/to/media"}}} :default)))
 
 (defn check-within-session-date
   [data]

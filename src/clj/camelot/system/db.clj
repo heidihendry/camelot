@@ -1,14 +1,11 @@
-(ns camelot.system.db.core
+(ns camelot.system.db
   (:require
+   [camelot.state.database :as database]
+   [camelot.system.protocols :as protocols]
    [clojure.tools.logging :as log]
    [yesql.core :as sql]
    [com.stuartsierra.component :as component]
-   [clojure.java.jdbc :as jdbc]
-   [schema.core :as sch])
-  (:import
-   (java.io IOException)))
-
-(def ^:dynamic *migration-state* nil)
+   [clojure.java.jdbc :as jdbc]))
 
 (def query-files
   ["bounding-box"
@@ -16,7 +13,6 @@
    "cameras"
    "deployments"
    "library"
-   "maintenance"
    "media"
    "photos"
    "sighting-field"
@@ -33,7 +29,8 @@
    "taxonomy"
    "trap-station-session-cameras"
    "trap-station-sessions"
-   "trap-stations"])
+   "trap-stations"
+   "maintenance"])
 
 (defn queries
   [name]
@@ -53,24 +50,31 @@
 (defn connect
   "Establish a connection to the database given a JDBC spec."
   [spec]
-  (jdbc/get-connection spec))
+  (jdbc/get-connection spec)
+  spec)
 
 (defn close
   "Close a connection to the database given a JDBC spec."
   [spec]
   (try
-    (jdbc/get-connection (assoc (dissoc spec :create) :shutdown true))
+    (let [spec (assoc (dissoc spec :create) :shutdown true)]
+      (jdbc/get-connection spec)
+      spec)
     (catch Exception e
       (log/info (.getMessage e)))))
 
-(defrecord Database [connections]
+(defrecord Database [config]
+  protocols/Connectable
+  (connect [this database]
+    (let [spec (database/spec database)]
+      (connect spec)))
+
+  (disconnect [this database]
+    (close (database/spec database)))
+
   component/Lifecycle
   (start [this]
-    (doall (map connect (vals connections)))
     (assoc this :queries (build-queries)))
 
   (stop [this]
-    (doall (map close (vals connections)))
-    (-> this
-        (assoc :connections nil)
-        (assoc :queries nil))))
+    (assoc this :queries nil)))

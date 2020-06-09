@@ -1,9 +1,8 @@
-(require '[camelot.util.state :as state])
 (require '[camelot.util.file :as file])
 
 (defn- -m038-downgrade
-  [state]
-  (let [media-dir (state/lookup-path state :media)]
+  [dataset]
+  (let [media-dir (-> dataset :paths :media)]
     (dorun (map
             (fn [f]
               (when (and (file/file? f)
@@ -17,4 +16,4 @@
                 (file/delete f)))
             (file-seq media-dir)))))
 
-(-m038-downgrade camelot.system.db.core/*migration-state*)
+(-m038-downgrade camelot.migration/*dataset*)

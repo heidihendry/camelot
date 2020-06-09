@@ -2,7 +2,7 @@
   "Wildlife detector component."
   (:require
    [camelot.services.analytics :as analytics]
-   [camelot.util.state :as state]
+   [camelot.state.datasets :as datasets]
    [duratom.core :as duratom]
    [com.stuartsierra.component :as component]
    [clojure.core.async :as async]
@@ -37,7 +37,7 @@
   (merge
    {:category "detector"
     :action (name (:action v))
-    :label (if-let [s (:subject v)] (name s))
+    :label (when-let [s (:subject v)] (name s))
     :label-value (let [lv (:subject-id v)] (when (int? lv) lv))
     :ni true}
    (:meta v)))
@@ -138,7 +138,7 @@
             detector-state
             (reduce
              (fn [acc dataset-id]
-               (let [state (state/with-dataset system-state dataset-id)]
+               (let [state (update system-state :datasets datasets/assoc-dataset-context dataset-id)]
                  (assoc-in acc [:datasets dataset-id]
                            (duratom/duratom :local-file
                                             :file-path (detector-path state)
@@ -146,7 +146,7 @@
                                             :rw {:read nippy/thaw-from-file
                                                  :write (fn [file data]
                                                           (async/go (async/>! state-update-chan [file data])))}))))
-             {:system (atom {})} (state/get-dataset-ids system-state))
+             {:system (atom {})} (datasets/get-available (:datasets system-state)))
             cmd-chan (async/chan)
             cmd-mult (async/mult cmd-chan)
             event-chan (detection/run system-state detector-state cmd-chan cmd-mult)]

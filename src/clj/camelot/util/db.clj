@@ -1,34 +1,19 @@
 (ns camelot.util.db
   (:require
    [clojure.spec.alpha :as s]
-   [camelot.util.state :as state]
+   [camelot.state.datasets :as datasets]
    [camelot.spec.system :as sysspec]
    [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
    [clj-time.core :as t]
-   [clj-time.coerce :as tc]
-   [clojure.tools.logging :as log]))
+   [clj-time.coerce :as tc]))
 
 (defmacro with-transaction
   "Run `body' with a new transaction added to the binding for state."
   [[bind state] & body]
-  `(let [dataset-id# (state/get-dataset-id ~state)]
-     (jdbc/with-db-transaction [tx# (get-in ~state [:database :connections dataset-id#])]
-       (let [~bind (assoc-in (assoc-in ~state [:database :default-connections dataset-id#]
-                                       (get-in ~state [:database :connections dataset-id#]))
-                             [:database :connections dataset-id#] tx#)]
-         ~@body))))
-
-(defmacro async-with-transaction
-  "Run `body' with a new transaction, created from the default connection.
-
-  Intended for async operations which are already running within a transaction."
-  [[bind state] & body]
-  `(let [dataset-id# (state/get-dataset-id ~state)]
-     (jdbc/with-db-transaction [tx# (get-in ~state [:database :connections dataset-id#])]
-       (let [~bind (assoc-in ~state [:database :connections dataset-id#]
-                             (get-in ~state [:database :default-connections dataset-id#]))]
-         ~@body))))
+  `(jdbc/with-db-transaction [tx# (datasets/lookup-connection (:datasets ~state))]
+     (let [~bind (update ~state :datasets datasets/assoc-connection-context tx#)]
+       ~@body)))
 
 (defn- clj-key
   "Reducer for translating from database types.
@@ -67,10 +52,10 @@
 (defn with-connection
   "Run a query with the given connection, if any."
   ([ks state q]
-   (if-let [conn {:connection (state/lookup-connection state)}]
+   (when-let [conn {:connection (datasets/lookup-connection (:datasets state))}]
      (q ks conn)))
   ([state q]
-   (if-let [conn {:connection (state/lookup-connection state)}]
+   (when-let [conn {:connection (datasets/lookup-connection (:datasets state))}]
      (q {} conn))))
 
 (defn get-query

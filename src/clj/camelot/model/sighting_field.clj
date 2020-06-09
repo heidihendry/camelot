@@ -90,7 +90,7 @@
 (defn get-specific
   "Return a specific sighting field by field ID."
   [state field-id]
-  (if-let [sf (first (query state :get-specific
+  (when-let [sf (first (query state :get-specific
                             {:sighting-field-id field-id}))]
     (->> (get-options state field-id)
          (assoc sf :sighting-field-options)
