@@ -18,7 +18,7 @@
   [state]
   (str (-> state :config :detector :username)
        "-"
-       (name (-> state :session :dataset-id))
+       (name (datasets/get-dataset-context (:datasets state)))
        "-detector.edn"))
 
 (def state-serialisation-backoff
@@ -28,7 +28,7 @@
 
 (defn- detector-path
   [state]
-  (let [file (io/file (-> state :config :paths :database)
+  (let [file (io/file (datasets/lookup-path (:datasets state) :database)
                       (detector-filename state))]
     (.getCanonicalPath ^File file)))
 
@@ -159,7 +159,7 @@
 (defprotocol Commandable
   (command [this cmd]))
 
-(defrecord Detector [config database]
+(defrecord Detector [config database datasets]
   Commandable
   ;; It's important with pause/resume that it happens for all detectors at
   ;; once. If this were not the case the core.async's thread pool will rapidly
@@ -170,7 +170,7 @@
 
   component/Lifecycle
   (start [this]
-    (let [system-state {:config config :database database}]
+    (let [system-state {:config config :database database :datasets datasets}]
       (if (-> system-state :config :detector :enabled)
         (init-dataset-detector this system-state)
         this)))
