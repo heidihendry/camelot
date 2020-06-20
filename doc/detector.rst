@@ -1,7 +1,7 @@
 Animal detection
 ------------------
 
-*The features described on this page require a registration, which is coming soon!*
+*The features described on this page require a |camelot_account|.*
 
 Typically most images captured by motion-triggered cameras are do not have
 valuable content, as the motion sensor was triggered by causes other than some
@@ -22,6 +22,10 @@ detection. In practice, this enables two features:
 
 .. figure:: screenshot/suggestion.png
    :alt: 
+
+.. |camelot_account| raw:: html
+
+   <a href="http://www.camelotproject.org/register/" target="_blank">Camelot Account</a>
 
 Setup
 ~~~~~
