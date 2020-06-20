@@ -7,7 +7,6 @@
 (def routes
   (context "/settings" {state :state}
            (GET "/" [] (-> (get state :config)
-                           ;; contains credentials
-                           (dissoc :detector)
+                           (update :detector dissoc :username :password)
                            cursorise/cursorise
                            r/response))))
