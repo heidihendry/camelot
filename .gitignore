@@ -18,3 +18,4 @@ doc/_build
 /node_modules
 /.cpcache
 /.clj-kondo/.cache
+/.cljs_node_repl/
