@@ -1,7 +1,12 @@
 ## ChangeLog
 
-### 1.6.4 [Unreleased]
+### 1.6.5 [Unreleased]
+#### Fixed
+* Omits trap station cameras with a single image from detection.
+
+### 1.6.4
 * Fix cut/copy/paste keyboard shortcuts under MacOS
+* Adds a 'has animals?' quick filter to the library
 
 ### 1.6.3
 #### Changed
