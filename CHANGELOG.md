@@ -1,6 +1,14 @@
 ## ChangeLog
 
-### 1.6.3 [Unreleased]
+### 1.6.5 [Unreleased]
+#### Fixed
+* Omits trap station cameras with a single image from detection.
+
+### 1.6.4
+#### Added
+* Adds a 'has animals?' quick filter to the library
+
+### 1.6.3
 #### Fixed
 * Fixes a bug in the reference window where the reference quality images may not be loaded initially.
 
