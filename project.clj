@@ -38,7 +38,7 @@
                         [jonase/eastwood "0.3.3"]
                         [com.jakemccrary/lein-test-refresh "0.23.0"]]
               :figwheel {:css-dirs ["resources/www/css"]
-                         :ring-handler user/http-handler
+                         :ring-handler dev/http-handler
                          :server-port 5341
                          :server-logfile "log/figwheel.log"}
               :cljsbuild {:builds
