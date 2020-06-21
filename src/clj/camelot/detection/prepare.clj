@@ -9,20 +9,25 @@
    [clojure.core.async :as async]
    [clojure.tools.logging :as log]))
 
-(def ^:private media-per-task-limit 100000)
+(def ^:private min-media-per-task-limit 2)
+(def ^:private max-media-per-task-limit 100000)
 
 (defn- retrieve
   [state detector-state session-camera-id]
-  (->> session-camera-id
-       (media/get-all state)
-       (take media-per-task-limit)
-       (remove #(state/media-processing-completed? detector-state (:media-id %)))))
+  (let [media (->> session-camera-id
+                   (media/get-all state)
+                   (take max-media-per-task-limit))]
+    ;; A long-fixed bug in bulk upload would create n trap-stations for n
+    ;; images. This check filters those out.
+    (if (< (count media) min-media-per-task-limit)
+      '()
+      (remove #(state/media-processing-completed? detector-state (:media-id %)) media))))
 
 (defn run
   "Create tasks and queue media for upload."
   [system-state detector-state-ref ch cmd-mult [upload-ch upload-cmd-ch] [poll-ch _] event-ch]
   (let [cmd-ch (async/tap cmd-mult (async/chan))
-        int-ch (async/chan (async/dropping-buffer (inc media-per-task-limit)))]
+        int-ch (async/chan (async/dropping-buffer (inc max-media-per-task-limit)))]
     (async/go-loop []
       (let [[v port] (async/alts! [cmd-ch int-ch ch] :priority true)]
         (condp = port
