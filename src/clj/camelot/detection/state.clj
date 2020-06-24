@@ -6,6 +6,8 @@
    :media {1201 {:status "completed"}}
    :session-cameras {1 {:task 120}}}
 
+(def task-retry-limit 5)
+
 (defn get-task
   "Return the task state with the given id."
   [detector-state task-id]
@@ -163,7 +165,9 @@
   [detector-state scid]
   (let [task (get-task-for-session-camera-id detector-state scid)]
     (boolean (and task
-                  (or (= (:status task) "failed")
+                  (or (and (= (:status task) "failed")
+                           (or (not (:can-retry? task))
+                               (>= (:retries task) task-retry-limit)))
                       (= (:status task) "archived")
                       (and (= (:status task) "completed")
                            (every? #(media-processing-completed? detector-state %)
