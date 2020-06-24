@@ -1,6 +1,12 @@
 ## ChangeLog
 
 ### 1.6.5 [Unreleased]
+#### Added
+* Retry mechanism for failed tasks
+
+#### Changed
+* Increases the poll delay for single tasks from 10 minutes to 15 minutes
+
 #### Fixed
 * Omits trap station cameras with a single image from detection.
 
