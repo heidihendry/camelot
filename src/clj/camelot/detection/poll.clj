@@ -129,7 +129,9 @@
                                               :subject :task
                                               :subject-id task-id})
                           (log/info "Failed to get results for" task-id)
-                          (state/set-task-status! detector-state-ref task-id "failed" {:can-retry? true}))
+                          (let [retries (or (:retries (state/get-task @detector-state-ref task-id)) 0)]
+                            (state/set-task-status! detector-state-ref task-id "failed" {:can-retry? true
+                                                                                         :retries (inc retries)})))
 
                         "PROBLEM"
                         (do
