@@ -13,7 +13,7 @@
    [clj-time.coerce :as tc]))
 
 (def ^:private retry-limit 72)
-(def ^:private retry-timeout (t/minutes 10))
+(def ^:private retry-timeout (t/minutes 15))
 
 (defn- build-payload
   [result image]
