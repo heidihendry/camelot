@@ -37,11 +37,15 @@
     (json/parse-string (:body resp) true)))
 
 (defn- http-post
-  [state endpoint]
-  (let [resp (dh/with-retry retry-policy
-               (http/post (str (-> state :config :detector :api-url) endpoint)
-                          (request-config state)))]
-    (json/parse-string (:body resp) true)))
+  ([state endpoint]
+   (http-post state endpoint nil))
+  ([state endpoint body]
+   (let [resp (dh/with-retry retry-policy
+                (http/post (str (-> state :config :detector :api-url) endpoint)
+                           (assoc (request-config state)
+                                  :body (json/generate-string body)
+                                  :content-type :json)))]
+     (json/parse-string (:body resp) true))))
 
 (defn account-auth
   "Verify the user can authenticate with the given credentials."
@@ -67,6 +71,11 @@
   "Archive a task."
   [state task-id]
   (http-post state (format "/task/%s/archive" task-id)))
+
+(defn bulk-learn
+  "Archive a task."
+  [state results]
+  (http-post state "/learn/bulk" results))
 
 (defn healthy?
   "Check service health."

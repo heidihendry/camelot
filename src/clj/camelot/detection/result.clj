@@ -36,7 +36,7 @@
 
 (defn run
   "Create suggestions for values placed on the returned channel."
-  [system-state detector-state-ref event-ch]
+  [system-state detector-state-ref event-ch learn-ch]
   (let [cmd-ch (async/chan (async/dropping-buffer 100))
         ch (async/chan)]
     (async/go-loop []
@@ -98,6 +98,7 @@
                                           :subject :media
                                           :subject-id media-id})
                       (log/error "Error while creating suggestion " media-id detection e))))
-                (state/set-media-processing-status! detector-state-ref media-id "completed")))
+                (state/set-media-processing-status! detector-state-ref media-id "completed")
+                (async/>! learn-ch (assoc v :media-id media-id))))
             (recur)))))
     [ch cmd-ch]))

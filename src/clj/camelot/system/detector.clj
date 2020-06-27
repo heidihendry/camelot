@@ -1,6 +1,8 @@
 (ns camelot.system.detector
   "Wildlife detector component."
   (:require
+   [camelot.protocols :as protocols]
+   [camelot.detection.learn :as learn]
    [camelot.services.analytics :as analytics]
    [camelot.util.state :as state]
    [duratom.core :as duratom]
@@ -126,7 +128,7 @@
             (recur)))))))
 
 (defn- init-dataset-detector
-  [this system-state]
+  [this system-state learn-chan]
   (if (:cmd-chan this)
     this
     (do
@@ -149,7 +151,7 @@
              {:system (atom {})} (state/get-dataset-ids system-state))
             cmd-chan (async/chan)
             cmd-mult (async/mult cmd-chan)
-            event-chan (detection/run system-state detector-state cmd-chan cmd-mult)]
+            event-chan (detection/run system-state detector-state cmd-chan cmd-mult learn-chan)]
         (run-analytics-publisher system-state detector-state event-chan cmd-chan cmd-mult)
         (run-state-file-manager detector-state state-update-chan cmd-mult)
         (-> this
@@ -168,11 +170,18 @@
     (when-let [chan (:cmd-chan this)]
       (async/put! chan cmd)))
 
+  protocols/Learnable
+  (learn [this media-with-dataset-id]
+    (async/>!! (:learn-chan this) media-with-dataset-id))
+
   component/Lifecycle
   (start [this]
     (let [system-state {:config config :database database}]
       (if (-> system-state :config :detector :enabled)
-        (init-dataset-detector this system-state)
+        ;; :learn needs to go into this early
+        (let [learn-chan (learn/run system-state)]
+          (assoc (init-dataset-detector this system-state learn-chan)
+                 :learn-chan learn-chan))
         this)))
 
   (stop [this]
@@ -181,6 +190,7 @@
         (log/info "Detector stopping...")
         (async/put! chan {:cmd :stop})
         (-> this
+            (assoc :learn-chan nil)
             (assoc :state nil)
             (assoc :cmd-chan nil)))
       this)))

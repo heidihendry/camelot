@@ -1,6 +1,10 @@
 ## ChangeLog
 
-### 1.6.5 [Unreleased]
+### 1.6.6 [Unreleased]
+#### Added
+* Add feedback mechanism to assess ML model accuracy
+
+### 1.6.5
 #### Added
 * Retry mechanism for failed tasks
 
