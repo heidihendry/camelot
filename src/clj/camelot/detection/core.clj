@@ -19,13 +19,13 @@
 ;; TODO consider connection pooling
 (defn run
   "Run the detector"
-  [system-state detector-state-ref cmd-pub-ch cmd-mult]
+  [system-state detector-state-ref cmd-pub-ch cmd-mult learn-ch]
   (let [event-ch (async/chan (async/sliding-buffer 1000))]
     (try
       (client/account-auth system-state)
       (swap! bootstrap-ch #(or % (bootstrap/run system-state detector-state-ref event-ch)))
       (let [archive-chans (archive/run system-state detector-state-ref event-ch)
-            result-chans (result/run system-state detector-state-ref event-ch)
+            result-chans (result/run system-state detector-state-ref event-ch learn-ch)
             poll-chans (poll/run system-state detector-state-ref result-chans archive-chans event-ch)
             submit-chans (submit/run system-state detector-state-ref poll-chans archive-chans event-ch)
             upload-chans (upload/run system-state detector-state-ref submit-chans event-ch)]

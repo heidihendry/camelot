@@ -198,8 +198,13 @@
 (sch/defn update-processed-flag!
   [state :- State
    {:keys [media-id media-processed]}]
-  (query state :update-processed-flag! {:media-id media-id
-                                                  :media-processed media-processed}))
+  (let [prev-processed (:media-processed (get-specific state media-id))
+        result (query state :update-processed-flag! {:media-id media-id
+                                                     :media-processed media-processed})]
+    (when (and media-processed (not prev-processed))
+      (.learn (:detector state) {:dataset-id (state/get-dataset-id state)
+                                 :media-id media-id}))
+    result))
 
 (sch/defn update-reference-quality-flag!
   [state :- State

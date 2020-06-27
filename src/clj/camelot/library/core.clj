@@ -78,14 +78,14 @@
 
 (defn- identify-media
   [state {:keys [quantity species sighting-fields bounding-box-id]} media-id]
-  (media/update-processed-flag! state {:media-id media-id
-                                       :media-processed true})
   (sighting/create! state (sighting/tsighting {:sighting-quantity quantity
                                                :taxonomy-id species
                                                :media-id media-id
                                                :bounding-box-id bounding-box-id
                                                :sighting-fields (reduce-kv #(assoc %1 %2 (str %3))
-                                                                           {} sighting-fields)})))
+                                                                           {} sighting-fields)}))
+  (media/update-processed-flag! state {:media-id media-id
+                                       :media-processed true}))
 
 (sch/defn identify
   "Creates identification data as sightings for each media ID given."

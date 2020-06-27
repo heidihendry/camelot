@@ -5,6 +5,14 @@
 * Camelot no longer supports 32-bit Java versions
 * Wrap logs in admin UI
 
+### 1.6.6
+#### Added
+* Add feedback mechanism to assess ML model accuracy
+
+### 1.6.5
+#### Added
+* Retry mechanism for failed tasks
+
 ### 1.6.5
 #### Fixed
 * Omits trap station cameras with a single image from detection.

@@ -33,3 +33,7 @@
 (defprotocol Configurable
   (config [this]
     "Get configuration."))
+
+(defprotocol Learnable
+  (learn [this thing]
+    "Learn about the given `thing`"))
