@@ -40,13 +40,15 @@
 
 (defn build-result-map
   [state media-id]
-  (when (:media-processed (media/get-specific state media-id))
-    (let [has-sightings (boolean (seq (sighting/get-all state media-id)))
-          suggestions (suggestion/get-all state media-id)]
-      (when-let [confs (seq (map :suggestion-confidence
-                                 (filter #(= (:suggestion-key %) "animal") suggestions)))]
+  (let [media (media/get-specific state media-id)]
+    (when (and (:media-detection-completed media) (:media-processed media))
+      (let [has-sightings (boolean (seq (sighting/get-all state media-id)))
+            suggestions (suggestion/get-all state media-id)
+            confs (seq (map :suggestion-confidence
+                            (filter #(= (:suggestion-key %) "animal") suggestions)))
+            max-conf (if (seq confs) (apply max confs) 0)]
         {:has_animals_actual has-sightings
-         :has_animals_detection_max_confidence (apply max confs)}))))
+         :has_animals_detection_max_confidence max-conf}))))
 
 (defn build-result
   [system-state v]
@@ -67,6 +69,7 @@
         (let [results (remove nil? (map #(build-result system-state %) vs))]
           (try
             (client/bulk-learn system-state {:results results})
+            (log/info "Learning complete for batch of size" (count vs) "/" (count results) "submitted")
             (catch Exception e
               (log/warn "Submitting learning results failed:" e)))))
       (recur))))
