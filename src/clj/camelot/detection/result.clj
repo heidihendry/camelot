@@ -78,30 +78,33 @@
                   (async/>! event-ch {:action :result-media-with-high-confidence-suggestion
                                       :subject :media
                                       :subject-id media-id}))
-                (suggestion/delete-for-media-id! state media-id)
-                (doseq [detection detections]
-                  (log/info "Creating suggestion for media-id" (:subject-id v))
-                  (try
-                    (let [bb (bounding-box/create! state (build-bounding-box detection))]
-                      (suggestion/create!
-                       state
-                       (build-suggestion media-id bb (:payload v) detection)))
-                    (if (>= (:conf detection)
-                            (-> state :config :detector :confidence-threshold))
-                      (async/>! event-ch {:action :result-high-confidence-suggestion-added
-                                          :subject :media
-                                          :subject-id media-id})
-                      (async/>! event-ch {:action :result-low-confidence-suggestion-added
-                                          :subject :media
-                                          :subject-id media-id}))
-                    (catch Exception e
-                      (async/>! event-ch {:action :result-create-suggestion-failed
-                                          :subject :media
-                                          :subject-id media-id})
-                      (log/error "Error while creating suggestion " media-id detection e))))
-                (media/update-detection-completed-flag! state {:media-id media-id
-                                                               :media-detection-completed true})
-                (state/set-media-processing-status! detector-state-ref media-id "completed")
-                (async/>! learn-ch (assoc v :media-id media-id))))
+                (if (media/get-specific state media-id)
+                  (do
+                    (suggestion/delete-for-media-id! state media-id)
+                    (doseq [detection detections]
+                      (log/info "Creating suggestion for media-id" (:subject-id v))
+                      (try
+                        (let [bb (bounding-box/create! state (build-bounding-box detection))]
+                          (suggestion/create!
+                           state
+                           (build-suggestion media-id bb (:payload v) detection)))
+                        (if (>= (:conf detection)
+                                (-> state :config :detector :confidence-threshold))
+                          (async/>! event-ch {:action :result-high-confidence-suggestion-added
+                                              :subject :media
+                                              :subject-id media-id})
+                          (async/>! event-ch {:action :result-low-confidence-suggestion-added
+                                              :subject :media
+                                              :subject-id media-id}))
+                        (catch Exception e
+                          (async/>! event-ch {:action :result-create-suggestion-failed
+                                              :subject :media
+                                              :subject-id media-id})
+                          (log/error "Error while creating suggestion " media-id detection e))))
+                    (media/update-detection-completed-flag! state {:media-id media-id
+                                                                   :media-detection-completed true})
+                    (state/set-media-processing-status! detector-state-ref media-id "completed")
+                    (async/>! learn-ch (assoc v :media-id media-id)))
+                  (log/warn "Received" (count detections) "results for media no longer exists" media-id))))
             (recur)))))
     [ch cmd-ch]))
