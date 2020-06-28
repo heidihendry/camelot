@@ -30,7 +30,7 @@
 
 (defn- detector-path
   [state]
-  (let [file (io/file (-> state :config :paths :database)
+  (let [file (io/file (state/lookup-path state :database)
                       (detector-filename state))]
     (.getCanonicalPath ^File file)))
 
