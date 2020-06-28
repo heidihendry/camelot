@@ -2,7 +2,14 @@
 
 ### 1.6.6 [Unreleased]
 #### Added
-* Add feedback mechanism to assess ML model accuracy
+* Adds feedback mechanism to assess ML model accuracy.
+* Adds new field: media-detection-completed
+
+#### Changed
+* Secrets, such as credentials, are now redacted in the launcher logs
+
+#### Fixed
+* Fixes the storage location of the progress made by the detector.
 
 ### 1.6.5
 #### Added
