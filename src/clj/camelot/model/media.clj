@@ -38,6 +38,7 @@
      media-cameracheck :- sch/Bool
      media-attention-needed :- sch/Bool
      media-processed :- (sch/maybe sch/Bool)
+     media-detection-completed :- (sch/maybe sch/Bool)
      media-capture-timestamp :- org.joda.time.DateTime
      media-reference-quality :- sch/Bool
      trap-station-session-camera-id :- sch/Int
@@ -213,14 +214,21 @@
     {:media-id media-id
      :media-reference-quality media-reference-quality}))
 
+(sch/defn update-detection-completed-flag!
+  [state :- State
+   {:keys [media-id media-detection-completed]}]
+  (query state :update-detection-completed-flag!
+    {:media-id media-id
+     :media-detection-completed media-detection-completed}))
+
 (sch/defn update-media-flags!
   [state :- State
    {:keys [media-id media-attention-needed media-processed media-reference-quality media-cameracheck]}]
   (query state :update-media-flags! {:media-id media-id
-                                               :media-reference-quality (or media-reference-quality false)
-                                               :media-attention-needed media-attention-needed
-                                               :media-cameracheck (or media-cameracheck false)
-                                               :media-processed media-processed}))
+                                     :media-reference-quality (or media-reference-quality false)
+                                     :media-attention-needed media-attention-needed
+                                     :media-cameracheck (or media-cameracheck false)
+                                     :media-processed media-processed}))
 
 (sch/defn read-media-file :- (sch/maybe java.io.BufferedInputStream)
   [state :- State

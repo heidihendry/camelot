@@ -4,6 +4,7 @@
             [camelot.detection.util :as util]
             [camelot.model.bounding-box :as bounding-box]
             [camelot.model.suggestion :as suggestion]
+            [camelot.model.media :as media]
             [clojure.core.async :as async]
             [clojure.tools.logging :as log]))
 
@@ -98,6 +99,8 @@
                                           :subject :media
                                           :subject-id media-id})
                       (log/error "Error while creating suggestion " media-id detection e))))
+                (media/update-detection-completed-flag! state {:media-id media-id
+                                                               :media-detection-completed true})
                 (state/set-media-processing-status! detector-state-ref media-id "completed")
                 (async/>! learn-ch (assoc v :media-id media-id))))
             (recur)))))

@@ -62,6 +62,11 @@
                      :required false
                      :table :media
                      :order 81}
+   :media-detection-completed {:datatype :boolean
+                               :required false
+                               :table :media
+                               :unmappable true
+                               :export-excluded true}
    :media-reference-quality {:datatype :boolean
                              :required false
                              :table :media
