@@ -2,14 +2,14 @@
 
 Camelot is open-source camera trapping software for wildlife researchers and conservationists.
 
-The latest version of Camelot is: **1.6.5**
+The latest version of Camelot is: **1.6.6**
 
 You can download it for your operating system below
 
-* [Windows](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.5-win32-x64.zip)
-* [MacOS](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.5-darwin-x64.zip)
-* [Linux](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.5-linux-x64.zip)
-* [Other](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.5.zip)
+* [Windows](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6-win32-x64.zip)
+* [MacOS](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6-darwin-x64.zip)
+* [Linux](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6-linux-x64.zip)
+* [Other](https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6.zip)
 
 Camelot:
 
