@@ -232,4 +232,4 @@ Holding **Shift** or **Control** and clicking an image with the mouse will perfo
 Library Filters
 ~~~~~~~~~~~~~~~
 Camelot Library Filters allow you to filter your images quickly.
-`Have a look at the list here. <https://docs.google.com/spreadsheets/d/1YVCzvb61tr9bjSyedaJWPGdCbwI-C8nApfcPSrRMEdo>`
+:download: `Have a look at the list here. <https://docs.google.com/spreadsheets/d/1YVCzvb61tr9bjSyedaJWPGdCbwI-C8nApfcPSrRMEdo>`
