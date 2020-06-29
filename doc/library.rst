@@ -232,3 +232,8 @@ Holding **Shift** or **Control** and clicking an image with the mouse will perfo
 Library Filters
 ~~~~~~~~~~~~~~~
 
++------------------------+------------+----------+----------+
+|Filter Name|Description|Example|Same as|
++========================+============+==========+==========+
+|camera|Name of the camera|camera:democamera1 |camera-name |
++------------------------+------------+----------+----------+
