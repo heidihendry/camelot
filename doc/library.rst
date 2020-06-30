@@ -176,6 +176,10 @@ flagged but do not have any species:
 ::
     flagged:true !species:*
 
+Want more filters, here's our handy list:
+http://bit.ly/camelot-library-filters
+(It's a work in progress)
+
 We think Camelot's search is pretty handy, and hope you think so too.
 
 Reference window
@@ -229,9 +233,4 @@ number of keyboard shortcuts:
 
 Holding **Shift** or **Control** and clicking an image with the mouse will perform the equivalent behaviour.
 
-Library Filters
-~~~~~~~~~~~~~~~
-Camelot Library Filters allow you to filter your images quickly.
-Have a look at the list here:
-http://bit.ly/camelot-library-filters
-(It's a work in progress)
+
