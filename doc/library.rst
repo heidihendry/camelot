@@ -176,7 +176,7 @@ flagged but do not have any species:
 ::
     flagged:true !species:*
 
-Want more filters, here's our handy list:
+Want more filters, here's our list:
 http://bit.ly/camelot-library-filters
 (It's a work in progress)
 
