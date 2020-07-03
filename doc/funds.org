@@ -31,6 +31,8 @@ All units in USD.
 | 2020/05 | AI for Earth grant  | 103.00 |        |   -16.0 |
 | 2020/05 | Domain registration |        |  13.20 |   -29.2 |
 | 2020/06 | AWS Hosting         |        |   6.81 |  -36.01 |
+| 2020/06 | Azure hosting       |        |  99.00 | -135.01 |
+| 2020/06 | AI for Earth grant  |  99.00 |        |  -36.01 |
 |---------+---------------------+--------+--------+---------|
 |         | *Total*             |        |        |  -36.01 |
 #+TBLFM: $5='(if (string= @-1 "Balance") 0.00 (* 0.01 (round (* 100 (- (+ (string-to-number @-1) (string-to-number $3))  (string-to-number $4))))))
