@@ -1,5 +1,9 @@
 ## ChangeLog
 
+### 1.6.7
+#### Fixed
+* Fixes adding sightings when animal detection is disabled
+
 ### 1.6.6
 #### Added
 * Adds feedback mechanism to assess ML model accuracy.
