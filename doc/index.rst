@@ -23,4 +23,5 @@ Camelot Documentation
    integration
    network
    misc
+   upgrade
    advanced_config

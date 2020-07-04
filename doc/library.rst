@@ -176,6 +176,10 @@ flagged but do not have any species:
 ::
     flagged:true !species:*
 
+Want more filters, here's our list:
+http://bit.ly/camelot-library-filters
+(It's a work in progress)
+
 We think Camelot's search is pretty handy, and hope you think so too.
 
 Reference window
@@ -228,3 +232,5 @@ number of keyboard shortcuts:
 -  **Delete**: Delete the selected media
 
 Holding **Shift** or **Control** and clicking an image with the mouse will perform the equivalent behaviour.
+
+
