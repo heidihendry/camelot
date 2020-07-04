@@ -43,9 +43,9 @@ OS-specific releases (recommended)
 Camelot has OS-specific releases, which are the recommended way to install
 Camelot:
 
-* `Windows <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6-win32-x64.zip>`__
-* `MacOS <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6-darwin-x64.zip>`__
-* `Linux <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6-linux-x64.zip>`__
+* `Windows <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.7-win32-x64.zip>`__
+* `MacOS <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.7-darwin-x64.zip>`__
+* `Linux <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.7-linux-x64.zip>`__
 
 Start Camelot by running "Camelot" application in the extracted archive.
 
@@ -57,7 +57,7 @@ Java .jar release
 
 A Java .jar file is also available:
 
-* `Servers, 32-bit OSs and others <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.6.zip>`__
+* `Servers, 32-bit OSs and others <https://s3-ap-southeast-2.amazonaws.com/camelot-project/release/camelot-1.6.7.zip>`__
 
 This release can be used on any operating system, though does not feature an
 administrative interface.
