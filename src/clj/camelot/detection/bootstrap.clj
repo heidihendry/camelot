@@ -10,7 +10,7 @@
    [clojure.tools.logging :as log]
    [clj-time.core :as t]))
 
-(def ^:private base-timeout-ms (* 300 1000))
+(def ^:private base-timeout-ms (* 3 60 60 1000))
 
 (defn- upload-complete?
   [media]

@@ -1,5 +1,9 @@
 ## ChangeLog
 
+### 1.6.8 [Unreleased]
+#### Changed
+* Adjust how long it takes Camelot to retry different checks to make animal detection more robust
+
 ### 1.6.7
 #### Changed
 * Remove 'Database' from the path selected for the database location
