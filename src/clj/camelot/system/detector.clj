@@ -158,6 +158,10 @@
             (assoc :state detector-state)
             (assoc :cmd-chan cmd-chan))))))
 
+(defn- detector-enabled?
+  [config]
+  (-> config :detector :enabled))
+
 (defprotocol Commandable
   (command [this cmd]))
 
@@ -172,17 +176,17 @@
 
   protocols/Learnable
   (learn [this media-with-dataset-id]
-    (async/>!! (:learn-chan this) media-with-dataset-id))
+    (when (:learn-chan this)
+      (async/>!! (:learn-chan this) media-with-dataset-id)))
 
   component/Lifecycle
   (start [this]
-    (let [system-state {:config config :database database :datasets datasets}]
-      (if (-> system-state :config :detector :enabled)
-        ;; :learn needs to go into this early
-        (let [learn-chan (learn/run system-state)]
-          (assoc (init-dataset-detector this system-state learn-chan)
-                 :learn-chan learn-chan))
-        this)))
+    (if (detector-enabled? config)
+      (let [system-state {:config config :database database :datasets datasets}
+            learn-chan (learn/run system-state)]
+        (assoc (init-dataset-detector this system-state learn-chan)
+               :learn-chan learn-chan))
+      this))
 
   (stop [this]
     (if-let [chan (:cmd-chan this)]

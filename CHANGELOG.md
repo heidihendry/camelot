@@ -5,6 +5,15 @@
 * Camelot no longer supports 32-bit Java versions
 * Wrap logs in admin UI
 
+### 1.6.7
+#### Fixed
+* Fixes adding sightings when animal detection is disabled
+
+### 1.6.6
+#### Added
+* Adds feedback mechanism to assess ML model accuracy.
+* Adds new field: media-detection-completed
+
 ### 1.6.6
 #### Added
 * Add feedback mechanism to assess ML model accuracy
