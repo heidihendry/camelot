@@ -8,6 +8,7 @@
 ### 1.6.7
 #### Fixed
 * Fixes adding sightings when animal detection is disabled
+* Fixes library UI not displaying the newly added sightings on other selected media
 
 ### 1.6.6
 #### Added

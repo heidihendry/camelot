@@ -106,7 +106,7 @@
           sighting-id (int (:1 record))]
       (create-sighting-field-value! s sighting-id (:sighting-fields data))
       (let [sighting (get-specific s sighting-id)]
-        (if-let [bounding-box-id (:bounding-box-id sighting)]
+        (when-let [bounding-box-id (:bounding-box-id sighting)]
           (suggestion/delete-with-bounding-box! s bounding-box-id))
         sighting))))
 
