@@ -3,6 +3,7 @@
 ### 1.6.7
 #### Changed
 * Remove 'Database' from the path selected for the database location
+* Gave more screen realestate to system logs in the admin UI
 
 #### Fixed
 * Fixes adding sightings when animal detection is disabled
