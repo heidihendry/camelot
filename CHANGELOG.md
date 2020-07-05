@@ -1,6 +1,11 @@
 ## ChangeLog
 
-### 1.6.5 [Unreleased]
+### 1.7.0 [Unreleased]
+#### Changed
+* Camelot no longer supports 32-bit Java versions
+* Wrap logs in admin UI
+
+### 1.6.5
 #### Fixed
 * Omits trap station cameras with a single image from detection.
 
