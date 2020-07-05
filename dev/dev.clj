@@ -1,4 +1,4 @@
-(ns user
+(ns dev
   (:require
    [camelot.core :as camelot]
    [camelot.system.http.core :as http]
