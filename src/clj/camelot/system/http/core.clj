@@ -31,7 +31,6 @@
   [state]
   (fn [handler & [options]]
     (fn [request]
-      (log/info "Test")
       (handler (merge-with merge request {:system state})))))
 
 (defn errors-to-internal-server-error
