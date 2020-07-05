@@ -6,6 +6,9 @@
 * Wrap logs in admin UI
 
 ### 1.6.8 [Unreleased]
+#### Added
+* Adds rerun button to detector to force failed batches to retry
+
 #### Changed
 * Adjust how long it takes Camelot to retry different checks to make animal detection more robust
 
