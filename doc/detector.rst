@@ -143,6 +143,16 @@ even if the internet connection cuts out and comes back. Camelot will always
 pause the animal detection system in the event it cannot communicate with the
 systems it needs to.
 
+Rerun batches
+~~~~~~~~~~~~~
+
+The rerun button (introduced in Camelot 1.6.8) allows for rerunning failed
+batches.  Any batch which has previously failed will be considered anew for
+animal detection and attempt to run immediately.
+
+Use of the rerun failed batches this will not reset any statistics for failed
+batches.
+
 Activity
 ~~~~~~~~
 
