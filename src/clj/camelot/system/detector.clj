@@ -57,7 +57,8 @@
   (condp = cmd
     :stop :stopped
     :pause :paused
-    :resume :running))
+    :resume :running
+    :rerun :rerunning))
 
 (defn- event-to-system-status
   [evt]

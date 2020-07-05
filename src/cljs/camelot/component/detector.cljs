@@ -57,7 +57,9 @@
                       ["Image batches submitted" [:task :submit-task-call-success]]
                       ["Image batches processed" [:task :poll-task-completed]]
                       ["Image batches archived" [:task :archive-success]]]
-              error-schema [["Image batch creations suspended"
+              error-schema [["Image batch creation skipped due to no media"
+                             [:trap-station-session-camera :prepare-skip-due-to-no-media]]
+                            ["Image batch creations suspended"
                              [:trap-station-session-camera :prepare-task-create-failed]]
                             ["Image uploads failed" [:media :upload-retry-limit-reached]]
                             ["Image batch submissions suspended" [:task :submit-retry-limit-reached]]
@@ -79,7 +81,7 @@
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :resume}} identity)}
                                                     "▶")
-                                        #_(dom/button #js {:className "btn btn-default"
+                                        (dom/button #js {:className "btn btn-default"
                                                          :onClick #(rest/post-x "/detector/command"
                                                                                 {:data {:cmd :rerun}} identity)
                                                          :disabled "disabled"}
@@ -93,11 +95,13 @@
                                                   "Status: running")
                                         (dom/button #js {:className "btn btn-default"
                                                          :onClick #(rest/post-x "/detector/command"
-                                                                                {:data {:cmd :pause}} identity)}
+                                                                                {:data {:cmd :pause}} identity)
+                                                         :title "Pause"}
                                                     "⏸")
-                                        #_(dom/button #js {:className "btn btn-default"
+                                        (dom/button #js {:className "btn btn-default"
                                                          :onClick #(rest/post-x "/detector/command"
-                                                                                {:data {:cmd :rerun}} identity)}
+                                                                                {:data {:cmd :rerun}} identity)
+                                                         :title "Rerun failed batches"}
                                                     "↻"))
 
                               (dom/span {:className "status-down"}

@@ -148,12 +148,16 @@
   (and (= (:status media) "completed")
        (= (:processing-status media) "completed")))
 
+(defn- media-failed?
+  [media]
+  (and (= (:status media) "failed")
+       (upload-retry-limit-reached? media)))
+
 (defn media-processing-completed?
   [detection-state media-id]
   (boolean
    (if-let [media (get-media-state detection-state media-id)]
-     (or (and (= (:status media) "failed")
-              (upload-retry-limit-reached? media))
+     (or (media-failed? media)
          (= (:status media) "skipped")
          (media-fully-processed? media)))))
 
@@ -161,13 +165,21 @@
   [detector-state-ref media-id status]
   (swap! detector-state-ref assoc-in [:media media-id :processing-status] status))
 
+(defn- task-failed?
+  [task]
+  (and (= (:status task) "failed")
+       (or (not (:can-retry? task))
+           (>= (:retries task) task-retry-limit))))
+
+(defn- session-camera-no-action?
+  [session-camera]
+  (= (:status session-camera) :no-action))
+
 (defn all-processing-completed-for-task?
   [detector-state scid]
   (let [task (get-task-for-session-camera-id detector-state scid)]
     (boolean (and task
-                  (or (and (= (:status task) "failed")
-                           (or (not (:can-retry? task))
-                               (>= (:retries task) task-retry-limit)))
+                  (or (task-failed? task)
                       (= (:status task) "archived")
                       (and (= (:status task) "completed")
                            (every? #(media-processing-completed? detector-state %)
@@ -180,3 +192,31 @@
 (defn session-camera-status
   [detector-state scid]
   (get-in detector-state [:session-cameras scid :status]))
+
+(defn- remove-failed
+  [state key pred]
+  (letfn [(remove-failed [tasks]
+            (->> tasks
+                 (remove (comp pred second))
+                 (into {})))]
+    (update state key remove-failed)))
+
+(defn- remove-failed-media
+  [state]
+  (remove-failed state :tasks media-failed?))
+
+(defn- remove-failed-session-cameras
+  [state]
+  (remove-failed state :session-cameras session-camera-no-action?))
+
+(defn- remove-failed-tasks
+  [state]
+  (remove-failed state :tasks task-failed?))
+
+(def remove-all-failures (comp remove-failed-media
+                               remove-failed-session-cameras
+                               remove-failed-tasks))
+
+(defn clear-all-failed!
+  [detector-state-ref]
+  (swap! detector-state-ref remove-all-failures))
