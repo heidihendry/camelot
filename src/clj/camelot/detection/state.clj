@@ -6,7 +6,7 @@
    :media {1201 {:status "completed"}}
    :session-cameras {1 {:task 120}}}
 
-(def task-retry-limit 5)
+(def task-retry-limit 10)
 
 (defn get-task
   "Return the task state with the given id."
