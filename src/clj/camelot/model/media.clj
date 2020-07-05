@@ -203,7 +203,7 @@
         result (query state :update-processed-flag! {:media-id media-id
                                                      :media-processed media-processed})]
     (when (and media-processed (not prev-processed))
-      (.learn (:detector state) {:dataset-id (state/get-dataset-id state)
+      (.learn (:detector state) {:dataset-id (datasets/get-dataset-context (:datasets state))
                                  :media-id media-id}))
     result))
 
