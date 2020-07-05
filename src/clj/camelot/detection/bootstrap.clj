@@ -61,7 +61,7 @@
             (when (= (:cmd v) :rerun)
               (log/info "Re-queuing session cameras due to re-run")
               (async/go
-                (doseq [dataset-id (state.datasets/get-available (:datasets system-state))]
+                (doseq [dataset-id (util.state/get-dataset-ids system-state)]
                   (datasets/with-context {:system-state system-state
                                           :ctx {:dataset-id dataset-id}}
                     [state]
