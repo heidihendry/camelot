@@ -35,8 +35,9 @@
 
 (defn run
   "Queue session cameras for preparation."
-  [system-state detector-state-ref event-ch]
+  [system-state detector-state-ref cmd-mult event-ch]
   (let [ch (async/chan 1)
+        cmd-ch (async/tap cmd-mult (async/chan))
         int-ch (async/chan (async/dropping-buffer 100000))]
     (log/info "Queuing session cameras")
     (async/go
@@ -50,10 +51,28 @@
             (log/warn "Found tasks:" (count (retrieve-tasks state @detector-state-ref)))
             (doseq [batch (retrieve-tasks state @detector-state-ref)]
               (async/>! int-ch batch))))))
+
     (async/go-loop []
       (let [timeout-ch (async/timeout base-timeout-ms)
-            [v port] (async/alts! [int-ch timeout-ch] :priority true)]
+            [v port] (async/alts! [cmd-ch int-ch timeout-ch] :priority true)]
         (condp = port
+          cmd-ch
+          (do
+            (when (= (:cmd v) :rerun)
+              (log/info "Re-queuing session cameras due to re-run")
+              (async/go
+                (doseq [dataset-id (state.datasets/get-available (:datasets system-state))]
+                  (datasets/with-context {:system-state system-state
+                                          :ctx {:dataset-id dataset-id}}
+                    [state]
+                    (let [detector-state-ref (datasets/detector-state state detector-state-ref)]
+                      (state/clear-all-failed! detector-state-ref)
+                      (doseq [batch (retrieve-tasks state @detector-state-ref)]
+                        (async/>! int-ch batch))))))
+              (async/>! event-ch {:action :bootstrap-timeout
+                                  :subject :global}))
+            (recur))
+
           int-ch
           (datasets/with-context {:system-state system-state
                                   :ctx v}
