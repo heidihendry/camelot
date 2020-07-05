@@ -6,7 +6,9 @@
    [ring.middleware.reload :refer [wrap-reload]]
    [schema.core :as s]
    [figwheel-sidecar.repl-api :as figwheel]
-   [reloaded.repl :refer [go start stop reset system]]))
+   [reloaded.repl :refer [go start stop reset system]])
+  (:import
+   (camelot.system.protocols Migratable)))
 
 ;; Let Clojure warn you when it needs to reflect on types, or when it does math
 ;; on unboxed numbers. In both cases you should add type annotations to prevent
@@ -38,11 +40,11 @@
 
 (defn migrate
   [dataset]
-  (.migrate (:migrater system) dataset))
+  (.migrate ^Migratable (:migrater system) dataset))
 
 (defn rollback
   [dataset]
-  (.rollback (:migrater system) dataset))
+  (.rollback ^Migratable (:migrater system) dataset))
 
 (defn runprod []
   (camelot.core/start-prod))
