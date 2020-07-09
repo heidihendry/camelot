@@ -5,7 +5,7 @@
 * Camelot no longer supports 32-bit Java versions
 * Wrap logs in admin UI
 
-### 1.6.8 [Unreleased]
+### 1.6.8
 #### Added
 * Adds rerun button to detector to force failed batches to retry
 
